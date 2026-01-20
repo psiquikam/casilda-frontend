@@ -1,0 +1,48 @@
+.gestion-container {
+  padding: 30px;
+  background: #f1f5f9;
+  min-height: calc(100vh - 64px);
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    h1 { margin: 0; font-weight: 800; color: #1e293b; }
+    p { margin: 0; color: #64748b; }
+  }
+}
+
+.table-card {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  .mini-avatar {
+    width: 32px; height: 32px; background: #e2e8f0;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: bold; color: #475569;
+  }
+}
+
+.role-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+
+  &.admin { background: #fee2e2; color: #ef4444; }
+  &.revisor { background: #dcfce7; color: #16a34a; }
+  &.consulta { background: #fef9c3; color: #ca8a04; }
+}
+
+.full-width {
+  width: 100%;
+}

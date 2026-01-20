@@ -1,0 +1,120 @@
+<div class="detalle-container">
+  <div class="header-acciones">
+    <div class="titulo">
+      <button mat-icon-button routerLink="/dashboard-revisor">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <h1>Expediente {{ caso.id }}</h1>
+        <small>Registrado el {{ caso.fechaCreacion }}</small>
+      </div>
+      <mat-chip-set>
+        <mat-chip class="prioridad-chip" [class.alta]="caso.prioridad === 'Alta'">
+          {{ caso.prioridad }}
+        </mat-chip>
+      </mat-chip-set>
+    </div>
+
+    <div class="botones-estado">
+      <span class="label">GESTIONAR FASE:</span>
+      <button mat-flat-button color="primary" (click)="cambiarEstado(2)" *ngIf="caso.estadoActual === 1">
+        <mat-icon>play_arrow</mat-icon> Iniciar Indagación
+      </button>
+      <button mat-flat-button color="accent" (click)="cambiarEstado(3)" *ngIf="caso.estadoActual === 2">
+        <mat-icon>gavel</mat-icon> Elevar a Investigación
+      </button>
+      <button mat-stroked-button color="warn">
+        <mat-icon>block</mat-icon> Desestimar
+      </button>
+    </div>
+  </div>
+
+  <div class="layout-grid">
+    <div class="main-info">
+      <mat-tab-group>
+        <mat-tab label="Detalles de la Queja">
+          <div class="tab-content">
+            <div class="section">
+              <h3>Relato de los Hechos</h3>
+              <div class="text-box">{{ caso.queja.descripcion }}</div>
+            </div>
+            
+            <div class="info-grid">
+              <div class="item">
+                <label>Tipo de Falta</label>
+                <p>{{ caso.queja.tipo }}</p>
+              </div>
+              <div class="item">
+                <label>Lugar</label>
+                <p>{{ caso.queja.lugar }}</p>
+              </div>
+              <div class="item">
+                <label>Testigos</label>
+                <p>{{ caso.queja.testigos }}</p>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="Datos de la Víctima">
+          <div class="tab-content">
+            <div class="perfil-victima">
+              <div class="avatar">{{ caso.victima.nombre[0] }}</div>
+              <div class="datos">
+                <h3>{{ caso.victima.nombre }}</h3>
+                <p>{{ caso.victima.cargo }}</p>
+              </div>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="info-grid">
+              <div class="item"><label>Documento</label><p>{{ caso.victima.documento }}</p></div>
+              <div class="item"><label>Correo</label><p>{{ caso.victima.correo }}</p></div>
+              <div class="item"><label>Género</label><p>{{ caso.victima.genero }}</p></div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="Evidencias ({{ caso.archivos.length }})">
+          <div class="tab-content">
+            <div class="file-grid">
+              <div *ngFor="let file of caso.archivos" class="file-card">
+                <mat-icon>description</mat-icon>
+                <div class="file-meta">
+                  <span class="name">{{ file.nombre }}</span>
+                  <span class="size">{{ file.tamano }}</span>
+                </div>
+                <button mat-icon-button color="primary"><mat-icon>download</mat-icon></button>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+
+    <div class="side-panel">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Progreso del Caso</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="mini-timeline">
+            <div class="step" [class.done]="caso.estadoActual >= 1">
+              <mat-icon>{{ caso.estadoActual >= 1 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+              <span>Recepción</span>
+            </div>
+            <div class="line"></div>
+            <div class="step" [class.done]="caso.estadoActual >= 2">
+              <mat-icon>{{ caso.estadoActual >= 2 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+              <span>Indagación Previa</span>
+            </div>
+            <div class="line"></div>
+            <div class="step" [class.done]="caso.estadoActual >= 3">
+              <mat-icon>{{ caso.estadoActual >= 3 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+              <span>Investigación</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

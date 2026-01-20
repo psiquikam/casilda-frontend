@@ -1,0 +1,157 @@
+<div class="dashboard-wrapper">
+    <header class="db-header">
+        <div>
+            <h1>Panel de Revisión Profesional</h1>
+            <p>Resumen de métricas y caracterización de casos vigentes.</p>
+        </div>
+        <button mat-flat-button color="primary">Descargar Reporte (PDF)</button>
+    </header>
+
+    <div class="stats-row">
+        <mat-card class="stat-card main">
+            <div class="icon-box"><mat-icon>folder_special</mat-icon></div>
+            <div class="content">
+                <span class="label">Total Casos</span>
+                <span class="value">{{ stats.total }}</span>
+            </div>
+        </mat-card>
+
+        <mat-card class="stat-card female">
+            <div class="icon-box"><mat-icon>woman</mat-icon></div>
+            <div class="content">
+                <span class="label">Casos Mujeres</span>
+                <span class="value">{{ stats.mujeres }}</span>
+            </div>
+        </mat-card>
+
+        <mat-card class="stat-card male">
+            <div class="icon-box"><mat-icon>man</mat-icon></div>
+            <div class="content">
+                <span class="label">Casos Hombres</span>
+                <span class="value">{{ stats.hombres }}</span>
+            </div>
+        </mat-card>
+    </div>
+
+    <h3 class="sub-title">Distribución por Vínculo Institucional</h3>
+    <div class="roles-grid">
+        <mat-card class="role-item">
+            <div class="role-container">
+                <div class="icon-box student"><mat-icon>school</mat-icon></div>
+                <div class="role-content">
+                    <div class="role-header">
+                        <span>Estudiantes</span>
+                        <strong class="count">{{ stats.estudiantes }}</strong>
+                    </div>
+                    <mat-progress-bar mode="determinate"
+                        [value]="(stats.estudiantes/stats.total)*100"></mat-progress-bar>
+                </div>
+            </div>
+        </mat-card>
+
+        <mat-card class="role-item">
+            <div class="role-container">
+                <div class="icon-box teacher"><mat-icon>history_edu</mat-icon></div>
+                <div class="role-content">
+                    <div class="role-header">
+                        <span>Docentes</span>
+                        <strong class="count">{{ stats.docentes }}</strong>
+                    </div>
+                    <mat-progress-bar mode="determinate" color="accent"
+                        [value]="(stats.docentes/stats.total)*100"></mat-progress-bar>
+                </div>
+            </div>
+        </mat-card>
+
+        <mat-card class="role-item">
+            <div class="role-container">
+                <div class="icon-box admin"><mat-icon>badge</mat-icon></div>
+                <div class="role-content">
+                    <div class="role-header">
+                        <span>Administrativos</span>
+                        <strong class="count">{{ stats.administrativos }}</strong>
+                    </div>
+                    <mat-progress-bar mode="determinate" color="warn"
+                        [value]="(stats.administrativos/stats.total)*100"></mat-progress-bar>
+                </div>
+            </div>
+        </mat-card>
+    </div>
+
+    <mat-card class="table-card">
+        <h3>Casos Recientes por Revisar</h3>
+        <div class="table-responsive">
+            <table mat-table [dataSource]="dataSourceQuejas">
+                <ng-container matColumnDef="id">
+                    <th mat-header-cell *matHeaderCellDef>Radicado</th>
+                    <td mat-cell *matCellDef="let element"><strong>{{element.id}}</strong></td>
+                </ng-container>
+
+                <ng-container matColumnDef="fecha">
+                    <th mat-header-cell *matHeaderCellDef>Fecha</th>
+                    <td mat-cell *matCellDef="let element"> {{element.fecha}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="victima">
+                    <th mat-header-cell *matHeaderCellDef>Tipo Víctima</th>
+                    <td mat-cell *matCellDef="let element"> {{element.victima}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="estado">
+                    <th mat-header-cell *matHeaderCellDef>Estado</th>
+                    <td mat-cell *matCellDef="let element">
+                        <span class="status-pill">{{element.estado}}</span>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="accion">
+                    <th mat-header-cell *matHeaderCellDef>Acción</th>
+                    <td mat-cell *matCellDef="let element">
+                        <button mat-icon-button color="primary" [routerLink]="['/detalle-revisor', element.id]">
+                            <mat-icon>visibility</mat-icon>
+                        </button>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumnsQuejas"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumnsQuejas;"></tr>
+            </table>
+        </div>
+    </mat-card>
+
+    <mat-card class="table-card">
+        <h3>Acompañamientos Recientes por Revisar</h3>
+        <div class="table-responsive">
+            <table mat-table [dataSource]="dataSourceAcompanamiento">
+                <ng-container matColumnDef="id">
+                    <th mat-header-cell *matHeaderCellDef>Radicado</th>
+                    <td mat-cell *matCellDef="let element"><strong>{{element.id}}</strong></td>
+                </ng-container>
+
+                <ng-container matColumnDef="fecha">
+                    <th mat-header-cell *matHeaderCellDef>Fecha</th>
+                    <td mat-cell *matCellDef="let element"> {{element.fecha}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="estado">
+                    <th mat-header-cell *matHeaderCellDef>Estado</th>
+                    <td mat-cell *matCellDef="let element">
+                        <span class="status-pill">{{element.estado}}</span>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="accion">
+                    <th mat-header-cell *matHeaderCellDef>Acción</th>
+                    <td mat-cell *matCellDef="let element">
+                        <button mat-icon-button color="primary" [routerLink]="['/reparto', element.id]">
+                            <mat-icon>visibility</mat-icon>
+                        </button>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumnsAcompanamiento"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumnsAcompanamiento;"></tr>
+            </table>
+        </div>
+    </mat-card>
+</div>

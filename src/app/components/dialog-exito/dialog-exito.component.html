@@ -1,0 +1,17 @@
+<div class="dialog-container">
+  <mat-icon class="success-icon">check_circle</mat-icon>
+  <h2 mat-dialog-title>¡Queja Registrada!</h2>
+  
+  <mat-dialog-content>
+    <p>Tu reporte ha sido procesado con éxito. Guarda este código para consultar el estado de tu caso:</p>
+    
+    <div class="code-box">
+      <span class="label">RADICADO</span>
+      <strong class="code">{{ data.codigo }}</strong>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="center">
+    <button mat-raised-button color="primary" (click)="cerrar()">Entendido</button>
+  </mat-dialog-actions>
+</div>

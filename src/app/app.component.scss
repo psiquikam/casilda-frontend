@@ -1,0 +1,22 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidenav-container {
+  flex: 1;
+  height: auto;
+}
+
+.aside-menu {
+  width: 260px;
+  border-right: 1px solid #e2e8f0;
+  background-color: white;
+}
+
+.main-content {
+  background-color: #f8fafc;
+  padding: 0;
+}

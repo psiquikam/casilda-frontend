@@ -1,0 +1,45 @@
+<h2 mat-dialog-title>{{ isEdit ? 'Editar Usuario' : 'Nuevo Usuario Institucional' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="userForm" class="form-container">
+    
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre Completo</mat-label>
+      <input matInput formControlName="nombre" placeholder="Ej: Maria Delgado">
+      <mat-error *ngIf="userForm.get('nombre')?.hasError('required')">El nombre es obligatorio</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Correo Electrónico</mat-label>
+      <input matInput formControlName="email" type="email" placeholder="usuario@fnsp.gov.co">
+      <mat-error *ngIf="userForm.get('email')?.hasError('email')">Formato de correo inválido</mat-error>
+    </mat-form-field>
+
+    <div class="row">
+      <mat-form-field appearance="outline">
+        <mat-label>Rol en el Sistema</mat-label>
+        <mat-select formControlName="rol">
+          <mat-option value="Admin">Administrador</mat-option>
+          <mat-option value="Revisor">Revisor Jurídico</mat-option>
+          <mat-option value="Consulta">Solo Consulta</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Estado</mat-label>
+        <mat-select formControlName="estado">
+          <mat-option value="Activo">Activo</mat-option>
+          <mat-option value="Inactivo">Inactivo</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="dialogRef.close()">Cancelar</button>
+  <button mat-flat-button color="primary" [disabled]="userForm.invalid" (click)="guardar()">
+    {{ isEdit ? 'Actualizar Cambios' : 'Crear Usuario' }}
+  </button>
+</mat-dialog-actions>

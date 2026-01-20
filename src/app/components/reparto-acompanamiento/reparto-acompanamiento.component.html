@@ -1,0 +1,69 @@
+<div class="reparto-container">
+  <div class="back-link" (click)="regresar()">
+    <mat-icon>arrow_back</mat-icon> Volver al Panel
+  </div>
+
+  <mat-card class="reparto-card">
+    <header class="reparto-header">
+      <div class="header-info">
+        <span class="badge">Nuevo Reparto</span>
+        <h1>Asignación de Caso: {{ codigoCaso }}</h1>
+        <p>Complete los campos para delegar la atención del acompañamiento.</p>
+      </div>
+      <mat-icon class="header-icon">person_add_alt_1</mat-icon>
+    </header>
+
+    <mat-divider></mat-divider>
+
+    <form [formGroup]="repartoForm" (ngSubmit)="guardarReparto()" class="reparto-form">
+      
+      <div class="form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Tipo de Asignación</mat-label>
+          <mat-select formControlName="tipoAsignacion">
+            <mat-option *ngFor="let tipo of tiposAsignacion" [value]="tipo">
+              {{ tipo }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha de Reparto</mat-label>
+          <input matInput formControlName="fechaReparto">
+          <mat-icon matSuffix>calendar_today</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Servicio / Dupla</mat-label>
+          <mat-select formControlName="servicio">
+            <mat-option *ngFor="let serv of servicios" [value]="serv">
+              {{ serv }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Asignar Profesional Responsable</mat-label>
+          <mat-select formControlName="asignadoA">
+            <mat-option *ngFor="let prof of profesionales" [value]="prof.id">
+              {{ prof.nombre }} ({{ prof.cargo }})
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Observaciones de Reparto</mat-label>
+        <textarea matInput rows="4" formControlName="observaciones" 
+                  placeholder="Instrucciones adicionales para el profesional..."></textarea>
+      </mat-form-field>
+
+      <div class="actions">
+        <button mat-button type="button" (click)="regresar()">Cancelar</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="repartoForm.invalid">
+          <mat-icon>check</mat-icon> Confirmar Asignación
+        </button>
+      </div>
+    </form>
+  </mat-card>
+</div>

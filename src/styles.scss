@@ -1,0 +1,119 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$casilda-purple-palette: (
+  50: #f1eaf4,
+  100: #dbcae4,
+  200: #c2a6d2,
+  300: #a982c0,
+  400: #9568b2,
+  500: #814ea5,
+  600: #73459c,
+  700: #6b2d95,
+  800: #5d258a,
+  900: #471978,
+  A100: #d5b0ff,
+  A200: #bc7dff,
+  A400: #a44aff,
+  A700: #9731ff,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: white,
+    400: white,
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(black, 0.87),
+    A200: white,
+    A400: white,
+    A700: white,
+  )
+);
+
+$my-primary-palette: mat.define-palette($casilda-purple-palette, 700); 
+$my-accent-palette:  mat.define-palette(mat.$amber-palette, A200);
+$my-warn-palette:    mat.define-palette(mat.$red-palette);
+
+$Casilda-FNSP-theme: mat.define-light-theme((
+  color: (
+    primary: $my-primary-palette,
+    accent: $my-accent-palette,
+    warn: $my-warn-palette,
+  ),
+  typography: mat.define-typography-config(),
+  density: 0
+));
+
+
+@include mat.all-component-themes($Casilda-FNSP-theme);
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body { 
+  height: 100%; 
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Inter', 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f8fafc;
+}
+
+.app-layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+.main-content {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 24px;
+  background-color: #f8fafc;
+}
+
+.full-width { 
+  width: 100%; 
+}
+
+.mat-mdc-form-field { 
+  margin-bottom: 12px; 
+}
+
+.main-header {
+  background-color: mat.get-color-from-palette($my-primary-palette, 700) !important;
+  color: white !important;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 10px;
+  
+  &:hover {
+    background: #a0aec0;
+  }
+}
+
+.login-container {
+  background: linear-gradient(135deg, #6b2d95 0%, #471978 100%);
+}

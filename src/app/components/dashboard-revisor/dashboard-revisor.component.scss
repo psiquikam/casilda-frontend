@@ -1,0 +1,220 @@
+.dashboard-wrapper {
+  padding: 24px; // Reducido un poco para móviles
+  background-color: #f8fafc;
+  min-height: calc(100vh - 64px);
+
+  .db-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 15px; // Espacio para cuando se apilen
+
+    h1 {
+      margin: 0;
+      color: #1e293b;
+      font-size: 1.8rem;
+      font-weight: 800;
+    }
+
+    p {
+      color: #64748b;
+      margin: 5px 0 0;
+    }
+
+    // RESPONSIVE HEADER
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: flex-start;
+
+      button {
+        width: 100%;
+      }
+
+      // Botón ancho completo en móvil
+    }
+  }
+}
+
+.stats-row,
+.roles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+
+  .stat-card,
+  .role-item {
+    border: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+  }
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 20px;
+
+  .icon-box {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    flex-shrink: 0; // Evita que el icono se aplaste
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  .content {
+    .label {
+      display: block;
+      color: #64748b;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .value {
+      display: block;
+      color: #1e293b;
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+  }
+
+  &.main .icon-box {
+    background: #e0e7ff;
+    color: #4338ca;
+  }
+
+  &.female .icon-box {
+    background: #fce7f3;
+    color: #be185d;
+  }
+
+  &.male .icon-box {
+    background: #ccfbf1;
+    color: #0f766e;
+  }
+}
+
+// CONTENEDOR DE TABLA RESPONSIVA
+.table-card {
+  margin-bottom: 24px; // Esto separará las tablas
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  overflow: hidden; // Evita que la sombra se corte
+
+  h3 {
+    margin-bottom: 20px;
+    color: #1e293b;
+  }
+
+  .table-responsive {
+    overflow-x: auto; // Activa scroll horizontal en móviles
+    width: 100%;
+
+    table {
+      width: 100%;
+      min-width: 600px; // Evita que las columnas se amontonen demasiado
+
+      .status-pill {
+        background: #f1f5f9;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #475569;
+        white-space: nowrap; // Evita que el texto del pill salte de línea
+      }
+    }
+  }
+}
+
+// Añade esto a tu archivo SCSS actual
+
+.role-item {
+  padding: 20px !important;
+
+  .role-container {
+    display: flex;
+    align-items: flex-start; // Alinea arriba para que la barra de progreso tenga espacio
+    gap: 15px;
+    width: 100%;
+  }
+
+  .role-content {
+    flex: 1; // Toma el resto del espacio
+
+    .role-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #475569;
+
+      .count {
+        font-size: 1.2rem;
+        color: #1e293b;
+      }
+    }
+  }
+
+  // Colores específicos para los iconos de roles
+  .icon-box {
+    &.student {
+      background: #e0f2fe;
+      color: #0284c7;
+    }
+
+    &.teacher {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    &.admin {
+      background: #f1f5f9;
+      color: #475569;
+    }
+  }
+}
+
+// Aseguramos que icon-box sea consistente en todo el dashboard
+.icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  mat-icon {
+    font-size: 24px;
+  }
+}
+
+// AJUSTES ADICIONALES PARA MÓVILES EXTREMOS
+@media (max-width: 480px) {
+  .dashboard-wrapper {
+    padding: 15px;
+  }
+
+  .db-header h1 {
+    font-size: 1.4rem;
+  }
+
+  .stat-card .content .value {
+    font-size: 1.2rem;
+  }
+}

@@ -1,0 +1,32 @@
+import { Component, EventEmitter, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../services/auth.service';
+import { RouterLink } from '@angular/router';
+
+// Importaciones de Material necesarias
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
+
+@Component({
+  selector: 'app-header',
+  standalone: true,
+  imports: [
+    CommonModule, 
+    MatToolbarModule, 
+    MatButtonModule, 
+    MatIconModule, 
+    MatMenuModule, 
+    MatDividerModule,
+    RouterLink
+  ],
+  templateUrl: './header.component.html',
+  styleUrls: ['./header.component.scss']
+})
+export class HeaderComponent {
+  @Output() toggleSidenav = new EventEmitter<void>();
+
+  constructor(public auth: AuthService) {}
+}

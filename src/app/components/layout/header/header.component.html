@@ -1,0 +1,28 @@
+<mat-toolbar color="primary" class="main-header">
+  <button mat-icon-button (click)="toggleSidenav.emit()">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <mat-icon svgIcon="logo-custom" class="logo-icon"></mat-icon>
+  <span class="app-title">SISTEMA CASILDA FNSP</span>
+
+  <span class="spacer"></span>
+
+  @if (!auth.isAuthenticated()) {
+  <button mat-button routerLink="/login">Iniciar Sesión</button>
+  } @else {
+  <div class="user-profile-zone" [matMenuTriggerFor]="userMenu">
+    <div class="user-info">
+      <span class="user-name">{{ auth.currentUser?.nombre }}</span>
+      <img [src]="auth.currentUser?.foto" class="user-avatar">
+    </div>
+  </div>
+
+  <mat-menu #userMenu="matMenu" class="custom-menu">
+    <button mat-menu-item (click)="auth.logout()">
+      <mat-icon color="warn">logout</mat-icon>
+      <span>Cerrar Sesión</span>
+    </button>
+  </mat-menu>
+  }
+</mat-toolbar>

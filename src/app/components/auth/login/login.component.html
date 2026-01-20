@@ -1,0 +1,47 @@
+<div class="login-container">
+  <mat-card class="login-card">
+    <mat-card-header>
+      <div class="header-content">
+        <mat-icon color="primary" class="logo-icon">gavel</mat-icon>
+        <mat-card-title>Sistema FNSP</mat-card-title>
+        <mat-card-subtitle>Ingreso de Funcionarios</mat-card-subtitle>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Correo Electrónico</mat-label>
+          <input matInput formControlName="email" placeholder="ejemplo@fnsp.gov">
+          <mat-icon matSuffix>email</mat-icon>
+          <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
+            Ingrese un correo válido
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Contraseña</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
+          <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+        </mat-form-field>
+
+        @if (errorMessage) {
+          <div class="error-box">
+            <mat-icon>error</mat-icon> {{ errorMessage }}
+          </div>
+        }
+
+        <button mat-raised-button color="primary" class="login-btn" type="submit" [disabled]="loginForm.invalid">
+          Ingresar al Sistema
+        </button>
+      </form>
+    </mat-card-content>
+    
+    <mat-card-footer>
+      <p><a routerLink="/seguimiento">¿Eres un ciudadano? Consulta tu caso aquí</a></p>
+    </mat-card-footer>
+  </mat-card>
+</div>

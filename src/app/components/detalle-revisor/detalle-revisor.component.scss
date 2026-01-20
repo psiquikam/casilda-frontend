@@ -1,0 +1,117 @@
+.detalle-container {
+  padding: 24px;
+  background-color: #f8fafc;
+  height: 100%;
+}
+
+.header-acciones {
+  background: white;
+  padding: 20px 24px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  .titulo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    h1 { margin: 0; font-size: 1.4rem; font-weight: 800; color: #1e293b; }
+    small { color: #64748b; }
+  }
+
+  .botones-estado {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    .label { font-size: 0.7rem; font-weight: 700; color: #94a3b8; }
+  }
+}
+
+.layout-grid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+}
+
+.main-info {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  min-height: 500px;
+
+  .tab-content {
+    padding: 30px;
+    
+    .text-box {
+      background: #f1f5f9;
+      padding: 20px;
+      border-radius: 8px;
+      line-height: 1.6;
+      color: #334155;
+      margin-top: 10px;
+    }
+  }
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-top: 30px;
+  
+  label { font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
+  p { margin: 5px 0 0; font-weight: 600; color: #1e293b; }
+}
+
+.file-card {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  gap: 12px;
+
+  .file-meta {
+    flex: 1;
+    .name { display: block; font-weight: 600; font-size: 0.9rem; }
+    .size { font-size: 0.8rem; color: #94a3b8; }
+  }
+}
+
+.mini-timeline {
+  padding: 10px 0;
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #cbd5e0;
+    font-weight: 600;
+    &.done { color: #3f51b5; }
+  }
+  .line {
+    width: 2px;
+    height: 20px;
+    background: #e2e8f0;
+    margin-left: 11px;
+  }
+}
+
+.prioridad-chip {
+  &.alta { background-color: #fee2e2 !important; color: #ef4444 !important; }
+}
+
+.perfil-victima {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  .avatar {
+    width: 50px; height: 50px; background: #e0e7ff; color: #4338ca;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; font-weight: 800;
+  }
+}

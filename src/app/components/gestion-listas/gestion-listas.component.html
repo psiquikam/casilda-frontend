@@ -1,0 +1,85 @@
+<div class="gestion-container">
+    <header class="page-header">
+        <div>
+            <h1>Gestión de Catálogos</h1>
+            <p>Administre los valores de las listas desplegables del sistema institucional.</p>
+        </div>
+    </header>
+
+    <mat-card class="table-card">
+        <mat-tab-group color="primary" mat-stretch-tabs="false">
+
+            @for (listKey of ['tiposSolicitud', 'campus', 'dependencias', 'facultades', 'tiposDocumento']; track
+            listKey) {
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <mat-icon class="tab-icon">settings_input_component</mat-icon>
+                    <span>{{ listKey | titlecase }}</span>
+                </ng-template>
+
+                <div class="tab-content">
+                    <div class="add-section">
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                            <mat-label>Nuevo valor para {{ listKey | titlecase }}</mat-label>
+                            <input matInput [(ngModel)]="nuevoItem" (keyup.enter)="agregar(listKey)"
+                                placeholder="Escriba el nuevo valor...">
+                        </mat-form-field>
+
+                        <button mat-raised-button color="primary" class="add-btn" (click)="agregar(listKey)"
+                            [disabled]="!nuevoItem">
+                            <mat-icon>save</mat-icon> Guardar
+                        </button>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table class="modern-table">
+                            <thead>
+                                <tr>
+                                    <th class="column-name">Nombre del Item</th>
+                                    <th class="column-actions">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (item of listas[listKey]; track item) {
+                                <tr [class.editing-row]="editandoItem?.original === item">
+                                    <td class="column-name">
+                                        @if (editandoItem?.original !== item || editandoItem?.lista !== listKey) {
+                                        <span class="item-text">{{item}}</span>
+                                        } @else {
+                                        <mat-form-field appearance="fill" subscriptSizing="dynamic" class="full-width">
+                                            <input matInput [(ngModel)]="editandoItem!.actual">
+                                        </mat-form-field>
+                                        }
+                                    </td>
+                                    <td class="column-actions">
+                                        <div class="actions-container">
+                                            @if (editandoItem?.original !== item) {
+                                            <button mat-icon-button class="edit-btn"
+                                                (click)="iniciarEdicion(listKey, item)">
+                                                <mat-icon>edit</mat-icon>
+                                            </button>
+                                            <button mat-icon-button class="delete-btn" (click)="borrar(listKey, item)">
+                                                <mat-icon>delete_outline</mat-icon>
+                                            </button>
+                                            } @else {
+                                            <button mat-icon-button class="check-btn" (click)="guardarEdicion()">
+                                                <mat-icon>check_circle</mat-icon>
+                                            </button>
+                                            <button mat-icon-button color="warn" (click)="editandoItem = null">
+                                                <mat-icon>cancel</mat-icon>
+                                            </button>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </mat-tab>
+            }
+
+        </mat-tab-group>
+    </mat-card>
+</div>

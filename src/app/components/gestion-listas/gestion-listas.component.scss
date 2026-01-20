@@ -1,0 +1,140 @@
+.gestion-container {
+  padding: 24px;
+  background-color: #f8fafc;
+  min-height: 100vh;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  p {
+    margin: 4px 0 0;
+    color: #64748b;
+  }
+}
+
+.table-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+::ng-deep .mat-mdc-tab-group {
+  .mat-mdc-tab.mdc-tab--active {
+    .mdc-tab__text-label {
+      color: #6b2d95 !important;
+      font-weight: 700;
+    }
+  }
+}
+
+.tab-icon {
+  margin-right: 8px;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.tab-content {
+  padding: 24px;
+}
+
+.add-section {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 16px;
+  background-color: #f1f5f9;
+  border-radius: 8px;
+
+  mat-form-field {
+    flex: 1;
+    background-color: white;
+    border-radius: 4px;
+  }
+
+  .add-btn {
+    height: 48px;
+    padding: 0 24px;
+    font-weight: 600;
+  }
+}
+
+.table-wrapper {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    background-color: #f8fafc;
+    padding: 12px 20px;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #64748b;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  td {
+    padding: 12px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+  }
+
+  .column-name {
+    text-align: left !important;
+
+    .item-text {
+      display: inline-block;
+      padding: 8px 0;
+    }
+  }
+
+  .column-actions {
+    width: 140px;
+    text-align: center !important;
+  }
+
+  .actions-container {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+  }
+
+  tr:hover {
+    background-color: #f8fafc;
+  }
+}
+
+.full-width {
+  width: 100%;
+
+  ::ng-deep .mat-mdc-form-field-infix {
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+  }
+}
+
+.edit-btn { color: #6b2d95; }
+.delete-btn { color: #ef4444; }
+.check-btn { color: #22c55e; }
+
+.editing-row {
+  background-color: #f1eaf4 !important;
+}
