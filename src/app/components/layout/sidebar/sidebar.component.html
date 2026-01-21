@@ -5,17 +5,35 @@
   </div>
 
   <mat-nav-list>
+
+    <mat-divider></mat-divider>
     <div class="menu-label">CONSULTA</div>
     <a mat-list-item routerLink="/seguimiento" routerLinkActive="active-item">
       <mat-icon matListItemIcon>find_in_page</mat-icon>
       <span matListItemTitle>Seguimiento</span>
     </a>
 
-    @if (auth.isAuthenticated()) {
+    @if (auth.isAdmin()) {
     <mat-divider></mat-divider>
+    <div class="menu-label">ADMINISTRACIÓN Y PARAMETRIZACIÓN</div>
+    <a mat-list-item routerLink="/gestion-usuarios" routerLinkActive="active-item">
+      <mat-icon matListItemIcon>group_add</mat-icon>
+      <span matListItemTitle>Usuarios</span>
+    </a>
+    <a mat-list-item routerLink="/gestion-sistema" routerLinkActive="active-item">
+      <mat-icon matListItemIcon>group_add</mat-icon>
+      <span matListItemTitle>Maestros</span>
+    </a>
+    }
 
-    @if (auth.isUsuario() || auth.isAdmin()) {
-    <div class="menu-label">MIS TRÁMITES</div>
+    @if (auth.isRevisor()) {
+    <mat-divider></mat-divider>
+    <div class="menu-label">EQUIPO DE ATENCIÓN</div>
+
+    <a mat-list-item routerLink="/mis-asignaciones" routerLinkActive="active-item">
+      <mat-icon matListItemIcon>admin_panel_settings</mat-icon>
+      <span matListItemTitle>Mis Asignaciones</span>
+    </a>
     <a mat-list-item routerLink="/nueva-queja" routerLinkActive="active-item">
       <mat-icon matListItemIcon>report_problem</mat-icon>
       <span matListItemTitle>Registrar Queja</span>
@@ -23,36 +41,23 @@
 
     <a mat-list-item routerLink="/solicitud-acompanamiento" routerLinkActive="active-item">
       <mat-icon matListItemIcon>psychology</mat-icon>
-      <span matListItemTitle>Acompañamiento</span>
-    </a>
-    }
-
-    @if (auth.isRevisor()) {
-    <mat-divider></mat-divider>
-    <div class="menu-label">GESTIÓN JURÍDICA</div>
-    <a mat-list-item routerLink="/dashboard-revisor" routerLinkActive="active-item">
-      <mat-icon matListItemIcon>admin_panel_settings</mat-icon>
-      <span matListItemTitle>Panel de Revisión</span>
+      <span matListItemTitle>Solicitar Acompañamiento</span>
     </a>
 
-    <a mat-list-item routerLink="/mis-asignaciones" routerLinkActive="active-item">
-      <mat-icon matListItemIcon>admin_panel_settings</mat-icon>
-      <span matListItemTitle>Mis Asignaciones</span>
-    </a>
+    <a mat-list-item routerLink="/consulta" routerLinkActive="active-item">
+      <mat-icon matListItemIcon>psychology</mat-icon>
+      <span matListItemTitle>Consulta</span>
+    </a>    
     }
 
     @if (auth.isAdmin()) {
     <mat-divider></mat-divider>
-    <div class="menu-label">SISTEMA</div>
-    <a mat-list-item routerLink="/gestion-usuarios" routerLinkActive="active-item">
-      <mat-icon matListItemIcon>group_add</mat-icon>
-      <span matListItemTitle>Master de Usuarios</span>
-    </a>
-    <a mat-list-item routerLink="/gestion-sistema" routerLinkActive="active-item">
-      <mat-icon matListItemIcon>group_add</mat-icon>
-      <span matListItemTitle>Master de listas</span>
+    <div class="menu-label">REPORTES-INFORMES-INDICADORES</div>
+    <a mat-list-item routerLink="/dashboard-revisor" routerLinkActive="active-item">
+      <mat-icon matListItemIcon>admin_panel_settings</mat-icon>
+      <span matListItemTitle>Indicadores</span>
     </a>
     }
-    }
+
   </mat-nav-list>
 </div>

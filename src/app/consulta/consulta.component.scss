@@ -1,0 +1,124 @@
+.consulta-container {
+  padding: 15px;
+  background-color: #f8fafc;
+  min-height: 100vh;
+}
+
+.page-header {
+  margin-bottom: 20px;
+  h1 { margin: 0; color: #1e293b; font-weight: 800; font-size: 1.4rem; }
+  p { color: #64748b; margin: 2px 0 0; font-size: 0.85rem; }
+}
+
+.table-card {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+
+  th.mat-mdc-header-cell {
+    background-color: #ffffff;
+    padding: 10px 8px !important;
+    border-bottom: 2px solid #f1f5f9;
+    height: 80px !important;
+    vertical-align: top;
+  }
+
+  td.mat-mdc-cell {
+    font-size: 13px;
+    padding: 8px !important;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  tr.mat-mdc-row {
+    height: 42px !important;
+    &:hover { background-color: #d5b0ff; }
+  }
+}
+
+.header-filter-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  
+  &.no-input {
+    justify-content: flex-end;
+    height: 58px;
+  }
+}
+
+.column-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #1e293b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filter-input {
+  width: 100%;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 11px;
+  outline: none;
+  background-color: #fdfdfd;
+  color: #475569;
+  transition: all 0.2s;
+
+  &:focus {
+    border-color: #3f51b5;
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.1);
+  }
+
+  &::placeholder {
+    color: #cbd5e0;
+  }
+}
+
+.chip-compact {
+  min-height: 20px !important;
+  font-size: 10px !important;
+  background-color: #f1f5f9 !important;
+  color: #475569 !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.unassigned {
+  color: #ef4444;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.no-data {
+  text-align: center;
+  padding: 40px;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+::ng-deep {
+  .mat-mdc-tab-header {
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .mat-mdc-tab .mdc-tab__text-label {
+    font-weight: 700;
+    font-size: 13px;
+    color: #64748b;
+  }
+  .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+    color: #3f51b5;
+  }
+}

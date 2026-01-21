@@ -13,6 +13,7 @@ import { GestionListasComponent } from './components/gestion-listas/gestion-list
 import { RepartoAcompanamientoComponent } from './components/reparto-acompanamiento/reparto-acompanamiento.component';
 import { MisAsignacionesComponent } from './components/mis-asignaciones/mis-asignaciones.component';
 import { DetalleAcompanamientoComponent } from './components/detalle-acompanamiento/detalle-acompanamiento.component';
+import { ConsultaComponent } from './consulta/consulta.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -74,6 +75,13 @@ export const routes: Routes = [
   {
     path: 'detalle-acompanamiento/:id',
     component: DetalleAcompanamientoComponent,
+    canActivate: [roleGuard],
+    data: { roles: ['Admin', 'Revisor'] }
+  },
+
+  {
+    path: 'consulta',
+    component: ConsultaComponent,
     canActivate: [roleGuard],
     data: { roles: ['Admin', 'Revisor'] }
   },
