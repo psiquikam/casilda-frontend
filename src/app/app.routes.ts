@@ -20,7 +20,6 @@ export const routes: Routes = [
   { path: 'seguimiento', component: SeguimientoTramiteComponent },
   { path: 'detalle-revisor/:id', component: DetalleRevisorComponent, canActivate: [authGuard] },
 
-  // RUTA MASTER: Solo el Admin
   {
     path: 'gestion-usuarios',
     component: GestionUsuariosComponent,
@@ -28,7 +27,6 @@ export const routes: Routes = [
     data: { roles: ['Admin'] }
   },
 
-  // PANEL REVISOR: Admin y Revisores pueden entrar
   {
     path: 'dashboard-revisor',
     component: DashboardRevisorComponent,
@@ -36,7 +34,6 @@ export const routes: Routes = [
     data: { roles: ['Admin', 'Revisor'] }
   },
 
-  // FORMULARIO: Todos los logueados (Admin, Revisor, Usuario)
   {
     path: 'nueva-queja',
     component: FormularioQuejaComponent,

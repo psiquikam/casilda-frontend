@@ -44,6 +44,16 @@
       <span matListItemTitle>Solicitar Acompañamiento</span>
     </a>
 
+    <a mat-list-item [routerLink]="['/reparto', 00000]" routerLinkActive="active-item">
+      <mat-icon matListItemIcon>psychology</mat-icon>
+      <span matListItemTitle>Reparto</span>
+    </a>
+
+    <a mat-list-item [routerLink]="['detalle-acompanamiento', 00000]" routerLinkActive="active-item">
+      <mat-icon matListItemIcon>psychology</mat-icon>
+      <span matListItemTitle>Contacto</span>
+    </a>
+
     <a mat-list-item routerLink="/consulta" routerLinkActive="active-item">
       <mat-icon matListItemIcon>psychology</mat-icon>
       <span matListItemTitle>Consulta</span>
