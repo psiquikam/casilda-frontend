@@ -5,69 +5,74 @@
   </div>
 
   <mat-nav-list>
-
     <mat-divider></mat-divider>
-    <div class="menu-label">CONSULTA</div>
+    <div class="menu-label">
+      <mat-icon class="large-icon">find_in_page</mat-icon>
+      <span>CONSULTA</span>
+    </div>
     <a mat-list-item routerLink="/seguimiento" routerLinkActive="active-item">
-      <mat-icon matListItemIcon>find_in_page</mat-icon>
       <span matListItemTitle>Seguimiento</span>
     </a>
 
     @if (auth.isAdmin()) {
     <mat-divider></mat-divider>
-    <div class="menu-label">ADMINISTRACIÓN Y PARAMETRIZACIÓN</div>
+    <div class="menu-label">
+      <mat-icon class="large-icon">manage_accounts</mat-icon>
+      <span>ADMINISTRACIÓN Y PARAMETRIZACIÓN</span>
+    </div>
     <a mat-list-item routerLink="/gestion-usuarios" routerLinkActive="active-item">
-      <mat-icon matListItemIcon>group_add</mat-icon>
       <span matListItemTitle>Usuarios</span>
     </a>
     <a mat-list-item routerLink="/gestion-sistema" routerLinkActive="active-item">
-      <mat-icon matListItemIcon>group_add</mat-icon>
       <span matListItemTitle>Maestros</span>
     </a>
     }
 
     @if (auth.isRevisor()) {
     <mat-divider></mat-divider>
-    <div class="menu-label">EQUIPO DE ATENCIÓN</div>
-
+    <div class="menu-label">
+      <mat-icon class="large-icon">handshake</mat-icon>
+      <span>EQUIPO DE ATENCIÓN</span>
+    </div>
     <a mat-list-item routerLink="/mis-asignaciones" routerLinkActive="active-item">
-      <mat-icon matListItemIcon>admin_panel_settings</mat-icon>
       <span matListItemTitle>Mis Asignaciones</span>
     </a>
     <a mat-list-item routerLink="/nueva-queja" routerLinkActive="active-item">
-      <mat-icon matListItemIcon>report_problem</mat-icon>
       <span matListItemTitle>Registrar Queja</span>
     </a>
-
     <a mat-list-item routerLink="/solicitud-acompanamiento" routerLinkActive="active-item">
-      <mat-icon matListItemIcon>psychology</mat-icon>
       <span matListItemTitle>Solicitar Acompañamiento</span>
     </a>
-
     <a mat-list-item [routerLink]="['/reparto', 00000]" routerLinkActive="active-item">
-      <mat-icon matListItemIcon>psychology</mat-icon>
       <span matListItemTitle>Reparto</span>
     </a>
-
     <a mat-list-item [routerLink]="['detalle-acompanamiento', 00000]" routerLinkActive="active-item">
-      <mat-icon matListItemIcon>psychology</mat-icon>
       <span matListItemTitle>Contacto</span>
     </a>
-
     <a mat-list-item routerLink="/consulta" routerLinkActive="active-item">
-      <mat-icon matListItemIcon>psychology</mat-icon>
       <span matListItemTitle>Consulta</span>
-    </a>    
+    </a>
     }
 
     @if (auth.isAdmin()) {
     <mat-divider></mat-divider>
-    <div class="menu-label">REPORTES-INFORMES-INDICADORES</div>
+    <div class="menu-label">
+      <mat-icon class="large-icon">query_stats</mat-icon>
+      <span>REPORTES E INDICADORES</span>
+    </div>
     <a mat-list-item routerLink="/dashboard-revisor" routerLinkActive="active-item">
-      <mat-icon matListItemIcon>admin_panel_settings</mat-icon>
-      <span matListItemTitle>Indicadores</span>
+      <span matListItemTitle>Panel de Indicadores</span>
     </a>
     }
+
+    <mat-divider></mat-divider>
+    <div class="menu-label">
+      <mat-icon class="large-icon">groups</mat-icon>
+      <span>RUTA VIOLETA</span>
+    </div>
+    <a mat-list-item routerLink="/seguimiento" routerLinkActive="active-item">
+      <span matListItemTitle>Seguimiento</span>
+    </a>
 
   </mat-nav-list>
 </div>

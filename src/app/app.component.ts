@@ -32,5 +32,15 @@ export class AppComponent {
       'logo-custom',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/casilda.svg')
     );
+
+    this.matIconRegistry.addSvgIcon(
+      'logo-AdminPara',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/AdminPara.svg')
+    );
+
+    this.matIconRegistry.addSvgIcon(
+      'logo-Reportes',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/Reportes.svg')
+    );
   }
 }

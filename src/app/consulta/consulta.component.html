@@ -1,26 +1,28 @@
 <div class="consulta-container">
   <header class="page-header">
-    <h1>Consulta General de Casos</h1>
-    <p>Gestión y seguimiento de solicitudes por estado actual.</p>
+    <div class="header-content">
+      <h1>Consulta General de Casos</h1>
+      <p>Gestión y seguimiento de solicitudes por estado actual</p>
+    </div>
   </header>
 
   <mat-card class="table-card">
-    <mat-tab-group animationDuration="0ms">
+    <mat-tab-group animationDuration="200ms">
       
       <mat-tab label="Abierto activo">
-        <div class="tab-content">
+        <div class="tab-body-wrapper">
           <ng-container *ngTemplateOutlet="tablaCasos; context: { dataSource: dataSourceActivos }"></ng-container>
         </div>
       </mat-tab>
 
       <mat-tab label="Abierto en transición">
-        <div class="tab-content">
+        <div class="tab-body-wrapper">
           <ng-container *ngTemplateOutlet="tablaCasos; context: { dataSource: dataSourceTransicion }"></ng-container>
         </div>
       </mat-tab>
 
       <mat-tab label="Cerrado">
-        <div class="tab-content">
+        <div class="tab-body-wrapper">
           <ng-container *ngTemplateOutlet="tablaCasos; context: { dataSource: dataSourceCerrados }"></ng-container>
         </div>
       </mat-tab>
@@ -35,19 +37,23 @@
       
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef>
-          <div class="header-filter-container">
-            <input class="filter-input" (keyup)="applyFilter('id', $event)" placeholder="Buscar ID...">
-            <span class="column-title">ID Caso</span>
+          <div class="header-inline-container">
+            <span class="column-title">ID</span>
+            <div class="search-box-slim">
+              <input (keyup)="applyFilter('id', $event)" placeholder="Filtrar">
+            </div>
           </div>
         </th>
-        <td mat-cell *matCellDef="let element"><strong>{{element.id}}</strong></td>
+        <td mat-cell *matCellDef="let element" class="id-cell">#{{element.id}}</td>
       </ng-container>
 
       <ng-container matColumnDef="nombre">
         <th mat-header-cell *matHeaderCellDef>
-          <div class="header-filter-container">
-            <input class="filter-input" (keyup)="applyFilter('nombre', $event)" placeholder="Buscar nombre...">
-            <span class="column-title">Nombre Usuario</span>
+          <div class="header-inline-container">
+            <span class="column-title">Usuario</span>
+            <div class="search-box-slim">
+              <input (keyup)="applyFilter('nombre', $event)" placeholder="Buscar...">
+            </div>
           </div>
         </th>
         <td mat-cell *matCellDef="let element">{{element.nombre}}</td>
@@ -55,9 +61,11 @@
 
       <ng-container matColumnDef="documento">
         <th mat-header-cell *matHeaderCellDef>
-          <div class="header-filter-container">
-            <input class="filter-input" (keyup)="applyFilter('documento', $event)" placeholder="Número...">
-            <span class="column-title">Documento</span>
+          <div class="header-inline-container">
+            <span class="column-title">Doc.</span>
+            <div class="search-box-slim">
+              <input (keyup)="applyFilter('documento', $event)" placeholder="N°">
+            </div>
           </div>
         </th>
         <td mat-cell *matCellDef="let element">{{element.documento}}</td>
@@ -65,45 +73,41 @@
 
       <ng-container matColumnDef="fecha">
         <th mat-header-cell *matHeaderCellDef>
-          <div class="header-filter-container no-input">
-            <span class="column-title">Fecha Solicitud</span>
-          </div>
+          <span class="column-title">Fecha Solicitud</span>
         </th>
         <td mat-cell *matCellDef="let element">{{element.fecha}}</td>
       </ng-container>
 
       <ng-container matColumnDef="dependencia">
         <th mat-header-cell *matHeaderCellDef>
-          <div class="header-filter-container no-input">
-            <span class="column-title">Dependencia</span>
-          </div>
+          <span class="column-title">Dependencia</span>
         </th>
         <td mat-cell *matCellDef="let element">
-          <mat-chip class="chip-compact">{{element.dependencia}}</mat-chip>
+          <span class="badge-soft">{{element.dependencia}}</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="profesional">
         <th mat-header-cell *matHeaderCellDef>
-          <div class="header-filter-container">
-            <input class="filter-input" (keyup)="applyFilter('profesional', $event)" placeholder="Profesional...">
-            <span class="column-title">Asignado a</span>
+          <div class="header-inline-container">
+            <span class="column-title">Asignado</span>
+            <div class="search-box-slim">
+              <input (keyup)="applyFilter('profesional', $event)" placeholder="...">
+            </div>
           </div>
         </th>
         <td mat-cell *matCellDef="let element">
-          <span [class.unassigned]="element.profesional === 'Sin asignar'">{{element.profesional}}</span>
+          <span [class.text-danger]="element.profesional === 'Sin asignar'">{{element.profesional}}</span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="acciones">
         <th mat-header-cell *matHeaderCellDef>
-          <div class="header-filter-container no-input">
-            <span class="column-title">Acciones</span>
-          </div>
+          <span class="column-title">Acciones</span>
         </th>
         <td mat-cell *matCellDef="let element">
-          <button mat-icon-button color="primary" [routerLink]="['/detalle-acompanamiento', element.id]" title="Gestionar">
-            <mat-icon>edit_note</mat-icon>
+          <button mat-icon-button class="action-purple" [routerLink]="['/detalle-acompanamiento', element.id]">
+            <mat-icon>edit_square</mat-icon>
           </button>
         </td>
       </ng-container>
@@ -111,9 +115,9 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-    
-    <div *ngIf="dataSource.filteredData.length === 0" class="no-data">
-      No se encontraron resultados que coincidan con los filtros.
+
+    <div *ngIf="dataSource.filteredData.length === 0" class="no-results-msg">
+      No se encontraron registros.
     </div>
   </div>
 </ng-template>

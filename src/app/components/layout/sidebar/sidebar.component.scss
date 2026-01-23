@@ -6,6 +6,7 @@
   background: white;
   box-sizing: border-box;
   overflow-x: hidden;
+  overflow-y: auto;
 
   .logo-container {
     padding: 30px 24px;
@@ -15,7 +16,7 @@
     
     mat-icon {
       color: #6B2D95;
-      transform: scale(1.2);
+      transform: scale(1.3);
     }
 
     span {
@@ -30,56 +31,77 @@
     padding: 0;
 
     .menu-label {
-      padding: 16px 24px 8px;
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: #94a3b8;
+      padding: 28px 24px 12px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #475569;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 1.2px;
+
+      mat-icon.large-icon {
+        font-size: 32px !important; 
+        width: 32px !important;
+        height: 32px !important;
+        color: #6B2D95;
+        
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        
+        margin: 0 !important;
+        filter: drop-shadow(0 2px 4px rgba(107, 45, 149, 0.15));
+
+        @media (max-width: 768px) {
+          font-size: 24px !important;
+          width: 24px !important;
+          height: 24px !important;
+        }
+      }
     }
 
     a[mat-list-item] {
-      margin: 4px 12px !important;
+      margin: 2px 12px !important;
       width: calc(100% - 24px) !important;
       border-radius: 12px;
       color: #64748b;
-      height: 48px !important;
+      height: 42px !important;
       transition: all 0.2s ease;
 
-      mat-icon {
-        color: #94a3b8;
-        margin-right: 8px;
+      ::ng-deep .mdc-list-item__content {
+        padding-left: 46px !important;
+
+        @media (max-width: 768px) {
+          padding-left: 34px !important;
+        }
       }
 
       &:hover {
         background-color: #f1f5f9;
         color: #1e293b;
-        mat-icon { color: #1e293b; }
       }
 
       &.active-item {
-        background-color: #eef2ff !important;
-        color: #4338ca !important;
-
-        mat-icon {
-          color: #211e41 !important;
-        }
-
-        span {
-          font-weight: 600;
+        background-color: #f5f3ff !important;
+        color: #6B2D95 !important;
+        
+        ::ng-deep .mdc-list-item__primary-text {
+          font-weight: 700 !important;
         }
       }
     }
   }
 
   mat-divider {
-    margin: 16px 24px;
+    margin: 12px 24px;
     border-top-color: #f1f5f9;
   }
 }
-
 ::ng-deep {
   .mdc-list-item__primary-text {
-    font-size: 0.9rem !important;
+    font-size: 0.88rem !important;
   }
 }
