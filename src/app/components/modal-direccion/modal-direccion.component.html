@@ -1,0 +1,57 @@
+<h2 mat-dialog-title class="pink-header-modal">Captura de Dirección</h2>
+<mat-dialog-content>
+  <form [formGroup]="direccionForm" class="grid-modal">
+    
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Vía Principal</mat-label>
+      <mat-select formControlName="viaPrincipal">
+        @for (v of vias; track v) { <mat-option [value]="v">{{v}}</mat-option> }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Número/Nombre Vía</mat-label>
+      <input matInput formControlName="numeroVia" placeholder="Ej: 45">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Letra/Sufijo</mat-label>
+      <input matInput formControlName="letraVia" placeholder="Ej: A Sur">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Número Cruce</mat-label>
+      <input matInput formControlName="numeroCruce" placeholder="Ej: 72">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Placa/Número</mat-label>
+      <input matInput formControlName="placa" placeholder="Ej: 10">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Ciudad</mat-label>
+      <mat-select formControlName="ciudad">
+        @for (c of ciudades; track c) { <mat-option [value]="c">{{c}}</mat-option> }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="span-all">
+      <mat-label>Barrio</mat-label>
+      <input matInput formControlName="barrio">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="span-all">
+      <mat-label>Complemento (Apto, Torre, Bloque)</mat-label>
+      <input matInput formControlName="complemento">
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onNoClick()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="guardar()" [disabled]="direccionForm.invalid">
+    Aceptar
+  </button>
+</mat-dialog-actions>

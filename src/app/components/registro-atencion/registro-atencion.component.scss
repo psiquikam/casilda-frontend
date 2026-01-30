@@ -1,0 +1,173 @@
+.form-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px;
+  background-color: #f1f5f9;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.form-card {
+  width: 100%;
+  max-width: 1200px;
+  border-radius: 12px;
+  padding: 0; 
+  overflow: hidden;
+  border: none;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  background: white;
+  height: auto !important;
+  display: block !important;
+
+  mat-card-header {
+    padding: 25px;
+    background: white;
+    border-bottom: 1px solid #f1f5f9;
+
+    mat-card-title {
+      font-weight: 900;
+      color: #0f172a;
+    }
+  }
+}
+
+::ng-deep {
+  .mat-mdc-tab-body-content {
+    padding: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  .mat-mdc-tab-body-wrapper {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .mat-mdc-tab-group {
+    height: auto !important;
+    flex-grow: 0 !important;
+  }
+
+  .mat-mdc-tab .mdc-tab__text-label {
+    font-weight: 800 !important;
+    font-size: 13px !important;
+    color: #64748b;
+  }
+
+  .mat-mdc-tab-group {
+    --mdc-tab-indicator-active-indicator-color: #6B2D95;
+    --mat-tab-header-active-label-text-color: #6B2D95;
+  }
+}
+
+.pink-header {
+  background-color: #e91e63;
+  color: white;
+  padding: 12px 25px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 20px;
+  width: 100%;
+  display: block;
+  box-sizing: border-box;
+}
+
+.tab-padding {
+  padding: 0 25px 25px 25px;
+  display: grid;
+  gap: 12px;
+  align-items: center;
+}
+
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+.span-all {
+  grid-column: 1 / -1;
+  
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+::ng-deep {
+  .mat-mdc-form-field-flex {
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 12px !important;
+    align-items: center !important;
+    display: flex !important;
+  }
+
+  .mat-mdc-form-field-infix {
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    min-height: 32px !important;
+    display: flex;
+    align-items: center;
+  }
+
+  .mat-mdc-text-field-wrapper .mat-mdc-floating-label {
+    top: 16px !important;
+    font-size: 13px;
+  }
+
+  .mat-mdc-text-field-wrapper.mat-mdc-form-field-can-float.mat-form-field-should-float .mat-mdc-floating-label {
+    transform: translateY(-22px) scale(0.75) !important;
+  }
+
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none !important;
+  }
+  
+  .mat-datepicker-toggle, .mat-icon {
+    transform: scale(0.8);
+  }
+}
+
+.span-all {
+  mat-form-field {
+    ::ng-deep {
+      .mat-mdc-form-field-flex {
+        height: auto !important;
+        min-height: 100px !important;
+        align-items: flex-start !important;
+        padding-top: 12px !important;
+      }
+      
+      .mat-mdc-form-field-infix {
+        height: auto !important;
+      }
+
+      .mat-mdc-text-field-wrapper .mat-mdc-floating-label {
+        top: 24px !important;
+      }
+    }
+  }
+}
+
+mat-card-actions {
+  padding: 15px 25px !important;
+  border-top: 1px solid #f1f5f9;
+  background-color: #fafafa;
+  gap: 12px;
+}
+
+.slim-btn {
+  height: 32px;
+  line-height: 32px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+@media (max-width: 950px) {
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 650px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .tab-padding { padding: 0 15px 15px 15px; }
+}

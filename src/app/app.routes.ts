@@ -14,7 +14,8 @@ import { RepartoAcompanamientoComponent } from './components/reparto-acompanamie
 import { MisAsignacionesComponent } from './components/mis-asignaciones/mis-asignaciones.component';
 import { DetalleAcompanamientoComponent } from './components/detalle-acompanamiento/detalle-acompanamiento.component';
 import { ConsultaComponent } from './consulta/consulta.component';
-
+import { RegistroAtencionComponent } from './components/registro-atencion/registro-atencion.component';
+  
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'seguimiento', component: SeguimientoTramiteComponent },
@@ -79,6 +80,13 @@ export const routes: Routes = [
   {
     path: 'consulta',
     component: ConsultaComponent,
+    canActivate: [roleGuard],
+    data: { roles: ['Admin', 'Revisor'] }
+  },
+
+  {
+    path: 'registro-atencion',
+    component: RegistroAtencionComponent,
     canActivate: [roleGuard],
     data: { roles: ['Admin', 'Revisor'] }
   },

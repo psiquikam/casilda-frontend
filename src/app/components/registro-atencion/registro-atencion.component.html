@@ -1,0 +1,170 @@
+<div class="form-container">
+    <mat-card class="form-card">
+        <mat-card-content>
+            <form [formGroup]="atencionForm">
+                <mat-tab-group animationDuration="200ms">
+
+                    <mat-tab label="Registro de atención caso">
+                        <div class="pink-header">Registro de atención caso</div>
+                        <div class="tab-padding grid-2">
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>Tipo solicitud</mat-label>
+                                <mat-select formControlName="tipoSolicitud">
+                                    @for (t of tiposSolicitud; track t) { <mat-option [value]="t">{{t}}</mat-option> }
+                                </mat-select>
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>Persona que atiende *</mat-label>
+                                <input matInput formControlName="personaAtiende">
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>Fecha y hora *</mat-label>
+                                <input matInput [matDatepicker]="picker1" formControlName="fechaHora">
+                                <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
+                                <mat-datepicker #picker1></mat-datepicker>
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>Persona que registra *</mat-label>
+                                <input matInput formControlName="personaRegistra">
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>Tipo de servicio *</mat-label>
+                                <mat-select formControlName="tipoServicio">
+                                    @for (s of tiposServicio; track s) { <mat-option [value]="s">{{s}}</mat-option> }
+                                </mat-select>
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>Quien remite *</mat-label>
+                                <input matInput formControlName="quienRemite">
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>Forma y lugar de la entrevista *</mat-label>
+                                <input matInput formControlName="formaEntrevista">
+                            </mat-form-field>
+
+                            <div class="button-container">
+                                <button mat-flat-button color="accent" type="button" class="slim-btn"
+                                    (click)="subirArchivo()">
+                                    <mat-icon>cloud_upload</mat-icon> Consentimiento Informado
+                                </button>
+                            </div>
+                        </div>
+                    </mat-tab>
+
+                    <mat-tab label="Datos de la persona">
+                        <div class="pink-header">Datos de la persona atendida</div>
+                        <div class="tab-padding grid-3">
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>Tipo Documento *</mat-label>
+                                <mat-select formControlName="tipoDocumento">
+                                    @for (t of tiposDoc; track t) { <mat-option [value]="t">{{t}}</mat-option> }
+                                </mat-select>
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>Documento *</mat-label>
+                                <input matInput formControlName="documento">
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>Fecha Nacimiento *</mat-label>
+                                <input matInput [matDatepicker]="picker2" formControlName="fechaNacimiento">
+                                <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+                                <mat-datepicker #picker2></mat-datepicker>
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>Primer Nombre *</mat-label>
+                                <input matInput formControlName="primerNombre">
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>Segundo Nombre</mat-label>
+                                <input matInput formControlName="segundoNombre">
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>Primer Apellido *</mat-label>
+                                <input matInput formControlName="primerApellido">
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>Segundo Apellido</mat-label>
+                                <input matInput formControlName="segundoApellido">
+                            </mat-form-field>
+
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>Celular *</mat-label>
+                                <input matInput formControlName="celular">
+                            </mat-form-field>
+
+                            <button mat-stroked-button color="primary" class="slim-btn" (click)="abrirModalDireccion()">
+                                <mat-icon>map</mat-icon> Dirección y Residencia
+                            </button>
+
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="span-all">
+                                <mat-label>Descripción *</mat-label>
+                                <textarea matInput formControlName="descripcionPersona" rows="2"></textarea>
+                            </mat-form-field>
+                        </div>
+                    </mat-tab>
+
+                    <mat-tab label="Datos complementarios">
+                        <div class="pink-header">Datos complementarios</div>
+                        <div class="tab-padding grid-2">
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>EPS *</mat-label>
+                                <input matInput formControlName="eps">
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>Régimen Salud *</mat-label>
+                                <input matInput formControlName="regimenSalud">
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>Campus</mat-label>
+                                <mat-select formControlName="campus">
+                                    @for (c of campusM; track c) { <mat-option [value]="c">{{c}}</mat-option> }
+                                </mat-select>
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>Facultad</mat-label>
+                                <mat-select formControlName="facultad">
+                                    @for (f of facultadesM; track f) { <mat-option [value]="f">{{f}}</mat-option> }
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </mat-tab>
+
+                    <mat-tab label="Documentación">
+                        <div class="pink-header">Documentación de la atención</div>
+                        <div class="tab-padding grid-2">
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>Tipo Violencia *</mat-label>
+                                <input matInput formControlName="tipoViolencia">
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>Subcategoría *</mat-label>
+                                <input matInput formControlName="subcategoriaViolencia">
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>Hace cuánto ocurrió *</mat-label>
+                                <input matInput formControlName="tiempoOcurrido">
+                            </mat-form-field>
+
+                            <div class="span-all text-area-container">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Hechos en circunstancias de tiempo, modo y lugar *</mat-label>
+                                    <textarea matInput rows="6" formControlName="hechos"></textarea>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </mat-tab>
+
+                </mat-tab-group>
+            </form>
+        </mat-card-content>
+    </mat-card>
+</div>
