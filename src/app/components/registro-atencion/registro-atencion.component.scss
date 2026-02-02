@@ -12,7 +12,7 @@
   width: 100%;
   max-width: 1200px;
   border-radius: 12px;
-  padding: 0; 
+  padding: 0;
   overflow: hidden;
   border: none;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
@@ -78,15 +78,20 @@
   padding: 0 25px 25px 25px;
   display: grid;
   gap: 12px;
-  align-items: center;
+  //align-items: center;
 }
 
-.grid-2 { grid-template-columns: repeat(2, 1fr); }
-.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
 
 .span-all {
   grid-column: 1 / -1;
-  
+
   mat-form-field {
     width: 100%;
   }
@@ -121,8 +126,9 @@
   .mat-mdc-form-field-subscript-wrapper {
     display: none !important;
   }
-  
-  .mat-datepicker-toggle, .mat-icon {
+
+  .mat-datepicker-toggle,
+  .mat-icon {
     transform: scale(0.8);
   }
 }
@@ -136,7 +142,7 @@
         align-items: flex-start !important;
         padding-top: 12px !important;
       }
-      
+
       .mat-mdc-form-field-infix {
         height: auto !important;
       }
@@ -146,6 +152,26 @@
       }
     }
   }
+}
+
+.button-container {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 10px 0;
+}
+
+.btn-label-top {
+  font-weight: 700;
+  font-size: 13px;
+  color: #1e293b;
+}
+
+.button-container .slim-btn {
+  padding: 0 30px;
 }
 
 mat-card-actions {
@@ -164,10 +190,19 @@ mat-card-actions {
 }
 
 @media (max-width: 950px) {
-  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 650px) {
-  .grid-2, .grid-3 { grid-template-columns: 1fr; }
-  .tab-padding { padding: 0 15px 15px 15px; }
+
+  .grid-2,
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .tab-padding {
+    padding: 0 15px 15px 15px;
+  }
 }
