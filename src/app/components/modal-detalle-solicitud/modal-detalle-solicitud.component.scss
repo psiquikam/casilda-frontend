@@ -1,0 +1,86 @@
+.modal-header-purple {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #6B2D95;
+  color: white;
+  padding: 16px 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.header-icon {
+  color: #FFD700;
+  transform: scale(1.1);
+}
+
+.close-btn {
+  color: white !important;
+}
+
+.custom-content {
+  padding: 20px 24px !important; 
+  margin: 0;
+  max-height: 65vh;
+  overflow-y: auto;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 16px;
+  padding-top: 15px;
+}
+
+.modal-footer {
+  padding: 16px 24px !important;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin: 0;
+}
+
+.btn-guardar {
+  background-color: #6B2D95 !important;
+  color: white !important;
+  font-weight: 600;
+  padding: 0 20px !important;
+}
+
+.btn-cancelar {
+  color: #64748b !important;
+  font-weight: 600;
+}
+
+@media (min-width: 640px) {
+  .form-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 1024px) {
+  .form-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+::ng-deep .mat-mdc-tab-group {
+  --mdc-tab-indicator-active-indicator-color: #6B2D95;
+  --mat-tab-header-active-label-text-color: #6B2D95;
+}
+
+::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+::ng-deep .mat-mdc-dialog-container .mdc-dialog__surface {
+  overflow: hidden !important;
+  display: flex;
+  flex-direction: column;
+}

@@ -77,6 +77,11 @@ tr.mat-mdc-header-row {
 
 .action-purple { color: #6B2D95 !important; }
 
+.action-buttons-container {
+  display: flex;
+  gap: 5px;
+}
+
 button[mat-icon-button] mat-icon {
   color: #6B2D95;
   transition: transform 0.2s;
@@ -85,4 +90,10 @@ button[mat-icon-button] mat-icon {
 ::ng-deep .mat-mdc-tab-group {
   --mdc-tab-indicator-active-indicator-color: #6B2D95;
   --mat-tab-header-active-label-text-color: #6B2D95;
+}
+
+.no-results-msg {
+  padding: 20px;
+  text-align: center;
+  color: #64748b;
 }

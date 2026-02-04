@@ -117,3 +117,9 @@ body {
 .login-container {
   background: linear-gradient(135deg, #6b2d95 0%, #471978 100%);
 }
+
+.custom-modal-container .mat-mdc-dialog-container .mdc-dialog__surface {
+  padding: 0 !important;
+  overflow: hidden !important;
+  border-radius: 8px !important;
+}

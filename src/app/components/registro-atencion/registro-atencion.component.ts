@@ -16,7 +16,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ModalDireccionComponent } from '../modal-direccion/modal-direccion.component';
 
 @Component({
@@ -35,6 +35,7 @@ import { ModalDireccionComponent } from '../modal-direccion/modal-direccion.comp
     MatButtonModule,
     MatIconModule,
     MatSnackBarModule,
+    MatDialogModule // IMPORTANTE: Faltaba este módulo para que el diálogo funcione al navegar
   ],
   templateUrl: './registro-atencion.component.html',
   styleUrls: ['./registro-atencion.component.scss']
@@ -42,18 +43,18 @@ import { ModalDireccionComponent } from '../modal-direccion/modal-direccion.comp
 export class RegistroAtencionComponent implements OnInit {
   atencionForm!: FormGroup;
 
-  tiposDoc = ['Cédula de Ciudadanía', 'Cédula de Extranjería', 'Tarjeta de Identidad', 'Pasaporte'];
-  tiposSolicitud = ['Queja', 'Reclamo', 'Sugerencia', 'Denuncia'];
-  tiposServicio = ['Asesoría Jurídica', 'Acompañamiento Psicosocial', 'Intervención Directa'];
-  facultadesM = ['Ingeniería', 'Artes y Humanidades', 'Ciencias de la Salud', 'Ciencias Económicas'];
-  campusM = ['Sede Principal', 'Sede Norte', 'Campus Deportivo', 'Sede Virtual'];
-  dependencias = ['Bienestar Universitario', 'Secretaría General', 'Rectoría', 'Talento Humano'];
-
-  etnias = ['Ninguna', 'Afrodescendiente', 'Indígena', 'Rrom', 'Palenquero'];
-  sexos = ['Masculino', 'Femenino', 'Intersexual'];
-  identidadesSexual = ['Hombre Cis', 'Mujer Cis', 'Hombre Trans', 'Mujer Trans', 'No binario'];
-  regimenesSalud = ['Contributivo', 'Subsidiado', 'Especial', 'Excepción'];
-  vinculosU = ['Estudiante', 'Docente', 'Administrativo', 'Egresado', 'Contratista'];
+  listaSexo = ['Masculino', 'Femenino', 'Intersexual', 'Indeterminado'];
+  listaEtnias = ['Ninguna', 'Indígena', 'Afrocolombiano', 'Raizal', 'Palenquero', 'Rrom/Gitano'];
+  listaIdentidadSexual = ['Hombre cisgénero', 'Mujer cisgénero', 'Hombre trans', 'Mujer trans', 'No binario', 'Género fluido', 'Otro'];
+  listaOrientacionSexual = ['Heterosexual', 'Homosexual (GAY/LESBIANA)', 'Bisexual', 'Pansexual', 'Asexual', 'Otro'];
+  listaVinculos = ['Estudiante Pregrado', 'Estudiante Posgrado', 'Docente', 'Administrativo', 'Egresado', 'Contratista', 'Visitante'];
+  listaTiposDiscapacidad = ['Física', 'Auditiva', 'Visual', 'Sordoceguera', 'Intelectual', 'Psicosocial', 'Múltiple', 'Ninguna'];
+  listaDiscapacidades = ['Posee diagnóstico', 'No posee diagnóstico', 'En proceso de diagnóstico', 'No aplica'];
+  tiposSolicitud = ['Psicosocial', 'Jurídica', 'Salud', 'Académica'];
+  tiposServicio = ['Asesoría', 'Acompañamiento', 'Seguimiento', 'Intervención'];
+  tiposDoc = ['Cédula de Ciudadanía', 'Tarjeta de Identidad', 'Cédula de Extranjería', 'Pasaporte'];
+  campusM = ['Principal', 'Robledo', 'Salud', 'Norte', 'Oriente'];
+  facultadesM = ['Ingeniería', 'Derecho', 'Medicina', 'Artes', 'Ciencias Sociales', 'Educación Física'];
 
   constructor(
     private fb: FormBuilder,
@@ -76,36 +77,33 @@ export class RegistroAtencionComponent implements OnInit {
       formaEntrevista: ['', Validators.required],
       consentimientoArchivo: [null],
 
-      // TAB 2: Datos de la persona
-      documento: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
+      // TAB 2: Datos de la persona (Ajustado a los nombres de tu HTML)
       tipoDocumento: ['', Validators.required],
+      documento: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
       fechaNacimiento: ['', Validators.required],
       primerNombre: ['', Validators.required],
       segundoNombre: [''],
       primerApellido: ['', Validators.required],
       segundoApellido: [''],
-      celular: ['', [Validators.required, Validators.maxLength(10)]],
-      telefonoAlterno: [''],
-      etnia: ['', Validators.required],
       sexo: ['', Validators.required],
+      etnia: ['', Validators.required],
       identidadSexual: ['', Validators.required],
-      orientacionSexual: [''],
-      tipoCorreo: ['Personal'],
+      orientacionSexual: ['', Validators.required],
+      celular: ['', [Validators.required, Validators.maxLength(10)]],
+      telefonoAlterno: ['', Validators.required],
+      correoPersonal: ['', [Validators.required, Validators.email]],
+      correoInstitucional: [''],
       descripcionPersona: ['', Validators.required],
-      correo: ['', [Validators.required, Validators.email]],
       direccionLugar: [''],
 
       // TAB 3: Datos complementarios
       eps: ['', Validators.required],
       regimenSalud: ['', Validators.required],
-      vinculoUni: ['', Validators.required],
-      subCategoriaVinculo: [''],
-      facultad: ['', Validators.required],
-      programa: [''],
-      dependencia: ['', Validators.required],
       campus: ['', Validators.required],
-      tipoDiscapacidad: ['Ninguna'],
-      discapacidad: ['No aplica'],
+      facultad: ['', Validators.required],
+      vinculo: ['', Validators.required],
+      tipoDiscapacidad: ['', Validators.required],
+      discapacidad: ['', Validators.required],
 
       // TAB 4: Documentación
       tipoViolencia: ['', Validators.required],
@@ -128,6 +126,7 @@ export class RegistroAtencionComponent implements OnInit {
       }
     });
   }
+
   subirArchivo(): void {
     const input = document.createElement('input');
     input.type = 'file';
@@ -150,8 +149,7 @@ export class RegistroAtencionComponent implements OnInit {
 
   guardarAtencion(): void {
     if (this.atencionForm.valid) {
-      console.log('--- ENVIANDO REGISTRO ---');
-      console.log(this.atencionForm.value);
+      console.log('--- ENVIANDO REGISTRO ---', this.atencionForm.value);
       this.snackBar.open('Atención registrada exitosamente', 'Éxito', {
         duration: 5000,
         panelClass: ['success-snackbar']

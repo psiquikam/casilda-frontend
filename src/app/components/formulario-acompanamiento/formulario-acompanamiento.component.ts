@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-// Material Imports
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -13,18 +12,29 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { ListasService } from '../../services/listas.service';
-import { MatDialog } from '@angular/material/dialog';
+import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
 
 @Component({
   selector: 'app-formulario-acompanamiento',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule,
-    MatInputModule, MatSelectModule, MatDatepickerModule, MatNativeDateModule,
-    MatButtonModule, MatIconModule, MatSnackBarModule
+    CommonModule,
+    ReactiveFormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatButtonModule,
+    MatIconModule,
+    MatSnackBarModule,
+    MatTabsModule,
+    MatDialogModule
   ],
   templateUrl: './formulario-acompanamiento.component.html',
   styleUrls: ['./formulario-acompanamiento.component.scss']
@@ -33,7 +43,7 @@ export class FormularioAcompanamientoComponent implements OnInit {
   private fb = inject(FormBuilder);
   private listasService = inject(ListasService);
   private snackBar = inject(MatSnackBar);
-  private dialog = inject(MatDialog)
+  private dialog = inject(MatDialog);
 
   acompanamientoForm!: FormGroup;
 
@@ -56,19 +66,29 @@ export class FormularioAcompanamientoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.initForm();
+  }
+
+  initForm(): void {
     this.acompanamientoForm = this.fb.group({
+      // DATOS REMITENTE
+      remitentePrimerNombre: ['', [Validators.required, Validators.minLength(2)]],
+      remitenteSegundoNombre: [''],
+      remitentePrimerApellido: ['', [Validators.required, Validators.minLength(2)]],
+      remitenteSegundoApellido: [''],
       tipoSolicitud: ['', Validators.required],
+      fechaSolicitud: [new Date(), Validators.required],
+      cargo: ['', Validators.required],
       campus: ['', Validators.required],
       dependencia: ['', Validators.required],
       facultad: ['', Validators.required],
-      tipoDocumento: ['', Validators.required],
 
+      // DATOS PACIENTE
       primerNombre: ['', [Validators.required, Validators.minLength(2)]],
       segundoNombre: [''],
       primerApellido: ['', [Validators.required, Validators.minLength(2)]],
       segundoApellido: [''],
-      cargo: ['', Validators.required],
-      fechaSolicitud: [new Date(), Validators.required],
+      tipoDocumento: ['', Validators.required],
       numeroDocumento: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
       identidadGenero: ['', Validators.required],
       edad: ['', [Validators.required, Validators.min(1), Validators.max(120)]],
@@ -79,7 +99,7 @@ export class FormularioAcompanamientoComponent implements OnInit {
     });
   }
 
-  enviarSolicitud() {
+  enviarSolicitud(): void {
     if (this.acompanamientoForm.valid) {
       const numeroAleatorio = Math.floor(1000 + Math.random() * 9000);
       const nuevoCodigo = `ACO-${numeroAleatorio}`;
@@ -88,11 +108,19 @@ export class FormularioAcompanamientoComponent implements OnInit {
         width: '400px',
         data: {
           titulo: '¡Acompañamiento Registrado!',
-          mensaje: 'Tu solicitud de acompañamiento ha sido recibida. Un profesional se pondrá en contacto contigo pronto.',
+          mensaje: 'Tu solicitud de acompañamiento ha sido recibida correctamente.',
           codigo: nuevoCodigo
         }
       });
 
+      this.acompanamientoForm.reset({ fechaSolicitud: new Date() });
+    } else {
+      this.snackBar.open('Existen campos obligatorios sin completar en los tabs', 'Cerrar', { duration: 3000 });
+    }
+  }
+
+  cancelar(): void {
+    if (confirm('¿Desea limpiar los datos del formulario?')) {
       this.acompanamientoForm.reset({ fechaSolicitud: new Date() });
     }
   }

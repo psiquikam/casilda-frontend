@@ -46,39 +46,46 @@
   .mat-mdc-tab-group {
     height: auto !important;
     flex-grow: 0 !important;
+    --mdc-tab-indicator-active-indicator-color: transparent;
+    --mat-tab-header-active-label-text-color: #ffffff;
   }
 
-  .mat-mdc-tab .mdc-tab__text-label {
-    font-weight: 800 !important;
-    font-size: 13px !important;
-    color: #64748b;
+  .mat-mdc-tab-header {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #e2e8f0;
   }
 
-  .mat-mdc-tab-group {
-    --mdc-tab-indicator-active-indicator-color: #6B2D95;
-    --mat-tab-header-active-label-text-color: #6B2D95;
+  .mat-mdc-tab {
+    height: 48px !important;
+    border-radius: 8px 8px 0 0;
+    margin-right: 4px;
+    background-color: #f8fafc;
+    
+    .mdc-tab__text-label {
+      font-weight: 700 !important;
+      font-size: 12px !important;
+      color: #64748b;
+      z-index: 2;
+    }
   }
-}
 
-.pink-header {
-  background-color: #e91e63;
-  color: white;
-  padding: 12px 25px;
-  font-weight: 700;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 20px;
-  width: 100%;
-  display: block;
-  box-sizing: border-box;
+  .mat-mdc-tab.mdc-tab--active {
+    background-color: #e91e63 !important;
+    
+    .mdc-tab__text-label {
+      color: #ffffff !important;
+    }
+
+    .mdc-tab-indicator__content {
+      border: none !important;
+    }
+  }
 }
 
 .tab-padding {
-  padding: 0 25px 25px 25px;
+  padding: 10px 25px 25px 25px;
   display: grid;
-  gap: 12px;
-  //align-items: center;
+  gap: 16px;
 }
 
 .grid-2 {
@@ -91,7 +98,6 @@
 
 .span-all {
   grid-column: 1 / -1;
-
   mat-form-field {
     width: 100%;
   }
@@ -133,7 +139,7 @@
   }
 }
 
-.span-all {
+.text-area-container {
   mat-form-field {
     ::ng-deep {
       .mat-mdc-form-field-flex {
@@ -142,11 +148,9 @@
         align-items: flex-start !important;
         padding-top: 12px !important;
       }
-
       .mat-mdc-form-field-infix {
         height: auto !important;
       }
-
       .mat-mdc-text-field-wrapper .mat-mdc-floating-label {
         top: 24px !important;
       }
@@ -170,8 +174,12 @@
   color: #1e293b;
 }
 
-.button-container .slim-btn {
-  padding: 0 30px;
+.slim-btn {
+  height: 32px;
+  line-height: 32px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 mat-card-actions {
@@ -181,14 +189,6 @@ mat-card-actions {
   gap: 12px;
 }
 
-.slim-btn {
-  height: 32px;
-  line-height: 32px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
 @media (max-width: 950px) {
   .grid-3 {
     grid-template-columns: repeat(2, 1fr);
@@ -196,13 +196,16 @@ mat-card-actions {
 }
 
 @media (max-width: 650px) {
-
-  .grid-2,
-  .grid-3 {
+  .grid-2, .grid-3 {
     grid-template-columns: 1fr;
   }
-
   .tab-padding {
     padding: 0 15px 15px 15px;
+  }
+  ::ng-deep .mat-mdc-tab {
+    margin-right: 2px;
+    .mdc-tab__text-label {
+      font-size: 10px !important;
+    }
   }
 }
