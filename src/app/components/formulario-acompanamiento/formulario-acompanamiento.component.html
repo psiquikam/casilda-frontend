@@ -10,155 +10,152 @@
   </header>
 
   <mat-card class="form-card">
-    <mat-card-content>
+    <mat-card-content class="content-padding">
       <form [formGroup]="acompanamientoForm">
-        <mat-tab-group animationDuration="200ms">
-          
-          <mat-tab label="Información del Remitente">
-            <div class="tab-padding">
-              <div class="row">
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Primer Nombre (Remitente)</mat-label>
-                  <input matInput formControlName="remitentePrimerNombre">
-                </mat-form-field>
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Segundo Nombre</mat-label>
-                  <input matInput formControlName="remitenteSegundoNombre">
-                </mat-form-field>
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Primer Apellido</mat-label>
-                  <input matInput formControlName="remitentePrimerApellido">
-                </mat-form-field>
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Segundo Apellido</mat-label>
-                  <input matInput formControlName="remitenteSegundoApellido">
-                </mat-form-field>
-              </div>
-
-              <div class="row">
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Tipo de Solicitud</mat-label>
-                  <mat-select formControlName="tipoSolicitud">
-                    @for (tipo of tiposSolicitud; track tipo) {
-                      <mat-option [value]="tipo">{{tipo}}</mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Fecha de Solicitud</mat-label>
-                  <input matInput [matDatepicker]="pickerRem" formControlName="fechaSolicitud">
-                  <mat-datepicker-toggle matIconSuffix [for]="pickerRem"></mat-datepicker-toggle>
-                  <mat-datepicker #pickerRem></mat-datepicker>
-                </mat-form-field>
-
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Cargo</mat-label>
-                  <input matInput formControlName="cargo" placeholder="Ej. Docente">
-                </mat-form-field>
-              </div>
-
-              <div class="row">
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Campus</mat-label>
-                  <mat-select formControlName="campus">
-                    @for (c of campusLista; track c) {
-                      <mat-option [value]="c">{{c}}</mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Dependencia</mat-label>
-                  <mat-select formControlName="dependencia">
-                    @for (dep of dependencias; track dep) {
-                      <mat-option [value]="dep">{{dep}}</mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Facultad</mat-label>
-                  <mat-select formControlName="facultad">
-                    @for (fac of facultades; track fac) {
-                      <mat-option [value]="fac">{{fac}}</mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-              </div>
+        
+        <div class="profile-selector">
+          <h3 class="section-title">¿Cómo desea realizar su solicitud?</h3>
+          <mat-radio-group formControlName="tipoReporte" class="profile-grid">
+            <div class="profile-card" [class.selected]="acompanamientoForm.get('tipoReporte')?.value === 'directa'">
+              <mat-radio-button value="directa">
+                <strong>Solicitud Directa</strong>
+                <p>Usted es la persona que requiere el acompañamiento.</p>
+              </mat-radio-button>
             </div>
-          </mat-tab>
-
-          <mat-tab label="Información del Paciente">
-            <div class="tab-padding">
-              <div class="row">
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Primer Nombre (Paciente)</mat-label>
-                  <input matInput formControlName="primerNombre">
-                </mat-form-field>
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Segundo Nombre</mat-label>
-                  <input matInput formControlName="segundoNombre">
-                </mat-form-field>
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Primer Apellido</mat-label>
-                  <input matInput formControlName="primerApellido">
-                </mat-form-field>
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Segundo Apellido</mat-label>
-                  <input matInput formControlName="segundoApellido">
-                </mat-form-field>
-              </div>
-
-              <div class="row">
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Tipo Documento</mat-label>
-                  <mat-select formControlName="tipoDocumento">
-                    @for (t of tiposDocumento; track t) {
-                      <mat-option [value]="t">{{t}}</mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Número Documento</mat-label>
-                  <input matInput formControlName="numeroDocumento">
-                </mat-form-field>
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Identidad de Género</mat-label>
-                  <input matInput formControlName="identidadGenero">
-                </mat-form-field>
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Edad</mat-label>
-                  <input matInput type="number" formControlName="edad">
-                </mat-form-field>
-              </div>
-
-              <div class="row">
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Celular</mat-label>
-                  <input matInput formControlName="celular" placeholder="3001234567">
-                </mat-form-field>
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Teléfono Alterno</mat-label>
-                  <input matInput formControlName="telefonoAlterno">
-                </mat-form-field>
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Correo Institucional</mat-label>
-                  <input matInput formControlName="correoInstitucional">
-                </mat-form-field>
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Correo Personal</mat-label>
-                  <input matInput formControlName="correoPersonal">
-                </mat-form-field>
-              </div>
+            <div class="profile-card" [class.selected]="acompanamientoForm.get('tipoReporte')?.value === 'indirecta'">
+              <mat-radio-button value="indirecta">
+                <strong>Solicitud Indirecta</strong>
+                <p>Usted reporta el caso de un tercero que requiere apoyo.</p>
+              </mat-radio-button>
             </div>
-          </mat-tab>
-        </mat-tab-group>
+          </mat-radio-group>
+        </div>
+
+        <div *ngIf="acompanamientoForm.get('tipoReporte')?.value === 'indirecta'" class="form-section">
+          <h3 class="section-title-divider">Remitente</h3>
+          <div class="row">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Primer Nombre (Remitente)</mat-label>
+              <input matInput formControlName="remitentePrimerNombre">
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Segundo Nombre</mat-label>
+              <input matInput formControlName="remitenteSegundoNombre">
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Primer Apellido</mat-label>
+              <input matInput formControlName="remitentePrimerApellido">
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Segundo Apellido</mat-label>
+              <input matInput formControlName="remitenteSegundoApellido">
+            </mat-form-field>
+          </div>
+
+          <div class="row">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Tipo de Solicitud</mat-label>
+              <mat-select formControlName="tipoSolicitud">
+                @for (tipo of tiposSolicitud; track tipo) {
+                  <mat-option [value]="tipo">{{tipo}}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Cargo</mat-label>
+              <input matInput formControlName="cargo">
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Campus</mat-label>
+              <mat-select formControlName="campus">
+                @for (c of campusLista; track c) {
+                  <mat-option [value]="c">{{c}}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Dependencia</mat-label>
+              <mat-select formControlName="dependencia">
+                @for (dep of dependencias; track dep) {
+                  <mat-option [value]="dep">{{dep}}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="form-section" *ngIf="acompanamientoForm.get('tipoReporte')?.value">
+          <h3 class="section-title-divider">Solicitante</h3>
+          <div class="row">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Primer Nombre (Solicitante)</mat-label>
+              <input matInput formControlName="primerNombre">
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Segundo Nombre</mat-label>
+              <input matInput formControlName="segundoNombre">
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Primer Apellido</mat-label>
+              <input matInput formControlName="primerApellido">
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Segundo Apellido</mat-label>
+              <input matInput formControlName="segundoApellido">
+            </mat-form-field>
+          </div>
+
+          <div class="row">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Tipo Documento</mat-label>
+              <mat-select formControlName="tipoDocumento">
+                @for (t of tiposDocumento; track t) {
+                  <mat-option [value]="t">{{t}}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Número Documento</mat-label>
+              <input matInput formControlName="numeroDocumento">
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Identidad de Género</mat-label>
+              <input matInput formControlName="identidadGenero">
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Edad</mat-label>
+              <input matInput type="number" formControlName="edad">
+            </mat-form-field>
+          </div>
+
+          <div class="row">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Celular</mat-label>
+              <input matInput formControlName="celular">
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Correo Institucional</mat-label>
+              <input matInput formControlName="correoInstitucional">
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Correo Personal</mat-label>
+              <input matInput formControlName="correoPersonal">
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Facultad</mat-label>
+              <mat-select formControlName="facultad">
+                @for (fac of facultades; track fac) {
+                  <mat-option [value]="fac">{{fac}}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
       </form>
     </mat-card-content>
 
-    <mat-card-actions align="end">
-      <button mat-button color="warn" type="button" (click)="cancelar()">Cancelar</button>
+    <mat-card-actions align="end" *ngIf="acompanamientoForm.get('tipoReporte')?.value">
+      <button mat-button color="warn" type="button" (click)="cancelar()">Limpiar</button>
       <button mat-raised-button color="primary" 
               [disabled]="acompanamientoForm.invalid"
               (click)="enviarSolicitud()">

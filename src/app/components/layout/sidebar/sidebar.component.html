@@ -34,14 +34,11 @@
       <mat-icon class="large-icon">handshake</mat-icon>
       <span>EQUIPO DE ATENCIÓN</span>
     </div>
-    <a mat-list-item routerLink="/mis-asignaciones" routerLinkActive="active-item">
-      <span matListItemTitle>Mis Asignaciones</span>
-    </a>
-    <a mat-list-item routerLink="/nueva-queja" routerLinkActive="active-item">
-      <span matListItemTitle>Registrar Queja</span>
+    <a mat-list-item routerLink="/consulta" routerLinkActive="active-item">
+      <span matListItemTitle>Consulta</span>
     </a>
     <a mat-list-item routerLink="/solicitud-acompanamiento" routerLinkActive="active-item">
-      <span matListItemTitle>Solicitar Acompañamiento</span>
+      <span matListItemTitle>Solicitud</span>
     </a>
     <a mat-list-item [routerLink]="['/reparto', 00000]" routerLinkActive="active-item">
       <span matListItemTitle>Reparto</span>
@@ -49,9 +46,17 @@
     <a mat-list-item [routerLink]="['detalle-acompanamiento', 00000]" routerLinkActive="active-item">
       <span matListItemTitle>Contacto</span>
     </a>
-    <a mat-list-item routerLink="/consulta" routerLinkActive="active-item">
-      <span matListItemTitle>Consulta</span>
+    <a mat-list-item routerLink="/registro-atencion" routerLinkActive="active-item">
+      <span matListItemTitle>Atención</span>
     </a>
+
+    <a mat-list-item routerLink="/mis-asignaciones" routerLinkActive="active-item">
+      <span matListItemTitle>Mis Asignaciones</span>
+    </a>
+    <a mat-list-item routerLink="/nueva-queja" routerLinkActive="active-item">
+      <span matListItemTitle>Registrar Queja</span>
+    </a>
+    
     }
 
     @if (auth.isAdmin()) {
@@ -72,15 +77,6 @@
     </div>
     <a mat-list-item routerLink="/seguimiento" routerLinkActive="active-item">
       <span matListItemTitle>Seguimiento</span>
-    </a>
-
-    <mat-divider></mat-divider>
-    <div class="menu-label">
-      <mat-icon class="large-icon">support_agent</mat-icon>
-      <span>Atención</span>
-    </div>
-    <a mat-list-item routerLink="/registro-atencion" routerLinkActive="active-item">
-      <span matListItemTitle>Registro atención</span>
     </a>
 
   </mat-nav-list>

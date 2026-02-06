@@ -18,7 +18,178 @@
     font-weight: 600;
     font-size: 13px;
     transition: color 0.2s;
-    &:hover { color: #1e293b; }
+
+    &:hover {
+      color: #1e293b;
+    }
+  }
+}
+
+.section-header {
+  width: 100%;
+  max-width: 900px;
+  margin-bottom: 15px;
+
+  h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #334155;
+  }
+
+  .subtitle {
+    font-size: 0.85rem;
+    color: #64748b;
+  }
+}
+
+.pendientes-card {
+  width: 100%;
+  max-width: 900px;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+
+  table {
+    width: 100%;
+
+    th {
+      background-color: #f8fafc;
+      color: #64748b;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0 16px;
+      height: 48px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    td {
+      padding: 0 16px;
+      font-size: 13px;
+      color: #334155;
+      height: 60px;
+    }
+
+    tr.element-row td {
+      border-bottom: none;
+    }
+
+    tr.expanded-row {
+      background: #fbfaff;
+    }
+
+    tr.element-row:not(.expanded-row):hover {
+      background: #f8fafc;
+      cursor: pointer;
+    }
+
+    tr.detail-row {
+      height: 0;
+    }
+  }
+
+  .element-detail {
+    overflow: hidden;
+    display: flex;
+    background: #fcfcfd;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    padding: 20px 24px;
+    width: 100%;
+    border-left: 4px solid #6B2D95;
+    margin: 0;
+    background: #fcfcfd;
+  }
+
+  .detail-item {
+    font-size: 13px;
+    color: #475569;
+
+    strong {
+      color: #1e293b;
+      margin-right: 5px;
+    }
+  }
+
+  button[mat-icon-button] mat-icon {
+    color: #6B2D95;
+    transition: transform 0.2s;
+  }
+
+  .badge-soft {
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .text-muted {
+    color: #94a3b8;
+    font-size: 11px;
+  }
+
+  .btn-sm {
+    height: 32px;
+    line-height: 32px;
+    padding: 0 12px;
+    font-size: 12px;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      margin-right: 4px;
+    }
+  }
+
+  .empty-state {
+    padding: 40px;
+    text-align: center;
+    color: #64748b;
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 10px;
+      color: #cbd5e1;
+    }
+
+    p {
+      margin: 0;
+      font-weight: 500;
+    }
+  }
+}
+
+.section-divider {
+  width: 100%;
+  max-width: 900px;
+  margin: 25px 0 10px 0;
+  display: flex;
+  align-items: center;
+  color: #64748b;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e2e8f0;
+    margin-left: 15px;
   }
 }
 
@@ -29,6 +200,13 @@
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+
+  &.disabled-card {
+    opacity: 0.6;
+    pointer-events: none;
+    filter: grayscale(0.8);
+    transition: all 0.3s ease;
+  }
 
   .reparto-header {
     padding: 20px 25px;
@@ -48,9 +226,25 @@
       display: inline-block;
     }
 
-    h1 { margin: 0; font-size: 1.25rem; font-weight: 800; color: #1e293b; }
-    p { margin: 2px 0 0; color: #64748b; font-size: 0.85rem; }
-    .header-icon { font-size: 32px; width: 32px; height: 32px; color: #e2e8f0; }
+    h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #1e293b;
+    }
+
+    p {
+      margin: 2px 0 0;
+      color: #64748b;
+      font-size: 0.85rem;
+    }
+
+    .header-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+      color: #e2e8f0;
+    }
   }
 
   .reparto-form {
@@ -89,8 +283,9 @@
       .mat-mdc-form-field-subscript-wrapper {
         display: none !important;
       }
-      
-      .mat-datepicker-toggle, .mat-icon {
+
+      .mat-datepicker-toggle,
+      .mat-icon {
         transform: scale(0.8);
       }
     }
@@ -137,7 +332,7 @@
       padding-top: 15px;
       border-top: 1px solid #f1f5f9;
 
-      button { 
+      button {
         padding: 0 20px;
         height: 36px;
         font-size: 13px;

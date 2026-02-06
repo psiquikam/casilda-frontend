@@ -12,7 +12,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatTabsModule } from '@angular/material/tabs';
+import { MatRadioModule } from '@angular/material/radio';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { ListasService } from '../../services/listas.service';
@@ -22,19 +22,9 @@ import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
   selector: 'app-formulario-acompanamiento',
   standalone: true,
   imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatButtonModule,
-    MatIconModule,
-    MatSnackBarModule,
-    MatTabsModule,
-    MatDialogModule
+    CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule,
+    MatInputModule, MatSelectModule, MatDatepickerModule, MatNativeDateModule,
+    MatButtonModule, MatIconModule, MatSnackBarModule, MatRadioModule, MatDialogModule
   ],
   templateUrl: './formulario-acompanamiento.component.html',
   styleUrls: ['./formulario-acompanamiento.component.scss']
@@ -46,7 +36,6 @@ export class FormularioAcompanamientoComponent implements OnInit {
   private dialog = inject(MatDialog);
 
   acompanamientoForm!: FormGroup;
-
   tiposSolicitud: string[] = [];
   campusLista: string[] = [];
   dependencias: string[] = [];
@@ -67,23 +56,21 @@ export class FormularioAcompanamientoComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
+    this.setupConditionalValidation();
   }
 
   initForm(): void {
     this.acompanamientoForm = this.fb.group({
-      // DATOS REMITENTE
-      remitentePrimerNombre: ['', [Validators.required, Validators.minLength(2)]],
+      tipoReporte: ['', Validators.required],
+      remitentePrimerNombre: [''],
       remitenteSegundoNombre: [''],
-      remitentePrimerApellido: ['', [Validators.required, Validators.minLength(2)]],
+      remitentePrimerApellido: [''],
       remitenteSegundoApellido: [''],
-      tipoSolicitud: ['', Validators.required],
-      fechaSolicitud: [new Date(), Validators.required],
-      cargo: ['', Validators.required],
-      campus: ['', Validators.required],
-      dependencia: ['', Validators.required],
-      facultad: ['', Validators.required],
-
-      // DATOS PACIENTE
+      tipoSolicitud: [''],
+      fechaSolicitud: [new Date()],
+      cargo: [''],
+      campus: [''],
+      dependencia: [''],
       primerNombre: ['', [Validators.required, Validators.minLength(2)]],
       segundoNombre: [''],
       primerApellido: ['', [Validators.required, Validators.minLength(2)]],
@@ -93,34 +80,51 @@ export class FormularioAcompanamientoComponent implements OnInit {
       identidadGenero: ['', Validators.required],
       edad: ['', [Validators.required, Validators.min(1), Validators.max(120)]],
       celular: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-      telefonoAlterno: [''],
       correoInstitucional: ['', [Validators.required, Validators.email]],
-      correoPersonal: ['', [Validators.required, Validators.email]]
+      correoPersonal: ['', [Validators.required, Validators.email]],
+      facultad: ['', Validators.required]
+    });
+  }
+
+  setupConditionalValidation(): void {
+    this.acompanamientoForm.get('tipoReporte')?.valueChanges.subscribe(tipo => {
+      const fields = [
+        'remitentePrimerNombre', 'remitentePrimerApellido', 
+        'tipoSolicitud', 'cargo', 'campus', 'dependencia'
+      ];
+      
+      fields.forEach(f => {
+        const control = this.acompanamientoForm.get(f);
+        if (tipo === 'indirecta') {
+          control?.setValidators([Validators.required]);
+        } else {
+          control?.clearValidators();
+          control?.reset();
+        }
+        control?.updateValueAndValidity();
+      });
     });
   }
 
   enviarSolicitud(): void {
     if (this.acompanamientoForm.valid) {
       const numeroAleatorio = Math.floor(1000 + Math.random() * 9000);
-      const nuevoCodigo = `ACO-${numeroAleatorio}`;
-
       this.dialog.open(DialogoExitoComponent, {
         width: '400px',
         data: {
           titulo: '¡Acompañamiento Registrado!',
-          mensaje: 'Tu solicitud de acompañamiento ha sido recibida correctamente.',
-          codigo: nuevoCodigo
+          mensaje: 'Tu solicitud ha sido recibida correctamente.',
+          codigo: `ACO-${numeroAleatorio}`
         }
       });
-
       this.acompanamientoForm.reset({ fechaSolicitud: new Date() });
     } else {
-      this.snackBar.open('Existen campos obligatorios sin completar en los tabs', 'Cerrar', { duration: 3000 });
+      this.snackBar.open('Complete todos los campos obligatorios', 'Cerrar', { duration: 3000 });
     }
   }
 
   cancelar(): void {
-    if (confirm('¿Desea limpiar los datos del formulario?')) {
+    if (confirm('¿Desea limpiar el formulario?')) {
       this.acompanamientoForm.reset({ fechaSolicitud: new Date() });
     }
   }

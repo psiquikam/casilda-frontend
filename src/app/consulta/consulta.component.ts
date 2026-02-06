@@ -11,6 +11,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { ModalDetalleSolicitudComponent } from '../components/modal-detalle-solicitud/modal-detalle-solicitud.component';
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-consulta',
   standalone: true,
@@ -32,6 +34,7 @@ import { ModalDetalleSolicitudComponent } from '../components/modal-detalle-soli
 export class ConsultaComponent implements OnInit {
 
   private dialog = inject(MatDialog);
+  private router = inject(Router);
 
   displayedColumns: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'dependencia', 'profesional', 'acciones'];
   expandedElement: any | null;
@@ -40,6 +43,7 @@ export class ConsultaComponent implements OnInit {
   dataSourceActivos = new MatTableDataSource<any>([]);
   dataSourceTransicion = new MatTableDataSource<any>([]);
   dataSourceCerrados = new MatTableDataSource<any>([]);
+  dataSourceSinRepartir = new MatTableDataSource<any>([]);
 
   filterValues: any = { id: '', nombre: '', documento: '', profesional: '' };
 
@@ -143,6 +147,33 @@ export class ConsultaComponent implements OnInit {
       remitentePrimerNombre: 'Valentina', remitenteSegundoNombre: '', remitentePrimerApellido: 'Peña', remitenteSegundoApellido: 'Lara',
       pacientePrimerNombre: 'Valentina', pacienteSegundoNombre: '', pacientePrimerApellido: 'Peña', pacienteSegundoApellido: 'Lara',
       observaciones: 'Taller de inducción para estudiantes nuevos.', prioridad: 'Baja', ultimaAccion: 'Diploma de participación entregado'
+    },
+    {
+      id: 'CAS-2001', nombre: 'Laura Restrepo', documento: '10359874', fecha: '2026-02-01',
+      dependencia: 'Bienestar', profesional: 'Sin asignar', estado: 'Abierto activo',
+      tipoSolicitud: 'Psicosocial', facultad: 'Artes', campus: 'Norte',
+      genero: 'Femenino', edad: 20, celular: '3109988776', cargo: 'Estudiante',
+      telefono: '6012233', correoInst: 'l.restrepo@U.edu.co', correoPers: 'laura.res@gmail.com',
+      observaciones: 'Solicita primera cita por ansiedad ante exámenes.', prioridad: 'Alta',
+      pacientePrimerNombre: 'Laura', pacienteSegundoNombre: 'Restrepo', pacientePrimerApellido: 'Restrepo', pacienteSegundoApellido: 'Restrepo',
+    },
+    {
+      id: 'ACO-2002', nombre: 'Miguel Cano', documento: '71234456', fecha: '2026-02-03',
+      dependencia: 'Jurídica', profesional: 'Sin asignar', estado: 'Abierto activo',
+      tipoSolicitud: 'Asesoría', facultad: 'Derecho', campus: 'Principal',
+      genero: 'Masculino', edad: 24, celular: '3154433221', cargo: 'Egresado',
+      telefono: '6014455', correoInst: 'm.cano@U.edu.co', correoPers: 'miguel.c@outlook.com',
+      observaciones: 'Consulta sobre trámites de grado y judicatura.', prioridad: 'Media',
+      pacientePrimerNombre: 'Miguel', pacienteSegundoNombre: 'Miguel', pacientePrimerApellido: 'Cano', pacienteSegundoApellido: 'Cano',
+    },
+    {
+      id: 'CAS-2003', nombre: 'Elena Vasquez', documento: '43567812', fecha: '2026-02-05',
+      dependencia: 'Salud', profesional: 'Sin asignar', estado: 'Abierto activo',
+      tipoSolicitud: 'Médica', facultad: 'Ingeniería', campus: 'Sur',
+      genero: 'Femenino', edad: 21, celular: '3201122334', cargo: 'Estudiante',
+      telefono: '6019900', correoInst: 'e.vasquez@U.edu.co', correoPers: 'elena.v@gmail.com',
+      observaciones: 'Reporte de accidente menor en laboratorios.', prioridad: 'Alta',
+      pacientePrimerNombre: 'Elena', pacienteSegundoNombre: 'Elena', pacientePrimerApellido: 'Vasquez', pacienteSegundoApellido: 'Vasquez',
     }
   ];
 
@@ -151,14 +182,32 @@ export class ConsultaComponent implements OnInit {
   }
 
   inicializarTablas() {
-    this.dataSourceActivos.data = this.datosSimulados.filter(c => c.estado === 'Abierto activo');
-    this.dataSourceTransicion.data = this.datosSimulados.filter(c => c.estado === 'Abierto en transición');
-    this.dataSourceCerrados.data = this.datosSimulados.filter(c => c.estado === 'Cerrado');
+    this.dataSourceSinRepartir.data = this.datosSimulados.filter(c =>
+      c.profesional === 'Sin asignar'
+    );
 
+    this.dataSourceActivos.data = this.datosSimulados.filter(c =>
+      c.estado === 'Abierto activo' && c.profesional !== 'Sin asignar'
+    );
+
+    this.dataSourceTransicion.data = this.datosSimulados.filter(c =>
+      c.estado === 'Abierto en transición'
+    );
+
+    this.dataSourceCerrados.data = this.datosSimulados.filter(c =>
+      c.estado === 'Cerrado'
+    );
+    this.setFilterPredicates();
+  }
+
+  setFilterPredicates() {
     const filterPredicate = this.createFilter();
-    this.dataSourceActivos.filterPredicate = filterPredicate;
-    this.dataSourceTransicion.filterPredicate = filterPredicate;
-    this.dataSourceCerrados.filterPredicate = filterPredicate;
+    [
+      this.dataSourceSinRepartir,
+      this.dataSourceActivos,
+      this.dataSourceTransicion,
+      this.dataSourceCerrados
+    ].forEach(ds => ds.filterPredicate = filterPredicate);
   }
 
   applyFilter(column: string, event: Event) {
@@ -168,6 +217,7 @@ export class ConsultaComponent implements OnInit {
     this.dataSourceActivos.filter = filterString;
     this.dataSourceTransicion.filter = filterString;
     this.dataSourceCerrados.filter = filterString;
+    this.dataSourceSinRepartir.filter = filterString;
   }
 
   createFilter(): (data: any, filter: string) => boolean {
@@ -188,5 +238,25 @@ export class ConsultaComponent implements OnInit {
       panelClass: 'custom-modal-container',
       autoFocus: false
     });
+  }
+
+  irAReparto(element: any) {
+    this.router.navigate(['/reparto', element.id]);
+  }
+
+  get totalSinRepartir(): number {
+  return this.dataSourceSinRepartir.data.length;
+}
+
+  get totalCerrado(): number {
+    return this.dataSourceCerrados.data.length;
+  }
+
+   get totalAbiertoActivo(): number{
+    return this.dataSourceActivos.data.length;
+  }
+
+   get totalAbiertoTransicion(): number{
+    return this.dataSourceTransicion.data.length;
   }
 }

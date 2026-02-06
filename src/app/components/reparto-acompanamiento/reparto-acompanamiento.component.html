@@ -3,27 +3,112 @@
     <mat-icon>arrow_back</mat-icon> Volver al Panel
   </div>
 
-  <mat-card class="reparto-card">
+  <div class="section-header">
+    <h2>Reparto</h2>
+    <span class="subtitle">Seleccione un caso de la lista para proceder con la asignación</span>
+  </div>
+
+  <mat-card class="pendientes-card">
+    <table mat-table [dataSource]="dataSource" multiTemplateDataRows>
+      
+      <ng-container matColumnDef="expand">
+        <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-icon-button aria-label="expand row"
+            (click)="(expandedElement = expandedElement === element ? null : element); $event.stopPropagation()">
+            <mat-icon>{{expandedElement === element ? 'remove_circle' : 'add_circle'}}</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID Caso </th>
+        <td mat-cell *matCellDef="let element"> <b>#{{element.id}}</b> </td>
+      </ng-container>
+
+      <ng-container matColumnDef="nombre">
+        <th mat-header-cell *matHeaderCellDef> Usuario </th>
+        <td mat-cell *matCellDef="let element"> {{element.nombre}} <br> <small class="text-muted">{{element.documento}}</small> </td>
+      </ng-container>
+
+      <ng-container matColumnDef="fecha">
+        <th mat-header-cell *matHeaderCellDef> Fecha </th>
+        <td mat-cell *matCellDef="let element"> {{element.fecha}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="dependencia">
+        <th mat-header-cell *matHeaderCellDef> Dependencia </th>
+        <td mat-cell *matCellDef="let element"> <span class="badge-soft">{{element.dependencia}}</span> </td>
+      </ng-container>
+
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef> Acción </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-stroked-button color="primary" class="btn-sm" 
+                  (click)="seleccionarCaso(element); $event.stopPropagation()"
+                  [disabled]="codigoCaso === element.id">
+            <mat-icon>arrow_downward</mat-icon> 
+            {{ codigoCaso === element.id ? 'Gestionando...' : 'Asignar' }}
+          </button>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="expandedDetail">
+        <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+          <div class="element-detail" [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+            <div class="detail-grid">
+              <div class="detail-item"><strong>Tipo Solicitud:</strong> {{element.tipoSolicitud}}</div>
+              <div class="detail-item"><strong>Facultad:</strong> {{element.facultad}}</div>
+              <div class="detail-item"><strong>Campus:</strong> {{element.campus}}</div>
+              <div class="detail-item"><strong>Identidad Género:</strong> {{element.genero}}</div>
+              <div class="detail-item"><strong>Edad:</strong> {{element.edad}} años</div>
+              <div class="detail-item"><strong>Celular:</strong> {{element.celular}}</div>
+              <div class="detail-item"><strong>Cargo:</strong> {{element.cargo}}</div>
+              <div class="detail-item"><strong>Teléfono:</strong> {{element.telefono}}</div>
+              <div class="detail-item"><strong>Correo Inst:</strong> {{element.correoInst}}</div>
+              <div class="detail-item"><strong>Correo Pers:</strong> {{element.correoPers}}</div>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      
+      <tr mat-row *matRowDef="let element; columns: displayedColumns;"
+          class="element-row"
+          [class.expanded-row]="expandedElement === element"
+          (click)="expandedElement = expandedElement === element ? null : element">
+      </tr>
+      
+      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
+    </table>
+
+    <div *ngIf="dataSource.data.length === 0" class="empty-state">
+        <mat-icon>check_circle_outline</mat-icon>
+        <p>¡Todo listo! No hay más casos pendientes.</p>
+    </div>
+  </mat-card>
+
+  <div class="section-divider">
+    <span>Detalles de Asignación</span>
+  </div>
+
+  <mat-card class="reparto-card" id="formulario-asignacion" [class.disabled-card]="codigoCaso === 'Seleccione un caso'">
     <header class="reparto-header">
       <div class="header-info">
-        <span class="badge">Nuevo Reparto</span>
-        <h1>Asignación de Caso: {{ codigoCaso }}</h1>
-        <p>Complete los campos para delegar la atención del acompañamiento.</p>
+        <span class="badge" *ngIf="codigoCaso !== 'Seleccione un caso'">Gestionando</span>
+        <h1>{{ codigoCaso === 'Seleccione un caso' ? 'Seleccione un caso arriba' : 'Asignando Caso: ' + codigoCaso }}</h1>
+        <p>Complete los campos para delegar la atención.</p>
       </div>
       <mat-icon class="header-icon">person_add_alt_1</mat-icon>
     </header>
 
-    <mat-divider></mat-divider>
-
     <form [formGroup]="repartoForm" (ngSubmit)="guardarReparto()" class="reparto-form">
-      
       <div class="form-grid">
         <mat-form-field appearance="outline">
           <mat-label>Tipo de Asignación</mat-label>
           <mat-select formControlName="tipoAsignacion">
-            <mat-option *ngFor="let tipo of tiposAsignacion" [value]="tipo">
-              {{ tipo }}
-            </mat-option>
+            <mat-option *ngFor="let tipo of tiposAsignacion" [value]="tipo">{{ tipo }}</mat-option>
           </mat-select>
         </mat-form-field>
 
@@ -36,14 +121,12 @@
         <mat-form-field appearance="outline">
           <mat-label>Servicio / Dupla</mat-label>
           <mat-select formControlName="servicio">
-            <mat-option *ngFor="let serv of servicios" [value]="serv">
-              {{ serv }}
-            </mat-option>
+            <mat-option *ngFor="let serv of servicios" [value]="serv">{{ serv }}</mat-option>
           </mat-select>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Asignar Profesional Responsable</mat-label>
+          <mat-label>Asignar Profesional</mat-label>
           <mat-select formControlName="asignadoA">
             <mat-option *ngFor="let prof of profesionales" [value]="prof.id">
               {{ prof.nombre }} ({{ prof.cargo }})
@@ -53,15 +136,15 @@
       </div>
 
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Observaciones de Reparto</mat-label>
-        <textarea matInput rows="4" formControlName="observaciones" 
-                  placeholder="Instrucciones adicionales para el profesional..."></textarea>
+        <mat-label>Observaciones</mat-label>
+        <textarea matInput rows="3" formControlName="observaciones"></textarea>
       </mat-form-field>
 
       <div class="actions">
         <button mat-button type="button" (click)="regresar()">Cancelar</button>
-        <button mat-raised-button color="primary" type="submit" [disabled]="repartoForm.invalid">
-          <mat-icon>check</mat-icon> Confirmar Asignación
+        <button mat-raised-button color="primary" type="submit" 
+                [disabled]="repartoForm.invalid || codigoCaso === 'Seleccione un caso'">
+          <mat-icon>check</mat-icon> Confirmar
         </button>
       </div>
     </form>
