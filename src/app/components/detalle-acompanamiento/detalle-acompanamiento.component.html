@@ -1,33 +1,117 @@
 <div class="gestion-container">
-  <header class="header centered">
-    <h1>Gestión de Contacto - {{ idCaso }}</h1>
-    <p>Registre cada intento de comunicación con el usuario para el agendamiento.</p>
-  </header>
+  <div class="back-link" (click)="regresar()">
+    <mat-icon>arrow_back</mat-icon> Volver al Panel
+  </div>
 
-  <div class="main-column-layout">
+  <div class="section-header">
+    <h2>Gestión de Contacto</h2>
+    <p class="subtitle">Administre el seguimiento y primer contacto de las solicitudes</p>
+  </div>
+
+  <mat-card class="master-card">
+    <table mat-table [dataSource]="dataSource" multiTemplateDataRows>
+      <ng-container matColumnDef="expand">
+        <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-icon-button (click)="(expandedElement = expandedElement === element ? null : element); $event.stopPropagation()">
+            <mat-icon>{{expandedElement === element ? 'remove_circle' : 'add_circle'}}</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>
+          <div class="header-filter">
+            <span>ID Caso</span>
+            <input (keyup)="applyFilter('id', $event)" placeholder="...">
+          </div>
+        </th>
+        <td mat-cell *matCellDef="let element"><b>#{{element.id}}</b></td>
+      </ng-container>
+
+      <ng-container matColumnDef="nombre">
+        <th mat-header-cell *matHeaderCellDef>
+          <div class="header-filter">
+            <span>Usuario</span>
+            <input (keyup)="applyFilter('nombre', $event)" placeholder="Filtrar...">
+          </div>
+        </th>
+        <td mat-cell *matCellDef="let element">{{element.nombre}} <br> <small class="text-muted">{{element.documento}}</small></td>
+      </ng-container>
+
+      <ng-container matColumnDef="fecha">
+        <th mat-header-cell *matHeaderCellDef>
+          <div class="header-filter">
+            <span>Fecha</span>
+            <input (keyup)="applyFilter('fecha', $event)" placeholder="AAAA-MM...">
+          </div>
+        </th>
+        <td mat-cell *matCellDef="let element">{{element.fecha}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="dependencia">
+        <th mat-header-cell *matHeaderCellDef>
+          <div class="header-filter">
+            <span>Dependencia</span>
+            <input (keyup)="applyFilter('dependencia', $event)" placeholder="...">
+          </div>
+        </th>
+        <td mat-cell *matCellDef="let element"><span class="badge-soft">{{element.dependencia}}</span></td>
+      </ng-container>
+
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef>Acción</th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-flat-button color="primary" class="btn-sm" (click)="seleccionarCaso(element); $event.stopPropagation()">
+            <mat-icon>phone_enabled</mat-icon> {{ idCaso === element.id ? 'Seleccionado' : 'Gestionar' }}
+          </button>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="expandedDetail">
+        <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+          <div class="element-detail" [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+            <div class="detail-grid">
+              <div class="detail-item"><strong>Tipo:</strong> {{element.tipoSolicitud}}</div>
+              <div class="detail-item"><strong>Facultad:</strong> {{element.facultad}}</div>
+              <div class="detail-item"><strong>Campus:</strong> {{element.campus}}</div>
+              <div class="detail-item"><strong>Celular:</strong> {{element.celular}}</div>
+              <div class="detail-item"><strong>Correo:</strong> {{element.correoInst}}</div>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="element-row" [class.expanded-row]="expandedElement === element"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
+    </table>
+    <mat-paginator [pageSizeOptions]="[5, 10]" showFirstLastButtons></mat-paginator>
+  </mat-card>
+
+  <div class="section-divider" id="seccion-gestion">
+    <span>Panel de Registro: {{ idCaso }}</span>
+  </div>
+
+  <div class="layout-grid" [class.locked]="idCaso === 'Seleccione un caso'">
     <mat-card class="form-card">
-      <h3 class="text-center">Nuevo Registro de Contacto</h3>
-
-      <form [formGroup]="contactoForm" (ngSubmit)="registrarIntento()" class="compact-form">
-        
-        <div class="form-grid">
+      <h3>Nuevo Intento de Comunicación</h3>
+      <form [formGroup]="contactoForm" (ngSubmit)="registrarIntento()">
+        <div class="form-inputs">
           <mat-form-field appearance="outline">
-            <mat-label>Fecha de contacto</mat-label>
+            <mat-label>Fecha</mat-label>
             <input matInput type="date" formControlName="fecha">
           </mat-form-field>
-
           <mat-form-field appearance="outline">
             <mat-label>Hora</mat-label>
             <input matInput type="time" formControlName="hora">
           </mat-form-field>
-
           <mat-form-field appearance="outline">
             <mat-label>Jornada</mat-label>
             <mat-select formControlName="jornada">
               <mat-option *ngFor="let j of jornadas" [value]="j">{{ j }}</mat-option>
             </mat-select>
           </mat-form-field>
-
           <mat-form-field appearance="outline">
             <mat-label>Resultado</mat-label>
             <mat-select formControlName="resultado">
@@ -35,61 +119,42 @@
             </mat-select>
           </mat-form-field>
         </div>
-
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Observaciones detalladas</mat-label>
-          <textarea
-            matInput
-            rows="3"
-            formControlName="observacion"
-            placeholder="Ej: Se conversó con la madre, solicita llamar a las 5pm">
-          </textarea>
+          <mat-label>Observaciones</mat-label>
+          <textarea matInput rows="2" formControlName="observacion"></textarea>
         </mat-form-field>
-
-        <button
-          mat-flat-button
-          color="primary"
-          class="btn-block"
-          type="submit"
-          [disabled]="contactoForm.invalid">
-          <mat-icon>save</mat-icon>
-          Guardar Intento de Contacto
+        <button mat-raised-button color="primary" class="btn-save" type="submit" [disabled]="contactoForm.invalid">
+          <mat-icon>save</mat-icon> Guardar Registro
         </button>
-
       </form>
     </mat-card>
 
     <mat-card class="history-card">
-      <h3 class="text-center">Historial de Intentos</h3>
-      <div class="table-container">
+      <h3>Historial de Intentos</h3>
+      <div class="table-wrapper">
         <table mat-table [dataSource]="historialContactos">
           <ng-container matColumnDef="fecha">
             <th mat-header-cell *matHeaderCellDef>Fecha / Hora</th>
             <td mat-cell *matCellDef="let element">{{ element.fecha }} <br><small>{{ element.hora }}</small></td>
           </ng-container>
-
           <ng-container matColumnDef="jornada">
             <th mat-header-cell *matHeaderCellDef>Jornada</th>
             <td mat-cell *matCellDef="let element">{{ element.jornada }}</td>
           </ng-container>
-
           <ng-container matColumnDef="resultado">
             <th mat-header-cell *matHeaderCellDef>Resultado</th>
             <td mat-cell *matCellDef="let element">
-              <span class="res-pill" [class.success]="element.resultado.includes('Exitoso')">
-                {{ element.resultado }}
-              </span>
+              <span class="pill" [class.success]="element.resultado.includes('Exitoso')">{{ element.resultado }}</span>
             </td>
           </ng-container>
-
           <ng-container matColumnDef="observacion">
             <th mat-header-cell *matHeaderCellDef>Observación</th>
             <td mat-cell *matCellDef="let element">{{ element.observacion }}</td>
           </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          <tr mat-header-row *matHeaderRowDef="columnasHistorial"></tr>
+          <tr mat-row *matRowDef="let row; columns: columnasHistorial;"></tr>
         </table>
+        <div *ngIf="historialContactos.length === 0" class="empty">No hay registros para este caso.</div>
       </div>
     </mat-card>
   </div>

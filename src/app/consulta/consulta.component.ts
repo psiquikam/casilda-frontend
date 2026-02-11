@@ -9,6 +9,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { ModalDetalleSolicitudComponent } from '../components/modal-detalle-solicitud/modal-detalle-solicitud.component';
 import { Router } from '@angular/router';
@@ -19,7 +20,7 @@ import { Router } from '@angular/router';
   imports: [
     CommonModule, FormsModule, MatTabsModule, MatTableModule,
     MatButtonModule, MatIconModule, MatChipsModule, MatCardModule,
-    MatInputModule, MatDialogModule
+    MatInputModule, MatDialogModule, MatPaginatorModule
   ],
   templateUrl: './consulta.component.html',
   styleUrls: ['./consulta.component.scss'],
@@ -45,7 +46,7 @@ export class ConsultaComponent implements OnInit {
   dataSourceCerrados = new MatTableDataSource<any>([]);
   dataSourceSinRepartir = new MatTableDataSource<any>([]);
 
-  filterValues: any = { id: '', nombre: '', documento: '', profesional: '' };
+  filterValues: any = { id: '', nombre: '', documento: '', profesional: '', fecha: '', dependencia: '' };
 
   datosSimulados = [
     {
@@ -197,7 +198,9 @@ export class ConsultaComponent implements OnInit {
     this.dataSourceCerrados.data = this.datosSimulados.filter(c =>
       c.estado === 'Cerrado'
     );
-    this.setFilterPredicates();
+    const filterPredicate = this.createFilter();
+    [this.dataSourceSinRepartir, this.dataSourceActivos, this.dataSourceTransicion, this.dataSourceCerrados]
+      .forEach(ds => ds.filterPredicate = filterPredicate);
   }
 
   setFilterPredicates() {
@@ -214,10 +217,12 @@ export class ConsultaComponent implements OnInit {
     const filterValue = (event.target as HTMLInputElement).value;
     this.filterValues[column] = filterValue.trim().toLowerCase();
     const filterString = JSON.stringify(this.filterValues);
-    this.dataSourceActivos.filter = filterString;
-    this.dataSourceTransicion.filter = filterString;
-    this.dataSourceCerrados.filter = filterString;
-    this.dataSourceSinRepartir.filter = filterString;
+    
+    [this.dataSourceSinRepartir, this.dataSourceActivos, this.dataSourceTransicion, this.dataSourceCerrados]
+      .forEach(ds => {
+        ds.filter = filterString;
+        if (ds.paginator) ds.paginator.firstPage();
+      });
   }
 
   createFilter(): (data: any, filter: string) => boolean {
@@ -226,6 +231,8 @@ export class ConsultaComponent implements OnInit {
       return data.id.toLowerCase().includes(searchTerms.id)
         && data.nombre.toLowerCase().includes(searchTerms.nombre)
         && data.documento.toLowerCase().includes(searchTerms.documento)
+        && data.fecha.toLowerCase().includes(searchTerms.fecha)
+        && data.dependencia.toLowerCase().includes(searchTerms.dependencia)
         && data.profesional.toLowerCase().includes(searchTerms.profesional);
     };
   }
@@ -245,18 +252,18 @@ export class ConsultaComponent implements OnInit {
   }
 
   get totalSinRepartir(): number {
-  return this.dataSourceSinRepartir.data.length;
-}
+    return this.dataSourceSinRepartir.data.length;
+  }
 
   get totalCerrado(): number {
     return this.dataSourceCerrados.data.length;
   }
 
-   get totalAbiertoActivo(): number{
+  get totalAbiertoActivo(): number {
     return this.dataSourceActivos.data.length;
   }
 
-   get totalAbiertoTransicion(): number{
+  get totalAbiertoTransicion(): number {
     return this.dataSourceTransicion.data.length;
   }
 }
