@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
-
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -12,6 +11,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule, MatPaginatorIntl } from '@angular/material/paginator';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ModalGestionComponent } from '../modal-gestion-contacto/modal-gestion-contacto.component';
+
 
 export function getSpanishPaginatorIntl() {
   const paginatorIntl = new MatPaginatorIntl();
@@ -32,10 +34,18 @@ export function getSpanishPaginatorIntl() {
   selector: 'app-detalle-acompanamiento',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule,
-    MatInputModule, MatSelectModule, MatButtonModule, MatTableModule,
-    MatIconModule, MatPaginatorModule
-  ],
+  CommonModule,
+  ReactiveFormsModule,
+  MatCardModule,
+  MatFormFieldModule,
+  MatInputModule,
+  MatSelectModule,
+  MatButtonModule,
+  MatTableModule,
+  MatIconModule,
+  MatPaginatorModule,
+  MatDialogModule
+],
   providers: [
     { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
   ],
@@ -53,6 +63,8 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
+
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -141,6 +153,14 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
       this.contactoForm.patchValue({ jornada: '', resultado: '', observacion: '' });
     }
   }
+
+  abrirModalGestion(caso: any) {
+  this.dialog.open(ModalGestionComponent, {
+    width: '900px',
+    maxWidth: '95vw',
+    data: caso
+  });
+}
 
   private formatearHora(hora: string): string {
     const [h, m] = hora.split(':').map(Number);
