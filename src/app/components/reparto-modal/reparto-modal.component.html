@@ -1,0 +1,54 @@
+<h2 mat-dialog-title>Asignar Caso: {{ data.id }}</h2>
+<mat-dialog-content>
+  <form [formGroup]="repartoForm" class="reparto-form">
+    
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Tipo de Asignación</mat-label>
+        <mat-select formControlName="tipoAsignacion">
+          <mat-option *ngFor="let tipo of tiposAsignacion" [value]="tipo">
+            {{ tipo }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha de Reparto</mat-label>
+        <input matInput formControlName="fechaReparto">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Servicio</mat-label>
+        <mat-select formControlName="servicio">
+          <mat-option *ngFor="let serv of servicios" [value]="serv">
+            {{ serv }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Asignar Profesional</mat-label>
+        <mat-select formControlName="asignadoA">
+          <mat-option *ngFor="let prof of profesionales" [value]="prof.id">
+            {{ prof.nombre }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Observaciones</mat-label>
+      <textarea matInput rows="3" formControlName="observaciones"></textarea>
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cerrar()">Cancelar</button>
+  <button mat-raised-button color="primary"
+          (click)="guardar()"
+          [disabled]="repartoForm.invalid">
+    Confirmar
+  </button>
+</mat-dialog-actions>

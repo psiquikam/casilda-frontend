@@ -64,7 +64,7 @@
         <th mat-header-cell *matHeaderCellDef> Acción </th>
         <td mat-cell *matCellDef="let element">
           <button mat-stroked-button color="primary" class="btn-sm" 
-                  (click)="seleccionarCaso(element); $event.stopPropagation()"
+                  (click)="abrirModal(element); $event.stopPropagation()"
                   [disabled]="codigoCaso === element.id">
             <mat-icon>arrow_downward</mat-icon> 
             {{ codigoCaso === element.id ? 'Gestionando...' : 'Asignar' }}
@@ -102,65 +102,5 @@
         <mat-icon>check_circle_outline</mat-icon>
         <p>¡Todo listo! No hay más casos pendientes.</p>
     </div>
-  </mat-card>
-
-  <div class="section-divider">
-    <span>Detalles de Asignación</span>
-  </div>
-
-  <mat-card class="reparto-card" id="formulario-asignacion" [class.disabled-card]="codigoCaso === 'Seleccione un caso'">
-    <header class="reparto-header">
-      <div class="header-info">
-        <span class="badge" *ngIf="codigoCaso !== 'Seleccione un caso'">Gestionando</span>
-        <h1>{{ codigoCaso === 'Seleccione un caso' ? 'Seleccione un caso arriba' : 'Asignando Caso: ' + codigoCaso }}</h1>
-        <p>Complete los campos para delegar la atención.</p>
-      </div>
-      <mat-icon class="header-icon">person_add_alt_1</mat-icon>
-    </header>
-
-    <form [formGroup]="repartoForm" (ngSubmit)="guardarReparto()" class="reparto-form">
-      <div class="form-grid">
-        <mat-form-field appearance="outline">
-          <mat-label>Tipo de Asignación</mat-label>
-          <mat-select formControlName="tipoAsignacion">
-            <mat-option *ngFor="let tipo of tiposAsignacion" [value]="tipo">{{ tipo }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Fecha de Reparto</mat-label>
-          <input matInput formControlName="fechaReparto">
-          <mat-icon matSuffix>calendar_today</mat-icon>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Servicio / Dupla</mat-label>
-          <mat-select formControlName="servicio">
-            <mat-option *ngFor="let serv of servicios" [value]="serv">{{ serv }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Asignar Profesional</mat-label>
-          <mat-select formControlName="asignadoA">
-            <mat-option *ngFor="let prof of profesionales" [value]="prof.id">
-              {{ prof.nombre }} ({{ prof.cargo }})
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Observaciones</mat-label>
-        <textarea matInput rows="3" formControlName="observaciones"></textarea>
-      </mat-form-field>
-
-      <div class="actions">
-        <button mat-button type="button" (click)="regresar()">Cancelar</button>
-        <button mat-raised-button color="primary" type="submit" [disabled]="repartoForm.invalid || codigoCaso === 'Seleccione un caso'">
-          <mat-icon>check</mat-icon> Confirmar
-        </button>
-      </div>
-    </form>
   </mat-card>
 </div>

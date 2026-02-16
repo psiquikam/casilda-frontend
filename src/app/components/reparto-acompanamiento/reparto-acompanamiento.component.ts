@@ -12,6 +12,9 @@ import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, MatPaginatorIntl } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
+import { MatDialog } from '@angular/material/dialog';
+import { RepartoModalComponent } from '../reparto-modal/reparto-modal.component';
+
 
 export function getSpanishPaginatorIntl() {
   const paginatorIntl = new MatPaginatorIntl();
@@ -55,6 +58,8 @@ export class RepartoAcompanamientoComponent implements OnInit, AfterViewInit {
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
+
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -142,14 +147,24 @@ export class RepartoAcompanamientoComponent implements OnInit, AfterViewInit {
     }
   }
 
-  seleccionarCaso(caso: any) {
-    this.codigoCaso = caso.id;
-    this.repartoForm.patchValue({ observaciones: '', tipoAsignacion: '', servicio: '', asignadoA: '' });
-    setTimeout(() => {
-      const formElement = document.getElementById('formulario-asignacion');
-      if (formElement) formElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 100);
-  }
+  abrirModal(caso: any) {
+  const dialogRef = this.dialog.open(RepartoModalComponent, {
+    width: '650px',
+    data: caso
+  });
+
+  dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      const index = this.dataSource.data.findIndex(c => c.id === result.caso.id);
+      if (index !== -1) {
+        const newData = [...this.dataSource.data];
+        newData.splice(index, 1);
+        this.dataSource.data = newData;
+      }
+    }
+  });
+}
+
 
   regresar() {
     this.router.navigate(['/consulta']);
