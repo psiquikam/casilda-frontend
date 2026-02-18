@@ -31,64 +31,82 @@
           </mat-radio-group>
         </div>
 
-        <div *ngIf="acompanamientoForm.get('tipoReporte')?.value === 'indirecta'" class="form-section">
-          <h3 class="section-title-divider">Remitente</h3>
-          <div class="row">
-            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-              <mat-label>Primer Nombre (Remitente)</mat-label>
-              <input matInput formControlName="remitentePrimerNombre">
-            </mat-form-field>
-            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-              <mat-label>Segundo Nombre</mat-label>
-              <input matInput formControlName="remitenteSegundoNombre">
-            </mat-form-field>
-            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-              <mat-label>Primer Apellido</mat-label>
-              <input matInput formControlName="remitentePrimerApellido">
-            </mat-form-field>
-            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-              <mat-label>Segundo Apellido</mat-label>
-              <input matInput formControlName="remitenteSegundoApellido">
-            </mat-form-field>
-          </div>
+        <ng-container *ngIf="acompanamientoForm.get('tipoReporte')?.value === 'indirecta'">
+          <mat-tab-group animationDuration="200ms" class="form-tabs">
+            
+            <mat-tab label="Información del Remitente">
+              <div class="tab-body-padding">
+                <div class="row">
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>Primer Nombre</mat-label>
+                    <input matInput formControlName="remitentePrimerNombre">
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>Segundo Nombre</mat-label>
+                    <input matInput formControlName="remitenteSegundoNombre">
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>Primer Apellido</mat-label>
+                    <input matInput formControlName="remitentePrimerApellido">
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>Segundo Apellido</mat-label>
+                    <input matInput formControlName="remitenteSegundoApellido">
+                  </mat-form-field>
+                </div>
+                <div class="row">
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>Tipo de Solicitud</mat-label>
+                    <mat-select formControlName="tipoSolicitud">
+                      @for (tipo of tiposSolicitud; track tipo) {
+                        <mat-option [value]="tipo">{{tipo}}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>Cargo</mat-label>
+                    <input matInput formControlName="cargo">
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>Campus</mat-label>
+                    <mat-select formControlName="campus">
+                      @for (c of campusLista; track c) {
+                        <mat-option [value]="c">{{c}}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>Dependencia</mat-label>
+                    <mat-select formControlName="dependencia">
+                      @for (dep of dependencias; track dep) {
+                        <mat-option [value]="dep">{{dep}}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+            </mat-tab>
 
-          <div class="row">
-            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-              <mat-label>Tipo de Solicitud</mat-label>
-              <mat-select formControlName="tipoSolicitud">
-                @for (tipo of tiposSolicitud; track tipo) {
-                  <mat-option [value]="tipo">{{tipo}}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-              <mat-label>Cargo</mat-label>
-              <input matInput formControlName="cargo">
-            </mat-form-field>
-            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-              <mat-label>Campus</mat-label>
-              <mat-select formControlName="campus">
-                @for (c of campusLista; track c) {
-                  <mat-option [value]="c">{{c}}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-              <mat-label>Dependencia</mat-label>
-              <mat-select formControlName="dependencia">
-                @for (dep of dependencias; track dep) {
-                  <mat-option [value]="dep">{{dep}}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-          </div>
-        </div>
+            <mat-tab label="Información del Solicitante">
+              <div class="tab-body-padding">
+                <ng-container *ngTemplateOutlet="camposSolicitante"></ng-container>
+              </div>
+            </mat-tab>
 
-        <div class="form-section" *ngIf="acompanamientoForm.get('tipoReporte')?.value">
-          <h3 class="section-title-divider">Solicitante</h3>
+          </mat-tab-group>
+        </ng-container>
+
+        <ng-container *ngIf="acompanamientoForm.get('tipoReporte')?.value === 'directa'">
+          <div class="form-section">
+            <h3 class="section-title-divider">Datos del Solicitante</h3>
+            <ng-container *ngTemplateOutlet="camposSolicitante"></ng-container>
+          </div>
+        </ng-container>
+
+        <ng-template #camposSolicitante>
           <div class="row">
             <mat-form-field appearance="outline" subscriptSizing="dynamic">
-              <mat-label>Primer Nombre (Solicitante)</mat-label>
+              <mat-label>Primer Nombre</mat-label>
               <input matInput formControlName="primerNombre">
             </mat-form-field>
             <mat-form-field appearance="outline" subscriptSizing="dynamic">
@@ -104,7 +122,6 @@
               <input matInput formControlName="segundoApellido">
             </mat-form-field>
           </div>
-
           <div class="row">
             <mat-form-field appearance="outline" subscriptSizing="dynamic">
               <mat-label>Tipo Documento</mat-label>
@@ -127,7 +144,6 @@
               <input matInput type="number" formControlName="edad">
             </mat-form-field>
           </div>
-
           <div class="row">
             <mat-form-field appearance="outline" subscriptSizing="dynamic">
               <mat-label>Celular</mat-label>
@@ -150,7 +166,8 @@
               </mat-select>
             </mat-form-field>
           </div>
-        </div>
+        </ng-template>
+
       </form>
     </mat-card-content>
 

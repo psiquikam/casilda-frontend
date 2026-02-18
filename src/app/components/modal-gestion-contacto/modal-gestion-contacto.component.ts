@@ -9,6 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-modal-gestion',
@@ -22,7 +23,8 @@ import { MatTabsModule } from '@angular/material/tabs';
     MatSelectModule,
     MatButtonModule,
     MatTableModule,
-    MatTabsModule
+    MatTabsModule,
+    MatIconModule
   ],
   templateUrl: './modal-gestion-contacto.component.html',
   styleUrls: ['./modal-gestion-contacto.component.scss']

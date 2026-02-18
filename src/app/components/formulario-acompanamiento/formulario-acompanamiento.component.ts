@@ -14,7 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-
+import { MatTabsModule } from '@angular/material/tabs';
 import { ListasService } from '../../services/listas.service';
 import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
 
@@ -24,7 +24,8 @@ import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
   imports: [
     CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule,
     MatInputModule, MatSelectModule, MatDatepickerModule, MatNativeDateModule,
-    MatButtonModule, MatIconModule, MatSnackBarModule, MatRadioModule, MatDialogModule
+    MatButtonModule, MatIconModule, MatSnackBarModule, MatRadioModule, 
+    MatDialogModule, MatTabsModule
   ],
   templateUrl: './formulario-acompanamiento.component.html',
   styleUrls: ['./formulario-acompanamiento.component.scss']

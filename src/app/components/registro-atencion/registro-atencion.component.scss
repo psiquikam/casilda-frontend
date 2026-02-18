@@ -209,3 +209,91 @@ mat-card-actions {
     }
   }
 }
+
+.form-container {
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+  background-color: #f1f5f9;
+  min-height: 100vh;
+}
+
+.form-card {
+  width: 100%;
+  max-width: 1200px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+::ng-deep {
+  .mat-mdc-tab-group {
+    --mdc-tab-indicator-active-indicator-color: transparent;
+  }
+
+  .mat-mdc-tab {
+    height: 48px !important;
+    background-color: #f8fafc;
+    border-radius: 8px 8px 0 0;
+    margin-right: 4px;
+    
+    .mdc-tab__text-label {
+      font-weight: 700 !important;
+      font-size: 11px !important;
+      color: #64748b;
+    }
+  }
+
+  .mat-mdc-tab.mdc-tab--active {
+    background-color: #e91e63 !important;
+    .mdc-tab__text-label { color: #ffffff !important; }
+  }
+
+  .mat-mdc-form-field-flex {
+    height: 32px !important;
+    padding: 0 12px !important;
+  }
+
+  .mat-mdc-form-field-subscript-wrapper { display: none !important; }
+}
+
+.tab-padding {
+  padding: 20px 25px;
+}
+
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.span-all { grid-column: 1 / -1; }
+
+.discapacidad-container {
+  margin-top: 25px;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 15px;
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    font-weight: 800;
+    color: #1e293b;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+}
+
+.discapacidad-item {
+  display: grid;
+  grid-template-columns: 1fr 2fr auto;
+  align-items: center;
+  background: white;
+  padding: 8px 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  margin-bottom: 5px;
+  font-size: 13px;
+}
+
+.empty-tab {
+  text-align: center;
+  padding: 50px;
+  color: #94a3b8;
+  font-style: italic;
+}

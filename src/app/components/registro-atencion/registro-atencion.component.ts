@@ -1,11 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule
-} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -18,6 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ModalDireccionComponent } from '../modal-direccion/modal-direccion.component';
+import { ModalDiscapacidadComponent } from '../modal-discapacidad/modal-discapacidad.component';
 
 @Component({
   selector: 'app-registro-atencion',
@@ -35,21 +31,20 @@ import { ModalDireccionComponent } from '../modal-direccion/modal-direccion.comp
     MatButtonModule,
     MatIconModule,
     MatSnackBarModule,
-    MatDialogModule // IMPORTANTE: Faltaba este módulo para que el diálogo funcione al navegar
+    MatDialogModule
   ],
   templateUrl: './registro-atencion.component.html',
   styleUrls: ['./registro-atencion.component.scss']
 })
 export class RegistroAtencionComponent implements OnInit {
   atencionForm!: FormGroup;
+  discapacidadesRegistradas: any[] = [];
 
   listaSexo = ['Masculino', 'Femenino', 'Intersexual', 'Indeterminado'];
   listaEtnias = ['Ninguna', 'Indígena', 'Afrocolombiano', 'Raizal', 'Palenquero', 'Rrom/Gitano'];
   listaIdentidadSexual = ['Hombre cisgénero', 'Mujer cisgénero', 'Hombre trans', 'Mujer trans', 'No binario', 'Género fluido', 'Otro'];
   listaOrientacionSexual = ['Heterosexual', 'Homosexual (GAY/LESBIANA)', 'Bisexual', 'Pansexual', 'Asexual', 'Otro'];
   listaVinculos = ['Estudiante Pregrado', 'Estudiante Posgrado', 'Docente', 'Administrativo', 'Egresado', 'Contratista', 'Visitante'];
-  listaTiposDiscapacidad = ['Física', 'Auditiva', 'Visual', 'Sordoceguera', 'Intelectual', 'Psicosocial', 'Múltiple', 'Ninguna'];
-  listaDiscapacidades = ['Posee diagnóstico', 'No posee diagnóstico', 'En proceso de diagnóstico', 'No aplica'];
   tiposSolicitud = ['Psicosocial', 'Jurídica', 'Salud', 'Académica'];
   tiposServicio = ['Asesoría', 'Acompañamiento', 'Seguimiento', 'Intervención'];
   tiposDoc = ['Cédula de Ciudadanía', 'Tarjeta de Identidad', 'Cédula de Extranjería', 'Pasaporte'];
@@ -76,8 +71,6 @@ export class RegistroAtencionComponent implements OnInit {
       quienRemite: ['', Validators.required],
       formaEntrevista: ['', Validators.required],
       consentimientoArchivo: [null],
-
-      // TAB 2: Datos de la persona (Ajustado a los nombres de tu HTML)
       tipoDocumento: ['', Validators.required],
       documento: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
       fechaNacimiento: ['', Validators.required],
@@ -93,24 +86,33 @@ export class RegistroAtencionComponent implements OnInit {
       telefonoAlterno: ['', Validators.required],
       correoPersonal: ['', [Validators.required, Validators.email]],
       correoInstitucional: [''],
-      descripcionPersona: ['', Validators.required],
       direccionLugar: [''],
-
-      // TAB 3: Datos complementarios
       eps: ['', Validators.required],
       regimenSalud: ['', Validators.required],
       campus: ['', Validators.required],
       facultad: ['', Validators.required],
       vinculo: ['', Validators.required],
-      tipoDiscapacidad: ['', Validators.required],
-      discapacidad: ['', Validators.required],
-
-      // TAB 4: Documentación
       tipoViolencia: ['', Validators.required],
       subcategoriaViolencia: ['', Validators.required],
       tiempoOcurrido: ['', Validators.required],
       hechos: ['', [Validators.required, Validators.minLength(20)]]
     });
+  }
+
+  abrirModalDiscapacidad(): void {
+    const dialogRef = this.dialog.open(ModalDiscapacidadComponent, {
+      width: '400px'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.discapacidadesRegistradas.push(result);
+      }
+    });
+  }
+
+  eliminarDiscapacidad(index: number): void {
+    this.discapacidadesRegistradas.splice(index, 1);
   }
 
   abrirModalDireccion(): void {
@@ -122,7 +124,6 @@ export class RegistroAtencionComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.atencionForm.patchValue({ direccionLugar: result });
-        this.snackBar.open('Dirección cargada correctamente', 'Cerrar', { duration: 2000 });
       }
     });
   }
@@ -134,40 +135,15 @@ export class RegistroAtencionComponent implements OnInit {
       const file = e.target.files[0];
       if (file) {
         this.atencionForm.patchValue({ consentimientoArchivo: file.name });
-        this.snackBar.open(`Archivo cargado: ${file.name}`, 'OK', { duration: 3000 });
       }
     };
     input.click();
   }
 
-  cancelar(): void {
-    if (confirm('¿Está seguro de cancelar? Se perderán los datos no guardados.')) {
-      this.atencionForm.reset();
-      this.initForm();
-    }
-  }
-
   guardarAtencion(): void {
     if (this.atencionForm.valid) {
-      console.log('--- ENVIANDO REGISTRO ---', this.atencionForm.value);
-      this.snackBar.open('Atención registrada exitosamente', 'Éxito', {
-        duration: 5000,
-        panelClass: ['success-snackbar']
-      });
-    } else {
-      this.marcarComoTocados(this.atencionForm);
-      this.snackBar.open('Por favor verifique los campos obligatorios en todos los tabs', 'Error', {
-        duration: 4000
-      });
+      const data = { ...this.atencionForm.value, discapacidades: this.discapacidadesRegistradas };
+      console.log(data);
     }
-  }
-
-  private marcarComoTocados(formGroup: FormGroup): void {
-    Object.values(formGroup.controls).forEach(control => {
-      control.markAsTouched();
-      if ((control as any).controls) {
-        this.marcarComoTocados(control as FormGroup);
-      }
-    });
   }
 }
