@@ -248,7 +248,8 @@
                             </mat-form-field>
                             <div class="span-all text-area-container">
                                 <mat-form-field appearance="outline">
-                                    <mat-label>Descripción de Hechos en circunstancias de tiempo, modo y lugar</mat-label>
+                                    <mat-label>Descripción de Hechos en circunstancias de tiempo, modo y
+                                        lugar</mat-label>
                                     <textarea matInput rows="6" formControlName="hechos"></textarea>
                                 </mat-form-field>
                             </div>
@@ -277,8 +278,7 @@
                             <div class="discapacidad-container span-all">
                                 <div class="section-title">
                                     <span>Documentacion de hechos</span>
-                                    <button mat-icon-button color="primary" type="button"
-                                        (click)="abrirModalHechos()">
+                                    <button mat-icon-button color="primary" type="button" (click)="abrirModalHechos()">
                                         <mat-icon>add_circle</mat-icon>
                                     </button>
                                 </div>
@@ -345,7 +345,50 @@
                     </mat-tab>
 
                     <mat-tab label="Acuerdos y compromisos">
-                        <div class="tab-padding empty-tab">Contenido para Acuerdos y compromisos</div>
+                        <div class="tab-padding">
+
+                            <div class="discapacidad-container">
+                                <div class="section-title">
+                                    <span>Activación de ruta</span>
+                                    <button mat-icon-button color="primary" type="button"
+                                        (click)="abrirModalRutaActivada()">
+                                        <mat-icon>add_circle</mat-icon>
+                                    </button>
+                                </div>
+                                <div class="discapacidad-list">
+                                    @for (item of activarRutasRegistrados; track item; let i = $index) {
+                                    <div class="discapacidad-item">
+                                        <span><strong>Tipo:</strong> {{item.tipo}}</span>
+                                        <span><strong>Cual:</strong> {{item.cual}}</span>
+                                        <button mat-icon-button color="warn" (click)="eliminarRutaActivada(i)">
+                                            <mat-icon>delete</mat-icon>
+                                        </button>
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="discapacidad-container">
+                                <div class="section-title">
+                                    <span>Remisiones</span>
+                                    <button mat-icon-button color="primary" type="button"
+                                        (click)="abrirModalRemision()">
+                                        <mat-icon>add_circle</mat-icon>
+                                    </button>
+                                </div>
+                                <div class="discapacidad-list">
+                                    @for (item of remisionesRegistrados; track item; let i = $index) {
+                                    <div class="discapacidad-item">
+                                        <span><strong>Tipo:</strong> {{item.tipo}}</span>
+                                        <span><strong>Fecha:</strong> {{item.fecha}}</span>
+                                        <span><strong>Cual:</strong> {{item.cual}}</span>
+                                        <button mat-icon-button color="warn" (click)="eliminarRemision(i)">
+                                            <mat-icon>delete</mat-icon>
+                                        </button>
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
                     </mat-tab>
 
                 </mat-tab-group>

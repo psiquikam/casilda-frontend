@@ -12,7 +12,7 @@
   <mat-card class="form-card">
     <mat-card-content class="content-padding">
       <form [formGroup]="acompanamientoForm">
-        
+
         <div class="profile-selector">
           <h3 class="section-title">¿Cómo desea realizar su solicitud?</h3>
           <mat-radio-group formControlName="tipoReporte" class="profile-grid">
@@ -33,7 +33,7 @@
 
         <ng-container *ngIf="acompanamientoForm.get('tipoReporte')?.value === 'indirecta'">
           <mat-tab-group animationDuration="200ms" class="form-tabs">
-            
+
             <mat-tab label="Información del Remitente">
               <div class="tab-body-padding">
                 <div class="row">
@@ -56,32 +56,8 @@
                 </div>
                 <div class="row">
                   <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                    <mat-label>Tipo de Solicitud</mat-label>
-                    <mat-select formControlName="tipoSolicitud">
-                      @for (tipo of tiposSolicitud; track tipo) {
-                        <mat-option [value]="tipo">{{tipo}}</mat-option>
-                      }
-                    </mat-select>
-                  </mat-form-field>
-                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
                     <mat-label>Cargo</mat-label>
                     <input matInput formControlName="cargo">
-                  </mat-form-field>
-                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                    <mat-label>Campus</mat-label>
-                    <mat-select formControlName="campus">
-                      @for (c of campusLista; track c) {
-                        <mat-option [value]="c">{{c}}</mat-option>
-                      }
-                    </mat-select>
-                  </mat-form-field>
-                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                    <mat-label>Dependencia</mat-label>
-                    <mat-select formControlName="dependencia">
-                      @for (dep of dependencias; track dep) {
-                        <mat-option [value]="dep">{{dep}}</mat-option>
-                      }
-                    </mat-select>
                   </mat-form-field>
                 </div>
               </div>
@@ -106,6 +82,14 @@
         <ng-template #camposSolicitante>
           <div class="row">
             <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Tipo de Solicitud</mat-label>
+              <mat-select formControlName="tipoSolicitud">
+                @for (tipo of tiposSolicitud; track tipo) {
+                <mat-option [value]="tipo">{{tipo}}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
               <mat-label>Primer Nombre</mat-label>
               <input matInput formControlName="primerNombre">
             </mat-form-field>
@@ -121,13 +105,37 @@
               <mat-label>Segundo Apellido</mat-label>
               <input matInput formControlName="segundoApellido">
             </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Campus</mat-label>
+              <mat-select formControlName="campus">
+                @for (tipo of campusLista; track tipo) {
+                <mat-option [value]="tipo">{{tipo}}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Dependencia</mat-label>
+              <mat-select formControlName="dependencia">
+                @for (c of dependencias; track c) {
+                <mat-option [value]="c">{{c}}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Facultad</mat-label>
+              <mat-select formControlName="facultad">
+                @for (fac of facultades; track fac) {
+                <mat-option [value]="fac">{{fac}}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
           </div>
           <div class="row">
             <mat-form-field appearance="outline" subscriptSizing="dynamic">
               <mat-label>Tipo Documento</mat-label>
               <mat-select formControlName="tipoDocumento">
                 @for (t of tiposDocumento; track t) {
-                  <mat-option [value]="t">{{t}}</mat-option>
+                <mat-option [value]="t">{{t}}</mat-option>
                 }
               </mat-select>
             </mat-form-field>
@@ -150,20 +158,16 @@
               <input matInput formControlName="celular">
             </mat-form-field>
             <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Celular Alterno</mat-label>
+              <input matInput formControlName="celularAlterno">
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
               <mat-label>Correo Institucional</mat-label>
               <input matInput formControlName="correoInstitucional">
             </mat-form-field>
             <mat-form-field appearance="outline" subscriptSizing="dynamic">
               <mat-label>Correo Personal</mat-label>
               <input matInput formControlName="correoPersonal">
-            </mat-form-field>
-            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-              <mat-label>Facultad</mat-label>
-              <mat-select formControlName="facultad">
-                @for (fac of facultades; track fac) {
-                  <mat-option [value]="fac">{{fac}}</mat-option>
-                }
-              </mat-select>
             </mat-form-field>
           </div>
         </ng-template>
@@ -173,9 +177,7 @@
 
     <mat-card-actions align="end" *ngIf="acompanamientoForm.get('tipoReporte')?.value">
       <button mat-button color="warn" type="button" (click)="cancelar()">Limpiar</button>
-      <button mat-raised-button color="primary" 
-              [disabled]="acompanamientoForm.invalid"
-              (click)="enviarSolicitud()">
+      <button mat-raised-button color="primary" [disabled]="acompanamientoForm.invalid" (click)="enviarSolicitud()">
         <mat-icon>send</mat-icon> Enviar Solicitud
       </button>
     </mat-card-actions>

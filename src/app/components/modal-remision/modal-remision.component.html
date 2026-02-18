@@ -1,0 +1,39 @@
+<h2 mat-dialog-title class="modal-title">Agregar Teléfono</h2>
+
+<mat-dialog-content class="modal-content">
+  <div class="form-grid">
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Tipo de Remision</mat-label>
+      <mat-select [(ngModel)]="data.tipo">
+        <mat-option value="Directa">Directa</mat-option>
+        <mat-option value="Indirecta">Indirecta</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Fecha</mat-label>
+      <input matInput type="date" [(ngModel)]="data.fecha">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>¿Cual?</mat-label>
+      <input matInput [(ngModel)]="data.cual" placeholder="Opcional">
+    </mat-form-field>
+
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="modal-actions">
+  <button mat-button (click)="onNoClick()">Cancelar</button>
+
+  <button 
+    mat-raised-button 
+    color="primary" 
+    [mat-dialog-close]="data"
+    [disabled]="!data.tipo || !data.fecha"
+  >
+    <mat-icon>check</mat-icon>
+    Agregar a la lista
+  </button>
+</mat-dialog-actions>

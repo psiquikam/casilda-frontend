@@ -31,32 +31,43 @@ export class ModalDetalleSolicitudComponent implements OnInit {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: { info: any, modo: 'editar' | 'visualizar' },
     public dialogRef: MatDialogRef<ModalDetalleSolicitudComponent>
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.detalleForm = this.fb.group({
+
+      // REMITENTE
       remitentePrimerNombre: [this.data.info.remitentePrimerNombre || '', Validators.required],
       remitenteSegundoNombre: [this.data.info.remitenteSegundoNombre || ''],
       remitentePrimerApellido: [this.data.info.remitentePrimerApellido || '', Validators.required],
       remitenteSegundoApellido: [this.data.info.remitenteSegundoApellido || ''],
       cargo: [this.data.info.cargo || ''],
-      dependencia: [this.data.info.dependencia || ''],
-      facultad: [this.data.info.facultad || ''],
-      campus: [this.data.info.campus || ''],
-      pacientePrimerNombre: [this.data.info.pacientePrimerNombre || '', Validators.required],
-      pacienteSegundoNombre: [this.data.info.pacienteSegundoNombre || ''],
-      pacientePrimerApellido: [this.data.info.pacientePrimerApellido || '', Validators.required],
-      pacienteSegundoApellido: [this.data.info.pacienteSegundoApellido || ''],
-      documento: [this.data.info.documento || '', Validators.required],
+
+      // SOLICITANTE
+      tipoSolicitud: [this.data.info.tipoSolicitud || ''],
+      primerNombre: [this.data.info.primerNombre || '', Validators.required],
+      segundoNombre: [this.data.info.segundoNombre || ''],
+      primerApellido: [this.data.info.primerApellido || '', Validators.required],
+      segundoApellido: [this.data.info.segundoApellido || ''],
+      tipoDocumento: [this.data.info.tipoDocumento || ''],
+      numeroDocumento: [this.data.info.numeroDocumento || ''],
       edad: [this.data.info.edad || ''],
+      identidadGenero: [this.data.info.identidadGenero || ''],
       celular: [this.data.info.celular || ''],
-      correoInst: [this.data.info.correoInst || '']
+      celularAlterno: [this.data.info.celularAlterno || ''],
+      correoInstitucional: [this.data.info.correoInstitucional || ''],
+      correoPersonal: [this.data.info.correoPersonal || ''],
+      campus: [this.data.info.campus || ''],
+      dependencia: [this.data.info.dependencia || ''],
+      facultad: [this.data.info.facultad || '']
+
     });
 
     if (this.data.modo === 'visualizar') {
       this.detalleForm.disable();
     }
   }
+
 
   guardar() {
     if (this.detalleForm.valid) {

@@ -62,28 +62,31 @@ export class FormularioAcompanamientoComponent implements OnInit {
 
   initForm(): void {
     this.acompanamientoForm = this.fb.group({
-      tipoReporte: ['', Validators.required],
+      //Datos remitente
       remitentePrimerNombre: [''],
       remitenteSegundoNombre: [''],
       remitentePrimerApellido: [''],
       remitenteSegundoApellido: [''],
-      tipoSolicitud: [''],
-      fechaSolicitud: [new Date()],
       cargo: [''],
-      campus: [''],
-      dependencia: [''],
+
       primerNombre: ['', [Validators.required, Validators.minLength(2)]],
       segundoNombre: [''],
       primerApellido: ['', [Validators.required, Validators.minLength(2)]],
       segundoApellido: [''],
       tipoDocumento: ['', Validators.required],
       numeroDocumento: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
+      tipoReporte: ['', Validators.required],
+      tipoSolicitud: [''],
+      fechaSolicitud: [new Date()],
+      dependencia: ['', Validators.required],
       identidadGenero: ['', Validators.required],
       edad: ['', [Validators.required, Validators.min(1), Validators.max(120)]],
       celular: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      celularAlterno: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       correoInstitucional: ['', [Validators.required, Validators.email]],
       correoPersonal: ['', [Validators.required, Validators.email]],
-      facultad: ['', Validators.required]
+      facultad: ['', Validators.required],
+      campus: ['', Validators.required]
     });
   }
 

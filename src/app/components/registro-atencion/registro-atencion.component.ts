@@ -18,6 +18,10 @@ import { ModalCorreoComponent } from '../modal-correo/modal-correo.component';
 import { ModalTelefonoComponent } from '../modal-telefono/modal-telefono.component';
 import { MatRadioModule } from '@angular/material/radio';
 import { ModalHechosComponent } from '../modal-hechos/modal-hechos.component';
+import { ModalRemisionComponent } from '../modal-remision/modal-remision.component';
+import { ModalActivarRutaComponent } from '../modal-activar-ruta/modal-activar-ruta.component';
+
+
 
 
 ModalHechosComponent
@@ -49,6 +53,9 @@ export class RegistroAtencionComponent implements OnInit {
   correoRegistrados: any[] = [];
   telefonosRegistrados: any[] = [];
   hechosRegistrados: any[] = [];
+  remisionesRegistrados: any[] = [];
+  activarRutasRegistrados: any[] = [];
+
 
   listaSexo = ['Masculino', 'Femenino', 'Intersexual', 'Indeterminado'];
   listaEtnias = ['Ninguna', 'Indígena', 'Afrocolombiano', 'Raizal', 'Palenquero', 'Rrom/Gitano'];
@@ -133,6 +140,38 @@ export class RegistroAtencionComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.discapacidadesRegistradas.push(result);
+      }
+    });
+  }
+
+  eliminarRemision(index: number): void {
+    this.remisionesRegistrados.splice(index, 1);
+  }
+
+  abrirModalRemision(): void {
+    const dialogRef = this.dialog.open(ModalRemisionComponent, {
+      width: '400px'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.remisionesRegistrados.push(result);
+      }
+    });
+  }
+
+  eliminarRutaActivada(index: number): void {
+    this.activarRutasRegistrados.splice(index, 1);
+  }
+
+  abrirModalRutaActivada(): void {
+    const dialogRef = this.dialog.open(ModalActivarRutaComponent, {
+      width: '400px'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.activarRutasRegistrados.push(result);
       }
     });
   }

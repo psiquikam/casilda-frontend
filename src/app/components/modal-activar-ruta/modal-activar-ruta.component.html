@@ -1,0 +1,34 @@
+<h2 mat-dialog-title class="modal-title">Agregar Teléfono</h2>
+
+<mat-dialog-content class="modal-content">
+  <div class="form-grid">
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Tipo de Ruta</mat-label>
+      <mat-select [(ngModel)]="data.tipo">
+        <mat-option value="Ruta1">Ruta 1</mat-option>
+        <mat-option value="Ruta2">Ruta 2</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>¿Cual?</mat-label>
+      <input matInput [(ngModel)]="data.cual" placeholder="Opcional">
+    </mat-form-field>
+
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="modal-actions">
+  <button mat-button (click)="onNoClick()">Cancelar</button>
+
+  <button 
+    mat-raised-button 
+    color="primary" 
+    [mat-dialog-close]="data"
+    [disabled]="!data.tipo || !data.cual"
+  >
+    <mat-icon>check</mat-icon>
+    Agregar a la lista
+  </button>
+</mat-dialog-actions>
