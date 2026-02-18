@@ -3,17 +3,22 @@
     <mat-icon color="primary">gavel</mat-icon>
     <span>SISTEMA QUEJAS</span>
   </div>
-
   <mat-nav-list>
+
+    @if (auth.isRevisor()) {
     <mat-divider></mat-divider>
     <div class="menu-label">
-      <mat-icon class="large-icon">find_in_page</mat-icon>
-      <span>CONSULTA</span>
+      <mat-icon class="large-icon">handshake</mat-icon>
+      <span>UAD-3</span>
     </div>
+    <a mat-list-item routerLink="/nueva-queja" routerLinkActive="active-item">
+      <span matListItemTitle>Registrar Queja</span>
+    </a>
     <a mat-list-item routerLink="/seguimiento" routerLinkActive="active-item">
       <span matListItemTitle>Seguimiento</span>
     </a>
-
+    
+    }
     @if (auth.isAdmin()) {
     <mat-divider></mat-divider>
     <div class="menu-label">
@@ -53,10 +58,6 @@
     <a mat-list-item routerLink="/mis-asignaciones" routerLinkActive="active-item">
       <span matListItemTitle>Mis Asignaciones</span>
     </a>
-    <a mat-list-item routerLink="/nueva-queja" routerLinkActive="active-item">
-      <span matListItemTitle>Registrar Queja</span>
-    </a>
-    
     }
 
     @if (auth.isAdmin()) {

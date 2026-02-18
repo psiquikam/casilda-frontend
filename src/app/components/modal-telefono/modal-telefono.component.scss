@@ -1,0 +1,54 @@
+.modal-title {
+  margin: 0;
+  padding: 20px 24px;
+  background-color: #f8fafc;
+  color: #0f172a;
+  font-weight: 800;
+  font-size: 18px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-content {
+  padding: 20px 24px !important;
+  
+  .form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-top: 10px;
+  }
+}
+
+.modal-actions {
+  padding: 16px 24px !important;
+  border-top: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+
+  button {
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+  }
+}
+
+::ng-deep {
+  .mat-mdc-dialog-container {
+    padding: 0 !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+  }
+
+  .modal-content {
+    .mat-mdc-form-field-flex {
+      height: auto !important;
+      min-height: 48px !important;
+      padding-top: 8px !important;
+      padding-bottom: 8px !important;
+    }
+    
+    .mat-mdc-text-field-wrapper .mat-mdc-floating-label {
+        top: 24px !important;
+    }
+  }
+}

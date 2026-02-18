@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RepartoModalComponent } from './reparto-modal.component';
+import { ModalCorreoComponent } from './modal-correo.component';
 
-describe('RepartoModalComponent', () => {
-  let component: RepartoModalComponent;
-  let fixture: ComponentFixture<RepartoModalComponent>;
+describe('ModalCorreoComponent', () => {
+  let component: ModalCorreoComponent;
+  let fixture: ComponentFixture<ModalCorreoComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RepartoModalComponent]
+      imports: [ModalCorreoComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(RepartoModalComponent);
+    fixture = TestBed.createComponent(ModalCorreoComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

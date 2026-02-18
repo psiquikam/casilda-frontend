@@ -14,7 +14,13 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ModalDireccionComponent } from '../modal-direccion/modal-direccion.component';
 import { ModalDiscapacidadComponent } from '../modal-discapacidad/modal-discapacidad.component';
+import { ModalCorreoComponent } from '../modal-correo/modal-correo.component';
+import { ModalTelefonoComponent } from '../modal-telefono/modal-telefono.component';
+import { MatRadioModule } from '@angular/material/radio';
+import { ModalHechosComponent } from '../modal-hechos/modal-hechos.component';
 
+
+ModalHechosComponent
 @Component({
   selector: 'app-registro-atencion',
   standalone: true,
@@ -31,7 +37,8 @@ import { ModalDiscapacidadComponent } from '../modal-discapacidad/modal-discapac
     MatButtonModule,
     MatIconModule,
     MatSnackBarModule,
-    MatDialogModule
+    MatDialogModule,
+    MatRadioModule
   ],
   templateUrl: './registro-atencion.component.html',
   styleUrls: ['./registro-atencion.component.scss']
@@ -39,12 +46,20 @@ import { ModalDiscapacidadComponent } from '../modal-discapacidad/modal-discapac
 export class RegistroAtencionComponent implements OnInit {
   atencionForm!: FormGroup;
   discapacidadesRegistradas: any[] = [];
+  correoRegistrados: any[] = [];
+  telefonosRegistrados: any[] = [];
+  hechosRegistrados: any[] = [];
 
   listaSexo = ['Masculino', 'Femenino', 'Intersexual', 'Indeterminado'];
   listaEtnias = ['Ninguna', 'Indígena', 'Afrocolombiano', 'Raizal', 'Palenquero', 'Rrom/Gitano'];
+  listaProgramas = ['Ingeniería', 'Derecho', 'Medicina', 'Artes', 'Ciencias Sociales', 'Educación Física']
   listaIdentidadSexual = ['Hombre cisgénero', 'Mujer cisgénero', 'Hombre trans', 'Mujer trans', 'No binario', 'Género fluido', 'Otro'];
   listaOrientacionSexual = ['Heterosexual', 'Homosexual (GAY/LESBIANA)', 'Bisexual', 'Pansexual', 'Asexual', 'Otro'];
   listaVinculos = ['Estudiante Pregrado', 'Estudiante Posgrado', 'Docente', 'Administrativo', 'Egresado', 'Contratista', 'Visitante'];
+  listaSubVinculos = ['Estudiante Pregrado', 'Estudiante Posgrado', 'Docente', 'Administrativo', 'Egresado', 'Contratista', 'Visitante'];
+  listaDependencia = [];
+  listaTipoViolencia = ['Violencia Psiclogica', 'Violencia Sexual', 'Violencia Física'];
+  listaSubTipoViolencia = ['Difusión de contenido intimo', 'Intimidación y Amenazas', 'Aislamiento Forzado'];
   tiposSolicitud = ['Psicosocial', 'Jurídica', 'Salud', 'Académica'];
   tiposServicio = ['Asesoría', 'Acompañamiento', 'Seguimiento', 'Intervención'];
   tiposDoc = ['Cédula de Ciudadanía', 'Tarjeta de Identidad', 'Cédula de Extranjería', 'Pasaporte'];
@@ -65,6 +80,7 @@ export class RegistroAtencionComponent implements OnInit {
     this.atencionForm = this.fb.group({
       tipoSolicitud: ['', Validators.required],
       personaAtiende: ['', Validators.required],
+      lugarNacimiento: ['', Validators.required],
       fechaHora: [new Date(), Validators.required],
       personaRegistra: ['', Validators.required],
       tipoServicio: ['', Validators.required],
@@ -89,13 +105,23 @@ export class RegistroAtencionComponent implements OnInit {
       direccionLugar: [''],
       eps: ['', Validators.required],
       regimenSalud: ['', Validators.required],
+      dependencia: ['', Validators.required],
       campus: ['', Validators.required],
       facultad: ['', Validators.required],
       vinculo: ['', Validators.required],
+      subVinculo: ['', Validators.required],
       tipoViolencia: ['', Validators.required],
       subcategoriaViolencia: ['', Validators.required],
       tiempoOcurrido: ['', Validators.required],
-      hechos: ['', [Validators.required, Validators.minLength(20)]]
+      programa: ['', Validators.required],
+      hechos: ['', [Validators.required, Validators.minLength(20)]],
+      violenciaGenero: ['', Validators.required],
+      presuntoPrimerNombre: ['', Validators.required],
+      presuntoSegundoNombre: [''],
+      presuntoPrimerApellido: ['', Validators.required],
+      presuntoSegundoApellido: [''],
+      presuntoVinculoUniversidad: ['', Validators.required],
+      presuntoVinculoVictima: ['', Validators.required],
     });
   }
 
@@ -126,6 +152,54 @@ export class RegistroAtencionComponent implements OnInit {
         this.atencionForm.patchValue({ direccionLugar: result });
       }
     });
+  }
+
+  abrirModalCorreo(): void {
+    const dialogRef = this.dialog.open(ModalCorreoComponent, {
+      width: '400px'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.correoRegistrados.push(result);
+      }
+    });
+  }
+
+  eliminarCorreo(index: number): void {
+    this.correoRegistrados.splice(index, 1);
+  }
+
+  abrirModalTelefono(): void {
+    const dialogRef = this.dialog.open(ModalTelefonoComponent, {
+      width: '400px'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.telefonosRegistrados.push(result);
+      }
+    });
+  }
+
+  eliminarTelefono(index: number): void {
+    this.telefonosRegistrados.splice(index, 1);
+  }
+
+  abrirModalHechos(): void {
+    const dialogRef = this.dialog.open(ModalHechosComponent, {
+      width: '400px'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.hechosRegistrados.push(result);
+      }
+    });
+  }
+
+  eliminarHechos(index: number): void {
+    this.hechosRegistrados.splice(index, 1);
   }
 
   subirArchivo(): void {

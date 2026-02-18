@@ -13,7 +13,7 @@ import { MatPaginator, MatPaginatorModule, MatPaginatorIntl } from '@angular/mat
 import { ActivatedRoute, Router } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { MatDialog } from '@angular/material/dialog';
-import { RepartoModalComponent } from '../reparto-modal/reparto-modal.component';
+import { RepartoModalComponent } from '../modal-reparto/modal-reparto.component';
 
 
 export function getSpanishPaginatorIntl() {

@@ -1,0 +1,46 @@
+<h2 mat-dialog-title class="modal-title">Agregar Hecho</h2>
+
+<mat-dialog-content class="modal-content">
+  <div class="form-grid">
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Fecha</mat-label>
+      <input matInput type="date" [(ngModel)]="data.fecha">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Modo</mat-label>
+      <input matInput [(ngModel)]="data.modo" placeholder="Ej: Verbal, físico, virtual...">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Lugar</mat-label>
+      <input matInput [(ngModel)]="data.lugar" placeholder="Ej: Aula 204, Oficina, Virtual...">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="span-all" subscriptSizing="dynamic">
+      <mat-label>Descripción del hecho</mat-label>
+      <textarea 
+        matInput 
+        [(ngModel)]="data.descripcion"
+        rows="4"
+        placeholder="Describa en detalle lo ocurrido..."
+      ></textarea>
+    </mat-form-field>
+
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="modal-actions">
+  <button mat-button (click)="onNoClick()">Cancelar</button>
+
+  <button 
+    mat-raised-button 
+    color="primary"
+    [mat-dialog-close]="data"
+    [disabled]="!data.fecha || !data.descripcion"
+  >
+    <mat-icon>check</mat-icon>
+    Agregar
+  </button>
+</mat-dialog-actions>

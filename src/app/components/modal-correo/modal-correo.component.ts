@@ -5,12 +5,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
-import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-
+import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-modal-discapacidad',
+  selector: 'app-modal-correo',
   standalone: true,
   imports: [
     CommonModule,
@@ -19,23 +18,21 @@ import { MatIconModule } from '@angular/material/icon';
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
-    FormsModule,
-    MatIconModule
+    MatIconModule,
+    FormsModule
   ],
-  templateUrl: './modal-discapacidad.component.html',
-  styleUrls: ['./modal-discapacidad.component.scss']
+  templateUrl: './modal-correo.component.html',
+  styleUrls: ['./modal-correo.component.scss']
 })
-export class ModalDiscapacidadComponent {
+export class ModalCorreoComponent {
 
   data = {
     tipo: '',
-    subTipo: '',
-    descripcion: ''
+    correo: '',
+    descripcion: '',
   };
 
-  constructor(
-    public dialogRef: MatDialogRef<ModalDiscapacidadComponent>
-  ) {}
+  constructor(public dialogRef: MatDialogRef<ModalCorreoComponent>) {}
 
   onNoClick(): void {
     this.dialogRef.close();

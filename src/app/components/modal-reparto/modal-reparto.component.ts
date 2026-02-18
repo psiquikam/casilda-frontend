@@ -12,8 +12,8 @@ import { MatIconModule } from '@angular/material/icon';
 @Component({
   selector: 'app-reparto-modal',
   standalone: true,
-  templateUrl: './reparto-modal.component.html',
-  styleUrls: ['./reparto-modal.component.scss'], 
+  templateUrl: './modal-reparto.component.html',
+  styleUrls: ['./modal-reparto.component.scss'], 
   imports: [
     CommonModule,
     ReactiveFormsModule,

@@ -8,34 +8,32 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 
-
 @Component({
-  selector: 'app-modal-discapacidad',
+  selector: 'app-modal-telefono',
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
-    FormsModule,
     MatIconModule
   ],
-  templateUrl: './modal-discapacidad.component.html',
-  styleUrls: ['./modal-discapacidad.component.scss']
+  templateUrl: './modal-telefono.component.html',
+  styleUrls: ['./modal-telefono.component.scss']
 })
-export class ModalDiscapacidadComponent {
+export class ModalTelefonoComponent {
 
   data = {
     tipo: '',
-    subTipo: '',
+    telefono: '',
+    alterno: '',
     descripcion: ''
   };
 
-  constructor(
-    public dialogRef: MatDialogRef<ModalDiscapacidadComponent>
-  ) {}
+  constructor(public dialogRef: MatDialogRef<ModalTelefonoComponent>) {}
 
   onNoClick(): void {
     this.dialogRef.close();

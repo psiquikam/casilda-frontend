@@ -60,7 +60,7 @@
     border-radius: 8px 8px 0 0;
     margin-right: 4px;
     background-color: #f8fafc;
-    
+
     .mdc-tab__text-label {
       font-weight: 700 !important;
       font-size: 12px !important;
@@ -71,7 +71,7 @@
 
   .mat-mdc-tab.mdc-tab--active {
     background-color: #e91e63 !important;
-    
+
     .mdc-tab__text-label {
       color: #ffffff !important;
     }
@@ -98,6 +98,7 @@
 
 .span-all {
   grid-column: 1 / -1;
+
   mat-form-field {
     width: 100%;
   }
@@ -148,9 +149,11 @@
         align-items: flex-start !important;
         padding-top: 12px !important;
       }
+
       .mat-mdc-form-field-infix {
         height: auto !important;
       }
+
       .mat-mdc-text-field-wrapper .mat-mdc-floating-label {
         top: 24px !important;
       }
@@ -196,14 +199,19 @@ mat-card-actions {
 }
 
 @media (max-width: 650px) {
-  .grid-2, .grid-3 {
+
+  .grid-2,
+  .grid-3 {
     grid-template-columns: 1fr;
   }
+
   .tab-padding {
     padding: 0 15px 15px 15px;
   }
+
   ::ng-deep .mat-mdc-tab {
     margin-right: 2px;
+
     .mdc-tab__text-label {
       font-size: 10px !important;
     }
@@ -235,7 +243,7 @@ mat-card-actions {
     background-color: #f8fafc;
     border-radius: 8px 8px 0 0;
     margin-right: 4px;
-    
+
     .mdc-tab__text-label {
       font-weight: 700 !important;
       font-size: 11px !important;
@@ -245,7 +253,10 @@ mat-card-actions {
 
   .mat-mdc-tab.mdc-tab--active {
     background-color: #e91e63 !important;
-    .mdc-tab__text-label { color: #ffffff !important; }
+
+    .mdc-tab__text-label {
+      color: #ffffff !important;
+    }
   }
 
   .mat-mdc-form-field-flex {
@@ -253,16 +264,30 @@ mat-card-actions {
     padding: 0 12px !important;
   }
 
-  .mat-mdc-form-field-subscript-wrapper { display: none !important; }
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none !important;
+  }
 }
 
 .tab-padding {
   padding: 20px 25px;
 }
 
-.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.span-all { grid-column: 1 / -1; }
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.span-all {
+  grid-column: 1 / -1;
+}
 
 .discapacidad-container {
   margin-top: 25px;
@@ -279,10 +304,21 @@ mat-card-actions {
   }
 }
 
+.discapacidad-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
 .discapacidad-item {
   display: grid;
-  grid-template-columns: 1fr 2fr auto;
+  grid-template-columns: 1fr 1fr 2fr 1fr auto;
   align-items: center;
+  gap: 12px;
   background: white;
   padding: 8px 15px;
   border: 1px solid #cbd5e1;
@@ -296,4 +332,21 @@ mat-card-actions {
   padding: 50px;
   color: #94a3b8;
   font-style: italic;
+}
+
+.pregunta-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+
+  .pregunta-label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #1e293b;
+  }
+
+  .radio-group {
+    display: flex;
+    gap: 20px;
+  }
 }

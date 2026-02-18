@@ -14,6 +14,18 @@
         <mat-option value="Múltiple">Múltiple</mat-option>
       </mat-select>
     </mat-form-field>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Subtipo de discapacidad</mat-label>
+      <mat-select [(ngModel)]="data.subTipo">
+        <mat-option value="Física">Física</mat-option>
+        <mat-option value="Auditiva">Auditiva</mat-option>
+        <mat-option value="Visual">Visual</mat-option>
+        <mat-option value="Sordoceguera">Sordoceguera</mat-option>
+        <mat-option value="Intelectual">Intelectual</mat-option>
+        <mat-option value="Psicosocial">Psicosocial</mat-option>
+        <mat-option value="Múltiple">Múltiple</mat-option>
+      </mat-select>
+    </mat-form-field>
 
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Descripción / Detalle</mat-label>
