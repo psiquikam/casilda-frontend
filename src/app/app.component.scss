@@ -6,17 +6,25 @@
 }
 
 .sidenav-container {
-  flex: 1;
-  height: auto;
+  height: 100%;
 }
 
 .aside-menu {
   width: 260px;
   border-right: 1px solid #e2e8f0;
   background-color: white;
+  overflow-y: auto;
 }
 
 .main-content {
-  background-color: #f8fafc;
-  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-wrapper {
+  flex: 1;
+  overflow: hidden;
+  padding: 16px;
 }

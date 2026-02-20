@@ -391,6 +391,74 @@
                         </div>
                     </mat-tab>
 
+                    <mat-tab label="Otros Casos">
+                        <div class="tab-padding">
+
+                            <div class="table-container" *ngIf="acuerdosCompromisos.length > 0; else emptyTab">
+
+                                <table mat-table [dataSource]="acuerdosCompromisos" class="mat-elevation-z2">
+
+                                    <ng-container matColumnDef="idCaso">
+                                        <th mat-header-cell *matHeaderCellDef> Id Caso </th>
+                                        <td mat-cell *matCellDef="let element"> {{element.idCaso}} </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="tiempoHechos">
+                                        <th mat-header-cell *matHeaderCellDef> Tiempo de los hechos </th>
+                                        <td mat-cell *matCellDef="let element"> {{element.tiempoHechos}} </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="tipoViolencia">
+                                        <th mat-header-cell *matHeaderCellDef> Tipo de Violencia </th>
+                                        <td mat-cell *matCellDef="let element">
+                                            <span class="badge-tipo">{{element.tipoViolencia}}</span>
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="subcategoria">
+                                        <th mat-header-cell *matHeaderCellDef> SubCategoría de Violencia </th>
+                                        <td mat-cell *matCellDef="let element"> {{element.subcategoria}} </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="descripcion">
+                                        <th mat-header-cell *matHeaderCellDef> Descripción </th>
+                                        <td mat-cell *matCellDef="let element" class="cell-desc">
+                                            {{element.descripcion}}
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="acciones">
+                                        <th mat-header-cell *matHeaderCellDef> Acciones </th>
+                                        <td mat-cell *matCellDef="let element; let i = index">
+                                            <div class="action-buttons">
+                                                <button mat-icon-button color="primary"
+                                                    (click)="editarAcuerdo(element)">
+                                                    <mat-icon>edit</mat-icon>
+                                                </button>
+                                                <button mat-icon-button color="warn" (click)="eliminarAcuerdo(i)">
+                                                    <mat-icon>delete</mat-icon>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="displayedColumnsAcuerdos"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: displayedColumnsAcuerdos;"></tr>
+
+                                </table>
+                            </div>
+
+                            <ng-template #emptyTab>
+                                <div class="empty-tab">
+                                    <mat-icon>inbox</mat-icon>
+                                    <span>No hay acuerdos registrados</span>
+                                </div>
+                            </ng-template>
+
+                        </div>
+                    </mat-tab>
+
+
                 </mat-tab-group>
             </form>
         </mat-card-content>

@@ -3,7 +3,7 @@
   justify-content: center;
   align-items: flex-start;
   padding: 24px;
-  background-color: #f1f5f9;
+  background-color: #f8fafc;
   min-height: 100vh;
   box-sizing: border-box;
 }
@@ -23,7 +23,7 @@
   mat-card-header {
     padding: 25px;
     background: white;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f8fafc;
 
     mat-card-title {
       font-weight: 900;
@@ -52,7 +52,7 @@
 
   .mat-mdc-tab-header {
     margin-bottom: 15px;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid #f8fafc;
   }
 
   .mat-mdc-tab {
@@ -222,7 +222,7 @@ mat-card-actions {
   display: flex;
   justify-content: center;
   padding: 24px;
-  background-color: #f1f5f9;
+  background-color: #f8fafc;
   min-height: 100vh;
 }
 
@@ -348,5 +348,60 @@ mat-card-actions {
   .radio-group {
     display: flex;
     gap: 20px;
+  }
+}
+
+.table-container {
+  margin-top: 16px;
+  overflow-x: auto;
+
+  table {
+    width: 100%;
+  }
+
+  th {
+    font-weight: 600;
+    color: #444;
+  }
+
+  td {
+    font-size: 0.9rem;
+    color: #555;
+  }
+
+  .badge-tipo {
+    background-color: #e8eaf6;
+    color: #3f51b5;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .cell-desc {
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+  }
+}
+
+.empty-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #999;
+
+  mat-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
   }
 }

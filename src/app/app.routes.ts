@@ -15,7 +15,8 @@ import { MisAsignacionesComponent } from './components/mis-asignaciones/mis-asig
 import { DetalleAcompanamientoComponent } from './components/detalle-acompanamiento/detalle-acompanamiento.component';
 import { ConsultaComponent } from './consulta/consulta.component';
 import { RegistroAtencionComponent } from './components/registro-atencion/registro-atencion.component';
-  
+import { CitaComponent } from './components/cita/cita.component';
+   
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'seguimiento', component: SeguimientoTramiteComponent },
@@ -87,6 +88,13 @@ export const routes: Routes = [
   {
     path: 'registro-atencion',
     component: RegistroAtencionComponent,
+    canActivate: [roleGuard],
+    data: { roles: ['Admin', 'Revisor'] }
+  },
+
+  {
+    path: 'cita',
+    component: CitaComponent,
     canActivate: [roleGuard],
     data: { roles: ['Admin', 'Revisor'] }
   },

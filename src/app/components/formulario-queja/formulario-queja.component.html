@@ -2,24 +2,24 @@
   <mat-stepper linear #stepper>
 
     <mat-step [stepControl]="formPerfil">
-      <form [formGroup]="formPerfil">
+      <form [formGroup]="formPerfil" class="step-body">
         <ng-template matStepLabel>Identificación</ng-template>
         <div class="profile-selector">
           <h3>¿Cómo desea realizar su reporte?</h3>
           <mat-radio-group formControlName="perfil" class="profile-grid">
-            <div class="profile-card" [class.selected]="tipoUsuario === 'anonimo'">
+            <div class="profile-card" [class.selected]="formPerfil.get('perfil')?.value === 'anonimo'">
               <mat-radio-button value="anonimo">
                 <strong>Anónimo</strong>
                 <p>No requiere inicio de sesión. Su identidad estará protegida.</p>
               </mat-radio-button>
             </div>
-            <div class="profile-card" [class.selected]="tipoUsuario === 'victima_logueada'">
+            <div class="profile-card" [class.selected]="formPerfil.get('perfil')?.value === 'victima_logueada'">
               <mat-radio-button value="victima_logueada">
                 <strong>Soy la víctima</strong>
                 <p>Reporte personal vinculado a su cuenta.</p>
               </mat-radio-button>
             </div>
-            <div class="profile-card" [class.selected]="tipoUsuario === 'tercero_logueado'">
+            <div class="profile-card" [class.selected]="formPerfil.get('perfil')?.value === 'tercero_logueado'">
               <mat-radio-button value="tercero_logueado">
                 <strong>A nombre de otro</strong>
                 <p>Usted reporta en representación de un tercero.</p>
@@ -34,7 +34,7 @@
     </mat-step>
 
     <mat-step [stepControl]="formConsentimiento">
-      <form [formGroup]="formConsentimiento">
+      <form [formGroup]="formConsentimiento" class="step-body">
         <ng-template matStepLabel>Privacidad</ng-template>
         <div class="policy-box">
           <h3>Tratamiento de Datos Personales</h3>
@@ -49,12 +49,12 @@
     </mat-step>
 
     <mat-step [stepControl]="formRelato">
-      <form [formGroup]="formRelato">
+      <form [formGroup]="formRelato" class="step-body">
         <ng-template matStepLabel>El Caso</ng-template>
 
         <div *ngIf="tipoUsuario === 'tercero_logueado'" class="alert-info">
           <mat-icon>info</mat-icon>
-          Usted reporta en representación. Sea detallado en su relación con la víctima.
+          <span>Usted reporta en representación. Sea detallado en su relación con la víctima.</span>
         </div>
 
         <mat-form-field appearance="outline" class="full-width">
@@ -62,17 +62,23 @@
           <textarea matInput formControlName="descripcion" rows="5"></textarea>
         </mat-form-field>
 
-        <p>¿Deseas que te puedan contactar por otros medios?</p>
-        <mat-radio-group formControlName="deseaContacto">
-          <mat-radio-button value="si">Sí</mat-radio-button>
-          <mat-radio-button value="no">No</mat-radio-button>
-        </mat-radio-group>
+        <div class="contact-preference">
+          <p>¿Deseas que te puedan contactar por otros medios?</p>
+          <mat-radio-group formControlName="deseaContacto">
+            <mat-radio-button value="si">Sí</mat-radio-button>
+            <mat-radio-button value="no">No</mat-radio-button>
+          </mat-radio-group>
+        </div>
 
         <div *ngIf="formRelato.get('deseaContacto')?.value === 'si'" class="contact-fields">
-          <mat-form-field appearance="outline"><mat-label>Correo</mat-label><input matInput
-              formControlName="correoContacto"></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>WhatsApp</mat-label><input matInput
-              formControlName="whatsappContacto"></mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Correo</mat-label>
+            <input matInput formControlName="correoContacto">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>WhatsApp</mat-label>
+            <input matInput formControlName="whatsappContacto">
+          </mat-form-field>
         </div>
 
         <div class="actions">
@@ -82,36 +88,30 @@
       </form>
     </mat-step>
 
-    <mat-step *ngIf="tipoUsuario !== 'anonimo'" [stepControl]="formVictima">
-      <form [formGroup]="formVictima">
+    <mat-step *ngIf="formPerfil.get('perfil')?.value !== 'anonimo'" [stepControl]="formVictima">
+      <form [formGroup]="formVictima" class="step-body">
         <ng-template matStepLabel>Víctima</ng-template>
         <div class="grid-form">
-          <mat-form-field appearance="outline"><mat-label>Identificación</mat-label><input matInput
-              formControlName="identificacion"></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Nombre</mat-label><input matInput
-              formControlName="nombre"></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Apellidos</mat-label><input matInput
-              formControlName="apellidos"></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Correo</mat-label><input matInput
-              formControlName="correo"></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>Identificación</mat-label><input matInput formControlName="identificacion"></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>Nombre</mat-label><input matInput formControlName="nombre"></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>Apellidos</mat-label><input matInput formControlName="apellidos"></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>Correo</mat-label><input matInput formControlName="correo"></mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Género</mat-label>
             <mat-select formControlName="genero">
               <mat-option value="Masculino">Masculino</mat-option>
               <mat-option value="Femenino">Femenino</mat-option>
-              <mat-option value="Otro">Otro / No binario</mat-option>
+              <mat-option value="Otro">Otro</mat-option>
             </mat-select>
           </mat-form-field>
-
           <mat-form-field appearance="outline">
-            <mat-label>Cargo / Vínculo</mat-label>
+            <mat-label>Vínculo</mat-label>
             <mat-select formControlName="cargo">
               <mat-option value="Estudiante">Estudiante</mat-option>
               <mat-option value="Docente">Docente</mat-option>
               <mat-option value="Administrativo">Administrativo</mat-option>
             </mat-select>
           </mat-form-field>
-
         </div>
         <div class="actions">
           <button mat-button matStepperPrevious>Atrás</button>
@@ -121,15 +121,12 @@
     </mat-step>
 
     <mat-step [stepControl]="formVictimario">
-      <form [formGroup]="formVictimario">
+      <form [formGroup]="formVictimario" class="step-body">
         <ng-template matStepLabel>Victimario</ng-template>
         <div class="grid-form">
-          <mat-form-field appearance="outline"><mat-label>Identificación (Si la conoce)</mat-label><input matInput
-              formControlName="identificacion"></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Nombre</mat-label><input matInput
-              formControlName="nombre"></mat-form-field>
-          <mat-form-field appearance="outline"><mat-label>Apellidos</mat-label><input matInput
-              formControlName="apellidos"></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>Identificación (Si la conoce)</mat-label><input matInput formControlName="identificacion"></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>Nombre</mat-label><input matInput formControlName="nombre"></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>Apellidos</mat-label><input matInput formControlName="apellidos"></mat-form-field>
         </div>
         <div class="actions">
           <button mat-button matStepperPrevious>Atrás</button>
@@ -139,10 +136,10 @@
     </mat-step>
 
     <mat-step [stepControl]="formEvidencias">
-      <form [formGroup]="formEvidencias">
+      <form [formGroup]="formEvidencias" class="step-body">
         <ng-template matStepLabel>Evidencias</ng-template>
         <div class="upload-zone">
-          <mat-icon style="font-size: 48px; width: 48px; height: 48px; color: #cbd5e0;">cloud_upload</mat-icon>
+          <mat-icon>cloud_upload</mat-icon>
           <p>Arrastre o seleccione archivos de evidencia</p>
           <input type="file" multiple>
         </div>
