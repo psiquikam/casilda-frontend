@@ -7,7 +7,7 @@ import { BehaviorSubject } from 'rxjs';
 export class ListasService {
   // Definimos los datos iniciales (Mocks)
   private data: any = {
-    tiposSolicitud: ['Psicológico', 'Jurídico', 'Académico', 'Social'],
+    tiposSolicitud: ['Psicológico', 'Jurídico', 'Académico', 'Social',],
     campus: ['Central', 'Robledo', 'Oriente', 'Apartadó'],
     dependencias: ['Bienestar Universitario', 'Talento Humano', 'Rectoría'],
     facultades: ['Medicina', 'Salud Pública', 'Enfermería', 'Artes'],

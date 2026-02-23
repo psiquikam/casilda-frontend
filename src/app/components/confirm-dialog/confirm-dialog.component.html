@@ -1,0 +1,28 @@
+<div class="confirm-container">
+
+  <div class="confirm-header">
+    <div class="icon-wrapper">
+      <mat-icon>warning</mat-icon>
+    </div>
+    <div class="title-group">
+      <h2>{{ data.titulo || 'Confirmar acción' }}</h2>
+      <p class="subtitle">Esta acción no se puede deshacer</p>
+    </div>
+  </div>
+
+  <div class="confirm-body">
+    <p>{{ data.mensaje || '¿Estás seguro de continuar?' }}</p>
+  </div>
+
+  <div class="confirm-actions">
+    <button mat-stroked-button (click)="cancelar()">
+      Cancelar
+    </button>
+
+    <button mat-flat-button color="warn" (click)="confirmar()">
+      <mat-icon>delete</mat-icon>
+      Eliminar
+    </button>
+  </div>
+
+</div>

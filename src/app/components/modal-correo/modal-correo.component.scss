@@ -1,54 +1,102 @@
-.modal-title {
-  margin: 0;
-  padding: 20px 24px;
-  background-color: #f8fafc;
-  color: #0f172a;
-  font-weight: 800;
-  font-size: 18px;
-  border-bottom: 1px solid #e2e8f0;
-}
+$purple-sys: #6B2D95;
 
-.modal-content {
-  padding: 20px 24px !important;
-  
-  .form-grid {
+:host {
+  display: block;
+
+  .modal-title {
+    margin: 0;
+    padding: 16px 24px;
+    background-color: $purple-sys;
+    color: white;
+    font-weight: 800;
+    font-size: 16px;
     display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding-top: 10px;
+    align-items: center;
+    gap: 8px;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .modal-content {
+    padding: 24px;
+    overflow: hidden;
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      width: 100%;
+
+      .field-tipo {
+        flex: 1;
+        min-width: 140px;
+      }
+
+      .field-correo {
+        flex: 1.5;
+        min-width: 200px;
+      }
+
+      .field-desc {
+        flex: 1.2;
+        min-width: 180px;
+      }
+    }
   }
 }
 
 .modal-actions {
-  padding: 16px 24px !important;
+  padding: 12px 24px;
   border-top: 1px solid #e2e8f0;
   background-color: #f8fafc;
 
-  button {
+  .btn-confirm {
+    background-color: $purple-sys;
+    color: white;
+    height: 36px;
+    border-radius: 6px;
     font-weight: 700;
-    text-transform: uppercase;
-    font-size: 12px;
-    letter-spacing: 0.5px;
+
+    mat-icon {
+      font-size: 18px;
+      margin-right: 4px;
+    }
+
+    &:disabled {
+      background-color: #e2e8f0;
+      color: #94a3b8;
+    }
   }
 }
 
-::ng-deep {
-  .mat-mdc-dialog-container {
-    padding: 0 !important;
-    border-radius: 12px !important;
-    overflow: hidden !important;
-  }
+::ng-deep .mat-mdc-dialog-container {
+  .mat-mdc-form-field {
+    .mat-mdc-text-field-wrapper {
+      height: 48px;
 
-  .modal-content {
-    .mat-mdc-form-field-flex {
-      height: auto !important;
-      min-height: 48px !important;
-      padding-top: 8px !important;
-      padding-bottom: 8px !important;
+      .mat-mdc-form-field-flex {
+        height: 48px;
+        align-items: center;
+      }
     }
-    
-    .mat-mdc-text-field-wrapper .mat-mdc-floating-label {
-        top: 24px !important;
+
+    .mat-mdc-form-field-infix {
+      padding: 0;
+      display: flex;
+      align-items: center;
+      min-height: 48px;
+    }
+
+    .mat-mdc-floating-label {
+      top: 24px;
+    }
+
+    .mat-mdc-form-field-subscript-wrapper {
+      display: none;
     }
   }
 }

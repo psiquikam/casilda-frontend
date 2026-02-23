@@ -11,7 +11,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { ModalDetalleSolicitudComponent } from '../components/modal-detalle-solicitud/modal-detalle-solicitud.component';
+import { ModalDetalleSolicitudComponent } from '../modal-detalle-solicitud/modal-detalle-solicitud.component';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { Router } from '@angular/router';
 
 @Component({
@@ -34,7 +35,8 @@ import { Router } from '@angular/router';
 })
 export class ConsultaComponent implements OnInit {
 
-  private dialog = inject(MatDialog);
+  constructor(private dialog: MatDialog) {}
+
   private router = inject(Router);
 
   displayedColumns: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'dependencia', 'profesional', 'acciones'];
@@ -45,6 +47,7 @@ export class ConsultaComponent implements OnInit {
   dataSourceTransicion = new MatTableDataSource<any>([]);
   dataSourceCerrados = new MatTableDataSource<any>([]);
   dataSourceSinRepartir = new MatTableDataSource<any>([]);
+
 
   filterValues: any = { id: '', nombre: '', documento: '', profesional: '', fecha: '', dependencia: '' };
 
@@ -217,7 +220,7 @@ export class ConsultaComponent implements OnInit {
     const filterValue = (event.target as HTMLInputElement).value;
     this.filterValues[column] = filterValue.trim().toLowerCase();
     const filterString = JSON.stringify(this.filterValues);
-    
+
     [this.dataSourceSinRepartir, this.dataSourceActivos, this.dataSourceTransicion, this.dataSourceCerrados]
       .forEach(ds => {
         ds.filter = filterString;
@@ -244,6 +247,24 @@ export class ConsultaComponent implements OnInit {
       data: { info: element, modo: modo },
       panelClass: 'custom-modal-container',
       autoFocus: false
+    });
+  }
+
+  eliminarCaso(element: any): void {
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '350px',
+      data: {
+        titulo: 'Eliminar caso',
+        mensaje: `¿Seguro que deseas eliminar el caso ${element.id}?`
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(confirmado => {
+      if (confirmado) {
+        this.datosSimulados = this.datosSimulados.filter(e => e !== element);
+        this.inicializarTablas();
+      }
     });
   }
 

@@ -13,7 +13,7 @@ import { GestionListasComponent } from './components/gestion-listas/gestion-list
 import { RepartoAcompanamientoComponent } from './components/reparto-acompanamiento/reparto-acompanamiento.component';
 import { MisAsignacionesComponent } from './components/mis-asignaciones/mis-asignaciones.component';
 import { DetalleAcompanamientoComponent } from './components/detalle-acompanamiento/detalle-acompanamiento.component';
-import { ConsultaComponent } from './consulta/consulta.component';
+import { ConsultaComponent } from './components/consulta/consulta.component';
 import { RegistroAtencionComponent } from './components/registro-atencion/registro-atencion.component';
 import { CitaComponent } from './components/cita/cita.component';
    

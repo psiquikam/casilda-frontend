@@ -32,7 +32,7 @@ export class ModalCorreoComponent {
     descripcion: '',
   };
 
-  constructor(public dialogRef: MatDialogRef<ModalCorreoComponent>) {}
+  constructor(public dialogRef: MatDialogRef<ModalCorreoComponent>) { }
 
   onNoClick(): void {
     this.dialogRef.close();

@@ -13,6 +13,10 @@
                                 </mat-select>
                             </mat-form-field>
                             <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>¿Quien remite?</mat-label>
+                                <input matInput formControlName="quienRemite">
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
                                 <mat-label>Persona que atiende</mat-label>
                                 <input matInput formControlName="personaAtiende">
                             </mat-form-field>
@@ -31,10 +35,6 @@
                                 <mat-select formControlName="tipoServicio">
                                     @for (s of tiposServicio; track s) { <mat-option [value]="s">{{s}}</mat-option> }
                                 </mat-select>
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Quien remite</mat-label>
-                                <input matInput formControlName="quienRemite">
                             </mat-form-field>
                             <mat-form-field appearance="outline" subscriptSizing="dynamic">
                                 <mat-label>Forma y lugar de la entrevista</mat-label>
@@ -347,7 +347,18 @@
                     <mat-tab label="Acuerdos y compromisos">
                         <div class="tab-padding">
 
-                            <div class="discapacidad-container">
+                            <div class="pregunta-acuerdo-header">
+                                <label class="pregunta-label">¿Logró llegar a un acuerdo con la persona?</label>
+
+                                <mat-radio-group formControlName="logroAcuerdo" class="radio-group-vertical">
+                                    <mat-radio-button value="SI">Sí</mat-radio-button>
+                                    <mat-radio-button value="NO" style="margin-left: 15px;">No</mat-radio-button>
+                                </mat-radio-group>
+                            </div>
+
+                            @if (atencionForm.get('logroAcuerdo')?.value === 'SI') {
+
+                            <div class="discapacidad-container animate-fade-in">
                                 <div class="section-title">
                                     <span>Activación de ruta</span>
                                     <button mat-icon-button color="primary" type="button"
@@ -367,7 +378,8 @@
                                     }
                                 </div>
                             </div>
-                            <div class="discapacidad-container">
+
+                            <div class="discapacidad-container animate-fade-in">
                                 <div class="section-title">
                                     <span>Remisiones</span>
                                     <button mat-icon-button color="primary" type="button"
@@ -388,6 +400,13 @@
                                     }
                                 </div>
                             </div>
+
+                            } @else {
+                            <div class="empty-state-container">
+                                <mat-icon color="disabled">handshake</mat-icon>
+                                <p>Indique que hubo un acuerdo para registrar activaciones de ruta o remisiones.</p>
+                            </div>
+                            }
                         </div>
                     </mat-tab>
 

@@ -1,10 +1,13 @@
-<h2 mat-dialog-title class="modal-title">Agregar Teléfono</h2>
+<h2 mat-dialog-title class="modal-title">
+  <mat-icon>phone</mat-icon>
+  Agregar Teléfono
+</h2>
 
 <mat-dialog-content class="modal-content">
-  <div class="form-grid">
+  <div class="form-row">
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Tipo de Teléfono</mat-label>
+    <mat-form-field appearance="outline" class="field-tipo">
+      <mat-label>Tipo</mat-label>
       <mat-select [(ngModel)]="data.tipo">
         <mat-option value="Personal">Personal</mat-option>
         <mat-option value="Institucional">Institucional</mat-option>
@@ -12,24 +15,19 @@
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-form-field appearance="outline" class="field-tel">
       <mat-label>Teléfono</mat-label>
       <input matInput [(ngModel)]="data.telefono" placeholder="Ej: 3001234567">
     </mat-form-field>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Teléfono Alterno</mat-label>
+    <mat-form-field appearance="outline" class="field-alt">
+      <mat-label>Alterno</mat-label>
       <input matInput [(ngModel)]="data.alterno" placeholder="Opcional">
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="span-all" subscriptSizing="dynamic">
+    <mat-form-field appearance="outline" class="field-desc">
       <mat-label>Descripción</mat-label>
-      <textarea 
-        matInput 
-        [(ngModel)]="data.descripcion" 
-        rows="3"
-        placeholder="Observaciones adicionales"
-      ></textarea>
+      <input matInput [(ngModel)]="data.descripcion" placeholder="Nota breve">
     </mat-form-field>
 
   </div>
@@ -38,13 +36,8 @@
 <mat-dialog-actions align="end" class="modal-actions">
   <button mat-button (click)="onNoClick()">Cancelar</button>
 
-  <button 
-    mat-raised-button 
-    color="primary" 
-    [mat-dialog-close]="data"
-    [disabled]="!data.tipo || !data.telefono"
-  >
+  <button mat-flat-button class="btn-confirm" [mat-dialog-close]="data" [disabled]="!data.tipo || !data.telefono">
     <mat-icon>check</mat-icon>
-    Agregar a la lista
+    Agregar
   </button>
 </mat-dialog-actions>

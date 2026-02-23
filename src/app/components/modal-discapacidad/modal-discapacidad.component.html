@@ -1,9 +1,13 @@
-<h2 mat-dialog-title class="modal-title">Agregar Discapacidad</h2>
+<h2 mat-dialog-title class="modal-title">
+  <mat-icon>accessibility</mat-icon>
+  Agregar Discapacidad
+</h2>
 
 <mat-dialog-content class="modal-content">
-  <div class="form-grid">
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Tipo de discapacidad</mat-label>
+  <div class="form-row">
+
+    <mat-form-field appearance="outline" class="field-tipo">
+      <mat-label>Tipo</mat-label>
       <mat-select [(ngModel)]="data.tipo">
         <mat-option value="Física">Física</mat-option>
         <mat-option value="Auditiva">Auditiva</mat-option>
@@ -14,8 +18,9 @@
         <mat-option value="Múltiple">Múltiple</mat-option>
       </mat-select>
     </mat-form-field>
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Subtipo de discapacidad</mat-label>
+
+    <mat-form-field appearance="outline" class="field-subtipo">
+      <mat-label>Subtipo</mat-label>
       <mat-select [(ngModel)]="data.subTipo">
         <mat-option value="Física">Física</mat-option>
         <mat-option value="Auditiva">Auditiva</mat-option>
@@ -27,16 +32,19 @@
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-form-field appearance="outline" class="field-desc">
       <mat-label>Descripción / Detalle</mat-label>
-      <textarea matInput [(ngModel)]="data.descripcion" rows="3" placeholder="Ej: Movilidad reducida en extremidades inferiores"></textarea>
+      <input matInput [(ngModel)]="data.descripcion" placeholder="Detalle breve">
     </mat-form-field>
+
   </div>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end" class="modal-actions">
   <button mat-button (click)="onNoClick()">Cancelar</button>
-  <button mat-raised-button color="primary" [mat-dialog-close]="data" [disabled]="!data.tipo || !data.descripcion">
-    <mat-icon>check</mat-icon> Agregar a la lista
+  <button mat-flat-button class="btn-confirm"
+          [mat-dialog-close]="data"
+          [disabled]="!data.tipo || !data.descripcion">
+    <mat-icon>check</mat-icon> Agregar
   </button>
 </mat-dialog-actions>

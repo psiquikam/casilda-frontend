@@ -13,14 +13,16 @@
   padding: 20px 0;
 }
 
-.span-all { grid-column: 1 / -1; }
+.span-all {
+  grid-column: 1 / -1;
+}
 
 ::ng-deep {
   .mat-mdc-dialog-container .mdc-dialog__surface {
     border-radius: 12px !important;
     overflow: hidden !important;
   }
-  
+
   .mat-mdc-form-field-flex {
     height: 32px !important;
     min-height: 32px !important;
@@ -38,5 +40,7 @@
     top: 16px !important;
   }
 
-  .mat-mdc-form-field-subscript-wrapper { display: none !important; }
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none !important;
+  }
 }

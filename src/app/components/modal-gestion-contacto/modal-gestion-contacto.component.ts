@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 
-import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -37,7 +37,7 @@ export class ModalGestionComponent implements OnInit {
   columnasHistorial: string[] = ['fecha', 'resultado', 'observacion'];
 
   resultados = [
-    'Exitoso (Cita agendada)',
+    'Exitoso',
     'No contesta',
     'Buzón de voz',
     'Número equivocado',
@@ -46,10 +46,15 @@ export class ModalGestionComponent implements OnInit {
 
   jornadas = ['Mañana', 'Tarde'];
 
+  tiposCita = ['Presencial', 'Virtual', 'Telefónica'];
+
+  mostrarCamposCita = false;
+
   constructor(
     private fb: FormBuilder,
+    private dialogRef: MatDialogRef<ModalGestionComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
+  ) { }
 
   ngOnInit(): void {
 
@@ -58,7 +63,10 @@ export class ModalGestionComponent implements OnInit {
       hora: [this.getHoraActual(), Validators.required],
       jornada: [{ value: '', disabled: true }, Validators.required],
       resultado: ['', Validators.required],
-      observacion: ['', [Validators.required, Validators.minLength(5)]]
+      observacion: ['', [Validators.required, Validators.minLength(5)]],
+      fechaCita: [''],
+      horaCita: [''],
+      tipoCita: ['']
     });
 
     const horaInicial = this.contactoForm.get('hora')?.value;
@@ -73,6 +81,37 @@ export class ModalGestionComponent implements OnInit {
       }
     });
 
+    this.contactoForm.get('resultado')?.valueChanges.subscribe((value) => {
+
+      const fallidosPrevios = this.historialContactos.filter(h => h.resultado !== 'Exitoso').length;
+
+      const totalFallidos = value !== 'Exitoso'
+        ? fallidosPrevios + 1
+        : fallidosPrevios;
+
+      this.mostrarCamposCita = value === 'Exitoso' || totalFallidos >= 2;
+
+      if (this.mostrarCamposCita) {
+        this.contactoForm.get('fechaCita')?.setValidators([Validators.required]);
+        this.contactoForm.get('horaCita')?.setValidators([Validators.required]);
+        this.contactoForm.get('tipoCita')?.setValidators([Validators.required]);
+      } else {
+        this.contactoForm.get('fechaCita')?.clearValidators();
+        this.contactoForm.get('horaCita')?.clearValidators();
+        this.contactoForm.get('tipoCita')?.clearValidators();
+
+        this.contactoForm.patchValue({
+          fechaCita: '',
+          horaCita: '',
+          tipoCita: ''
+        });
+      }
+
+      this.contactoForm.get('fechaCita')?.updateValueAndValidity();
+      this.contactoForm.get('horaCita')?.updateValueAndValidity();
+      this.contactoForm.get('tipoCita')?.updateValueAndValidity();
+    });
+
     this.historialContactos = [
       {
         fecha: '2026-02-10',
@@ -82,6 +121,38 @@ export class ModalGestionComponent implements OnInit {
         observacion: 'Se intentó contacto sin éxito.'
       }
     ];
+
+    this.evaluarCita();
+  }
+
+  private evaluarCita(): void {
+    const resultado = this.contactoForm.get('resultado')?.value;
+
+    const fallidos = this.historialContactos.filter(h => h.resultado !== 'Exitoso').length;
+
+    const activar = resultado === 'Exitoso' || fallidos >= 2;
+
+    this.mostrarCamposCita = activar;
+
+    if (activar) {
+      this.contactoForm.get('fechaCita')?.setValidators([Validators.required]);
+      this.contactoForm.get('horaCita')?.setValidators([Validators.required]);
+      this.contactoForm.get('tipoCita')?.setValidators([Validators.required]);
+    } else {
+      this.contactoForm.get('fechaCita')?.clearValidators();
+      this.contactoForm.get('horaCita')?.clearValidators();
+      this.contactoForm.get('tipoCita')?.clearValidators();
+
+      this.contactoForm.patchValue({
+        fechaCita: '',
+        horaCita: '',
+        tipoCita: ''
+      });
+    }
+
+    this.contactoForm.get('fechaCita')?.updateValueAndValidity();
+    this.contactoForm.get('horaCita')?.updateValueAndValidity();
+    this.contactoForm.get('tipoCita')?.updateValueAndValidity();
   }
 
   registrarIntento(): void {
@@ -99,10 +170,7 @@ export class ModalGestionComponent implements OnInit {
 
     this.historialContactos = [nuevo, ...this.historialContactos];
 
-    this.contactoForm.patchValue({
-      resultado: '',
-      observacion: ''
-    });
+    this.dialogRef.close(nuevo);
   }
 
   private formatearHora(hora: string): string {

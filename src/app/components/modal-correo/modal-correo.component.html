@@ -1,9 +1,12 @@
-<h2 mat-dialog-title class="modal-title">Agregar Correo</h2>
+<h2 mat-dialog-title class="modal-title">
+  <mat-icon>email</mat-icon>
+  Agregar Correo
+</h2>
 
 <mat-dialog-content class="modal-content">
-  <div class="form-grid">
+  <div class="form-row">
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-form-field appearance="outline" class="field-tipo">
       <mat-label>Tipo de Correo</mat-label>
       <mat-select [(ngModel)]="data.tipo">
         <mat-option value="Personal">Personal</mat-option>
@@ -11,19 +14,14 @@
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-form-field appearance="outline" class="field-correo">
       <mat-label>Correo</mat-label>
       <input matInput [(ngModel)]="data.correo" placeholder="Ej: user@gmail.com">
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="span-all" subscriptSizing="dynamic">
+    <mat-form-field appearance="outline" class="field-desc">
       <mat-label>Descripción</mat-label>
-      <textarea 
-        matInput 
-        [(ngModel)]="data.descripcion" 
-        rows="3"
-        placeholder="Observaciones adicionales"
-      ></textarea>
+      <input matInput [(ngModel)]="data.descripcion" placeholder="Observaciones">
     </mat-form-field>
 
   </div>
@@ -32,12 +30,7 @@
 <mat-dialog-actions align="end" class="modal-actions">
   <button mat-button (click)="onNoClick()">Cancelar</button>
 
-  <button 
-    mat-raised-button 
-    color="primary" 
-    [mat-dialog-close]="data"
-    [disabled]="!data.tipo || !data.correo"
-  >
+  <button mat-flat-button class="btn-confirm" [mat-dialog-close]="data" [disabled]="!data.tipo || !data.correo">
     <mat-icon>check</mat-icon>
     Agregar a la lista
   </button>

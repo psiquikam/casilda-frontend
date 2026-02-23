@@ -71,7 +71,7 @@ export class RegistroAtencionComponent implements OnInit {
   listaDependencia = ['Bienestar Universitario', 'Rectoría', 'Talento Humano', 'Admisiones'];
   listaTipoViolencia = ['Violencia Psicológica', 'Violencia Sexual', 'Violencia Física', 'Violencia Económica'];
   listaSubTipoViolencia = ['Difusión de contenido íntimo', 'Intimidación y Amenazas', 'Aislamiento Forzado', 'Acoso'];
-  tiposSolicitud = ['Psicosocial', 'Jurídica', 'Salud', 'Académica'];
+  tiposSolicitud = ['Indirecta', 'Directa'];
   tiposServicio = ['Asesoría', 'Acompañamiento', 'Seguimiento', 'Intervención'];
   tiposDoc = ['Cédula de Ciudadanía', 'Tarjeta de Identidad', 'Cédula de Extranjería', 'Pasaporte'];
   campusM = ['Principal', 'Robledo', 'Salud', 'Norte', 'Oriente'];
@@ -127,6 +127,17 @@ export class RegistroAtencionComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
+    this.atencionForm.get('quienRemite')?.disable();
+    this.atencionForm.get('tipoSolicitud')?.valueChanges.subscribe(valor => {
+    const quienRemiteControl = this.atencionForm.get('quienRemite');
+
+    if (valor === 'Indirecta') {
+      quienRemiteControl?.enable();
+    } else {
+      quienRemiteControl?.disable();
+      quienRemiteControl?.setValue('');
+    }
+  });
   }
 
   initForm(): void {
@@ -167,6 +178,7 @@ export class RegistroAtencionComponent implements OnInit {
       vinculo: ['', Validators.required],
       subVinculo: ['', Validators.required],
       programa: ['', Validators.required],
+      logroAcuerdo: ['NO'], // Valor por defecto
 
       tipoViolencia: ['', Validators.required],
       subcategoriaViolencia: ['', Validators.required],
@@ -192,32 +204,32 @@ export class RegistroAtencionComponent implements OnInit {
   }
 
   abrirModalDiscapacidad(): void {
-    const dialogRef = this.dialog.open(ModalDiscapacidadComponent, { width: '400px' });
+    const dialogRef = this.dialog.open(ModalDiscapacidadComponent, { width: '800px' });
     dialogRef.afterClosed().subscribe(res => { if (res) this.discapacidadesRegistradas.push(res); });
   }
 
   abrirModalCorreo(): void {
-    const dialogRef = this.dialog.open(ModalCorreoComponent, { width: '400px' });
+    const dialogRef = this.dialog.open(ModalCorreoComponent, { width: '800px' });
     dialogRef.afterClosed().subscribe(res => { if (res) this.correoRegistrados.push(res); });
   }
 
   abrirModalTelefono(): void {
-    const dialogRef = this.dialog.open(ModalTelefonoComponent, { width: '400px' });
+    const dialogRef = this.dialog.open(ModalTelefonoComponent, { width: '800px' });
     dialogRef.afterClosed().subscribe(res => { if (res) this.telefonosRegistrados.push(res); });
   }
 
   abrirModalHechos(): void {
-    const dialogRef = this.dialog.open(ModalHechosComponent, { width: '600px' });
+    const dialogRef = this.dialog.open(ModalHechosComponent, { width: '800px' });
     dialogRef.afterClosed().subscribe(res => { if (res) this.hechosRegistrados.push(res); });
   }
 
   abrirModalRemision(): void {
-    const dialogRef = this.dialog.open(ModalRemisionComponent, { width: '400px' });
+    const dialogRef = this.dialog.open(ModalRemisionComponent, { width: '800px' });
     dialogRef.afterClosed().subscribe(res => { if (res) this.remisionesRegistrados.push(res); });
   }
 
   abrirModalRutaActivada(): void {
-    const dialogRef = this.dialog.open(ModalActivarRutaComponent, { width: '400px' });
+    const dialogRef = this.dialog.open(ModalActivarRutaComponent, { width: '800px' });
     dialogRef.afterClosed().subscribe(res => { if (res) this.activarRutasRegistrados.push(res); });
   }
 
