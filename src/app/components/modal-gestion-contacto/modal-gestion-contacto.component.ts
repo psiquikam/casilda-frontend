@@ -55,10 +55,22 @@ export class ModalGestionComponent implements OnInit {
 
     this.contactoForm = this.fb.group({
       fecha: [this.getToday(), Validators.required],
-      hora: ['08:00', Validators.required],
-      jornada: ['', Validators.required],
+      hora: [this.getHoraActual(), Validators.required],
+      jornada: [{ value: '', disabled: true }, Validators.required],
       resultado: ['', Validators.required],
       observacion: ['', [Validators.required, Validators.minLength(5)]]
+    });
+
+    const horaInicial = this.contactoForm.get('hora')?.value;
+    this.contactoForm.patchValue({
+      jornada: this.calcularJornada(horaInicial)
+    });
+
+    this.contactoForm.get('hora')?.valueChanges.subscribe(hora => {
+      if (hora) {
+        const jornada = this.calcularJornada(hora);
+        this.contactoForm.patchValue({ jornada }, { emitEvent: false });
+      }
     });
 
     this.historialContactos = [
@@ -75,7 +87,7 @@ export class ModalGestionComponent implements OnInit {
   registrarIntento(): void {
     if (this.contactoForm.invalid) return;
 
-    const val = this.contactoForm.value;
+    const val = this.contactoForm.getRawValue();
 
     const nuevo = {
       fecha: val.fecha,
@@ -88,7 +100,6 @@ export class ModalGestionComponent implements OnInit {
     this.historialContactos = [nuevo, ...this.historialContactos];
 
     this.contactoForm.patchValue({
-      jornada: '',
       resultado: '',
       observacion: ''
     });
@@ -103,5 +114,17 @@ export class ModalGestionComponent implements OnInit {
 
   private getToday(): string {
     return new Date().toISOString().substring(0, 10);
+  }
+
+  private getHoraActual(): string {
+    const now = new Date();
+    const h = now.getHours().toString().padStart(2, '0');
+    const m = now.getMinutes().toString().padStart(2, '0');
+    return `${h}:${m}`;
+  }
+
+  private calcularJornada(hora: string): string {
+    const h = Number(hora.split(':')[0]);
+    return h < 12 ? 'Mañana' : 'Tarde';
   }
 }
