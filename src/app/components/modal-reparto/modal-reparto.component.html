@@ -6,14 +6,12 @@
 
   <mat-dialog-content class="modal-content">
     <form [formGroup]="repartoForm" class="reparto-form">
-      
+
       <div class="form-grid">
         <mat-form-field appearance="outline">
           <mat-label>Tipo de Asignación</mat-label>
           <mat-select formControlName="tipoAsignacion">
-            <mat-option *ngFor="let tipo of tiposAsignacion" [value]="tipo">
-              {{ tipo }}
-            </mat-option>
+            <mat-option *ngFor="let tipo of tiposAsignacion" [value]="tipo">{{ tipo }}</mat-option>
           </mat-select>
         </mat-form-field>
 
@@ -25,25 +23,51 @@
         <mat-form-field appearance="outline">
           <mat-label>Servicio</mat-label>
           <mat-select formControlName="servicio">
-            <mat-option *ngFor="let serv of servicios" [value]="serv">
-              {{ serv }}
-            </mat-option>
+            <mat-option *ngFor="let serv of servicios" [value]="serv">{{ serv }}</mat-option>
           </mat-select>
         </mat-form-field>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Asignar Profesional</mat-label>
-          <mat-select formControlName="asignadoA">
-            <mat-option *ngFor="let prof of profesionales" [value]="prof.id">
-              {{ prof.nombre }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+        <div class="add-prof-container">
+          <mat-form-field appearance="outline">
+            <mat-label>Profesional o Dupla</mat-label>
+            <mat-select formControlName="seleccionTemp">
+              <mat-optgroup label="Duplas / Grupos">
+                <mat-option *ngFor="let opt of opcionesAsignacion" [value]="opt.id"
+                  [style.display]="opt.esGrupo ? 'block' : 'none'">
+                  {{ opt.nombre }}
+                </mat-option>
+              </mat-optgroup>
+              <mat-optgroup label="Individuales">
+                <mat-option *ngFor="let opt of opcionesAsignacion" [value]="opt.id"
+                  [style.display]="!opt.esGrupo ? 'block' : 'none'">
+                  {{ opt.nombre }}
+                </mat-option>
+              </mat-optgroup>
+            </mat-select>
+          </mat-form-field>
+          <button type="button" mat-icon-button color="primary" (click)="agregarAsignacion()"
+            [disabled]="!repartoForm.get('seleccionTemp')?.value">
+            <mat-icon>add_circle</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="asignados-section" *ngIf="profesionalesAsignados.length > 0">
+        <p class="section-label">Personal asignado ({{profesionalesAsignados.length}}):</p>
+        <div class="asignados-list">
+          <div class="prof-chip" *ngFor="let prof of profesionalesAsignados; let i = index">
+            <mat-icon class="mini-icon">person</mat-icon>
+            <span>{{ prof.nombre }}</span>
+            <button type="button" class="btn-remove" (click)="eliminarProfesional(i)">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        </div>
       </div>
 
       <mat-form-field appearance="outline" class="full-width desc-field">
         <mat-label>Observaciones de la asignación</mat-label>
-        <textarea matInput rows="5" formControlName="observaciones" placeholder="Indique detalles adicionales para el profesional..."></textarea>
+        <textarea matInput rows="4" formControlName="observaciones"></textarea>
       </mat-form-field>
 
     </form>
@@ -51,7 +75,8 @@
 
   <mat-dialog-actions align="end" class="modal-footer">
     <button mat-button (click)="cerrar()" color="warn">Cancelar</button>
-    <button mat-flat-button class="btn-confirm" (click)="guardar()" [disabled]="repartoForm.invalid">
+    <button mat-flat-button class="btn-confirm" (click)="guardar()"
+      [disabled]="repartoForm.invalid || profesionalesAsignados.length === 0">
       <mat-icon>check_circle</mat-icon>
       Confirmar Asignación
     </button>
