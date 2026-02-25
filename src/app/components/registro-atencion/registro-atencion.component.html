@@ -1,234 +1,463 @@
-<div class="form-container">
-    <mat-card class="form-card">
-        <mat-card-content>
-            <form [formGroup]="atencionForm">
-                <mat-tab-group animationDuration="200ms">
+<div *ngIf="!modoAtencion" class="animate-fade-in">
+    <div class="table-header-container">
+        <h2>Casos pendientes</h2>
+        <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Buscar casos...</mat-label>
+            <input matInput (keyup)="applyFilter($event)" placeholder="Ej: CAS-1001" #input>
+            <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+    </div>
 
-                    <mat-tab label="Registro de atención caso">
-                        <div class="tab-padding grid-2">
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Tipo solicitud</mat-label>
-                                <mat-select formControlName="tipoSolicitud">
-                                    @for (t of tiposSolicitud; track t) { <mat-option [value]="t">{{t}}</mat-option> }
-                                </mat-select>
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>¿Quien remite?</mat-label>
-                                <input matInput formControlName="quienRemite">
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Persona que atiende</mat-label>
-                                <input matInput formControlName="personaAtiende">
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Fecha y hora</mat-label>
-                                <input matInput [matDatepicker]="picker1" formControlName="fechaHora">
-                                <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
-                                <mat-datepicker #picker1></mat-datepicker>
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Persona que registra</mat-label>
-                                <input matInput formControlName="personaRegistra">
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Tipo de servicio</mat-label>
-                                <mat-select formControlName="tipoServicio">
-                                    @for (s of tiposServicio; track s) { <mat-option [value]="s">{{s}}</mat-option> }
-                                </mat-select>
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Forma y lugar de la entrevista</mat-label>
-                                <input matInput formControlName="formaEntrevista">
-                            </mat-form-field>
-                            <div class="button-container">
-                                <span class="btn-label-top">Archivo que contiene el Consentimiento*</span>
-                                <button mat-flat-button color="accent" type="button" class="slim-btn"
-                                    (click)="subirArchivo()">
-                                    <mat-icon>cloud_upload</mat-icon> Consentimiento Informado
-                                </button>
+    <div class="mat-elevation-z2 table-container">
+        <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
+
+            <ng-container matColumnDef="expand">
+                <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
+                <td mat-cell *matCellDef="let element">
+                    <button mat-icon-button
+                        (click)="(expandedElement = expandedElement === element ? null : element); $event.stopPropagation()">
+                        <mat-icon>{{expandedElement === element ? 'remove_circle' : 'add_circle'}}</mat-icon>
+                    </button>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="idCaso">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> ID Caso </th>
+                <td mat-cell *matCellDef="let element"> {{element.idCaso}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="tipoViolencia">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Tipo </th>
+                <td mat-cell *matCellDef="let element"> {{element.tipoViolencia}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="descripcion">
+                <th mat-header-cell *matHeaderCellDef> Descripción </th>
+                <td mat-cell *matCellDef="let element" class="cell-desc"> {{element.descripcion}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef> Acciones </th>
+                <td mat-cell *matCellDef="let element">
+                    <button mat-raised-button color="primary" class="slim-btn" (click)="iniciarAtencion(element)">
+                        Iniciar atención
+                    </button>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="expandedDetail">
+                <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumnsTablaInicial.length">
+                    <div class="element-detail"
+                        [@detailExpand]="element === expandedElement ? 'expanded' : 'collapsed'">
+                        <div class="detail-grid">
+                            <div class="detail-item"><strong>ID Caso:</strong> {{element.idCaso}}</div>
+                            <div class="detail-item"><strong>Tiempo de hechos:</strong> {{element.tiempoHechos}}</div>
+                            <div class="detail-item"><strong>Tipo de violencia:</strong> {{element.tipoViolencia}}</div>
+                            <div class="detail-item"><strong>Subcategoría:</strong> {{element.subcategoria}}</div>
+                            <div class="detail-item full-width"><strong>Descripción:</strong> {{element.descripcion}}
                             </div>
                         </div>
-                    </mat-tab>
+                    </div>
+                </td>
+            </ng-container>
 
-                    <mat-tab label="Datos de la persona">
-                        <div class="tab-padding grid-3">
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Número de Documento</mat-label>
-                                <input matInput formControlName="documento">
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Tipo Documento</mat-label>
-                                <mat-select formControlName="tipoDocumento">
-                                    @for (t of tiposDoc; track t) { <mat-option [value]="t">{{t}}</mat-option> }
-                                </mat-select>
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Fecha Nacimiento</mat-label>
-                                <input matInput [matDatepicker]="picker2" formControlName="fechaNacimiento">
-                                <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
-                                <mat-datepicker #picker2></mat-datepicker>
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Primer Nombre</mat-label>
-                                <input matInput formControlName="primerNombre">
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Segundo Nombre</mat-label>
-                                <input matInput formControlName="segundoNombre">
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Primer Apellido</mat-label>
-                                <input matInput formControlName="primerApellido">
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Segundo Apellido</mat-label>
-                                <input matInput formControlName="segundoApellido">
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>EPS - Regimen de Salud</mat-label>
-                                <input matInput formControlName="eps">
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Regimen de salud</mat-label>
-                                <input matInput formControlName="regimenSalud">
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Lugar de Nacimiento</mat-label>
-                                <input matInput formControlName="lugarNacimiento">
-                            </mat-form-field>
-                            <button mat-stroked-button color="primary" type="button" class="slim-btn"
-                                (click)="abrirModalDireccion()">
-                                <mat-icon>map</mat-icon> Dirección y Residencia
-                            </button>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>¿Pertenece a alguna Etnia?</mat-label>
-                                <mat-select formControlName="etnia">
-                                    @for (e of listaEtnias; track e) { <mat-option [value]="e">{{e}}</mat-option> }
-                                </mat-select>
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Sexo</mat-label>
-                                <mat-select formControlName="sexo">
-                                    @for (s of listaSexo; track s) { <mat-option [value]="s">{{s}}</mat-option> }
-                                </mat-select>
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Identidad Sexual</mat-label>
-                                <mat-select formControlName="identidadSexual">
-                                    @for (i of listaIdentidadSexual; track i) { <mat-option
-                                        [value]="i">{{i}}</mat-option> }
-                                </mat-select>
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Orientación Sexual</mat-label>
-                                <mat-select formControlName="orientacionSexual">
-                                    @for (o of listaOrientacionSexual; track o) { <mat-option
-                                        [value]="o">{{o}}</mat-option> }
-                                </mat-select>
-                            </mat-form-field>
-                        </div>
-                    </mat-tab>
+            <tr mat-header-row *matHeaderRowDef="displayedColumnsTablaInicial"></tr>
+            <tr mat-row *matRowDef="let element; columns: displayedColumnsTablaInicial;" class="element-row"
+                [class.expanded-row]="expandedElement === element"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
 
-                    <mat-tab label="Datos complementarios">
-                        <div class="tab-padding">
-                            <div class="grid-3">
+            <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell" colspan="5">No se encontraron resultados para "{{input.value}}"</td>
+            </tr>
+        </table>
+        <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons
+            aria-label="Seleccionar página"></mat-paginator>
+    </div>
+</div>
+
+<div *ngIf="modoAtencion">
+    <button mat-button color="warn" (click)="modoAtencion = false">
+        ← Volver a la lista
+    </button>
+    <div class="form-container">
+        <mat-card class="form-card">
+            <mat-card-content>
+                <form [formGroup]="atencionForm">
+                    <mat-tab-group animationDuration="200ms" color="primary">
+
+                        <mat-tab label="Registro de atención caso">
+                            <div class="tab-padding grid-2">
                                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                    <mat-label>Vínculo de la persona atendida con la universidad</mat-label>
-                                    <mat-select formControlName="vinculo">
-                                        @for (v of listaVinculos; track v) { <mat-option [value]="v">{{v}}</mat-option>
+                                    <mat-label>Tipo solicitud</mat-label>
+                                    <mat-select formControlName="tipoSolicitud">
+                                        @for (t of tiposSolicitud; track t) { <mat-option [value]="t">{{t}}</mat-option>
+                                        }
+                                    </mat-select>
+                                </mat-form-field>
+                                <mat-form-field appearance="outline" subscriptSizing="dynamic"
+                                    *ngIf="mostrarQuienRemite()">
+                                    <mat-label>¿Quién remite?</mat-label>
+                                    <input matInput formControlName="quienRemite">
+                                </mat-form-field>
+                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                    <mat-label>Persona o dupla que atiende</mat-label>
+                                    <input matInput formControlName="personaAtiende">
+                                </mat-form-field>
+                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                    <mat-label>Fecha y hora</mat-label>
+                                    <input matInput [matDatepicker]="picker1" formControlName="fechaHora">
+                                    <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker1></mat-datepicker>
+                                </mat-form-field>
+                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                    <mat-label>Persona que registra</mat-label>
+                                    <input matInput formControlName="personaRegistra">
+                                </mat-form-field>
+                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                    <mat-label>Tipo de servicio</mat-label>
+                                    <mat-select formControlName="tipoServicio">
+                                        @for (s of tiposServicio; track s) { <mat-option [value]="s">{{s}}</mat-option>
                                         }
                                     </mat-select>
                                 </mat-form-field>
                                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                    <mat-label>Sub Vinculo</mat-label>
-                                    <mat-select formControlName="subVinculo">
-                                        @for (v of listaSubVinculos; track v) { <mat-option
-                                            [value]="v">{{v}}</mat-option> }
+                                    <mat-label>Forma y lugar de la entrevista</mat-label>
+                                    <input matInput formControlName="formaEntrevista">
+                                </mat-form-field>
+                                <div class="button-container">
+                                    <span class="btn-label-top">Archivo que contiene el Consentimiento*</span>
+                                    <button mat-flat-button color="accent" type="button" class="slim-btn"
+                                        (click)="subirArchivo()">
+                                        <mat-icon>cloud_upload</mat-icon> Consentimiento Informado
+                                    </button>
+                                </div>
+                            </div>
+                        </mat-tab>
+
+                        <mat-tab label="Datos de la persona">
+                            <div class="tab-padding">
+                                <div class="grid-3">
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>Número de Documento</mat-label>
+                                        <input matInput formControlName="documento">
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>Tipo Documento</mat-label>
+                                        <mat-select formControlName="tipoDocumento">
+                                            @for (t of tiposDoc; track t) { <mat-option [value]="t">{{t}}</mat-option> }
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>Fecha Nacimiento</mat-label>
+                                        <input matInput [matDatepicker]="picker2" formControlName="fechaNacimiento">
+                                        <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+                                        <mat-datepicker #picker2></mat-datepicker>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>Primer Nombre</mat-label>
+                                        <input matInput formControlName="primerNombre">
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>Segundo Nombre</mat-label>
+                                        <input matInput formControlName="segundoNombre">
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>Primer Apellido</mat-label>
+                                        <input matInput formControlName="primerApellido">
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>Segundo Apellido</mat-label>
+                                        <input matInput formControlName="segundoApellido">
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Regimen de Salud</mat-label>
+                                        <mat-select formControlName="regimenSalud">
+                                            @for (v of listaRegimenSalud; track v) {
+                                            <mat-option [value]="v">{{v}}</mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>EPS - Regimen de Salud</mat-label>
+                                        <mat-select formControlName="regimenSalud">
+                                            @for (v of listaEPSRegimen; track v) {
+                                            <mat-option [value]="v">{{v}}</mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>Lugar de Nacimiento</mat-label>
+                                        <input matInput formControlName="lugarNacimiento">
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>¿Pertenece a alguna Etnia?</mat-label>
+                                        <mat-select formControlName="etnia">
+                                            @for (e of listaEtnias; track e) { <mat-option
+                                                [value]="e">{{e}}</mat-option> }
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>Sexo</mat-label>
+                                        <mat-select formControlName="sexo">
+                                            @for (s of listaSexo; track s) { <mat-option [value]="s">{{s}}</mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>Identidad Sexual</mat-label>
+                                        <mat-select formControlName="identidadSexual">
+                                            @for (i of listaIdentidadSexual; track i) { <mat-option
+                                                [value]="i">{{i}}</mat-option> }
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>Orientación Sexual</mat-label>
+                                        <mat-select formControlName="orientacionSexual">
+                                            @for (o of listaOrientacionSexual; track o) { <mat-option
+                                                [value]="o">{{o}}</mat-option> }
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <button mat-stroked-button color="primary" type="button" class="slim-btn"
+                                        (click)="abrirModalDireccion()">
+                                        <mat-icon>map</mat-icon>
+                                        {{ atencionForm.get('direccionLugar')?.value ? 'Cambiar Dirección' :
+                                        'Capturar Dirección' }}
+                                    </button>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="span-all">
+                                        <mat-label>Dirección de Residencia Registrada</mat-label>
+                                        <input matInput formControlName="direccionLugar" readonly
+                                            placeholder="No se ha registrado dirección">
+                                        <mat-icon matSuffix color="primary">location_on</mat-icon>
+                                    </mat-form-field>
+                                </div>
+
+                                <div class="discapacidad-container">
+                                    <div class="section-title">
+                                        <span>Discapacidad</span>
+                                        <button mat-icon-button color="primary" type="button"
+                                            (click)="abrirModalDiscapacidad()">
+                                            <mat-icon>add_circle</mat-icon>
+                                        </button>
+                                    </div>
+                                    <div class="discapacidad-list">
+                                        @for (item of discapacidadesRegistradas; track item; let i = $index) {
+                                        <div class="discapacidad-item">
+                                            <span><strong>Tipo:</strong> {{item.tipo}}</span>
+                                            <span><strong>Sub Tipo:</strong> {{item.subTipo}}</span>
+                                            <span><strong>Descripción:</strong> {{item.descripcion}}</span>
+                                            <button mat-icon-button color="warn" (click)="eliminarDiscapacidad(i)">
+                                                <mat-icon>delete</mat-icon>
+                                            </button>
+                                        </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-tab>
+
+                        <mat-tab label="Datos complementarios">
+                            <div class="tab-padding">
+                                <div class="grid-3">
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>Vínculo de la persona atendida con la universidad</mat-label>
+                                        <mat-select formControlName="vinculo">
+                                            @for (v of listaVinculos; track v) { <mat-option
+                                                [value]="v">{{v}}</mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>Sub Vinculo</mat-label>
+                                        <mat-select formControlName="subVinculo">
+                                            @for (v of listaSubVinculos; track v) { <mat-option
+                                                [value]="v">{{v}}</mat-option> }
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>Facultad</mat-label>
+                                        <mat-select formControlName="facultad">
+                                            @for (f of facultadesM; track f) { <mat-option
+                                                [value]="f">{{f}}</mat-option> }
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>Programa</mat-label>
+                                        <mat-select formControlName="programa">
+                                            @for (f of listaProgramas; track f) { <mat-option
+                                                [value]="f">{{f}}</mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>Dependencia</mat-label>
+                                        <mat-select formControlName="dependencia">
+                                            @for (f of listaDependencia; track f) { <mat-option
+                                                [value]="f">{{f}}</mat-option> }
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>Campus</mat-label>
+                                        <mat-select formControlName="campus">
+                                            @for (c of campusM; track c) { <mat-option [value]="c">{{c}}</mat-option> }
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+
+                                <div class="discapacidad-container">
+                                    <div class="section-title">
+                                        <span>Correo</span>
+                                        <button mat-icon-button color="primary" type="button"
+                                            (click)="abrirModalCorreo()">
+                                            <mat-icon>add_circle</mat-icon>
+                                        </button>
+                                    </div>
+                                    <div class="discapacidad-list">
+                                        @for (item of correoRegistrados; track item; let i = $index) {
+                                        <div class="discapacidad-item">
+                                            <span><strong>Tipo:</strong> {{item.tipo}}</span>
+                                            <span><strong>Correo:</strong> {{item.correo}}</span>
+                                            <span><strong>Descripcion:</strong> {{item.descripcion}}</span>
+                                            <button mat-icon-button color="warn" (click)="eliminarCorreo(i)">
+                                                <mat-icon>delete</mat-icon>
+                                            </button>
+                                        </div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="discapacidad-container">
+                                    <div class="section-title">
+                                        <span>Teléfono</span>
+                                        <button mat-icon-button color="primary" type="button"
+                                            (click)="abrirModalTelefono()">
+                                            <mat-icon>add_circle</mat-icon>
+                                        </button>
+                                    </div>
+                                    <div class="discapacidad-list">
+                                        @for (item of telefonosRegistrados; track item; let i = $index) {
+                                        <div class="discapacidad-item">
+                                            <span><strong>Tipo:</strong> {{item.tipo}}</span>
+                                            <span><strong>Telefono:</strong> {{item.telefono}}</span>
+                                            <span><strong>Telefono Alterno:</strong> {{item.alterno}}</span>
+                                            <span><strong>Descripción:</strong> {{item.descripcion}}</span>
+                                            <button mat-icon-button color="warn" (click)="eliminarTelefono(i)">
+                                                <mat-icon>delete</mat-icon>
+                                            </button>
+                                        </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-tab>
+
+                        <mat-tab label="Documentación">
+                            <div class="tab-padding grid-2">
+                                <mat-form-field appearance="outline" subscriptSizing="dynamic" class="span-all">
+                                    <mat-label>Hace cuánto ocurrió</mat-label>
+                                    <input matInput formControlName="tiempoOcurrido">
+                                </mat-form-field>
+
+                                <div class="discapacidad-container span-all">
+                                    <div class="section-title">
+                                        <span>Documentacion de hechos</span>
+                                        <button mat-icon-button color="primary" type="button"
+                                            (click)="abrirModalHechos()">
+                                            <mat-icon>add_circle</mat-icon>
+                                        </button>
+                                    </div>
+                                    <div class="discapacidad-list">
+                                        @for (item of hechosRegistrados; track item; let i = $index) {
+                                        <div class="discapacidad-item">
+                                            <span><strong>Fecha:</strong> {{item.fecha}}</span>
+                                            <span><strong>Modo:</strong> {{item.modo}}</span>
+                                            <span><strong>Lugar:</strong> {{item.lugar}}</span>
+                                            <span><strong>Descripción:</strong> {{item.descripcion}}</span>
+                                            <button mat-icon-button color="warn" (click)="eliminarHechos(i)">
+                                                <mat-icon>delete</mat-icon>
+                                            </button>
+                                        </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="pregunta-container span-all">
+                                    <label class="pregunta-label">¿Violencia basada en género?</label>
+
+                                    <mat-radio-group formControlName="violenciaGenero" class="radio-group">
+                                        <mat-radio-button value="SI">Sí</mat-radio-button>
+                                        <mat-radio-button value="NO">No</mat-radio-button>
+                                    </mat-radio-group>
+                                </div>
+                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                    <mat-label>Tipo de Violencia</mat-label>
+                                    <mat-select formControlName="tipoViolencia">
+                                        @for (c of listaSubTipoViolencia; track c) { <mat-option
+                                            [value]="c">{{c}}</mat-option> }
                                     </mat-select>
                                 </mat-form-field>
                                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                    <mat-label>Facultad</mat-label>
-                                    <mat-select formControlName="facultad">
-                                        @for (f of facultadesM; track f) { <mat-option [value]="f">{{f}}</mat-option> }
+                                    <mat-label>Subcategoria de Violencia</mat-label>
+                                    <mat-select formControlName="subcategoriaViolencia">
+                                        @for (c of listaSubTipoViolencia; track c) { <mat-option
+                                            [value]="c">{{c}}</mat-option> }
                                     </mat-select>
                                 </mat-form-field>
-                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                    <mat-label>Programa</mat-label>
-                                    <mat-select formControlName="programa">
-                                        @for (f of listaProgramas; track f) { <mat-option [value]="f">{{f}}</mat-option>
+                            </div>
+                        </mat-tab>
+
+                        <mat-tab label="Presunto agresor">
+                            <div class="tab-padding grid-3">
+
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Primer Nombre</mat-label>
+                                    <input matInput formControlName="presuntoPrimerNombre">
+                                </mat-form-field>
+
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Segundo Nombre</mat-label>
+                                    <input matInput formControlName="presuntoSegundoNombre">
+                                </mat-form-field>
+
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Primer Apellido</mat-label>
+                                    <input matInput formControlName="presuntoPrimerApellido">
+                                </mat-form-field>
+
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Segundo Apellido</mat-label>
+                                    <input matInput formControlName="presuntoSegundoApellido">
+                                </mat-form-field>
+
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Vínculo con la universidad</mat-label>
+                                    <mat-select formControlName="presuntoVinculoUniversidad">
+                                        @for (v of listaVinculos; track v) {
+                                        <mat-option [value]="v">{{v}}</mat-option>
                                         }
                                     </mat-select>
                                 </mat-form-field>
-                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                    <mat-label>Dependencia</mat-label>
-                                    <mat-select formControlName="dependencia">
-                                        @for (f of listaDependencia; track f) { <mat-option
-                                            [value]="f">{{f}}</mat-option> }
-                                    </mat-select>
+
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Vínculo con la víctima</mat-label>
+                                    <input matInput formControlName="presuntoVinculoVictima">
                                 </mat-form-field>
-                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                    <mat-label>Campus</mat-label>
-                                    <mat-select formControlName="campus">
-                                        @for (c of campusM; track c) { <mat-option [value]="c">{{c}}</mat-option> }
-                                    </mat-select>
-                                </mat-form-field>
+
                             </div>
 
+                        </mat-tab>
+
+                        <mat-tab label="Apreciaciones psicojuridicas">
                             <div class="discapacidad-container">
                                 <div class="section-title">
-                                    <span>Discapacidad</span>
+                                    <span>Apreciaciones Psicojuridicas</span>
                                     <button mat-icon-button color="primary" type="button"
-                                        (click)="abrirModalDiscapacidad()">
+                                        (click)="abrirModalApreciacionJuridica()">
                                         <mat-icon>add_circle</mat-icon>
                                     </button>
                                 </div>
                                 <div class="discapacidad-list">
-                                    @for (item of discapacidadesRegistradas; track item; let i = $index) {
+                                    @for (item of apreciacionesJuridicas; track item; let i = $index) {
                                     <div class="discapacidad-item">
                                         <span><strong>Tipo:</strong> {{item.tipo}}</span>
-                                        <span><strong>Sub Tipo:</strong> {{item.subTipo}}</span>
-                                        <span><strong>Descripción:</strong> {{item.descripcion}}</span>
-                                        <button mat-icon-button color="warn" (click)="eliminarDiscapacidad(i)">
-                                            <mat-icon>delete</mat-icon>
-                                        </button>
-                                    </div>
-                                    }
-                                </div>
-                            </div>
-                            <div class="discapacidad-container">
-                                <div class="section-title">
-                                    <span>Correo</span>
-                                    <button mat-icon-button color="primary" type="button" (click)="abrirModalCorreo()">
-                                        <mat-icon>add_circle</mat-icon>
-                                    </button>
-                                </div>
-                                <div class="discapacidad-list">
-                                    @for (item of correoRegistrados; track item; let i = $index) {
-                                    <div class="discapacidad-item">
-                                        <span><strong>Tipo:</strong> {{item.tipo}}</span>
-                                        <span><strong>Correo:</strong> {{item.correo}}</span>
-                                        <span><strong>Descripcion:</strong> {{item.descripcion}}</span>
-                                        <button mat-icon-button color="warn" (click)="eliminarCorreo(i)">
-                                            <mat-icon>delete</mat-icon>
-                                        </button>
-                                    </div>
-                                    }
-                                </div>
-                            </div>
-                            <div class="discapacidad-container">
-                                <div class="section-title">
-                                    <span>Teléfono</span>
-                                    <button mat-icon-button color="primary" type="button"
-                                        (click)="abrirModalTelefono()">
-                                        <mat-icon>add_circle</mat-icon>
-                                    </button>
-                                </div>
-                                <div class="discapacidad-list">
-                                    @for (item of telefonosRegistrados; track item; let i = $index) {
-                                    <div class="discapacidad-item">
-                                        <span><strong>Tipo:</strong> {{item.tipo}}</span>
-                                        <span><strong>Telefono:</strong> {{item.telefono}}</span>
-                                        <span><strong>Telefono Alterno:</strong> {{item.alterno}}</span>
                                         <span><strong>Descripción:</strong> {{item.descripcion}}</span>
                                         <button mat-icon-button color="warn" (click)="eliminarTelefono(i)">
                                             <mat-icon>delete</mat-icon>
@@ -237,252 +466,168 @@
                                     }
                                 </div>
                             </div>
-                        </div>
-                    </mat-tab>
-
-                    <mat-tab label="Documentación">
-                        <div class="tab-padding grid-2">
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="span-all">
-                                <mat-label>Hace cuánto ocurrió</mat-label>
-                                <input matInput formControlName="tiempoOcurrido">
-                            </mat-form-field>
-                            <div class="span-all text-area-container">
-                                <mat-form-field appearance="outline">
-                                    <mat-label>Descripción de Hechos en circunstancias de tiempo, modo y
-                                        lugar</mat-label>
-                                    <textarea matInput rows="6" formControlName="hechos"></textarea>
-                                </mat-form-field>
-                            </div>
-                            <div class="pregunta-container span-all">
-                                <label class="pregunta-label">¿Violencia basada en género?</label>
-
-                                <mat-radio-group formControlName="violenciaGenero" class="radio-group">
-                                    <mat-radio-button value="SI">Sí</mat-radio-button>
-                                    <mat-radio-button value="NO">No</mat-radio-button>
-                                </mat-radio-group>
-                            </div>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Tipo de Violencia</mat-label>
-                                <mat-select formControlName="tipoViolencia">
-                                    @for (c of listaSubTipoViolencia; track c) { <mat-option
-                                        [value]="c">{{c}}</mat-option> }
-                                </mat-select>
-                            </mat-form-field>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Subcategoria de Violencia</mat-label>
-                                <mat-select formControlName="subcategoriaViolencia">
-                                    @for (c of listaSubTipoViolencia; track c) { <mat-option
-                                        [value]="c">{{c}}</mat-option> }
-                                </mat-select>
-                            </mat-form-field>
-                            <div class="discapacidad-container span-all">
+                            <div class="discapacidad-container">
                                 <div class="section-title">
-                                    <span>Documentacion de hechos</span>
-                                    <button mat-icon-button color="primary" type="button" (click)="abrirModalHechos()">
+                                    <span>Apreciaciones Psicologicas</span>
+                                    <button mat-icon-button color="primary" type="button"
+                                        (click)="abrirModalApreciacionPsicologica()">
                                         <mat-icon>add_circle</mat-icon>
                                     </button>
                                 </div>
                                 <div class="discapacidad-list">
-                                    @for (item of hechosRegistrados; track item; let i = $index) {
+                                    @for (item of apreciacionesPsicologicas; track item; let i = $index) {
                                     <div class="discapacidad-item">
-                                        <span><strong>Fecha:</strong> {{item.fecha}}</span>
-                                        <span><strong>Modo:</strong> {{item.modo}}</span>
-                                        <span><strong>Lugar:</strong> {{item.lugar}}</span>
+                                        <span><strong>Tipo:</strong> {{item.tipo}}</span>
                                         <span><strong>Descripción:</strong> {{item.descripcion}}</span>
-                                        <button mat-icon-button color="warn" (click)="eliminarHechos(i)">
+                                        <button mat-icon-button color="warn" (click)="eliminarTelefono(i)">
                                             <mat-icon>delete</mat-icon>
                                         </button>
                                     </div>
                                     }
                                 </div>
                             </div>
-                        </div>
-                    </mat-tab>
+                        </mat-tab>
 
-                    <mat-tab label="Presunto agresor">
-                        <div class="tab-padding grid-3">
+                        <mat-tab label="Acuerdos y compromisos">
+                            <div class="tab-padding">
 
-                            <mat-form-field appearance="outline">
-                                <mat-label>Primer Nombre</mat-label>
-                                <input matInput formControlName="presuntoPrimerNombre">
-                            </mat-form-field>
+                                <div class="pregunta-acuerdo-header">
+                                    <label class="pregunta-label">¿Logró llegar a un acuerdo con la persona?</label>
 
-                            <mat-form-field appearance="outline">
-                                <mat-label>Segundo Nombre</mat-label>
-                                <input matInput formControlName="presuntoSegundoNombre">
-                            </mat-form-field>
-
-                            <mat-form-field appearance="outline">
-                                <mat-label>Primer Apellido</mat-label>
-                                <input matInput formControlName="presuntoPrimerApellido">
-                            </mat-form-field>
-
-                            <mat-form-field appearance="outline">
-                                <mat-label>Segundo Apellido</mat-label>
-                                <input matInput formControlName="presuntoSegundoApellido">
-                            </mat-form-field>
-
-                            <mat-form-field appearance="outline">
-                                <mat-label>Vínculo con la universidad</mat-label>
-                                <mat-select formControlName="presuntoVinculoUniversidad">
-                                    @for (v of listaVinculos; track v) {
-                                    <mat-option [value]="v">{{v}}</mat-option>
-                                    }
-                                </mat-select>
-                            </mat-form-field>
-
-                            <mat-form-field appearance="outline">
-                                <mat-label>Vínculo con la víctima</mat-label>
-                                <input matInput formControlName="presuntoVinculoVictima">
-                            </mat-form-field>
-
-                        </div>
-
-                    </mat-tab>
-
-                    <mat-tab label="Apreciaciones psicojuridicas">
-                        <div class="tab-padding empty-tab">Contenido para Apreciaciones psicojurídicas</div>
-                    </mat-tab>
-
-                    <mat-tab label="Acuerdos y compromisos">
-                        <div class="tab-padding">
-
-                            <div class="pregunta-acuerdo-header">
-                                <label class="pregunta-label">¿Logró llegar a un acuerdo con la persona?</label>
-
-                                <mat-radio-group formControlName="logroAcuerdo" class="radio-group-vertical">
-                                    <mat-radio-button value="SI">Sí</mat-radio-button>
-                                    <mat-radio-button value="NO" style="margin-left: 15px;">No</mat-radio-button>
-                                </mat-radio-group>
-                            </div>
-
-                            @if (atencionForm.get('logroAcuerdo')?.value === 'SI') {
-
-                            <div class="discapacidad-container animate-fade-in">
-                                <div class="section-title">
-                                    <span>Activación de ruta</span>
-                                    <button mat-icon-button color="primary" type="button"
-                                        (click)="abrirModalRutaActivada()">
-                                        <mat-icon>add_circle</mat-icon>
-                                    </button>
+                                    <mat-radio-group formControlName="logroAcuerdo" class="radio-group-vertical">
+                                        <mat-radio-button value="SI">Sí</mat-radio-button>
+                                        <mat-radio-button value="NO" style="margin-left: 15px;">No</mat-radio-button>
+                                    </mat-radio-group>
                                 </div>
-                                <div class="discapacidad-list">
-                                    @for (item of activarRutasRegistrados; track item; let i = $index) {
-                                    <div class="discapacidad-item">
-                                        <span><strong>Tipo:</strong> {{item.tipo}}</span>
-                                        <span><strong>Cual:</strong> {{item.cual}}</span>
-                                        <button mat-icon-button color="warn" (click)="eliminarRutaActivada(i)">
-                                            <mat-icon>delete</mat-icon>
+
+                                @if (atencionForm.get('logroAcuerdo')?.value === 'SI') {
+
+                                <div class="discapacidad-container animate-fade-in">
+                                    <div class="section-title">
+                                        <span>Activación de ruta</span>
+                                        <button mat-icon-button color="primary" type="button"
+                                            (click)="abrirModalRutaActivada()">
+                                            <mat-icon>add_circle</mat-icon>
                                         </button>
                                     </div>
-                                    }
+                                    <div class="discapacidad-list">
+                                        @for (item of activarRutasRegistrados; track item; let i = $index) {
+                                        <div class="discapacidad-item">
+                                            <span><strong>Tipo:</strong> {{item.tipo}}</span>
+                                            <span><strong>Cual:</strong> {{item.cual}}</span>
+                                            <button mat-icon-button color="warn" (click)="eliminarRutaActivada(i)">
+                                                <mat-icon>delete</mat-icon>
+                                            </button>
+                                        </div>
+                                        }
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="discapacidad-container animate-fade-in">
-                                <div class="section-title">
-                                    <span>Remisiones</span>
-                                    <button mat-icon-button color="primary" type="button"
-                                        (click)="abrirModalRemision()">
-                                        <mat-icon>add_circle</mat-icon>
-                                    </button>
-                                </div>
-                                <div class="discapacidad-list">
-                                    @for (item of remisionesRegistrados; track item; let i = $index) {
-                                    <div class="discapacidad-item">
-                                        <span><strong>Tipo:</strong> {{item.tipo}}</span>
-                                        <span><strong>Fecha:</strong> {{item.fecha}}</span>
-                                        <span><strong>Cual:</strong> {{item.cual}}</span>
-                                        <button mat-icon-button color="warn" (click)="eliminarRemision(i)">
-                                            <mat-icon>delete</mat-icon>
+                                <div class="discapacidad-container animate-fade-in">
+                                    <div class="section-title">
+                                        <span>Remisiones</span>
+                                        <button mat-icon-button color="primary" type="button"
+                                            (click)="abrirModalRemision()">
+                                            <mat-icon>add_circle</mat-icon>
                                         </button>
                                     </div>
-                                    }
+                                    <div class="discapacidad-list">
+                                        @for (item of remisionesRegistrados; track item; let i = $index) {
+                                        <div class="discapacidad-item">
+                                            <span><strong>Tipo:</strong> {{item.tipo}}</span>
+                                            <span><strong>Fecha:</strong> {{item.fecha}}</span>
+                                            <span><strong>Cual:</strong> {{item.cual}}</span>
+                                            <button mat-icon-button color="warn" (click)="eliminarRemision(i)">
+                                                <mat-icon>delete</mat-icon>
+                                            </button>
+                                        </div>
+                                        }
+                                    </div>
                                 </div>
-                            </div>
 
-                            } @else {
-                            <div class="empty-state-container">
-                                <mat-icon color="disabled">handshake</mat-icon>
-                                <p>Indique que hubo un acuerdo para registrar activaciones de ruta o remisiones.</p>
-                            </div>
-                            }
-                        </div>
-                    </mat-tab>
-
-                    <mat-tab label="Otros Casos">
-                        <div class="tab-padding">
-
-                            <div class="table-container" *ngIf="acuerdosCompromisos.length > 0; else emptyTab">
-
-                                <table mat-table [dataSource]="acuerdosCompromisos" class="mat-elevation-z2">
-
-                                    <ng-container matColumnDef="idCaso">
-                                        <th mat-header-cell *matHeaderCellDef> Id Caso </th>
-                                        <td mat-cell *matCellDef="let element"> {{element.idCaso}} </td>
-                                    </ng-container>
-
-                                    <ng-container matColumnDef="tiempoHechos">
-                                        <th mat-header-cell *matHeaderCellDef> Tiempo de los hechos </th>
-                                        <td mat-cell *matCellDef="let element"> {{element.tiempoHechos}} </td>
-                                    </ng-container>
-
-                                    <ng-container matColumnDef="tipoViolencia">
-                                        <th mat-header-cell *matHeaderCellDef> Tipo de Violencia </th>
-                                        <td mat-cell *matCellDef="let element">
-                                            <span class="badge-tipo">{{element.tipoViolencia}}</span>
-                                        </td>
-                                    </ng-container>
-
-                                    <ng-container matColumnDef="subcategoria">
-                                        <th mat-header-cell *matHeaderCellDef> SubCategoría de Violencia </th>
-                                        <td mat-cell *matCellDef="let element"> {{element.subcategoria}} </td>
-                                    </ng-container>
-
-                                    <ng-container matColumnDef="descripcion">
-                                        <th mat-header-cell *matHeaderCellDef> Descripción </th>
-                                        <td mat-cell *matCellDef="let element" class="cell-desc">
-                                            {{element.descripcion}}
-                                        </td>
-                                    </ng-container>
-
-                                    <ng-container matColumnDef="acciones">
-                                        <th mat-header-cell *matHeaderCellDef> Acciones </th>
-                                        <td mat-cell *matCellDef="let element; let i = index">
-                                            <div class="action-buttons">
-                                                <button mat-icon-button color="primary"
-                                                    (click)="editarAcuerdo(element)">
-                                                    <mat-icon>edit</mat-icon>
-                                                </button>
-                                                <button mat-icon-button color="warn" (click)="eliminarAcuerdo(i)">
-                                                    <mat-icon>delete</mat-icon>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </ng-container>
-
-                                    <tr mat-header-row *matHeaderRowDef="displayedColumnsAcuerdos"></tr>
-                                    <tr mat-row *matRowDef="let row; columns: displayedColumnsAcuerdos;"></tr>
-
-                                </table>
-                            </div>
-
-                            <ng-template #emptyTab>
-                                <div class="empty-tab">
-                                    <mat-icon>inbox</mat-icon>
-                                    <span>No hay acuerdos registrados</span>
+                                } @else {
+                                <div class="empty-state-container">
+                                    <mat-icon color="disabled">handshake</mat-icon>
+                                    <p>Indique que hubo un acuerdo para registrar activaciones de ruta o remisiones.</p>
                                 </div>
-                            </ng-template>
+                                }
+                            </div>
+                        </mat-tab>
 
-                        </div>
-                    </mat-tab>
+                        <mat-tab label="Otros Casos">
+                            <div class="tab-padding">
+
+                                <div class="table-container" *ngIf="acuerdosCompromisos.length > 0; else emptyTab">
+
+                                    <table mat-table [dataSource]="acuerdosCompromisos" class="mat-elevation-z2">
+
+                                        <ng-container matColumnDef="idCaso">
+                                            <th mat-header-cell *matHeaderCellDef> Id Caso </th>
+                                            <td mat-cell *matCellDef="let element"> {{element.idCaso}} </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="tiempoHechos">
+                                            <th mat-header-cell *matHeaderCellDef> Tiempo de los hechos </th>
+                                            <td mat-cell *matCellDef="let element"> {{element.tiempoHechos}} </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="tipoViolencia">
+                                            <th mat-header-cell *matHeaderCellDef> Tipo de Violencia </th>
+                                            <td mat-cell *matCellDef="let element">
+                                                <span class="badge-tipo">{{element.tipoViolencia}}</span>
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="subcategoria">
+                                            <th mat-header-cell *matHeaderCellDef> SubCategoría de Violencia </th>
+                                            <td mat-cell *matCellDef="let element"> {{element.subcategoria}} </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="descripcion">
+                                            <th mat-header-cell *matHeaderCellDef> Descripción </th>
+                                            <td mat-cell *matCellDef="let element" class="cell-desc">
+                                                {{element.descripcion}}
+                                            </td>
+                                        </ng-container>
+
+                                        <ng-container matColumnDef="acciones">
+                                            <th mat-header-cell *matHeaderCellDef> Acciones </th>
+                                            <td mat-cell *matCellDef="let element; let i = index">
+                                                <div class="action-buttons">
+                                                    <button mat-icon-button color="primary"
+                                                        (click)="editarAcuerdo(element)">
+                                                        <mat-icon>edit</mat-icon>
+                                                    </button>
+                                                    <button mat-icon-button color="warn" (click)="eliminarAcuerdo(i)">
+                                                        <mat-icon>delete</mat-icon>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </ng-container>
+
+                                        <tr mat-header-row *matHeaderRowDef="displayedColumnsAcuerdos"></tr>
+                                        <tr mat-row *matRowDef="let row; columns: displayedColumnsAcuerdos;"></tr>
+
+                                    </table>
+                                </div>
+
+                                <ng-template #emptyTab>
+                                    <div class="empty-tab">
+                                        <mat-icon>inbox</mat-icon>
+                                        <span>No hay acuerdos registrados</span>
+                                    </div>
+                                </ng-template>
+
+                            </div>
+                        </mat-tab>
 
 
-                </mat-tab-group>
-            </form>
-        </mat-card-content>
-        <mat-card-actions align="end">
-            <button mat-raised-button color="primary" (click)="guardarAtencion()">Guardar</button>
-        </mat-card-actions>
-    </mat-card>
+                    </mat-tab-group>
+                </form>
+            </mat-card-content>
+            <mat-card-actions align="end">
+                <button mat-raised-button color="primary" (click)="guardarAtencion()">Guardar</button>
+            </mat-card-actions>
+        </mat-card>
+    </div>
 </div>

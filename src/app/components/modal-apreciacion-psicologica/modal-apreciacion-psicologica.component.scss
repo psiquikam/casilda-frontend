@@ -36,9 +36,9 @@ $purple-sys: #6B2D95;
         min-width: 180px;
       }
 
-      .field-cual {
-        flex: 1.5;
-        min-width: 220px;
+      .field-desc {
+        flex: 2.5;
+        min-width: 300px;
       }
     }
   }
@@ -72,7 +72,6 @@ $purple-sys: #6B2D95;
   .mat-mdc-form-field {
     .mat-mdc-text-field-wrapper {
       height: 48px;
-
       .mat-mdc-form-field-flex {
         height: 48px;
         align-items: center;

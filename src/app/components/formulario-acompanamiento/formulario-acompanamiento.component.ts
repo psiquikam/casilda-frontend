@@ -15,6 +15,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTabsModule } from '@angular/material/tabs';
+
 import { ListasService } from '../../services/listas.service';
 import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
 
@@ -62,48 +63,52 @@ export class FormularioAcompanamientoComponent implements OnInit {
 
   initForm(): void {
     this.acompanamientoForm = this.fb.group({
-      //Datos remitente
+      tipoReporte: ['', Validators.required],
+
+      remitenteTipoSolicitud: [''],
       remitentePrimerNombre: [''],
       remitenteSegundoNombre: [''],
       remitentePrimerApellido: [''],
       remitenteSegundoApellido: [''],
-      cargo: [''],
+      remitenteCargo: [''],
+      remitenteCampus: [''],
+      remitenteDependencia: [''],
+      remitenteFacultad: [''],
+      remitenteOtraFacultad: [''],
+      remitenteFechaSolicitud: [new Date()],
+      remitenteTipoDocumento: [''],
+      remitenteNumeroDocumento: [''],
 
+      tipoDocumento: ['', Validators.required],
+      numeroDocumento: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
+      fechaNacimiento: [null, Validators.required],
       primerNombre: ['', [Validators.required, Validators.minLength(2)]],
       segundoNombre: [''],
       primerApellido: ['', [Validators.required, Validators.minLength(2)]],
       segundoApellido: [''],
-      tipoDocumento: ['', Validators.required],
-      numeroDocumento: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
-      tipoReporte: ['', Validators.required],
-      tipoSolicitud: [''],
-      fechaSolicitud: [new Date()],
-      dependencia: ['', Validators.required],
       identidadGenero: ['', Validators.required],
-      edad: ['', [Validators.required, Validators.min(1), Validators.max(120)]],
       celular: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-      celularAlterno: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      telefonoAlterno: ['', [Validators.pattern('^[0-9]{10}$')]],
       correoInstitucional: ['', [Validators.required, Validators.email]],
-      correoPersonal: ['', [Validators.required, Validators.email]],
-      facultad: ['', Validators.required],
-      campus: ['', Validators.required]
+      correoPersonal: ['', [Validators.required, Validators.email]]
     });
   }
 
   setupConditionalValidation(): void {
     this.acompanamientoForm.get('tipoReporte')?.valueChanges.subscribe(tipo => {
-      const fields = [
-        'remitentePrimerNombre', 'remitentePrimerApellido', 
-        'tipoSolicitud', 'cargo', 'campus', 'dependencia'
+      const remitenteFields = [
+        'remitenteTipoSolicitud', 'remitentePrimerNombre', 'remitentePrimerApellido',
+        'remitenteCargo', 'remitenteCampus', 'remitenteDependencia', 'remitenteFacultad',
+        'remitenteFechaSolicitud', 'remitenteTipoDocumento', 'remitenteNumeroDocumento'
       ];
       
-      fields.forEach(f => {
+      remitenteFields.forEach(f => {
         const control = this.acompanamientoForm.get(f);
         if (tipo === 'indirecta') {
           control?.setValidators([Validators.required]);
         } else {
           control?.clearValidators();
-          control?.reset();
+          control?.setValue(f === 'remitenteFechaSolicitud' ? new Date() : '');
         }
         control?.updateValueAndValidity();
       });
@@ -113,23 +118,33 @@ export class FormularioAcompanamientoComponent implements OnInit {
   enviarSolicitud(): void {
     if (this.acompanamientoForm.valid) {
       const numeroAleatorio = Math.floor(1000 + Math.random() * 9000);
+      const payload = this.acompanamientoForm.value;
+
+      console.log('Enviando solicitud:', payload);
+
       this.dialog.open(DialogoExitoComponent, {
         width: '400px',
         data: {
-          titulo: '¡Acompañamiento Registrado!',
-          mensaje: 'Tu solicitud ha sido recibida correctamente.',
-          codigo: `ACO-${numeroAleatorio}`
+          titulo: '¡Solicitud Creada!',
+          mensaje: 'Tu requerimiento ha sido registrado en el sistema.',
+          codigo: `REQ-${numeroAleatorio}`
         }
       });
-      this.acompanamientoForm.reset({ fechaSolicitud: new Date() });
+      
+      this.acompanamientoForm.reset({ 
+        remitenteFechaSolicitud: new Date() 
+      });
     } else {
-      this.snackBar.open('Complete todos los campos obligatorios', 'Cerrar', { duration: 3000 });
+      this.acompanamientoForm.markAllAsTouched();
+      this.snackBar.open('Por favor, revisa los campos marcados en rojo', 'Cerrar', { duration: 3000 });
     }
   }
 
   cancelar(): void {
-    if (confirm('¿Desea limpiar el formulario?')) {
-      this.acompanamientoForm.reset({ fechaSolicitud: new Date() });
+    if (confirm('¿Desea limpiar todos los campos del formulario?')) {
+      this.acompanamientoForm.reset({ 
+        remitenteFechaSolicitud: new Date() 
+      });
     }
   }
 }

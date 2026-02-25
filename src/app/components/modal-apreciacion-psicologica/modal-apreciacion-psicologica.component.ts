@@ -7,36 +7,32 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
-  selector: 'app-modal-remision',
+  selector: 'app-modal-apreciacion-psicologica',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
     MatIconModule,
-    MatDatepickerModule,
-    MatNativeDateModule
+    FormsModule
   ],
-  templateUrl: './modal-remision.component.html',
-  styleUrls: ['./modal-remision.component.scss']
+  templateUrl: './modal-apreciacion-psicologica.component.html',
+  styleUrls: ['./modal-apreciacion-psicologica.component.scss']
 })
-export class ModalRemisionComponent {
-
+export class ModalApreciacionPsicologicaComponent {
   data = {
     tipo: '',
-    cual: '',
-    fecha: null as Date | null
+    descripcion: ''
   };
 
-  constructor(public dialogRef: MatDialogRef<ModalRemisionComponent>) {}
+  listaTipos = ['Clínica', 'Familiar', 'Educativa', 'Social', 'Otra'];
+
+  constructor(public dialogRef: MatDialogRef<ModalApreciacionPsicologicaComponent>) { }
 
   onNoClick(): void {
     this.dialogRef.close();

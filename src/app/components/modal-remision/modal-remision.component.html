@@ -1,23 +1,28 @@
-<h2 mat-dialog-title class="modal-title">Agregar Teléfono</h2>
+<h2 mat-dialog-title class="modal-title">
+  <mat-icon>assignment</mat-icon>
+  Agregar Remisión
+</h2>
 
 <mat-dialog-content class="modal-content">
-  <div class="form-grid">
+  <div class="form-row">
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Tipo de Remision</mat-label>
+    <mat-form-field appearance="outline" class="field-tipo">
+      <mat-label>Tipo de Remisión</mat-label>
       <mat-select [(ngModel)]="data.tipo">
         <mat-option value="Directa">Directa</mat-option>
         <mat-option value="Indirecta">Indirecta</mat-option>
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-form-field appearance="outline" class="field-fecha">
       <mat-label>Fecha</mat-label>
-      <input matInput type="date" [(ngModel)]="data.fecha">
+      <input matInput [matDatepicker]="picker" [(ngModel)]="data.fecha">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
     </mat-form-field>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>¿Cual?</mat-label>
+    <mat-form-field appearance="outline" class="field-cual">
+      <mat-label>¿Cuál?</mat-label>
       <input matInput [(ngModel)]="data.cual" placeholder="Opcional">
     </mat-form-field>
 
@@ -27,12 +32,7 @@
 <mat-dialog-actions align="end" class="modal-actions">
   <button mat-button (click)="onNoClick()">Cancelar</button>
 
-  <button 
-    mat-raised-button 
-    color="primary" 
-    [mat-dialog-close]="data"
-    [disabled]="!data.tipo || !data.fecha"
-  >
+  <button mat-flat-button class="btn-confirm" [mat-dialog-close]="data" [disabled]="!data.tipo || !data.fecha">
     <mat-icon>check</mat-icon>
     Agregar a la lista
   </button>

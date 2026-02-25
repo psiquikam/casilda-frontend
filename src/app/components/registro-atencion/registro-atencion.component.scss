@@ -1,3 +1,4 @@
+/* 1. CONTENEDORES Y ESTRUCTURA BASE */
 .form-container {
   display: flex;
   justify-content: center;
@@ -32,6 +33,7 @@
   }
 }
 
+/* 2. PERSONALIZACIÓN DE TABS (NG-DEEP) */
 ::ng-deep {
   .mat-mdc-tab-body-content {
     padding: 0 !important;
@@ -46,8 +48,7 @@
   .mat-mdc-tab-group {
     height: auto !important;
     flex-grow: 0 !important;
-    --mdc-tab-indicator-active-indicator-color: transparent;
-    --mat-tab-header-active-label-text-color: #ffffff;
+    --mdc-tab-indicator-active-indicator-color: #6B2D95; // Usando tu color morado
   }
 
   .mat-mdc-tab-header {
@@ -59,7 +60,7 @@
     height: 48px !important;
     border-radius: 8px 8px 0 0;
     margin-right: 4px;
-    background-color: #f8fafc;
+    background-color: #ffffff !important;
 
     .mdc-tab__text-label {
       font-weight: 700 !important;
@@ -70,10 +71,8 @@
   }
 
   .mat-mdc-tab.mdc-tab--active {
-    background-color: #e91e63 !important;
-
     .mdc-tab__text-label {
-      color: #ffffff !important;
+      color: #6B2D95 !important;
     }
 
     .mdc-tab-indicator__content {
@@ -82,18 +81,23 @@
   }
 }
 
+/* 3. GRID Y LAYOUT DE FORMULARIOS */
 .tab-padding {
-  padding: 10px 25px 25px 25px;
+  padding: 20px 25px;
   display: grid;
   gap: 16px;
 }
 
 .grid-2 {
   grid-template-columns: repeat(2, 1fr);
+  display: grid;
+  gap: 16px;
 }
 
 .grid-3 {
   grid-template-columns: repeat(3, 1fr);
+  display: grid;
+  gap: 16px;
 }
 
 .span-all {
@@ -104,6 +108,7 @@
   }
 }
 
+/* 4. CAMPOS DE TEXTO Y DATEPICKERS (SLIM DESIGN) */
 ::ng-deep {
   .mat-mdc-form-field-flex {
     height: 32px !important;
@@ -150,10 +155,6 @@
         padding-top: 12px !important;
       }
 
-      .mat-mdc-form-field-infix {
-        height: auto !important;
-      }
-
       .mat-mdc-text-field-wrapper .mat-mdc-floating-label {
         top: 24px !important;
       }
@@ -161,6 +162,7 @@
   }
 }
 
+/* 5. BOTONES Y ACCIONES */
 .button-container {
   grid-column: 1 / -1;
   display: flex;
@@ -192,103 +194,88 @@ mat-card-actions {
   gap: 12px;
 }
 
-@media (max-width: 950px) {
-  .grid-3 {
-    grid-template-columns: repeat(2, 1fr);
+/* 6. TABLA Y EXPANSIÓN (FIX DE ESPACIO EN BLANCO) */
+.table-container {
+  margin-top: 16px;
+  overflow-x: auto;
+
+  table {
+    width: 100%;
+  }
+
+  th {
+    font-weight: 600;
+    color: #444;
+  }
+
+  td {
+    font-size: 0.9rem;
+    color: #555;
   }
 }
 
-@media (max-width: 650px) {
-
-  .grid-2,
-  .grid-3 {
-    grid-template-columns: 1fr;
-  }
-
-  .tab-padding {
-    padding: 0 15px 15px 15px;
-  }
-
-  ::ng-deep .mat-mdc-tab {
-    margin-right: 2px;
-
-    .mdc-tab__text-label {
-      font-size: 10px !important;
-    }
-  }
+// ESTO ELIMINA EL ESPACIO EN BLANCO ENTRE FILAS
+tr.detail-row {
+  height: 0 !important;
+  min-height: 0 !important; // Obliga a la fila a no tener altura mínima
 }
 
-.form-container {
+.detail-row td {
+  padding: 0 !important;
+  border-bottom-width: 0 !important;
+  height: 0 !important;
+}
+
+.element-row td {
+  border-bottom-width: 0;
+}
+
+.expanded-row {
+  background: #fbfaff;
+}
+
+.element-detail {
+  overflow: hidden;
   display: flex;
-  justify-content: center;
-  padding: 24px;
-  background-color: #f8fafc;
-  min-height: 100vh;
+  background: #fcfcfd;
+  padding: 0; // Se controla con el detail-grid
 }
 
-.form-card {
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+  padding: 20px;
   width: 100%;
-  max-width: 1200px;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  border-left: 4px solid #6B2D95;
+  margin: 10px 0;
 }
 
-::ng-deep {
-  .mat-mdc-tab-group {
-    --mdc-tab-indicator-active-indicator-color: transparent;
-  }
-
-  .mat-mdc-tab {
-    height: 48px !important;
-    background-color: #f8fafc;
-    border-radius: 8px 8px 0 0;
-    margin-right: 4px;
-
-    .mdc-tab__text-label {
-      font-weight: 700 !important;
-      font-size: 11px !important;
-      color: #64748b;
-    }
-  }
-
-  .mat-mdc-tab.mdc-tab--active {
-    background-color: #e91e63 !important;
-
-    .mdc-tab__text-label {
-      color: #ffffff !important;
-    }
-  }
-
-  .mat-mdc-form-field-flex {
-    height: 32px !important;
-    padding: 0 12px !important;
-  }
-
-  .mat-mdc-form-field-subscript-wrapper {
-    display: none !important;
-  }
+.detail-item {
+  font-size: 14px;
 }
 
-.tab-padding {
-  padding: 20px 25px;
-}
-
-.grid-2 {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-}
-
-.grid-3 {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-
-.span-all {
+.full-width {
   grid-column: 1 / -1;
 }
 
+.cell-desc {
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.badge-tipo {
+  background-color: #e8eaf6;
+  color: #3f51b5;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* 7. COMPONENTES DINÁMICOS (LISTAS) */
 .discapacidad-container {
   margin-top: 25px;
   border-top: 1px solid #e2e8f0;
@@ -308,7 +295,6 @@ mat-card-actions {
   display: flex;
   flex-direction: column;
   gap: 8px;
-
   max-height: 180px;
   overflow-y: auto;
   padding-right: 5px;
@@ -327,13 +313,7 @@ mat-card-actions {
   font-size: 13px;
 }
 
-.empty-tab {
-  text-align: center;
-  padding: 50px;
-  color: #94a3b8;
-  font-style: italic;
-}
-
+/* 8. OTROS ESTADOS (EMPTY, ACUERDOS, ANIMACIONES) */
 .pregunta-container {
   display: flex;
   flex-direction: column;
@@ -351,61 +331,6 @@ mat-card-actions {
   }
 }
 
-.table-container {
-  margin-top: 16px;
-  overflow-x: auto;
-
-  table {
-    width: 100%;
-  }
-
-  th {
-    font-weight: 600;
-    color: #444;
-  }
-
-  td {
-    font-size: 0.9rem;
-    color: #555;
-  }
-
-  .badge-tipo {
-    background-color: #e8eaf6;
-    color: #3f51b5;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    font-weight: 500;
-  }
-
-  .cell-desc {
-    max-width: 300px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .action-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 4px;
-  }
-}
-
-.empty-tab {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
-  color: #999;
-
-  mat-icon {
-    font-size: 48px;
-    margin-bottom: 10px;
-  }
-}
-
 .pregunta-acuerdo-header {
   background-color: #f8f9fa;
   padding: 15px;
@@ -418,23 +343,21 @@ mat-card-actions {
   border: 1px solid #e0e0e0;
 }
 
-.pregunta-label {
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 5px;
-}
-
+.empty-tab,
 .empty-state-container {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: 40px;
-  color: #888;
-}
+  color: #999;
 
-.empty-state-container mat-icon {
-  font-size: 48px;
-  width: 48px;
-  height: 48px;
-  margin-bottom: 10px;
+  mat-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+    width: 48px;
+    height: 48px;
+  }
 }
 
 .animate-fade-in {
@@ -451,4 +374,36 @@ mat-card-actions {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* 9. RESPONSIVE DESIGN */
+@media (max-width: 950px) {
+  .grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 650px) {
+
+  .grid-2,
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .tab-padding {
+    padding: 0 15px 15px 15px;
+  }
+
+  ::ng-deep .mat-mdc-tab .mdc-tab__text-label {
+    font-size: 10px !important;
+  }
+}
+
+input[readonly] {
+  color: #555;
+  cursor: default;
+}
+
+.mat-mdc-form-field.span-all {
+  margin-bottom: 10px;
 }

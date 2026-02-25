@@ -6,6 +6,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-modal-hechos',
@@ -17,7 +19,9 @@ import { FormsModule } from '@angular/forms';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   templateUrl: './modal-hechos.component.html',
   styleUrls: ['./modal-hechos.component.scss']
@@ -25,7 +29,7 @@ import { FormsModule } from '@angular/forms';
 export class ModalHechosComponent {
 
   data = {
-    fecha: '',
+    fecha: null as Date | null,
     modo: '',
     lugar: '',
     descripcion: ''

@@ -2,14 +2,13 @@
   padding: 24px;
   background-color: #f8fafc;
   min-height: 100vh;
-
   display: flex;
   flex-direction: column;
   align-items: center;
 
   .back-link {
     width: 100%;
-    max-width: 900px;
+    max-width: 1200px; // Aumentado para dar más margen
     display: flex;
     align-items: center;
     gap: 8px;
@@ -18,6 +17,7 @@
     margin-bottom: 15px;
     font-weight: 600;
     font-size: 13px;
+    transition: color 0.2s;
 
     &:hover {
       color: #1e293b;
@@ -27,51 +27,83 @@
 
 .section-header {
   width: 100%;
-  max-width: 900px;
+  max-width: 1200px;
   margin-bottom: 15px;
 
   h2 {
     margin: 0;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     font-weight: 800;
     color: #0f172a;
   }
 
   .subtitle {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: #64748b;
   }
 }
 
 .pendientes-card {
   width: 100%;
-  max-width: 900px;
+  max-width: 1200px;
   background: #ffffff;
   border-radius: 12px;
-  overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
-  margin-bottom: 20px;
-  padding: 0 !important;
+  overflow: hidden;
+  padding: 0;
+
+  .table-responsive {
+    width: 100%;
+    // Eliminamos el overflow-x forzado aquí para evitar el scroll en PC
+    overflow-x: visible;
+  }
 
   table {
     width: 100%;
-    border-collapse: collapse;
+    // Quitamos el min-width fijo que causaba el scroll
+    min-width: 100%;
+    border-spacing: 0;
   }
 
   th {
     background-color: #f8fafc;
-    height: 55px;
+    padding: 12px !important;
     border-bottom: 1px solid #e2e8f0;
-    text-align: left;
+    color: #475569;
+    font-weight: 700;
+    white-space: nowrap; // Evita que los títulos se rompan
+
+    &.text-center {
+      text-align: center;
+    }
   }
 
   td {
-    padding: 0 12px !important;
+    padding: 10px 12px;
     font-size: 13px;
     color: #334155;
-    height: 55px;
+    border-bottom: 1px solid #e2e8f0;
     vertical-align: middle;
   }
+
+  /* Clases de utilidad para columnas específicas */
+  .mat-column-id {
+    width: 100px;
+  }
+
+  .mat-column-expand {
+    width: 48px;
+  }
+
+  .mat-column-estado {
+    width: 140px;
+  }
+
+  .mat-column-acciones {
+    min-width: 220px;
+  }
+
+  // Espacio suficiente para los 2 botones
 
   .header-filter {
     display: flex;
@@ -79,17 +111,19 @@
     gap: 4px;
 
     span {
-      font-size: 11px;
-      color: #64748b;
+      font-size: 10px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     input {
-      width: 100%;
       border: 1px solid #e2e8f0;
       border-radius: 6px;
-      padding: 3px 6px;
+      padding: 4px 8px;
       font-size: 11px;
-      background: white;
+      width: 100%;
+      box-sizing: border-box;
 
       &:focus {
         outline: none;
@@ -101,115 +135,115 @@
 
   .element-row {
     cursor: pointer;
-    transition: background 0.2s ease;
-
-    td {
-      border-bottom: 1px solid #e2e8f0;
-    }
 
     &:hover {
       background: #f9fafb;
     }
-  }
 
-  .element-row.expanded-row {
-    background: #f3f0ff;
+    &.expanded-row {
+      background: #f3f0ff;
+    }
   }
 
   .detail-row {
-    display: none;
-  }
+    height: 0;
 
-  .element-row.expanded-row + .detail-row {
-    display: table-row;
-  }
-
-  .detail-row td {
-    padding: 0 !important;
-    border: 0 !important;
+    td {
+      padding: 0;
+      border: 0;
+    }
   }
 
   .element-detail {
-    padding: 20px 24px;
-    background: #fcfcfd;
-  }
-
-  .element-row.expanded-row + .detail-row .element-detail {
-    margin: 0;
+    overflow: hidden;
+    display: flex;
+    padding: 0 24px;
   }
 
   .detail-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 12px 20px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
     width: 100%;
+    margin: 16px 0;
     padding: 16px;
+    background: white;
     border-left: 4px solid #6B2D95;
-    background: #ffffff;
     border-radius: 8px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.02);
   }
 
-  .detail-item {
-    font-size: 13px;
-    color: #475569;
-
-    strong {
-      color: #1e293b;
-      margin-right: 5px;
-    }
-  }
-
-  button[mat-icon-button] mat-icon {
-    color: #6B2D95;
-  }
-
-  .badge-soft {
-    background: #f1f5f9;
-    color: #475569;
-    padding: 4px 8px;
-    border-radius: 6px;
+  .badge-programada,
+  .badge-sin-programar {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
     font-size: 11px;
-    font-weight: 700;
+    display: inline-block;
+    white-space: nowrap;
   }
 
-  .text-muted {
-    color: #94a3b8;
-    font-size: 11px;
+  .badge-programada {
+    background: #e8f5e9;
+    color: #1b5e20;
+  }
+
+  .badge-sin-programar {
+    background: #fff3e0;
+    color: #e65100;
+  }
+
+  .action-group {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: nowrap; // Mantiene botones en una línea en PC
   }
 
   .btn-sm {
     height: 32px;
-    line-height: 32px;
-    padding: 0 12px;
-    font-size: 12px;
+    font-size: 11px;
+    font-weight: 600;
     border-radius: 6px;
+    white-space: nowrap;
 
     mat-icon {
-      font-size: 16px;
-      width: 16px;
-      height: 16px;
-      margin-right: 4px;
-    }
-  }
-
-  .empty-state {
-    padding: 40px;
-    text-align: center;
-    color: #64748b;
-
-    mat-icon {
-      font-size: 48px;
-      margin-bottom: 10px;
-      color: #cbd5e1;
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
     }
 
-    p {
-      margin: 0;
-      font-weight: 500;
+    &.btn-reprogramar {
+      color: #7d5a00;
+      border-color: #ffc107;
+      background-color: #fffdf2;
+
+      &:hover {
+        background-color: #fff9c4;
+      }
     }
   }
 
   mat-paginator {
     border-top: 1px solid #e2e8f0;
+  }
+}
+
+/* Solo habilitamos scroll en pantallas realmente pequeñas */
+@media (max-width: 992px) {
+  .pendientes-card {
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    table {
+      min-width: 900px; // Aquí sí forzamos el scroll para proteger el layout
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
   }
 }

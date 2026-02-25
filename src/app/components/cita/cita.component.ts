@@ -14,6 +14,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { MatDialog } from '@angular/material/dialog';
 import { AsignarCitaModalComponent } from '../modal-asignar-cita/modal-asignar-cita.component';
+import { ReprogramarCitaModalComponent } from '../modal-reprogramar-cita/modal-reprogramar-cita.component';
 
 
 export function getSpanishPaginatorIntl() {
@@ -65,7 +66,7 @@ export class CitaComponent implements OnInit, AfterViewInit {
 
   repartoForm!: FormGroup;
   codigoCaso: string = 'Seleccione un caso';
-  displayedColumns: string[] = ['expand', 'id', 'nombre', 'fecha', 'dependencia', 'acciones'];
+  displayedColumns: string[] = ['expand', 'id', 'nombre', 'fecha', 'dependencia', 'estado', 'acciones'];
   dataSource = new MatTableDataSource<any>([]);
   expandedElement: any | null;
 
@@ -74,16 +75,19 @@ export class CitaComponent implements OnInit, AfterViewInit {
   datosSimulados = [
     {
       id: 'CAS-2001', nombre: 'Laura Restrepo', documento: '10359874', fecha: '2026-02-01', dependencia: 'Bienestar',
+      estado: 'Sin programar',
       tipoSolicitud: 'Psicosocial', facultad: 'Artes', campus: 'Norte', genero: 'Femenino', edad: 20, celular: '3109988776',
       cargo: 'Estudiante', telefono: '6012233', correoInst: 'l.restrepo@U.edu.co', correoPers: 'laura.res@gmail.com'
     },
     {
       id: 'ACO-2002', nombre: 'Miguel Cano', documento: '71234456', fecha: '2026-02-03', dependencia: 'Jurídica',
+      estado: 'Programada',
       tipoSolicitud: 'Asesoría', facultad: 'Derecho', campus: 'Principal', genero: 'Masculino', edad: 24, celular: '3154433221',
       cargo: 'Egresado', telefono: '6014455', correoInst: 'm.cano@U.edu.co', correoPers: 'miguel.c@outlook.com'
     },
     {
       id: 'CAS-2003', nombre: 'Elena Vasquez', documento: '43567812', fecha: '2026-02-05', dependencia: 'Salud',
+      estado: 'Sin programar',
       tipoSolicitud: 'Médica', facultad: 'Ingeniería', campus: 'Sur', genero: 'Femenino', edad: 21, celular: '3201122334',
       cargo: 'Estudiante', telefono: '6019900', correoInst: 'e.vasquez@U.edu.co', correoPers: 'elena.v@gmail.com'
     }
@@ -147,23 +151,53 @@ export class CitaComponent implements OnInit, AfterViewInit {
     }
   }
 
-  abrirModal(caso: any) {
-  const dialogRef = this.dialog.open(AsignarCitaModalComponent, {
-    width: '650px',
-    data: caso
-  });
+  reprogramarCita(caso: any) {
+    this.abrirModalGestion(caso, 'reprogramar');
+  }
 
-  dialogRef.afterClosed().subscribe(result => {
-    if (result) {
-      const index = this.dataSource.data.findIndex(c => c.id === result.caso.id);
-      if (index !== -1) {
-        const newData = [...this.dataSource.data];
-        newData.splice(index, 1);
-        this.dataSource.data = newData;
+  cancelarCita(caso: any) {
+    this.abrirModalGestion(caso, 'cancelar');
+  }
+
+  private abrirModalGestion(caso: any, accion: 'cancelar' | 'reprogramar') {
+    const dialogRef = this.dialog.open(ReprogramarCitaModalComponent, {
+      width: '600px',
+      data: { caso: caso, accion: accion }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Resultado de la gestión:', result);
+        
+        const index = this.dataSource.data.findIndex(c => c.id === result.id);
+        if (index !== -1) {
+          if (result.accion === 'cancelar') {
+            this.dataSource.data[index].estado = 'Sin programar';
+          } else {
+            this.dataSource.data[index].fecha = result.formulario.fechaCita;
+          }
+          this.dataSource._updateChangeSubscription();
+        }
       }
-    }
-  });
-}
+    });
+  }
+
+  abrirModal(caso: any) {
+    const dialogRef = this.dialog.open(AsignarCitaModalComponent, {
+      width: '650px',
+      data: caso
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const index = this.dataSource.data.findIndex(c => c.id === result.caso.id);
+        if (index !== -1) {
+          this.dataSource.data[index].estado = 'Programada';
+          this.dataSource._updateChangeSubscription();
+        }
+      }
+    });
+  }
 
 
   regresar() {

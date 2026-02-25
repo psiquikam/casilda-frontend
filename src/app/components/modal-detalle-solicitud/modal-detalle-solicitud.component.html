@@ -1,20 +1,28 @@
 <div class="modal-header-purple">
   <div class="header-title">
-    <mat-icon class="header-icon">{{ data.modo === 'editar' ? 'edit' : 'visibility' }}</mat-icon>
-    <span>{{ data.modo === 'editar' ? 'Editar Solicitud' : 'Visualizar Solicitud' }} #{{ data.info.id }}</span>
+    <mat-icon class="header-icon">
+      {{ data.modo === 'editar' ? 'edit' : 'visibility' }}
+    </mat-icon>
+    {{ data.modo === 'editar' ? 'Editar Solicitud' : 'Visualizar Solicitud' }} #{{ data.info.id }}
   </div>
-  <button mat-icon-button (click)="dialogRef.close()" class="close-btn">
+
+  <button mat-icon-button class="close-btn" (click)="dialogRef.close()">
     <mat-icon>close</mat-icon>
   </button>
 </div>
 
 <mat-dialog-content class="custom-content">
   <form [formGroup]="detalleForm">
+
     <mat-tab-group animationDuration="200ms">
 
-      <!-- REMITENTE -->
       <mat-tab label="Remitente">
-        <div class="form-grid pt-3">
+        <div class="form-grid">
+
+          <mat-form-field appearance="outline">
+            <mat-label>Tipo Solicitud</mat-label>
+            <input matInput formControlName="remitenteTipoSolicitud">
+          </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Primer Nombre</mat-label>
@@ -36,21 +44,69 @@
             <input matInput formControlName="remitenteSegundoApellido">
           </mat-form-field>
 
-          <mat-form-field appearance="outline" class="span-all">
+          <mat-form-field appearance="outline">
             <mat-label>Cargo</mat-label>
-            <input matInput formControlName="cargo">
+            <input matInput formControlName="remitenteCargo">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Campus</mat-label>
+            <input matInput formControlName="remitenteCampus">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Dependencia</mat-label>
+            <input matInput formControlName="remitenteDependencia">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Facultad</mat-label>
+            <input matInput formControlName="remitenteFacultad">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Otra Facultad</mat-label>
+            <input matInput formControlName="remitenteOtraFacultad">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha Solicitud</mat-label>
+            <input matInput [matDatepicker]="pickerRem" formControlName="remitenteFechaSolicitud">
+            <mat-datepicker-toggle matSuffix [for]="pickerRem"></mat-datepicker-toggle>
+            <mat-datepicker #pickerRem></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Tipo Documento</mat-label>
+            <input matInput formControlName="remitenteTipoDocumento">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Número Documento</mat-label>
+            <input matInput formControlName="remitenteNumeroDocumento">
           </mat-form-field>
 
         </div>
       </mat-tab>
 
-      <!-- SOLICITANTE -->
       <mat-tab label="Solicitante">
-        <div class="form-grid pt-3">
+        <div class="form-grid">
 
           <mat-form-field appearance="outline">
-            <mat-label>Tipo de Solicitud</mat-label>
-            <input matInput formControlName="tipoSolicitud">
+            <mat-label>Tipo Documento</mat-label>
+            <input matInput formControlName="tipoDocumento">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Número Documento</mat-label>
+            <input matInput formControlName="numeroDocumento">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha Nacimiento</mat-label>
+            <input matInput [matDatepicker]="pickerNac" formControlName="fechaNacimiento">
+            <mat-datepicker-toggle matSuffix [for]="pickerNac"></mat-datepicker-toggle>
+            <mat-datepicker #pickerNac></mat-datepicker>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
@@ -74,21 +130,6 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Tipo Documento</mat-label>
-            <input matInput formControlName="tipoDocumento">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Número Documento</mat-label>
-            <input matInput formControlName="numeroDocumento">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Edad</mat-label>
-            <input matInput type="number" formControlName="edad">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
             <mat-label>Identidad de Género</mat-label>
             <input matInput formControlName="identidadGenero">
           </mat-form-field>
@@ -99,8 +140,8 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Celular Alterno</mat-label>
-            <input matInput formControlName="celularAlterno">
+            <mat-label>Teléfono Alterno</mat-label>
+            <input matInput formControlName="telefonoAlterno">
           </mat-form-field>
 
           <mat-form-field appearance="outline">
@@ -113,33 +154,23 @@
             <input matInput formControlName="correoPersonal">
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Campus</mat-label>
-            <input matInput formControlName="campus">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Dependencia</mat-label>
-            <input matInput formControlName="dependencia">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Facultad</mat-label>
-            <input matInput formControlName="facultad">
-          </mat-form-field>
-
         </div>
       </mat-tab>
 
     </mat-tab-group>
+
   </form>
 </mat-dialog-content>
 
-
 <mat-dialog-actions class="modal-footer">
-  <button mat-button (click)="dialogRef.close()" class="btn-cancelar">Cancelar</button>
-  <button *ngIf="data.modo === 'editar'" mat-raised-button class="btn-guardar" [disabled]="detalleForm.invalid"
-    (click)="guardar()">
-    <mat-icon>save</mat-icon> Guardar Cambios
+  <button mat-button class="btn-cancelar" (click)="dialogRef.close()">Cancelar</button>
+
+  <button *ngIf="data.modo === 'editar'"
+          mat-raised-button
+          class="btn-guardar"
+          [disabled]="detalleForm.invalid"
+          (click)="guardar()">
+    <mat-icon>save</mat-icon>
+    Guardar
   </button>
 </mat-dialog-actions>

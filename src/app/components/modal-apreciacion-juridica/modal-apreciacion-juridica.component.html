@@ -1,0 +1,28 @@
+<h2 mat-dialog-title class="modal-title">
+  <mat-icon>gavel</mat-icon>
+  Agregar Apreciación Jurídica
+</h2>
+
+<mat-dialog-content class="modal-content">
+  <div class="form-row">
+    <mat-form-field appearance="outline" class="field-tipo">
+      <mat-label>Tipo de Apreciación</mat-label>
+      <mat-select [(ngModel)]="data.tipo">
+        <mat-option *ngFor="let t of listaTipos" [value]="t">{{t}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="field-desc">
+      <mat-label>Descripción Jurídica</mat-label>
+      <input matInput [(ngModel)]="data.descripcion" placeholder="Detalle el concepto o estado legal">
+    </mat-form-field>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="modal-actions">
+  <button mat-button (click)="onNoClick()">Cancelar</button>
+  <button mat-flat-button class="btn-confirm" [mat-dialog-close]="data" [disabled]="!data.tipo || !data.descripcion">
+    <mat-icon>check</mat-icon>
+    Agregar a la lista
+  </button>
+</mat-dialog-actions>

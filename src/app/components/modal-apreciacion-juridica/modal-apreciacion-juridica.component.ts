@@ -7,36 +7,32 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
-  selector: 'app-modal-remision',
+  selector: 'app-modal-apreciacion-juridica',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
     MatIconModule,
-    MatDatepickerModule,
-    MatNativeDateModule
+    FormsModule
   ],
-  templateUrl: './modal-remision.component.html',
-  styleUrls: ['./modal-remision.component.scss']
+  templateUrl: './modal-apreciacion-juridica.component.html',
+  styleUrls: ['./modal-apreciacion-juridica.component.scss']
 })
-export class ModalRemisionComponent {
-
+export class ModalApreciacionJuridicaComponent {
   data = {
     tipo: '',
-    cual: '',
-    fecha: null as Date | null
+    descripcion: ''
   };
 
-  constructor(public dialogRef: MatDialogRef<ModalRemisionComponent>) {}
+  listaTipos = ['Penal', 'Civil', 'Laboral', 'Administrativa', 'Derechos Humanos'];
+
+  constructor(public dialogRef: MatDialogRef<ModalApreciacionJuridicaComponent>) { }
 
   onNoClick(): void {
     this.dialogRef.close();

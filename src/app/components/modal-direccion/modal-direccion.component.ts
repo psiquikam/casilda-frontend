@@ -11,7 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
   selector: 'app-modal-direccion',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, MatDialogModule, 
+    CommonModule, ReactiveFormsModule, MatDialogModule,
     MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule
   ],
   templateUrl: './modal-direccion.component.html',
@@ -19,7 +19,7 @@ import { MatButtonModule } from '@angular/material/button';
 })
 export class ModalDireccionComponent {
   direccionForm: FormGroup;
-  
+
   vias = ['Calle', 'Carrera', 'Avenida', 'Transversal', 'Diagonal', 'Circular'];
   ciudades = ['Medellín', 'Bogotá', 'Cali', 'Barranquilla', 'Bucaramanga'];
 
@@ -46,9 +46,7 @@ export class ModalDireccionComponent {
 
   guardar(): void {
     if (this.direccionForm.valid) {
-      const d = this.direccionForm.value;
-      const direccionCompleta = `${d.viaPrincipal} ${d.numeroVia}${d.letraVia} # ${d.numeroCruce} - ${d.placa}, ${d.barrio}, ${d.ciudad}`;
-      this.dialogRef.close(direccionCompleta);
+      this.dialogRef.close(this.direccionForm.value);
     }
   }
 }

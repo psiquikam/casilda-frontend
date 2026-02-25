@@ -35,7 +35,7 @@ import { Router } from '@angular/router';
 })
 export class ConsultaComponent implements OnInit {
 
-  constructor(private dialog: MatDialog) {}
+  constructor(private dialog: MatDialog) { }
 
   private router = inject(Router);
 
@@ -49,136 +49,224 @@ export class ConsultaComponent implements OnInit {
   dataSourceSinRepartir = new MatTableDataSource<any>([]);
 
 
-  filterValues: any = { id: '', nombre: '', documento: '', profesional: '', fecha: '', dependencia: '' };
+  filterValues: any = {
+    id: '',
+    nombre: '',
+    documento: '',
+    fecha: '',
+    dependencia: '',
+    profesional: ''
+  };
 
   datosSimulados = [
+
     {
-      id: 'CAS-1020', nombre: 'Juan Pérez', documento: '10203040', fecha: '2025-11-15',
-      dependencia: 'Bienestar', profesional: 'Ps. Ana López', estado: 'Abierto activo',
-      tipoSolicitud: 'Psicosocial', facultad: 'Ingeniería', campus: 'Principal',
-      genero: 'Masculino', edad: 22, celular: '3001234567', cargo: 'Estudiante',
-      telefono: '6012345', correoInst: 'juan.perez@U.edu.co', correoPers: 'juanp@gmail.com',
-      remitentePrimerNombre: 'Juan', remitenteSegundoNombre: 'Antonio', remitentePrimerApellido: 'Pérez', remitenteSegundoApellido: 'García',
-      pacientePrimerNombre: 'Juan', pacienteSegundoNombre: 'Antonio', pacientePrimerApellido: 'Pérez', pacienteSegundoApellido: 'García',
-      observaciones: 'Requiere seguimiento semanal por estrés académico.', prioridad: 'Alta', ultimaAccion: 'Entrevista inicial completada'
+      id: 'CAS-3001',
+      estado: 'Sin asignar',
+      profesional: 'Sin asignar',
+      fecha: '2026-02-01',
+      dependencia: 'Bienestar',
+
+      remitenteTipoSolicitud: 'Psicosocial',
+      remitentePrimerNombre: 'Laura',
+      remitenteSegundoNombre: 'Marcela',
+      remitentePrimerApellido: 'Gómez',
+      remitenteSegundoApellido: 'Ruiz',
+      remitenteCargo: 'Docente',
+      remitenteCampus: 'Principal',
+      remitenteDependencia: 'Bienestar',
+      remitenteFacultad: 'Ingeniería',
+      remitenteOtraFacultad: '',
+      remitenteFechaSolicitud: '2026-02-01',
+      remitenteTipoDocumento: 'CC',
+      remitenteNumeroDocumento: '100200300',
+
+      tipoDocumento: 'CC',
+      numeroDocumento: '100200300',
+      fechaNacimiento: null,
+      primerNombre: 'Carlos',
+      segundoNombre: 'Andrés',
+      primerApellido: 'Gómez',
+      segundoApellido: 'Ruiz',
+      identidadGenero: 'Masculino',
+      celular: '3001112233',
+      telefonoAlterno: '6011234',
+      correoInstitucional: 'c.gomez@u.edu.co',
+      correoPersonal: 'carlos@gmail.com'
     },
     {
-      id: 'ACO-0982', nombre: 'María García', documento: '52637485', fecha: '2025-12-01',
-      dependencia: 'Jurídica', profesional: 'Abog. Carlos Ruiz', estado: 'Cerrado',
-      tipoSolicitud: 'Asesoría', facultad: 'Derecho', campus: 'Norte',
-      genero: 'Femenino', edad: 25, celular: '3119876543', cargo: 'Egresada',
-      telefono: '6019876', correoInst: 'm.garcia@U.edu.co', correoPers: 'mariag@outlook.com',
-      remitentePrimerNombre: 'María', remitenteSegundoNombre: '', remitentePrimerApellido: 'García', remitenteSegundoApellido: 'López',
-      pacientePrimerNombre: 'María', pacienteSegundoNombre: '', pacientePrimerApellido: 'García', pacienteSegundoApellido: 'López',
-      observaciones: 'Caso cerrado tras conciliación exitosa.', prioridad: 'Baja', ultimaAccion: 'Cierre de expediente'
+      id: 'CAS-3002',
+      estado: 'Sin asignar',
+      profesional: 'Sin asignar',
+      fecha: '2026-02-02',
+      dependencia: 'Salud',
+
+      remitenteTipoSolicitud: 'Médica',
+      remitentePrimerNombre: 'Andrés',
+      remitenteSegundoNombre: '',
+      remitentePrimerApellido: 'Torres',
+      remitenteSegundoApellido: 'López',
+      remitenteCargo: 'Administrativo',
+      remitenteCampus: 'Norte',
+      remitenteDependencia: 'Salud',
+      remitenteFacultad: 'Medicina',
+      remitenteOtraFacultad: '',
+      remitenteFechaSolicitud: '2026-02-02',
+      remitenteTipoDocumento: 'CC',
+      remitenteNumeroDocumento: '200300400',
+
+      tipoDocumento: 'CC',
+      numeroDocumento: '200300400',
+      fechaNacimiento: null,
+      primerNombre: 'Daniela',
+      segundoNombre: '',
+      primerApellido: 'Torres',
+      segundoApellido: 'López',
+      identidadGenero: 'Femenino',
+      celular: '3012223344',
+      telefonoAlterno: '6015678',
+      correoInstitucional: 'd.torres@u.edu.co',
+      correoPersonal: 'daniela@gmail.com'
+    },
+
+    {
+      id: 'CAS-3003',
+      estado: 'Abierto activo',
+      profesional: 'Ps. Ana López',
+      fecha: '2026-02-03',
+      dependencia: 'Bienestar',
+
+      remitenteTipoSolicitud: 'Psicosocial',
+      remitentePrimerNombre: 'Miguel',
+      remitenteSegundoNombre: '',
+      remitentePrimerApellido: 'Ramírez',
+      remitenteSegundoApellido: 'Castro',
+      remitenteCargo: 'Estudiante',
+      remitenteCampus: 'Sur',
+      remitenteDependencia: 'Bienestar',
+      remitenteFacultad: 'Artes',
+      remitenteOtraFacultad: '',
+      remitenteFechaSolicitud: '2026-02-03',
+      remitenteTipoDocumento: 'CC',
+      remitenteNumeroDocumento: '300400500',
+
+      tipoDocumento: 'CC',
+      numeroDocumento: '300400500',
+      fechaNacimiento: null,
+      primerNombre: 'Miguel',
+      segundoNombre: '',
+      primerApellido: 'Ramírez',
+      segundoApellido: 'Castro',
+      identidadGenero: 'Masculino',
+      celular: '3023334455',
+      telefonoAlterno: '6016789',
+      correoInstitucional: 'm.ramirez@u.edu.co',
+      correoPersonal: 'miguel@gmail.com'
     },
     {
-      id: 'CAS-1025', nombre: 'Andrés Mendoza', documento: '10982233', fecha: '2026-01-10',
-      dependencia: 'Bienestar', profesional: 'Ps. Ana López', estado: 'Abierto en transición',
-      tipoSolicitud: 'Psicosocial', facultad: 'Artes', campus: 'Sur',
-      genero: 'Masculino', edad: 19, celular: '3156677889', cargo: 'Estudiante',
-      telefono: '6015544', correoInst: 'a.mendoza@U.edu.co', correoPers: 'andres_m@gmail.com',
-      remitentePrimerNombre: 'Andrés', remitenteSegundoNombre: 'Felipe', remitentePrimerApellido: 'Mendoza', remitenteSegundoApellido: 'Ruiz',
-      pacientePrimerNombre: 'Andrés', pacienteSegundoNombre: 'Felipe', pacientePrimerApellido: 'Mendoza', pacienteSegundoApellido: 'Ruiz',
-      observaciones: 'Remitido de sede Sur para atención especializada.', prioridad: 'Media', ultimaAccion: 'Remisión enviada'
+      id: 'CAS-3004',
+      estado: 'Abierto activo',
+      profesional: 'Dr. Jaime Luna',
+      fecha: '2026-02-04',
+      dependencia: 'Salud',
+
+      remitenteTipoSolicitud: 'Médica',
+      remitentePrimerNombre: 'Valentina',
+      remitenteSegundoNombre: '',
+      remitentePrimerApellido: 'Morales',
+      remitenteSegundoApellido: 'Díaz',
+      remitenteCargo: 'Docente',
+      remitenteCampus: 'Principal',
+      remitenteDependencia: 'Salud',
+      remitenteFacultad: 'Medicina',
+      remitenteOtraFacultad: '',
+      remitenteFechaSolicitud: '2026-02-04',
+      remitenteTipoDocumento: 'CC',
+      remitenteNumeroDocumento: '400500600',
+
+      tipoDocumento: 'CC',
+      numeroDocumento: '400500600',
+      fechaNacimiento: null,
+      primerNombre: 'Valentina',
+      segundoNombre: '',
+      primerApellido: 'Morales',
+      segundoApellido: 'Díaz',
+      identidadGenero: 'Femenino',
+      celular: '3034445566',
+      telefonoAlterno: '6017890',
+      correoInstitucional: 'v.morales@u.edu.co',
+      correoPersonal: 'valentina@gmail.com'
+    },
+
+    {
+      id: 'CAS-3005',
+      estado: 'Abierto en transición',
+      profesional: 'Ps. Ana López',
+      fecha: '2026-02-05',
+      dependencia: 'Bienestar',
+
+      remitenteTipoSolicitud: 'Psicosocial',
+      remitentePrimerNombre: 'Camilo',
+      remitenteSegundoNombre: '',
+      remitentePrimerApellido: 'Ortiz',
+      remitenteSegundoApellido: 'Vega',
+      remitenteCargo: 'Estudiante',
+      remitenteCampus: 'Principal',
+      remitenteDependencia: 'Bienestar',
+      remitenteFacultad: 'Ingeniería',
+      remitenteOtraFacultad: '',
+      remitenteFechaSolicitud: '2026-02-05',
+      remitenteTipoDocumento: 'CC',
+      remitenteNumeroDocumento: '500600700',
+
+      tipoDocumento: 'CC',
+      numeroDocumento: '500600700',
+      fechaNacimiento: null,
+      primerNombre: 'Camilo',
+      segundoNombre: '',
+      primerApellido: 'Ortiz',
+      segundoApellido: 'Vega',
+      identidadGenero: 'Masculino',
+      celular: '3045556677',
+      telefonoAlterno: '6018901',
+      correoInstitucional: 'c.ortiz@u.edu.co',
+      correoPersonal: 'camilo@gmail.com'
     },
     {
-      id: 'CAS-1030', nombre: 'Lucía Fernández', documento: '32445566', fecha: '2026-01-12',
-      dependencia: 'Salud', profesional: 'Dr. Jaime Luna', estado: 'Abierto activo',
-      tipoSolicitud: 'Médica', facultad: 'Medicina', campus: 'Principal',
-      genero: 'Femenino', edad: 21, celular: '3209988776', cargo: 'Estudiante',
-      telefono: '6012233', correoInst: 'l.fernandez@U.edu.co', correoPers: 'lucia.f@gmail.com',
-      remitentePrimerNombre: 'Lucía', remitenteSegundoNombre: '', remitentePrimerApellido: 'Fernández', remitenteSegundoApellido: 'Castro',
-      pacientePrimerNombre: 'Lucía', pacienteSegundoNombre: '', pacientePrimerApellido: 'Fernández', pacienteSegundoApellido: 'Castro',
-      observaciones: 'Paciente con cuadro de migraña recurrente.', prioridad: 'Media', ultimaAccion: 'Exámenes ordenados'
-    },
-    {
-      id: 'ACO-1100', nombre: 'Carlos Prado', documento: '80112233', fecha: '2026-01-15',
-      dependencia: 'Jurídica', profesional: 'Abog. Elena Soler', estado: 'Abierto activo',
-      tipoSolicitud: 'Asesoría', facultad: 'Administración', campus: 'Norte',
-      genero: 'Masculino', edad: 35, celular: '3104433221', cargo: 'Docente',
-      telefono: '6014455', correoInst: 'c.prado@U.edu.co', correoPers: 'carlosp@live.com',
-      remitentePrimerNombre: 'Carlos', remitenteSegundoNombre: 'Iván', remitentePrimerApellido: 'Prado', remitenteSegundoApellido: 'Vidal',
-      pacientePrimerNombre: 'Carlos', pacienteSegundoNombre: 'Iván', pacientePrimerApellido: 'Prado', pacienteSegundoApellido: 'Vidal',
-      observaciones: 'Asesoría sobre propiedad intelectual de investigación.', prioridad: 'Alta', ultimaAccion: 'Revisión de contrato'
-    },
-    {
-      id: 'CAS-1045', nombre: 'Diana Holguín', documento: '11223344', fecha: '2026-01-18',
-      dependencia: 'Bienestar', profesional: 'Ps. Ana López', estado: 'Abierto en transición',
-      tipoSolicitud: 'Psicosocial', facultad: 'Ciencias', campus: 'Principal',
-      genero: 'Femenino', edad: 20, celular: '3187766554', cargo: 'Estudiante',
-      telefono: '6017788', correoInst: 'd.holguin@U.edu.co', correoPers: 'diana.h@gmail.com',
-      remitentePrimerNombre: 'Diana', remitenteSegundoNombre: 'Marcela', remitentePrimerApellido: 'Holguín', remitenteSegundoApellido: 'Torres',
-      pacientePrimerNombre: 'Diana', pacienteSegundoNombre: 'Marcela', pacientePrimerApellido: 'Holguín', pacienteSegundoApellido: 'Torres',
-      observaciones: 'Cambio de jornada solicitado por motivos laborales.', prioridad: 'Baja', ultimaAccion: 'Validando certificados'
-    },
-    {
-      id: 'ACO-1215', nombre: 'Roberto Gómez', documento: '79554433', fecha: '2026-01-20',
-      dependencia: 'Seguridad', profesional: 'Of. Mario Sosa', estado: 'Cerrado',
-      tipoSolicitud: 'Reporte', facultad: 'Ingeniería', campus: 'Principal',
-      genero: 'Masculino', edad: 42, celular: '3005544332', cargo: 'Administrativo',
-      telefono: '6019900', correoInst: 'r.gomez@U.edu.co', correoPers: 'roberto.g@gmail.com',
-      remitentePrimerNombre: 'Roberto', remitenteSegundoNombre: '', remitentePrimerApellido: 'Gómez', remitenteSegundoApellido: 'Sanz',
-      pacientePrimerNombre: 'Roberto', pacienteSegundoNombre: '', pacientePrimerApellido: 'Gómez', pacienteSegundoApellido: 'Sanz',
-      observaciones: 'Reporte de extravío de carnet institucional.', prioridad: 'Baja', ultimaAccion: 'Reposición entregada'
-    },
-    {
-      id: 'CAS-1060', nombre: 'Sofía Reyes', documento: '10109988', fecha: '2026-01-22',
-      dependencia: 'Bienestar', profesional: 'Ps. Martha Pinzón', estado: 'Abierto activo',
-      tipoSolicitud: 'Psicosocial', facultad: 'Psicología', campus: 'Sur',
-      genero: 'Femenino', edad: 23, celular: '3123344556', cargo: 'Estudiante',
-      telefono: '6011122', correoInst: 's.reyes@U.edu.co', correoPers: 'sofi.r@outlook.com',
-      remitentePrimerNombre: 'Sofía', remitenteSegundoNombre: '', remitentePrimerApellido: 'Reyes', remitenteSegundoApellido: 'Díaz',
-      pacientePrimerNombre: 'Sofía', pacienteSegundoNombre: '', pacientePrimerApellido: 'Reyes', pacienteSegundoApellido: 'Díaz',
-      observaciones: 'Dificultades de aprendizaje en materias cuantitativas.', prioridad: 'Media', ultimaAccion: 'Cita psicopedagogía'
-    },
-    {
-      id: 'CAS-1080', nombre: 'Mateo Ortiz', documento: '10556644', fecha: '2026-01-25',
-      dependencia: 'Salud', profesional: 'Enf. Rosa Alba', estado: 'Abierto en transición',
-      tipoSolicitud: 'Médica', facultad: 'Educación', campus: 'Norte',
-      genero: 'Masculino', edad: 21, celular: '3162233445', cargo: 'Estudiante',
-      telefono: '6013344', correoInst: 'm.ortiz@U.edu.co', correoPers: 'mateo_o@gmail.com',
-      remitentePrimerNombre: 'Mateo', remitenteSegundoNombre: 'David', remitentePrimerApellido: 'Ortiz', remitenteSegundoApellido: 'Mora',
-      pacientePrimerNombre: 'Mateo', pacienteSegundoNombre: 'David', pacientePrimerApellido: 'Ortiz', pacienteSegundoApellido: 'Mora',
-      observaciones: 'Validación de incapacidad externa por cirugía.', prioridad: 'Alta', ultimaAccion: 'Documentos en revisión médica'
-    },
-    {
-      id: 'ACO-1350', nombre: 'Valentina Peña', documento: '10002233', fecha: '2026-01-28',
-      dependencia: 'Bienestar', profesional: 'Ps. Ana López', estado: 'Cerrado',
-      tipoSolicitud: 'Psicosocial', facultad: 'Ingeniería', campus: 'Principal',
-      genero: 'Femenino', edad: 18, celular: '3198877665', cargo: 'Estudiante',
-      telefono: '6018899', correoInst: 'v.pena@U.edu.co', correoPers: 'valenp@gmail.com',
-      remitentePrimerNombre: 'Valentina', remitenteSegundoNombre: '', remitentePrimerApellido: 'Peña', remitenteSegundoApellido: 'Lara',
-      pacientePrimerNombre: 'Valentina', pacienteSegundoNombre: '', pacientePrimerApellido: 'Peña', pacienteSegundoApellido: 'Lara',
-      observaciones: 'Taller de inducción para estudiantes nuevos.', prioridad: 'Baja', ultimaAccion: 'Diploma de participación entregado'
-    },
-    {
-      id: 'CAS-2001', nombre: 'Laura Restrepo', documento: '10359874', fecha: '2026-02-01',
-      dependencia: 'Bienestar', profesional: 'Sin asignar', estado: 'Abierto activo',
-      tipoSolicitud: 'Psicosocial', facultad: 'Artes', campus: 'Norte',
-      genero: 'Femenino', edad: 20, celular: '3109988776', cargo: 'Estudiante',
-      telefono: '6012233', correoInst: 'l.restrepo@U.edu.co', correoPers: 'laura.res@gmail.com',
-      observaciones: 'Solicita primera cita por ansiedad ante exámenes.', prioridad: 'Alta',
-      pacientePrimerNombre: 'Laura', pacienteSegundoNombre: 'Restrepo', pacientePrimerApellido: 'Restrepo', pacienteSegundoApellido: 'Restrepo',
-    },
-    {
-      id: 'ACO-2002', nombre: 'Miguel Cano', documento: '71234456', fecha: '2026-02-03',
-      dependencia: 'Jurídica', profesional: 'Sin asignar', estado: 'Abierto activo',
-      tipoSolicitud: 'Asesoría', facultad: 'Derecho', campus: 'Principal',
-      genero: 'Masculino', edad: 24, celular: '3154433221', cargo: 'Egresado',
-      telefono: '6014455', correoInst: 'm.cano@U.edu.co', correoPers: 'miguel.c@outlook.com',
-      observaciones: 'Consulta sobre trámites de grado y judicatura.', prioridad: 'Media',
-      pacientePrimerNombre: 'Miguel', pacienteSegundoNombre: 'Miguel', pacientePrimerApellido: 'Cano', pacienteSegundoApellido: 'Cano',
-    },
-    {
-      id: 'CAS-2003', nombre: 'Elena Vasquez', documento: '43567812', fecha: '2026-02-05',
-      dependencia: 'Salud', profesional: 'Sin asignar', estado: 'Abierto activo',
-      tipoSolicitud: 'Médica', facultad: 'Ingeniería', campus: 'Sur',
-      genero: 'Femenino', edad: 21, celular: '3201122334', cargo: 'Estudiante',
-      telefono: '6019900', correoInst: 'e.vasquez@U.edu.co', correoPers: 'elena.v@gmail.com',
-      observaciones: 'Reporte de accidente menor en laboratorios.', prioridad: 'Alta',
-      pacientePrimerNombre: 'Elena', pacienteSegundoNombre: 'Elena', pacientePrimerApellido: 'Vasquez', pacienteSegundoApellido: 'Vasquez',
+      id: 'CAS-3006',
+      estado: 'Cerrado',
+      profesional: 'Abog. Elena Soler',
+      fecha: '2026-02-06',
+      dependencia: 'Jurídica',
+
+      remitenteTipoSolicitud: 'Asesoría',
+      remitentePrimerNombre: 'Natalia',
+      remitenteSegundoNombre: '',
+      remitentePrimerApellido: 'Pardo',
+      remitenteSegundoApellido: 'Luna',
+      remitenteCargo: 'Egresada',
+      remitenteCampus: 'Norte',
+      remitenteDependencia: 'Jurídica',
+      remitenteFacultad: 'Derecho',
+      remitenteOtraFacultad: '',
+      remitenteFechaSolicitud: '2026-02-06',
+      remitenteTipoDocumento: 'CC',
+      remitenteNumeroDocumento: '600700800',
+
+      tipoDocumento: 'CC',
+      numeroDocumento: '600700800',
+      fechaNacimiento: null,
+      primerNombre: 'Natalia',
+      segundoNombre: '',
+      primerApellido: 'Pardo',
+      segundoApellido: 'Luna',
+      identidadGenero: 'Femenino',
+      celular: '3056667788',
+      telefonoAlterno: '6019012',
+      correoInstitucional: 'n.pardo@u.edu.co',
+      correoPersonal: 'natalia@gmail.com'
     }
+
   ];
 
   ngOnInit() {
@@ -221,32 +309,58 @@ export class ConsultaComponent implements OnInit {
     this.filterValues[column] = filterValue.trim().toLowerCase();
     const filterString = JSON.stringify(this.filterValues);
 
-    [this.dataSourceSinRepartir, this.dataSourceActivos, this.dataSourceTransicion, this.dataSourceCerrados]
-      .forEach(ds => {
-        ds.filter = filterString;
-        if (ds.paginator) ds.paginator.firstPage();
-      });
+    [
+      this.dataSourceSinRepartir,
+      this.dataSourceActivos,
+      this.dataSourceTransicion,
+      this.dataSourceCerrados
+    ].forEach(ds => {
+      ds.filter = filterString;
+      if (ds.paginator) ds.paginator.firstPage();
+    });
   }
 
   createFilter(): (data: any, filter: string) => boolean {
     return (data: any, filter: string): boolean => {
       const searchTerms = JSON.parse(filter);
-      return data.id.toLowerCase().includes(searchTerms.id)
-        && data.nombre.toLowerCase().includes(searchTerms.nombre)
-        && data.documento.toLowerCase().includes(searchTerms.documento)
-        && data.fecha.toLowerCase().includes(searchTerms.fecha)
-        && data.dependencia.toLowerCase().includes(searchTerms.dependencia)
-        && data.profesional.toLowerCase().includes(searchTerms.profesional);
+
+      const nombreCompleto = `
+      ${data.primerNombre || ''} 
+      ${data.segundoNombre || ''} 
+      ${data.primerApellido || ''} 
+      ${data.segundoApellido || ''}
+    `.toLowerCase();
+
+      const documentoCompleto = `
+      ${data.tipoDocumento || ''} 
+      ${data.numeroDocumento || ''}
+    `.toLowerCase();
+
+      return (!searchTerms.id || data.id?.toLowerCase().includes(searchTerms.id))
+        && (!searchTerms.nombre || nombreCompleto.includes(searchTerms.nombre))
+        && (!searchTerms.documento || documentoCompleto.includes(searchTerms.documento))
+        && (!searchTerms.fecha || data.fecha?.toLowerCase().includes(searchTerms.fecha))
+        && (!searchTerms.dependencia || data.dependencia?.toLowerCase().includes(searchTerms.dependencia))
+        && (!searchTerms.profesional || data.profesional?.toLowerCase().includes(searchTerms.profesional));
     };
   }
 
   abrirModal(element: any, modo: 'editar' | 'visualizar') {
-    this.dialog.open(ModalDetalleSolicitudComponent, {
+    const dialogRef = this.dialog.open(ModalDetalleSolicitudComponent, {
       width: '1000px',
       maxHeight: '95vh',
       data: { info: element, modo: modo },
       panelClass: 'custom-modal-container',
       autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && modo === 'editar') {
+
+        Object.assign(element, result);
+
+        this.inicializarTablas();
+      }
     });
   }
 
