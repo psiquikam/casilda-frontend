@@ -41,7 +41,7 @@
                     <mat-label>Tipo de Solicitud</mat-label>
                     <mat-select formControlName="remitenteTipoSolicitud">
                       @for (tipo of tiposSolicitud; track tipo) {
-                        <mat-option [value]="tipo">{{tipo}}</mat-option>
+                      <mat-option [value]="tipo">{{tipo}}</mat-option>
                       }
                     </mat-select>
                   </mat-form-field>
@@ -60,7 +60,7 @@
                 </div>
 
                 <div class="row">
-                  
+
                   <mat-form-field appearance="outline">
                     <mat-label>Segundo Apellido</mat-label>
                     <input matInput formControlName="remitenteSegundoApellido">
@@ -73,7 +73,7 @@
                     <mat-label>Campus</mat-label>
                     <mat-select formControlName="remitenteCampus">
                       @for (c of campusLista; track c) {
-                        <mat-option [value]="c">{{c}}</mat-option>
+                      <mat-option [value]="c">{{c}}</mat-option>
                       }
                     </mat-select>
                   </mat-form-field>
@@ -81,19 +81,19 @@
                     <mat-label>Dependencia</mat-label>
                     <mat-select formControlName="remitenteDependencia">
                       @for (d of dependencias; track d) {
-                        <mat-option [value]="d">{{d}}</mat-option>
+                      <mat-option [value]="d">{{d}}</mat-option>
                       }
                     </mat-select>
                   </mat-form-field>
                 </div>
 
                 <div class="row">
-                  
+
                   <mat-form-field appearance="outline">
                     <mat-label>Facultad</mat-label>
                     <mat-select formControlName="remitenteFacultad">
                       @for (f of facultades; track f) {
-                        <mat-option [value]="f">{{f}}</mat-option>
+                      <mat-option [value]="f">{{f}}</mat-option>
                       }
                     </mat-select>
                   </mat-form-field>
@@ -111,7 +111,7 @@
                     <mat-label>Tipo Documento</mat-label>
                     <mat-select formControlName="remitenteTipoDocumento">
                       @for (t of tiposDocumento; track t) {
-                        <mat-option [value]="t">{{t}}</mat-option>
+                      <mat-option [value]="t">{{t}}</mat-option>
                       }
                     </mat-select>
                   </mat-form-field>
@@ -148,7 +148,7 @@
               <mat-label>Tipo Documento</mat-label>
               <mat-select formControlName="tipoDocumento">
                 @for (t of tiposDocumento; track t) {
-                  <mat-option [value]="t">{{t}}</mat-option>
+                <mat-option [value]="t">{{t}}</mat-option>
                 }
               </mat-select>
             </mat-form-field>
@@ -169,7 +169,7 @@
           </div>
 
           <div class="row">
-            
+
             <mat-form-field appearance="outline">
               <mat-label>Segundo Nombre</mat-label>
               <input matInput formControlName="segundoNombre">
@@ -188,23 +188,46 @@
             </mat-form-field>
           </div>
 
-          <div class="row">
-            <mat-form-field appearance="outline">
-              <mat-label>Celular</mat-label>
-              <input matInput formControlName="celular">
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Teléfono Alterno</mat-label>
-              <input matInput formControlName="telefonoAlterno">
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Correo Institucional</mat-label>
-              <input matInput formControlName="correoInstitucional">
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Correo Personal</mat-label>
-              <input matInput formControlName="correoPersonal">
-            </mat-form-field>
+          <div class="discapacidad-container">
+            <div class="section-title">
+              <span>Correo</span>
+              <button mat-icon-button color="primary" type="button" (click)="abrirModalCorreo()">
+                <mat-icon>add_circle</mat-icon>
+              </button>
+            </div>
+            <div class="discapacidad-list">
+              @for (item of correoRegistrados; track item; let i = $index) {
+              <div class="discapacidad-item">
+                <span><strong>Tipo:</strong> {{item.tipo}}</span>
+                <span><strong>Correo:</strong> {{item.correo}}</span>
+                <span><strong>Descripcion:</strong> {{item.descripcion}}</span>
+                <button mat-icon-button color="warn" (click)="eliminarCorreo(i)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+              }
+            </div>
+          </div>
+          <div class="discapacidad-container">
+            <div class="section-title">
+              <span>Teléfono</span>
+              <button mat-icon-button color="primary" type="button" (click)="abrirModalTelefono()">
+                <mat-icon>add_circle</mat-icon>
+              </button>
+            </div>
+            <div class="discapacidad-list">
+              @for (item of telefonosRegistrados; track item; let i = $index) {
+              <div class="discapacidad-item">
+                <span><strong>Tipo:</strong> {{item.tipo}}</span>
+                <span><strong>Telefono:</strong> {{item.telefono}}</span>
+                <span><strong>Telefono Alterno:</strong> {{item.alterno}}</span>
+                <span><strong>Descripción:</strong> {{item.descripcion}}</span>
+                <button mat-icon-button color="warn" (click)="eliminarTelefono(i)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+              }
+            </div>
           </div>
         </ng-template>
 

@@ -1,11 +1,9 @@
-/* 1. CONTENEDORES Y ESTRUCTURA BASE */
 .form-container {
   display: flex;
   justify-content: center;
   align-items: flex-start;
   padding: 24px;
   background-color: #f8fafc;
-  min-height: 100vh;
   box-sizing: border-box;
 }
 
@@ -275,7 +273,6 @@ tr.detail-row {
   font-weight: 500;
 }
 
-/* 7. COMPONENTES DINÁMICOS (LISTAS) */
 .discapacidad-container {
   margin-top: 25px;
   border-top: 1px solid #e2e8f0;
@@ -313,7 +310,6 @@ tr.detail-row {
   font-size: 13px;
 }
 
-/* 8. OTROS ESTADOS (EMPTY, ACUERDOS, ANIMACIONES) */
 .pregunta-container {
   display: flex;
   flex-direction: column;
@@ -376,7 +372,6 @@ tr.detail-row {
   }
 }
 
-/* 9. RESPONSIVE DESIGN */
 @media (max-width: 950px) {
   .grid-3 {
     grid-template-columns: repeat(2, 1fr);

@@ -5,8 +5,7 @@ $purple-sys: #6b2d95;
   flex-direction: column;
   align-items: center;
   padding: 30px 10px;
-  background-color: #f8fafc;
-  min-height: 100vh;
+  height: auto; 
 }
 
 .page-header {
@@ -40,6 +39,7 @@ $purple-sys: #6b2d95;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  background: white;
 }
 
 .content-padding {
@@ -124,7 +124,6 @@ $purple-sys: #6b2d95;
 }
 
 ::ng-deep {
-
   .mat-mdc-form-field-flex {
     height: 40px !important;
     padding: 0 12px !important;
@@ -163,7 +162,6 @@ mat-card-actions {
     opacity: 0;
     transform: translateY(10px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -180,8 +178,44 @@ mat-card-actions {
   .profile-grid {
     grid-template-columns: 1fr !important;
   }
-
   .row {
     grid-template-columns: 1fr;
   }
+}
+
+.discapacidad-container {
+  margin-top: 25px;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 15px;
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    font-weight: 800;
+    color: #1e293b;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+}
+
+.discapacidad-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.discapacidad-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr 1fr auto;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  padding: 8px 15px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  margin-bottom: 5px;
+  font-size: 13px;
 }

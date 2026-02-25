@@ -18,6 +18,8 @@ import { MatTabsModule } from '@angular/material/tabs';
 
 import { ListasService } from '../../services/listas.service';
 import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
+import { ModalCorreoComponent } from '../modal-correo/modal-correo.component';
+import { ModalTelefonoComponent } from '../modal-telefono/modal-telefono.component';
 
 @Component({
   selector: 'app-formulario-acompanamiento',
@@ -25,7 +27,7 @@ import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
   imports: [
     CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule,
     MatInputModule, MatSelectModule, MatDatepickerModule, MatNativeDateModule,
-    MatButtonModule, MatIconModule, MatSnackBarModule, MatRadioModule, 
+    MatButtonModule, MatIconModule, MatSnackBarModule, MatRadioModule,
     MatDialogModule, MatTabsModule
   ],
   templateUrl: './formulario-acompanamiento.component.html',
@@ -43,6 +45,8 @@ export class FormularioAcompanamientoComponent implements OnInit {
   dependencias: string[] = [];
   facultades: string[] = [];
   tiposDocumento: string[] = [];
+  correoRegistrados: any[] = [];
+  telefonosRegistrados: any[] = [];
 
   constructor() {
     this.listasService.listas$
@@ -101,7 +105,7 @@ export class FormularioAcompanamientoComponent implements OnInit {
         'remitenteCargo', 'remitenteCampus', 'remitenteDependencia', 'remitenteFacultad',
         'remitenteFechaSolicitud', 'remitenteTipoDocumento', 'remitenteNumeroDocumento'
       ];
-      
+
       remitenteFields.forEach(f => {
         const control = this.acompanamientoForm.get(f);
         if (tipo === 'indirecta') {
@@ -115,10 +119,28 @@ export class FormularioAcompanamientoComponent implements OnInit {
     });
   }
 
+  abrirModalCorreo(): void {
+    const dialogRef = this.dialog.open(ModalCorreoComponent, { width: '800px' });
+    dialogRef.afterClosed().subscribe(res => { if (res) this.correoRegistrados.push(res); });
+  }
+
+  abrirModalTelefono(): void {
+    const dialogRef = this.dialog.open(ModalTelefonoComponent, { width: '800px' });
+    dialogRef.afterClosed().subscribe(res => { if (res) this.telefonosRegistrados.push(res); });
+  }
+
+  eliminarCorreo(i: number) { this.correoRegistrados.splice(i, 1); }
+  eliminarTelefono(i: number) { this.telefonosRegistrados.splice(i, 1); }
+
   enviarSolicitud(): void {
     if (this.acompanamientoForm.valid) {
       const numeroAleatorio = Math.floor(1000 + Math.random() * 9000);
-      const payload = this.acompanamientoForm.value;
+
+      const payload = {
+        ...this.acompanamientoForm.value,
+        correosAdicionales: this.correoRegistrados,
+        telefonosAdicionales: this.telefonosRegistrados
+      };
 
       console.log('Enviando solicitud:', payload);
 
@@ -130,10 +152,14 @@ export class FormularioAcompanamientoComponent implements OnInit {
           codigo: `REQ-${numeroAleatorio}`
         }
       });
-      
-      this.acompanamientoForm.reset({ 
-        remitenteFechaSolicitud: new Date() 
+
+      this.acompanamientoForm.reset({
+        remitenteFechaSolicitud: new Date()
       });
+
+      this.correoRegistrados = [];
+      this.telefonosRegistrados = [];
+
     } else {
       this.acompanamientoForm.markAllAsTouched();
       this.snackBar.open('Por favor, revisa los campos marcados en rojo', 'Cerrar', { duration: 3000 });
@@ -142,9 +168,11 @@ export class FormularioAcompanamientoComponent implements OnInit {
 
   cancelar(): void {
     if (confirm('¿Desea limpiar todos los campos del formulario?')) {
-      this.acompanamientoForm.reset({ 
-        remitenteFechaSolicitud: new Date() 
+      this.acompanamientoForm.reset({
+        remitenteFechaSolicitud: new Date()
       });
+      this.correoRegistrados = [];
+      this.telefonosRegistrados = [];
     }
   }
 }
