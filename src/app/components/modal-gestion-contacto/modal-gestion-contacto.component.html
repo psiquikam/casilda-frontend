@@ -7,7 +7,6 @@
   <mat-dialog-content class="modal-content">
     <mat-tab-group animationDuration="0ms">
 
-      <!-- TAB 1 -->
       <mat-tab label="Intento de Comunicación">
         <div class="tab-body-wrapper">
           <form [formGroup]="contactoForm" (ngSubmit)="registrarIntento()" class="form-layout">
@@ -15,12 +14,12 @@
             <div class="form-grid">
               <mat-form-field appearance="outline">
                 <mat-label>Fecha</mat-label>
-                <input matInput type="date" formControlName="fecha">
+                <input matInput type="date" formControlName="fecha" [readonly]="true">
               </mat-form-field>
 
               <mat-form-field appearance="outline">
                 <mat-label>Hora</mat-label>
-                <input matInput type="time" formControlName="hora">
+                <input matInput type="time" formControlName="hora" [readonly]="true">
               </mat-form-field>
 
               <mat-form-field appearance="outline">
@@ -43,7 +42,6 @@
               <textarea matInput rows="4" formControlName="observacion"></textarea>
             </mat-form-field>
 
-            <!-- CAMPOS DE CITA (AHORA EN EL LUGAR CORRECTO) -->
             <div class="form-grid" *ngIf="mostrarCamposCita">
 
               <mat-form-field appearance="outline">
@@ -76,7 +74,6 @@
         </div>
       </mat-tab>
 
-      <!-- TAB 2 -->
       <mat-tab label="Historial">
         <div class="tab-body-wrapper">
           <div class="table-wrapper">

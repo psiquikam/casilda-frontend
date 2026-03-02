@@ -40,26 +40,6 @@ $purple-sys: #6B2D95;
   align-items: center;
 }
 
-.add-prof-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  mat-form-field {
-    flex: 1;
-  }
-
-  button {
-    color: $purple-sys;
-
-    mat-icon {
-      font-size: 28px;
-      width: 28px;
-      height: 28px;
-    }
-  }
-}
-
 .asignados-section {
   margin: 15px 0;
   padding: 12px;
@@ -122,6 +102,8 @@ $purple-sys: #6B2D95;
   textarea {
     resize: none;
     font-size: 14px;
+    line-height: 1.5;
+    padding: 4px 0;
   }
 }
 
@@ -144,32 +126,59 @@ $purple-sys: #6B2D95;
 }
 
 ::ng-deep {
-  .form-grid .mat-mdc-form-field {
+  .form-grid .mat-mdc-form-field:not(.desc-field),
+  .mat-mdc-form-field:not(.desc-field):not(.full-width) {
     .mat-mdc-form-field-flex {
       height: 40px !important;
       padding: 0 12px !important;
       align-items: center !important;
+      display: flex !important;
     }
 
     .mat-mdc-form-field-infix {
       padding-top: 8px !important;
       padding-bottom: 8px !important;
       min-height: 40px !important;
+      display: flex;
+      align-items: center;
     }
 
     .mat-mdc-text-field-wrapper .mat-mdc-floating-label {
       top: 20px !important;
       font-size: 14px;
     }
+  }
 
-    .mat-mdc-form-field-subscript-wrapper {
-      display: none !important;
+  .mat-mdc-form-field.desc-field {
+    .mat-mdc-form-field-flex {
+      height: auto !important;
+      min-height: 100px !important;
+      align-items: flex-start !important;
+      padding: 12px !important;
     }
+
+    .mat-mdc-form-field-infix {
+      padding-top: 4px !important;
+      padding-bottom: 4px !important;
+      height: auto !important;
+    }
+
+    .mat-mdc-text-field-wrapper.mat-mdc-form-field-can-float.mat-form-field-should-float .mat-mdc-floating-label {
+      transform: translateY(-26px) scale(0.75) !important;
+    }
+  }
+
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none !important;
   }
 
   .mat-mdc-optgroup-label {
     font-weight: 700 !important;
     color: $purple-sys !important;
     font-size: 11px !important;
+  }
+
+  .mat-mdc-dialog-content {
+    overflow-x: hidden !important;
   }
 }

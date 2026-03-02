@@ -32,25 +32,28 @@ export class RepartoModalComponent {
   servicios = ['Psicología', 'Asesoría Jurídica', 'Trabajo Social', 'Dupla Psicosocial'];
 
   opcionesAsignacion = [
-    { id: 'p1', nombre: 'Dra. Elena Gómez', esGrupo: false, integrantes: [] },
-    { id: 'p2', nombre: 'Dr. Ricardo Luna', esGrupo: false, integrantes: [] },
-    { id: 'p3', nombre: 'Mg. Sofía Reyes', esGrupo: false, integrantes: [] },
+    { id: 'p1', nombre: 'Abogado N1', esGrupo: false, integrantes: [] },
+    { id: 'p2', nombre: 'Abogado N2', esGrupo: false, integrantes: [] },
+    { id: 'p3', nombre: 'Psicologa N1', esGrupo: false, integrantes: [] },
+    { id: 'p4', nombre: 'Psicologa N2', esGrupo: false, integrantes: [] },
+    { id: 'p5', nombre: 'Psicoorientadora', esGrupo: false, integrantes: [] },
+    { id: 'p6', nombre: 'Trabajadora Social', esGrupo: false, integrantes: [] },
     { 
       id: 'd1', 
-      nombre: 'Dupla 1 (Elena & Ricardo)', 
+      nombre: 'Dupla 1', 
       esGrupo: true, 
       integrantes: [
-        { id: 'p1', nombre: 'Dra. Elena Gómez' },
-        { id: 'p2', nombre: 'Dr. Ricardo Luna' }
+        { id: 'p1', nombre: 'Abogado N1' },
+        { id: 'p3', nombre: 'Psicologa N1' }
       ] 
     },
     { 
       id: 'd2', 
-      nombre: 'Dupla 2 (Sofía & Marina)', 
+      nombre: 'Dupla 2', 
       esGrupo: true, 
       integrantes: [
-        { id: 'p3', nombre: 'Mg. Sofía Reyes' },
-        { id: 'p4', nombre: 'Dra. Marina Silva' }
+        { id: 'p2', nombre: 'Abogado N2' },
+        { id: 'p4', nombre: 'Psicologa N2' }
       ] 
     }
   ];
@@ -62,7 +65,7 @@ export class RepartoModalComponent {
   ) {
     this.repartoForm = this.fb.group({
       tipoAsignacion: ['', Validators.required],
-      fechaReparto: [new Date().toISOString().substring(0, 10), Validators.required],
+      fechaReparto: [new Date().toISOString().substring(0, 10)],
       servicio: ['', Validators.required],
       seleccionTemp: [''], 
       observaciones: ['', [Validators.required, Validators.minLength(10)]]
@@ -77,13 +80,10 @@ export class RepartoModalComponent {
     
     if (opcion) {
       if (opcion.esGrupo) {
-        opcion.integrantes.forEach(integrante => {
-          this.insertarSinDuplicados(integrante);
-        });
+        opcion.integrantes.forEach(integrante => this.insertarSinDuplicados(integrante));
       } else {
         this.insertarSinDuplicados({ id: opcion.id, nombre: opcion.nombre });
       }
-      this.repartoForm.get('seleccionTemp')?.setValue('');
     }
   }
 
@@ -94,15 +94,14 @@ export class RepartoModalComponent {
     }
   }
 
-  eliminarProfesional(index: number) {
-    this.profesionalesAsignados.splice(index, 1);
-  }
-
   guardar() {
     if (this.repartoForm.valid && this.profesionalesAsignados.length > 0) {
+      const { seleccionTemp, ...datosForm } = this.repartoForm.value;
       this.dialogRef.close({
-        ...this.repartoForm.value,
-        profesionales: this.profesionalesAsignados
+        ...datosForm,
+        idsProfesionales: this.profesionalesAsignados.map(p => p.id),
+        nombresProfesionales: this.profesionalesAsignados.map(p => p.nombre).join(' & '),
+        idCaso: this.data.id
       });
     }
   }

@@ -9,7 +9,7 @@
   <mat-card class="table-card">
     <mat-tab-group animationDuration="200ms">
 
-      <mat-tab label="Sin Repartir ({{ totalSinRepartir }})">
+      <mat-tab label="Sin asignar ({{ totalSinRepartir }})">
         <div class="tab-body-wrapper">
           <ng-container *ngTemplateOutlet="tablaCasos; context: { 
             dataSource: dataSourceSinRepartir, 
@@ -62,7 +62,9 @@
         <td mat-cell *matCellDef="let element">
           <button mat-icon-button
             (click)="(expandedElement = expandedElement === element ? null : element); $event.stopPropagation()">
-            <mat-icon>{{expandedElement === element ? 'remove_circle' : 'add_circle'}}</mat-icon>
+            <mat-icon [ngClass]="expandedElement === element ? 'icon-remove' : 'icon-add'">
+              {{expandedElement === element ? 'remove_circle' : 'add_circle'}}
+            </mat-icon>
           </button>
         </td>
       </ng-container>

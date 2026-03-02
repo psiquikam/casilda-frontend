@@ -10,12 +10,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, MatPaginatorIntl } from '@angular/material/paginator';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { MatDialog } from '@angular/material/dialog';
-import { AsignarCitaModalComponent } from '../modal-asignar-cita/modal-asignar-cita.component';
 import { ReprogramarCitaModalComponent } from '../modal-reprogramar-cita/modal-reprogramar-cita.component';
-
 
 export function getSpanishPaginatorIntl() {
   const paginatorIntl = new MatPaginatorIntl();
@@ -40,7 +39,7 @@ export function getSpanishPaginatorIntl() {
   imports: [
     CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule,
     MatInputModule, MatSelectModule, MatButtonModule, MatIconModule,
-    MatDividerModule, MatTableModule, MatPaginatorModule
+    MatDividerModule, MatTableModule, MatPaginatorModule, MatTooltipModule
   ],
   providers: [
     { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
@@ -56,17 +55,13 @@ export function getSpanishPaginatorIntl() {
   ],
 })
 export class CitaComponent implements OnInit, AfterViewInit {
-  private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private dialog = inject(MatDialog);
 
-
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  repartoForm!: FormGroup;
-  codigoCaso: string = 'Seleccione un caso';
-  displayedColumns: string[] = ['expand', 'id', 'nombre', 'fecha', 'dependencia', 'estado', 'acciones'];
+  displayedColumns: string[] = ['expand', 'id', 'nombre', 'fecha', 'dependencia', 'acciones'];
   dataSource = new MatTableDataSource<any>([]);
   expandedElement: any | null;
 
@@ -74,47 +69,16 @@ export class CitaComponent implements OnInit, AfterViewInit {
 
   datosSimulados = [
     {
-      id: 'CAS-2001', nombre: 'Laura Restrepo', documento: '10359874', fecha: '2026-02-01', dependencia: 'Bienestar',
-      estado: 'Sin programar',
-      tipoSolicitud: 'Psicosocial', facultad: 'Artes', campus: 'Norte', genero: 'Femenino', edad: 20, celular: '3109988776',
-      cargo: 'Estudiante', telefono: '6012233', correoInst: 'l.restrepo@U.edu.co', correoPers: 'laura.res@gmail.com'
-    },
-    {
       id: 'ACO-2002', nombre: 'Miguel Cano', documento: '71234456', fecha: '2026-02-03', dependencia: 'Jurídica',
       estado: 'Programada',
       tipoSolicitud: 'Asesoría', facultad: 'Derecho', campus: 'Principal', genero: 'Masculino', edad: 24, celular: '3154433221',
       cargo: 'Egresado', telefono: '6014455', correoInst: 'm.cano@U.edu.co', correoPers: 'miguel.c@outlook.com'
-    },
-    {
-      id: 'CAS-2003', nombre: 'Elena Vasquez', documento: '43567812', fecha: '2026-02-05', dependencia: 'Salud',
-      estado: 'Sin programar',
-      tipoSolicitud: 'Médica', facultad: 'Ingeniería', campus: 'Sur', genero: 'Femenino', edad: 21, celular: '3201122334',
-      cargo: 'Estudiante', telefono: '6019900', correoInst: 'e.vasquez@U.edu.co', correoPers: 'elena.v@gmail.com'
     }
-  ];
-
-  tiposAsignacion = ['Prioritaria', 'Ordinaria', 'Seguimiento'];
-  servicios = ['Psicología', 'Asesoría Jurídica', 'Trabajo Social', 'Dupla Psicosocial'];
-  profesionales = [
-    { id: 1, nombre: 'Dra. Elena Gómez', cargo: 'Abogada' },
-    { id: 2, nombre: 'Dr. Ricardo Luna', cargo: 'Psicólogo' },
-    { id: 3, nombre: 'Dupla A (Social/Psico)', cargo: 'Dupla' }
   ];
 
   ngOnInit() {
     this.dataSource.data = this.datosSimulados;
     this.dataSource.filterPredicate = this.createFilter();
-
-    const idUrl = this.route.snapshot.paramMap.get('codigo');
-    if (idUrl) this.codigoCaso = idUrl;
-
-    this.repartoForm = this.fb.group({
-      tipoAsignacion: ['', Validators.required],
-      fechaReparto: [{ value: new Date().toLocaleDateString(), disabled: true }],
-      servicio: ['', Validators.required],
-      asignadoA: ['', Validators.required],
-      observaciones: ['', [Validators.required, Validators.minLength(10)]]
-    });
   }
 
   ngAfterViewInit() {
@@ -137,18 +101,8 @@ export class CitaComponent implements OnInit, AfterViewInit {
     };
   }
 
-  guardarReparto() {
-    if (this.repartoForm.valid) {
-      const index = this.dataSource.data.findIndex(c => c.id === this.codigoCaso);
-      if (index !== -1) {
-        const newData = [...this.dataSource.data];
-        newData.splice(index, 1);
-        this.dataSource.data = newData;
-      }
-      this.repartoForm.reset({ fechaReparto: new Date().toLocaleDateString() });
-      this.codigoCaso = 'Seleccione un caso';
-      this.expandedElement = null;
-    }
+  iniciarAtencion(caso: any) {
+    console.log('Iniciando atención para:', caso.id);
   }
 
   reprogramarCita(caso: any) {
@@ -167,38 +121,18 @@ export class CitaComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Resultado de la gestión:', result);
-        
-        const index = this.dataSource.data.findIndex(c => c.id === result.id);
-        if (index !== -1) {
-          if (result.accion === 'cancelar') {
-            this.dataSource.data[index].estado = 'Sin programar';
-          } else {
+        if (result.accion === 'cancelar') {
+          this.dataSource.data = this.dataSource.data.filter(c => c.id !== result.id);
+        } else {
+          const index = this.dataSource.data.findIndex(c => c.id === result.id);
+          if (index !== -1) {
             this.dataSource.data[index].fecha = result.formulario.fechaCita;
+            this.dataSource._updateChangeSubscription();
           }
-          this.dataSource._updateChangeSubscription();
         }
       }
     });
   }
-
-  abrirModal(caso: any) {
-    const dialogRef = this.dialog.open(AsignarCitaModalComponent, {
-      width: '650px',
-      data: caso
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        const index = this.dataSource.data.findIndex(c => c.id === result.caso.id);
-        if (index !== -1) {
-          this.dataSource.data[index].estado = 'Programada';
-          this.dataSource._updateChangeSubscription();
-        }
-      }
-    });
-  }
-
 
   regresar() {
     this.router.navigate(['/consulta']);

@@ -59,8 +59,8 @@ export class ModalGestionComponent implements OnInit {
   ngOnInit(): void {
 
     this.contactoForm = this.fb.group({
-      fecha: [this.getToday(), Validators.required],
-      hora: [this.getHoraActual(), Validators.required],
+      fecha: [{ value: this.getToday(), disabled: true }, Validators.required],
+      hora: [{ value: this.getHoraActual(), disabled: true }, Validators.required],
       jornada: [{ value: '', disabled: true }, Validators.required],
       resultado: ['', Validators.required],
       observacion: ['', [Validators.required, Validators.minLength(5)]],

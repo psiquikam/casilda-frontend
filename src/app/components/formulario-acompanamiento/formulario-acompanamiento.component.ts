@@ -78,8 +78,6 @@ export class FormularioAcompanamientoComponent implements OnInit {
       remitenteCampus: [''],
       remitenteDependencia: [''],
       remitenteFacultad: [''],
-      remitenteOtraFacultad: [''],
-      remitenteFechaSolicitud: [new Date()],
       remitenteTipoDocumento: [''],
       remitenteNumeroDocumento: [''],
 

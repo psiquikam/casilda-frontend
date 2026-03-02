@@ -38,12 +38,16 @@
               <div class="tab-body-padding">
                 <div class="row">
                   <mat-form-field appearance="outline">
-                    <mat-label>Tipo de Solicitud</mat-label>
-                    <mat-select formControlName="remitenteTipoSolicitud">
-                      @for (tipo of tiposSolicitud; track tipo) {
-                      <mat-option [value]="tipo">{{tipo}}</mat-option>
+                    <mat-label>Tipo Documento</mat-label>
+                    <mat-select formControlName="remitenteTipoDocumento">
+                      @for (t of tiposDocumento; track t) {
+                      <mat-option [value]="t">{{t}}</mat-option>
                       }
                     </mat-select>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline">
+                    <mat-label>Número Documento</mat-label>
+                    <input matInput formControlName="remitenteNumeroDocumento">
                   </mat-form-field>
                   <mat-form-field appearance="outline">
                     <mat-label>Primer Nombre</mat-label>
@@ -53,14 +57,13 @@
                     <mat-label>Segundo Nombre</mat-label>
                     <input matInput formControlName="remitenteSegundoNombre">
                   </mat-form-field>
+                </div>
+
+                <div class="row">
                   <mat-form-field appearance="outline">
                     <mat-label>Primer Apellido</mat-label>
                     <input matInput formControlName="remitentePrimerApellido">
                   </mat-form-field>
-                </div>
-
-                <div class="row">
-
                   <mat-form-field appearance="outline">
                     <mat-label>Segundo Apellido</mat-label>
                     <input matInput formControlName="remitenteSegundoApellido">
@@ -77,6 +80,9 @@
                       }
                     </mat-select>
                   </mat-form-field>
+                </div>
+
+                <div class="row">
                   <mat-form-field appearance="outline">
                     <mat-label>Dependencia</mat-label>
                     <mat-select formControlName="remitenteDependencia">
@@ -85,9 +91,6 @@
                       }
                     </mat-select>
                   </mat-form-field>
-                </div>
-
-                <div class="row">
 
                   <mat-form-field appearance="outline">
                     <mat-label>Facultad</mat-label>
@@ -96,31 +99,6 @@
                       <mat-option [value]="f">{{f}}</mat-option>
                       }
                     </mat-select>
-                  </mat-form-field>
-                  <mat-form-field appearance="outline">
-                    <mat-label>Otra Facultad</mat-label>
-                    <input matInput formControlName="remitenteOtraFacultad">
-                  </mat-form-field>
-                  <mat-form-field appearance="outline">
-                    <mat-label>Fecha Solicitud</mat-label>
-                    <input matInput [matDatepicker]="pickerRem" formControlName="remitenteFechaSolicitud">
-                    <mat-datepicker-toggle matIconSuffix [for]="pickerRem"></mat-datepicker-toggle>
-                    <mat-datepicker #pickerRem></mat-datepicker>
-                  </mat-form-field>
-                  <mat-form-field appearance="outline">
-                    <mat-label>Tipo Documento</mat-label>
-                    <mat-select formControlName="remitenteTipoDocumento">
-                      @for (t of tiposDocumento; track t) {
-                      <mat-option [value]="t">{{t}}</mat-option>
-                      }
-                    </mat-select>
-                  </mat-form-field>
-                </div>
-
-                <div class="row">
-                  <mat-form-field appearance="outline">
-                    <mat-label>Número Documento</mat-label>
-                    <input matInput formControlName="remitenteNumeroDocumento">
                   </mat-form-field>
                 </div>
               </div>

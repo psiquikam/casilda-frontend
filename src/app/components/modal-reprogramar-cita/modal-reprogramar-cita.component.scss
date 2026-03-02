@@ -1,5 +1,4 @@
 $purple-sys: #6B2D95;
-$warn-red: #f44336;
 
 .modal-container {
   overflow: hidden;
@@ -16,10 +15,6 @@ $warn-red: #f44336;
   gap: 12px;
   font-weight: 800;
   font-size: 1.1rem;
-
-  &.bg-cancel {
-    background-color: $warn-red;
-  }
 
   mat-icon {
     font-size: 24px;

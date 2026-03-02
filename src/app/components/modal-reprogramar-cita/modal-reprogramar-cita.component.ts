@@ -35,17 +35,15 @@ export class ReprogramarCitaModalComponent implements OnInit {
     private dialogRef: MatDialogRef<ReprogramarCitaModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { caso: any, accion: 'cancelar' | 'reprogramar' }
   ) {
-    // Inicializamos el formulario
     this.gestionForm = this.fb.group({
       fechaCita: ['', Validators.required],
-      horaCita: ['08:00', Validators.required], // Hora por defecto
+      horaCita: ['08:00', Validators.required],
       motivo: ['', Validators.required],
       observaciones: ['', [Validators.maxLength(500)]]
     });
   }
 
   ngOnInit(): void {
-    // Si el caso ya tiene fecha (está programada), la cargamos automáticamente
     if (this.data.caso && this.data.caso.fecha) {
       this.gestionForm.patchValue({
         fechaCita: this.data.caso.fecha
@@ -53,7 +51,6 @@ export class ReprogramarCitaModalComponent implements OnInit {
     }
   }
 
-  // Getters para cambiar dinámicamente la UI
   get titulo(): string {
     return this.data.accion === 'cancelar' ? 'Cancelar Cita' : 'Reprogramar Cita';
   }
