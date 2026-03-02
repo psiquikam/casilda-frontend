@@ -29,7 +29,6 @@ export class ModalTelefonoComponent {
   data = {
     tipo: '',
     telefono: '',
-    alterno: '',
     descripcion: ''
   };
 

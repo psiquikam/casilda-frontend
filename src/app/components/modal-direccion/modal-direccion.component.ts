@@ -20,6 +20,22 @@ import { MatButtonModule } from '@angular/material/button';
 export class ModalDireccionComponent {
   direccionForm: FormGroup;
 
+  departamentos = [
+    'Antioquia',
+    'Cundinamarca',
+    'Valle del Cauca',
+    'Atlántico',
+    'Santander'
+  ];
+
+  municipios = [
+    'Medellín',
+    'Envigado',
+    'Bogotá',
+    'Cali',
+    'Barranquilla',
+    'Bucaramanga'
+  ];
   vias = ['Calle', 'Carrera', 'Avenida', 'Transversal', 'Diagonal', 'Circular'];
   ciudades = ['Medellín', 'Bogotá', 'Cali', 'Barranquilla', 'Bucaramanga'];
 
@@ -29,13 +45,14 @@ export class ModalDireccionComponent {
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.direccionForm = this.fb.group({
+      departamento: ['Antioquia', Validators.required],
+      municipio: ['Medellín', Validators.required],
       viaPrincipal: ['', Validators.required],
       numeroVia: ['', Validators.required],
       letraVia: [''],
       numeroCruce: ['', Validators.required],
       placa: ['', Validators.required],
       barrio: ['', Validators.required],
-      ciudad: ['Medellín', Validators.required],
       complemento: ['']
     });
   }
