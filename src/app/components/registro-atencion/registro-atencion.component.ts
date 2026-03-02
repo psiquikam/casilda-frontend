@@ -27,6 +27,10 @@ import { ModalRemisionComponent } from '../modal-remision/modal-remision.compone
 import { ModalActivarRutaComponent } from '../modal-activar-ruta/modal-activar-ruta.component';
 import { ModalApreciacionJuridicaComponent } from '../modal-apreciacion-juridica/modal-apreciacion-juridica.component';
 import { ModalApreciacionPsicologicaComponent } from '../modal-apreciacion-psicologica/modal-apreciacion-psicologica.component';
+import { TablaCasosComponent } from '../tabla-casos/tabla-casos.component';
+import { TablaOtrosCasosComponent } from '../tabla-otros-casos/tabla-otros-casos.component';
+
+
 
 @Component({
   selector: 'app-registro-atencion',
@@ -49,7 +53,9 @@ import { ModalApreciacionPsicologicaComponent } from '../modal-apreciacion-psico
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
-    MatTooltipModule
+    MatTooltipModule,
+    TablaCasosComponent,
+    TablaOtrosCasosComponent
   ],
   templateUrl: './registro-atencion.component.html',
   styleUrls: ['./registro-atencion.component.scss'],
@@ -64,22 +70,108 @@ import { ModalApreciacionPsicologicaComponent } from '../modal-apreciacion-psico
 export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   atencionForm!: FormGroup;
 
-  acuerdosCompromisos: any[] = [
-    { idCaso: '1001', tiempoHechos: 'Reciente', tipoViolencia: 'Psicológica', subcategoria: 'Acoso', descripcion: 'Seguimiento por afectación emocional' },
-    { idCaso: '1002', tiempoHechos: 'Hace 6 meses', tipoViolencia: 'Física', subcategoria: 'Agresión', descripcion: 'Compromiso de acompañamiento médico' },
-    { idCaso: '1003', tiempoHechos: 'Hace 1 año', tipoViolencia: 'Sexual', subcategoria: 'Intimidación', descripcion: 'Remisión a atención especializada' }
+  casoPorAtender: any[] = [
+    {
+      idCaso: '1001',
+      tiempoHechos: 'Reciente',
+      tipoViolencia: 'Psicológica',
+      subcategoria: 'Acoso',
+      descripcion: 'Seguimiento por afectación emocional',
+      nombre: 'Jose',
+      documento: '1213154312',
+
+      tipoSolicitud: 'Directa',
+      facultad: 'Ingeniería',
+      campus: 'Principal',
+      genero: 'Masculino',
+      edad: 22,
+      celular: '3001234567',
+      cargo: 'Estudiante',
+      telefono: '6041234567',
+      correoInst: 'jose@universidad.edu',
+      correoPers: 'jose@gmail.com'
+    },
+    {
+      idCaso: '1002',
+      tiempoHechos: 'Hace 6 meses',
+      tipoViolencia: 'Física',
+      subcategoria: 'Agresión',
+      descripcion: 'Compromiso de acompañamiento médico',
+      nombre: 'Laura',
+      documento: '987654321',
+
+      tipoSolicitud: 'Indirecta',
+      facultad: 'Medicina',
+      campus: 'Salud',
+      genero: 'Femenino',
+      edad: 25,
+      celular: '3019876543',
+      cargo: 'Estudiante',
+      telefono: '6047654321',
+      correoInst: 'laura@universidad.edu',
+      correoPers: 'laura@gmail.com'
+    }
   ];
 
-  dataSource = new MatTableDataSource<any>(this.acuerdosCompromisos);
-  displayedColumnsTablaInicial = ['expand', 'idCaso', 'tipoViolencia', 'descripcion', 'acciones'];
-  displayedColumnsAcuerdos: string[] = ['idCaso', 'tiempoHechos', 'tipoViolencia', 'subcategoria', 'descripcion', 'acciones'];
-  
+  casosRelacionados: any[] = [
+    {
+      idCaso: '1001',
+      tiempoHechos: 'Reciente',
+      tipoViolencia: 'Psicológica',
+      subcategoria: 'Acoso',
+      descripcion: 'Seguimiento por afectación emocional',
+      nombre: 'Jose',
+      documento: '1213154312',
+
+      tipoSolicitud: 'Directa',
+      facultad: 'Ingeniería',
+      campus: 'Principal',
+      genero: 'Masculino',
+      edad: 22,
+      celular: '3001234567',
+      cargo: 'Estudiante',
+      telefono: '6041234567',
+      correoInst: 'jose@universidad.edu',
+      correoPers: 'jose@gmail.com'
+    },
+    {
+      idCaso: '1002',
+      tiempoHechos: 'Hace 6 meses',
+      tipoViolencia: 'Física',
+      subcategoria: 'Agresión',
+      descripcion: 'Compromiso de acompañamiento médico',
+      nombre: 'Laura',
+      documento: '987654321',
+
+      tipoSolicitud: 'Indirecta',
+      facultad: 'Medicina',
+      campus: 'Salud',
+      genero: 'Femenino',
+      edad: 25,
+      celular: '3019876543',
+      cargo: 'Estudiante',
+      telefono: '6047654321',
+      correoInst: 'laura@universidad.edu',
+      correoPers: 'laura@gmail.com'
+    }
+  ];
+
+
+  dataSource = new MatTableDataSource<any>(this.casoPorAtender);
+  dataSourceOtros = new MatTableDataSource<any>(this.casosRelacionados);
+  displayedColumnsTablaInicial = ['expand', 'idCaso', 'tipoViolencia', 'descripcion', 'nombre', 'acciones'];
+  displayedColumnsOtros = ['expand', 'idCaso', 'tipoViolencia', 'descripcion', 'nombre'];
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+
+  @ViewChild('paginatorOtros') paginatorOtros!: MatPaginator;
+  @ViewChild('sortOtros') sortOtros!: MatSort;
 
   modoAtencion = false;
   casoSeleccionado: any = null;
   expandedElement: any | null = null;
+  expandedElementOtros: any | null = null;
 
   filterValues: any = {
     idCaso: '',
@@ -133,6 +225,14 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       return idMatch && tipoMatch && descMatch;
     };
 
+    this.dataSourceOtros.filterPredicate = (data: any, filter: string): boolean => {
+      const searchTerms = JSON.parse(filter);
+      const idMatch = data.idCaso.toString().toLowerCase().includes(searchTerms.idCaso);
+      const tipoMatch = data.tipoViolencia.toLowerCase().includes(searchTerms.tipoViolencia);
+      const descMatch = data.descripcion.toLowerCase().includes(searchTerms.descripcion);
+      return idMatch && tipoMatch && descMatch;
+    };
+
     this.atencionForm.get('logroAcuerdo')?.valueChanges.subscribe(valor => {
       if (valor === 'NO') {
         this.remisionesRegistrados = [];
@@ -144,6 +244,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+    this.dataSourceOtros.paginator = this.paginatorOtros;
+    this.dataSourceOtros.sort = this.sortOtros;
   }
 
   applyFilter(column: string, event: Event) {
@@ -168,6 +270,14 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       documento: caso.idCaso || '',
       tipoViolencia: caso.tipoViolencia || ''
     });
+  }
+
+  seleccionarCaso(element: any) {
+    console.log(element);
+  }
+
+  applyFilterOtros(column: string, event: Event) {
+    console.log(column, event);
   }
 
   mostrarQuienRemite(): boolean {
@@ -233,10 +343,12 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   eliminarHechos(i: number) { this.hechosRegistrados.splice(i, 1); }
   eliminarRemision(i: number) { this.remisionesRegistrados.splice(i, 1); }
   eliminarRutaActivada(i: number) { this.activarRutasRegistrados.splice(i, 1); }
-  
+  eliminarApreciacionJuridica(i: number) { this.remisionesRegistrados.splice(i, 1); }
+  eliminarApreciacionPsicologica(i: number) { this.remisionesRegistrados.splice(i, 1); }
+
   eliminarAcuerdo(index: number) {
-    this.acuerdosCompromisos.splice(index, 1);
-    this.dataSource.data = [...this.acuerdosCompromisos];
+    this.casoPorAtender.splice(index, 1);
+    this.dataSource.data = [...this.casoPorAtender];
   }
 
   editarAcuerdo(element: any) { console.log('Editar', element); }
