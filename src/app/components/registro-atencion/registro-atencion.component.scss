@@ -1,3 +1,164 @@
+$purple-sys: #6B2D95;
+$green-success: #22c55e;
+$slate-600: #475569;
+
+.cita-container {
+  padding: 24px;
+  background-color: #f8fafc;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .back-link {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+    cursor: pointer;
+    margin-bottom: 15px;
+    font-weight: 600;
+    font-size: 13px;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #1e293b;
+    }
+  }
+}
+
+.section-header {
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: 15px;
+
+  h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #0f172a;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+    color: #64748b;
+  }
+}
+
+.pendientes-card {
+  width: 100%;
+  max-width: 1200px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+  padding: 0;
+}
+
+tr.mat-mdc-header-row {
+  height: 65px;
+  background: white;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.04);
+}
+
+.header-inline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+}
+
+.column-title {
+  font-size: 11px;
+  font-weight: 850;
+  color: #1e293b;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.search-box-slim {
+  background: #f1f5f9;
+  border-radius: 6px;
+  padding: 2px 8px;
+  border: 1px solid #e2e8f0;
+  width: 90%;
+  max-width: 120px;
+
+  input {
+    border: none;
+    background: transparent;
+    font-size: 11px;
+    width: 100%;
+    outline: none;
+    color: #475569;
+  }
+}
+
+.id-cell {
+  font-weight: 800;
+  color: $purple-sys;
+}
+
+.badge-soft {
+  background: #f1f5f9;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+}
+
+.action-buttons-container {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+
+  button.mat-mdc-icon-button {
+    width: 28px !important;
+    height: 28px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+
+    ::ng-deep .mat-mdc-button-touch-target {
+      width: 28px !important;
+      height: 28px !important;
+    }
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
+
+.action-success {
+  color: $green-success;
+
+  &:hover {
+    background-color: rgba(34, 197, 94, 0.08) !important;
+  }
+}
+
+.icon-add {
+  color: $green-success !important;
+}
+
+.icon-remove {
+  color: #64748b !important;
+}
+
 .form-container {
   display: flex;
   justify-content: center;
@@ -31,7 +192,6 @@
   }
 }
 
-/* 2. PERSONALIZACIÓN DE TABS (NG-DEEP) */
 ::ng-deep {
   .mat-mdc-tab-body-content {
     padding: 0 !important;
@@ -46,7 +206,7 @@
   .mat-mdc-tab-group {
     height: auto !important;
     flex-grow: 0 !important;
-    --mdc-tab-indicator-active-indicator-color: #6B2D95; // Usando tu color morado
+    --mdc-tab-indicator-active-indicator-color: #6B2D95;
   }
 
   .mat-mdc-tab-header {
@@ -79,7 +239,6 @@
   }
 }
 
-/* 3. GRID Y LAYOUT DE FORMULARIOS */
 .tab-padding {
   padding: 20px 25px;
   display: grid;
@@ -106,7 +265,6 @@
   }
 }
 
-/* 4. CAMPOS DE TEXTO Y DATEPICKERS (SLIM DESIGN) */
 ::ng-deep {
   .mat-mdc-form-field-flex {
     height: 32px !important;
@@ -160,7 +318,6 @@
   }
 }
 
-/* 5. BOTONES Y ACCIONES */
 .button-container {
   grid-column: 1 / -1;
   display: flex;
@@ -192,10 +349,30 @@ mat-card-actions {
   gap: 12px;
 }
 
-/* 6. TABLA Y EXPANSIÓN (FIX DE ESPACIO EN BLANCO) */
+.table-header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 16px;
+
+  h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+  }
+
+  .filter-field {
+    width: 300px;
+  }
+}
+
 .table-container {
-  margin-top: 16px;
-  overflow-x: auto;
+  border-radius: 8px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
 
   table {
     width: 100%;
@@ -204,6 +381,7 @@ mat-card-actions {
   th {
     font-weight: 600;
     color: #444;
+    background-color: #f8fafc;
   }
 
   td {
@@ -212,10 +390,9 @@ mat-card-actions {
   }
 }
 
-// ESTO ELIMINA EL ESPACIO EN BLANCO ENTRE FILAS
 tr.detail-row {
   height: 0 !important;
-  min-height: 0 !important; // Obliga a la fila a no tener altura mínima
+  min-height: 0 !important;
 }
 
 .detail-row td {
@@ -232,25 +409,43 @@ tr.detail-row {
   background: #fbfaff;
 }
 
+.detail-row {
+  height: 0;
+
+  td {
+    padding: 0;
+    border: 0;
+  }
+}
+
 .element-detail {
   overflow: hidden;
   display: flex;
-  background: #fcfcfd;
-  padding: 0; // Se controla con el detail-grid
+  padding: 0 24px 16px 24px;
 }
 
 .detail-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 15px;
   padding: 20px;
   width: 100%;
-  border-left: 4px solid #6B2D95;
-  margin: 10px 0;
+  border-left: 4px solid $purple-sys;
+  background: #fcfcfd;
+  border-radius: 8px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.02), 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-top: 5px;
 }
 
 .detail-item {
-  font-size: 14px;
+  font-size: 13px;
+  color: #475569;
+
+  strong {
+    color: #1e293b;
+    margin-right: 5px;
+    font-weight: 700;
+  }
 }
 
 .full-width {
@@ -262,6 +457,21 @@ tr.detail-row {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+::ng-deep .slim-paginator {
+  background-color: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+
+  .mat-mdc-paginator-container {
+    min-height: 48px;
+    font-size: 12px;
+  }
+
+  .mat-mdc-icon-button {
+    width: 32px;
+    height: 32px;
+  }
 }
 
 .badge-tipo {
@@ -349,10 +559,13 @@ tr.detail-row {
   color: #999;
 
   mat-icon {
-    font-size: 48px;
-    margin-bottom: 10px;
-    width: 48px;
-    height: 48px;
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 

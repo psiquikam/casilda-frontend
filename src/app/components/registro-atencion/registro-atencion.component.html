@@ -1,78 +1,116 @@
-<div *ngIf="!modoAtencion" class="animate-fade-in">
-    <div class="table-header-container">
-        <h2>Casos pendientes</h2>
-        <mat-form-field appearance="outline" class="filter-field">
-            <mat-label>Buscar casos...</mat-label>
-            <input matInput (keyup)="applyFilter($event)" placeholder="Ej: CAS-1001" #input>
-            <mat-icon matSuffix>search</mat-icon>
-        </mat-form-field>
+<div *ngIf="!modoAtencion" class="cita-container animate-fade-in">
+    <div class="back-link" (click)="regresar()">
+        <mat-icon>arrow_back</mat-icon> Volver al Panel
     </div>
 
-    <div class="mat-elevation-z2 table-container">
-        <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
+    <div class="section-header">
+        <h2>Citas Pendientes</h2>
+        <span class="subtitle">Gestión y seguimiento de denuncias y solicitudes activas</span>
+    </div>
 
-            <ng-container matColumnDef="expand">
-                <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
-                <td mat-cell *matCellDef="let element">
-                    <button mat-icon-button
-                        (click)="(expandedElement = expandedElement === element ? null : element); $event.stopPropagation()">
-                        <mat-icon>{{expandedElement === element ? 'remove_circle' : 'add_circle'}}</mat-icon>
-                    </button>
-                </td>
-            </ng-container>
+    <mat-card class="pendientes-card">
+        <div class="table-responsive">
+            <table mat-table [dataSource]="dataSource" multiTemplateDataRows matSort>
 
-            <ng-container matColumnDef="idCaso">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> ID Caso </th>
-                <td mat-cell *matCellDef="let element"> {{element.idCaso}} </td>
-            </ng-container>
+                <ng-container matColumnDef="expand">
+                    <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
+                    <td mat-cell *matCellDef="let element">
+                        <button mat-icon-button
+                            (click)="(expandedElement = expandedElement === element ? null : element); $event.stopPropagation()">
+                            <mat-icon [ngClass]="expandedElement === element ? 'icon-remove' : 'icon-add'">
+                                {{expandedElement === element ? 'remove_circle' : 'add_circle'}}
+                            </mat-icon>
+                        </button>
+                    </td>
+                </ng-container>
 
-            <ng-container matColumnDef="tipoViolencia">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Tipo </th>
-                <td mat-cell *matCellDef="let element"> {{element.tipoViolencia}} </td>
-            </ng-container>
-
-            <ng-container matColumnDef="descripcion">
-                <th mat-header-cell *matHeaderCellDef> Descripción </th>
-                <td mat-cell *matCellDef="let element" class="cell-desc"> {{element.descripcion}} </td>
-            </ng-container>
-
-            <ng-container matColumnDef="acciones">
-                <th mat-header-cell *matHeaderCellDef> Acciones </th>
-                <td mat-cell *matCellDef="let element">
-                    <button mat-raised-button color="primary" class="slim-btn" (click)="iniciarAtencion(element)">
-                        Iniciar atención
-                    </button>
-                </td>
-            </ng-container>
-
-            <ng-container matColumnDef="expandedDetail">
-                <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumnsTablaInicial.length">
-                    <div class="element-detail"
-                        [@detailExpand]="element === expandedElement ? 'expanded' : 'collapsed'">
-                        <div class="detail-grid">
-                            <div class="detail-item"><strong>ID Caso:</strong> {{element.idCaso}}</div>
-                            <div class="detail-item"><strong>Tiempo de hechos:</strong> {{element.tiempoHechos}}</div>
-                            <div class="detail-item"><strong>Tipo de violencia:</strong> {{element.tipoViolencia}}</div>
-                            <div class="detail-item"><strong>Subcategoría:</strong> {{element.subcategoria}}</div>
-                            <div class="detail-item full-width"><strong>Descripción:</strong> {{element.descripcion}}
+                <ng-container matColumnDef="idCaso">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <div class="header-inline-container">
+                            <span class="column-title">ID Caso</span>
+                            <div class="search-box-slim">
+                                <input (keyup)="applyFilter('idCaso', $event)" placeholder="Filtrar">
                             </div>
                         </div>
-                    </div>
-                </td>
-            </ng-container>
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="id-cell">#{{element.idCaso}}</td>
+                </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="displayedColumnsTablaInicial"></tr>
-            <tr mat-row *matRowDef="let element; columns: displayedColumnsTablaInicial;" class="element-row"
-                [class.expanded-row]="expandedElement === element"></tr>
-            <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
+                <ng-container matColumnDef="tipoViolencia">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <div class="header-inline-container">
+                            <span class="column-title">Tipo</span>
+                            <div class="search-box-slim">
+                                <input (keyup)="applyFilter('tipoViolencia', $event)" placeholder="Filtrar...">
+                            </div>
+                        </div>
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <span class="badge-soft">{{element.tipoViolencia}}</span>
+                    </td>
+                </ng-container>
 
-            <tr class="mat-row" *matNoDataRow>
-                <td class="mat-cell" colspan="5">No se encontraron resultados para "{{input.value}}"</td>
-            </tr>
-        </table>
-        <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons
-            aria-label="Seleccionar página"></mat-paginator>
-    </div>
+                <ng-container matColumnDef="descripcion">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <div class="header-inline-container">
+                            <span class="column-title">Descripción</span>
+                            <div class="search-box-slim">
+                                <input (keyup)="applyFilter('descripcion', $event)" placeholder="Buscar...">
+                            </div>
+                        </div>
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="cell-desc">
+                        {{element.descripcion}}
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="acciones">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <div class="column-title text-center">Acciones</div>
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <div class="action-buttons-container">
+                            <button mat-icon-button class="action-success" matTooltip="Iniciar Atención"
+                                (click)="iniciarAtencion(element); $event.stopPropagation()">
+                                <mat-icon>play_circle_outline</mat-icon>
+                            </button>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="expandedDetail">
+                    <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumnsTablaInicial.length">
+                        <div class="element-detail"
+                            [@detailExpand]="element === expandedElement ? 'expanded' : 'collapsed'">
+                            <div class="detail-grid">
+                                <div class="detail-item"><strong>ID Caso:</strong> {{element.idCaso}}</div>
+                                <div class="detail-item"><strong>Tiempo de hechos:</strong> {{element.tiempoHechos}}
+                                </div>
+                                <div class="detail-item"><strong>Tipo de violencia:</strong> {{element.tipoViolencia}}
+                                </div>
+                                <div class="detail-item"><strong>Subcategoría:</strong> {{element.subcategoria}}</div>
+                                <div class="detail-item full-width"><strong>Descripción detallada:</strong>
+                                    {{element.descripcion}}</div>
+                            </div>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumnsTablaInicial"></tr>
+                <tr mat-row *matRowDef="let element; columns: displayedColumnsTablaInicial;" class="element-row"
+                    [class.expanded-row]="expandedElement === element">
+                </tr>
+                <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
+            </table>
+
+            <div *ngIf="dataSource.data.length === 0" class="no-results-msg">
+                <mat-icon>folder_open</mat-icon>
+                <p>No se encontraron citas pendientes.</p>
+            </div>
+
+            <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+        </div>
+    </mat-card>
 </div>
 
 <div *ngIf="modoAtencion">
@@ -85,7 +123,7 @@
                 <form [formGroup]="atencionForm">
                     <mat-tab-group animationDuration="200ms" color="primary">
 
-                        <mat-tab label="Registro de atención caso">
+                        <mat-tab label="Registro de atención">
                             <div class="tab-padding grid-2">
                                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
                                     <mat-label>Tipo solicitud</mat-label>
@@ -120,9 +158,13 @@
                                         }
                                     </mat-select>
                                 </mat-form-field>
+
                                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
                                     <mat-label>Forma y lugar de la entrevista</mat-label>
-                                    <input matInput formControlName="formaEntrevista">
+                                    <mat-select formControlName="formaEntrevista">
+                                        @for (s of formayLugar; track s) { <mat-option [value]="s">{{s}}</mat-option>
+                                        }
+                                    </mat-select>
                                 </mat-form-field>
                                 <div class="button-container">
                                     <span class="btn-label-top">Archivo que contiene el Consentimiento*</span>
@@ -190,13 +232,6 @@
                                         <input matInput formControlName="lugarNacimiento">
                                     </mat-form-field>
                                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                        <mat-label>¿Pertenece a alguna Etnia?</mat-label>
-                                        <mat-select formControlName="etnia">
-                                            @for (e of listaEtnias; track e) { <mat-option
-                                                [value]="e">{{e}}</mat-option> }
-                                        </mat-select>
-                                    </mat-form-field>
-                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
                                         <mat-label>Sexo</mat-label>
                                         <mat-select formControlName="sexo">
                                             @for (s of listaSexo; track s) { <mat-option [value]="s">{{s}}</mat-option>
@@ -215,6 +250,13 @@
                                         <mat-select formControlName="orientacionSexual">
                                             @for (o of listaOrientacionSexual; track o) { <mat-option
                                                 [value]="o">{{o}}</mat-option> }
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>¿Pertenece a alguna Etnia?</mat-label>
+                                        <mat-select formControlName="etnia">
+                                            @for (e of listaEtnias; track e) { <mat-option
+                                                [value]="e">{{e}}</mat-option> }
                                         </mat-select>
                                     </mat-form-field>
                                     <button mat-stroked-button color="primary" type="button" class="slim-btn"

@@ -4,8 +4,8 @@
   </div>
 
   <div class="section-header">
-    <h2>Citas</h2>
-    <span class="subtitle">Seleccione un caso de la lista para proceder con la asignación de cita</span>
+    <h2>Citas Programadas</h2>
+    <span class="subtitle">Gestión de atención y seguimiento de casos con cita activa</span>
   </div>
 
   <mat-card class="pendientes-card">
@@ -16,86 +16,71 @@
           <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
           <td mat-cell *matCellDef="let element">
             <button mat-icon-button (click)="(expandedElement = expandedElement === element ? null : element); $event.stopPropagation()">
-              <mat-icon>{{expandedElement === element ? 'remove_circle' : 'add_circle'}}</mat-icon>
+              <mat-icon [ngClass]="expandedElement === element ? 'icon-remove' : 'icon-add'">
+                {{expandedElement === element ? 'remove_circle' : 'add_circle'}}
+              </mat-icon>
             </button>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="id">
           <th mat-header-cell *matHeaderCellDef>
-            <div class="header-filter">
-              <span>ID Caso</span>
-              <input (keyup)="applyFilter('id', $event)" placeholder="...">
+            <div class="header-inline-container">
+              <span class="column-title">ID Caso</span>
+              <div class="search-box-slim"><input (keyup)="applyFilter('id', $event)" placeholder="Filtrar"></div>
             </div>
           </th>
-          <td mat-cell *matCellDef="let element"> <b>#{{element.id}}</b> </td>
+          <td mat-cell *matCellDef="let element" class="id-cell">#{{element.id}}</td>
         </ng-container>
 
         <ng-container matColumnDef="nombre">
           <th mat-header-cell *matHeaderCellDef>
-            <div class="header-filter">
-              <span>Usuario</span>
-              <input (keyup)="applyFilter('nombre', $event)" placeholder="Filtrar...">
+            <div class="header-inline-container">
+              <span class="column-title">Usuario</span>
+              <div class="search-box-slim"><input (keyup)="applyFilter('nombre', $event)" placeholder="Buscar..."></div>
             </div>
           </th>
-          <td mat-cell *matCellDef="let element"> 
-            {{element.nombre}} <br> 
-            <small class="text-muted">{{element.documento}}</small> 
+          <td mat-cell *matCellDef="let element">
+            {{element.nombre}} <br>
+            <small class="text-muted">{{element.documento}}</small>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="fecha">
           <th mat-header-cell *matHeaderCellDef>
-            <div class="header-filter">
-              <span>Fecha</span>
-              <input (keyup)="applyFilter('fecha', $event)" placeholder="AAAA-MM...">
+            <div class="header-inline-container">
+              <span class="column-title">Fecha Cita</span>
+              <div class="search-box-slim"><input (keyup)="applyFilter('fecha', $event)" placeholder="AAAA-MM-DD"></div>
             </div>
           </th>
-          <td mat-cell *matCellDef="let element"> {{element.fecha}} </td>
+          <td mat-cell *matCellDef="let element">{{element.fecha}}</td>
         </ng-container>
 
         <ng-container matColumnDef="dependencia">
           <th mat-header-cell *matHeaderCellDef>
-            <div class="header-filter">
-              <span>Dependencia</span>
-              <input (keyup)="applyFilter('dependencia', $event)" placeholder="...">
+            <div class="header-inline-container">
+              <span class="column-title">Dependencia</span>
+              <div class="search-box-slim"><input (keyup)="applyFilter('dependencia', $event)" placeholder="Filtrar..."></div>
             </div>
           </th>
-          <td mat-cell *matCellDef="let element"> <span class="badge-soft">{{element.dependencia}}</span> </td>
-        </ng-container>
-
-        <ng-container matColumnDef="estado">
-          <th mat-header-cell *matHeaderCellDef> Estado Cita </th>
-          <td mat-cell *matCellDef="let element">
-            <span [ngClass]="{
-              'badge-programada': element.estado === 'Programada',
-              'badge-sin-programar': element.estado === 'Sin programar'
-            }">
-              {{element.estado}}
-            </span>
-          </td>
+          <td mat-cell *matCellDef="let element"><span class="badge-soft">{{element.dependencia}}</span></td>
         </ng-container>
 
         <ng-container matColumnDef="acciones">
-          <th mat-header-cell *matHeaderCellDef class="text-center"> Acción </th>
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="column-title text-center">Acciones</div>
+          </th>
           <td mat-cell *matCellDef="let element">
-            <div class="action-group">
-              <button *ngIf="element.estado === 'Sin programar'" 
-                      mat-stroked-button color="primary" class="btn-sm"
-                      (click)="abrirModal(element); $event.stopPropagation()">
-                <mat-icon>add_task</mat-icon> Asignar
+            <div class="action-buttons-container">
+              <button mat-icon-button class="action-success" matTooltip="Iniciar Atención" (click)="iniciarAtencion(element); $event.stopPropagation()">
+                <mat-icon>play_circle_outline</mat-icon>
               </button>
-
-              <ng-container *ngIf="element.estado === 'Programada'">
-                <button mat-stroked-button color="accent" class="btn-sm btn-reprogramar"
-                        (click)="reprogramarCita(element); $event.stopPropagation()">
-                  <mat-icon>event_repeat</mat-icon> Reprogramar
-                </button>
-                <button mat-stroked-button color="warn" class="btn-sm"
-                        (click)="cancelarCita(element); $event.stopPropagation()">
-                  <mat-icon>cancel</mat-icon> Cancelar
-                </button>
-              </ng-container>
+              <button mat-icon-button class="action-warning" matTooltip="Reprogramar" (click)="reprogramarCita(element); $event.stopPropagation()">
+                <mat-icon>event_repeat</mat-icon>
+              </button>
+              <button mat-icon-button class="action-danger" matTooltip="Cancelar" (click)="cancelarCita(element); $event.stopPropagation()">
+                <mat-icon>cancel</mat-icon>
+              </button>
             </div>
           </td>
         </ng-container>
@@ -120,18 +105,15 @@
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let element; columns: displayedColumns;" 
-            class="element-row" 
-            [class.expanded-row]="expandedElement === element"></tr>
+        <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="element-row" [class.expanded-row]="expandedElement === element"></tr>
         <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
       </table>
-    </div>
 
-    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
-
-    <div *ngIf="dataSource.data.length === 0" class="empty-state">
-      <mat-icon>check_circle_outline</mat-icon>
-      <p>¡Todo listo! No hay más casos pendientes.</p>
+      <div *ngIf="dataSource.data.length === 0" class="no-results-msg">
+        <mat-icon>event_available</mat-icon>
+        <p>No hay citas programadas pendientes.</p>
+      </div>
+      <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
     </div>
   </mat-card>
 </div>

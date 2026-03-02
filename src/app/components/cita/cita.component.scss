@@ -1,3 +1,8 @@
+$purple-sys: #6B2D95;
+$green-success: #22c55e;
+$warning: #b45309;
+$danger: #ef4444;
+
 .cita-container {
   padding: 24px;
   background-color: #f8fafc;
@@ -8,7 +13,7 @@
 
   .back-link {
     width: 100%;
-    max-width: 1200px; // Aumentado para dar más margen
+    max-width: 1200px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -48,202 +53,214 @@
   max-width: 1200px;
   background: #ffffff;
   border-radius: 12px;
+  border: none;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
   overflow: hidden;
   padding: 0;
+}
 
-  .table-responsive {
-    width: 100%;
-    // Eliminamos el overflow-x forzado aquí para evitar el scroll en PC
-    overflow-x: visible;
-  }
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
 
-  table {
-    width: 100%;
-    // Quitamos el min-width fijo que causaba el scroll
-    min-width: 100%;
-    border-spacing: 0;
-  }
+table {
+  width: 100%;
+  border-spacing: 0;
+}
 
-  th {
-    background-color: #f8fafc;
-    padding: 12px !important;
-    border-bottom: 1px solid #e2e8f0;
-    color: #475569;
-    font-weight: 700;
-    white-space: nowrap; // Evita que los títulos se rompan
+tr.mat-mdc-header-row {
+  height: 65px;
+  background: white;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.04);
+}
 
-    &.text-center {
-      text-align: center;
+th.mat-mdc-header-cell {
+  padding: 0 8px !important;
+  border-bottom: 1px solid #e2e8f0;
+
+  &.mat-column-acciones {
+    text-align: center;
+
+    .column-title {
+      display: flex;
+      justify-content: center;
+      width: 100%;
     }
   }
+}
+
+.header-inline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+}
+
+.column-title {
+  font-size: 11px;
+  font-weight: 850;
+  color: #1e293b;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.search-box-slim {
+  background: #f1f5f9;
+  border-radius: 6px;
+  padding: 2px 8px;
+  border: 1px solid #e2e8f0;
+  width: 90%;
+  max-width: 100px;
+
+  input {
+    border: none;
+    background: transparent;
+    font-size: 11px;
+    width: 100%;
+    outline: none;
+    color: #475569;
+  }
+}
+
+.id-cell {
+  font-weight: 800;
+  color: $purple-sys;
+}
+
+.badge-soft {
+  background: #f1f5f9;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+}
+
+.element-row td {
+  border-bottom-width: 0;
+}
+
+.expanded-row {
+  background: #fbfaff;
+}
+
+.detail-row {
+  height: 0;
 
   td {
-    padding: 10px 12px;
-    font-size: 13px;
-    color: #334155;
-    border-bottom: 1px solid #e2e8f0;
-    vertical-align: middle;
+    padding: 0;
+    border: 0;
   }
+}
 
-  /* Clases de utilidad para columnas específicas */
-  .mat-column-id {
-    width: 100px;
+.element-detail {
+  overflow: hidden;
+  display: flex;
+  padding: 0 24px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  padding: 20px;
+  width: 100%;
+  border-left: 4px solid #6B2D95;
+  margin: 10px 0;
+  background: #fcfcfd;
+  border-radius: 8px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.02);
+}
+
+.detail-item {
+  font-size: 13px;
+  color: #475569;
+
+  strong {
+    color: #1e293b;
+    margin-right: 5px;
   }
+}
 
-  .mat-column-expand {
-    width: 48px;
-  }
+.action-buttons-container {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 
-  .mat-column-estado {
-    width: 140px;
-  }
-
-  .mat-column-acciones {
-    min-width: 220px;
-  }
-
-  // Espacio suficiente para los 2 botones
-
-  .header-filter {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-
-    span {
-      font-size: 10px;
-      color: #94a3b8;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    input {
-      border: 1px solid #e2e8f0;
-      border-radius: 6px;
-      padding: 4px 8px;
-      font-size: 11px;
-      width: 100%;
-      box-sizing: border-box;
-
-      &:focus {
-        outline: none;
-        border-color: #6B2D95;
-        box-shadow: 0 0 0 2px rgba(107, 45, 149, 0.1);
-      }
-    }
-  }
-
-  .element-row {
-    cursor: pointer;
-
-    &:hover {
-      background: #f9fafb;
-    }
-
-    &.expanded-row {
-      background: #f3f0ff;
-    }
-  }
-
-  .detail-row {
-    height: 0;
-
-    td {
-      padding: 0;
-      border: 0;
-    }
-  }
-
-  .element-detail {
-    overflow: hidden;
-    display: flex;
-    padding: 0 24px;
-  }
-
-  .detail-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 12px;
-    width: 100%;
-    margin: 16px 0;
-    padding: 16px;
-    background: white;
-    border-left: 4px solid #6B2D95;
-    border-radius: 8px;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.02);
-  }
-
-  .badge-programada,
-  .badge-sin-programar {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 11px;
-    display: inline-block;
-    white-space: nowrap;
-  }
-
-  .badge-programada {
-    background: #e8f5e9;
-    color: #1b5e20;
-  }
-
-  .badge-sin-programar {
-    background: #fff3e0;
-    color: #e65100;
-  }
-
-  .action-group {
-    display: flex;
-    gap: 8px;
+  button.mat-mdc-icon-button {
+    width: 28px !important;
+    height: 28px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center;
     justify-content: center;
-    flex-wrap: nowrap; // Mantiene botones en una línea en PC
-  }
 
-  .btn-sm {
-    height: 32px;
-    font-size: 11px;
-    font-weight: 600;
-    border-radius: 6px;
-    white-space: nowrap;
+    ::ng-deep .mat-mdc-button-touch-target {
+      width: 28px !important;
+      height: 28px !important;
+    }
 
     mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-    }
-
-    &.btn-reprogramar {
-      color: #7d5a00;
-      border-color: #ffc107;
-      background-color: #fffdf2;
-
-      &:hover {
-        background-color: #fff9c4;
-      }
-    }
-  }
-
-  mat-paginator {
-    border-top: 1px solid #e2e8f0;
-  }
-}
-
-/* Solo habilitamos scroll en pantallas realmente pequeñas */
-@media (max-width: 992px) {
-  .pendientes-card {
-    .table-responsive {
-      overflow-x: auto;
-    }
-
-    table {
-      min-width: 900px; // Aquí sí forzamos el scroll para proteger el layout
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 }
 
-@media (max-width: 600px) {
-  .detail-grid {
-    grid-template-columns: 1fr;
+.action-success {
+  color: $green-success;
+
+  &:hover {
+    background-color: rgba(34, 197, 94, 0.08) !important;
   }
+}
+
+.action-warning {
+  color: $warning;
+
+  &:hover {
+    background-color: rgba(180, 83, 9, 0.08) !important;
+  }
+}
+
+.action-danger {
+  color: $danger;
+
+  &:hover {
+    background-color: rgba(239, 68, 68, 0.08) !important;
+  }
+}
+
+.icon-add {
+  color: $green-success !important;
+}
+
+.icon-remove {
+  color: #64748b !important;
+}
+
+.no-results-msg {
+  padding: 40px;
+  text-align: center;
+  color: #64748b;
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 8px;
+    opacity: 0.5;
+  }
+}
+
+mat-paginator {
+  border-top: 1px solid #e2e8f0;
 }

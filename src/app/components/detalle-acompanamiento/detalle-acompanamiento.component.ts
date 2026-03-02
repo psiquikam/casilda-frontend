@@ -13,6 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule, MatPaginatorIntl } from '@angular/material/paginator';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ModalGestionComponent } from '../modal-gestion-contacto/modal-gestion-contacto.component';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 
 export function getSpanishPaginatorIntl() {
@@ -44,7 +45,8 @@ export function getSpanishPaginatorIntl() {
   MatTableModule,
   MatIconModule,
   MatPaginatorModule,
-  MatDialogModule
+  MatDialogModule,
+  MatTooltipModule
 ],
   providers: [
     { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }

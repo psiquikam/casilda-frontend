@@ -39,14 +39,11 @@
       <mat-icon class="large-icon">handshake</mat-icon>
       <span>EQUIPO DE ATENCIÓN</span>
     </div>
-    <a mat-list-item routerLink="/consulta" routerLinkActive="active-item">
-      <span matListItemTitle>Consulta</span>
-    </a>
     <a mat-list-item routerLink="/solicitud-acompanamiento" routerLinkActive="active-item">
       <span matListItemTitle>Solicitud</span>
     </a>
-    <a mat-list-item [routerLink]="['/reparto', 00000]" routerLinkActive="active-item">
-      <span matListItemTitle>Reparto</span>
+    <a mat-list-item routerLink="/consulta" routerLinkActive="active-item">
+      <span matListItemTitle>Consulta solicitud</span>
     </a>
     <a mat-list-item [routerLink]="['detalle-acompanamiento', 00000]" routerLinkActive="active-item">
       <span matListItemTitle>Contacto</span>
@@ -56,10 +53,6 @@
     </a>
     <a mat-list-item routerLink="/registro-atencion" routerLinkActive="active-item">
       <span matListItemTitle>Atención</span>
-    </a>
-
-    <a mat-list-item routerLink="/mis-asignaciones" routerLinkActive="active-item">
-      <span matListItemTitle>Mis Asignaciones</span>
     </a>
     }
 

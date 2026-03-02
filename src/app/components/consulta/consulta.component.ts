@@ -13,6 +13,7 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { ModalDetalleSolicitudComponent } from '../modal-detalle-solicitud/modal-detalle-solicitud.component';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { RepartoModalComponent } from '../modal-reparto/modal-reparto.component';
 import { Router } from '@angular/router';
 
 @Component({
@@ -370,7 +371,7 @@ export class ConsultaComponent implements OnInit {
       width: '350px',
       data: {
         titulo: 'Eliminar caso',
-        mensaje: `¿Seguro que deseas eliminar el caso ${element.id}?`
+        mensaje: `¿Seguro que deseas eliminar la solicitud asociada al caso ${element.id}?`
       }
     });
 
@@ -383,9 +384,23 @@ export class ConsultaComponent implements OnInit {
   }
 
   irAReparto(element: any) {
-    this.router.navigate(['/reparto', element.id]);
-  }
+    const dialogRef = this.dialog.open(RepartoModalComponent, {
+      width: '550px',
+      data: element,
+      autoFocus: false
+    });
 
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        element.profesional = result.nombresProfesionales;
+        element.estado = 'Abierto activo';
+        element.dependencia = result.servicio;
+        element.fecha = result.fechaReparto;
+
+        this.inicializarTablas();
+      }
+    });
+  }
   get totalSinRepartir(): number {
     return this.dataSourceSinRepartir.data.length;
   }

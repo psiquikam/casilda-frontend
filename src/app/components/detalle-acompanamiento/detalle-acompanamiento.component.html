@@ -1,127 +1,118 @@
-<div class="gestion-container">
+<div class="consulta-container">
+  <header class="page-header">
+    <div class="header-content">
+      <div class="back-link" (click)="regresar()">
+        <mat-icon>arrow_back</mat-icon> Volver al Panel
+      </div>
+      <h1>Gestión de Contacto</h1>
+      <p>Administre el seguimiento y primer contacto de las solicitudes</p>
+    </div>
+  </header>
 
-  <div class="section-header">
-    <div class="back-link" (click)="regresar()">
-    <mat-icon>arrow_back</mat-icon> Volver al Panel
-  </div>
-    <h2>Gestión de Contacto</h2>
-    <p class="subtitle">
-      Administre el seguimiento y primer contacto de las solicitudes
-    </p>
-  </div>
+  <mat-card class="table-card">
+    <div class="table-responsive">
+      <table mat-table [dataSource]="dataSource" multiTemplateDataRows>
 
-  <mat-card class="master-card">
-    <table mat-table [dataSource]="dataSource" multiTemplateDataRows>
+        <ng-container matColumnDef="expand">
+          <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
+          <td mat-cell *matCellDef="let element">
+            <button mat-icon-button
+              (click)="(expandedElement = expandedElement === element ? null : element); $event.stopPropagation()">
+              <mat-icon [ngClass]="expandedElement === element ? 'icon-remove' : 'icon-add'">
+                {{expandedElement === element ? 'remove_circle' : 'add_circle'}}
+              </mat-icon>
+            </button>
+          </td>
+        </ng-container>
 
-      <ng-container matColumnDef="expand">
-        <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
-        <td mat-cell *matCellDef="let element">
-          <button mat-icon-button
-            (click)="expandedElement = expandedElement === element ? null : element; $event.stopPropagation()">
-            <mat-icon>
-              {{expandedElement === element ? 'remove_circle' : 'add_circle'}}
-            </mat-icon>
-          </button>
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef>
-          <div class="header-filter">
-            <span>ID Caso</span>
-            <input (keyup)="applyFilter('id', $event)" placeholder="...">
-          </div>
-        </th>
-        <td mat-cell *matCellDef="let element">
-          <b>#{{element.id}}</b>
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="nombre">
-        <th mat-header-cell *matHeaderCellDef>
-          <div class="header-filter">
-            <span>Usuario</span>
-            <input (keyup)="applyFilter('nombre', $event)" placeholder="Filtrar...">
-          </div>
-        </th>
-        <td mat-cell *matCellDef="let element">
-          {{element.nombre}} <br>
-          <small class="text-muted">{{element.documento}}</small>
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="fecha">
-        <th mat-header-cell *matHeaderCellDef>
-          <div class="header-filter">
-            <span>Fecha</span>
-            <input (keyup)="applyFilter('fecha', $event)" placeholder="AAAA-MM...">
-          </div>
-        </th>
-        <td mat-cell *matCellDef="let element">
-          {{element.fecha}}
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="dependencia">
-        <th mat-header-cell *matHeaderCellDef>
-          <div class="header-filter">
-            <span>Dependencia</span>
-            <input (keyup)="applyFilter('dependencia', $event)" placeholder="...">
-          </div>
-        </th>
-        <td mat-cell *matCellDef="let element">
-          <span class="badge-soft">{{element.dependencia}}</span>
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="acciones">
-        <th mat-header-cell *matHeaderCellDef>Acción</th>
-        <td mat-cell *matCellDef="let element">
-
-          <button mat-flat-button color="primary" class="btn-sm"
-                  (click)="abrirModalGestion(element); $event.stopPropagation()">
-            <mat-icon>phone_enabled</mat-icon>
-            Gestionar
-          </button>
-
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="expandedDetail">
-        <td mat-cell *matCellDef="let element"
-            [attr.colspan]="displayedColumns.length">
-
-          <div class="element-detail"
-               [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
-
-            <div class="detail-grid">
-              <div class="detail-item"><strong>Tipo:</strong> {{element.tipoSolicitud}}</div>
-              <div class="detail-item"><strong>Facultad:</strong> {{element.facultad}}</div>
-              <div class="detail-item"><strong>Campus:</strong> {{element.campus}}</div>
-              <div class="detail-item"><strong>Celular:</strong> {{element.celular}}</div>
-              <div class="detail-item"><strong>Correo:</strong> {{element.correoInst}}</div>
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="header-inline-container">
+              <span class="column-title">ID Caso</span>
+              <div class="search-box-slim"><input (keyup)="applyFilter('id', $event)" placeholder="Filtrar"></div>
             </div>
+          </th>
+          <td mat-cell *matCellDef="let element" class="id-cell">#{{element.id}}</td>
+        </ng-container>
 
-          </div>
-        </td>
-      </ng-container>
+        <ng-container matColumnDef="nombre">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="header-inline-container">
+              <span class="column-title">Usuario</span>
+              <div class="search-box-slim"><input (keyup)="applyFilter('nombre', $event)" placeholder="Buscar..."></div>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let element">
+            <div class="user-cell">
+              <span>{{element.nombre}}</span>
+              <small class="text-muted">{{element.documento}}</small>
+            </div>
+          </td>
+        </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <ng-container matColumnDef="fecha">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="header-inline-container">
+              <span class="column-title">Fecha</span>
+              <div class="search-box-slim"><input (keyup)="applyFilter('fecha', $event)" placeholder="AAAA-MM"></div>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let element">{{element.fecha}}</td>
+        </ng-container>
 
-      <tr mat-row
-          *matRowDef="let element; columns: displayedColumns;"
-          class="element-row"
+        <ng-container matColumnDef="dependencia">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="header-inline-container">
+              <span class="column-title">Dependencia</span>
+              <div class="search-box-slim"><input (keyup)="applyFilter('dependencia', $event)" placeholder="..."></div>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let element">
+            <span class="badge-soft">{{element.dependencia}}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="column-title text-center">Acciones</div>
+          </th>
+          <td mat-cell *matCellDef="let element">
+            <div class="action-buttons-container">
+              <button mat-icon-button class="action-purple" matTooltip="Intento de contacto"
+                (click)="abrirModalGestion(element); $event.stopPropagation()">
+                <mat-icon>phone_enabled</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="expandedDetail">
+          <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+            <div class="element-detail" [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+              <div class="detail-grid">
+                <div class="detail-item"><strong>Tipo:</strong> {{element.tipoSolicitud}}</div>
+                <div class="detail-item"><strong>Facultad:</strong> {{element.facultad}}</div>
+                <div class="detail-item"><strong>Campus:</strong> {{element.campus}}</div>
+                <div class="detail-item"><strong>Celular:</strong> {{element.celular}}</div>
+                <div class="detail-item"><strong>Correo Institucional:</strong> {{element.correoInst}}</div>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="element-row"
           [class.expanded-row]="expandedElement === element">
-      </tr>
+        </tr>
+        <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
+      </table>
 
-      <tr mat-row
-          *matRowDef="let row; columns: ['expandedDetail']"
-          class="detail-row">
-      </tr>
+      <div *ngIf="dataSource.data.length === 0" class="no-results-msg">
+        <mat-icon>info_outline</mat-icon>
+        <p>No se encontraron registros para gestionar.</p>
+      </div>
 
-    </table>
-
-    <mat-paginator [pageSizeOptions]="[5, 10]" showFirstLastButtons></mat-paginator>
+      <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+    </div>
   </mat-card>
-
 </div>

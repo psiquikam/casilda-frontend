@@ -1,6 +1,11 @@
+$purple-sys: #6B2D95;
+$green-success: #22c55e;
+$danger: #ef4444;
+
 .consulta-container {
   padding: 24px;
   background-color: #f8fafc;
+  min-height: 100vh;
 }
 
 .page-header {
@@ -26,6 +31,7 @@
   border: none;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
   background: white;
+  overflow: hidden;
 }
 
 .table-responsive {
@@ -34,16 +40,38 @@
 }
 
 tr.mat-mdc-header-row {
-  height: 56px !important;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.04);
+  height: 65px;
   background: white;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.04);
+}
+
+th.mat-mdc-header-cell {
+  padding: 0 8px !important;
+
+  &.mat-column-acciones {
+    text-align: center;
+
+    .column-title {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+  }
+}
+
+.header-inline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
 }
 
 .column-title {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 850;
   color: #1e293b;
   text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .search-box-slim {
@@ -51,7 +79,8 @@ tr.mat-mdc-header-row {
   border-radius: 6px;
   padding: 2px 8px;
   border: 1px solid #e2e8f0;
-  width: 80px;
+  width: 90%;
+  max-width: 100px;
 
   input {
     border: none;
@@ -59,12 +88,13 @@ tr.mat-mdc-header-row {
     font-size: 11px;
     width: 100%;
     outline: none;
+    color: #475569;
   }
 }
 
 .id-cell {
   font-weight: 800;
-  color: #6B2D95;
+  color: $purple-sys;
 }
 
 .badge-soft {
@@ -91,17 +121,19 @@ tr.mat-mdc-header-row {
 .element-detail {
   overflow: hidden;
   display: flex;
-  background: #fcfcfd;
 }
 
 .detail-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 15px;
   padding: 20px;
   width: 100%;
   border-left: 4px solid #6B2D95;
   margin: 10px 0;
+  background: #fcfcfd;
+  border-radius: 8px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.02);
 }
 
 .detail-item {
@@ -114,27 +146,77 @@ tr.mat-mdc-header-row {
   }
 }
 
-.action-purple {
-  color: #6B2D95 !important;
-}
-
 .action-buttons-container {
   display: flex;
-  gap: 5px;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+
+  button.mat-mdc-icon-button {
+    width: 28px !important;
+    height: 28px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+
+    ::ng-deep .mat-mdc-button-touch-target {
+      width: 28px !important;
+      height: 28px !important;
+    }
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
 }
 
-button[mat-icon-button] mat-icon {
-  color: #2d9564;
-  transition: transform 0.2s;
+.action-purple {
+  color: $purple-sys;
+
+  &:hover {
+    background-color: rgba(107, 45, 149, 0.08) !important;
+  }
+}
+
+.action-danger {
+  color: $danger;
+
+  &:hover {
+    background-color: rgba(239, 68, 68, 0.08) !important;
+  }
+}
+
+.icon-add {
+  color: $green-success !important;
+}
+
+.icon-remove {
+  color: #64748b !important;
 }
 
 ::ng-deep .mat-mdc-tab-group {
-  --mdc-tab-indicator-active-indicator-color: #6B2D95;
-  --mat-tab-header-active-label-text-color: #6B2D95;
+  --mdc-tab-indicator-active-indicator-color: #{$purple-sys};
+  --mat-tab-header-active-label-text-color: #{$purple-sys};
 }
 
 .no-results-msg {
-  padding: 20px;
+  padding: 40px;
   text-align: center;
   color: #64748b;
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 8px;
+    opacity: 0.5;
+  }
 }
