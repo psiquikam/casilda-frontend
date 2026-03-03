@@ -1,4 +1,4 @@
-$purple-sys: #6B2D95;
+$purple-sys: #348F41;
 
 .cita-container {
   padding: 24px;
@@ -103,7 +103,7 @@ $purple-sys: #6B2D95;
   .mat-mdc-tab-group {
     height: auto !important;
     flex-grow: 0 !important;
-    --mdc-tab-indicator-active-indicator-color: #6B2D95;
+    --mdc-tab-indicator-active-indicator-color: #348F41;
   }
 
   .mat-mdc-tab-header {
@@ -127,7 +127,7 @@ $purple-sys: #6B2D95;
 
   .mat-mdc-tab.mdc-tab--active {
     .mdc-tab__text-label {
-      color: #6B2D95 !important;
+      color: #348F41 !important;
     }
 
     .mdc-tab-indicator__content {
@@ -388,7 +388,7 @@ input[readonly] {
   border-radius: 8px;
   gap: 6px;
 
-  background-color: #6B2D95 !important;
+  background-color: #348F41 !important;
   color: white !important;
 
   display: inline-flex;

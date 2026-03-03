@@ -30,7 +30,7 @@ export class AppComponent {
   ) {
     this.matIconRegistry.addSvgIcon(
       'logo-custom',
-      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/casilda.svg')
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/distintivo_casilda.svg')
     );
 
     this.matIconRegistry.addSvgIcon(

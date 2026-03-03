@@ -44,7 +44,7 @@
     padding: 6px 16px;
     border-radius: 30px;
     font-weight: 700;
-    &.aco { background: #f3e8ff; color: #6b2d95; }
+    &.aco { background: #f3e8ff; color: #348F41; }
     &.cas { background: #fee2e2; color: #ef4444; }
   }
 
@@ -94,18 +94,18 @@
 
     &.active {
       .timeline-icon { 
-        background: #6b2d95; 
-        border-color: #6b2d95; 
+        background: #348F41; 
+        border-color: #348F41; 
         color: white;
         box-shadow: 0 0 10px rgba(107,45,149,0.3);
       }
-      h3 { color: #6b2d95; font-weight: 700; }
+      h3 { color: #348F41; font-weight: 700; }
       .active-detail {
         margin-top: 10px;
         padding: 15px;
         background: #f8fafc;
         border-radius: 8px;
-        border-left: 4px solid #6b2d95;
+        border-left: 4px solid #348F41;
         p { margin: 0; font-style: italic; color: #475569; }
       }
     }

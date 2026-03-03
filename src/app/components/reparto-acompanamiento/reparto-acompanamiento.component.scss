@@ -93,7 +93,7 @@
 
       &:focus {
         outline: none;
-        border-color: #6B2D95;
+        border-color: #348F41;
         box-shadow: 0 0 0 2px rgba(107, 45, 149, 0.1);
       }
     }
@@ -144,7 +144,7 @@
     gap: 12px 20px;
     width: 100%;
     padding: 16px;
-    border-left: 4px solid #6B2D95;
+    border-left: 4px solid #348F41;
     background: #ffffff;
     border-radius: 8px;
   }
@@ -160,7 +160,7 @@
   }
 
   button[mat-icon-button] mat-icon {
-    color: #6B2D95;
+    color: #348F41;
   }
 
   .badge-soft {
