@@ -370,7 +370,7 @@ export class ConsultaComponent implements OnInit {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '350px',
       data: {
-        titulo: 'Eliminar caso',
+        titulo: 'Eliminar solicitud',
         mensaje: `¿Seguro que deseas eliminar la solicitud asociada al caso ${element.id}?`
       }
     });

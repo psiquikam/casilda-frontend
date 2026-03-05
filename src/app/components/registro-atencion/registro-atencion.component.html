@@ -303,9 +303,23 @@
 
                         <mat-tab label="Documentación">
                             <div class="tab-padding grid-2">
-                                <mat-form-field appearance="outline" subscriptSizing="dynamic" class="span-all">
+                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
                                     <mat-label>Hace cuánto ocurrió</mat-label>
                                     <input matInput formControlName="tiempoOcurrido">
+                                </mat-form-field>
+
+                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                    <mat-label>¿En qué forma ocurrió el hecho?</mat-label>
+                                    <mat-select formControlName="queForma">
+                                        @for (c of queForma; track c) { <mat-option [value]="c">{{c}}</mat-option> }
+                                    </mat-select>
+                                </mat-form-field>
+
+                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                    <mat-label>Lugar de ocurriencia de hechos de violencia</mat-label>
+                                    <mat-select formControlName="lugarHechos">
+                                        @for (c of lugarHechos; track c) { <mat-option [value]="c">{{c}}</mat-option> }
+                                    </mat-select>
                                 </mat-form-field>
 
                                 <div class="discapacidad-container span-all">
@@ -338,23 +352,178 @@
                                         <mat-radio-button value="SI">Sí</mat-radio-button>
                                         <mat-radio-button value="NO">No</mat-radio-button>
                                     </mat-radio-group>
+
+                                    <label class="pregunta-label">“¿El hecho de violencia ocurrió en el desarrollo de
+                                        actividades misionales, o en representación de la Universidad? O ¿Dentro o fuera
+                                        de los bienes inmuebles de la universidad con ocasión, en razón o como
+                                        consecuencia de su vínculo o el vínculo del presunto(a) agresor(a) con la
+                                        institución educativa?</label>
+                                    <mat-radio-group formControlName="violenciaMisional" class="radio-group">
+                                        <mat-radio-button value="SI">Sí</mat-radio-button>
+                                        <mat-radio-button value="NO">No</mat-radio-button>
+                                    </mat-radio-group>
+
+                                    @if (atencionForm.get('violenciaMisional')?.value === 'SI') {
+
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>Actividad Misional</mat-label>
+                                        <mat-select formControlName="lugarHechos">
+                                            @for (c of actividadesMisionales; track c) { <mat-option
+                                                [value]="c">{{c}}</mat-option> }
+                                        </mat-select>
+                                    </mat-form-field>
+
+                                    }
                                 </div>
-                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                    <mat-label>Tipo de Violencia</mat-label>
-                                    <mat-select formControlName="tipoViolencia">
-                                        @for (c of listaSubTipoViolencia; track c) { <mat-option
-                                            [value]="c">{{c}}</mat-option> }
-                                    </mat-select>
-                                </mat-form-field>
-                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                    <mat-label>Subcategoria de Violencia</mat-label>
-                                    <mat-select formControlName="subcategoriaViolencia">
-                                        @for (c of listaSubTipoViolencia; track c) { <mat-option
-                                            [value]="c">{{c}}</mat-option> }
-                                    </mat-select>
-                                </mat-form-field>
                             </div>
                         </mat-tab>
+
+
+                        @if (atencionForm.get('violenciaGenero')?.value === 'SI') {
+
+                        <mat-tab label="VBG">
+                            <div class="vbg-grid">
+
+                                <div class="vbg-card">
+                                    <div class="vbg-header">
+                                        <span>Tipo de violencia psicológica *</span>
+
+                                        <mat-radio-group formControlName="violenciaPsicologica">
+                                            <mat-radio-button value="SI">Sí</mat-radio-button>
+                                            <mat-radio-button value="NO">No</mat-radio-button>
+                                        </mat-radio-group>
+                                    </div>
+
+                                    @if (atencionForm.get('violenciaPsicologica')?.value === 'SI') {
+                                    <div class="vbg-options">
+                                        @for (c of listaPsicologica; track c) {
+                                        <mat-checkbox [value]="c">{{c}}</mat-checkbox>
+                                        }
+                                    </div>
+                                    }
+                                </div>
+
+
+                                <div class="vbg-card">
+                                    <div class="vbg-header">
+                                        <span>Tipo de violencia física *</span>
+
+                                        <mat-radio-group formControlName="violenciaFisica">
+                                            <mat-radio-button value="SI">Sí</mat-radio-button>
+                                            <mat-radio-button value="NO">No</mat-radio-button>
+                                        </mat-radio-group>
+                                    </div>
+
+                                    @if (atencionForm.get('violenciaFisica')?.value === 'SI') {
+                                    <div class="vbg-options">
+                                        @for (c of listaFisica; track c) {
+                                        <mat-checkbox [value]="c">{{c}}</mat-checkbox>
+                                        }
+                                    </div>
+                                    }
+                                </div>
+
+
+                                <div class="vbg-card">
+                                    <div class="vbg-header">
+                                        <span>Tipo de violencia sexual *</span>
+
+                                        <mat-radio-group formControlName="violenciaSexual">
+                                            <mat-radio-button value="SI">Sí</mat-radio-button>
+                                            <mat-radio-button value="NO">No</mat-radio-button>
+                                        </mat-radio-group>
+                                    </div>
+
+                                    @if (atencionForm.get('violenciaSexual')?.value === 'SI') {
+                                    <div class="vbg-options">
+                                        @for (c of listaSexual; track c) {
+                                        <mat-checkbox [value]="c">{{c}}</mat-checkbox>
+                                        }
+                                    </div>
+                                    }
+                                </div>
+
+                                <div class="vbg-card">
+                                    <div class="vbg-header">
+                                        <span>Tipo de violencia Institucional *</span>
+
+                                        <mat-radio-group formControlName="violenciaInstitucional">
+                                            <mat-radio-button value="SI">Sí</mat-radio-button>
+                                            <mat-radio-button value="NO">No</mat-radio-button>
+                                        </mat-radio-group>
+                                    </div>
+
+                                    @if (atencionForm.get('violenciaInstitucional')?.value === 'SI') {
+                                    <div class="vbg-options">
+                                        @for (c of listaInstitucional; track c) {
+                                        <mat-checkbox [value]="c">{{c}}</mat-checkbox>
+                                        }
+                                    </div>
+                                    }
+                                </div>
+
+                                <div class="vbg-card">
+                                    <div class="vbg-header">
+                                        <span>Tipo de violencia económica/Patrimonial *</span>
+
+                                        <mat-radio-group formControlName="violenciaEconomica">
+                                            <mat-radio-button value="SI">Sí</mat-radio-button>
+                                            <mat-radio-button value="NO">No</mat-radio-button>
+                                        </mat-radio-group>
+                                    </div>
+
+                                    @if (atencionForm.get('violenciaEconomica')?.value === 'SI') {
+                                    <div class="vbg-options">
+                                        @for (c of listaPatrimonial; track c) {
+                                        <mat-checkbox [value]="c">{{c}}</mat-checkbox>
+                                        }
+                                    </div>
+                                    }
+                                </div>
+
+                                <div class="vbg-card">
+                                    <div class="vbg-header">
+                                        <span>Tipo de violencia sexual informática *</span>
+
+                                        <mat-radio-group formControlName="violenciaInformatica">
+                                            <mat-radio-button value="SI">Sí</mat-radio-button>
+                                            <mat-radio-button value="NO">No</mat-radio-button>
+                                        </mat-radio-group>
+                                    </div>
+
+                                    @if (atencionForm.get('violenciaInformatica')?.value === 'SI') {
+                                    <div class="vbg-options">
+                                        @for (c of listaInformatica; track c) {
+                                        <mat-checkbox [value]="c">{{c}}</mat-checkbox>
+                                        }
+                                    </div>
+                                    }
+                                </div>
+
+                                <div class="vbg-card">
+                                    <div class="vbg-header">
+                                        <span>Tipo de violencia por prejuicio *</span>
+
+                                        <mat-radio-group formControlName="violenciaPrejuicio">
+                                            <mat-radio-button value="SI">Sí</mat-radio-button>
+                                            <mat-radio-button value="NO">No</mat-radio-button>
+                                        </mat-radio-group>
+                                    </div>
+
+                                    @if (atencionForm.get('violenciaPrejuicio')?.value === 'SI') {
+                                    <div class="vbg-options">
+                                        @for (c of listaPrejuicio; track c) {
+                                        <mat-checkbox [value]="c">{{c}}</mat-checkbox>
+                                        }
+                                    </div>
+                                    }
+                                </div>
+
+                            </div>
+
+                        </mat-tab>
+
+                        }
 
                         <mat-tab label="Presunto agresor">
                             <div class="tab-padding grid-3">
@@ -511,8 +680,8 @@
                             <div class="tab-padding">
 
                                 <app-tabla-otros-casos [dataSource]="dataSourceOtros"
-                                    [displayedColumns]="displayedColumnsOtros"
-                                    [expandedElement]="expandedElement" (iniciar)="iniciarAtencion($event)"
+                                    [displayedColumns]="displayedColumnsOtros" [expandedElement]="expandedElement"
+                                    (iniciar)="iniciarAtencion($event)"
                                     (expand)="expandedElement = expandedElement === $event ? null : $event"
                                     (filter)="applyFilter($event.column, $event.event)">
                                 </app-tabla-otros-casos>

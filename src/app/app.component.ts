@@ -42,5 +42,10 @@ export class AppComponent {
       'logo-Reportes',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/Reportes.svg')
     );
+
+    this.matIconRegistry.addSvgIcon(
+      'logo-alma',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/linea_alma.svg')
+    );
   }
 }
