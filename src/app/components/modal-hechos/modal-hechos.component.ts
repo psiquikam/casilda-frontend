@@ -29,8 +29,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 export class ModalHechosComponent {
 
   data = {
-    fecha: null as Date | null,
-    modo: '',
+    fecha: '',
     lugar: '',
     descripcion: ''
   };

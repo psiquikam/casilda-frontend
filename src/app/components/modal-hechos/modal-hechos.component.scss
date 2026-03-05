@@ -28,35 +28,14 @@ $purple-sys: #348F41;
     .form-container {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-    }
-
-    .form-row {
-      display: flex;
-      gap: 12px;
-      align-items: center;
+      gap: 16px;
       width: 100%;
-
-      .field-fecha {
-        flex: 1;
-        min-width: 160px;
-      }
-
-      .field-modo {
-        flex: 1.2;
-        min-width: 180px;
-      }
-
-      .field-lugar {
-        flex: 1.2;
-        min-width: 180px;
-      }
     }
 
     .form-row-full {
       width: 100%;
 
-      .field-descripcion {
+      mat-form-field {
         width: 100%;
       }
     }

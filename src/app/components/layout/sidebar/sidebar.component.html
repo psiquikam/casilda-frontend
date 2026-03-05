@@ -5,20 +5,6 @@
   </div>
   <mat-nav-list>
 
-    @if (auth.isRevisor()) {
-    <mat-divider></mat-divider>
-    <div class="menu-label">
-      <mat-icon class="large-icon">handshake</mat-icon>
-      <span>UAD-3</span>
-    </div>
-    <a mat-list-item routerLink="/nueva-queja" routerLinkActive="active-item">
-      <span matListItemTitle>Registrar Queja</span>
-    </a>
-    <a mat-list-item routerLink="/seguimiento" routerLinkActive="active-item">
-      <span matListItemTitle>Seguimiento</span>
-    </a>
-    
-    }
     @if (auth.isAdmin()) {
     <mat-divider></mat-divider>
     <div class="menu-label">
@@ -36,7 +22,7 @@
     @if (auth.isRevisor()) {
     <mat-divider></mat-divider>
     <div class="menu-label">
-      <mat-icon class="large-icon">handshake</mat-icon>
+      <mat-icon svgIcon="logo-custom" class="logo-icon"></mat-icon>
       <span>EQUIPO DE ATENCIÓN</span>
     </div>
     <a mat-list-item routerLink="/solicitud-acompanamiento" routerLinkActive="active-item">
@@ -55,6 +41,30 @@
       <span matListItemTitle>Atención</span>
     </a>
     }
+
+    @if (auth.isRevisor()) {
+    <mat-divider></mat-divider>
+    <div class="menu-label">
+      <mat-icon class="large-icon">handshake</mat-icon>
+      <span>LÍNEA ALMA</span>
+    </div>
+    
+    }
+
+    @if (auth.isRevisor()) {
+    <mat-divider></mat-divider>
+    <div class="menu-label">
+      <mat-icon class="large-icon">handshake</mat-icon>
+      <span>UAD EQUIPO 3 Y 4</span>
+    </div>
+    <a mat-list-item routerLink="/nueva-queja" routerLinkActive="active-item">
+      <span matListItemTitle>Registrar Queja</span>
+    </a>
+    <a mat-list-item routerLink="/seguimiento" routerLinkActive="active-item">
+      <span matListItemTitle>Seguimiento</span>
+    </a>
+    
+    }   
 
     @if (auth.isAdmin()) {
     <mat-divider></mat-divider>

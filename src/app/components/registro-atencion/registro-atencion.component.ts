@@ -29,6 +29,8 @@ import { ModalApreciacionJuridicaComponent } from '../modal-apreciacion-juridica
 import { ModalApreciacionPsicologicaComponent } from '../modal-apreciacion-psicologica/modal-apreciacion-psicologica.component';
 import { TablaCasosComponent } from '../tabla-casos/tabla-casos.component';
 import { TablaOtrosCasosComponent } from '../tabla-otros-casos/tabla-otros-casos.component';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+
 
 
 
@@ -55,7 +57,8 @@ import { TablaOtrosCasosComponent } from '../tabla-otros-casos/tabla-otros-casos
     MatSortModule,
     MatTooltipModule,
     TablaCasosComponent,
-    TablaOtrosCasosComponent
+    TablaOtrosCasosComponent,
+    MatCheckboxModule
   ],
   templateUrl: './registro-atencion.component.html',
   styleUrls: ['./registro-atencion.component.scss'],
@@ -206,6 +209,61 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   tiposDoc = ['Cédula de Ciudadanía', 'Tarjeta de Identidad', 'Cédula de Extranjería', 'Pasaporte'];
   campusM = ['Principal', 'Robledo', 'Salud', 'Norte', 'Oriente'];
   facultadesM = ['Ingeniería', 'Derecho', 'Medicina', 'Artes', 'Ciencias Sociales', 'Educación Física'];
+  queForma = ['Ingeniería', 'Derecho', 'Medicina', 'Artes', 'Ciencias Sociales', 'Educación Física'];
+  lugarHechos = ['Ingeniería', 'Derecho', 'Medicina', 'Artes', 'Ciencias Sociales', 'Educación Física'];
+  actividadesMisionales = ['Docencia', 'Extensión', 'Investigación', 'Administrativas'];
+
+
+  //TAB VBG
+  listaPsicologica = [
+    'Difusión de contenido íntimo',
+    'Constreñimiento ilegal',
+    'Lenguaje misógino, sexista o discursos de odio',
+    'Intimidación y amenazas',
+    'Aislamiento forzado',
+    'Abuso de poder y/o confianza',
+    'Injurias por vías de hecho o calumnia'
+  ];
+
+  listaFisica = [
+    'Violencia intrafamiliar',
+    'Violencia de pareja/expareja',
+    'Violencia interpersonal',
+    'Lesiones personales',
+    'Feminicidio (Tentativa o comisión)'
+  ];
+
+  listaSexual = [
+    'Acoso sexual',
+    'Acceso carnal',
+    'Actos sexuales',
+    'Violencia sexual correctiva'
+  ];
+
+  listaInstitucional = [
+    'Omision del deber de denuncia',
+    'Revictimización',
+    'Omisión al deber de debida diligencia',
+  ]
+
+  listaPatrimonial = [
+    'Inasistencia alimentaria',
+    'Hurto',
+    'Control económico',
+    'Daño en bien ajeno',
+  ]
+
+  listaInformatica = [
+    'Grooming',
+    'Pornografía',
+    'Sexting',
+    'Chantaje sexual o extorsión sexual',
+    'Violación de datos personales',
+  ]
+
+  listaPrejuicio = [
+    'Discriminación por género u orientación sexual o identidad de género',
+  ]
 
   constructor(
     private fb: FormBuilder,
@@ -387,14 +445,32 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       tipoViolencia: ['', Validators.required],
       subcategoriaViolencia: ['', Validators.required],
       tiempoOcurrido: ['', Validators.required],
+      queForma: ['', Validators.required],
+      lugarHechos: ['', Validators.required],
       violenciaGenero: ['', Validators.required],
+      violenciaMisional: ['', Validators.required],
+      actividadMisional: ['', Validators.required],
       presuntoPrimerNombre: ['', Validators.required],
       presuntoSegundoNombre: [''],
       presuntoPrimerApellido: ['', Validators.required],
       presuntoSegundoApellido: [''],
       presuntoVinculoUniversidad: ['', Validators.required],
       presuntoVinculoVictima: ['', Validators.required],
-      direccionLugar: ['']
+      direccionLugar: [''],
+      violenciaPsicologica: ['NO'],
+      detalleViolenciaPsicologica: [''],
+      violenciaFisica: ['NO'],
+      detalleViolenciaFisica: [''],
+      violenciaSexual: ['NO'],
+      detalleViolenciaSexual: [''],
+      violenciaInstitucional: ['NO'],
+      detalleViolenciaInstitucional: [''],
+      violenciaEconomica: ['NO'],
+      detalleViolenciaEconomica: [''],
+      violenciaInformatica: ['NO'],
+      detalleViolenciaInformatica: [''],
+      violenciaPrejuicio: ['NO'],
+      detalleViolenciaPrejuicio: [''],
     });
   }
 

@@ -101,10 +101,6 @@ export class CitaComponent implements OnInit, AfterViewInit {
     };
   }
 
-  iniciarAtencion(caso: any) {
-    console.log('Iniciando atención para:', caso.id);
-  }
-
   reprogramarCita(caso: any) {
     this.abrirModalGestion(caso, 'reprogramar');
   }

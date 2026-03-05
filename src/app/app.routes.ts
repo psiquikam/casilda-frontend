@@ -10,9 +10,8 @@ import { roleGuard } from './services/role.guard';
 import { AccesoDenegadoComponent } from './components/acceso-denegado/acceso-denegado.component';
 import { FormularioAcompanamientoComponent } from './components/formulario-acompanamiento/formulario-acompanamiento.component';
 import { GestionListasComponent } from './components/gestion-listas/gestion-listas.component';
-import { RepartoAcompanamientoComponent } from './components/reparto-acompanamiento/reparto-acompanamiento.component';
 import { MisAsignacionesComponent } from './components/mis-asignaciones/mis-asignaciones.component';
-import { DetalleAcompanamientoComponent } from './components/detalle-acompanamiento/detalle-acompanamiento.component';
+import { DetalleAcompanamientoComponent } from './components/gestion-contacto/gestion-contacto.component';
 import { ConsultaComponent } from './components/consulta/consulta.component';
 import { RegistroAtencionComponent } from './components/registro-atencion/registro-atencion.component';
 import { CitaComponent } from './components/cita/cita.component';
@@ -55,13 +54,6 @@ export const routes: Routes = [
     component: GestionListasComponent,
     canActivate: [roleGuard],
     data: { roles: ['Admin'] }
-  },
-
-  {
-    path: 'reparto/:codigo',
-    component: RepartoAcompanamientoComponent,
-    canActivate: [roleGuard],
-    data: { roles: ['Admin', 'Revisor'] }
   },
 
   {
