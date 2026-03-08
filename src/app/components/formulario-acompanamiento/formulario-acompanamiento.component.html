@@ -40,8 +40,8 @@
                   <mat-form-field appearance="outline">
                     <mat-label>Tipo Documento</mat-label>
                     <mat-select formControlName="remitenteTipoDocumento">
-                      @for (t of tiposDocumento; track t) {
-                      <mat-option [value]="t">{{t}}</mat-option>
+                      @for (t of tiposDocumento; track t.id) {
+                      <mat-option [value]="t.id">{{t.nombre}}</mat-option>
                       }
                     </mat-select>
                   </mat-form-field>
@@ -70,13 +70,17 @@
                   </mat-form-field>
                   <mat-form-field appearance="outline">
                     <mat-label>Cargo</mat-label>
-                    <input matInput formControlName="remitenteCargo">
+                    <mat-select formControlName="remitenteCargo">
+                      @for (c of cargos; track c.id) {
+                      <mat-option [value]="c.id">{{c.nombre}}</mat-option>
+                      }
+                    </mat-select>
                   </mat-form-field>
                   <mat-form-field appearance="outline">
                     <mat-label>Campus</mat-label>
                     <mat-select formControlName="remitenteCampus">
-                      @for (c of campusLista; track c) {
-                      <mat-option [value]="c">{{c}}</mat-option>
+                      @for (c of campusLista; track c.id) {
+                      <mat-option [value]="c.id">{{c.nombre}}</mat-option>
                       }
                     </mat-select>
                   </mat-form-field>
@@ -86,8 +90,8 @@
                   <mat-form-field appearance="outline">
                     <mat-label>Dependencia</mat-label>
                     <mat-select formControlName="remitenteDependencia">
-                      @for (d of dependencias; track d) {
-                      <mat-option [value]="d">{{d}}</mat-option>
+                      @for (d of dependencias; track d.id) {
+                      <mat-option [value]="d.id">{{d.nombre}}</mat-option>
                       }
                     </mat-select>
                   </mat-form-field>
@@ -95,8 +99,8 @@
                   <mat-form-field appearance="outline">
                     <mat-label>Facultad</mat-label>
                     <mat-select formControlName="remitenteFacultad">
-                      @for (f of facultades; track f) {
-                      <mat-option [value]="f">{{f}}</mat-option>
+                      @for (f of facultades; track f.id) {
+                      <mat-option [value]="f.id">{{f.nombre}}</mat-option>
                       }
                     </mat-select>
                   </mat-form-field>
@@ -125,8 +129,8 @@
             <mat-form-field appearance="outline">
               <mat-label>Tipo Documento</mat-label>
               <mat-select formControlName="tipoDocumento">
-                @for (t of tiposDocumento; track t) {
-                <mat-option [value]="t">{{t}}</mat-option>
+                @for (t of tiposDocumento; track t.id) {
+                <mat-option [value]="t.id">{{t.nombre}}</mat-option>
                 }
               </mat-select>
             </mat-form-field>
@@ -162,7 +166,11 @@
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Identidad de Género</mat-label>
-              <input matInput formControlName="identidadGenero">
+              <mat-select formControlName="identidadGenero">
+                @for (ig of identidadesGenero; track ig.id) {
+                <mat-option [value]="ig.id">{{ig.nombre}}</mat-option>
+                }
+              </mat-select>
             </mat-form-field>
           </div>
 
@@ -214,7 +222,7 @@
 
     <mat-card-actions align="end" *ngIf="acompanamientoForm.get('tipoReporte')?.value">
       <button mat-button color="warn" type="button" (click)="cancelar()">Limpiar</button>
-      <button mat-raised-button color="primary" [disabled]="acompanamientoForm.invalid" (click)="enviarSolicitud()">
+      <button mat-raised-button color="primary" [disabled]="acompanamientoForm.invalid || enviando" (click)="enviarSolicitud()">
         <mat-icon>send</mat-icon> Enviar Solicitud
       </button>
     </mat-card-actions>

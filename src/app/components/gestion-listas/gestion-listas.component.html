@@ -14,19 +14,24 @@
             <mat-tab>
                 <ng-template mat-tab-label>
                     <mat-icon class="tab-icon">settings_input_component</mat-icon>
-                    <span>{{ listKey | titlecase }}</span>
+                    <span>{{ etiquetas[listKey] }}</span>
                 </ng-template>
 
                 <div class="tab-content">
                     <div class="add-section">
+                        @if (tieneCodigo(listKey)) {
                         <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                            <mat-label>Nuevo valor para {{ listKey | titlecase }}</mat-label>
-                            <input matInput [(ngModel)]="nuevoItem" (keyup.enter)="agregar(listKey)"
-                                placeholder="Escriba el nuevo valor...">
+                            <mat-label>Código</mat-label>
+                            <input matInput [(ngModel)]="nuevoCodigo" placeholder="Ej: CC">
                         </mat-form-field>
-
+                        }
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                            <mat-label>Nombre</mat-label>
+                            <input matInput [(ngModel)]="nuevoNombre" (keyup.enter)="agregar(listKey)"
+                                placeholder="Escriba el nombre...">
+                        </mat-form-field>
                         <button mat-raised-button color="primary" class="add-btn" (click)="agregar(listKey)"
-                            [disabled]="!nuevoItem">
+                            [disabled]="!nuevoNombre">
                             <mat-icon>save</mat-icon> Guardar
                         </button>
                     </div>
@@ -35,25 +40,39 @@
                         <table class="modern-table">
                             <thead>
                                 <tr>
-                                    <th class="column-name">Nombre del Item</th>
+                                    @if (tieneCodigo(listKey)) {
+                                    <th class="column-code">Código</th>
+                                    }
+                                    <th class="column-name">Nombre</th>
                                     <th class="column-actions">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @for (item of listas[listKey]; track item) {
-                                <tr [class.editing-row]="editandoItem?.original === item">
-                                    <td class="column-name">
-                                        @if (editandoItem?.original !== item || editandoItem?.lista !== listKey) {
-                                        <span class="item-text">{{item}}</span>
+                                @for (item of listas[listKey]; track item.id) {
+                                <tr [class.editing-row]="editandoItem?.id === item.id && editandoItem?.lista === listKey">
+                                    @if (tieneCodigo(listKey)) {
+                                    <td class="column-code">
+                                        @if (editandoItem?.id !== item.id || editandoItem?.lista !== listKey) {
+                                        <span class="item-text">{{ item.codigo }}</span>
                                         } @else {
                                         <mat-form-field appearance="fill" subscriptSizing="dynamic" class="full-width">
-                                            <input matInput [(ngModel)]="editandoItem!.actual">
+                                            <input matInput [(ngModel)]="editandoItem!.codigo" placeholder="Código">
+                                        </mat-form-field>
+                                        }
+                                    </td>
+                                    }
+                                    <td class="column-name">
+                                        @if (editandoItem?.id !== item.id || editandoItem?.lista !== listKey) {
+                                        <span class="item-text">{{ item.nombre }}</span>
+                                        } @else {
+                                        <mat-form-field appearance="fill" subscriptSizing="dynamic" class="full-width">
+                                            <input matInput [(ngModel)]="editandoItem!.nombre">
                                         </mat-form-field>
                                         }
                                     </td>
                                     <td class="column-actions">
                                         <div class="actions-container">
-                                            @if (editandoItem?.original !== item) {
+                                            @if (editandoItem?.id !== item.id || editandoItem?.lista !== listKey) {
                                             <button mat-icon-button class="edit-btn"
                                                 (click)="iniciarEdicion(listKey, item)">
                                                 <mat-icon>edit</mat-icon>

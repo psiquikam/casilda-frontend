@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,14 +8,16 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { DialogUsuarioComponent } from '../dialog-usuario/dialog-usuario.component';
+import { UsuarioService } from '../../services/usuario.service';
+import Swal from 'sweetalert2';
 
-// Interfaz para definir la estructura del usuario
 export interface Usuario {
   id: number;
   nombre: string;
   email: string;
-  rol: 'Admin' | 'Revisor' | 'Consulta';
+  rol: string;
   estado: 'Activo' | 'Inactivo';
+  idRol: number;
 }
 
 @Component({
@@ -28,17 +30,31 @@ export interface Usuario {
   templateUrl: './gestion-usuarios.component.html',
   styleUrls: ['./gestion-usuarios.component.scss']
 })
-export class GestionUsuariosComponent {
+export class GestionUsuariosComponent implements OnInit {
   displayedColumns: string[] = ['nombre', 'email', 'rol', 'estado', 'acciones'];
+  usuarios: Usuario[] = [];
 
-  // Datos de ejemplo
-  usuarios: Usuario[] = [
-    { id: 1, nombre: 'Admin Sistema', email: 'admin@fnsp.gov', rol: 'Admin', estado: 'Activo' },
-    { id: 2, nombre: 'Carlos Pérez', email: 'c.perez@juridico.com', rol: 'Revisor', estado: 'Activo' },
-    { id: 3, nombre: 'Ana García', email: 'ana.garcia@gmail.com', rol: 'Consulta', estado: 'Inactivo' },
-  ];
+  constructor(private dialog: MatDialog, private usuarioService: UsuarioService) {}
 
-  constructor(private dialog: MatDialog) { }
+  ngOnInit(): void {
+    this.cargarUsuarios();
+  }
+
+  private cargarUsuarios(): void {
+    this.usuarioService.obtenerTodos().subscribe({
+      next: (data) => {
+        this.usuarios = data.map(u => ({
+          id: Number(u.id),
+          nombre: u.nombre,
+          email: u.email,
+          rol: u.nombreRol,
+          estado: u.activo ? 'Activo' : 'Inactivo',
+          idRol: u.idRol
+        }));
+      },
+      error: (err) => console.error('Error cargando usuarios', err)
+    });
+  }
 
   abrirFormulario(usuario?: Usuario) {
     const dialogRef = this.dialog.open(DialogUsuarioComponent, {
@@ -47,27 +63,54 @@ export class GestionUsuariosComponent {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        if (usuario) {
-          const index = this.usuarios.findIndex(u => u.id === usuario.id);
-          this.usuarios[index] = result;
-        } else {
-          result.id = Date.now();
-          this.usuarios = [...this.usuarios, result];
-        }
-        this.usuarios = [...this.usuarios];
+      if (!result) return;
+      const request = {
+        nombre: result.nombre,
+        email: result.email,
+        password: result.password || undefined,
+        idRol: result.idRol,
+        activo: result.estado === 'Activo'
+      };
+
+      if (usuario) {
+        this.usuarioService.actualizar(usuario.id, request).subscribe({
+          next: () => this.cargarUsuarios(),
+          error: (err) => console.error('Error actualizando usuario', err)
+        });
+      } else {
+        this.usuarioService.crear(request).subscribe({
+          next: () => this.cargarUsuarios(),
+          error: (err) => console.error('Error creando usuario', err)
+        });
       }
     });
   }
 
   eliminarUsuario(id: number) {
-    if (confirm('¿Está seguro de eliminar este usuario?')) {
-      this.usuarios = this.usuarios.filter(u => u.id !== id);
-    }
+    Swal.fire({
+      title: '¿Está seguro?',
+      text: '¿Desea eliminar este usuario?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then(result => {
+      if (result.isConfirmed) {
+        this.usuarioService.eliminar(id).subscribe({
+          next: () => this.cargarUsuarios(),
+          error: (err) => console.error('Error eliminando usuario', err)
+        });
+      }
+    });
   }
 
   toggleEstado(usuario: Usuario) {
-    usuario.estado = usuario.estado === 'Activo' ? 'Inactivo' : 'Activo';
+    const nuevoActivo = usuario.estado !== 'Activo';
+    this.usuarioService.cambiarEstado(usuario.id, nuevoActivo).subscribe({
+      next: () => this.cargarUsuarios(),
+      error: (err) => console.error('Error cambiando estado', err)
+    });
   }
 
 }
