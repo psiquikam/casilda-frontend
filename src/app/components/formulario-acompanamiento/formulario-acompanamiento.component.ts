@@ -157,11 +157,11 @@ export class FormularioAcompanamientoComponent implements OnInit {
     // Mapear todos los correos y teléfonos registrados en los modales
     const correos = this.correoRegistrados
       .filter(c => c.correo)
-      .map(c => ({ tipo: c.tipo as string, correo: c.correo as string, descripcion: c.descripcion || undefined }));
+      .map(c => ({ tipoId: c.tipoId as number, correo: c.correo as string, descripcion: c.descripcion || undefined }));
 
     const telefonos = this.telefonosRegistrados
       .filter(t => t.telefono)
-      .map(t => ({ tipo: t.tipo as string, telefono: t.telefono as string, descripcion: t.descripcion || undefined }));
+      .map(t => ({ tipoId: t.tipoId as number, telefono: t.telefono as string, descripcion: t.descripcion || undefined }));
 
     const payload = {
       tipoSolicitudId,
@@ -174,9 +174,6 @@ export class FormularioAcompanamientoComponent implements OnInit {
         numeroDocumento: fv.numeroDocumento,
         fechaNacimiento: this.formatDate(fv.fechaNacimiento)!,
         identidadGeneroId: fv.identidadGenero,
-        campusId: null,
-        dependenciaId: null,
-        facultadId: null,
         correos,
         telefonos
       },
@@ -188,9 +185,9 @@ export class FormularioAcompanamientoComponent implements OnInit {
         tipoDocumentoId: fv.remitenteTipoDocumento ?? null,
         numeroDocumento: fv.remitenteNumeroDocumento || null,
         cargoId: fv.remitenteCargo,
-        campusId: fv.remitenteCampus ?? null,
-        dependenciaId: fv.remitenteDependencia ?? null,
-        facultadId: fv.remitenteFacultad ?? null
+        campusId: fv.remitenteCampus,
+        dependenciaId: fv.remitenteDependencia,
+        facultadId: fv.remitenteFacultad
       } : null
     };
 

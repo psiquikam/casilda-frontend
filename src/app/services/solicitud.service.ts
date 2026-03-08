@@ -4,13 +4,13 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface CorreoSolicitanteDto {
-  tipo: string;
+  tipoId: number;
   correo: string;
   descripcion?: string;
 }
 
 export interface TelefonoSolicitanteDto {
-  tipo: string;
+  tipoId: number;
   telefono: string;
   descripcion?: string;
 }
@@ -37,6 +37,7 @@ export interface DatosRemitenteRequest {
   primerApellido: string;
   segundoApellido?: string | null;
   tipoDocumentoId?: number | null;
+  numeroDocumento?: string | null;
   cargoId: number;
   campusId?: number | null;
   dependenciaId?: number | null;
@@ -53,14 +54,64 @@ export interface SolicitudAcompanamientoResponse {
   id: number;
   codigo: string;
   tipoSolicitud: string;
-  tipoReporte: string;
   estado: string;
   fechaCreacion: string;
+  // Para la tabla
+  dependencia: string;
+  profesional: string;
+  // Solicitante resumen
   nombreSolicitante: string;
   documentoSolicitante: string;
-  correoSolicitante?: string;
-  nombreRemitente?: string;
-  mensaje: string;
+  // Solicitante completo
+  tipoDocumento: string;
+  numeroDocumento: string;
+  fechaNacimiento: string | null;
+  primerNombre: string;
+  segundoNombre: string;
+  primerApellido: string;
+  segundoApellido: string;
+  identidadGenero: string;
+  celular: string;
+  telefonoAlterno: string;
+  correoInstitucional: string;
+  correoPersonal: string;
+  // Remitente
+  nombreRemitente: string | null;
+  remitenteTipoSolicitud: string;
+  remitentePrimerNombre: string;
+  remitenteSegundoNombre: string;
+  remitentePrimerApellido: string;
+  remitenteSegundoApellido: string;
+  remitenteCargo: string;
+  remitenteCampus: string;
+  remitenteDependencia: string;
+  remitenteFacultad: string;
+  remitenteOtraFacultad: string;
+  remitenteFechaSolicitud: string;
+  remitenteTipoDocumento: string;
+  remitenteNumeroDocumento: string;
+}
+
+export interface UpdateSolicitudDto {
+  primerNombre?: string;
+  segundoNombre?: string | null;
+  primerApellido?: string;
+  segundoApellido?: string | null;
+  identidadGenero?: string | null;
+}
+
+export interface AsignarSolicitudDto {
+  profesionalesIds: number[];
+  tipoAsignacion: string;
+  servicio: string;
+  observaciones: string;
+  fechaReparto?: string;
+}
+
+export interface ProfesionalDto {
+  id: number;
+  nombre: string;
+  cargo: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -72,11 +123,31 @@ export class SolicitudService {
     return this.http.post<SolicitudAcompanamientoResponse>(`${this.apiUrl}/acompanamiento`, request);
   }
 
+  obtenerPorId(id: number): Observable<SolicitudAcompanamientoResponse> {
+    return this.http.get<SolicitudAcompanamientoResponse>(`${this.apiUrl}/acompanamiento/${id}`);
+  }
+
   obtenerPorCodigo(codigo: string): Observable<SolicitudAcompanamientoResponse> {
     return this.http.get<SolicitudAcompanamientoResponse>(`${this.apiUrl}/acompanamiento/codigo/${codigo}`);
   }
 
   listarTodas(): Observable<SolicitudAcompanamientoResponse[]> {
     return this.http.get<SolicitudAcompanamientoResponse[]>(`${this.apiUrl}/acompanamiento`);
+  }
+
+  eliminar(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/acompanamiento/${id}`);
+  }
+
+  actualizar(id: number, datos: UpdateSolicitudDto): Observable<SolicitudAcompanamientoResponse> {
+    return this.http.put<SolicitudAcompanamientoResponse>(`${this.apiUrl}/acompanamiento/${id}`, datos);
+  }
+
+  asignar(id: number, datos: AsignarSolicitudDto): Observable<SolicitudAcompanamientoResponse> {
+    return this.http.post<SolicitudAcompanamientoResponse>(`${this.apiUrl}/acompanamiento/${id}/asignar`, datos);
+  }
+
+  listarProfesionales(): Observable<ProfesionalDto[]> {
+    return this.http.get<ProfesionalDto[]>(`${this.apiUrl}/profesionales`);
   }
 }

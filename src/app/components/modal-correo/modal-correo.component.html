@@ -8,9 +8,8 @@
 
     <mat-form-field appearance="outline" class="field-tipo">
       <mat-label>Tipo de Correo</mat-label>
-      <mat-select [(ngModel)]="data.tipo">
-        <mat-option value="Personal">Personal</mat-option>
-        <mat-option value="Institucional">Institucional</mat-option>
+      <mat-select [(ngModel)]="data.tipoId">
+        <mat-option *ngFor="let tipo of tiposCorreo" [value]="tipo.id">{{ tipo.nombre }}</mat-option>
       </mat-select>
     </mat-form-field>
 
@@ -30,7 +29,7 @@
 <mat-dialog-actions align="end" class="modal-actions">
   <button mat-button (click)="onNoClick()">Cancelar</button>
 
-  <button mat-flat-button class="btn-confirm" [mat-dialog-close]="data" [disabled]="!data.tipo || !data.correo">
+  <button mat-flat-button class="btn-confirm" [mat-dialog-close]="data" [disabled]="!data.tipoId || !data.correo">
     <mat-icon>check</mat-icon>
     Agregar a la lista
   </button>

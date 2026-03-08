@@ -11,40 +11,40 @@
 
       <mat-tab label="Sin asignar ({{ totalSinRepartir }})">
         <div class="tab-body-wrapper">
-          <ng-container *ngTemplateOutlet="tablaCasos; context: { 
-            dataSource: dataSourceSinRepartir, 
-            showReparto: true, 
-            msgVacio: '¡Excelente! No hay solicitudes pendientes de asignación.' 
+          <ng-container *ngTemplateOutlet="tablaCasos; context: {
+            dataSource: dataSourceSinRepartir,
+            showReparto: true,
+            msgVacio: '¡Excelente! No hay solicitudes pendientes de asignación.'
           }"></ng-container>
         </div>
       </mat-tab>
 
       <mat-tab label="Abierto activo ({{totalAbiertoActivo}})">
         <div class="tab-body-wrapper">
-          <ng-container *ngTemplateOutlet="tablaCasos; context: { 
-            dataSource: dataSourceActivos, 
-            showReparto: false, 
-            msgVacio: 'No hay casos activos con profesional asignado en este momento.' 
+          <ng-container *ngTemplateOutlet="tablaCasos; context: {
+            dataSource: dataSourceActivos,
+            showReparto: false,
+            msgVacio: 'No hay casos activos con profesional asignado en este momento.'
           }"></ng-container>
         </div>
       </mat-tab>
 
       <mat-tab label="Abierto en transición ({{totalAbiertoTransicion}})">
         <div class="tab-body-wrapper">
-          <ng-container *ngTemplateOutlet="tablaCasos; context: { 
-            dataSource: dataSourceTransicion, 
-            showReparto: false, 
-            msgVacio: 'No se registran casos en proceso de transición.' 
+          <ng-container *ngTemplateOutlet="tablaCasos; context: {
+            dataSource: dataSourceTransicion,
+            showReparto: false,
+            msgVacio: 'No se registran casos en proceso de transición.'
           }"></ng-container>
         </div>
       </mat-tab>
 
       <mat-tab label="Cerrado ({{ totalCerrado }})">
         <div class="tab-body-wrapper">
-          <ng-container *ngTemplateOutlet="tablaCasos; context: { 
-            dataSource: dataSourceCerrados, 
-            showReparto: false, 
-            msgVacio: 'El historial de casos cerrados está vacío.' 
+          <ng-container *ngTemplateOutlet="tablaCasos; context: {
+            dataSource: dataSourceCerrados,
+            showReparto: false,
+            msgVacio: 'El historial de casos cerrados está vacío.'
           }"></ng-container>
         </div>
       </mat-tab>
@@ -166,7 +166,7 @@
             <div class="detail-grid">
 
               <div class="detail-item">
-                <strong>Tipo Solicitud:</strong> {{element.remitenteTipoSolicitud}}
+                <strong>Tipo Solicitud:</strong> {{element.tipoSolicitud}}
               </div>
 
               <div class="detail-item">
