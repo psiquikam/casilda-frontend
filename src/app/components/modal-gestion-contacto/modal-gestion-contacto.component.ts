@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -10,6 +11,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { SolicitudService, ContactoTelefonicoDto } from '../../services/solicitud.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-modal-gestion',
@@ -24,7 +28,8 @@ import { MatIconModule } from '@angular/material/icon';
     MatButtonModule,
     MatTableModule,
     MatTabsModule,
-    MatIconModule
+    MatIconModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './modal-gestion-contacto.component.html',
   styleUrls: ['./modal-gestion-contacto.component.scss']
@@ -32,36 +37,31 @@ import { MatIconModule } from '@angular/material/icon';
 export class ModalGestionComponent implements OnInit {
 
   contactoForm!: FormGroup;
+  guardando = false;
+  cargandoHistorial = false;
 
-  historialContactos: any[] = [];
+  historialContactos: ContactoTelefonicoDto[] = [];
   columnasHistorial: string[] = ['fecha', 'resultado', 'observacion'];
 
-  resultados = [
-    'Exitoso',
-    'No contesta',
-    'Buzón de voz',
-    'Número equivocado',
-    'Solicita llamar luego'
-  ];
-
-  jornadas = ['Mañana', 'Tarde'];
-
-  tiposCita = ['Presencial', 'Virtual', 'Telefónica'];
+  resultados: string[] = [];
 
   mostrarCamposCita = false;
+
+  private readonly maestrosUrl = `${environment.apiBaseUrl}/maestros`;
 
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<ModalGestionComponent>,
+    private solicitudService: SolicitudService,
+    private http: HttpClient,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
   ngOnInit(): void {
-
     this.contactoForm = this.fb.group({
       fecha: [{ value: this.getToday(), disabled: true }, Validators.required],
       hora: [{ value: this.getHoraActual(), disabled: true }, Validators.required],
-      jornada: [{ value: '', disabled: true }, Validators.required],
+      jornada: [{ value: '', disabled: true }],
       resultado: ['', Validators.required],
       observacion: ['', [Validators.required, Validators.minLength(5)]],
       fechaCita: [''],
@@ -70,71 +70,44 @@ export class ModalGestionComponent implements OnInit {
     });
 
     const horaInicial = this.contactoForm.get('hora')?.value;
-    this.contactoForm.patchValue({
-      jornada: this.calcularJornada(horaInicial)
-    });
+    this.contactoForm.patchValue({ jornada: this.calcularJornada(horaInicial) });
 
     this.contactoForm.get('hora')?.valueChanges.subscribe(hora => {
       if (hora) {
-        const jornada = this.calcularJornada(hora);
-        this.contactoForm.patchValue({ jornada }, { emitEvent: false });
+        this.contactoForm.patchValue({ jornada: this.calcularJornada(hora) }, { emitEvent: false });
       }
     });
 
     this.contactoForm.get('resultado')?.valueChanges.subscribe((value) => {
-
       const fallidosPrevios = this.historialContactos.filter(h => h.resultado !== 'Exitoso').length;
-
-      const totalFallidos = value !== 'Exitoso'
-        ? fallidosPrevios + 1
-        : fallidosPrevios;
-
+      const totalFallidos = value !== 'Exitoso' ? fallidosPrevios + 1 : fallidosPrevios;
       this.mostrarCamposCita = value === 'Exitoso' || totalFallidos >= 2;
-
-      if (this.mostrarCamposCita) {
-        this.contactoForm.get('fechaCita')?.setValidators([Validators.required]);
-        this.contactoForm.get('horaCita')?.setValidators([Validators.required]);
-        this.contactoForm.get('tipoCita')?.setValidators([Validators.required]);
-      } else {
-        this.contactoForm.get('fechaCita')?.clearValidators();
-        this.contactoForm.get('horaCita')?.clearValidators();
-        this.contactoForm.get('tipoCita')?.clearValidators();
-
-        this.contactoForm.patchValue({
-          fechaCita: '',
-          horaCita: '',
-          tipoCita: ''
-        });
-      }
-
-      this.contactoForm.get('fechaCita')?.updateValueAndValidity();
-      this.contactoForm.get('horaCita')?.updateValueAndValidity();
-      this.contactoForm.get('tipoCita')?.updateValueAndValidity();
+      this.actualizarValidadoresCita();
     });
 
-    this.historialContactos = [
-      {
-        fecha: '2026-02-10',
-        hora: '10:00 AM',
-        jornada: 'Mañana',
-        resultado: 'No contesta',
-        observacion: 'Se intentó contacto sin éxito.'
-      }
-    ];
-
-    this.evaluarCita();
+    // Cargar datos desde el backend
+    this.cargarResultados();
+    this.cargarHistorial();
   }
 
-  private evaluarCita(): void {
-    const resultado = this.contactoForm.get('resultado')?.value;
+  cargarResultados(): void {
+    this.http.get<{ id: number; nombre: string }[]>(`${this.maestrosUrl}/resultados-contacto-telefonico`).subscribe({
+      next: (lista) => { this.resultados = lista.map(r => r.nombre); },
+      error: () => { this.resultados = ['Exitoso', 'No contesta', 'Buzón de voz', 'Número equivocado', 'Solicita llamar luego']; }
+    });
+  }
 
-    const fallidos = this.historialContactos.filter(h => h.resultado !== 'Exitoso').length;
+  cargarHistorial(): void {
+    if (!this.data?.id) return;
+    this.cargandoHistorial = true;
+    this.solicitudService.listarContactos(this.data.id).subscribe({
+      next: (contactos) => { this.historialContactos = contactos; this.cargandoHistorial = false; },
+      error: () => { this.cargandoHistorial = false; }
+    });
+  }
 
-    const activar = resultado === 'Exitoso' || fallidos >= 2;
-
-    this.mostrarCamposCita = activar;
-
-    if (activar) {
+  private actualizarValidadoresCita(): void {
+    if (this.mostrarCamposCita) {
       this.contactoForm.get('fechaCita')?.setValidators([Validators.required]);
       this.contactoForm.get('horaCita')?.setValidators([Validators.required]);
       this.contactoForm.get('tipoCita')?.setValidators([Validators.required]);
@@ -142,14 +115,8 @@ export class ModalGestionComponent implements OnInit {
       this.contactoForm.get('fechaCita')?.clearValidators();
       this.contactoForm.get('horaCita')?.clearValidators();
       this.contactoForm.get('tipoCita')?.clearValidators();
-
-      this.contactoForm.patchValue({
-        fechaCita: '',
-        horaCita: '',
-        tipoCita: ''
-      });
+      this.contactoForm.patchValue({ fechaCita: '', horaCita: '', tipoCita: '' });
     }
-
     this.contactoForm.get('fechaCita')?.updateValueAndValidity();
     this.contactoForm.get('horaCita')?.updateValueAndValidity();
     this.contactoForm.get('tipoCita')?.updateValueAndValidity();
@@ -159,25 +126,27 @@ export class ModalGestionComponent implements OnInit {
     if (this.contactoForm.invalid) return;
 
     const val = this.contactoForm.getRawValue();
+    this.guardando = true;
 
-    const nuevo = {
+    this.solicitudService.registrarContacto(this.data.id, {
       fecha: val.fecha,
-      hora: this.formatearHora(val.hora),
-      jornada: val.jornada,
+      hora: val.hora,
       resultado: val.resultado,
       observacion: val.observacion
-    };
-
-    this.historialContactos = [nuevo, ...this.historialContactos];
-
-    this.dialogRef.close(nuevo);
-  }
-
-  private formatearHora(hora: string): string {
-    const [h, m] = hora.split(':').map(Number);
-    const ampm = h >= 12 ? 'PM' : 'AM';
-    const h12 = h % 12 || 12;
-    return `${h12}:${m.toString().padStart(2, '0')} ${ampm}`;
+    }).subscribe({
+      next: (contacto) => {
+        this.guardando = false;
+        this.historialContactos = [contacto, ...this.historialContactos];
+        this.contactoForm.patchValue({ resultado: '', observacion: '' });
+        this.mostrarCamposCita = false;
+        this.actualizarValidadoresCita();
+        this.dialogRef.close(true);
+      },
+      error: (err) => {
+        console.error('Error al registrar contacto:', err);
+        this.guardando = false;
+      }
+    });
   }
 
   private getToday(): string {

@@ -14,6 +14,7 @@ import { MatPaginator, MatPaginatorModule, MatPaginatorIntl } from '@angular/mat
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ModalGestionComponent } from '../modal-gestion-contacto/modal-gestion-contacto.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { SolicitudService } from '../../services/solicitud.service';
 
 
 export function getSpanishPaginatorIntl() {
@@ -66,50 +67,61 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private dialog = inject(MatDialog);
-
+  private solicitudService = inject(SolicitudService);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   idCaso: string = 'Seleccione un caso';
   contactoForm!: FormGroup;
-  
+  cargando = false;
+
   displayedColumns: string[] = ['expand', 'id', 'nombre', 'fecha', 'dependencia', 'acciones'];
   dataSource = new MatTableDataSource<any>([]);
   expandedElement: any | null;
   filterValues = { id: '', nombre: '', fecha: '', dependencia: '' };
 
-  datosSimulados = [
-    { id: 'CAS-2001', nombre: 'Laura Restrepo', documento: '10359874', fecha: '2026-02-01', dependencia: 'Bienestar', tipoSolicitud: 'Psicosocial', celular: '3109988776', correoInst: 'l.restrepo@U.edu.co', facultad: 'Artes', campus: 'Norte' },
-    { id: 'ACO-2002', nombre: 'Miguel Cano', documento: '71234456', fecha: '2026-02-03', dependencia: 'Jurídica', tipoSolicitud: 'Asesoría', celular: '3154433221', correoInst: 'm.cano@U.edu.co', facultad: 'Derecho', campus: 'Central' },
-    { id: 'CAS-2003', nombre: 'Elena Vasquez', documento: '43567812', fecha: '2026-02-05', dependencia: 'Salud', tipoSolicitud: 'Médica', celular: '3201122334', correoInst: 'e.vasquez@U.edu.co', facultad: 'Salud', campus: 'Sur' }
-  ];
-
-  historialContactos: any[] = [];
-  columnasHistorial: string[] = ['fecha', 'jornada', 'resultado', 'observacion'];
-  resultados = ['Exitoso (Cita agendada)', 'No contesta', 'Buzón de voz', 'Número equivocado', 'Solicita llamar luego'];
-  jornadas = ['Mañana', 'Tarde'];
-
   ngOnInit(): void {
-    this.dataSource.data = this.datosSimulados;
+    this.cargarSolicitudes();
     this.dataSource.filterPredicate = this.createFilter();
 
     this.contactoForm = this.fb.group({
       fecha: [new Date().toISOString().substring(0, 10), Validators.required],
       hora: ['08:00', Validators.required],
-      jornada: ['', Validators.required],
+      jornada: [{ value: '', disabled: true }],
       resultado: ['', Validators.required],
       observacion: ['', [Validators.required, Validators.minLength(5)]]
     });
-
-    const idUrl = this.route.snapshot.paramMap.get('id');
-    if (idUrl) {
-      const caso = this.datosSimulados.find(c => c.id === idUrl);
-      if (caso) this.seleccionarCaso(caso);
-    }
   }
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
+  }
+
+  cargarSolicitudes(): void {
+    this.cargando = true;
+    this.solicitudService.listarTodas().subscribe({
+      next: (solicitudes) => {
+        this.dataSource.data = solicitudes.map(s => ({
+          id: s.id,
+          solicitudId: s.id,
+          codigo: s.codigo,
+          nombre: s.nombreSolicitante,
+          documento: s.documentoSolicitante,
+          fecha: s.fechaCreacion ? String(s.fechaCreacion).substring(0, 10) : '',
+          dependencia: s.remitenteDependencia || s.dependencia || '',
+          tipoSolicitud: s.tipoSolicitud,
+          campus: s.remitenteCampus || '',
+          facultad: s.remitenteFacultad || '',
+          celular: s.celular || '',
+          correoInst: s.correoInstitucional || ''
+        }));
+        this.cargando = false;
+      },
+      error: (err) => {
+        console.error('Error al cargar solicitudes:', err);
+        this.cargando = false;
+      }
+    });
   }
 
   applyFilter(column: string, event: Event) {
@@ -121,57 +133,29 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
   createFilter(): (data: any, filter: string) => boolean {
     return (data: any, filter: string): boolean => {
       const searchTerms = JSON.parse(filter);
-      return data.id.toLowerCase().includes(searchTerms.id)
-        && data.nombre.toLowerCase().includes(searchTerms.nombre)
-        && data.fecha.toLowerCase().includes(searchTerms.fecha)
-        && data.dependencia.toLowerCase().includes(searchTerms.dependencia);
+      return String(data.id).toLowerCase().includes(searchTerms.id)
+        && (data.nombre || '').toLowerCase().includes(searchTerms.nombre)
+        && (data.fecha || '').toLowerCase().includes(searchTerms.fecha)
+        && (data.dependencia || '').toLowerCase().includes(searchTerms.dependencia);
     };
   }
 
-  seleccionarCaso(caso: any) {
-    this.idCaso = caso.id;
-    this.historialContactos = [
-      { fecha: '2026-02-10', hora: '10:00 AM', jornada: 'Mañana', resultado: 'No contesta', observacion: 'Se intentó contacto sin éxito.' }
-    ];
-    this.contactoForm.patchValue({ jornada: '', resultado: '', observacion: '' });
-    
-    setTimeout(() => {
-      const element = document.getElementById('seccion-gestion');
-      if (element) element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 150);
-  }
-
-  registrarIntento(): void {
-    if (this.contactoForm.valid) {
-      const val = this.contactoForm.value;
-      const nuevo = {
-        fecha: val.fecha,
-        hora: this.formatearHora(val.hora),
-        jornada: val.jornada,
-        resultado: val.resultado,
-        observacion: val.observacion
-      };
-      this.historialContactos = [nuevo, ...this.historialContactos];
-      this.contactoForm.patchValue({ jornada: '', resultado: '', observacion: '' });
-    }
-  }
-
   abrirModalGestion(caso: any) {
-  this.dialog.open(ModalGestionComponent, {
-    width: '900px',
-    maxWidth: '95vw',
-    data: caso
-  });
-}
+    const dialogRef = this.dialog.open(ModalGestionComponent, {
+      width: '900px',
+      maxWidth: '95vw',
+      data: caso
+    });
 
-  private formatearHora(hora: string): string {
-    const [h, m] = hora.split(':').map(Number);
-    const ampm = h >= 12 ? 'PM' : 'AM';
-    const h12 = h % 12 || 12;
-    return `${h12}:${m.toString().padStart(2, '0')} ${ampm}`;
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.cargarSolicitudes();
+      }
+    });
   }
 
   regresar() {
     this.router.navigate(['/consulta']);
   }
 }
+

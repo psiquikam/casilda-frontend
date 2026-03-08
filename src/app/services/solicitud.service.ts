@@ -101,17 +101,31 @@ export interface UpdateSolicitudDto {
 }
 
 export interface AsignarSolicitudDto {
-  profesionalesIds: number[];
+  grupoProfesionalId: number;
   tipoAsignacion: string;
   servicio: string;
   observaciones: string;
   fechaReparto?: string;
 }
 
-export interface ProfesionalDto {
+export interface GrupoProfesionalDto {
   id: number;
   nombre: string;
-  cargo: string;
+}
+
+export interface ContactoTelefonicoDto {
+  fecha: string;
+  hora: string;
+  jornada: string;
+  resultado: string;
+  observacion: string;
+}
+
+export interface ContactoTelefonicoRequestDto {
+  fecha: string;
+  hora: string;
+  resultado: string;
+  observacion: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -147,7 +161,15 @@ export class SolicitudService {
     return this.http.post<SolicitudAcompanamientoResponse>(`${this.apiUrl}/acompanamiento/${id}/asignar`, datos);
   }
 
-  listarProfesionales(): Observable<ProfesionalDto[]> {
-    return this.http.get<ProfesionalDto[]>(`${this.apiUrl}/profesionales`);
+  listarGruposProfesionales(): Observable<GrupoProfesionalDto[]> {
+    return this.http.get<GrupoProfesionalDto[]>(`${this.apiUrl}/grupos-profesionales`);
+  }
+
+  listarContactos(id: number): Observable<ContactoTelefonicoDto[]> {
+    return this.http.get<ContactoTelefonicoDto[]>(`${this.apiUrl}/acompanamiento/${id}/contactos`);
+  }
+
+  registrarContacto(id: number, datos: ContactoTelefonicoRequestDto): Observable<ContactoTelefonicoDto> {
+    return this.http.post<ContactoTelefonicoDto>(`${this.apiUrl}/acompanamiento/${id}/contacto`, datos);
   }
 }

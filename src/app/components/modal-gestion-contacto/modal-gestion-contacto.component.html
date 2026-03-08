@@ -24,9 +24,7 @@
 
               <mat-form-field appearance="outline">
                 <mat-label>Jornada</mat-label>
-                <mat-select formControlName="jornada">
-                  <mat-option *ngFor="let j of jornadas" [value]="j">{{ j }}</mat-option>
-                </mat-select>
+                <input matInput [value]="contactoForm.get('jornada')?.value" readonly>
               </mat-form-field>
 
               <mat-form-field appearance="outline">
@@ -53,14 +51,6 @@
                 <mat-label>Hora de Cita</mat-label>
                 <input matInput type="time" formControlName="horaCita">
               </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Tipo de Cita</mat-label>
-                <mat-select formControlName="tipoCita">
-                  <mat-option *ngFor="let t of tiposCita" [value]="t">{{ t }}</mat-option>
-                </mat-select>
-              </mat-form-field>
-
             </div>
 
             <div class="form-actions">
