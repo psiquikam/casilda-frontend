@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -7,6 +7,13 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+
+interface TipoCorreoDto {
+  id: number;
+  nombre: string;
+}
 
 @Component({
   selector: 'app-modal-correo',
@@ -24,15 +31,26 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './modal-correo.component.html',
   styleUrls: ['./modal-correo.component.scss']
 })
-export class ModalCorreoComponent {
+export class ModalCorreoComponent implements OnInit {
+
+  private http = inject(HttpClient);
+
+  tiposCorreo: TipoCorreoDto[] = [];
 
   data = {
-    tipo: '',
+    tipoId: null as number | null,
     correo: '',
     descripcion: '',
   };
 
   constructor(public dialogRef: MatDialogRef<ModalCorreoComponent>) { }
+
+  ngOnInit(): void {
+    this.http.get<TipoCorreoDto[]>(`${environment.apiBaseUrl}/maestros/tipos-correo`).subscribe({
+      next: (tipos) => this.tiposCorreo = tipos,
+      error: (err) => console.error('Error al cargar tipos de correo:', err)
+    });
+  }
 
   onNoClick(): void {
     this.dialogRef.close();

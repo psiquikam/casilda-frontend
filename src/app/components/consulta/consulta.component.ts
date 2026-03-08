@@ -15,6 +15,7 @@ import { ModalDetalleSolicitudComponent } from '../modal-detalle-solicitud/modal
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { RepartoModalComponent } from '../modal-reparto/modal-reparto.component';
 import { Router } from '@angular/router';
+import { SolicitudService } from '../../services/solicitud.service';
 
 @Component({
   selector: 'app-consulta',
@@ -36,9 +37,10 @@ import { Router } from '@angular/router';
 })
 export class ConsultaComponent implements OnInit {
 
-  constructor(private dialog: MatDialog) { }
-
+  private solicitudService = inject(SolicitudService);
   private router = inject(Router);
+
+  constructor(private dialog: MatDialog) { }
 
   displayedColumns: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'dependencia', 'profesional', 'acciones'];
   expandedElement: any | null;
@@ -49,6 +51,8 @@ export class ConsultaComponent implements OnInit {
   dataSourceCerrados = new MatTableDataSource<any>([]);
   dataSourceSinRepartir = new MatTableDataSource<any>([]);
 
+  solicitudes: any[] = [];
+  cargando = false;
 
   filterValues: any = {
     id: '',
@@ -59,250 +63,83 @@ export class ConsultaComponent implements OnInit {
     profesional: ''
   };
 
-  datosSimulados = [
-
-    {
-      id: 'CAS-3001',
-      estado: 'Sin asignar',
-      profesional: 'Sin asignar',
-      fecha: '2026-02-01',
-      dependencia: 'Bienestar',
-
-      remitenteTipoSolicitud: 'Psicosocial',
-      remitentePrimerNombre: 'Laura',
-      remitenteSegundoNombre: 'Marcela',
-      remitentePrimerApellido: 'Gómez',
-      remitenteSegundoApellido: 'Ruiz',
-      remitenteCargo: 'Docente',
-      remitenteCampus: 'Principal',
-      remitenteDependencia: 'Bienestar',
-      remitenteFacultad: 'Ingeniería',
-      remitenteOtraFacultad: '',
-      remitenteFechaSolicitud: '2026-02-01',
-      remitenteTipoDocumento: 'CC',
-      remitenteNumeroDocumento: '100200300',
-
-      tipoDocumento: 'CC',
-      numeroDocumento: '100200300',
-      fechaNacimiento: null,
-      primerNombre: 'Carlos',
-      segundoNombre: 'Andrés',
-      primerApellido: 'Gómez',
-      segundoApellido: 'Ruiz',
-      identidadGenero: 'Masculino',
-      celular: '3001112233',
-      telefonoAlterno: '6011234',
-      correoInstitucional: 'c.gomez@u.edu.co',
-      correoPersonal: 'carlos@gmail.com'
-    },
-    {
-      id: 'CAS-3002',
-      estado: 'Sin asignar',
-      profesional: 'Sin asignar',
-      fecha: '2026-02-02',
-      dependencia: 'Salud',
-
-      remitenteTipoSolicitud: 'Médica',
-      remitentePrimerNombre: 'Andrés',
-      remitenteSegundoNombre: '',
-      remitentePrimerApellido: 'Torres',
-      remitenteSegundoApellido: 'López',
-      remitenteCargo: 'Administrativo',
-      remitenteCampus: 'Norte',
-      remitenteDependencia: 'Salud',
-      remitenteFacultad: 'Medicina',
-      remitenteOtraFacultad: '',
-      remitenteFechaSolicitud: '2026-02-02',
-      remitenteTipoDocumento: 'CC',
-      remitenteNumeroDocumento: '200300400',
-
-      tipoDocumento: 'CC',
-      numeroDocumento: '200300400',
-      fechaNacimiento: null,
-      primerNombre: 'Daniela',
-      segundoNombre: '',
-      primerApellido: 'Torres',
-      segundoApellido: 'López',
-      identidadGenero: 'Femenino',
-      celular: '3012223344',
-      telefonoAlterno: '6015678',
-      correoInstitucional: 'd.torres@u.edu.co',
-      correoPersonal: 'daniela@gmail.com'
-    },
-
-    {
-      id: 'CAS-3003',
-      estado: 'Abierto activo',
-      profesional: 'Ps. Ana López',
-      fecha: '2026-02-03',
-      dependencia: 'Bienestar',
-
-      remitenteTipoSolicitud: 'Psicosocial',
-      remitentePrimerNombre: 'Miguel',
-      remitenteSegundoNombre: '',
-      remitentePrimerApellido: 'Ramírez',
-      remitenteSegundoApellido: 'Castro',
-      remitenteCargo: 'Estudiante',
-      remitenteCampus: 'Sur',
-      remitenteDependencia: 'Bienestar',
-      remitenteFacultad: 'Artes',
-      remitenteOtraFacultad: '',
-      remitenteFechaSolicitud: '2026-02-03',
-      remitenteTipoDocumento: 'CC',
-      remitenteNumeroDocumento: '300400500',
-
-      tipoDocumento: 'CC',
-      numeroDocumento: '300400500',
-      fechaNacimiento: null,
-      primerNombre: 'Miguel',
-      segundoNombre: '',
-      primerApellido: 'Ramírez',
-      segundoApellido: 'Castro',
-      identidadGenero: 'Masculino',
-      celular: '3023334455',
-      telefonoAlterno: '6016789',
-      correoInstitucional: 'm.ramirez@u.edu.co',
-      correoPersonal: 'miguel@gmail.com'
-    },
-    {
-      id: 'CAS-3004',
-      estado: 'Abierto activo',
-      profesional: 'Dr. Jaime Luna',
-      fecha: '2026-02-04',
-      dependencia: 'Salud',
-
-      remitenteTipoSolicitud: 'Médica',
-      remitentePrimerNombre: 'Valentina',
-      remitenteSegundoNombre: '',
-      remitentePrimerApellido: 'Morales',
-      remitenteSegundoApellido: 'Díaz',
-      remitenteCargo: 'Docente',
-      remitenteCampus: 'Principal',
-      remitenteDependencia: 'Salud',
-      remitenteFacultad: 'Medicina',
-      remitenteOtraFacultad: '',
-      remitenteFechaSolicitud: '2026-02-04',
-      remitenteTipoDocumento: 'CC',
-      remitenteNumeroDocumento: '400500600',
-
-      tipoDocumento: 'CC',
-      numeroDocumento: '400500600',
-      fechaNacimiento: null,
-      primerNombre: 'Valentina',
-      segundoNombre: '',
-      primerApellido: 'Morales',
-      segundoApellido: 'Díaz',
-      identidadGenero: 'Femenino',
-      celular: '3034445566',
-      telefonoAlterno: '6017890',
-      correoInstitucional: 'v.morales@u.edu.co',
-      correoPersonal: 'valentina@gmail.com'
-    },
-
-    {
-      id: 'CAS-3005',
-      estado: 'Abierto en transición',
-      profesional: 'Ps. Ana López',
-      fecha: '2026-02-05',
-      dependencia: 'Bienestar',
-
-      remitenteTipoSolicitud: 'Psicosocial',
-      remitentePrimerNombre: 'Camilo',
-      remitenteSegundoNombre: '',
-      remitentePrimerApellido: 'Ortiz',
-      remitenteSegundoApellido: 'Vega',
-      remitenteCargo: 'Estudiante',
-      remitenteCampus: 'Principal',
-      remitenteDependencia: 'Bienestar',
-      remitenteFacultad: 'Ingeniería',
-      remitenteOtraFacultad: '',
-      remitenteFechaSolicitud: '2026-02-05',
-      remitenteTipoDocumento: 'CC',
-      remitenteNumeroDocumento: '500600700',
-
-      tipoDocumento: 'CC',
-      numeroDocumento: '500600700',
-      fechaNacimiento: null,
-      primerNombre: 'Camilo',
-      segundoNombre: '',
-      primerApellido: 'Ortiz',
-      segundoApellido: 'Vega',
-      identidadGenero: 'Masculino',
-      celular: '3045556677',
-      telefonoAlterno: '6018901',
-      correoInstitucional: 'c.ortiz@u.edu.co',
-      correoPersonal: 'camilo@gmail.com'
-    },
-    {
-      id: 'CAS-3006',
-      estado: 'Cerrado',
-      profesional: 'Abog. Elena Soler',
-      fecha: '2026-02-06',
-      dependencia: 'Jurídica',
-
-      remitenteTipoSolicitud: 'Asesoría',
-      remitentePrimerNombre: 'Natalia',
-      remitenteSegundoNombre: '',
-      remitentePrimerApellido: 'Pardo',
-      remitenteSegundoApellido: 'Luna',
-      remitenteCargo: 'Egresada',
-      remitenteCampus: 'Norte',
-      remitenteDependencia: 'Jurídica',
-      remitenteFacultad: 'Derecho',
-      remitenteOtraFacultad: '',
-      remitenteFechaSolicitud: '2026-02-06',
-      remitenteTipoDocumento: 'CC',
-      remitenteNumeroDocumento: '600700800',
-
-      tipoDocumento: 'CC',
-      numeroDocumento: '600700800',
-      fechaNacimiento: null,
-      primerNombre: 'Natalia',
-      segundoNombre: '',
-      primerApellido: 'Pardo',
-      segundoApellido: 'Luna',
-      identidadGenero: 'Femenino',
-      celular: '3056667788',
-      telefonoAlterno: '6019012',
-      correoInstitucional: 'n.pardo@u.edu.co',
-      correoPersonal: 'natalia@gmail.com'
-    }
-
-  ];
-
   ngOnInit() {
-    this.inicializarTablas();
+    this.cargarDatos();
+  }
+
+  cargarDatos() {
+    this.cargando = true;
+    this.solicitudService.listarTodas().subscribe({
+      next: (respuestas) => {
+        this.solicitudes = respuestas.map(r => this.mapToItem(r));
+        this.inicializarTablas();
+        this.cargando = false;
+      },
+      error: (err) => {
+        console.error('Error al cargar solicitudes:', err);
+        this.cargando = false;
+      }
+    });
+  }
+
+  private mapToItem(r: any): any {
+    return {
+      solicitudId: r.id,
+      id: r.codigo,
+      tipoSolicitud: r.tipoSolicitud || '',
+      estado: r.estado || '',
+      profesional: r.profesional || 'Sin asignar',
+      fecha: r.fechaCreacion ? r.fechaCreacion.substring(0, 10) : '',
+      dependencia: r.dependencia || '',
+      // Solicitante
+      tipoDocumento: r.tipoDocumento || '',
+      numeroDocumento: r.numeroDocumento || '',
+      fechaNacimiento: r.fechaNacimiento || null,
+      primerNombre: r.primerNombre || '',
+      segundoNombre: r.segundoNombre || '',
+      primerApellido: r.primerApellido || '',
+      segundoApellido: r.segundoApellido || '',
+      identidadGenero: r.identidadGenero || '',
+      celular: r.celular || '',
+      telefonoAlterno: r.telefonoAlterno || '',
+      correoInstitucional: r.correoInstitucional || '',
+      correoPersonal: r.correoPersonal || '',
+      // Remitente
+      remitentePrimerNombre: r.remitentePrimerNombre || '',
+      remitenteSegundoNombre: r.remitenteSegundoNombre || '',
+      remitentePrimerApellido: r.remitentePrimerApellido || '',
+      remitenteSegundoApellido: r.remitenteSegundoApellido || '',
+      remitenteCargo: r.remitenteCargo || '',
+      remitenteCampus: r.remitenteCampus || '',
+      remitenteDependencia: r.remitenteDependencia || '',
+      remitenteFacultad: r.remitenteFacultad || '',
+      remitenteFechaSolicitud: r.remitenteFechaSolicitud || r.fecha || '',
+      remitenteTipoDocumento: r.remitenteTipoDocumento || '',
+      remitenteNumeroDocumento: r.remitenteNumeroDocumento || ''
+    };
   }
 
   inicializarTablas() {
-    this.dataSourceSinRepartir.data = this.datosSimulados.filter(c =>
-      c.profesional === 'Sin asignar'
+    this.dataSourceSinRepartir.data = this.solicitudes.filter(c =>
+      !c.profesional || c.profesional === 'Sin asignar'
     );
 
-    this.dataSourceActivos.data = this.datosSimulados.filter(c =>
-      c.estado === 'Abierto activo' && c.profesional !== 'Sin asignar'
+    this.dataSourceActivos.data = this.solicitudes.filter(c =>
+      c.profesional && c.profesional !== 'Sin asignar' &&
+      c.estado !== 'Cerrado' && c.estado !== 'Abierto en transición'
     );
 
-    this.dataSourceTransicion.data = this.datosSimulados.filter(c =>
+    this.dataSourceTransicion.data = this.solicitudes.filter(c =>
       c.estado === 'Abierto en transición'
     );
 
-    this.dataSourceCerrados.data = this.datosSimulados.filter(c =>
+    this.dataSourceCerrados.data = this.solicitudes.filter(c =>
       c.estado === 'Cerrado'
     );
+
     const filterPredicate = this.createFilter();
     [this.dataSourceSinRepartir, this.dataSourceActivos, this.dataSourceTransicion, this.dataSourceCerrados]
       .forEach(ds => ds.filterPredicate = filterPredicate);
-  }
-
-  setFilterPredicates() {
-    const filterPredicate = this.createFilter();
-    [
-      this.dataSourceSinRepartir,
-      this.dataSourceActivos,
-      this.dataSourceTransicion,
-      this.dataSourceCerrados
-    ].forEach(ds => ds.filterPredicate = filterPredicate);
   }
 
   applyFilter(column: string, event: Event) {
@@ -326,14 +163,14 @@ export class ConsultaComponent implements OnInit {
       const searchTerms = JSON.parse(filter);
 
       const nombreCompleto = `
-      ${data.primerNombre || ''} 
-      ${data.segundoNombre || ''} 
-      ${data.primerApellido || ''} 
+      ${data.primerNombre || ''}
+      ${data.segundoNombre || ''}
+      ${data.primerApellido || ''}
       ${data.segundoApellido || ''}
     `.toLowerCase();
 
       const documentoCompleto = `
-      ${data.tipoDocumento || ''} 
+      ${data.tipoDocumento || ''}
       ${data.numeroDocumento || ''}
     `.toLowerCase();
 
@@ -357,16 +194,24 @@ export class ConsultaComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && modo === 'editar') {
-
-        Object.assign(element, result);
-
-        this.inicializarTablas();
+        this.solicitudService.actualizar(element.solicitudId, {
+          primerNombre: result.primerNombre,
+          segundoNombre: result.segundoNombre || null,
+          primerApellido: result.primerApellido,
+          segundoApellido: result.segundoApellido || null,
+          identidadGenero: result.identidadGenero || null
+        }).subscribe({
+          next: (updated) => {
+            Object.assign(element, this.mapToItem(updated));
+            this.inicializarTablas();
+          },
+          error: (err) => console.error('Error al actualizar solicitud:', err)
+        });
       }
     });
   }
 
   eliminarCaso(element: any): void {
-
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '350px',
       data: {
@@ -377,8 +222,10 @@ export class ConsultaComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(confirmado => {
       if (confirmado) {
-        this.datosSimulados = this.datosSimulados.filter(e => e !== element);
-        this.inicializarTablas();
+        this.solicitudService.eliminar(element.solicitudId).subscribe({
+          next: () => this.cargarDatos(),
+          error: (err) => console.error('Error al eliminar solicitud:', err)
+        });
       }
     });
   }
@@ -392,15 +239,20 @@ export class ConsultaComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        element.profesional = result.nombresProfesionales;
-        element.estado = 'Abierto activo';
-        element.dependencia = result.servicio;
-        element.fecha = result.fechaReparto;
-
-        this.inicializarTablas();
+        this.solicitudService.asignar(element.solicitudId, {
+          profesionalesIds: result.idsProfesionales,
+          tipoAsignacion: result.tipoAsignacion,
+          servicio: result.servicio,
+          observaciones: result.observaciones,
+          fechaReparto: result.fechaReparto
+        }).subscribe({
+          next: () => this.cargarDatos(),
+          error: (err) => console.error('Error al asignar solicitud:', err)
+        });
       }
     });
   }
+
   get totalSinRepartir(): number {
     return this.dataSourceSinRepartir.data.length;
   }
@@ -417,3 +269,4 @@ export class ConsultaComponent implements OnInit {
     return this.dataSourceTransicion.data.length;
   }
 }
+
