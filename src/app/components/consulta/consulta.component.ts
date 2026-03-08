@@ -240,7 +240,7 @@ export class ConsultaComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.solicitudService.asignar(element.solicitudId, {
-          profesionalesIds: result.idsProfesionales,
+          grupoProfesionalId: result.grupoProfesionalId,
           tipoAsignacion: result.tipoAsignacion,
           servicio: result.servicio,
           observaciones: result.observaciones,

@@ -7,7 +7,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { SolicitudService, ProfesionalDto } from '../../services/solicitud.service';
+import { SolicitudService, GrupoProfesionalDto } from '../../services/solicitud.service';
 
 @Component({
   selector: 'app-reparto-modal',
@@ -27,12 +27,10 @@ import { SolicitudService, ProfesionalDto } from '../../services/solicitud.servi
 })
 export class RepartoModalComponent implements OnInit {
   repartoForm: FormGroup;
-  profesionalesAsignados: any[] = [];
+  gruposProfesionales: GrupoProfesionalDto[] = [];
 
   tiposAsignacion = ['Prioritaria', 'Ordinaria', 'Seguimiento'];
   servicios = ['Psicología', 'Asesoría Jurídica', 'Trabajo Social', 'Dupla Psicosocial'];
-
-  opcionesAsignacion: { id: number; nombre: string; cargo: string; esGrupo?: boolean }[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -44,48 +42,24 @@ export class RepartoModalComponent implements OnInit {
       tipoAsignacion: ['', Validators.required],
       fechaReparto: [new Date().toISOString().substring(0, 10)],
       servicio: ['', Validators.required],
-      seleccionTemp: [''],
+      grupoProfesionalId: [null, Validators.required],
       observaciones: ['', [Validators.required, Validators.minLength(10)]]
     });
   }
 
   ngOnInit() {
-    this.solicitudService.listarProfesionales().subscribe({
-      next: (profesionales) => {
-        this.opcionesAsignacion = profesionales.map(p => ({
-          id: p.id,
-          nombre: p.nombre,
-          cargo: p.cargo
-        }));
+    this.solicitudService.listarGruposProfesionales().subscribe({
+      next: (grupos) => {
+        this.gruposProfesionales = grupos;
       },
-      error: (err) => console.error('Error al cargar profesionales:', err)
+      error: (err) => console.error('Error al cargar grupos profesionales:', err)
     });
   }
 
-  agregarAsignacion() {
-    const idSeleccionado = this.repartoForm.get('seleccionTemp')?.value;
-    if (!idSeleccionado) return;
-
-    const opcion = this.opcionesAsignacion.find(o => o.id === idSeleccionado);
-    if (opcion) {
-      this.insertarSinDuplicados({ id: opcion.id, nombre: opcion.nombre });
-    }
-  }
-
-  private insertarSinDuplicados(persona: any) {
-    const existe = this.profesionalesAsignados.some(p => p.id === persona.id);
-    if (!existe) {
-      this.profesionalesAsignados.push(persona);
-    }
-  }
-
   guardar() {
-    if (this.repartoForm.valid && this.profesionalesAsignados.length > 0) {
-      const { seleccionTemp, ...datosForm } = this.repartoForm.value;
+    if (this.repartoForm.valid) {
       this.dialogRef.close({
-        ...datosForm,
-        idsProfesionales: this.profesionalesAsignados.map(p => p.id),
-        nombresProfesionales: this.profesionalesAsignados.map(p => p.nombre).join(' & '),
+        ...this.repartoForm.value,
         idCaso: this.data.id
       });
     }

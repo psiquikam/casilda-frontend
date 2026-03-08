@@ -24,19 +24,10 @@
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Profesional o Dupla</mat-label>
-          <mat-select formControlName="seleccionTemp" (selectionChange)="agregarAsignacion()">
-            <mat-optgroup label="Duplas / Grupos">
-              <mat-option *ngFor="let opt of opcionesAsignacion" [value]="opt.id"
-                [style.display]="opt.esGrupo ? 'block' : 'none'">
-                {{ opt.nombre }}
-              </mat-option>
-            </mat-optgroup>
-            <mat-optgroup label="Individuales">
-              <mat-option *ngFor="let opt of opcionesAsignacion" [value]="opt.id"
-                [style.display]="!opt.esGrupo ? 'block' : 'none'">
-                {{ opt.nombre }}
-              </mat-option>
-            </mat-optgroup>
+          <mat-select formControlName="grupoProfesionalId">
+            <mat-option *ngFor="let grupo of gruposProfesionales" [value]="grupo.id">
+              {{ grupo.nombre }}
+            </mat-option>
           </mat-select>
         </mat-form-field>
       </div>
@@ -52,7 +43,7 @@
   <mat-dialog-actions align="end" class="modal-footer">
     <button mat-button (click)="cerrar()" color="warn">Cancelar</button>
     <button mat-flat-button class="btn-confirm" (click)="guardar()"
-      [disabled]="repartoForm.invalid || profesionalesAsignados.length === 0">
+      [disabled]="repartoForm.invalid">
       <mat-icon>check_circle</mat-icon>
       Confirmar Asignación
     </button>

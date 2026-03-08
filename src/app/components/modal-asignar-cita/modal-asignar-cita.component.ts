@@ -12,7 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
   selector: 'app-reparto-modal',
   standalone: true,
   templateUrl: './modal-asignar-cita.component.html',
-  styleUrls: ['./modal-asignar-cita.component.scss'], 
+  styleUrls: ['./modal-asignar-cita.component.scss'],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -28,13 +28,6 @@ export class AsignarCitaModalComponent {
 
   citaForm: FormGroup;
 
-  tiposCita = [
-    'Psicológica',
-    'Jurídica',
-    'Trabajo Social',
-    'Seguimiento'
-  ];
-
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<AsignarCitaModalComponent>,
@@ -42,8 +35,7 @@ export class AsignarCitaModalComponent {
   ) {
     this.citaForm = this.fb.group({
       fechaCita: ['', Validators.required],
-      horaCita: ['', Validators.required],
-      tipoCita: ['', Validators.required]
+      horaCita: ['', Validators.required]
     });
   }
 
