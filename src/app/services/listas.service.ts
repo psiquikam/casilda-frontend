@@ -1,44 +1,113 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
+
+export interface MaestroDto {
+  id: number;
+  codigo?: string | null;
+  nombre: string;
+}
+
+type ListaKey = 'tiposSolicitud' | 'campus' | 'dependencias' | 'facultades' | 'tiposDocumento' | 'identidadesGenero' | 'cargos';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ListasService {
-  // Definimos los datos iniciales (Mocks)
-  private data: any = {
-    tiposSolicitud: ['Psicológico', 'Jurídico', 'Académico', 'Social',],
-    campus: ['Central', 'Robledo', 'Oriente', 'Apartadó'],
-    dependencias: ['Bienestar Universitario', 'Talento Humano', 'Rectoría'],
-    facultades: ['Medicina', 'Salud Pública', 'Enfermería', 'Artes'],
-    tiposDocumento: ['Cédula de Ciudadanía', 'Tarjeta de Identidad', 'Pasaporte']
+  private readonly apiBaseUrl = `${environment.apiBaseUrl}/maestros`;
+  private readonly endpointByList: Record<ListaKey, string> = {
+    tiposSolicitud: 'tipos-solicitud',
+    campus: 'campus',
+    dependencias: 'dependencias',
+    facultades: 'facultades',
+    tiposDocumento: 'tipos-identificacion',
+    identidadesGenero: 'identidades-genero',
+    cargos: 'cargos'
   };
 
-  private listasSubject = new BehaviorSubject<any>(this.data);
+  private data: Record<ListaKey, MaestroDto[]> = {
+    tiposSolicitud: [],
+    campus: [],
+    dependencias: [],
+    facultades: [],
+    tiposDocumento: [],
+    identidadesGenero: [],
+    cargos: []
+  };
+
+  private listasSubject = new BehaviorSubject<Record<ListaKey, MaestroDto[]>>(this.data);
   listas$ = this.listasSubject.asObservable();
 
-  constructor() {}
-
-  // CRUD: Agregar
-  agregarItem(lista: string, nuevoItem: string) {
-    if (nuevoItem && !this.data[lista].includes(nuevoItem)) {
-      this.data[lista].push(nuevoItem);
-      this.listasSubject.next(this.data);
-    }
+  constructor(private readonly http: HttpClient) {
+    this.cargarListas();
   }
 
-  // CRUD: Eliminar (Simulado)
-  eliminarItem(lista: string, itemAEliminar: string) {
-    this.data[lista] = this.data[lista].filter((item: string) => item !== itemAEliminar);
-    this.listasSubject.next(this.data);
+  private cargarListas(): void {
+    forkJoin({
+      tiposSolicitud: this.obtenerListaDesdeEndpoint('tiposSolicitud'),
+      campus: this.obtenerListaDesdeEndpoint('campus'),
+      dependencias: this.obtenerListaDesdeEndpoint('dependencias'),
+      facultades: this.obtenerListaDesdeEndpoint('facultades'),
+      tiposDocumento: this.obtenerListaDesdeEndpoint('tiposDocumento'),
+      identidadesGenero: this.obtenerListaDesdeEndpoint('identidadesGenero'),
+      cargos: this.obtenerListaDesdeEndpoint('cargos')
+    }).subscribe(result => {
+      this.data = result;
+      this.listasSubject.next(this.data);
+    });
   }
 
-  // CRUD: Editar (Simulado)
-  editarItem(lista: string, valorAntiguo: string, valorNuevo: string) {
-    const index = this.data[lista].indexOf(valorAntiguo);
-    if (index !== -1) {
-      this.data[lista][index] = valorNuevo;
-      this.listasSubject.next(this.data);
-    }
+  private obtenerListaDesdeEndpoint(lista: ListaKey) {
+    const endpoint = this.endpointByList[lista];
+    return this.http.get<MaestroDto[]>(`${this.apiBaseUrl}/${endpoint}`).pipe(
+      catchError((error) => {
+        console.error(`Error consultando maestros para ${lista}:`, error);
+        return of([] as MaestroDto[]);
+      })
+    );
+  }
+
+  agregarItem(lista: string, nombre: string, codigo?: string) {
+    const listaKey = lista as ListaKey;
+    const endpoint = this.endpointByList[listaKey];
+    if (!endpoint || !nombre.trim()) return;
+
+    const body: any = { nombre: nombre.trim() };
+    if (codigo?.trim()) body['codigo'] = codigo.trim();
+
+    this.http.post<MaestroDto>(`${this.apiBaseUrl}/${endpoint}`, body)
+      .subscribe({
+        next: () => this.cargarListas(),
+        error: (error) => console.error(`Error agregando item en ${listaKey}:`, error)
+      });
+  }
+
+  eliminarItem(lista: string, id: number) {
+    const listaKey = lista as ListaKey;
+    const endpoint = this.endpointByList[listaKey];
+    if (!endpoint || !id) return;
+
+    this.http.delete<void>(`${this.apiBaseUrl}/${endpoint}/${id}`)
+      .subscribe({
+        next: () => this.cargarListas(),
+        error: (error) => console.error(`Error eliminando item en ${listaKey}:`, error)
+      });
+  }
+
+  editarItem(lista: string, id: number, nombre: string, codigo?: string) {
+    const listaKey = lista as ListaKey;
+    const endpoint = this.endpointByList[listaKey];
+    if (!endpoint || !id || !nombre.trim()) return;
+
+    const body: any = { nombre: nombre.trim() };
+    if (codigo !== undefined) body['codigo'] = codigo?.trim() || null;
+
+    this.http.put<MaestroDto>(`${this.apiBaseUrl}/${endpoint}/${id}`, body)
+      .subscribe({
+        next: () => this.cargarListas(),
+        error: (error) => console.error(`Error editando item en ${listaKey}:`, error)
+      });
   }
 }

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ListasService } from '../../services/listas.service';
+import { ListasService, MaestroDto } from '../../services/listas.service';
+import Swal from 'sweetalert2';
 
 // Material
 import { MatTabsModule } from '@angular/material/tabs';
@@ -16,16 +17,27 @@ import { MatCardModule } from '@angular/material/card';
   selector: 'app-gestion-listas',
   standalone: true,
   imports: [
-    CommonModule, FormsModule, MatTabsModule, MatTableModule, 
+    CommonModule, FormsModule, MatTabsModule, MatTableModule,
     MatButtonModule, MatIconModule, MatInputModule, MatFormFieldModule, MatCardModule
   ],
   templateUrl: './gestion-listas.component.html',
   styleUrls: ['./gestion-listas.component.scss']
 })
 export class GestionListasComponent implements OnInit {
-  listas: any = {};
-  nuevoItem: string = '';
-  editandoItem: { lista: string, original: string, actual: string } | null = null;
+  listas: Record<string, MaestroDto[]> = {};
+  nuevoNombre: string = '';
+  nuevoCodigo: string = '';
+  editandoItem: { lista: string; id: number; nombre: string; codigo: string } | null = null;
+
+  readonly etiquetas: Record<string, string> = {
+    tiposSolicitud: 'Tipos de Solicitud',
+    campus: 'Campus',
+    dependencias: 'Dependencias',
+    facultades: 'Facultades',
+    tiposDocumento: 'Tipos de Documento'
+  };
+
+  readonly listasConCodigo = new Set(['tiposDocumento']);
 
   constructor(private listasService: ListasService) {}
 
@@ -33,29 +45,49 @@ export class GestionListasComponent implements OnInit {
     this.listasService.listas$.subscribe(data => this.listas = data);
   }
 
+  tieneCodigo(listKey: string): boolean {
+    return this.listasConCodigo.has(listKey);
+  }
+
   agregar(nombreLista: string) {
-    if (this.nuevoItem.trim()) {
-      this.listasService.agregarItem(nombreLista, this.nuevoItem.trim());
-      this.nuevoItem = '';
-    }
+    if (!this.nuevoNombre.trim()) return;
+    this.listasService.agregarItem(nombreLista, this.nuevoNombre.trim(), this.nuevoCodigo.trim() || undefined);
+    this.nuevoNombre = '';
+    this.nuevoCodigo = '';
   }
 
-  borrar(nombreLista: string, item: string) {
-    if (confirm(`¿Está seguro de eliminar "${item}"?`)) {
-      this.listasService.eliminarItem(nombreLista, item);
-    }
+  borrar(nombreLista: string, item: MaestroDto) {
+    Swal.fire({
+      title: '¿Está seguro?',
+      text: `¿Desea eliminar "${item.nombre}"?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then(result => {
+      if (result.isConfirmed) {
+        this.listasService.eliminarItem(nombreLista, item.id);
+      }
+    });
   }
 
-  iniciarEdicion(nombreLista: string, item: string) {
-    this.editandoItem = { lista: nombreLista, original: item, actual: item };
+  iniciarEdicion(nombreLista: string, item: MaestroDto) {
+    this.editandoItem = {
+      lista: nombreLista,
+      id: item.id,
+      nombre: item.nombre,
+      codigo: item.codigo ?? ''
+    };
   }
 
   guardarEdicion() {
-    if (this.editandoItem && this.editandoItem.actual.trim()) {
+    if (this.editandoItem && this.editandoItem.nombre.trim()) {
       this.listasService.editarItem(
-        this.editandoItem.lista, 
-        this.editandoItem.original, 
-        this.editandoItem.actual.trim()
+        this.editandoItem.lista,
+        this.editandoItem.id,
+        this.editandoItem.nombre.trim(),
+        this.tieneCodigo(this.editandoItem.lista) ? this.editandoItem.codigo : undefined
       );
       this.editandoItem = null;
     }

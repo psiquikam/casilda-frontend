@@ -23,7 +23,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  
+
   .mini-avatar {
     width: 32px; height: 32px; background: #e2e8f0;
     border-radius: 50%; display: flex; align-items: center; justify-content: center;
@@ -40,6 +40,9 @@
 
   &.admin { background: #fee2e2; color: #ef4444; }
   &.revisor { background: #dcfce7; color: #16a34a; }
+  &.coordinador { background: #dbeafe; color: #2563eb; }
+  &.profesional { background: #ede9fe; color: #7c3aed; }
+  &.usuario { background: #ffedd5; color: #ea580c; }
   &.consulta { background: #fef9c3; color: #ca8a04; }
 }
 

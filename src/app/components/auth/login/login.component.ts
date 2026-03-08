@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../../services/auth.service'; 
+import { AuthService } from '../../../services/auth.service';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -24,6 +24,7 @@ export class LoginComponent {
   loginForm: FormGroup;
   hidePassword = true;
   errorMessage: string = '';
+  loading = false;
 
   constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
     if (this.auth.isAuthenticated()) {
@@ -35,24 +36,27 @@ export class LoginComponent {
       password: ['', [Validators.required]]
     });
   }
+
   onSubmit() {
     if (this.loginForm.valid) {
+      this.loading = true;
+      this.errorMessage = '';
       const { email, password } = this.loginForm.value;
-      const success = this.auth.loginWithCredentials(email, password);
 
-      if (success) {
-        const rol = this.auth.currentUser?.rol;
-
-        if (rol === 'Admin') {
-          this.router.navigate(['/gestion-usuarios']);
-        } else if (rol === 'Revisor') {
-          this.router.navigate(['/dashboard-revisor']);
-        } else {
-          this.router.navigate(['/nueva-queja']);
+      this.auth.loginWithCredentials(email, password).subscribe({
+        next: (resp) => {
+          this.loading = false;
+          if (resp.rol === 'Admin') {
+            this.router.navigate(['/gestion-usuarios']);
+          } else {
+            this.router.navigate(['/dashboard-revisor']);
+          }
+        },
+        error: () => {
+          this.loading = false;
+          this.errorMessage = 'Credenciales inválidas. Verifique su usuario y contraseña.';
         }
-      } else {
-        this.errorMessage = 'Credenciales inválidas';
-      }
+      });
     }
   }
 }

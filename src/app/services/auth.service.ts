@@ -1,71 +1,59 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
-// Definimos la estructura de nuestros usuarios simulados
 export interface UserSession {
   email: string;
   nombre: string;
-  rol: 'Admin' | 'Revisor' | 'Usuario';
-  foto: string;
+  rol: string;
+  foto?: string;
+  token: string;
+}
+
+export interface AuthLoginResponse {
+  nombre: string;
+  email: string;
+  rol: string;
+  foto?: string;
+  token: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private MOCK_USERS = [
-    {
-      email: 'admin@gmail.com', password: '123',
-      data: { nombre: 'Super Administrador', rol: 'Admin', foto: 'https://i.pravatar.cc/150?u=1' }
-    },
-    {
-      email: 'revisor@gmail.com', password: '123',
-      data: { nombre: 'Carlos Revisor', rol: 'Revisor', foto: 'https://i.pravatar.cc/150?u=2' }
-    },
-    {
-      email: 'user@gmail.com', password: '123',
-      data: { nombre: 'Juan Ciudadano', rol: 'Usuario', foto: 'https://i.pravatar.cc/150?u=3' }
-    }
-  ];
-
+  private readonly apiUrl = `${environment.apiBaseUrl}/auth`;
   public currentUser: UserSession | null = null;
 
-  constructor(private router: Router) {
-    const savedUser = localStorage.getItem('userSession');
-    if (savedUser) {
-      this.currentUser = JSON.parse(savedUser);
-    }
+  constructor(private http: HttpClient, private router: Router) {
+    const saved = localStorage.getItem('userSession');
+    if (saved) this.currentUser = JSON.parse(saved);
   }
 
   isAuthenticated(): boolean {
-    return this.currentUser !== null;
+    return !!this.currentUser;
   }
 
-  isAdmin() { return this.currentUser?.rol === 'Admin'; }
-  isRevisor() { return this.currentUser?.rol === 'Revisor' || this.currentUser?.rol === 'Admin'; }
-  isUsuario() { return this.currentUser?.rol === 'Usuario'; }
+  getToken(): string | null {
+    return this.currentUser?.token ?? null;
+  }
 
-  loginWithCredentials(email: string, pass: string): boolean {
-    const userFound = this.MOCK_USERS.find(u => u.email === email && u.password === pass);
+  isAdmin(): boolean { return this.currentUser?.rol === 'Admin'; }
+  isRevisor(): boolean { return ['Admin', 'Revisor'].includes(this.currentUser?.rol ?? ''); }
+  isUsuario(): boolean { return !this.isRevisor(); }
 
-    if (userFound) {
-      this.currentUser = userFound.data as UserSession;
-      localStorage.setItem('userSession', JSON.stringify(this.currentUser));
-      
-      // Redirigimos según el rol
-      if (this.isAdmin()) {
-          this.router.navigate(['/gestion-usuarios']);
-      } else {
-          this.router.navigate(['/dashboard-revisor']);
-      }
-      return true;
-    } else {
-      // Falló el login
-      return false;
-    }
+  loginWithCredentials(email: string, password: string): Observable<AuthLoginResponse> {
+    return this.http.post<AuthLoginResponse>(`${this.apiUrl}/login`, { email, password }).pipe(
+      tap(response => {
+        this.currentUser = response;
+        localStorage.setItem('userSession', JSON.stringify(response));
+      })
+    );
   }
 
   logout() {
     this.currentUser = null;
     localStorage.removeItem('userSession');
-    this.router.navigate(['/login']); // Al salir, lo mandamos al login
+    this.router.navigate(['/login']);
   }
 }
