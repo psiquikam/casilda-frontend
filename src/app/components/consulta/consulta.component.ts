@@ -241,8 +241,8 @@ export class ConsultaComponent implements OnInit {
       if (result) {
         this.solicitudService.asignar(element.solicitudId, {
           grupoProfesionalId: result.grupoProfesionalId,
-          tipoAsignacion: result.tipoAsignacion,
-          servicio: result.servicio,
+          idTipoAsignacion: result.idTipoAsignacion,
+          idTipoServicio: result.idTipoServicio,
           observaciones: result.observaciones,
           fechaReparto: result.fechaReparto
         }).subscribe({

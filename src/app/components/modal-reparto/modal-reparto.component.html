@@ -10,15 +10,15 @@
       <div class="form-grid">
         <mat-form-field appearance="outline">
           <mat-label>Tipo de Asignación</mat-label>
-          <mat-select formControlName="tipoAsignacion">
-            <mat-option *ngFor="let tipo of tiposAsignacion" [value]="tipo">{{ tipo }}</mat-option>
+          <mat-select formControlName="idTipoAsignacion">
+            <mat-option *ngFor="let tipo of tiposAsignacion" [value]="tipo.id">{{ tipo.nombre }}</mat-option>
           </mat-select>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
           <mat-label>Servicio</mat-label>
-          <mat-select formControlName="servicio">
-            <mat-option *ngFor="let serv of servicios" [value]="serv">{{ serv }}</mat-option>
+          <mat-select formControlName="idTipoServicio">
+            <mat-option *ngFor="let serv of tiposServicio" [value]="serv.id">{{ serv.nombre }}</mat-option>
           </mat-select>
         </mat-form-field>
 
