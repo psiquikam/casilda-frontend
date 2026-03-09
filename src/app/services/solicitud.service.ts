@@ -102,8 +102,8 @@ export interface UpdateSolicitudDto {
 
 export interface AsignarSolicitudDto {
   grupoProfesionalId: number;
-  tipoAsignacion: string;
-  servicio: string;
+  idTipoAsignacion: number;
+  idTipoServicio: number;
   observaciones: string;
   fechaReparto?: string;
 }
@@ -119,6 +119,9 @@ export interface ContactoTelefonicoDto {
   jornada: string;
   resultado: string;
   observacion: string;
+  citaCreada?: boolean;
+  citaId?: number;
+  fechaCita?: string;
 }
 
 export interface ContactoTelefonicoRequestDto {
@@ -126,6 +129,8 @@ export interface ContactoTelefonicoRequestDto {
   hora: string;
   resultado: string;
   observacion: string;
+  fechaCita?: string;
+  horaCita?: string;
 }
 
 @Injectable({ providedIn: 'root' })

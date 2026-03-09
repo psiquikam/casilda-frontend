@@ -12,8 +12,12 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { SolicitudService, ContactoTelefonicoDto } from '../../services/solicitud.service';
 import { environment } from '../../../environments/environment';
+
+/** Resultado que permite concertar cita en primera llamada */
+const RESULTADO_EXITOSO = 'Contesta y se concerta cita';
 
 @Component({
   selector: 'app-modal-gestion',
@@ -29,7 +33,8 @@ import { environment } from '../../../environments/environment';
     MatTableModule,
     MatTabsModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatSnackBarModule
   ],
   templateUrl: './modal-gestion-contacto.component.html',
   styleUrls: ['./modal-gestion-contacto.component.scss']
@@ -47,13 +52,18 @@ export class ModalGestionComponent implements OnInit {
 
   mostrarCamposCita = false;
 
+  /** Máximo de llamadas antes de asignación unilateral de cita */
+  maxLlamadas = 2;
+
   private readonly maestrosUrl = `${environment.apiBaseUrl}/maestros`;
+  private readonly parametrosUrl = `${environment.apiBaseUrl}/parametros`;
 
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<ModalGestionComponent>,
     private solicitudService: SolicitudService,
     private http: HttpClient,
+    private snackBar: MatSnackBar,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
@@ -65,8 +75,7 @@ export class ModalGestionComponent implements OnInit {
       resultado: ['', Validators.required],
       observacion: ['', [Validators.required, Validators.minLength(5)]],
       fechaCita: [''],
-      horaCita: [''],
-      tipoCita: ['']
+      horaCita: ['']
     });
 
     const horaInicial = this.contactoForm.get('hora')?.value;
@@ -79,21 +88,40 @@ export class ModalGestionComponent implements OnInit {
     });
 
     this.contactoForm.get('resultado')?.valueChanges.subscribe((value) => {
-      const fallidosPrevios = this.historialContactos.filter(h => h.resultado !== 'Exitoso').length;
-      const totalFallidos = value !== 'Exitoso' ? fallidosPrevios + 1 : fallidosPrevios;
-      this.mostrarCamposCita = value === 'Exitoso' || totalFallidos >= 2;
-      this.actualizarValidadoresCita();
+      this.recalcularMostrarCamposCita(value);
     });
 
     // Cargar datos desde el backend
+    this.cargarMaxLlamadas();
     this.cargarResultados();
     this.cargarHistorial();
+  }
+
+  /** Calcula si se deben mostrar los campos de cita según el resultado y el número de llamada */
+  private recalcularMostrarCamposCita(resultado: string): void {
+    const numeroDeLlamada = this.historialContactos.length + 1;
+    const esConcertada = resultado === RESULTADO_EXITOSO;
+    const esUnilateral = numeroDeLlamada >= this.maxLlamadas;
+    this.mostrarCamposCita = esConcertada || esUnilateral;
+    this.actualizarValidadoresCita();
+  }
+
+  cargarMaxLlamadas(): void {
+    this.http.get<number>(`${this.parametrosUrl}/max-llamadas-contacto`).subscribe({
+      next: (valor) => {
+        this.maxLlamadas = valor;
+        // Recalcular por si ya hay resultado seleccionado
+        const resultado = this.contactoForm.get('resultado')?.value;
+        if (resultado) this.recalcularMostrarCamposCita(resultado);
+      },
+      error: () => { this.maxLlamadas = 2; }
+    });
   }
 
   cargarResultados(): void {
     this.http.get<{ id: number; nombre: string }[]>(`${this.maestrosUrl}/resultados-contacto-telefonico`).subscribe({
       next: (lista) => { this.resultados = lista.map(r => r.nombre); },
-      error: () => { this.resultados = ['Exitoso', 'No contesta', 'Buzón de voz', 'Número equivocado', 'Solicita llamar luego']; }
+      error: () => { this.resultados = []; }
     });
   }
 
@@ -110,16 +138,13 @@ export class ModalGestionComponent implements OnInit {
     if (this.mostrarCamposCita) {
       this.contactoForm.get('fechaCita')?.setValidators([Validators.required]);
       this.contactoForm.get('horaCita')?.setValidators([Validators.required]);
-      this.contactoForm.get('tipoCita')?.setValidators([Validators.required]);
     } else {
       this.contactoForm.get('fechaCita')?.clearValidators();
       this.contactoForm.get('horaCita')?.clearValidators();
-      this.contactoForm.get('tipoCita')?.clearValidators();
-      this.contactoForm.patchValue({ fechaCita: '', horaCita: '', tipoCita: '' });
+      this.contactoForm.patchValue({ fechaCita: '', horaCita: '' });
     }
     this.contactoForm.get('fechaCita')?.updateValueAndValidity();
     this.contactoForm.get('horaCita')?.updateValueAndValidity();
-    this.contactoForm.get('tipoCita')?.updateValueAndValidity();
   }
 
   registrarIntento(): void {
@@ -132,14 +157,19 @@ export class ModalGestionComponent implements OnInit {
       fecha: val.fecha,
       hora: val.hora,
       resultado: val.resultado,
-      observacion: val.observacion
+      observacion: val.observacion,
+      fechaCita: val.fechaCita || undefined,
+      horaCita: val.horaCita || undefined
     }).subscribe({
       next: (contacto) => {
         this.guardando = false;
-        this.historialContactos = [contacto, ...this.historialContactos];
-        this.contactoForm.patchValue({ resultado: '', observacion: '' });
-        this.mostrarCamposCita = false;
-        this.actualizarValidadoresCita();
+        if (contacto.citaCreada) {
+          this.snackBar.open(
+            `✅ Cita registrada para el ${contacto.fechaCita ?? val.fechaCita}.`,
+            'Cerrar',
+            { duration: 5000, panelClass: ['snack-success'] }
+          );
+        }
         this.dialogRef.close(true);
       },
       error: (err) => {
