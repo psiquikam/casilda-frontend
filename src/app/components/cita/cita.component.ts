@@ -1,20 +1,20 @@
 import { Component, OnInit, inject, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, MatPaginatorIntl } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { MatDialog } from '@angular/material/dialog';
 import { ReprogramarCitaModalComponent } from '../modal-reprogramar-cita/modal-reprogramar-cita.component';
+import { SolicitudService, CitaDto, EstadoCitaEnum } from '../../services/solicitud.service';
 
 export function getSpanishPaginatorIntl() {
   const paginatorIntl = new MatPaginatorIntl();
@@ -37,9 +37,10 @@ export function getSpanishPaginatorIntl() {
   selector: 'app-cita',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule,
-    MatInputModule, MatSelectModule, MatButtonModule, MatIconModule,
-    MatDividerModule, MatTableModule, MatPaginatorModule, MatTooltipModule
+    CommonModule, MatCardModule, MatFormFieldModule,
+    MatInputModule, MatButtonModule, MatIconModule,
+    MatDividerModule, MatTableModule, MatPaginatorModule, MatTooltipModule,
+    MatProgressSpinnerModule
   ],
   providers: [
     { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
@@ -58,31 +59,36 @@ export class CitaComponent implements OnInit, AfterViewInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private dialog = inject(MatDialog);
+  private solicitudService = inject(SolicitudService);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   displayedColumns: string[] = ['expand', 'id', 'nombre', 'fecha', 'dependencia', 'acciones'];
-  dataSource = new MatTableDataSource<any>([]);
-  expandedElement: any | null;
+  dataSource = new MatTableDataSource<CitaDto>([]);
+  expandedElement: CitaDto | null = null;
+
+  cargando = false;
 
   filterValues = { id: '', nombre: '', fecha: '', dependencia: '' };
 
-  datosSimulados = [
-    {
-      id: 'ACO-2002', nombre: 'Miguel Cano', documento: '71234456', fecha: '2026-02-03', dependencia: 'Jurídica',
-      estado: 'Programada',
-      tipoSolicitud: 'Asesoría', facultad: 'Derecho', campus: 'Principal', genero: 'Masculino', edad: 24, celular: '3154433221',
-      cargo: 'Egresado', telefono: '6014455', correoInst: 'm.cano@U.edu.co', correoPers: 'miguel.c@outlook.com'
-    }
-  ];
-
   ngOnInit() {
-    this.dataSource.data = this.datosSimulados;
     this.dataSource.filterPredicate = this.createFilter();
+    this.cargarCitas();
   }
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
+  }
+
+  cargarCitas(): void {
+    this.cargando = true;
+    this.solicitudService.listarCitas().subscribe({
+      next: (citas) => {
+        this.dataSource.data = citas.filter(c => c.idEstadoCita !== EstadoCitaEnum.CANCELADA);
+        this.cargando = false;
+      },
+      error: () => { this.cargando = false; }
+    });
   }
 
   applyFilter(column: string, event: Event) {
@@ -91,41 +97,56 @@ export class CitaComponent implements OnInit, AfterViewInit {
     this.dataSource.filter = JSON.stringify(this.filterValues);
   }
 
-  createFilter(): (data: any, filter: string) => boolean {
-    return (data: any, filter: string): boolean => {
-      const searchTerms = JSON.parse(filter);
-      return data.id.toLowerCase().includes(searchTerms.id)
-        && data.nombre.toLowerCase().includes(searchTerms.nombre)
-        && data.fecha.toLowerCase().includes(searchTerms.fecha)
-        && data.dependencia.toLowerCase().includes(searchTerms.dependencia);
+  createFilter(): (data: CitaDto, filter: string) => boolean {
+    return (data: CitaDto, filter: string): boolean => {
+      const f = JSON.parse(filter);
+      return (data.codigoSolicitud || '').toLowerCase().includes(f.id)
+        && (data.nombreSolicitante || '').toLowerCase().includes(f.nombre)
+        && (data.fechaCita || '').toLowerCase().includes(f.fecha)
+        && (data.dependencia || '').toLowerCase().includes(f.dependencia);
     };
   }
 
-  reprogramarCita(caso: any) {
-    this.abrirModalGestion(caso, 'reprogramar');
+  reprogramarCita(cita: CitaDto) {
+    this.abrirModalGestion(cita, 'reprogramar');
   }
 
-  cancelarCita(caso: any) {
-    this.abrirModalGestion(caso, 'cancelar');
+  cancelarCita(cita: CitaDto) {
+    this.abrirModalGestion(cita, 'cancelar');
   }
 
-  private abrirModalGestion(caso: any, accion: 'cancelar' | 'reprogramar') {
+  private abrirModalGestion(cita: CitaDto, accion: 'cancelar' | 'reprogramar') {
     const dialogRef = this.dialog.open(ReprogramarCitaModalComponent, {
       width: '600px',
-      data: { caso: caso, accion: accion }
+      data: {
+        caso: { ...cita, fecha: cita.fechaCita ? cita.fechaCita.split(' ')[0] : '' },
+        accion
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        if (result.accion === 'cancelar') {
-          this.dataSource.data = this.dataSource.data.filter(c => c.id !== result.id);
-        } else {
-          const index = this.dataSource.data.findIndex(c => c.id === result.id);
-          if (index !== -1) {
-            this.dataSource.data[index].fecha = result.formulario.fechaCita;
-            this.dataSource._updateChangeSubscription();
-          }
-        }
+      if (!result) return;
+      const citaId = cita.id;
+      if (result.accion === 'cancelar') {
+        const f = result.formulario;
+        this.solicitudService.cancelarCita(citaId, {
+          idMotivoEstadoCita: f.idMotivoEstadoCita,
+          observaciones: f.observaciones
+        }).subscribe({
+          next: () => this.cargarCitas(),
+          error: (err) => console.error('Error al cancelar cita:', err)
+        });
+      } else {
+        const f = result.formulario;
+        this.solicitudService.reprogramarCita(citaId, {
+          fechaCita: f.fechaCita,
+          horaCita: f.horaCita,
+          idMotivoEstadoCita: f.idMotivoEstadoCita,
+          observaciones: f.observaciones
+        }).subscribe({
+          next: () => this.cargarCitas(),
+          error: (err) => console.error('Error al reprogramar cita:', err)
+        });
       }
     });
   }

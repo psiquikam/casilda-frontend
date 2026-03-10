@@ -9,23 +9,23 @@
       <p class="info-text">
         Usuario: <b>{{ data.caso.nombre }}</b>
       </p>
-      
+
       <div class="form-grid">
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" *ngIf="data.accion === 'reprogramar'">
           <mat-label>Fecha de Cita</mat-label>
           <input matInput type="date" formControlName="fechaCita">
         </mat-form-field>
 
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" *ngIf="data.accion === 'reprogramar'">
           <mat-label>Hora de Cita</mat-label>
           <input matInput type="time" formControlName="horaCita">
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="span-all">
           <mat-label>Motivo</mat-label>
-          <mat-select formControlName="motivo">
-            <mat-option *ngFor="let m of listaMotivos" [value]="m">
-              {{ m }}
+          <mat-select formControlName="idMotivoEstadoCita">
+            <mat-option *ngFor="let m of motivos" [value]="m.id">
+              {{ m.nombre }}
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -41,10 +41,10 @@
 
   <mat-dialog-actions align="end" class="modal-footer">
     <button mat-button (click)="cerrar()">Volver</button>
-    <button mat-flat-button 
-            [color]="colorBoton" 
-            class="btn-confirm" 
-            (click)="guardar()" 
+    <button mat-flat-button
+            [color]="colorBoton"
+            class="btn-confirm"
+            (click)="guardar()"
             [disabled]="gestionForm.invalid">
       <mat-icon>check_circle</mat-icon>
       Confirmar {{ data.accion === 'cancelar' ? 'Cancelación' : 'Reprogramación' }}
