@@ -7,6 +7,9 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { MaestroDto } from '../../services/listas.service';
 
 @Component({
   selector: 'app-reprogramar-modal',
@@ -21,34 +24,38 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class ReprogramarCitaModalComponent implements OnInit {
   gestionForm: FormGroup;
-
-  listaMotivos = [
-    'Inasistencia injustificada',
-    'Cambio de agenda de la dupla o la profesional',
-    'Circunstancias externas',
-    'Solicitud de persona a atender',
-    'NA'
-  ];
+  motivos: MaestroDto[] = [];
 
   constructor(
     private fb: FormBuilder,
+    private http: HttpClient,
     private dialogRef: MatDialogRef<ReprogramarCitaModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { caso: any, accion: 'cancelar' | 'reprogramar' }
   ) {
     this.gestionForm = this.fb.group({
       fechaCita: ['', Validators.required],
       horaCita: ['08:00', Validators.required],
-      motivo: ['', Validators.required],
+      idMotivoEstadoCita: [null, Validators.required],
       observaciones: ['', [Validators.maxLength(500)]]
     });
   }
 
   ngOnInit(): void {
+    if (this.data.accion === 'cancelar') {
+      this.gestionForm.get('fechaCita')?.clearValidators();
+      this.gestionForm.get('fechaCita')?.updateValueAndValidity();
+      this.gestionForm.get('horaCita')?.clearValidators();
+      this.gestionForm.get('horaCita')?.updateValueAndValidity();
+    }
     if (this.data.caso && this.data.caso.fecha) {
       this.gestionForm.patchValue({
         fechaCita: this.data.caso.fecha
       });
     }
+    this.http.get<MaestroDto[]>(`${environment.apiBaseUrl}/maestros/motivos-estado-cita`).subscribe({
+      next: (lista) => { this.motivos = lista; },
+      error: () => { this.motivos = []; }
+    });
   }
 
   get titulo(): string {
