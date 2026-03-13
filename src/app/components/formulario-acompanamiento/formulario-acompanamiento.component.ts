@@ -2,6 +2,7 @@
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MatTableModule } from '@angular/material/table';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -30,7 +31,7 @@ import { ModalTelefonoComponent } from '../modal-telefono/modal-telefono.compone
     CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule,
     MatInputModule, MatSelectModule, MatDatepickerModule, MatNativeDateModule,
     MatButtonModule, MatIconModule, MatSnackBarModule, MatRadioModule,
-    MatDialogModule, MatTabsModule, MatProgressSpinnerModule
+    MatDialogModule, MatTabsModule, MatProgressSpinnerModule, MatTableModule
   ],
   templateUrl: './formulario-acompanamiento.component.html',
   styleUrls: ['./formulario-acompanamiento.component.scss']

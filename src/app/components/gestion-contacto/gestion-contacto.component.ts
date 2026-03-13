@@ -36,19 +36,19 @@ export function getSpanishPaginatorIntl() {
   selector: 'app-detalle-acompanamiento',
   standalone: true,
   imports: [
-  CommonModule,
-  ReactiveFormsModule,
-  MatCardModule,
-  MatFormFieldModule,
-  MatInputModule,
-  MatSelectModule,
-  MatButtonModule,
-  MatTableModule,
-  MatIconModule,
-  MatPaginatorModule,
-  MatDialogModule,
-  MatTooltipModule
-],
+    CommonModule,
+    ReactiveFormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatTableModule,
+    MatIconModule,
+    MatPaginatorModule,
+    MatDialogModule,
+    MatTooltipModule
+  ],
   providers: [
     { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
   ],
@@ -69,16 +69,30 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
   private dialog = inject(MatDialog);
   private solicitudService = inject(SolicitudService);
 
+  dataSourceActivos = new MatTableDataSource<any>([]);
+  dataSourceTransicion = new MatTableDataSource<any>([]);
+  dataSourceCerrados = new MatTableDataSource<any>([]);
+  dataSourceSinRepartir = new MatTableDataSource<any>([]);
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   idCaso: string = 'Seleccione un caso';
   contactoForm!: FormGroup;
+  solicitudes: any[] = [];
   cargando = false;
 
-  displayedColumns: string[] = ['expand', 'id', 'nombre', 'fecha', 'dependencia', 'acciones'];
+
+  displayedColumns: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'dependencia', 'profesional', 'acciones'];
   dataSource = new MatTableDataSource<any>([]);
   expandedElement: any | null;
-  filterValues = { id: '', nombre: '', fecha: '', dependencia: '' };
+  filterValues: any = {
+    id: '',
+    nombre: '',
+    documento: '',
+    fecha: '',
+    dependencia: '',
+    profesional: ''
+  };
 
   ngOnInit(): void {
     this.cargarSolicitudes();
@@ -105,6 +119,8 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
           id: s.id,
           solicitudId: s.id,
           codigo: s.codigo,
+          profesional: s.profesional,
+          tipoDocumento: s.tipoDocumento,
           nombre: s.nombreSolicitante,
           documento: s.documentoSolicitante,
           fecha: s.fechaCreacion ? String(s.fechaCreacion).substring(0, 10) : '',
@@ -124,19 +140,67 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
     });
   }
 
+  inicializarTablas() {
+    this.dataSourceSinRepartir.data = this.solicitudes.filter(c =>
+      !c.profesional || c.profesional === 'Sin asignar'
+    );
+
+    this.dataSourceActivos.data = this.solicitudes.filter(c =>
+      c.profesional && c.profesional !== 'Sin asignar' &&
+      c.estado !== 'Cerrado' && c.estado !== 'Abierto en transición'
+    );
+
+    this.dataSourceTransicion.data = this.solicitudes.filter(c =>
+      c.estado === 'Abierto en transición'
+    );
+
+    this.dataSourceCerrados.data = this.solicitudes.filter(c =>
+      c.estado === 'Cerrado'
+    );
+
+    const filterPredicate = this.createFilter();
+    [this.dataSourceSinRepartir, this.dataSourceActivos, this.dataSourceTransicion, this.dataSourceCerrados]
+      .forEach(ds => ds.filterPredicate = filterPredicate);
+  }
+
   applyFilter(column: string, event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
-    (this.filterValues as any)[column] = filterValue.trim().toLowerCase();
-    this.dataSource.filter = JSON.stringify(this.filterValues);
+    this.filterValues[column] = filterValue.trim().toLowerCase();
+    const filterString = JSON.stringify(this.filterValues);
+
+    [
+      this.dataSourceSinRepartir,
+      this.dataSourceActivos,
+      this.dataSourceTransicion,
+      this.dataSourceCerrados
+    ].forEach(ds => {
+      ds.filter = filterString;
+      if (ds.paginator) ds.paginator.firstPage();
+    });
   }
 
   createFilter(): (data: any, filter: string) => boolean {
     return (data: any, filter: string): boolean => {
       const searchTerms = JSON.parse(filter);
-      return String(data.id).toLowerCase().includes(searchTerms.id)
-        && (data.nombre || '').toLowerCase().includes(searchTerms.nombre)
-        && (data.fecha || '').toLowerCase().includes(searchTerms.fecha)
-        && (data.dependencia || '').toLowerCase().includes(searchTerms.dependencia);
+
+      const nombreCompleto = `
+      ${data.primerNombre || ''}
+      ${data.segundoNombre || ''}
+      ${data.primerApellido || ''}
+      ${data.segundoApellido || ''}
+    `.toLowerCase();
+
+      const documentoCompleto = `
+      ${data.tipoDocumento || ''}
+      ${data.numeroDocumento || ''}
+    `.toLowerCase();
+
+      return (!searchTerms.id || data.id?.toLowerCase().includes(searchTerms.id))
+        && (!searchTerms.nombre || nombreCompleto.includes(searchTerms.nombre))
+        && (!searchTerms.documento || documentoCompleto.includes(searchTerms.documento))
+        && (!searchTerms.fecha || data.fecha?.toLowerCase().includes(searchTerms.fecha))
+        && (!searchTerms.dependencia || data.dependencia?.toLowerCase().includes(searchTerms.dependencia))
+        && (!searchTerms.profesional || data.profesional?.toLowerCase().includes(searchTerms.profesional));
     };
   }
 

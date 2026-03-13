@@ -1,0 +1,151 @@
+$purple-sys: #348F41;
+$purple-buttons: #348F41;
+
+:host {
+  display: block;
+
+  .modal-title {
+    margin: 0;
+    padding: 12px 20px;
+    background-color: $purple-sys;
+    color: white;
+    font-weight: 800;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .modal-content {
+    padding: 20px;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .form-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 8px;
+      width: 100%;
+
+      .flex-field {
+        flex: 1;
+      }
+    }
+  }
+}
+
+.file-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+
+  .btn-file {
+    background-color: #b0b0b0;
+    color: #333;
+    font-weight: bold;
+    border-radius: 8px;
+    text-transform: none;
+    height: 32px;
+  }
+
+  .file-name {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+}
+
+.modal-actions {
+  padding: 12px 24px;
+  border-top: 1px solid #e2e8f0;
+  gap: 8px;
+
+  .btn-confirm {
+    background-color: $purple-buttons;
+    color: white;
+    height: 32px;
+    border-radius: 16px;
+    font-weight: 700;
+    min-width: 90px;
+  }
+}
+
+::ng-deep .mat-mdc-dialog-container {
+  .mat-mdc-form-field {
+    width: 100%;
+    vertical-align: top;
+
+    &:not(.field-textarea) {
+      .mat-mdc-text-field-wrapper {
+        height: 48px !important;
+
+        .mat-mdc-form-field-flex {
+          height: 48px !important;
+          align-items: center;
+        }
+      }
+
+      .mat-mdc-form-field-infix {
+        padding: 0 !important;
+        display: flex;
+        align-items: center;
+        min-height: 48px !important;
+      }
+
+      .mat-mdc-floating-label {
+        top: 24px !important;
+      }
+    }
+
+    &.field-textarea {
+  .mat-mdc-text-field-wrapper {
+    min-height: 115px !important;
+    height: auto !important;
+    overflow: visible;
+  }
+
+      .mat-mdc-form-field-infix {
+        padding-top: 12px !important;
+        padding-bottom: 4px !important;
+        min-height: 115px !important;
+        display: flex;
+      }
+
+      .mat-mdc-floating-label {
+        top: 24px !important;
+      }
+
+      textarea.mat-mdc-input-element {
+        margin-top: 10px !important;
+        padding: 0 4px;
+        line-height: 1.4;
+        height: 90px !important;
+        overflow-y: auto !important;
+        resize: none;
+
+        &::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: #cbd5e1;
+          border-radius: 10px;
+        }
+      }
+    }
+
+    .mat-mdc-form-field-subscript-wrapper {
+      display: none;
+    }
+  }
+}

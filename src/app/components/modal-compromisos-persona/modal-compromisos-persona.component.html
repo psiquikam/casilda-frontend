@@ -1,0 +1,33 @@
+<h2 mat-dialog-title class="modal-title">
+    <mat-icon>assignment</mat-icon>
+    Compromiso de la Persona Atendida
+</h2>
+
+<mat-dialog-content class="modal-content">
+    <div class="form-row"> <mat-form-field appearance="outline" class="flex-field">
+            <mat-label>Fecha de Cumplimiento</mat-label>
+            <input matInput [matDatepicker]="picker" [(ngModel)]="data.fecha" placeholder="Seleccione fecha">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="flex-field">
+            <mat-label>Seleccione el Compromiso</mat-label>
+            <mat-select [(ngModel)]="data.compromisos">
+                <mat-option *ngFor="let opcion of catalogoCompromisos" [value]="opcion">
+                    {{opcion}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="modal-actions">
+    <button mat-button (click)="onNoClick()">Cancelar</button>
+
+    <button mat-flat-button class="btn-confirm" [mat-dialog-close]="data" [disabled]="!data.compromisos || !data.fecha">
+        <mat-icon>check</mat-icon>
+        Agregar compromiso
+    </button>
+</mat-dialog-actions>

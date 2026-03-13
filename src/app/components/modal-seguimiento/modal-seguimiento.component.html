@@ -1,0 +1,78 @@
+<h2 mat-dialog-title class="modal-title">
+  <mat-icon>assignment_turned_in</mat-icon>
+  Remisiones
+</h2>
+
+<mat-dialog-content class="modal-content">
+  <div class="form-row">
+    <mat-form-field appearance="outline" class="flex-field">
+      <mat-label>Tipo de seguimiento</mat-label>
+      <mat-select [(ngModel)]="data.tipoSeguimiento">
+        <mat-option *ngFor="let opcion of catalogoSeguimiento" [value]="opcion">{{opcion}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="flex-field">
+      <mat-label>Fecha</mat-label>
+      <input matInput [matDatepicker]="picker" [(ngModel)]="data.fecha" placeholder="Seleccione fecha">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+  </div>
+
+  <div class="form-row">
+    <mat-form-field appearance="outline" class="flex-field">
+      <mat-label>Acción *</mat-label>
+      <mat-select [(ngModel)]="data.accion">
+        <mat-option *ngFor="let opcion of catalogoAcciones" [value]="opcion">{{opcion}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="flex-field">
+      <mat-label>Actividad *</mat-label>
+      <mat-select [(ngModel)]="data.actividad">
+        <mat-option *ngFor="let opcion of catalogoActividades" [value]="opcion">{{opcion}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="form-row">
+    <mat-form-field appearance="outline" class="flex-field field-textarea">
+      <mat-label>Descripción *</mat-label>
+      <textarea matInput [(ngModel)]="data.descripcion" rows="5" placeholder="Ingrese detalles"></textarea>
+    </mat-form-field>
+
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+      <mat-form-field appearance="outline">
+        <mat-label>Estado de seguimiento *</mat-label>
+        <mat-select [(ngModel)]="data.estadoSeguimiento">
+          <mat-option *ngFor="let opcion of catalogoEstados" [value]="opcion">{{opcion}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Motivo del estado *</mat-label>
+        <mat-select [(ngModel)]="data.motivoEstado">
+          <mat-option *ngFor="let opcion of catalogoMotivos" [value]="opcion">{{opcion}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="file-section">
+    <input type="file" #fileInput (change)="onFileSelected($event)" style="display: none;">
+    <button mat-flat-button class="btn-file" (click)="fileInput.click()">
+      Seleccionar archivo
+    </button>
+    <p class="file-name">{{ data.archivo ? data.archivo.name : 'Sin archivos seleccionados' }}</p>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="modal-actions">
+  <button mat-button (click)="onNoClick()">Cancelar</button>
+  <button mat-flat-button class="btn-confirm" [mat-dialog-close]="data"
+    [disabled]="!data.accion || !data.descripcion || !data.fecha">
+    <mat-icon>check</mat-icon>
+    Guardar Remisión
+  </button>
+</mat-dialog-actions>
