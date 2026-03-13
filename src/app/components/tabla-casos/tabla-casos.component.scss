@@ -3,71 +3,41 @@ $green-success: #22c55e;
 $warning: #b45309;
 $danger: #ef4444;
 
-.cita-container {
+.consulta-container {
   padding: 24px;
   background-color: #f8fafc;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  .back-link {
-    width: 100%;
-    max-width: 1200px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #64748b;
-    cursor: pointer;
-    margin-bottom: 15px;
-    font-weight: 600;
-    font-size: 13px;
-    transition: color 0.2s;
-
-    &:hover {
-      color: #1e293b;
-    }
-  }
 }
 
-.section-header {
-  width: 100%;
-  max-width: 1200px;
-  margin-bottom: 15px;
+.page-header {
+  margin-bottom: 20px;
 
-  h2 {
+  h1 {
     margin: 0;
-    font-size: 1.4rem;
-    font-weight: 800;
     color: #0f172a;
+    font-weight: 900;
+    font-size: 1.5rem;
+    letter-spacing: -0.5px;
   }
 
-  .subtitle {
-    font-size: 0.9rem;
+  p {
     color: #64748b;
+    margin: 2px 0 0;
+    font-size: 0.85rem;
   }
 }
 
-.pendientes-card {
-  width: 100%;
-  max-width: 1200px;
-  background: #ffffff;
+.table-card {
   border-radius: 12px;
   border: none;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+  background: white;
   overflow: hidden;
-  padding: 0;
 }
 
 .table-responsive {
   width: 100%;
   overflow-x: auto;
 }
-
-table {
-  width: 100%;
-  border-spacing: 0;
-}
-
 
 tr.mat-mdc-header-row {
   height: 65px;
@@ -77,7 +47,6 @@ tr.mat-mdc-header-row {
 
 th.mat-mdc-header-cell {
   padding: 0 8px !important;
-  border-bottom: 1px solid #e2e8f0;
 
   &.mat-column-acciones {
     text-align: center;
@@ -147,17 +116,11 @@ th.mat-mdc-header-cell {
 
 .detail-row {
   height: 0;
-
-  td {
-    padding: 0;
-    border: 0;
-  }
 }
 
 .element-detail {
   overflow: hidden;
   display: flex;
-  padding: 0 24px;
 }
 
 .detail-grid {
@@ -204,10 +167,10 @@ th.mat-mdc-header-cell {
     }
 
     mat-icon {
-      font-size: 28px;
-      width: 28px;
-      height: 28px;
-      line-height: 28px;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
       display: flex;
       align-items: center;
       justify-content: center;

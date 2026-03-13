@@ -9,14 +9,14 @@
   overflow-y: auto;
 
   .logo-container {
-    padding: 30px 24px;
+    padding: 20px 24px; // Reducido de 30px
     display: flex;
     align-items: center;
     gap: 12px;
     
     mat-icon {
       color: #348F41;
-      transform: scale(1.3);
+      transform: scale(1.1); // Ligeramente más pequeño
     }
 
     span {
@@ -31,51 +31,43 @@
     padding: 0;
 
     .menu-label {
-      padding: 28px 24px 12px;
+      padding: 16px 24px 6px; // Reducido de 28px top y 12px bottom
       display: flex;
       align-items: center;
       gap: 14px;
       
-      font-size: 0.75rem;
+      font-size: 0.7rem; // Un poco más pequeño
       font-weight: 800;
       color: #475569;
       text-transform: uppercase;
-      letter-spacing: 1.2px;
+      letter-spacing: 1px;
 
       mat-icon.large-icon {
-        font-size: 32px !important; 
-        width: 32px !important;
-        height: 32px !important;
+        font-size: 24px !important; // Reducido de 32px para compactar
+        width: 24px !important;
+        height: 24px !important;
         color: #348F41;
-        
         display: flex !important;
         align-items: center;
         justify-content: center;
-        
         margin: 0 !important;
         filter: drop-shadow(0 2px 4px rgba(107, 45, 149, 0.15));
-
-        @media (max-width: 768px) {
-          font-size: 24px !important;
-          width: 24px !important;
-          height: 24px !important;
-        }
       }
     }
 
     a[mat-list-item] {
-      margin: 2px 12px !important;
+      margin: 1px 12px !important; // Reducido margen vertical de 2px a 1px
       width: calc(100% - 24px) !important;
-      border-radius: 12px;
+      border-radius: 8px;
       color: #64748b;
-      height: 42px !important;
+      height: 36px !important; // Reducido de 42px a 36px
       transition: all 0.2s ease;
 
       ::ng-deep .mdc-list-item__content {
-        padding-left: 46px !important;
+        padding-left: 38px !important; // Ajustado para alinearse con iconos más pequeños
 
         @media (max-width: 768px) {
-          padding-left: 34px !important;
+          padding-left: 30px !important;
         }
       }
 
@@ -96,12 +88,13 @@
   }
 
   mat-divider {
-    margin: 12px 24px;
+    margin: 6px 24px; // Reducido de 12px a 6px
     border-top-color: #f1f5f9;
   }
 }
+
 ::ng-deep {
   .mdc-list-item__primary-text {
-    font-size: 0.88rem !important;
+    font-size: 0.82rem !important; // Un poco más pequeño para mantener proporción
   }
 }

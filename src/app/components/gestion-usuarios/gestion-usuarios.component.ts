@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { DialogUsuarioComponent } from '../dialog-usuario/dialog-usuario.component';
 import { UsuarioService } from '../../services/usuario.service';
 import Swal from 'sweetalert2';
@@ -25,14 +26,17 @@ export interface Usuario {
   standalone: true,
   imports: [
     CommonModule, MatTableModule, MatButtonModule, MatIconModule,
-    MatCardModule, MatChipsModule, MatDialogModule, MatTooltipModule
+    MatCardModule, MatChipsModule, MatDialogModule, MatTooltipModule,
+    MatPaginatorModule
   ],
   templateUrl: './gestion-usuarios.component.html',
   styleUrls: ['./gestion-usuarios.component.scss']
 })
 export class GestionUsuariosComponent implements OnInit {
   displayedColumns: string[] = ['nombre', 'email', 'rol', 'estado', 'acciones'];
-  usuarios: Usuario[] = [];
+  dataSource = new MatTableDataSource<Usuario>([]);
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(private dialog: MatDialog, private usuarioService: UsuarioService) {}
 
@@ -43,14 +47,16 @@ export class GestionUsuariosComponent implements OnInit {
   private cargarUsuarios(): void {
     this.usuarioService.obtenerTodos().subscribe({
       next: (data) => {
-        this.usuarios = data.map(u => ({
+        const usuariosTransformados = data.map(u => ({
           id: Number(u.id),
           nombre: u.nombre,
           email: u.email,
           rol: u.nombreRol,
-          estado: u.activo ? 'Activo' : 'Inactivo',
+          estado: (u.activo ? 'Activo' : 'Inactivo') as 'Activo' | 'Inactivo',
           idRol: u.idRol
         }));
+        this.dataSource.data = usuariosTransformados;
+        this.dataSource.paginator = this.paginator;
       },
       error: (err) => console.error('Error cargando usuarios', err)
     });
@@ -112,5 +118,4 @@ export class GestionUsuariosComponent implements OnInit {
       error: (err) => console.error('Error cambiando estado', err)
     });
   }
-
 }

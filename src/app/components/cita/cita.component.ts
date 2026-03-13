@@ -63,13 +63,20 @@ export class CitaComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  displayedColumns: string[] = ['expand', 'id', 'nombre', 'fecha', 'dependencia', 'acciones'];
+  displayedColumns: string[] = ['expand', 'id', 'nombre', 'documento', 'dependencia', 'tipoSolicitud', 'estadoCita', 'acciones'];
   dataSource = new MatTableDataSource<CitaDto>([]);
   expandedElement: CitaDto | null = null;
 
   cargando = false;
 
-  filterValues = { id: '', nombre: '', fecha: '', dependencia: '' };
+  filterValues: any = {
+    id: '',
+    nombre: '',
+    documento: '',
+    dependencia: '',
+    tipoSolicitud: '',
+    estadoCita: '',
+  };
 
   ngOnInit() {
     this.dataSource.filterPredicate = this.createFilter();

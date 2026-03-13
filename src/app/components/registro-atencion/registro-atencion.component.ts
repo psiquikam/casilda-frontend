@@ -18,6 +18,8 @@ import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+
 import { ModalDireccionComponent } from '../modal-direccion/modal-direccion.component';
 import { ModalDiscapacidadComponent } from '../modal-discapacidad/modal-discapacidad.component';
 import { ModalCorreoComponent } from '../modal-correo/modal-correo.component';
@@ -29,10 +31,9 @@ import { ModalApreciacionJuridicaComponent } from '../modal-apreciacion-juridica
 import { ModalApreciacionPsicologicaComponent } from '../modal-apreciacion-psicologica/modal-apreciacion-psicologica.component';
 import { TablaCasosComponent } from '../tabla-casos/tabla-casos.component';
 import { TablaOtrosCasosComponent } from '../tabla-otros-casos/tabla-otros-casos.component';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-
-
-
+import { ModalCompromisosPersonaComponent } from '../modal-compromisos-persona/modal-compromisos-persona.component';
+import { ModalCompromisosProfesionalesComponent } from '../modal-compromisos-profesionales/modal-compromisos-profesionales.component';
+import { ModalSeguimientosComponent } from '../modal-seguimiento/modal-seguimiento.component';
 
 @Component({
   selector: 'app-registro-atencion',
@@ -75,15 +76,18 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
   casoPorAtender: any[] = [
     {
-      idCaso: '1001',
+      id: '1001',
       tiempoHechos: 'Reciente',
       tipoViolencia: 'Psicológica',
       subcategoria: 'Acoso',
       descripcion: 'Seguimiento por afectación emocional',
-      nombre: 'Jose',
+      nombre: 'Jose Alfredo Martinez Robledo',
       documento: '1213154312',
-
+      tipoDocumento: 'CC',
       tipoSolicitud: 'Directa',
+      fecha: '2025-01-25',
+      dependencia: 'Ingenieria',
+      profesional: 'Sin asignar',
       facultad: 'Ingeniería',
       campus: 'Principal',
       genero: 'Masculino',
@@ -95,15 +99,18 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       correoPers: 'jose@gmail.com'
     },
     {
-      idCaso: '1002',
+      id: '1002',
       tiempoHechos: 'Hace 6 meses',
       tipoViolencia: 'Física',
       subcategoria: 'Agresión',
       descripcion: 'Compromiso de acompañamiento médico',
-      nombre: 'Laura',
+      nombre: 'Laura Victoria Florez Parra',
       documento: '987654321',
-
-      tipoSolicitud: 'Indirecta',
+      tipoDocumento: 'CC',
+      tipoSolicitud: 'Directa',
+      fecha: '2025-01-25',
+      dependencia: 'Artes',
+      profesional: 'Sin asignar',
       facultad: 'Medicina',
       campus: 'Salud',
       genero: 'Femenino',
@@ -118,15 +125,18 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
   casosRelacionados: any[] = [
     {
-      idCaso: '1001',
+      id: '1001',
       tiempoHechos: 'Reciente',
       tipoViolencia: 'Psicológica',
       subcategoria: 'Acoso',
       descripcion: 'Seguimiento por afectación emocional',
-      nombre: 'Jose',
+      nombre: 'Jose Alfredo Martinez Robledo',
       documento: '1213154312',
-
+      tipoDocumento: 'CC',
       tipoSolicitud: 'Directa',
+      fecha: '2025-01-25',
+      dependencia: 'Ingenieria',
+      profesional: 'Sin asignar',
       facultad: 'Ingeniería',
       campus: 'Principal',
       genero: 'Masculino',
@@ -138,15 +148,18 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       correoPers: 'jose@gmail.com'
     },
     {
-      idCaso: '1002',
+      id: '1002',
       tiempoHechos: 'Hace 6 meses',
       tipoViolencia: 'Física',
       subcategoria: 'Agresión',
       descripcion: 'Compromiso de acompañamiento médico',
-      nombre: 'Laura',
+      nombre: 'Laura Victoria Florez Parra',
       documento: '987654321',
-
-      tipoSolicitud: 'Indirecta',
+      tipoDocumento: 'CC',
+      tipoSolicitud: 'Directa',
+      fecha: '2025-01-25',
+      dependencia: 'Artes',
+      profesional: 'Sin asignar',
       facultad: 'Medicina',
       campus: 'Salud',
       genero: 'Femenino',
@@ -159,11 +172,10 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     }
   ];
 
-
   dataSource = new MatTableDataSource<any>(this.casoPorAtender);
   dataSourceOtros = new MatTableDataSource<any>(this.casosRelacionados);
-  displayedColumnsTablaInicial = ['expand', 'idCaso', 'tipoViolencia', 'descripcion', 'nombre', 'acciones'];
-  displayedColumnsOtros = ['expand', 'idCaso', 'tipoViolencia', 'descripcion', 'nombre'];
+  displayedColumnsTablaInicial: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'dependencia', 'profesional', 'acciones'];
+  displayedColumnsOtros: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'dependencia', 'profesional',];
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -177,9 +189,12 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   expandedElementOtros: any | null = null;
 
   filterValues: any = {
-    idCaso: '',
-    tipoViolencia: '',
-    descripcion: ''
+    id: '',
+    nombre: '',
+    documento: '',
+    fecha: '',
+    dependencia: '',
+    profesional: ''
   };
 
   discapacidadesRegistradas: any[] = [];
@@ -190,6 +205,15 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   hechosRegistrados: any[] = [];
   remisionesRegistrados: any[] = [];
   activarRutasRegistrados: any[] = [];
+  compromisosPersona: any[] = [];
+  compromisosProfesional: any[] = [];
+  seguimientosRegistrados: any[] = [];
+
+  psicologicaSel: string[] = [];
+  fisicaSel: string[] = [];
+  sexualSel: string[] = [];
+  institucionalSel: string[] = [];
+  economicaSel: string[] = [];
 
   listaSexo = ['Masculino', 'Femenino', 'Intersexual', 'Indeterminado'];
   listaEtnias = ['Ninguna', 'Indígena', 'Afrocolombiano', 'Raizal', 'Palenquero', 'Rrom/Gitano'];
@@ -209,12 +233,12 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   tiposDoc = ['Cédula de Ciudadanía', 'Tarjeta de Identidad', 'Cédula de Extranjería', 'Pasaporte'];
   campusM = ['Principal', 'Robledo', 'Salud', 'Norte', 'Oriente'];
   facultadesM = ['Ingeniería', 'Derecho', 'Medicina', 'Artes', 'Ciencias Sociales', 'Educación Física'];
-  queForma = ['Ingeniería', 'Derecho', 'Medicina', 'Artes', 'Ciencias Sociales', 'Educación Física'];
-  lugarHechos = ['Ingeniería', 'Derecho', 'Medicina', 'Artes', 'Ciencias Sociales', 'Educación Física'];
+  queForma = ['Individual', 'Colectiva', 'Otra'];
+  lugarHechos = ['Campus Principal', 'Campus Salud', 'Entorno Virtual', 'Fuera de la Universidad'];
   actividadesMisionales = ['Docencia', 'Extensión', 'Investigación', 'Administrativas'];
+  estadosAtencion = ['estado 1', 'estado 2', 'estado 3', 'estado 4'];
+  grupoAtencion = ['grupo 1', 'grupo 2', 'grupo 3', 'grupo 4'];
 
-
-  //TAB VBG
   listaPsicologica = [
     'Difusión de contenido íntimo',
     'Constreñimiento ilegal',
@@ -244,14 +268,14 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     'Omision del deber de denuncia',
     'Revictimización',
     'Omisión al deber de debida diligencia',
-  ]
+  ];
 
   listaPatrimonial = [
     'Inasistencia alimentaria',
     'Hurto',
     'Control económico',
     'Daño en bien ajeno',
-  ]
+  ];
 
   listaInformatica = [
     'Grooming',
@@ -259,11 +283,11 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     'Sexting',
     'Chantaje sexual o extorsión sexual',
     'Violación de datos personales',
-  ]
+  ];
 
   listaPrejuicio = [
     'Discriminación por género u orientación sexual o identidad de género',
-  ]
+  ];
 
   constructor(
     private fb: FormBuilder,
@@ -315,6 +339,28 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     }
   }
 
+  onCheckboxChange(event: any, valor: string, arrayName: string) {
+    const lista = this[arrayName as keyof RegistroAtencionComponent] as string[];
+    if (event.checked) {
+      lista.push(valor);
+    } else {
+      const index = lista.indexOf(valor);
+      if (index >= 0) lista.splice(index, 1);
+    }
+
+    const controlMap: { [key: string]: string } = {
+      'psicologicaSel': 'detalleViolenciaPsicologica',
+      'fisicaSel': 'detalleViolenciaFisica',
+      'sexualSel': 'detalleViolenciaSexual',
+      'institucionalSel': 'detalleViolenciaInstitucional',
+      'economicaSel': 'detalleViolenciaEconomica'
+    };
+
+    if (controlMap[arrayName]) {
+      this.atencionForm.get(controlMap[arrayName])?.setValue(lista.join(', '));
+    }
+  }
+
   regresar(): void {
     this.modoAtencion = false;
     this.casoSeleccionado = null;
@@ -325,7 +371,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     this.modoAtencion = true;
     this.atencionForm.patchValue({
       tipoSolicitud: caso.tipoSolicitud || 'Indirecta',
-      documento: caso.idCaso || '',
+      documento: caso.documento || '',
       tipoViolencia: caso.tipoViolencia || ''
     });
   }
@@ -356,53 +402,199 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   }
 
   abrirModalApreciacionJuridica(): void {
-    const dialogRef = this.dialog.open(ModalApreciacionJuridicaComponent, { width: '800px' });
-    dialogRef.afterClosed().subscribe(res => { if (res) this.apreciacionesJuridicas.push(res); });
+    const dialogRef = this.dialog.open(ModalApreciacionJuridicaComponent, {
+      width: '800px',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.apreciacionesJuridicas = [...this.apreciacionesJuridicas, result];
+        this.snackBar.open('Apreciación agregada', 'Cerrar', { duration: 2000 });
+      }
+    });
   }
 
   abrirModalApreciacionPsicologica(): void {
-    const dialogRef = this.dialog.open(ModalApreciacionPsicologicaComponent, { width: '800px' });
-    dialogRef.afterClosed().subscribe(res => { if (res) this.apreciacionesPsicologicas.push(res); });
+    const dialogRef = this.dialog.open(ModalApreciacionPsicologicaComponent, {
+      width: '800px',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.apreciacionesPsicologicas = [...this.apreciacionesPsicologicas, result];
+        this.snackBar.open('Apreciación agregada', 'Cerrar', { duration: 2000 });
+      }
+    });
   }
 
   abrirModalDiscapacidad(): void {
-    const dialogRef = this.dialog.open(ModalDiscapacidadComponent, { width: '800px' });
-    dialogRef.afterClosed().subscribe(res => { if (res) this.discapacidadesRegistradas.push(res); });
+    const dialogRef = this.dialog.open(ModalDiscapacidadComponent, {
+      width: '800px',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.discapacidadesRegistradas = [...this.discapacidadesRegistradas, result];
+        this.snackBar.open('Discapacidad agregada', 'Cerrar', { duration: 2000 });
+      }
+    });
   }
 
   abrirModalCorreo(): void {
-    const dialogRef = this.dialog.open(ModalCorreoComponent, { width: '800px' });
-    dialogRef.afterClosed().subscribe(res => { if (res) this.correoRegistrados.push(res); });
+    const dialogRef = this.dialog.open(ModalCorreoComponent, {
+      width: '800px',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.correoRegistrados = [...this.correoRegistrados, result];
+        this.snackBar.open('Correo agregado', 'Cerrar', { duration: 2000 });
+      }
+    });
   }
 
   abrirModalTelefono(): void {
-    const dialogRef = this.dialog.open(ModalTelefonoComponent, { width: '800px' });
-    dialogRef.afterClosed().subscribe(res => { if (res) this.telefonosRegistrados.push(res); });
+    const dialogRef = this.dialog.open(ModalTelefonoComponent, {
+      width: '800px',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.telefonosRegistrados = [...this.telefonosRegistrados, result];
+        this.snackBar.open('Telefono agregado', 'Cerrar', { duration: 2000 });
+      }
+    });
   }
 
   abrirModalHechos(): void {
-    const dialogRef = this.dialog.open(ModalHechosComponent, { width: '800px' });
-    dialogRef.afterClosed().subscribe(res => { if (res) this.hechosRegistrados.push(res); });
+    const dialogRef = this.dialog.open(ModalHechosComponent, {
+      width: '800px',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.hechosRegistrados = [...this.hechosRegistrados, result];
+        this.snackBar.open('Hecho agregado', 'Cerrar', { duration: 2000 });
+      }
+    });
   }
 
   abrirModalRemision(): void {
-    const dialogRef = this.dialog.open(ModalRemisionComponent, { width: '800px' });
-    dialogRef.afterClosed().subscribe(res => { if (res) this.remisionesRegistrados.push(res); });
+    const dialogRef = this.dialog.open(ModalRemisionComponent, {
+      width: '800px',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.remisionesRegistrados = [...this.remisionesRegistrados, result];
+        this.snackBar.open('Hecho agregado', 'Cerrar', { duration: 2000 });
+      }
+    });
   }
 
   abrirModalRutaActivada(): void {
-    const dialogRef = this.dialog.open(ModalActivarRutaComponent, { width: '800px' });
-    dialogRef.afterClosed().subscribe(res => { if (res) this.activarRutasRegistrados.push(res); });
-  }
+    const dialogRef = this.dialog.open(ModalActivarRutaComponent, {
+      width: '800px',
+      disableClose: true
+    });
 
-  eliminarDiscapacidad(i: number) { this.discapacidadesRegistradas.splice(i, 1); }
-  eliminarCorreo(i: number) { this.correoRegistrados.splice(i, 1); }
-  eliminarTelefono(i: number) { this.telefonosRegistrados.splice(i, 1); }
-  eliminarHechos(i: number) { this.hechosRegistrados.splice(i, 1); }
-  eliminarRemision(i: number) { this.remisionesRegistrados.splice(i, 1); }
-  eliminarRutaActivada(i: number) { this.activarRutasRegistrados.splice(i, 1); }
-  eliminarApreciacionJuridica(i: number) { this.remisionesRegistrados.splice(i, 1); }
-  eliminarApreciacionPsicologica(i: number) { this.remisionesRegistrados.splice(i, 1); }
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.activarRutasRegistrados = [...this.activarRutasRegistrados, result];
+        this.snackBar.open('Hecho agregado', 'Cerrar', { duration: 2000 });
+      }
+    });
+  }
+  abrirModalCompromisosPersona(): void {
+    const dialogRef = this.dialog.open(ModalCompromisosPersonaComponent, {
+      width: '800px',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.compromisosPersona = [...this.compromisosPersona, result];
+        this.snackBar.open('Hecho agregado', 'Cerrar', { duration: 2000 });
+      }
+    });
+  }
+  abrirModalCompromisosProfesional(): void {
+    const dialogRef = this.dialog.open(ModalCompromisosProfesionalesComponent, {
+      width: '800px',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.compromisosProfesional = [...this.compromisosProfesional, result];
+        this.snackBar.open('Hecho agregado', 'Cerrar', { duration: 2000 });
+      }
+    });
+  }
+  abrirModalSeguimientos(): void {
+    const dialogRef = this.dialog.open(ModalSeguimientosComponent, {
+      width: '800px',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.seguimientosRegistrados = [...this.seguimientosRegistrados, result];
+        this.snackBar.open('Hecho agregado', 'Cerrar', { duration: 2000 });
+      }
+    });
+  }
+  eliminarSeguimientos(i: number) {
+    this.seguimientosRegistrados.splice(i, 1);
+    this.seguimientosRegistrados = [...this.seguimientosRegistrados];
+  }
+  eliminarCompromisosProfesional(i: number) {
+    this.compromisosProfesional.splice(i, 1);
+    this.compromisosProfesional = [...this.compromisosProfesional];
+  }
+  eliminarDiscapacidad(i: number) {
+    this.discapacidadesRegistradas.splice(i, 1);
+    this.discapacidadesRegistradas = [...this.discapacidadesRegistradas];
+  }
+  eliminarCompromisosPersona(i: number) {
+    this.compromisosPersona.splice(i, 1);
+    this.compromisosPersona = [...this.compromisosPersona];
+  }
+  eliminarCorreo(i: number) {
+    this.correoRegistrados.splice(i, 1);
+    this.correoRegistrados = [...this.correoRegistrados];
+  }
+  eliminarTelefono(i: number) {
+    this.telefonosRegistrados.splice(i, 1);
+    this.telefonosRegistrados = [...this.telefonosRegistrados];
+  }
+  eliminarHechos(i: number) {
+    this.hechosRegistrados.splice(i, 1);
+    this.hechosRegistrados = [...this.hechosRegistrados];
+  }
+  eliminarRemision(i: number) {
+    this.remisionesRegistrados.splice(i, 1);
+    this.remisionesRegistrados = [...this.remisionesRegistrados];
+  }
+  eliminarRutaActivada(i: number) {
+    this.activarRutasRegistrados.splice(i, 1);
+    this.activarRutasRegistrados = [...this.activarRutasRegistrados];
+  }
+  eliminarApreciacionJuridica(i: number) {
+    this.apreciacionesJuridicas.splice(i, 1);
+    this.apreciacionesJuridicas = [...this.apreciacionesJuridicas];
+  }
+  eliminarApreciacionPsicologica(i: number) {
+    this.apreciacionesPsicologicas.splice(i, 1);
+    this.apreciacionesPsicologicas = [...this.apreciacionesPsicologicas];
+  }
 
   eliminarAcuerdo(index: number) {
     this.casoPorAtender.splice(index, 1);
@@ -470,6 +662,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       violenciaInformatica: ['NO'],
       detalleViolenciaInformatica: [''],
       violenciaPrejuicio: ['NO'],
+      estadosAtencion: ['', Validators.required],
+      grupoAtencion: ['', Validators.required],
       detalleViolenciaPrejuicio: [''],
     });
   }
@@ -516,7 +710,17 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         remisiones: this.remisionesRegistrados,
         rutas: this.activarRutasRegistrados,
         apreciacionesJuridicas: this.apreciacionesJuridicas,
-        apreciacionesPsicologicas: this.apreciacionesPsicologicas
+        compromisosPersona: this.compromisosPersona,
+        compromisosProfesional: this.compromisosProfesional,
+        seguimientos: this.seguimientosRegistrados,
+        apreciacionesPsicologicas: this.apreciacionesPsicologicas,
+        detalleVbg: {
+          psicologica: this.psicologicaSel,
+          fisica: this.fisicaSel,
+          sexual: this.sexualSel,
+          institucional: this.institucionalSel,
+          economica: this.economicaSel
+        }
       };
       console.log('Datos a enviar:', dataFinal);
       this.snackBar.open('Registro guardado exitosamente', 'OK', { duration: 3000 });
