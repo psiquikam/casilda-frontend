@@ -107,11 +107,11 @@ $purple-sys: #348F41;
 
 .table-responsive {
   width: 100%;
-  max-height: 180px;
+  max-height: 130px;
   overflow: auto;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 .atencion-table {
@@ -119,13 +119,14 @@ $purple-sys: #348F41;
   th.mat-header-cell {
     background: #f8fafc;
     font-weight: 700;
-    font-size: 11px;
+    font-size: 10px;
     text-transform: uppercase;
     color: #64748b;
-    padding: 8px 12px;
+    padding: 5px 10px;
   }
-  td.mat-cell { padding: 8px 12px; font-size: 12px; color: #334155; }
+  td.mat-cell { padding: 5px 10px; font-size: 11px; color: #334155; }
 }
+
 
 .no-results-msg {
   text-align: center;
