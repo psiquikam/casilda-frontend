@@ -122,16 +122,16 @@ export class FormularioAcompanamientoComponent implements OnInit {
 
   abrirModalCorreo(): void {
     const dialogRef = this.dialog.open(ModalCorreoComponent, { width: '800px' });
-    dialogRef.afterClosed().subscribe(res => { if (res) this.correoRegistrados.push(res); });
+    dialogRef.afterClosed().subscribe(res => { if (res) this.correoRegistrados = [...this.correoRegistrados, res]; });
   }
 
   abrirModalTelefono(): void {
     const dialogRef = this.dialog.open(ModalTelefonoComponent, { width: '800px' });
-    dialogRef.afterClosed().subscribe(res => { if (res) this.telefonosRegistrados.push(res); });
+    dialogRef.afterClosed().subscribe(res => { if (res) this.telefonosRegistrados = [...this.telefonosRegistrados, res]; });
   }
 
-  eliminarCorreo(i: number) { this.correoRegistrados.splice(i, 1); }
-  eliminarTelefono(i: number) { this.telefonosRegistrados.splice(i, 1); }
+  eliminarCorreo(i: number) { this.correoRegistrados = this.correoRegistrados.filter((_, idx) => idx !== i); }
+  eliminarTelefono(i: number) { this.telefonosRegistrados = this.telefonosRegistrados.filter((_, idx) => idx !== i); }
 
   private formatDate(date: Date | null): string | null {
     if (!date) return null;

@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -47,7 +47,17 @@ export class ModalSeguimientosComponent {
     archivo: null as File | null
   };
 
-  constructor(public dialogRef: MatDialogRef<ModalSeguimientosComponent>) { }
+  bloquearTipo = false;
+
+  constructor(
+    public dialogRef: MatDialogRef<ModalSeguimientosComponent>,
+    @Inject(MAT_DIALOG_DATA) public incomingData: any
+  ) {
+    if (incomingData?.tipoSeguimiento) {
+      this.data.tipoSeguimiento = incomingData.tipoSeguimiento;
+      this.bloquearTipo = true;
+    }
+  }
 
   onFileSelected(event: any) {
     const file = event.target.files[0];

@@ -1,14 +1,9 @@
 <div class="sidebar">
-  <div class="logo-container">
-    <mat-icon color="primary">gavel</mat-icon>
-    <span>SISTEMA QUEJAS</span>
-  </div>
   <mat-nav-list>
 
     @if (auth.isAdmin()) {
-    <mat-divider></mat-divider>
     <div class="menu-label">
-      <mat-icon class="large-icon">manage_accounts</mat-icon>
+      <mat-icon svgIcon="administracion" class="logo-icon"></mat-icon>
       <span>ADMINISTRACIÓN Y PARAMETRIZACIÓN</span>
     </div>
     <a mat-list-item routerLink="/gestion-usuarios" routerLinkActive="active-item">
@@ -22,7 +17,7 @@
     @if (auth.isRevisor()) {
     <mat-divider></mat-divider>
     <div class="menu-label">
-      <mat-icon svgIcon="logo-custom" class="logo-icon"></mat-icon>
+      <mat-icon svgIcon="equipo-atencion" class="logo-icon"></mat-icon>
       <span>EQUIPO DE ATENCIÓN</span>
     </div>
     <a mat-list-item routerLink="/solicitud-acompanamiento" routerLinkActive="active-item">
@@ -45,16 +40,15 @@
     @if (auth.isRevisor()) {
     <mat-divider></mat-divider>
     <div class="menu-label">
-      <mat-icon class="large-icon">handshake</mat-icon>
+      <mat-icon svgIcon="logo-alma" class="logo-icon"></mat-icon>
       <span>LÍNEA ALMA</span>
     </div>
-    
     }
 
     @if (auth.isRevisor()) {
     <mat-divider></mat-divider>
     <div class="menu-label">
-      <mat-icon class="large-icon">handshake</mat-icon>
+      <mat-icon svgIcon="uad-equipo" class="logo-icon"></mat-icon>
       <span>UAD EQUIPO 3 Y 4</span>
     </div>
     <a mat-list-item routerLink="/nueva-queja" routerLinkActive="active-item">
@@ -63,13 +57,12 @@
     <a mat-list-item routerLink="/seguimiento" routerLinkActive="active-item">
       <span matListItemTitle>Seguimiento</span>
     </a>
-    
-    }   
+    }
 
     @if (auth.isAdmin()) {
     <mat-divider></mat-divider>
     <div class="menu-label">
-      <mat-icon class="large-icon">query_stats</mat-icon>
+      <mat-icon svgIcon="reportes-indicadores" class="logo-icon"></mat-icon>
       <span>REPORTES E INDICADORES</span>
     </div>
     <a mat-list-item routerLink="/dashboard-revisor" routerLinkActive="active-item">

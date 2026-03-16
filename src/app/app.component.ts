@@ -47,5 +47,25 @@ export class AppComponent {
       'logo-alma',
       this.domSanitizer.bypassSecurityTrustResourceUrl('assets/linea_alma.svg')
     );
+
+    this.matIconRegistry.addSvgIcon(
+      'equipo-atencion',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/equipo_atencion.svg')
+    );
+
+    this.matIconRegistry.addSvgIcon(
+      'uad-equipo',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/uad_equipo_3_y_4.svg')
+    );
+
+    this.matIconRegistry.addSvgIcon(
+      'reportes-indicadores',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/reportes_informes_indicadores.svg')
+    );
+
+    this.matIconRegistry.addSvgIcon(
+      'administracion',
+      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/administracion.svg')
+    );
   }
 }

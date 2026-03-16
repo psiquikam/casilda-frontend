@@ -26,52 +26,80 @@ $purple-sys: #348F41;
 
 .section-header-inline {
   display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
 
   .section-title {
     display: flex;
     align-items: center;
-    gap: 8px;
     margin: 0;
 
     span {
-      line-height: 1;
+      font-weight: 700;
+      color: #1e293b;
+    }
+  }
+
+  .seguimiento-select {
+    width: 220px;
+    margin-bottom: 0;
+
+    ::ng-deep {
+
+      .mat-mdc-form-field-subscript-wrapper {
+        display: none;
+      }
+
+      .mat-mdc-text-field-wrapper {
+        height: 36px;
+        padding: 0 8px;
+      }
+
+      .mat-mdc-form-field-flex {
+        height: 100%;
+        align-items: center;
+      }
+
+      .mat-mdc-form-field-infix {
+        padding: 0;
+        min-height: unset;
+        display: flex;
+        align-items: center;
+      }
+
+      .mat-mdc-floating-label {
+        top: 18px;
+      }
     }
   }
 
   .btn-add-inline {
-    width: 24px !important;
-    height: 24px !important;
-    line-height: 24px !important;
-    padding: 0 !important;
-    display: flex;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
+
+    .mat-mdc-button-touch-target {
+      width: 32px;
+      height: 32px;
+    }
 
     mat-icon {
       color: #348F41;
-      font-size: 20px !important;
-      width: 20px !important;
-      height: 20px !important;
-      margin: 0 !important;
+      width: 24px;
+      height: 24px;
+      font-size: 24px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      line-height: 1;
+      margin: 0;
     }
-  }
-}
-
-.section-header {
-  width: 100%;
-  margin-bottom: 15px;
-
-  h2 {
-    margin: 0;
-    font-size: 1.4rem;
-    font-weight: 800;
-    color: #0f172a;
-  }
-
-  .subtitle {
-    font-size: 0.9rem;
-    color: #64748b;
   }
 }
 
@@ -275,9 +303,9 @@ mat-card-actions {
 }
 
 .discapacidad-container {
-  margin-top: 25px;
+  margin-top: 10px;
   border-top: 1px solid #e2e8f0;
-  padding-top: 15px;
+  padding-top: 8px;
 
   .section-title {
     display: flex;
@@ -291,7 +319,7 @@ mat-card-actions {
 .table-responsive {
   display: block !important;
   width: 100%;
-  max-height: 160px !important;
+  max-height: 120px !important;
   overflow-y: auto !important;
   overflow-x: auto;
   border: 1px solid #e2e8f0;
@@ -323,13 +351,13 @@ mat-card-actions {
     font-weight: 700;
     font-size: 12px;
     text-transform: uppercase;
-    padding: 12px;
+    padding: 6px 10px;
     border-bottom: 2px solid #e2e8f0;
   }
 
   td.mat-cell {
-    font-size: 13px;
-    padding: 12px;
+    font-size: 12px;
+    padding: 6px 10px;
     color: #475569;
     border-bottom: 1px solid #f1f5f9;
   }
@@ -467,7 +495,7 @@ input[readonly] {
 
 .direccion-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   width: 100%;
   grid-column: 1 / -1;
@@ -490,6 +518,8 @@ input[readonly] {
   font-size: 12px !important;
   display: flex;
   align-items: center;
+  align-self: flex-start;
+  margin-top: 12px !important;
   gap: 6px;
   white-space: nowrap;
   background-color: #348F41 !important;

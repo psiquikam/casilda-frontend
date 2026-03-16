@@ -42,8 +42,8 @@
       text-transform: uppercase;
       letter-spacing: 1px;
 
-      mat-icon.large-icon {
-        font-size: 24px !important; // Reducido de 32px para compactar
+      mat-icon.large-icon, mat-icon.logo-icon {
+        font-size: 24px !important;
         width: 24px !important;
         height: 24px !important;
         color: #348F41;
@@ -52,6 +52,13 @@
         justify-content: center;
         margin: 0 !important;
         filter: drop-shadow(0 2px 4px rgba(107, 45, 149, 0.15));
+      }
+
+      mat-icon.logo-icon ::ng-deep svg path,
+      mat-icon.logo-icon ::ng-deep svg circle,
+      mat-icon.logo-icon ::ng-deep svg rect,
+      mat-icon.logo-icon ::ng-deep svg polygon {
+        fill: #348F41;
       }
     }
 

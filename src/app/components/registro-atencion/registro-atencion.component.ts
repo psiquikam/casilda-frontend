@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
@@ -19,6 +19,7 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { FormsModule } from '@angular/forms';
 
 import { ModalDireccionComponent } from '../modal-direccion/modal-direccion.component';
 import { ModalDiscapacidadComponent } from '../modal-discapacidad/modal-discapacidad.component';
@@ -59,7 +60,8 @@ import { ModalSeguimientosComponent } from '../modal-seguimiento/modal-seguimien
     MatTooltipModule,
     TablaCasosComponent,
     TablaOtrosCasosComponent,
-    MatCheckboxModule
+    MatCheckboxModule,
+    FormsModule
   ],
   templateUrl: './registro-atencion.component.html',
   styleUrls: ['./registro-atencion.component.scss'],
@@ -176,6 +178,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   dataSourceOtros = new MatTableDataSource<any>(this.casosRelacionados);
   displayedColumnsTablaInicial: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'dependencia', 'profesional', 'acciones'];
   displayedColumnsOtros: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'dependencia', 'profesional',];
+  catalogoSeguimiento: string[] = ['Presencial', 'Telefónico', 'Virtual', 'Visita Domiciliaria'];
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -183,10 +186,17 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   @ViewChild('paginatorOtros') paginatorOtros!: MatPaginator;
   @ViewChild('sortOtros') sortOtros!: MatSort;
 
+  tipoSeguimientoControl = new FormControl<string | null>(null);
+
+  miFormulario = new FormGroup({
+    tipoSeguimiento: this.tipoSeguimientoControl
+  });
+
   modoAtencion = false;
   casoSeleccionado: any = null;
   expandedElement: any | null = null;
   expandedElementOtros: any | null = null;
+  tipoSeguimientoSeleccionado?: string;
 
   filterValues: any = {
     id: '',
@@ -538,10 +548,11 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       }
     });
   }
-  abrirModalSeguimientos(): void {
+  abrirModalSeguimientos(tipoSeguimiento?: string): void {
     const dialogRef = this.dialog.open(ModalSeguimientosComponent, {
       width: '800px',
-      disableClose: true
+      disableClose: true,
+      data: { tipoSeguimiento }
     });
 
     dialogRef.afterClosed().subscribe(result => {
