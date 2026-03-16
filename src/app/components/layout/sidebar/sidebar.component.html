@@ -1,8 +1,4 @@
 <div class="sidebar">
-  <div class="logo-container">
-    <mat-icon color="primary">gavel</mat-icon>
-    <span>SISTEMA QUEJAS</span>
-  </div>
   <mat-nav-list>
 
     @if (auth.isAdmin()) {
@@ -48,7 +44,6 @@
       <mat-icon class="large-icon">handshake</mat-icon>
       <span>LÍNEA ALMA</span>
     </div>
-    
     }
 
     @if (auth.isRevisor()) {
@@ -63,8 +58,7 @@
     <a mat-list-item routerLink="/seguimiento" routerLinkActive="active-item">
       <span matListItemTitle>Seguimiento</span>
     </a>
-    
-    }   
+    }
 
     @if (auth.isAdmin()) {
     <mat-divider></mat-divider>
