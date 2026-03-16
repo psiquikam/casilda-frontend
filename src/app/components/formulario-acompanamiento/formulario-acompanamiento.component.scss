@@ -29,10 +29,12 @@ $purple-sys: #348F41;
   background: white;
 }
 
-.content-padding { padding: 25px; }
+.content-padding { padding: 20px; }
 
 .profile-selector {
   margin-bottom: 25px;
+
+  .section-title { margin: 0 0 10px; }
 
   .profile-grid {
     display: grid;
