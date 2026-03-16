@@ -7,8 +7,10 @@
   <div class="form-row">
     <mat-form-field appearance="outline" class="flex-field">
       <mat-label>Tipo de seguimiento</mat-label>
-      <mat-select [(ngModel)]="data.tipoSeguimiento">
-        <mat-option *ngFor="let opcion of catalogoSeguimiento" [value]="opcion">{{opcion}}</mat-option>
+      <mat-select [(ngModel)]="data.tipoSeguimiento" [disabled]="bloquearTipo">
+        <mat-option *ngFor="let opcion of catalogoSeguimiento" [value]="opcion">
+          {{opcion}}
+        </mat-option>
       </mat-select>
     </mat-form-field>
 

@@ -1073,14 +1073,35 @@
 
                                 <div class="discapacidad-container">
                                     <div class="section-header-inline">
+
                                         <div class="section-title">
                                             <span>Seguimientos del Caso</span>
                                         </div>
 
-                                        <button mat-icon-button class="btn-add-inline" (click)="abrirModalSeguimientos()"
+                                        <mat-form-field appearance="outline" subscriptSizing="dynamic"
+                                            class="seguimiento-select">
+
+                                            <mat-label>Tipo de Seguimiento</mat-label>
+
+                                            <mat-select [(ngModel)]="tipoSeguimientoSeleccionado"
+                                                [ngModelOptions]="{standalone: true}">
+
+                                                @for (s of catalogoSeguimiento; track s) {
+                                                <mat-option [value]="s">{{s}}</mat-option>
+                                                }
+
+                                            </mat-select>
+
+                                        </mat-form-field>
+
+                                        <button mat-icon-button class="btn-add-inline"
+                                            (click)="abrirModalSeguimientos(tipoSeguimientoSeleccionado)"
                                             matTooltip="Agregar Remisión">
+
                                             <mat-icon>add_circle</mat-icon>
+
                                         </button>
+
                                     </div>
 
                                     <div class="table-responsive">
@@ -1088,7 +1109,8 @@
 
                                             <ng-container matColumnDef="tipoSeguimiento">
                                                 <th mat-header-cell *matHeaderCellDef> Tipo Seguimiento </th>
-                                                <td mat-cell *matCellDef="let element"> {{element.tipoSeguimiento}} </td>
+                                                <td mat-cell *matCellDef="let element"> {{element.tipoSeguimiento}}
+                                                </td>
                                             </ng-container>
 
                                             <ng-container matColumnDef="fecha">
@@ -1106,7 +1128,8 @@
 
                                             <ng-container matColumnDef="estado">
                                                 <th mat-header-cell *matHeaderCellDef> Estado </th>
-                                                <td mat-cell *matCellDef="let element"> {{element.estadoSeguimiento}} </td>
+                                                <td mat-cell *matCellDef="let element"> {{element.estadoSeguimiento}}
+                                                </td>
                                             </ng-container>
 
                                             <ng-container matColumnDef="descripcion">
@@ -1118,8 +1141,8 @@
                                                 <th mat-header-cell *matHeaderCellDef style="text-align: center;">
                                                     Acciones </th>
                                                 <td mat-cell *matCellDef="let i = index" style="text-align: center;">
-                                                    <button mat-icon-button color="warn" (click)="eliminarSeguimientos(i)"
-                                                        matTooltip="Eliminar">
+                                                    <button mat-icon-button color="warn"
+                                                        (click)="eliminarSeguimientos(i)" matTooltip="Eliminar">
                                                         <mat-icon>delete</mat-icon>
                                                     </button>
                                                 </td>
