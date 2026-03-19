@@ -4,13 +4,17 @@
     <span class="app-title">CASILDA</span>
   </div>
 
+  @if (!auth.isAuthenticated()) {
   <div class="header-center-container">
     <span class="center-text-line">Sistema de vigilancia en salud pública para el abordaje</span>
     <span class="center-text-line">de las violencias y las discriminaciones basadas en género</span>
   </div>
+  }
 
   <div class="udea-logo-section">
-    <img src="assets/Logo-Udea-Blanco.png" alt="UdeA" class="udea-logo">
+    @if (!auth.isAuthenticated()) {
+      <img src="assets/Logo-Udea-Blanco.png" alt="UdeA" class="udea-logo">
+    }
     
     @if (auth.isAuthenticated()) {
       <div class="user-profile-zone" [matMenuTriggerFor]="userMenu">
