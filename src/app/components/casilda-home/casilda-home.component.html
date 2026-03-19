@@ -1,0 +1,41 @@
+<div class="casilda-home-container">
+  <header class="hero-section">
+    <p class="unified-hero-text">
+      ¿Necesitas reportar una situación de violencia o discriminación basada en género en la UdeA? 
+      <strong>CASILDA te acompaña</strong>
+    </p>
+  </header>
+
+  <section class="cards-grid">
+    <app-casilda-card 
+      *ngFor="let item of acciones" 
+      [icon]="item.icon" 
+      [title]="item.title" 
+      [variant]="item.variant"
+      [matTooltip]="item.tooltip"
+      matTooltipPosition="above"
+      matTooltipClass="standard-tooltip">
+    </app-casilda-card>
+  </section>
+
+  <div class="info-divider">
+    <span class="divider-text">Información de interés general</span>
+  </div>
+
+  <section class="cards-grid stats">
+    <app-casilda-card 
+      *ngFor="let item of estadisticas" 
+      [icon]="item.icon" 
+      [value]="item.value || ''" 
+      [title]="item.title" 
+      [isLogo]="item.isLogo || false"
+      [matTooltip]="item.tooltip"
+      matTooltipPosition="above"
+      [matTooltipClass]="item.title === '¿Quién es CASILDA?' ? 'large-tooltip' : 'standard-tooltip'">
+    </app-casilda-card>
+  </section>
+
+  <footer class="legal-disclaimer">
+    <p>Las denuncias serán tratadas con confidencialidad y en cumplimiento de la ley de protección de datos personales.</p>
+  </footer>
+</div>

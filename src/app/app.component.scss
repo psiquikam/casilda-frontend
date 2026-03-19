@@ -1,25 +1,35 @@
-:host {
+html, body {
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.full-screen-login {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+}
+
+.public-viewport-wrapper {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  overflow: hidden; 
-}
+  width: 100vw;
+  overflow: hidden;
 
-.sidenav-container {
-  flex: 1; 
-  height: 100%;
-  overflow: hidden; 
-}
+  app-header, 
+  app-public-header, 
+  app-public-footer {
+    flex-shrink: 0;
+  }
 
-.main-content {
-  height: 100%;
-  overflow-y: auto; 
-  display: flex;
-  flex-direction: column;
-  background-color: #f8fafc; 
-}
-
-.page-wrapper {
-  padding: 16px;
-  overflow: visible; 
+  .content-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: #ffffff;
+  }
 }

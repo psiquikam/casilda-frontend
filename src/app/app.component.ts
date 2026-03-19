@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { RouterOutlet, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { HeaderComponent } from './components/layout/header/header.component';
@@ -7,65 +7,59 @@ import { SidebarComponent } from './components/layout/sidebar/sidebar.component'
 import { MatIconRegistry, MatIconModule } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AuthService } from './services/auth.service';
+import { CasildaHomeComponent } from './components/casilda-home/casilda-home.component';
+import { PublicHeaderComponent } from './components/public-header/public-header.component';
+import { PublicFooterComponent } from './components/public-footer/public-footer.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
-    CommonModule, 
-    RouterOutlet, 
-    MatSidenavModule, 
+    CommonModule,
+    RouterOutlet,
+    MatSidenavModule,
     MatIconModule,
-    HeaderComponent, 
-    SidebarComponent
+    HeaderComponent,
+    SidebarComponent,
+    CasildaHomeComponent,
+    PublicHeaderComponent,
+    PublicFooterComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
+  private router = inject(Router);
+
   constructor(
     private matIconRegistry: MatIconRegistry,
     private domSanitizer: DomSanitizer,
     public auth: AuthService
   ) {
-    this.matIconRegistry.addSvgIcon(
-      'logo-custom',
-      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/distintivo_casilda.svg')
-    );
+    this.registerIcons();
+  }
 
-    this.matIconRegistry.addSvgIcon(
-      'logo-AdminPara',
-      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/AdminPara.svg')
-    );
+  isLoginRoute(): boolean {
+    return this.router.url === '/login';
+  }
 
-    this.matIconRegistry.addSvgIcon(
-      'logo-Reportes',
-      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/Reportes.svg')
-    );
+  private registerIcons(): void {
+    const icons = [
+      { name: 'logo-custom', url: 'assets/distintivo_casilda.svg' },
+      { name: 'logo-AdminPara', url: 'assets/AdminPara.svg' },
+      { name: 'logo-Reportes', url: 'assets/Reportes.svg' },
+      { name: 'logo-alma', url: 'assets/linea_alma.svg' },
+      { name: 'equipo-atencion', url: 'assets/equipo_atencion.svg' },
+      { name: 'uad-equipo', url: 'assets/uad_equipo_3_y_4.svg' },
+      { name: 'reportes-indicadores', url: 'assets/reportes_informes_indicadores.svg' },
+      { name: 'administracion', url: 'assets/administracion.svg' }
+    ];
 
-    this.matIconRegistry.addSvgIcon(
-      'logo-alma',
-      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/linea_alma.svg')
-    );
-
-    this.matIconRegistry.addSvgIcon(
-      'equipo-atencion',
-      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/equipo_atencion.svg')
-    );
-
-    this.matIconRegistry.addSvgIcon(
-      'uad-equipo',
-      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/uad_equipo_3_y_4.svg')
-    );
-
-    this.matIconRegistry.addSvgIcon(
-      'reportes-indicadores',
-      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/reportes_informes_indicadores.svg')
-    );
-
-    this.matIconRegistry.addSvgIcon(
-      'administracion',
-      this.domSanitizer.bypassSecurityTrustResourceUrl('assets/administracion.svg')
-    );
+    icons.forEach(icon => {
+      this.matIconRegistry.addSvgIcon(
+        icon.name,
+        this.domSanitizer.bypassSecurityTrustResourceUrl(icon.url)
+      );
+    });
   }
 }

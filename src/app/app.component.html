@@ -13,5 +13,20 @@
     </mat-sidenav-content>
   </mat-sidenav-container>
 } @else {
-  <router-outlet></router-outlet>
+  @if (isLoginRoute()) {
+    <div class="full-screen-login">
+      <router-outlet></router-outlet>
+    </div>
+  } @else {
+    <div class="public-viewport-wrapper">
+      <app-header></app-header>
+      <app-public-header></app-public-header>
+
+      <main class="content-area">
+        <router-outlet></router-outlet>
+      </main>
+
+      <app-public-footer></app-public-footer>
+    </div>
+  }
 }

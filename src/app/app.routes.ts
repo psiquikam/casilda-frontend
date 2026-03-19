@@ -15,8 +15,10 @@ import { DetalleAcompanamientoComponent } from './components/gestion-contacto/ge
 import { ConsultaComponent } from './components/consulta/consulta.component';
 import { RegistroAtencionComponent } from './components/registro-atencion/registro-atencion.component';
 import { CitaComponent } from './components/cita/cita.component';
-   
+import { CasildaHomeComponent } from './components/casilda-home/casilda-home.component';
+
 export const routes: Routes = [
+  { path: 'home', component: CasildaHomeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'seguimiento', component: SeguimientoTramiteComponent },
   { path: 'detalle-revisor/:id', component: DetalleRevisorComponent, canActivate: [authGuard] },
@@ -92,5 +94,6 @@ export const routes: Routes = [
   },
 
   { path: 'acceso-denegado', component: AccesoDenegadoComponent },
-  { path: '', redirectTo: '/login', pathMatch: 'full' }
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  { path: '**', redirectTo: '/home' }
 ];

@@ -1,75 +1,86 @@
 .main-header {
   display: flex;
   align-items: center;
-  padding: 0 16px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  z-index: 1000;
+  justify-content: space-between;
+  padding: 0 2vw;
+  height: 15vh;
+  min-height: 80px;
+  max-height: 100px;
+  background-color: #1a6332;
+  color: white;
+  position: relative;
+  flex-shrink: 0;
 }
 
-.logo-icon {
-  width: 40px;
-  height: 40px;
-  font-size: 40px;
-}
-
-.app-title {
-  font-weight: 800;
-  letter-spacing: 1px;
-  margin-left: 8px;
-}
-
-.spacer {
-  flex: 1 1 auto;
-}
-
-.user-profile-zone {
+.logo-section {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 4px 12px;
-  border-radius: 30px;
-  cursor: pointer;
-  transition: background 0.3s;
+  gap: 1vw;
 
-  &:hover {
+  .logo-icon {
+    width: clamp(40px, 5vh, 65px);
+    height: clamp(40px, 5vh, 65px);
+    color: white !important;
+    fill: white !important;
+  }
+
+  .app-title {
+    font-size: clamp(1.2rem, 2.5vw, 2.2rem);
+    font-weight: 900;
+    color: white;
+  }
+}
+
+.header-center-container {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: auto;
+
+  .center-text-line {
+    font-size: clamp(0.8rem, 1.1vw, 1.3rem);
+    font-weight: 800;
+    line-height: 1.2;
+    white-space: nowrap;
+    color: white;
+  }
+}
+
+.udea-logo-section {
+  display: flex;
+  align-items: center;
+  gap: 1.5vw;
+
+  .udea-logo {
+    height: clamp(50px, 7vh, 75px);
+    width: auto;
+    object-fit: contain;
+  }
+
+  .user-profile-zone {
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
     background: rgba(255, 255, 255, 0.1);
-  }
+    transition: background 0.2s;
 
-  .user-info {
-    display: flex;
-    flex-direction: column;
-    text-align: right;
-    
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
     .user-name {
+      font-weight: 700;
       font-size: 0.9rem;
-      font-weight: 600;
-      line-height: 1;
     }
-    
-    .user-role {
-      font-size: 0.7rem;
-      opacity: 0.8;
-    }
-  }
-
-  .user-avatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    border: 2px solid white;
-    object-fit: cover;
   }
 }
 
-// Estilos dentro del Menú Desplegable
-.menu-header {
-  padding: 16px;
-  line-height: 1.2;
-  
-  strong { display: block; font-size: 1rem; color: #1e293b; }
-  p { margin: 0; font-size: 0.8rem; color: #64748b; }
-}
-
-.logout-btn {
-  color: #f44336;
+@media (max-width: 1000px) {
+  .header-center-container { 
+    display: none; 
+  }
 }

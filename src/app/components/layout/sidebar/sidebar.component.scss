@@ -9,14 +9,14 @@
   overflow-y: auto;
 
   .logo-container {
-    padding: 20px 24px; // Reducido de 30px
+    padding: 20px 24px;
     display: flex;
     align-items: center;
     gap: 12px;
     
     mat-icon {
       color: #348F41;
-      transform: scale(1.1); // Ligeramente más pequeño
+      transform: scale(1.1);
     }
 
     span {
@@ -31,12 +31,12 @@
     padding: 0;
 
     .menu-label {
-      padding: 16px 24px 6px; // Reducido de 28px top y 12px bottom
+      padding: 16px 24px 6px;
       display: flex;
       align-items: center;
       gap: 14px;
       
-      font-size: 0.7rem; // Un poco más pequeño
+      font-size: 0.7rem;
       font-weight: 800;
       color: #475569;
       text-transform: uppercase;
@@ -63,15 +63,15 @@
     }
 
     a[mat-list-item] {
-      margin: 1px 12px !important; // Reducido margen vertical de 2px a 1px
+      margin: 1px 12px !important;
       width: calc(100% - 24px) !important;
       border-radius: 8px;
       color: #64748b;
-      height: 36px !important; // Reducido de 42px a 36px
+      height: 36px !important;
       transition: all 0.2s ease;
 
       ::ng-deep .mdc-list-item__content {
-        padding-left: 38px !important; // Ajustado para alinearse con iconos más pequeños
+        padding-left: 38px !important;
 
         @media (max-width: 768px) {
           padding-left: 30px !important;

@@ -1,0 +1,9 @@
+<div class="card-wrapper" [ngClass]="variant">
+  <div class="icon-container">
+    <mat-icon [svgIcon]="icon"></mat-icon>
+  </div>
+  <div class="text-container">
+    <span class="stat-value" *ngIf="value">{{ value }}</span>
+    <span class="card-title">{{ title }}</span>
+  </div>
+</div>
