@@ -1,0 +1,50 @@
+.public-header {
+  background-color: #1a6332;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  width: 100%;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    cursor: pointer;
+    padding: 5px 12px;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    mat-icon {
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+    }
+
+    .nav-label {
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .public-header {
+    gap: 15px;
+    .nav-item {
+      padding: 5px;
+      .nav-label {
+        font-size: 0.75rem;
+      }
+    }
+  }
+}

@@ -1,27 +1,27 @@
-<mat-toolbar color="primary" class="main-header">
-  <button mat-icon-button (click)="toggleSidenav.emit()">
-    <mat-icon>menu</mat-icon>
-  </button>
-
-  <mat-icon svgIcon="logo-custom" class="logo-icon"></mat-icon>
-  <span class="app-title">CASILDA</span>
-
-  <span class="spacer"></span>
-
-  @if (!auth.isAuthenticated()) {
-  <button mat-button routerLink="/login">Iniciar Sesión</button>
-  } @else {
-  <div class="user-profile-zone" [matMenuTriggerFor]="userMenu">
-    <div class="user-info">
-      <span class="user-name">{{ auth.currentUser?.nombre }}</span>
-    </div>
+<mat-toolbar class="main-header">
+  <div class="logo-section">
+    <mat-icon svgIcon="logo-custom" class="logo-icon"></mat-icon>
+    <span class="app-title">CASILDA</span>
   </div>
 
-  <mat-menu #userMenu="matMenu" class="custom-menu">
-    <button mat-menu-item (click)="auth.logout()">
-      <mat-icon color="warn">logout</mat-icon>
-      <span>Cerrar Sesión</span>
-    </button>
-  </mat-menu>
-  }
+  <div class="header-center-container">
+    <span class="center-text-line">Sistema de vigilancia en salud pública para el abordaje</span>
+    <span class="center-text-line">de las violencias y las discriminaciones basadas en género</span>
+  </div>
+
+  <div class="udea-logo-section">
+    <img src="assets/Logo-Udea-Blanco.png" alt="UdeA" class="udea-logo">
+    
+    @if (auth.isAuthenticated()) {
+      <div class="user-profile-zone" [matMenuTriggerFor]="userMenu">
+        <span class="user-name">{{ auth.currentUser?.nombre }}</span>
+      </div>
+      <mat-menu #userMenu="matMenu">
+        <button mat-menu-item (click)="auth.logout()">
+          <mat-icon color="warn">logout</mat-icon>
+          <span>Cerrar Sesión</span>
+        </button>
+      </mat-menu>
+    }
+  </div>
 </mat-toolbar>
