@@ -35,6 +35,8 @@ import { TablaOtrosCasosComponent } from '../tabla-otros-casos/tabla-otros-casos
 import { ModalCompromisosPersonaComponent } from '../modal-compromisos-persona/modal-compromisos-persona.component';
 import { ModalCompromisosProfesionalesComponent } from '../modal-compromisos-profesionales/modal-compromisos-profesionales.component';
 import { ModalSeguimientosComponent } from '../modal-seguimiento/modal-seguimiento.component';
+import { AuthService } from '../../services/auth.service';
+import { CitaDto, EstadoCitaEnum, SolicitudService } from '../../services/solicitud.service';
 
 @Component({
   selector: 'app-registro-atencion',
@@ -76,103 +78,9 @@ import { ModalSeguimientosComponent } from '../modal-seguimiento/modal-seguimien
 export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   atencionForm!: FormGroup;
 
-  casoPorAtender: any[] = [
-    {
-      id: '1001',
-      tiempoHechos: 'Reciente',
-      tipoViolencia: 'Psicológica',
-      subcategoria: 'Acoso',
-      descripcion: 'Seguimiento por afectación emocional',
-      nombre: 'Jose Alfredo Martinez Robledo',
-      documento: '1213154312',
-      tipoDocumento: 'CC',
-      tipoSolicitud: 'Directa',
-      fecha: '2025-01-25',
-      dependencia: 'Ingenieria',
-      profesional: 'Sin asignar',
-      facultad: 'Ingeniería',
-      campus: 'Principal',
-      genero: 'Masculino',
-      edad: 22,
-      celular: '3001234567',
-      cargo: 'Estudiante',
-      telefono: '6041234567',
-      correoInst: 'jose@universidad.edu',
-      correoPers: 'jose@gmail.com'
-    },
-    {
-      id: '1002',
-      tiempoHechos: 'Hace 6 meses',
-      tipoViolencia: 'Física',
-      subcategoria: 'Agresión',
-      descripcion: 'Compromiso de acompañamiento médico',
-      nombre: 'Laura Victoria Florez Parra',
-      documento: '987654321',
-      tipoDocumento: 'CC',
-      tipoSolicitud: 'Directa',
-      fecha: '2025-01-25',
-      dependencia: 'Artes',
-      profesional: 'Sin asignar',
-      facultad: 'Medicina',
-      campus: 'Salud',
-      genero: 'Femenino',
-      edad: 25,
-      celular: '3019876543',
-      cargo: 'Estudiante',
-      telefono: '6047654321',
-      correoInst: 'laura@universidad.edu',
-      correoPers: 'laura@gmail.com'
-    }
-  ];
+  casoPorAtender: any[] = [];
 
-  casosRelacionados: any[] = [
-    {
-      id: '1001',
-      tiempoHechos: 'Reciente',
-      tipoViolencia: 'Psicológica',
-      subcategoria: 'Acoso',
-      descripcion: 'Seguimiento por afectación emocional',
-      nombre: 'Jose Alfredo Martinez Robledo',
-      documento: '1213154312',
-      tipoDocumento: 'CC',
-      tipoSolicitud: 'Directa',
-      fecha: '2025-01-25',
-      dependencia: 'Ingenieria',
-      profesional: 'Sin asignar',
-      facultad: 'Ingeniería',
-      campus: 'Principal',
-      genero: 'Masculino',
-      edad: 22,
-      celular: '3001234567',
-      cargo: 'Estudiante',
-      telefono: '6041234567',
-      correoInst: 'jose@universidad.edu',
-      correoPers: 'jose@gmail.com'
-    },
-    {
-      id: '1002',
-      tiempoHechos: 'Hace 6 meses',
-      tipoViolencia: 'Física',
-      subcategoria: 'Agresión',
-      descripcion: 'Compromiso de acompañamiento médico',
-      nombre: 'Laura Victoria Florez Parra',
-      documento: '987654321',
-      tipoDocumento: 'CC',
-      tipoSolicitud: 'Directa',
-      fecha: '2025-01-25',
-      dependencia: 'Artes',
-      profesional: 'Sin asignar',
-      facultad: 'Medicina',
-      campus: 'Salud',
-      genero: 'Femenino',
-      edad: 25,
-      celular: '3019876543',
-      cargo: 'Estudiante',
-      telefono: '6047654321',
-      correoInst: 'laura@universidad.edu',
-      correoPers: 'laura@gmail.com'
-    }
-  ];
+  casosRelacionados: any[] = [];
 
   dataSource = new MatTableDataSource<any>(this.casoPorAtender);
   dataSourceOtros = new MatTableDataSource<any>(this.casosRelacionados);
@@ -237,6 +145,12 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   listaSubTipoViolencia = ['Difusión de contenido íntimo', 'Intimidación y Amenazas', 'Aislamiento Forzado', 'Acoso'];
   tiposSolicitud = ['Indirecta', 'Directa'];
   formayLugar = ['Lugar 1', 'Lugar 2'];
+  listaDepartamentos = [
+    { id: 1, nombre: 'Antioquia' },
+    { id: 2, nombre: 'Bogotá D.C.' },
+    { id: 3, nombre: 'Valle del Cauca' }
+  ];
+  ciudadesHechos = ['Medellín', 'Envigado', 'Bogotá'];
   listaRegimenSalud = ['Contributivo', 'Subsidiado'];
   listaEPSRegimen = ['Nuevo EPS', 'Savia Salud', 'SURA'];
   tiposServicio = ['Asesoría', 'Acompañamiento', 'Seguimiento', 'Intervención'];
@@ -303,26 +217,35 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
+    private readonly authService: AuthService,
+    private readonly solicitudService: SolicitudService,
   ) { }
 
   ngOnInit(): void {
     this.initForm();
     this.simularCargaBackend();
+    this.cargarCitas();
+    const nombreUsuario = this.authService.currentUser?.nombre || '';
+    this.atencionForm.get('personaRegistra')?.setValue(nombreUsuario);
 
     this.dataSource.filterPredicate = (data: any, filter: string): boolean => {
       const searchTerms = JSON.parse(filter);
-      const idMatch = data.idCaso.toString().toLowerCase().includes(searchTerms.idCaso);
-      const tipoMatch = data.tipoViolencia.toLowerCase().includes(searchTerms.tipoViolencia);
-      const descMatch = data.descripcion.toLowerCase().includes(searchTerms.descripcion);
-      return idMatch && tipoMatch && descMatch;
+      return (data.id || '').toString().toLowerCase().includes(searchTerms.id)
+        && (data.nombre || '').toLowerCase().includes(searchTerms.nombre)
+        && `${data.tipoDocumento || ''} ${data.documento || ''}`.toLowerCase().includes(searchTerms.documento)
+        && (data.fecha || '').toLowerCase().includes(searchTerms.fecha)
+        && (data.dependencia || '').toLowerCase().includes(searchTerms.dependencia)
+        && (data.profesional || '').toLowerCase().includes(searchTerms.profesional);
     };
 
     this.dataSourceOtros.filterPredicate = (data: any, filter: string): boolean => {
       const searchTerms = JSON.parse(filter);
-      const idMatch = data.idCaso.toString().toLowerCase().includes(searchTerms.idCaso);
-      const tipoMatch = data.tipoViolencia.toLowerCase().includes(searchTerms.tipoViolencia);
-      const descMatch = data.descripcion.toLowerCase().includes(searchTerms.descripcion);
-      return idMatch && tipoMatch && descMatch;
+      return (data.id || '').toString().toLowerCase().includes(searchTerms.id)
+        && (data.nombre || '').toLowerCase().includes(searchTerms.nombre)
+        && `${data.tipoDocumento || ''} ${data.documento || ''}`.toLowerCase().includes(searchTerms.documento)
+        && (data.fecha || '').toLowerCase().includes(searchTerms.fecha)
+        && (data.dependencia || '').toLowerCase().includes(searchTerms.dependencia)
+        && (data.profesional || '').toLowerCase().includes(searchTerms.profesional);
     };
 
     this.atencionForm.get('logroAcuerdo')?.valueChanges.subscribe(valor => {
@@ -376,14 +299,98 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     this.casoSeleccionado = null;
   }
 
+  private cargarCitas(): void {
+    this.solicitudService.listarCitas().subscribe({
+      next: (citas) => {
+        const citasActivas = citas.filter((cita) => cita.idEstadoCita !== EstadoCitaEnum.CANCELADA);
+        const filas = citasActivas.map((cita) => this.mapearCitaATabla(cita));
+        this.casoPorAtender = filas;
+        this.casosRelacionados = filas;
+        this.dataSource.data = filas;
+        this.dataSourceOtros.data = filas;
+      },
+      error: (error) => {
+        console.error('Error al cargar citas:', error);
+        this.casoPorAtender = [];
+        this.casosRelacionados = [];
+        this.dataSource.data = [];
+        this.dataSourceOtros.data = [];
+      }
+    });
+  }
+
+  private mapearCitaATabla(cita: CitaDto): any {
+    return {
+      id: cita.codigoSolicitud || String(cita.solicitudId),
+      solicitudId: cita.solicitudId,
+      citaId: cita.id,
+      nombre: cita.nombreSolicitante || '',
+      documento: cita.documento || '',
+      tipoDocumento: '',
+      tipoSolicitud: cita.tipoSolicitud || '',
+      fecha: cita.fechaCita ? cita.fechaCita.substring(0, 10) : '',
+      dependencia: cita.dependencia || '',
+      profesional: (cita as any).grupoProfesional || (cita as any).profesional || 'Sin asignar',
+      facultad: cita.facultad || '',
+      campus: cita.campus || '',
+      genero: cita.identidadGenero || '',
+      edad: null,
+      celular: cita.celular || '',
+      cargo: cita.estadoCita || '',
+      telefono: cita.telefonoAlterno || '',
+      correoInst: cita.correoInstitucional || '',
+      correoPers: cita.correoPersonal || ''
+    };
+  }
+
+  private obtenerPersonaAtiende(caso: any): string {
+    const grupoProfesional = typeof caso?.grupoProfesional === 'string' ? caso.grupoProfesional.trim() : '';
+    const profesionalAsignado = typeof caso?.profesional === 'string' ? caso.profesional.trim() : '';
+
+    if (grupoProfesional) {
+      return grupoProfesional;
+    }
+
+    if (profesionalAsignado) {
+      return profesionalAsignado;
+    }
+
+    return 'Sin asignar';
+  }
+
   iniciarAtencion(caso: any): void {
     this.casoSeleccionado = caso;
     this.modoAtencion = true;
     this.atencionForm.patchValue({
       tipoSolicitud: caso.tipoSolicitud || 'Indirecta',
+      personaAtiende: this.obtenerPersonaAtiende(caso),
       documento: caso.documento || '',
       tipoViolencia: caso.tipoViolencia || ''
     });
+
+    if (caso?.solicitudId) {
+      this.solicitudService.obtenerPorId(caso.solicitudId).subscribe({
+        next: (solicitud) => {
+          this.atencionForm.patchValue({
+            personaAtiende: solicitud.profesional || this.obtenerPersonaAtiende(caso),
+            tipoDocumento: solicitud.tipoDocumento || this.atencionForm.get('tipoDocumento')?.value,
+            documento: solicitud.numeroDocumento || caso.documento || '',
+            primerNombre: solicitud.primerNombre || '',
+            segundoNombre: solicitud.segundoNombre || '',
+            primerApellido: solicitud.primerApellido || '',
+            segundoApellido: solicitud.segundoApellido || '',
+            fechaNacimiento: solicitud.fechaNacimiento ? new Date(solicitud.fechaNacimiento) : '',
+            dependencia: solicitud.remitenteDependencia || solicitud.dependencia || caso.dependencia || '',
+            facultad: solicitud.remitenteFacultad || caso.facultad || '',
+            campus: solicitud.remitenteCampus || caso.campus || '',
+            identidadSexual: solicitud.identidadGenero || ''
+          });
+        },
+        error: (error) => {
+          console.error('Error al cargar detalle de solicitud para la cita:', error);
+        }
+      });
+    }
   }
 
   seleccionarCaso(element: any) {
@@ -617,14 +624,16 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   initForm(): void {
     this.atencionForm = this.fb.group({
       tipoSolicitud: [{ value: 'Indirecta', disabled: true }, Validators.required],
-      lugarNacimiento: ['', Validators.required],
+      departamentoNacimiento: [''],
+      ciudadNacimiento: ['', Validators.required],
       fechaHora: [{ value: new Date(), disabled: true }, Validators.required],
-      personaRegistra: [{ value: 'Usuario_Sistema_01', disabled: true }, Validators.required],
+      personaRegistra: [{ value: '', disabled: true }, Validators.required],
       tipoServicio: ['', Validators.required],
+      departamentoEntrevista: [''],
       quienRemite: [{ value: 'Unidad de Bienestar Universitario', disabled: true }],
       formaEntrevista: ['', Validators.required],
       consentimientoArchivo: [null],
-      personaAtiende: [{ value: 'Nombre del Profesional', disabled: true }, Validators.required],
+      personaAtiende: [{ value: 'Sin asignar', disabled: true }, Validators.required],
       tipoDocumento: [{ value: '', disabled: true }, Validators.required],
       documento: [{ value: '', disabled: true }, [Validators.required]],
       fechaNacimiento: [{ value: '', disabled: true }, Validators.required],
@@ -649,6 +658,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       subcategoriaViolencia: ['', Validators.required],
       tiempoOcurrido: ['', Validators.required],
       queForma: ['', Validators.required],
+      departamentoHechos: [''],
+      ciudadHechos: [''],
       lugarHechos: ['', Validators.required],
       violenciaGenero: ['', Validators.required],
       violenciaMisional: ['', Validators.required],
@@ -681,9 +692,10 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
   simularCargaBackend(): void {
     setTimeout(() => {
+      const nombreUsuario = this.authService.currentUser?.nombre || 'Usuario_Sistema_01';
       this.atencionForm.patchValue({
         tipoSolicitud: 'Indirecta',
-        personaRegistra: 'Usuario_Sistema_01',
+        personaRegistra: nombreUsuario,
         quienRemite: 'Unidad de Bienestar Universitario',
         fechaHora: new Date(),
         tipoDocumento: 'Cédula de Ciudadanía',
