@@ -53,11 +53,7 @@
 
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Barrio</mat-label>
-      <mat-select formControlName="barrio">
-        @for (b of barrios; track b) {
-          <mat-option [value]="b">{{ b }}</mat-option>
-        }
-      </mat-select>
+      <input matInput formControlName="barrio" placeholder="Ej: El Poblado">
     </mat-form-field>
 
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
