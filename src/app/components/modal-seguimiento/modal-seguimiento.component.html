@@ -7,9 +7,10 @@
   <div class="form-row">
     <mat-form-field appearance="outline" class="flex-field">
       <mat-label>Tipo de seguimiento</mat-label>
-      <mat-select [(ngModel)]="data.tipoSeguimiento" [disabled]="bloquearTipo">
-        <mat-option *ngFor="let opcion of catalogoSeguimiento" [value]="opcion">
-          {{opcion}}
+      <mat-select [(ngModel)]="data.idtiposeguimiento" (ngModelChange)="seleccionarTipoSeguimiento($event)"
+        [disabled]="bloquearTipo || cargandoMaestros">
+        <mat-option *ngFor="let opcion of tiposSeguimiento" [value]="opcion.id">
+          {{opcion.nombre}}
         </mat-option>
       </mat-select>
     </mat-form-field>
@@ -25,15 +26,15 @@
   <div class="form-row">
     <mat-form-field appearance="outline" class="flex-field">
       <mat-label>Acción *</mat-label>
-      <mat-select [(ngModel)]="data.accion">
-        <mat-option *ngFor="let opcion of catalogoAcciones" [value]="opcion">{{opcion}}</mat-option>
+      <mat-select [(ngModel)]="data.idaccion" (ngModelChange)="seleccionarAccion($event)">
+        <mat-option *ngFor="let opcion of acciones" [value]="opcion.id">{{opcion.nombre}}</mat-option>
       </mat-select>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="flex-field">
       <mat-label>Actividad *</mat-label>
-      <mat-select [(ngModel)]="data.actividad">
-        <mat-option *ngFor="let opcion of catalogoActividades" [value]="opcion">{{opcion}}</mat-option>
+      <mat-select [(ngModel)]="data.idactividad" (ngModelChange)="seleccionarActividad($event)">
+        <mat-option *ngFor="let opcion of actividades" [value]="opcion.id">{{opcion.nombre}}</mat-option>
       </mat-select>
     </mat-form-field>
   </div>
@@ -47,15 +48,15 @@
     <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
       <mat-form-field appearance="outline">
         <mat-label>Estado de seguimiento *</mat-label>
-        <mat-select [(ngModel)]="data.estadoSeguimiento">
-          <mat-option *ngFor="let opcion of catalogoEstados" [value]="opcion">{{opcion}}</mat-option>
+        <mat-select [(ngModel)]="data.idestadoseguimiento" (ngModelChange)="seleccionarEstadoSeguimiento($event)">
+          <mat-option *ngFor="let opcion of estadosSeguimiento" [value]="opcion.id">{{opcion.nombre}}</mat-option>
         </mat-select>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Motivo del estado *</mat-label>
-        <mat-select [(ngModel)]="data.motivoEstado">
-          <mat-option *ngFor="let opcion of catalogoMotivos" [value]="opcion">{{opcion}}</mat-option>
+        <mat-select [(ngModel)]="data.idmotivoestado" (ngModelChange)="seleccionarMotivoEstado($event)">
+          <mat-option *ngFor="let opcion of motivosEstadoSeguimiento" [value]="opcion.id">{{opcion.nombre}}</mat-option>
         </mat-select>
       </mat-form-field>
     </div>
@@ -72,9 +73,9 @@
 
 <mat-dialog-actions align="end" class="modal-actions">
   <button mat-button (click)="onNoClick()">Cancelar</button>
-  <button mat-flat-button class="btn-confirm" [mat-dialog-close]="data"
-    [disabled]="!data.accion || !data.descripcion || !data.fecha">
+  <button mat-flat-button class="btn-confirm" (click)="guardar()"
+    [disabled]="data.idtiposeguimiento == null || data.idaccion == null || data.idactividad == null || data.idestadoseguimiento == null || data.idmotivoestado == null || !data.descripcion || !data.fecha">
     <mat-icon>check</mat-icon>
-    Guardar Remisión
+    Guardar Seguimiento
   </button>
 </mat-dialog-actions>

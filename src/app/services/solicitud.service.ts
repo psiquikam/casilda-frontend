@@ -187,11 +187,25 @@ export interface CancelarCitaRequestDto {
   observaciones?: string;
 }
 
+export interface CompromisoPersonaRequestDto {
+  idatencion: number;
+  fechacompromiso: string;
+  idtipocompromiso: number;
+}
+
+export interface CompromisoProfesionalRequestDto {
+  idatencion: number;
+  fechacompromiso: string;
+  idgrupoprofesional: number;
+  idtipocompromiso: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class SolicitudService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiBaseUrl}/solicitudes`;
   private readonly citasUrl = `${environment.apiBaseUrl}/citas`;
+  private readonly compromisosUrl = `${environment.apiBaseUrl}/compromisos`;
 
   buscarRemitentePorDocumento(documento: string): Observable<RemitenteSearchDto> {
     return this.http.get<RemitenteSearchDto>(`${environment.apiBaseUrl}/personas/documento/${documento}`);
@@ -251,5 +265,13 @@ export class SolicitudService {
 
   listarMotivosEstadoCita(): Observable<MaestroDto[]> {
     return this.http.get<MaestroDto[]>(`${environment.apiBaseUrl}/maestros/motivos-estado-cita`);
+  }
+
+  crearCompromisoPersona(datos: CompromisoPersonaRequestDto): Observable<unknown> {
+    return this.http.post(`${this.compromisosUrl}/persona`, datos);
+  }
+
+  crearCompromisoProfesional(datos: CompromisoProfesionalRequestDto): Observable<unknown> {
+    return this.http.post(`${this.compromisosUrl}/profesional`, datos);
   }
 }

@@ -733,7 +733,11 @@
 
                                 <mat-form-field appearance="outline">
                                     <mat-label>Vínculo con la víctima</mat-label>
-                                    <input matInput formControlName="presuntoVinculoVictima">
+                                    <mat-select formControlName="presuntoVinculoVictima">
+                                        @for (v of listaVinculosAgresorVictima; track v) {
+                                        <mat-option [value]="v">{{v}}</mat-option>
+                                        }
+                                    </mat-select>
                                 </mat-form-field>
 
                             </div>
@@ -780,7 +784,7 @@
 
                                         <tr mat-header-row *matHeaderRowDef="['tipo', 'descripcion', 'acciones']"></tr>
                                         <tr mat-row
-                                            *matRowDef="let row; columns: ['tipo', 'descripcion', 'descripcion', 'acciones'];">
+                                            *matRowDef="let row; columns: ['tipo', 'descripcion', 'acciones'];">
                                         </tr>
                                     </table>
 
@@ -830,7 +834,7 @@
 
                                         <tr mat-header-row *matHeaderRowDef="['tipo', 'descripcion', 'acciones']"></tr>
                                         <tr mat-row
-                                            *matRowDef="let row; columns: ['tipo', 'descripcion', 'descripcion', 'acciones'];">
+                                            *matRowDef="let row; columns: ['tipo', 'descripcion', 'acciones'];">
                                         </tr>
                                     </table>
 
@@ -947,7 +951,7 @@
                                                 </td>
                                             </ng-container>
 
-                                            <tr mat-header-row *matHeaderRowDef="['tipo', 'cual', 'acciones']"></tr>
+                                            <tr mat-header-row *matHeaderRowDef="['tipo', 'fecha', 'cual', 'acciones']"></tr>
                                             <tr mat-row
                                                 *matRowDef="let row; columns: ['tipo','fecha', 'cual', 'acciones'];">
                                             </tr>

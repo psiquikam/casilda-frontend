@@ -13,18 +13,20 @@
 
         <mat-form-field appearance="outline" class="flex-field">
             <mat-label>Profesional que atiende</mat-label>
-            <mat-select [(ngModel)]="data.profesional">
-                <mat-option *ngFor="let opcion of catalogoProfesionales" [value]="opcion">
-                    {{opcion}}
+            <mat-select [(ngModel)]="data.idgrupoprofesional" (ngModelChange)="seleccionarProfesional($event)"
+                [disabled]="cargandoProfesionales">
+                <mat-option *ngFor="let opcion of gruposProfesionales" [value]="opcion.id">
+                    {{opcion.nombre}}
                 </mat-option>
             </mat-select>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="flex-field">
             <mat-label>Seleccione el Compromiso</mat-label>
-            <mat-select [(ngModel)]="data.compromisos">
-                <mat-option *ngFor="let opcion of catalogoCompromisos" [value]="opcion">
-                    {{opcion}}
+            <mat-select [(ngModel)]="data.idtipocompromiso" (ngModelChange)="seleccionarCompromiso($event)"
+                [disabled]="cargandoCompromisos">
+                <mat-option *ngFor="let opcion of tiposCompromiso" [value]="opcion.id">
+                    {{opcion.nombre}}
                 </mat-option>
             </mat-select>
         </mat-form-field>
@@ -35,7 +37,8 @@
 <mat-dialog-actions align="end" class="modal-actions">
     <button mat-button (click)="onNoClick()">Cancelar</button>
 
-    <button mat-flat-button class="btn-confirm" [mat-dialog-close]="data" [disabled]="!data.compromisos || !data.fecha">
+    <button mat-flat-button class="btn-confirm" (click)="guardar()"
+        [disabled]="data.idtipocompromiso == null || data.idgrupoprofesional == null || !data.fecha">
         <mat-icon>check</mat-icon>
         Agregar compromiso
     </button>

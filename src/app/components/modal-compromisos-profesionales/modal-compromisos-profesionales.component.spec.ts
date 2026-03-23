@@ -1,4 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogRef } from '@angular/material/dialog';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { ModalCompromisosProfesionalesComponent } from './modal-compromisos-profesionales.component';
 
@@ -8,7 +11,12 @@ describe('ModalCompromisosProfesionalesComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ModalCompromisosProfesionalesComponent]
+      imports: [ModalCompromisosProfesionalesComponent],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } }
+      ]
     })
     .compileComponents();
     
