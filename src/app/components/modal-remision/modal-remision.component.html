@@ -9,8 +9,9 @@
     <mat-form-field appearance="outline" class="field-tipo">
       <mat-label>Tipo de Remisión</mat-label>
       <mat-select [(ngModel)]="data.tipo">
-        <mat-option value="Directa">Directa</mat-option>
-        <mat-option value="Indirecta">Indirecta</mat-option>
+        @for (tipo of tiposRemision; track tipo.id) {
+          <mat-option [value]="tipo.nombre">{{ tipo.nombre }}</mat-option>
+        }
       </mat-select>
     </mat-form-field>
 

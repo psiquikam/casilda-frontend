@@ -8,27 +8,19 @@
 
     <mat-form-field appearance="outline" class="field-tipo">
       <mat-label>Tipo</mat-label>
-      <mat-select [(ngModel)]="data.tipo">
-        <mat-option value="Física">Física</mat-option>
-        <mat-option value="Auditiva">Auditiva</mat-option>
-        <mat-option value="Visual">Visual</mat-option>
-        <mat-option value="Sordoceguera">Sordoceguera</mat-option>
-        <mat-option value="Intelectual">Intelectual</mat-option>
-        <mat-option value="Psicosocial">Psicosocial</mat-option>
-        <mat-option value="Múltiple">Múltiple</mat-option>
+      <mat-select [ngModel]="selectedTipoId" (ngModelChange)="onTipoChange($event)">
+        @for (tipo of tiposDiscapacidad; track tipo.id) {
+          <mat-option [value]="tipo.id">{{ tipo.nombre }}</mat-option>
+        }
       </mat-select>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="field-subtipo">
       <mat-label>Subtipo</mat-label>
-      <mat-select [(ngModel)]="data.subTipo">
-        <mat-option value="Física">Física</mat-option>
-        <mat-option value="Auditiva">Auditiva</mat-option>
-        <mat-option value="Visual">Visual</mat-option>
-        <mat-option value="Sordoceguera">Sordoceguera</mat-option>
-        <mat-option value="Intelectual">Intelectual</mat-option>
-        <mat-option value="Psicosocial">Psicosocial</mat-option>
-        <mat-option value="Múltiple">Múltiple</mat-option>
+      <mat-select [(ngModel)]="data.subTipo" [disabled]="!selectedTipoId">
+        @for (subtipo of subTiposDiscapacidad; track subtipo.id) {
+          <mat-option [value]="subtipo.nombre">{{ subtipo.nombre }}</mat-option>
+        }
       </mat-select>
     </mat-form-field>
 

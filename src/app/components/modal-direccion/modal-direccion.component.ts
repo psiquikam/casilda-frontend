@@ -31,7 +31,7 @@ export class ModalDireccionComponent implements OnInit {
   direccionForm!: FormGroup;
 
   departamentos: MaestroDto[] = [];
-  ciudades: string[] = [];
+  ciudades: MaestroDto[] = [];
   vias = ['Calle', 'Carrera', 'Avenida', 'Transversal', 'Diagonal', 'Circular'];
 
   constructor(
@@ -48,7 +48,7 @@ export class ModalDireccionComponent implements OnInit {
   private inicializarFormulario(): void {
     this.direccionForm = this.fb.group({
       departamento: ['', Validators.required],
-      ciudad: ['', Validators.required],
+      ciudad: [null, Validators.required],
       viaPrincipal: ['', Validators.required],
       numeroVia: ['', Validators.required],
       letraVia: [''],
@@ -84,10 +84,9 @@ export class ModalDireccionComponent implements OnInit {
     }
 
     this.http.get<MaestroDto[]>(`${this.maestrosUrl}/departamentos/${departamentoId}/ciudades`).pipe(
-      map((lista) => lista.map((item) => item.nombre)),
       catchError((error) => {
         console.error(`Error cargando ciudades del departamento ${departamentoId}:`, error);
-        return of([] as string[]);
+        return of([] as MaestroDto[]);
       })
     ).subscribe((ciudades) => {
       this.ciudades = ciudades;
@@ -106,8 +105,10 @@ export class ModalDireccionComponent implements OnInit {
     }
     if (v.barrio) partes.push(`Barrio ${v.barrio}`);
     if (v.complemento) partes.push(v.complemento);
-    if (v.municipio) partes.push(v.municipio);
-    if (v.departamento) partes.push(v.departamento);
+    const municipio = this.ciudades.find((c) => c.id === v.ciudad)?.nombre;
+    const departamento = this.departamentos.find((d) => d.id === v.departamento)?.nombre;
+    if (municipio) partes.push(municipio);
+    if (departamento) partes.push(departamento);
     return partes.length ? partes.join(', ') : 'La dirección aparecerá aquí...';
   }
 
@@ -117,7 +118,18 @@ export class ModalDireccionComponent implements OnInit {
 
   guardar(): void {
     if (this.direccionForm.valid) {
-      this.dialogRef.close(this.direccionForm.value);
+      const formValue = this.direccionForm.getRawValue();
+      const departamentoNombre = this.departamentos.find((d) => d.id === formValue.departamento)?.nombre ?? '';
+      const municipioNombre = this.ciudades.find((c) => c.id === formValue.ciudad)?.nombre ?? '';
+
+      this.dialogRef.close({
+        ...formValue,
+        departamentoId: formValue.departamento,
+        ciudadId: formValue.ciudad,
+        departamento: departamentoNombre,
+        municipio: municipioNombre,
+        barrio: formValue.barrio
+      });
     }
   }
 }

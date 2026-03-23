@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -7,6 +7,13 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+
+export interface MaestroDto {
+  id: number;
+  nombre: string;
+}
 
 @Component({
   selector: 'app-modal-telefono',
@@ -24,50 +31,53 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './modal-activar-ruta.component.html',
   styleUrls: ['./modal-activar-ruta.component.scss']
 })
-export class ModalActivarRutaComponent {
+export class ModalActivarRutaComponent implements OnInit {
+  private readonly http = inject(HttpClient);
+  private readonly maestrosUrl = `${environment.apiBaseUrl}/maestros`;
 
   data = {
     tipo: '',
     cual: '',
   };
 
-  opcionesRuta: Record<string, string[]> = {
-    Ruta1: [
-      'UAD 3 y 4 (Unidad de asuntos disciplinarios)',
-      'URC (Unidad de resolución de conflictos)',
-      'Defensa técnica',
-      'Línea Alma',
-      'Seguridad a personas y bienes (vigilancia)',
-      'Ruta de atención por amenaza',
-      'Medidas de protección (académicas)',
-      'Medidas de protección (laborales)',
-      'No acepta/No toma ninguna decisión en esta sesión',
-      'No aplica',
-      'Otras',
-    ],
-    Ruta2: [
-      'Unidad de Fiscalía',
-      'Código Fucsia (ACV)',
-      'Línea 123 - Mujer - Medellín',
-      'Línea 123 - Mujer - Área Metropolitana',
-      'Línea 155 - Nacional',
-      'Línea 122 - Fiscalía',
-      'Dupla psicojurídica - Secretaría Mujeres Medellín',
-      'No acepta/No toma ninguna decisión en esta sesión',
-    ],
-  };
+  tiposRutaActivacion: MaestroDto[] = [];
+  rutasActivacion: MaestroDto[] = [];
 
-  get opcionesCuales(): string[] {
-    return this.opcionesRuta[this.data.tipo] ?? [];
+  constructor(public dialogRef: MatDialogRef<ModalActivarRutaComponent>) {}
+
+  ngOnInit(): void {
+    this.cargarTiposRutaActivacion();
+    this.cargarRutasActivacion();
+  }
+
+  private cargarTiposRutaActivacion(): void {
+    this.http.get<MaestroDto[]>(`${this.maestrosUrl}/tipos-ruta-activacion`).subscribe({
+      next: (lista) => {
+        this.tiposRutaActivacion = lista;
+      },
+      error: () => {
+        this.tiposRutaActivacion = [];
+      }
+    });
+  }
+
+  private cargarRutasActivacion(): void {
+    this.http.get<MaestroDto[]>(`${this.maestrosUrl}/rutas-activacion`).subscribe({
+      next: (lista) => {
+        this.rutasActivacion = lista;
+      },
+      error: () => {
+        this.rutasActivacion = [];
+      }
+    });
   }
 
   onTipoChange(): void {
     this.data.cual = '';
   }
 
-  constructor(public dialogRef: MatDialogRef<ModalActivarRutaComponent>) {}
-
   onNoClick(): void {
     this.dialogRef.close();
   }
 }
+
