@@ -10,7 +10,7 @@ $casilda-purple-palette: (
   400: #9568b2,
   500: #814ea5,
   600: #73459c,
-  700: #6B2D95,
+  700: #348F41,
   800: #5d258a,
   900: #471978,
   A100: #d5b0ff,
@@ -114,8 +114,8 @@ body {
 
 /* Forzar ripple y state-layer a morado en todos los componentes */
 :root {
-  --mdc-ripple-color: #6B2D95;
-  --mat-ripple-color: rgba(107, 45, 149, 0.12);
+  --mdc-ripple-color: #348F41;
+  --mat-ripple-color: rgba(52, 143, 65, 0.12);
 }
 
 .mat-mdc-button,
@@ -125,32 +125,32 @@ body {
 .mat-mdc-flat-button,
 .mat-mdc-fab,
 .mat-mdc-mini-fab {
-  --mdc-ripple-color: #6B2D95;
-  --mat-mdc-button-ripple-color: rgba(107, 45, 149, 0.12);
-  --mat-mdc-button-persistent-ripple-color: #6B2D95;
+  --mdc-ripple-color: #348F41;
+  --mat-mdc-button-ripple-color: rgba(52, 143, 65, 0.12);
+  --mat-mdc-button-persistent-ripple-color: #348F41;
 }
 
 .mat-mdc-icon-button {
-  --mdc-icon-button-state-layer-color: #6B2D95;
+  --mdc-icon-button-state-layer-color: #348F41;
 }
 
 .mat-mdc-radio-button {
-  --mdc-radio-selected-focus-icon-color: #6B2D95;
-  --mdc-radio-selected-hover-icon-color: #6B2D95;
-  --mdc-radio-selected-icon-color: #6B2D95;
-  --mdc-radio-selected-pressed-icon-color: #6B2D95;
-  --mat-radio-ripple-color: rgba(107, 45, 149, 0.12);
+  --mdc-radio-selected-focus-icon-color: #348F41;
+  --mdc-radio-selected-hover-icon-color: #348F41;
+  --mdc-radio-selected-icon-color: #348F41;
+  --mdc-radio-selected-pressed-icon-color: #348F41;
+  --mat-radio-ripple-color: rgba(52, 143, 65, 0.12);
 }
 
 .mat-mdc-checkbox {
-  --mdc-checkbox-selected-focus-state-layer-color: #6B2D95;
-  --mdc-checkbox-selected-hover-state-layer-color: #6B2D95;
-  --mdc-checkbox-selected-pressed-state-layer-color: #6B2D95;
+  --mdc-checkbox-selected-focus-state-layer-color: #348F41;
+  --mdc-checkbox-selected-hover-state-layer-color: #348F41;
+  --mdc-checkbox-selected-pressed-state-layer-color: #348F41;
 }
 
 .mat-mdc-option:hover,
 .mat-mdc-option.mdc-list-item--selected {
-  --mat-option-selected-state-layer-color: rgba(107, 45, 149, 0.08);
+  --mat-option-selected-state-layer-color: rgba(52, 143, 65, 0.08);
 }
 
 .custom-modal-container .mat-mdc-dialog-container .mdc-dialog__surface {
