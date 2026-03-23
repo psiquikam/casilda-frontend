@@ -49,7 +49,7 @@
                         </div>
                     </th>
                     <td mat-cell *matCellDef="let element">
-                        {{element.tipoDocumento}} - {{element.documento}}
+                        {{element.tipoDocumento ? element.tipoDocumento + ' - ' : ''}}{{element.documento}}
                     </td>
                 </ng-container>
 

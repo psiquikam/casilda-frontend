@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -6,6 +6,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
+import { HttpClient } from '@angular/common/http';
+import { map, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { MaestroDto } from '../../services/listas.service';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
@@ -18,43 +23,32 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './modal-direccion.component.html',
   styleUrls: ['./modal-direccion.component.scss']
 })
-export class ModalDireccionComponent {
-  direccionForm: FormGroup;
+export class ModalDireccionComponent implements OnInit {
+  private readonly fb = inject(FormBuilder);
+  private readonly http = inject(HttpClient);
+  private readonly maestrosUrl = `${environment.apiBaseUrl}/maestros`;
 
-  departamentos = [
-    'Antioquia',
-    'Cundinamarca',
-    'Valle del Cauca',
-    'Atlántico',
-    'Santander'
-  ];
+  direccionForm!: FormGroup;
 
-  municipios = [
-    'Medellín',
-    'Envigado',
-    'Bogotá',
-    'Cali',
-    'Barranquilla',
-    'Bucaramanga'
-  ];
+  departamentos: MaestroDto[] = [];
+  ciudades: string[] = [];
   vias = ['Calle', 'Carrera', 'Avenida', 'Transversal', 'Diagonal', 'Circular'];
-  ciudades = ['Medellín', 'Bogotá', 'Cali', 'Barranquilla', 'Bucaramanga'];
-  barrios = [
-    'Aranjuez', 'Belén', 'Boston', 'Buenos Aires', 'Castilla', 'El Centro',
-    'El Poblado', 'El Salvador', 'Estadio', 'Floresta', 'Guayabal', 'La América',
-    'La Candelaria', 'La Floresta', 'Laureles', 'Los Ángeles', 'Manrique',
-    'Moravia', 'Niquitao', 'Pedregal', 'Robledo', 'San Javier', 'Santa Cruz',
-    'Trinidad', 'Villahermosa', 'Villa del Prado', 'Zamora'
-  ];
 
   constructor(
-    private fb: FormBuilder,
     public dialogRef: MatDialogRef<ModalDireccionComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
-  ) {
+  ) { }
+
+  ngOnInit(): void {
+    this.cargarDepartamentos();
+    this.inicializarFormulario();
+    this.suscribirCambiosDepartamento();
+  }
+
+  private inicializarFormulario(): void {
     this.direccionForm = this.fb.group({
-      departamento: ['Antioquia', Validators.required],
-      municipio: ['Medellín', Validators.required],
+      departamento: ['', Validators.required],
+      ciudad: ['', Validators.required],
       viaPrincipal: ['', Validators.required],
       numeroVia: ['', Validators.required],
       letraVia: [''],
@@ -65,6 +59,41 @@ export class ModalDireccionComponent {
     });
   }
 
+  private cargarDepartamentos(): void {
+    this.http.get<MaestroDto[]>(`${this.maestrosUrl}/departamentos`).pipe(
+      catchError((error) => {
+        console.error('Error cargando departamentos:', error);
+        return of([] as MaestroDto[]);
+      })
+    ).subscribe((depts) => {
+      this.departamentos = depts.sort((a, b) => a.nombre.localeCompare(b.nombre));
+    });
+  }
+
+  private suscribirCambiosDepartamento(): void {
+    this.direccionForm.get('departamento')?.valueChanges.subscribe((departamentoId) => {
+      this.cargarCiudadesPorDepartamento(departamentoId);
+      this.direccionForm.get('ciudad')?.setValue('');
+    });
+  }
+
+  private cargarCiudadesPorDepartamento(departamentoId: number | null): void {
+    if (!departamentoId) {
+      this.ciudades = [];
+      return;
+    }
+
+    this.http.get<MaestroDto[]>(`${this.maestrosUrl}/departamentos/${departamentoId}/ciudades`).pipe(
+      map((lista) => lista.map((item) => item.nombre)),
+      catchError((error) => {
+        console.error(`Error cargando ciudades del departamento ${departamentoId}:`, error);
+        return of([] as string[]);
+      })
+    ).subscribe((ciudades) => {
+      this.ciudades = ciudades;
+    });
+  }
+  
   get direccionPreview(): string {
     const v = this.direccionForm.value;
     const partes: string[] = [];

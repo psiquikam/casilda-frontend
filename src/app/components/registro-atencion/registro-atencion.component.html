@@ -59,8 +59,18 @@
                                 </mat-form-field>
 
                                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                    <mat-label>Departamento de la entrevista</mat-label>
+                                    <mat-select formControlName="departamentoEntrevista">
+                                        @for (d of listaDepartamentos; track d) {
+                                        <mat-option [value]="d.id">{{d.nombre}}</mat-option>
+                                        }
+                                    </mat-select>
+                                </mat-form-field>
+
+                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
                                     <mat-label>Forma y lugar de la entrevista</mat-label>
-                                    <mat-select formControlName="formaEntrevista">
+                                    <mat-select formControlName="formaEntrevista"
+                                        [disabled]="!atencionForm.get('departamentoEntrevista')?.value">
                                         @for (s of formayLugar; track s) { <mat-option [value]="s">{{s}}</mat-option>
                                         }
                                     </mat-select>
@@ -127,8 +137,21 @@
                                         </mat-select>
                                     </mat-form-field>
                                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                        <mat-label>Lugar de Nacimiento</mat-label>
-                                        <input matInput formControlName="lugarNacimiento">
+                                        <mat-label>Departamento de Nacimiento</mat-label>
+                                        <mat-select formControlName="departamentoNacimiento">
+                                            @for (d of listaDepartamentos; track d) {
+                                            <mat-option [value]="d.id">{{d.nombre}}</mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>Ciudad de Nacimiento</mat-label>
+                                        <mat-select formControlName="ciudadNacimiento"
+                                            [disabled]="!atencionForm.get('departamentoNacimiento')?.value">
+                                            @for (c of formayLugar; track c) {
+                                            <mat-option [value]="c">{{c}}</mat-option>
+                                            }
+                                        </mat-select>
                                     </mat-form-field>
                                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
                                         <mat-label>Sexo</mat-label>
@@ -411,6 +434,25 @@
                                     <mat-label>¿En qué forma ocurrió el hecho?</mat-label>
                                     <mat-select formControlName="queForma">
                                         @for (c of queForma; track c) { <mat-option [value]="c">{{c}}</mat-option> }
+                                    </mat-select>
+                                </mat-form-field>
+
+                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                    <mat-label>Departamento de hechos</mat-label>
+                                    <mat-select formControlName="departamentoHechos">
+                                        @for (d of listaDepartamentos; track d) {
+                                        <mat-option [value]="d.id">{{d.nombre}}</mat-option>
+                                        }
+                                    </mat-select>
+                                </mat-form-field>
+
+                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                    <mat-label>Ciudad de hechos</mat-label>
+                                    <mat-select formControlName="ciudadHechos"
+                                        [disabled]="!atencionForm.get('departamentoHechos')?.value">
+                                        @for (c of ciudadesHechos; track c) {
+                                        <mat-option [value]="c">{{c}}</mat-option>
+                                        }
                                     </mat-select>
                                 </mat-form-field>
 
