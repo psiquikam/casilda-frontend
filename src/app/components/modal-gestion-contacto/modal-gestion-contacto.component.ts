@@ -13,6 +13,8 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { SolicitudService, ContactoTelefonicoDto } from '../../services/solicitud.service';
 import { environment } from '../../../environments/environment';
 
@@ -34,7 +36,9 @@ const RESULTADO_EXITOSO = 'Contesta y se concerta cita';
     MatTabsModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   templateUrl: './modal-gestion-contacto.component.html',
   styleUrls: ['./modal-gestion-contacto.component.scss']
@@ -147,6 +151,12 @@ export class ModalGestionComponent implements OnInit {
     this.contactoForm.get('horaCita')?.updateValueAndValidity();
   }
 
+  private formatFecha(fecha: any): string {
+    if (!fecha) return '';
+    if (typeof fecha === 'string') return fecha;
+    return new Date(fecha).toISOString().substring(0, 10);
+  }
+
   registrarIntento(): void {
     if (this.contactoForm.invalid) return;
 
@@ -158,7 +168,7 @@ export class ModalGestionComponent implements OnInit {
       hora: val.hora,
       resultado: val.resultado,
       observacion: val.observacion,
-      fechaCita: val.fechaCita || undefined,
+      fechaCita: val.fechaCita ? this.formatFecha(val.fechaCita) : undefined,
       horaCita: val.horaCita || undefined
     }).subscribe({
       next: (contacto) => {

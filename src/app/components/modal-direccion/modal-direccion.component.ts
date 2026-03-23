@@ -11,13 +11,14 @@ import { map, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { MaestroDto } from '../../services/listas.service';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-modal-direccion',
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, MatDialogModule,
-    MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule
+    MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatIconModule
   ],
   templateUrl: './modal-direccion.component.html',
   styleUrls: ['./modal-direccion.component.scss']
@@ -91,6 +92,23 @@ export class ModalDireccionComponent implements OnInit {
     ).subscribe((ciudades) => {
       this.ciudades = ciudades;
     });
+  }
+  
+  get direccionPreview(): string {
+    const v = this.direccionForm.value;
+    const partes: string[] = [];
+    if (v.viaPrincipal && v.numeroVia) {
+      let via = `${v.viaPrincipal} ${v.numeroVia}`;
+      if (v.letraVia) via += ` ${v.letraVia}`;
+      if (v.numeroCruce) via += ` #${v.numeroCruce}`;
+      if (v.placa) via += `-${v.placa}`;
+      partes.push(via);
+    }
+    if (v.barrio) partes.push(`Barrio ${v.barrio}`);
+    if (v.complemento) partes.push(v.complemento);
+    if (v.municipio) partes.push(v.municipio);
+    if (v.departamento) partes.push(v.departamento);
+    return partes.length ? partes.join(', ') : 'La dirección aparecerá aquí...';
   }
 
   onNoClick(): void {

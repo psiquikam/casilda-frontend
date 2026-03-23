@@ -7,6 +7,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-reparto-modal',
@@ -21,12 +23,14 @@ import { MatIconModule } from '@angular/material/icon';
     MatSelectModule,
     MatInputModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ]
 })
 export class AsignarCitaModalComponent {
 
-  citaForm: FormGroup;
+  citaForm!: FormGroup;
 
   constructor(
     private fb: FormBuilder,
@@ -34,16 +38,23 @@ export class AsignarCitaModalComponent {
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.citaForm = this.fb.group({
-      fechaCita: ['', Validators.required],
+      fechaCita: [null, Validators.required],
       horaCita: ['', Validators.required]
     });
   }
 
+  private formatFecha(fecha: any): string {
+    if (!fecha) return '';
+    if (typeof fecha === 'string') return fecha;
+    return new Date(fecha).toISOString().substring(0, 10);
+  }
+
   guardar() {
     if (this.citaForm.valid) {
+      const val = this.citaForm.value;
       this.dialogRef.close({
         caso: this.data,
-        cita: this.citaForm.value
+        cita: { ...val, fechaCita: this.formatFecha(val.fechaCita) }
       });
     }
   }

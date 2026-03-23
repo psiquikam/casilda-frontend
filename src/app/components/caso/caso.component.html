@@ -1,17 +1,55 @@
-<div class="consulta-container">
+<div class="caso-container">
   <header class="page-header">
     <div class="header-content">
-      <h1>Consulta Solicitud de Atención</h1>
-      <p>Gestión y seguimiento de solicitudes por estado actual</p>
+      <h1>Consulta Caso</h1>
+      <p>Gestión y seguimiento de casos por estado actual</p>
     </div>
   </header>
 
   <mat-card class="table-card">
-    <ng-container *ngTemplateOutlet="tablaCasos; context: {
-      dataSource: dataSourceTodos,
-      showReparto: true,
-      msgVacio: 'No hay solicitudes registradas.'
-    }"></ng-container>
+    <mat-tab-group animationDuration="200ms">
+
+      <mat-tab label="Sin asignar ({{ totalSinRepartir }})">
+        <div class="tab-body-wrapper">
+          <ng-container *ngTemplateOutlet="tablaCasos; context: {
+            dataSource: dataSourceSinRepartir,
+            showReparto: true,
+            msgVacio: '¡Excelente! No hay casos pendientes de asignación.'
+          }"></ng-container>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Abierto activo ({{totalAbiertoActivo}})">
+        <div class="tab-body-wrapper">
+          <ng-container *ngTemplateOutlet="tablaCasos; context: {
+            dataSource: dataSourceActivos,
+            showReparto: false,
+            msgVacio: 'No hay casos activos con profesional asignado en este momento.'
+          }"></ng-container>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Abierto en transición ({{totalAbiertoTransicion}})">
+        <div class="tab-body-wrapper">
+          <ng-container *ngTemplateOutlet="tablaCasos; context: {
+            dataSource: dataSourceTransicion,
+            showReparto: false,
+            msgVacio: 'No se registran casos en proceso de transición.'
+          }"></ng-container>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Cerrado ({{ totalCerrado }})">
+        <div class="tab-body-wrapper">
+          <ng-container *ngTemplateOutlet="tablaCasos; context: {
+            dataSource: dataSourceCerrados,
+            showReparto: false,
+            msgVacio: 'El historial de casos cerrados está vacío.'
+          }"></ng-container>
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
   </mat-card>
 </div>
 
@@ -87,27 +125,11 @@
         <td mat-cell *matCellDef="let element"><span class="badge-soft">{{element.dependencia}}</span></td>
       </ng-container>
 
-      <ng-container matColumnDef="estado">
-        <th mat-header-cell *matHeaderCellDef>
-          <div class="header-inline-container">
-            <span class="column-title">Estado</span>
-          </div>
-        </th>
-        <td mat-cell *matCellDef="let element">
-          <span class="badge-estado" [ngClass]="{
-            'badge-sin-asignar': !element.profesional || element.profesional === 'Sin asignar',
-            'badge-activo': element.estado !== 'Cerrado' && element.estado !== 'Abierto en transición' && element.profesional && element.profesional !== 'Sin asignar',
-            'badge-transicion': element.estado === 'Abierto en transición',
-            'badge-cerrado': element.estado === 'Cerrado'
-          }">{{element.estado || 'Sin asignar'}}</span>
-        </td>
-      </ng-container>
-
       <ng-container matColumnDef="profesional">
         <th mat-header-cell *matHeaderCellDef>
           <div class="header-inline-container">
             <span class="column-title">Asignado</span>
-            <div class="search-box-slim"><input (keyup)="applyFilter('profesional', $event)" placeholder="Filtrar..."></div>
+            <div class="search-box-slim"><input (keyup)="applyFilter('profesional', $event)" placeholder="..."></div>
           </div>
         </th>
         <td mat-cell *matCellDef="let element">

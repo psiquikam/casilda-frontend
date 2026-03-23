@@ -18,15 +18,15 @@ import { Router } from '@angular/router';
 import { SolicitudService } from '../../services/solicitud.service';
 
 @Component({
-  selector: 'app-consulta',
+  selector: 'app-caso',
   standalone: true,
   imports: [
     CommonModule, FormsModule, MatTabsModule, MatTableModule,
     MatButtonModule, MatIconModule, MatChipsModule, MatCardModule,
     MatInputModule, MatDialogModule, MatPaginatorModule
   ],
-  templateUrl: './consulta.component.html',
-  styleUrls: ['./consulta.component.scss'],
+  templateUrl: './caso.component.html',
+  styleUrls: ['./caso.component.scss'],
   animations: [
     trigger('detailExpand', [
       state('collapsed, void', style({ height: '0px', minHeight: '0' })),
@@ -35,18 +35,17 @@ import { SolicitudService } from '../../services/solicitud.service';
     ]),
   ],
 })
-export class ConsultaComponent implements OnInit {
+export class CasoComponent implements OnInit {
 
   private solicitudService = inject(SolicitudService);
   private router = inject(Router);
 
   constructor(private dialog: MatDialog) { }
 
-  displayedColumns: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'dependencia', 'estado', 'profesional', 'acciones'];
+  displayedColumns: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'dependencia', 'profesional', 'acciones'];
   expandedElement: any | null;
   expandedDetailColumns: string[] = ['expandedDetail'];
 
-  dataSourceTodos = new MatTableDataSource<any>([]);
   dataSourceActivos = new MatTableDataSource<any>([]);
   dataSourceTransicion = new MatTableDataSource<any>([]);
   dataSourceCerrados = new MatTableDataSource<any>([]);
@@ -92,7 +91,6 @@ export class ConsultaComponent implements OnInit {
       profesional: r.profesional || 'Sin asignar',
       fecha: r.fechaCreacion ? r.fechaCreacion.substring(0, 10) : '',
       dependencia: r.dependencia || '',
-      // Solicitante
       tipoDocumento: r.tipoDocumento || '',
       numeroDocumento: r.numeroDocumento || '',
       fechaNacimiento: r.fechaNacimiento || null,
@@ -105,7 +103,6 @@ export class ConsultaComponent implements OnInit {
       telefonoAlterno: r.telefonoAlterno || '',
       correoInstitucional: r.correoInstitucional || '',
       correoPersonal: r.correoPersonal || '',
-      // Remitente
       remitentePrimerNombre: r.remitentePrimerNombre || '',
       remitenteSegundoNombre: r.remitenteSegundoNombre || '',
       remitentePrimerApellido: r.remitentePrimerApellido || '',
@@ -121,8 +118,6 @@ export class ConsultaComponent implements OnInit {
   }
 
   inicializarTablas() {
-    this.dataSourceTodos.data = this.solicitudes;
-
     this.dataSourceSinRepartir.data = this.solicitudes.filter(c =>
       !c.profesional || c.profesional === 'Sin asignar'
     );
@@ -141,7 +136,7 @@ export class ConsultaComponent implements OnInit {
     );
 
     const filterPredicate = this.createFilter();
-    [this.dataSourceTodos, this.dataSourceSinRepartir, this.dataSourceActivos, this.dataSourceTransicion, this.dataSourceCerrados]
+    [this.dataSourceSinRepartir, this.dataSourceActivos, this.dataSourceTransicion, this.dataSourceCerrados]
       .forEach(ds => ds.filterPredicate = filterPredicate);
   }
 
@@ -151,7 +146,6 @@ export class ConsultaComponent implements OnInit {
     const filterString = JSON.stringify(this.filterValues);
 
     [
-      this.dataSourceTodos,
       this.dataSourceSinRepartir,
       this.dataSourceActivos,
       this.dataSourceTransicion,
@@ -219,8 +213,8 @@ export class ConsultaComponent implements OnInit {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '350px',
       data: {
-        titulo: 'Eliminar solicitud',
-        mensaje: `¿Seguro que deseas eliminar la solicitud asociada al caso ${element.id}?`
+        titulo: 'Eliminar caso',
+        mensaje: `¿Seguro que deseas eliminar el caso ${element.id}?`
       }
     });
 
@@ -228,7 +222,7 @@ export class ConsultaComponent implements OnInit {
       if (confirmado) {
         this.solicitudService.eliminar(element.solicitudId).subscribe({
           next: () => this.cargarDatos(),
-          error: (err) => console.error('Error al eliminar solicitud:', err)
+          error: (err) => console.error('Error al eliminar caso:', err)
         });
       }
     });
@@ -251,7 +245,7 @@ export class ConsultaComponent implements OnInit {
           fechaReparto: result.fechaReparto
         }).subscribe({
           next: () => this.cargarDatos(),
-          error: (err) => console.error('Error al asignar solicitud:', err)
+          error: (err) => console.error('Error al asignar caso:', err)
         });
       }
     });
@@ -273,4 +267,3 @@ export class ConsultaComponent implements OnInit {
     return this.dataSourceTransicion.data.length;
   }
 }
-

@@ -40,7 +40,7 @@ export class CasildaHomeComponent {
       tooltip: 'Línea de atención psicológica y apoyo inmediato de la Universidad.'
     },
     { 
-      icon: 'security', 
+      icon: 'seguridad-bienes',
       title: 'Atención por Seguridad a Personas y Bienes', 
       variant: 'light',
       tooltip: 'Reporte de incidentes de seguridad inmediata dentro del campus.'

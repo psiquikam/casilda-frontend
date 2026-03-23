@@ -1,7 +1,7 @@
-$purple-sys: #348F41;
+$purple-sys: #6B2D95;
 
 .modal-container {
-  overflow: hidden;
+  overflow: visible;
   border-radius: 4px;
 }
 
@@ -50,6 +50,7 @@ $purple-sys: #348F41;
     .mat-mdc-form-field-flex {
       height: 40px !important;
       align-items: center !important;
+      overflow: visible !important;
     }
 
     .mat-mdc-form-field-infix {

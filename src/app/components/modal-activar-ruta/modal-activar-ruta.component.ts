@@ -31,6 +31,40 @@ export class ModalActivarRutaComponent {
     cual: '',
   };
 
+  opcionesRuta: Record<string, string[]> = {
+    Ruta1: [
+      'UAD 3 y 4 (Unidad de asuntos disciplinarios)',
+      'URC (Unidad de resolución de conflictos)',
+      'Defensa técnica',
+      'Línea Alma',
+      'Seguridad a personas y bienes (vigilancia)',
+      'Ruta de atención por amenaza',
+      'Medidas de protección (académicas)',
+      'Medidas de protección (laborales)',
+      'No acepta/No toma ninguna decisión en esta sesión',
+      'No aplica',
+      'Otras',
+    ],
+    Ruta2: [
+      'Unidad de Fiscalía',
+      'Código Fucsia (ACV)',
+      'Línea 123 - Mujer - Medellín',
+      'Línea 123 - Mujer - Área Metropolitana',
+      'Línea 155 - Nacional',
+      'Línea 122 - Fiscalía',
+      'Dupla psicojurídica - Secretaría Mujeres Medellín',
+      'No acepta/No toma ninguna decisión en esta sesión',
+    ],
+  };
+
+  get opcionesCuales(): string[] {
+    return this.opcionesRuta[this.data.tipo] ?? [];
+  }
+
+  onTipoChange(): void {
+    this.data.cual = '';
+  }
+
   constructor(public dialogRef: MatDialogRef<ModalActivarRutaComponent>) {}
 
   onNoClick(): void {

@@ -52,7 +52,12 @@ export class AppComponent {
       { name: 'equipo-atencion', url: 'assets/equipo_atencion.svg' },
       { name: 'uad-equipo', url: 'assets/uad_equipo_3_y_4.svg' },
       { name: 'reportes-indicadores', url: 'assets/reportes_informes_indicadores.svg' },
-      { name: 'administracion', url: 'assets/administracion.svg' }
+      { name: 'administracion', url: 'assets/administracion.svg' },
+      { name: 'seguridad-bienes', url: 'assets/seguridad_bienes_y_servicios.svg' },
+      { name: 'logo-login', url: 'assets/login.svg' },
+      { name: 'icono-eliminar', url: 'assets/eliminar.svg' },
+      { name: 'icono-editar', url: 'assets/editar.svg' },
+      { name: 'icono-ver', url: 'assets/ver.svg' }
     ];
 
     icons.forEach(icon => {

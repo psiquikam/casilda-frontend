@@ -1,4 +1,4 @@
-$purple-sys: #348F41;
+$purple-sys: #6B2D95;
 
 .form-container {
   display: flex;
@@ -90,9 +90,61 @@ $purple-sys: #348F41;
     width: 28px !important;
     height: 28px !important;
     line-height: 28px !important;
+    padding: 0 !important;
     color: $purple-sys;
-    
+
+    ::ng-deep {
+      .mat-mdc-button-touch-target,
+      .mat-mdc-button-ripple,
+      .mdc-button__ripple {
+        width: 28px !important;
+        height: 28px !important;
+        top: 0 !important;
+        left: 0 !important;
+      }
+    }
+
     mat-icon { font-size: 20px !important; width: 20px; height: 20px; }
+  }
+}
+
+.btn-search-doc {
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  padding: 0 !important;
+  background-color: #348F41 !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 6px rgba(52, 143, 65, 0.4);
+  transition: background-color 0.2s, box-shadow 0.2s;
+
+  ::ng-deep {
+    .mat-mdc-button-touch-target,
+    .mat-mdc-button-ripple,
+    .mdc-button__ripple {
+      border-radius: 50% !important;
+    }
+  }
+
+  mat-icon {
+    font-size: 13px !important;
+    width: 13px !important;
+    height: 13px !important;
+    line-height: 13px !important;
+    color: white !important;
+  }
+
+  &:hover:not(:disabled) {
+    background-color: #2a7334 !important;
+    box-shadow: 0 3px 8px rgba(52, 143, 65, 0.5);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    box-shadow: none;
   }
 }
 
@@ -116,24 +168,26 @@ $purple-sys: #348F41;
 
 .atencion-table {
   width: 100%;
+  --mat-table-header-container-height: 28px;
+  --mat-table-row-item-container-height: 22px;
   th.mat-header-cell {
     background: #f8fafc;
     font-weight: 700;
     font-size: 10px;
     text-transform: uppercase;
     color: #64748b;
-    padding: 5px 10px;
+    padding: 0 10px;
   }
-  td.mat-cell { padding: 5px 10px; font-size: 11px; color: #334155; }
+  td.mat-cell { padding: 0 10px; font-size: 11px; color: #334155; height: 22px; }
 }
 
 
 .no-results-msg {
   text-align: center;
-  padding: 15px;
+  padding: 6px;
   color: #94a3b8;
-  mat-icon { font-size: 24px; opacity: 0.5; }
-  p { font-size: 12px; margin: 0; }
+  mat-icon { font-size: 16px; width: 16px; height: 16px; opacity: 0.5; }
+  p { font-size: 11px; margin: 0; }
 }
 
 .row {

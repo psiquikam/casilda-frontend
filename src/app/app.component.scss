@@ -5,6 +5,26 @@ html, body {
   overflow: hidden;
 }
 
+.auth-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+
+  app-header {
+    flex-shrink: 0;
+  }
+
+  .sidenav-container {
+    flex: 1;
+    overflow: hidden;
+  }
+}
+
+::ng-deep .aside-menu {
+  width: 220px !important;
+}
+
 .full-screen-login {
   height: 100vh;
   width: 100vw;

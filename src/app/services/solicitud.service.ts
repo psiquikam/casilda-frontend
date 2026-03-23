@@ -93,6 +93,19 @@ export interface SolicitudAcompanamientoResponse {
   remitenteNumeroDocumento: string;
 }
 
+export interface RemitenteSearchDto {
+  primerNombre: string;
+  segundoNombre?: string | null;
+  primerApellido: string;
+  segundoApellido?: string | null;
+  tipoDocumentoId?: number | null;
+  numeroDocumento?: string | null;
+  cargoId?: number | null;
+  campusId?: number | null;
+  dependenciaId?: number | null;
+  facultadId?: number | null;
+}
+
 export interface UpdateSolicitudDto {
   primerNombre?: string;
   segundoNombre?: string | null;
@@ -179,6 +192,10 @@ export class SolicitudService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiBaseUrl}/solicitudes`;
   private readonly citasUrl = `${environment.apiBaseUrl}/citas`;
+
+  buscarRemitentePorDocumento(documento: string): Observable<RemitenteSearchDto> {
+    return this.http.get<RemitenteSearchDto>(`${environment.apiBaseUrl}/personas/documento/${documento}`);
+  }
 
   crearAcompanamiento(request: SolicitudAcompanamientoRequest): Observable<SolicitudAcompanamientoResponse> {
     return this.http.post<SolicitudAcompanamientoResponse>(`${this.apiUrl}/acompanamiento`, request);

@@ -10,7 +10,7 @@ $casilda-purple-palette: (
   400: #9568b2,
   500: #814ea5,
   600: #73459c,
-  700: #348F41,
+  700: #6B2D95,
   800: #5d258a,
   900: #471978,
   A100: #d5b0ff,
@@ -86,7 +86,7 @@ body {
 }
 
 .main-header {
-  background-color: mat.get-color-from-palette($my-primary-palette, 700) !important;
+  background-color: #348F41 !important;
   color: white !important;
 }
 
@@ -110,6 +110,47 @@ body {
 
 .login-container {
   background: linear-gradient(135deg, #348F41 0%, #471978 100%);
+}
+
+/* Forzar ripple y state-layer a morado en todos los componentes */
+:root {
+  --mdc-ripple-color: #6B2D95;
+  --mat-ripple-color: rgba(107, 45, 149, 0.12);
+}
+
+.mat-mdc-button,
+.mat-mdc-icon-button,
+.mat-mdc-raised-button,
+.mat-mdc-outlined-button,
+.mat-mdc-flat-button,
+.mat-mdc-fab,
+.mat-mdc-mini-fab {
+  --mdc-ripple-color: #6B2D95;
+  --mat-mdc-button-ripple-color: rgba(107, 45, 149, 0.12);
+  --mat-mdc-button-persistent-ripple-color: #6B2D95;
+}
+
+.mat-mdc-icon-button {
+  --mdc-icon-button-state-layer-color: #6B2D95;
+}
+
+.mat-mdc-radio-button {
+  --mdc-radio-selected-focus-icon-color: #6B2D95;
+  --mdc-radio-selected-hover-icon-color: #6B2D95;
+  --mdc-radio-selected-icon-color: #6B2D95;
+  --mdc-radio-selected-pressed-icon-color: #6B2D95;
+  --mat-radio-ripple-color: rgba(107, 45, 149, 0.12);
+}
+
+.mat-mdc-checkbox {
+  --mdc-checkbox-selected-focus-state-layer-color: #6B2D95;
+  --mdc-checkbox-selected-hover-state-layer-color: #6B2D95;
+  --mdc-checkbox-selected-pressed-state-layer-color: #6B2D95;
+}
+
+.mat-mdc-option:hover,
+.mat-mdc-option.mdc-list-item--selected {
+  --mat-option-selected-state-layer-color: rgba(107, 45, 149, 0.08);
 }
 
 .custom-modal-container .mat-mdc-dialog-container .mdc-dialog__surface {
