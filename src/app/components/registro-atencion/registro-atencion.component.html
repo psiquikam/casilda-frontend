@@ -1,9 +1,9 @@
 <div *ngIf="!modoAtencion" class="cita-container animate-fade-in">
 
     <div class="section-header">
-        <h2>Consulta Solicitud de Atención</h2>
+        <h2>Consulta de citas programadas</h2>
         <span class="subtitle">
-            Gestión y seguimiento de casos por atender
+            Gestión de atenciones
         </span>
     </div>
 
@@ -217,7 +217,7 @@
                                                 <td mat-cell *matCellDef="let i = index" style="text-align: center;">
                                                     <button mat-icon-button color="warn"
                                                         (click)="eliminarDiscapacidad(i)" matTooltip="Eliminar">
-                                                        <mat-icon>delete</mat-icon>
+                                                        <mat-icon svgIcon="icono-eliminar"></mat-icon>
                                                     </button>
                                                 </td>
                                             </ng-container>
@@ -323,7 +323,7 @@
                                                 <td mat-cell *matCellDef="let i = index" style="text-align: center;">
                                                     <button mat-icon-button color="warn" (click)="eliminarCorreo(i)"
                                                         matTooltip="Eliminar">
-                                                        <mat-icon>delete</mat-icon>
+                                                        <mat-icon svgIcon="icono-eliminar"></mat-icon>
                                                     </button>
                                                 </td>
                                             </ng-container>
@@ -379,7 +379,7 @@
                                                 <td mat-cell *matCellDef="let i = index" style="text-align: center;">
                                                     <button mat-icon-button color="warn" (click)="eliminarTelefono(i)"
                                                         matTooltip="Eliminar">
-                                                        <mat-icon>delete</mat-icon>
+                                                        <mat-icon svgIcon="icono-eliminar"></mat-icon>
                                                     </button>
                                                 </td>
                                             </ng-container>
@@ -458,7 +458,7 @@
                                                 <td mat-cell *matCellDef="let i = index" style="text-align: center;">
                                                     <button mat-icon-button color="warn" (click)="eliminarHechos(i)"
                                                         matTooltip="Eliminar">
-                                                        <mat-icon>delete</mat-icon>
+                                                        <mat-icon svgIcon="icono-eliminar"></mat-icon>
                                                     </button>
                                                 </td>
                                             </ng-container>
@@ -499,7 +499,7 @@
 
                                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
                                         <mat-label>Actividad Misional</mat-label>
-                                        <mat-select formControlName="violenciaMisional">
+                                        <mat-select formControlName="actividadMisional">
                                             @for (c of actividadesMisionales; track c) { <mat-option
                                                 [value]="c">{{c}}</mat-option> }
                                         </mat-select>
@@ -846,7 +846,7 @@
                                                 <td mat-cell *matCellDef="let i = index" style="text-align: center;">
                                                     <button mat-icon-button color="warn"
                                                         (click)="eliminarRutaActivada(i)" matTooltip="Eliminar">
-                                                        <mat-icon>delete</mat-icon>
+                                                        <mat-icon svgIcon="icono-eliminar"></mat-icon>
                                                     </button>
                                                 </td>
                                             </ng-container>
@@ -900,7 +900,7 @@
                                                 <td mat-cell *matCellDef="let i = index" style="text-align: center;">
                                                     <button mat-icon-button color="warn"
                                                         (click)="eliminarRutaActivada(i)" matTooltip="Eliminar">
-                                                        <mat-icon>delete</mat-icon>
+                                                        <mat-icon svgIcon="icono-eliminar"></mat-icon>
                                                     </button>
                                                 </td>
                                             </ng-container>
@@ -1143,7 +1143,7 @@
                                                 <td mat-cell *matCellDef="let i = index" style="text-align: center;">
                                                     <button mat-icon-button color="warn"
                                                         (click)="eliminarSeguimientos(i)" matTooltip="Eliminar">
-                                                        <mat-icon>delete</mat-icon>
+                                                        <mat-icon svgIcon="icono-eliminar"></mat-icon>
                                                     </button>
                                                 </td>
                                             </ng-container>

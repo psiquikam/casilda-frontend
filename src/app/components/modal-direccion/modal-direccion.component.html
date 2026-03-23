@@ -51,15 +51,26 @@
       <input matInput formControlName="placa" placeholder="Ej: 10">
     </mat-form-field>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="span-all">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Barrio</mat-label>
-      <input matInput formControlName="barrio">
+      <mat-select formControlName="barrio">
+        @for (b of barrios; track b) {
+          <mat-option [value]="b">{{ b }}</mat-option>
+        }
+      </mat-select>
     </mat-form-field>
 
-    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="span-all">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Complemento (Apto, Torre, Bloque)</mat-label>
       <input matInput formControlName="complemento">
     </mat-form-field>
+
+    <div class="address-preview span-all">
+      <span class="preview-label">
+        <mat-icon>location_on</mat-icon> Vista previa
+      </span>
+      <span class="preview-text">{{ direccionPreview }}</span>
+    </div>
 
   </form>
 </mat-dialog-content>

@@ -14,7 +14,8 @@ import { MatPaginator, MatPaginatorModule, MatPaginatorIntl } from '@angular/mat
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ModalGestionComponent } from '../modal-gestion-contacto/modal-gestion-contacto.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { SolicitudService } from '../../services/solicitud.service';
+import { SolicitudService, ContactoTelefonicoDto } from '../../services/solicitud.service';
+import { forkJoin, Observable } from 'rxjs';
 
 
 export function getSpanishPaginatorIntl() {
@@ -85,6 +86,8 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'dependencia', 'profesional', 'acciones'];
   dataSource = new MatTableDataSource<any>([]);
   expandedElement: any | null;
+  numIntentosMap: Record<number, number> = {};
+  maxLlamadas = 2;
   filterValues: any = {
     id: '',
     nombre: '',
@@ -115,7 +118,7 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
     this.cargando = true;
     this.solicitudService.listarTodas().subscribe({
       next: (solicitudes) => {
-        this.dataSource.data = solicitudes.map(s => ({
+        const mapped = solicitudes.map(s => ({
           id: s.id,
           solicitudId: s.id,
           codigo: s.codigo,
@@ -131,7 +134,21 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
           celular: s.celular || '',
           correoInst: s.correoInstitucional || ''
         }));
+        this.dataSource.data = mapped;
         this.cargando = false;
+
+        const asignados = mapped.filter(e => e.profesional && e.profesional !== 'Sin asignar');
+        if (asignados.length === 0) return;
+        const calls: Record<string, Observable<ContactoTelefonicoDto[]>> = {};
+        asignados.forEach(e => { calls[String(e.id)] = this.solicitudService.listarContactos(e.id); });
+        forkJoin(calls).subscribe({
+          next: (results) => {
+            Object.keys(results).forEach(idStr => {
+              this.numIntentosMap[Number(idStr)] = results[idStr].length;
+            });
+          },
+          error: () => {}
+        });
       },
       error: (err) => {
         console.error('Error al cargar solicitudes:', err);
@@ -208,13 +225,21 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
     const dialogRef = this.dialog.open(ModalGestionComponent, {
       width: '900px',
       maxWidth: '95vw',
-      data: caso
+      data: { ...caso, soloLectura: false }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.cargarSolicitudes();
       }
+    });
+  }
+
+  abrirHistorial(caso: any) {
+    this.dialog.open(ModalGestionComponent, {
+      width: '900px',
+      maxWidth: '95vw',
+      data: { ...caso, soloLectura: true }
     });
   }
 

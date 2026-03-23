@@ -13,7 +13,9 @@
       <div class="form-grid">
         <mat-form-field appearance="outline" *ngIf="data.accion === 'reprogramar'">
           <mat-label>Fecha de Cita</mat-label>
-          <input matInput type="date" formControlName="fechaCita">
+          <input matInput [matDatepicker]="pickerCita" formControlName="fechaCita">
+          <mat-datepicker-toggle matIconSuffix [for]="pickerCita"></mat-datepicker-toggle>
+          <mat-datepicker #pickerCita></mat-datepicker>
         </mat-form-field>
 
         <mat-form-field appearance="outline" *ngIf="data.accion === 'reprogramar'">

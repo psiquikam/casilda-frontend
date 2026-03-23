@@ -1,4 +1,4 @@
-$purple-sys: #348F41;
+$purple-sys: #6B2D95;
 $green-success: #22c55e;
 $danger: #ef4444;
 
@@ -215,6 +215,14 @@ th.mat-mdc-header-cell {
 
   &:hover {
     background-color: rgba(107, 45, 149, 0.08) !important;
+  }
+}
+
+.action-visible {
+  color: #4b97b9;
+
+  &:hover {
+    background-color: rgba(75, 151, 185, 0.08) !important;
   }
 }
 

@@ -7,6 +7,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { MaestroDto } from '../../services/listas.service';
@@ -19,7 +21,8 @@ import { MaestroDto } from '../../services/listas.service';
   imports: [
     CommonModule, ReactiveFormsModule, MatDialogModule,
     MatFormFieldModule, MatSelectModule, MatInputModule,
-    MatButtonModule, MatIconModule
+    MatButtonModule, MatIconModule,
+    MatDatepickerModule, MatNativeDateModule
   ]
 })
 export class ReprogramarCitaModalComponent implements OnInit {
@@ -70,12 +73,19 @@ export class ReprogramarCitaModalComponent implements OnInit {
     return this.data.accion === 'cancelar' ? 'warn' : 'primary';
   }
 
+  private formatFecha(fecha: any): string {
+    if (!fecha) return '';
+    if (typeof fecha === 'string') return fecha;
+    return new Date(fecha).toISOString().substring(0, 10);
+  }
+
   guardar() {
     if (this.gestionForm.valid) {
+      const val = this.gestionForm.value;
       this.dialogRef.close({
         id: this.data.caso.id,
         accion: this.data.accion,
-        formulario: this.gestionForm.value
+        formulario: { ...val, fechaCita: this.formatFecha(val.fechaCita) }
       });
     }
   }

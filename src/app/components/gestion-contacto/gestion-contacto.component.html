@@ -99,9 +99,17 @@
           </th>
           <td mat-cell *matCellDef="let element">
             <div class="action-buttons-container">
-              <button mat-icon-button class="action-purple" matTooltip="Intento de contacto"
+              <button mat-icon-button class="action-purple"
+                [matTooltip]="(!element.profesional || element.profesional === 'Sin asignar') ? 'Sin asignar — no disponible' : (numIntentosMap[element.id] || 0) >= maxLlamadas ? 'Máx. intentos alcanzados' : 'Intento de contacto'"
+                [disabled]="!element.profesional || element.profesional === 'Sin asignar' || (numIntentosMap[element.id] || 0) >= maxLlamadas"
                 (click)="abrirModalGestion(element); $event.stopPropagation()">
                 <mat-icon>phone_enabled</mat-icon>
+              </button>
+              <button mat-icon-button class="action-visible"
+                matTooltip="Ver historial"
+                [disabled]="!element.profesional || element.profesional === 'Sin asignar'"
+                (click)="abrirHistorial(element); $event.stopPropagation()">
+                <mat-icon svgIcon="icono-ver"></mat-icon>
               </button>
             </div>
           </td>

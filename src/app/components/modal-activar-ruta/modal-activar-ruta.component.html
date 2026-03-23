@@ -8,15 +8,19 @@
 
     <mat-form-field appearance="outline" class="field-tipo">
       <mat-label>Tipo de Ruta</mat-label>
-      <mat-select [(ngModel)]="data.tipo">
-        <mat-option value="Ruta1">Ruta 1</mat-option>
-        <mat-option value="Ruta2">Ruta 2</mat-option>
+      <mat-select [(ngModel)]="data.tipo" (ngModelChange)="onTipoChange()">
+        <mat-option value="Ruta1">Interna</mat-option>
+        <mat-option value="Ruta2">Externa</mat-option>
       </mat-select>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="field-cual">
       <mat-label>¿Cuál?</mat-label>
-      <input matInput [(ngModel)]="data.cual" placeholder="Opcional">
+      <mat-select [(ngModel)]="data.cual" [disabled]="!data.tipo">
+        @for (op of opcionesCuales; track op) {
+          <mat-option [value]="op">{{ op }}</mat-option>
+        }
+      </mat-select>
     </mat-form-field>
 
   </div>

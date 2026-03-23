@@ -1,13 +1,13 @@
 <div class="modal-container">
   <h2 mat-dialog-title class="modal-header">
-    <mat-icon>contact_phone</mat-icon>
-    <span>Gestión de Contacto - {{ data.id }}</span>
+    <mat-icon>{{ data.soloLectura ? 'history' : 'contact_phone' }}</mat-icon>
+    <span>{{ data.soloLectura ? 'Historial de Contacto' : 'Gestión de Contacto' }} - {{ data.id }}</span>
   </h2>
 
   <mat-dialog-content class="modal-content">
     <mat-tab-group animationDuration="0ms">
 
-      <mat-tab label="Intento de Comunicación">
+      <mat-tab label="Intento de Comunicación" *ngIf="!data.soloLectura">
         <div class="tab-body-wrapper">
           <form [formGroup]="contactoForm" (ngSubmit)="registrarIntento()" class="form-layout">
 
@@ -44,7 +44,9 @@
 
               <mat-form-field appearance="outline">
                 <mat-label>Fecha de Cita</mat-label>
-                <input matInput type="date" formControlName="fechaCita">
+                <input matInput [matDatepicker]="pickerCita" formControlName="fechaCita">
+                <mat-datepicker-toggle matIconSuffix [for]="pickerCita"></mat-datepicker-toggle>
+                <mat-datepicker #pickerCita></mat-datepicker>
               </mat-form-field>
 
               <mat-form-field appearance="outline">

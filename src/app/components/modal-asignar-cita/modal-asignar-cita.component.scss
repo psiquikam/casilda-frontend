@@ -1,7 +1,7 @@
-$purple-sys: #348F41;
+$purple-sys: #6B2D95;
 
 .modal-container {
-  overflow: hidden;
+  overflow: visible;
   border-radius: 0px;
 }
 
@@ -37,10 +37,11 @@ $purple-sys: #348F41;
 
 ::ng-deep {
   .form-grid .mat-mdc-form-field {
-    .mat-mdc-form-field-flex { 
-      height: 40px !important; 
-      padding: 0 12px !important; 
+    .mat-mdc-form-field-flex {
+      height: 40px !important;
+      padding: 0 12px !important;
       align-items: center !important;
+      overflow: visible !important;
     }
     
     .mat-mdc-form-field-infix { 
