@@ -16,7 +16,7 @@
       <mat-label>Ciudad / Municipio</mat-label>
       <mat-select formControlName="ciudad" [disabled]="!direccionForm.get('departamento')?.value">
         @for (c of ciudades; track c) {
-        <mat-option [value]="c">{{ c }}</mat-option>
+        <mat-option [value]="c.id">{{ c.nombre }}</mat-option>
         }
       </mat-select>
     </mat-form-field>

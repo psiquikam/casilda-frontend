@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { animate, state, style, transition, trigger } from '@angular/animations';
+import { HttpClient } from '@angular/common/http';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -20,6 +21,8 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 import { ModalDireccionComponent } from '../modal-direccion/modal-direccion.component';
 import { ModalDiscapacidadComponent } from '../modal-discapacidad/modal-discapacidad.component';
@@ -37,6 +40,8 @@ import { ModalCompromisosProfesionalesComponent } from '../modal-compromisos-pro
 import { ModalSeguimientosComponent } from '../modal-seguimiento/modal-seguimiento.component';
 import { AuthService } from '../../services/auth.service';
 import { CitaDto, EstadoCitaEnum, SolicitudService } from '../../services/solicitud.service';
+import { MaestroDto } from '../../services/listas.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-registro-atencion',
@@ -77,6 +82,7 @@ import { CitaDto, EstadoCitaEnum, SolicitudService } from '../../services/solici
 })
 export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   atencionForm!: FormGroup;
+  private readonly maestrosUrl = `${environment.apiBaseUrl}/maestros`;
 
   casoPorAtender: any[] = [];
 
@@ -133,88 +139,44 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   institucionalSel: string[] = [];
   economicaSel: string[] = [];
 
-  listaSexo = ['Masculino', 'Femenino', 'Intersexual', 'Indeterminado'];
-  listaEtnias = ['Ninguna', 'Indígena', 'Afrocolombiano', 'Raizal', 'Palenquero', 'Rrom/Gitano'];
-  listaProgramas = ['Ingeniería', 'Derecho', 'Medicina', 'Artes', 'Ciencias Sociales', 'Educación Física'];
-  listaIdentidadSexual = ['Hombre cisgénero', 'Mujer cisgénero', 'Hombre trans', 'Mujer trans', 'No binario', 'Género fluido', 'Otro'];
-  listaOrientacionSexual = ['Heterosexual', 'Homosexual (GAY/LESBIANA)', 'Bisexual', 'Pansexual', 'Asexual', 'Otro'];
-  listaVinculos = ['Estudiante Pregrado', 'Estudiante Posgrado', 'Docente', 'Administrativo', 'Egresado', 'Contratista', 'Visitante'];
-  listaSubVinculos = ['Estudiante Pregrado', 'Estudiante Posgrado', 'Docente', 'Administrativo', 'Egresado', 'Contratista', 'Visitante'];
-  listaDependencia = ['Bienestar Universitario', 'Rectoría', 'Talento Humano', 'Admisiones'];
-  listaTipoViolencia = ['Violencia Psicológica', 'Violencia Sexual', 'Violencia Física', 'Violencia Económica'];
-  listaSubTipoViolencia = ['Difusión de contenido íntimo', 'Intimidación y Amenazas', 'Aislamiento Forzado', 'Acoso'];
-  tiposSolicitud = ['Indirecta', 'Directa'];
-  formayLugar = ['Lugar 1', 'Lugar 2'];
-  listaDepartamentos = [
-    { id: 1, nombre: 'Antioquia' },
-    { id: 2, nombre: 'Bogotá D.C.' },
-    { id: 3, nombre: 'Valle del Cauca' }
-  ];
-  ciudadesHechos = ['Medellín', 'Envigado', 'Bogotá'];
-  listaRegimenSalud = ['Contributivo', 'Subsidiado'];
-  listaEPSRegimen = ['Nuevo EPS', 'Savia Salud', 'SURA'];
-  tiposServicio = ['Asesoría', 'Acompañamiento', 'Seguimiento', 'Intervención'];
-  tiposDoc = ['Cédula de Ciudadanía', 'Tarjeta de Identidad', 'Cédula de Extranjería', 'Pasaporte'];
-  campusM = ['Principal', 'Robledo', 'Salud', 'Norte', 'Oriente'];
-  facultadesM = ['Ingeniería', 'Derecho', 'Medicina', 'Artes', 'Ciencias Sociales', 'Educación Física'];
-  queForma = ['Individual', 'Colectiva', 'Otra'];
-  lugarHechos = ['Campus Principal', 'Campus Salud', 'Entorno Virtual', 'Fuera de la Universidad'];
-  actividadesMisionales = ['Docencia', 'Extensión', 'Investigación', 'Administrativas'];
-  estadosAtencion = ['estado 1', 'estado 2', 'estado 3', 'estado 4'];
-  grupoAtencion = ['grupo 1', 'grupo 2', 'grupo 3', 'grupo 4'];
+  listaSexo: string[] = [];
+  listaEtnias: string[] = [];
+  listaProgramas: string[] = [];
+  listaIdentidadSexual: string[] = [];
+  listaOrientacionSexual: string[] = [];
+  listaVinculos: string[] = [];
+  listaSubVinculos: string[] = [];
+  listaDependencia: string[] = [];
+  listaTipoViolencia: string[] = [];
+  listaSubTipoViolencia: string[] = [];
+  tiposSolicitud: string[] = [];
+  municipiosEntrevista: MaestroDto[] = [];
+  listaDepartamentos: MaestroDto[] = [];
+  municipiosNacimiento: MaestroDto[] = [];
+  municipiosHechos: MaestroDto[] = [];
+  listaRegimenSalud: string[] = [];
+  listaEPSRegimen: string[] = [];
+  tiposServicio: string[] = [];
+  tiposDoc: string[] = [];
+  campusM: string[] = [];
+  facultadesM: string[] = [];
+  queForma: string[] = [];
+  lugarHechos: string[] = [];
+  actividadesMisionales: string[] = [];
+  estadosAtencion: string[] = [];
+  grupoAtencion: string[] = [];
 
-  listaPsicologica = [
-    'Difusión de contenido íntimo',
-    'Constreñimiento ilegal',
-    'Lenguaje misógino, sexista o discursos de odio',
-    'Intimidación y amenazas',
-    'Aislamiento forzado',
-    'Abuso de poder y/o confianza',
-    'Injurias por vías de hecho o calumnia'
-  ];
-
-  listaFisica = [
-    'Violencia intrafamiliar',
-    'Violencia de pareja/expareja',
-    'Violencia interpersonal',
-    'Lesiones personales',
-    'Feminicidio (Tentativa o comisión)'
-  ];
-
-  listaSexual = [
-    'Acoso sexual',
-    'Acceso carnal',
-    'Actos sexuales',
-    'Violencia sexual correctiva'
-  ];
-
-  listaInstitucional = [
-    'Omision del deber de denuncia',
-    'Revictimización',
-    'Omisión al deber de debida diligencia',
-  ];
-
-  listaPatrimonial = [
-    'Inasistencia alimentaria',
-    'Hurto',
-    'Control económico',
-    'Daño en bien ajeno',
-  ];
-
-  listaInformatica = [
-    'Grooming',
-    'Pornografía',
-    'Sexting',
-    'Chantaje sexual o extorsión sexual',
-    'Violación de datos personales',
-  ];
-
-  listaPrejuicio = [
-    'Discriminación por género u orientación sexual o identidad de género',
-  ];
+  listaPsicologica: string[] = [];
+  listaFisica: string[] = [];
+  listaSexual: string[] = [];
+  listaInstitucional: string[] = [];
+  listaPatrimonial: string[] = [];
+  listaInformatica: string[] = [];
+  listaPrejuicio: string[] = [];
 
   constructor(
     private fb: FormBuilder,
+    private readonly http: HttpClient,
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
     private readonly authService: AuthService,
@@ -223,6 +185,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.initForm();
+    this.configurarDependenciaMunicipios();
+    this.cargarListasMaestras();
     this.simularCargaBackend();
     this.cargarCitas();
     const nombreUsuario = this.authService.currentUser?.nombre || '';
@@ -254,6 +218,146 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         this.activarRutasRegistrados = [];
       }
     });
+  }
+
+  private cargarListasMaestras(): void {
+    forkJoin({
+      sexos: this.obtenerMaestro('sexos'),
+      etnias: this.obtenerMaestro('etnias'),
+      programas: this.obtenerMaestro('programas'),
+      identidadesSexuales: this.obtenerMaestro('identidades-sexuales'),
+      orientacionesSexuales: this.obtenerMaestro('orientaciones-sexuales'),
+      vinculosUdea: this.obtenerMaestro('vinculos-udea'),
+      subVinculosUdea: this.obtenerMaestro('subvinculos-udea'),
+      dependencias: this.obtenerMaestro('dependencias'),
+      tiposViolencia: this.obtenerMaestro('tipos-violencia'),
+      tiposSolicitud: this.obtenerMaestro('tipos-solicitud'),
+      departamentos: this.obtenerMaestro('departamentos'),
+      regimenes: this.obtenerMaestro('regimenes'),
+      eps: this.obtenerMaestro('eps'),
+      tiposServicio: this.obtenerMaestro('tipos-servicio'),
+      tiposIdentificacion: this.obtenerMaestro('tipos-identificacion'),
+      campus: this.obtenerMaestro('campus'),
+      facultades: this.obtenerMaestro('facultades'),
+      formasOcurrencia: this.obtenerMaestro('formas-ocurrencia'),
+      lugaresOcurrencia: this.obtenerMaestro('lugares-ocurrencia'),
+      actividadesMisionales: this.obtenerMaestro('actividades-misionales'),
+      estadosAtencion: this.obtenerMaestro('estados-atencion'),
+      gruposAtencion: this.obtenerMaestro('grupos-atencion'),
+      modalidadesPsicologicas: this.obtenerMaestro('modalidades-violencia/tipo/1'),
+      modalidadesFisicas: this.obtenerMaestro('modalidades-violencia/tipo/2'),
+      modalidadesSexuales: this.obtenerMaestro('modalidades-violencia/tipo/3'),
+      modalidadesInstitucionales: this.obtenerMaestro('modalidades-violencia/tipo/4'),
+      modalidadesPatrimoniales: this.obtenerMaestro('modalidades-violencia/tipo/5'),
+      modalidadesInformaticas: this.obtenerMaestro('modalidades-violencia/tipo/6'),
+      modalidadesPrejuicio: this.obtenerMaestro('modalidades-violencia/tipo/7')
+    }).subscribe({
+      next: (data) => {
+        this.listaSexo = this.mapNombres(data.sexos);
+        this.listaEtnias = this.mapNombres(data.etnias);
+        this.listaProgramas = this.mapNombres(data.programas);
+        this.listaIdentidadSexual = this.mapNombres(data.identidadesSexuales);
+        this.listaOrientacionSexual = this.mapNombres(data.orientacionesSexuales);
+        this.listaVinculos = this.mapNombres(data.vinculosUdea);
+        this.listaSubVinculos = this.mapNombres(data.subVinculosUdea);
+        this.listaDependencia = this.mapNombres(data.dependencias);
+        this.listaTipoViolencia = this.mapNombres(data.tiposViolencia);
+        this.listaSubTipoViolencia = this.mapNombres(data.modalidadesPsicologicas);
+        this.tiposSolicitud = this.mapNombres(data.tiposSolicitud);
+        this.listaDepartamentos = data.departamentos;
+        this.listaRegimenSalud = this.mapNombres(data.regimenes);
+        this.listaEPSRegimen = this.mapNombres(data.eps);
+        this.tiposServicio = this.mapNombres(data.tiposServicio);
+        this.tiposDoc = this.mapNombres(data.tiposIdentificacion);
+        this.campusM = this.mapNombres(data.campus);
+        this.facultadesM = this.mapNombres(data.facultades);
+        this.queForma = this.mapNombres(data.formasOcurrencia);
+        this.lugarHechos = this.mapNombres(data.lugaresOcurrencia);
+        this.actividadesMisionales = this.mapNombres(data.actividadesMisionales);
+        this.estadosAtencion = this.mapNombres(data.estadosAtencion);
+        this.grupoAtencion = this.mapNombres(data.gruposAtencion);
+        this.listaPsicologica = this.mapNombres(data.modalidadesPsicologicas);
+        this.listaFisica = this.mapNombres(data.modalidadesFisicas);
+        this.listaSexual = this.mapNombres(data.modalidadesSexuales);
+        this.listaInstitucional = this.mapNombres(data.modalidadesInstitucionales);
+        this.listaPatrimonial = this.mapNombres(data.modalidadesPatrimoniales);
+        this.listaInformatica = this.mapNombres(data.modalidadesInformaticas);
+        this.listaPrejuicio = this.mapNombres(data.modalidadesPrejuicio);
+      },
+      error: (error) => {
+        console.error('Error cargando listas maestras de registro de atención:', error);
+      }
+    });
+  }
+
+  private configurarDependenciaMunicipios(): void {
+    this.atencionForm.get('departamentoEntrevista')?.valueChanges.subscribe((departamentoId) => {
+      this.atencionForm.patchValue({ formaEntrevista: '' });
+      this.municipiosEntrevista = [];
+      if (departamentoId) {
+        this.cargarMunicipiosPorDepartamento(Number(departamentoId), 'entrevista');
+      }
+    });
+
+    this.atencionForm.get('departamentoNacimiento')?.valueChanges.subscribe((departamentoId) => {
+      this.atencionForm.patchValue({ ciudadNacimiento: '' });
+      this.municipiosNacimiento = [];
+      if (departamentoId) {
+        this.cargarMunicipiosPorDepartamento(Number(departamentoId), 'nacimiento');
+      }
+    });
+
+    this.atencionForm.get('departamentoHechos')?.valueChanges.subscribe((departamentoId) => {
+      this.atencionForm.patchValue({ ciudadHechos: '' });
+      this.municipiosHechos = [];
+      if (departamentoId) {
+        this.cargarMunicipiosPorDepartamento(Number(departamentoId), 'hechos');
+      }
+    });
+  }
+
+  private cargarMunicipiosPorDepartamento(departamentoId: number, destino: 'entrevista' | 'nacimiento' | 'hechos'): void {
+    this.http.get<MaestroDto[]>(`${this.maestrosUrl}/departamentos/${departamentoId}/ciudades`).subscribe({
+      next: (lista) => {
+        if (destino === 'entrevista') {
+          this.municipiosEntrevista = lista;
+          return;
+        }
+
+        if (destino === 'nacimiento') {
+          this.municipiosNacimiento = lista;
+          return;
+        }
+
+        this.municipiosHechos = lista;
+      },
+      error: () => {
+        if (destino === 'entrevista') {
+          this.municipiosEntrevista = [];
+          return;
+        }
+
+        if (destino === 'nacimiento') {
+          this.municipiosNacimiento = [];
+          return;
+        }
+
+        this.municipiosHechos = [];
+      }
+    });
+  }
+
+  private obtenerMaestro(endpoint: string) {
+    return this.http.get<MaestroDto[]>(`${this.maestrosUrl}/${endpoint}`).pipe(
+      catchError((error) => {
+        console.error(`Error cargando maestro ${endpoint}:`, error);
+        return of([] as MaestroDto[]);
+      })
+    );
+  }
+
+  private mapNombres(lista: MaestroDto[]): string[] {
+    return lista.map(item => item.nombre);
   }
 
   ngAfterViewInit() {

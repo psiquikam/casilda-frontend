@@ -71,7 +71,7 @@
                                     <mat-label>Forma y lugar de la entrevista</mat-label>
                                     <mat-select formControlName="formaEntrevista"
                                         [disabled]="!atencionForm.get('departamentoEntrevista')?.value">
-                                        @for (s of formayLugar; track s) { <mat-option [value]="s">{{s}}</mat-option>
+                                        @for (m of municipiosEntrevista; track m.id) { <mat-option [value]="m.id">{{m.nombre}}</mat-option>
                                         }
                                     </mat-select>
                                 </mat-form-field>
@@ -148,8 +148,8 @@
                                         <mat-label>Ciudad de Nacimiento</mat-label>
                                         <mat-select formControlName="ciudadNacimiento"
                                             [disabled]="!atencionForm.get('departamentoNacimiento')?.value">
-                                            @for (c of formayLugar; track c) {
-                                            <mat-option [value]="c">{{c}}</mat-option>
+                                            @for (c of municipiosNacimiento; track c.id) {
+                                            <mat-option [value]="c.id">{{c.nombre}}</mat-option>
                                             }
                                         </mat-select>
                                     </mat-form-field>
@@ -450,8 +450,8 @@
                                     <mat-label>Ciudad de hechos</mat-label>
                                     <mat-select formControlName="ciudadHechos"
                                         [disabled]="!atencionForm.get('departamentoHechos')?.value">
-                                        @for (c of ciudadesHechos; track c) {
-                                        <mat-option [value]="c">{{c}}</mat-option>
+                                        @for (c of municipiosHechos; track c.id) {
+                                        <mat-option [value]="c.id">{{c.nombre}}</mat-option>
                                         }
                                     </mat-select>
                                 </mat-form-field>
