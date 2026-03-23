@@ -3,12 +3,9 @@ $blue-eye: #4b97b9;
 $green-success: #22c55e;
 $danger: #ef4444;
 
-.consulta-container {
+.caso-container {
   padding: 24px;
   background-color: #f8fafc;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
 }
 
 .page-header {
@@ -98,19 +95,6 @@ th.mat-mdc-header-cell {
 .id-cell {
   font-weight: 800;
   color: $purple-sys;
-}
-
-.badge-estado {
-  padding: 3px 8px;
-  border-radius: 20px;
-  font-size: 10px;
-  font-weight: 700;
-  white-space: nowrap;
-
-  &.badge-sin-asignar { background: #fef3c7; color: #92400e; }
-  &.badge-activo      { background: #dcfce7; color: #166534; }
-  &.badge-transicion  { background: #dbeafe; color: #1e40af; }
-  &.badge-cerrado     { background: #f1f5f9; color: #475569; }
 }
 
 .badge-soft {
@@ -226,29 +210,9 @@ th.mat-mdc-header-cell {
   color: #64748b !important;
 }
 
-.section-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 20px;
-  border-bottom: 1px solid #f1f5f9;
-
-  .section-label {
-    font-weight: 800;
-    font-size: 0.95rem;
-    color: #1e293b;
-  }
-
-  .section-count {
-    background: $purple-sys;
-    color: white;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 20px;
-    min-width: 20px;
-    text-align: center;
-  }
+::ng-deep .mat-mdc-tab-group {
+  --mdc-tab-indicator-active-indicator-color: #{$purple-sys};
+  --mat-tab-header-active-label-text-color: #{$purple-sys};
 }
 
 .no-results-msg {

@@ -402,10 +402,10 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     const dialogRef = this.dialog.open(ModalDireccionComponent, { width: '600px' });
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        const { viaPrincipal, numeroVia, letraVia, numeroCruce, placa, barrio, ciudad, complemento } = result;
+        const { viaPrincipal, numeroVia, letraVia, numeroCruce, placa, barrio, municipio, departamento, complemento } = result;
         const letra = letraVia ? ` ${letraVia}` : '';
-        const comp = complemento ? ` (${complemento})` : '';
-        const direccionFinal = `${viaPrincipal} ${numeroVia}${letra} # ${numeroCruce} - ${placa}, ${barrio}, ${ciudad}${comp}`;
+        const comp = complemento ? `, ${complemento}` : '';
+        const direccionFinal = `${viaPrincipal} ${numeroVia}${letra} #${numeroCruce}-${placa}, Barrio ${barrio}${comp}, ${municipio}, ${departamento}`;
         this.atencionForm.patchValue({ direccionLugar: direccionFinal.replace(/\s+/g, ' ').trim() });
       }
     });

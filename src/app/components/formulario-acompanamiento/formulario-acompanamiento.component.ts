@@ -17,9 +17,10 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { ListasService, MaestroDto } from '../../services/listas.service';
-import { SolicitudService } from '../../services/solicitud.service';
+import { SolicitudService, RemitenteSearchDto } from '../../services/solicitud.service';
 import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
 import { ModalCorreoComponent } from '../modal-correo/modal-correo.component';
 import { ModalTelefonoComponent } from '../modal-telefono/modal-telefono.component';
@@ -31,7 +32,8 @@ import { ModalTelefonoComponent } from '../modal-telefono/modal-telefono.compone
     CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule,
     MatInputModule, MatSelectModule, MatDatepickerModule, MatNativeDateModule,
     MatButtonModule, MatIconModule, MatSnackBarModule, MatRadioModule,
-    MatDialogModule, MatTabsModule, MatProgressSpinnerModule, MatTableModule
+    MatDialogModule, MatTabsModule, MatProgressSpinnerModule, MatTableModule,
+    MatTooltipModule
   ],
   templateUrl: './formulario-acompanamiento.component.html',
   styleUrls: ['./formulario-acompanamiento.component.scss']
@@ -54,6 +56,7 @@ export class FormularioAcompanamientoComponent implements OnInit {
   correoRegistrados: any[] = [];
   telefonosRegistrados: any[] = [];
   enviando = false;
+  buscandoRemitente = false;
 
   constructor() {
     this.listasService.listas$
@@ -117,6 +120,33 @@ export class FormularioAcompanamientoComponent implements OnInit {
         }
         control?.updateValueAndValidity();
       });
+    });
+  }
+
+  buscarRemitente(): void {
+    const documento = this.acompanamientoForm.get('remitenteNumeroDocumento')?.value?.trim();
+    if (!documento) return;
+
+    this.buscandoRemitente = true;
+    this.solicitudService.buscarRemitentePorDocumento(documento).subscribe({
+      next: (res: RemitenteSearchDto) => {
+        this.buscandoRemitente = false;
+        this.acompanamientoForm.patchValue({
+          remitentePrimerNombre: res.primerNombre ?? '',
+          remitenteSegundoNombre: res.segundoNombre ?? '',
+          remitentePrimerApellido: res.primerApellido ?? '',
+          remitenteSegundoApellido: res.segundoApellido ?? '',
+          remitenteTipoDocumento: res.tipoDocumentoId ?? null,
+          remitenteCargo: res.cargoId ?? null,
+          remitenteCampus: res.campusId ?? null,
+          remitenteDependencia: res.dependenciaId ?? null,
+          remitenteFacultad: res.facultadId ?? null,
+        });
+      },
+      error: () => {
+        this.buscandoRemitente = false;
+        this.snackBar.open('No se encontró ningún funcionario con ese documento.', 'Cerrar', { duration: 3000 });
+      }
     });
   }
 

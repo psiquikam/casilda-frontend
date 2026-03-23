@@ -39,6 +39,7 @@ export class ModalCorreoComponent implements OnInit {
 
   data = {
     tipoId: null as number | null,
+    tipo: '',
     correo: '',
     descripcion: '',
   };
@@ -50,6 +51,11 @@ export class ModalCorreoComponent implements OnInit {
       next: (tipos) => this.tiposCorreo = tipos,
       error: (err) => console.error('Error al cargar tipos de correo:', err)
     });
+  }
+
+  onTipoChange(id: number): void {
+    const found = this.tiposCorreo.find(t => t.id === id);
+    this.data.tipo = found ? found.nombre : '';
   }
 
   onNoClick(): void {

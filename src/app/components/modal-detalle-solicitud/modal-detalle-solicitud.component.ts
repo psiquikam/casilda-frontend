@@ -39,13 +39,14 @@ export class ModalDetalleSolicitudComponent implements OnInit {
 
   ngOnInit() {
     const info = this.data?.info ?? {};
+    const esIndirecta = !!(info.remitentePrimerNombre || info.remitentePrimerApellido);
 
     this.detalleForm = this.fb.group({
 
       remitenteTipoSolicitud: [info.remitenteTipoSolicitud ?? ''],
-      remitentePrimerNombre: [info.remitentePrimerNombre ?? '', Validators.required],
+      remitentePrimerNombre: [info.remitentePrimerNombre ?? '', esIndirecta ? Validators.required : []],
       remitenteSegundoNombre: [info.remitenteSegundoNombre ?? ''],
-      remitentePrimerApellido: [info.remitentePrimerApellido ?? '', Validators.required],
+      remitentePrimerApellido: [info.remitentePrimerApellido ?? '', esIndirecta ? Validators.required : []],
       remitenteSegundoApellido: [info.remitenteSegundoApellido ?? ''],
       remitenteCargo: [info.remitenteCargo ?? ''],
       remitenteCampus: [info.remitenteCampus ?? ''],
@@ -74,6 +75,11 @@ export class ModalDetalleSolicitudComponent implements OnInit {
     if (this.data.modo === 'visualizar') {
       this.detalleForm.disable();
     }
+  }
+
+  get tieneRemitente(): boolean {
+    const info = this.data?.info ?? {};
+    return !!(info.remitentePrimerNombre || info.remitentePrimerApellido);
   }
 
   guardar() {

@@ -75,10 +75,10 @@
                                             @if (editandoItem?.id !== item.id || editandoItem?.lista !== listKey) {
                                             <button mat-icon-button class="edit-btn"
                                                 (click)="iniciarEdicion(listKey, item)">
-                                                <mat-icon>edit</mat-icon>
+                                                <mat-icon svgIcon="icono-editar"></mat-icon>
                                             </button>
                                             <button mat-icon-button class="delete-btn" (click)="borrar(listKey, item)">
-                                                <mat-icon>delete_outline</mat-icon>
+                                                <mat-icon svgIcon="icono-eliminar"></mat-icon>
                                             </button>
                                             } @else {
                                             <button mat-icon-button class="check-btn" (click)="guardarEdicion()">

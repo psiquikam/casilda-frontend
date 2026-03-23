@@ -16,7 +16,7 @@
 
     <mat-tab-group animationDuration="200ms">
 
-      <mat-tab label="Remitente">
+      <mat-tab label="Remitente" *ngIf="tieneRemitente">
         <div class="form-grid">
 
           <mat-form-field appearance="outline">

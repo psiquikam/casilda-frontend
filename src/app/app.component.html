@@ -1,17 +1,19 @@
 @if (auth.isAuthenticated()) {
-  <app-header (toggleSidenav)="sidenav.toggle()"></app-header>
+  <div class="auth-layout">
+    <app-header (toggleSidenav)="sidenav.toggle()"></app-header>
 
-  <mat-sidenav-container class="sidenav-container">
-    <mat-sidenav #sidenav mode="side" opened class="aside-menu">
-      <app-sidebar></app-sidebar>
-    </mat-sidenav>
+    <mat-sidenav-container class="sidenav-container">
+      <mat-sidenav #sidenav mode="side" opened class="aside-menu">
+        <app-sidebar></app-sidebar>
+      </mat-sidenav>
 
-    <mat-sidenav-content class="main-content">
-      <div class="page-wrapper">
-        <router-outlet></router-outlet>
-      </div>
-    </mat-sidenav-content>
-  </mat-sidenav-container>
+      <mat-sidenav-content class="main-content">
+        <div class="page-wrapper">
+          <router-outlet></router-outlet>
+        </div>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </div>
 } @else {
   @if (isLoginRoute()) {
     <div class="full-screen-login">
