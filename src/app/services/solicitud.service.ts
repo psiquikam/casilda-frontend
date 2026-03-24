@@ -72,6 +72,9 @@ export interface SolicitudAcompanamientoResponse {
   primerApellido: string;
   segundoApellido: string;
   identidadGenero: string;
+  idDepartamentoResidencia?: number | null;
+  idCiudadResidencia?: number | null;
+  direccionResidencia?: string | null;
   celular: string;
   telefonoAlterno: string;
   correoInstitucional: string;
@@ -175,6 +178,21 @@ export interface CitaDto {
   correoPersonal?: string;
 }
 
+export interface AtencionResponseDto {
+  id: number;
+  fecha: string;
+  citaId: number;
+  tipoServicioId: number;
+  tipoServicio: string;
+  lugarEntrevistaId: number;
+  lugarEntrevista: string;
+  regimenId: number;
+  regimen: string;
+  epsId: number;
+  eps: string;
+  logroAcuerdo: boolean;
+}
+
 export interface ReprogramarCitaRequestDto {
   fechaCita: string;
   horaCita: string;
@@ -198,6 +216,87 @@ export interface CompromisoProfesionalRequestDto {
   fechacompromiso: string;
   idgrupoprofesional: number;
   idtipocompromiso: number;
+}
+
+export interface SeguimientoAtencionRequestDto {
+  idAtencion: number;
+  idTipoSeguimiento: number;
+  fecha: string; // formato ISO 8601 yyyy-MM-ddTHH:mm:ss
+  idAccion: number;
+  idActividad: number;
+  descripcion: string;
+  idEstadoSeguimiento: number;
+  idMotivoEstadoSeguimiento: number;
+  archivoNombre?: string; // Nombre del archivo
+  archivoTipo?: string; // MIME type (ej: application/pdf)
+  archivoContenido?: string; // Base64 encoded file content
+}
+
+export interface AgresorVictimaRequestDto {
+  primerNombre: string;
+  segundoNombre?: string | null;
+  primerApellido: string;
+  segundoApellido?: string | null;
+  idVinculoUniversidad: number;
+  idVinculoVictima: number;
+}
+
+export interface PersonaAtencionRequestDto {
+  idSexo: number;
+  idEtnia: number;
+  idCiudadResidencia?: number | null;
+  direccionResidencia?: string | null;
+}
+
+export interface AtencionRegistroRequestDto {
+  citaId: number;
+  idTipoServicio: number;
+  idMunicipioEntrevista: number;
+  idRegimen: number;
+  idEps: number;
+  logroAcuerdo?: boolean;
+  archivoConsentimientoNombre?: string;
+  archivoConsentimientoTipo?: string;
+  archivoConsentimientoContenido?: string;
+}
+
+export interface CompromisosAtencionRequestDto {
+  persona?: CompromisoPersonaRequestDto[];
+  profesional?: CompromisoProfesionalRequestDto[];
+}
+
+export interface CasoAtencionRequestDto {
+  idDependencia: number;
+  idCampus: number;
+  idFacultad: number;
+  idVinculoUniversidad: number;
+  idSubVinculoUniversidad?: number | null;
+  idPrograma: number;
+  idIdentidadGenero: number;
+  idOrientacionSexual: number;
+  tiempoOcurrido: string;
+  idFormaOcurrencia: number;
+  idLugarOcurrencia: number;
+  violenciaGenero: boolean;
+  violenciaMisional: boolean;
+  idActividadMisional?: number | null;
+  modalidadesViolenciaPsicologica?: number[];
+  modalidadesViolenciaFisica?: number[];
+  modalidadesViolenciaSexual?: number[];
+  modalidadesViolenciaInstitucional?: number[];
+  modalidadesViolenciaEconomica?: number[];
+  modalidadesViolenciaInformatica?: number[];
+  modalidadesViolenciaPrejuicio?: number[];
+  agresorVictima: AgresorVictimaRequestDto;
+  direccionLugar?: string | null;
+}
+
+export interface RegistroAtencionCompleteRequestDto {
+  atencion: AtencionRegistroRequestDto;
+  persona: PersonaAtencionRequestDto;
+  caso: CasoAtencionRequestDto;
+  seguimientos?: SeguimientoAtencionRequestDto[];
+  compromisos?: CompromisosAtencionRequestDto;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -273,5 +372,38 @@ export class SolicitudService {
 
   crearCompromisoProfesional(datos: CompromisoProfesionalRequestDto): Observable<unknown> {
     return this.http.post(`${this.compromisosUrl}/profesional`, datos);
+  }
+
+  registrarAtencionCompleta(datos: RegistroAtencionCompleteRequestDto): Observable<AtencionResponseDto> {
+    return this.http.post<AtencionResponseDto>(`${this.apiUrl}/atenciones`, datos);
+  }
+
+  crearSeguimiento(datos: SeguimientoAtencionRequestDto): Observable<unknown> {
+    return this.http.post(`${this.apiUrl}/seguimientos`, datos);
+  }
+
+  /**
+   * Convierte un archivo (File) a base64 string
+   * @param file El archivo a convertir
+   * @returns Promise que resuelve con el contenido en base64
+   */
+  convertirArchivoABase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsArrayBuffer(file);
+      reader.onload = () => {
+        const arrayBuffer = reader.result as ArrayBuffer;
+        const bytes = new Uint8Array(arrayBuffer);
+        let binary = '';
+        for (let i = 0; i < bytes.byteLength; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        const base64 = btoa(binary);
+        resolve(base64);
+      };
+      reader.onerror = (error) => {
+        reject(error);
+      };
+    });
   }
 }
