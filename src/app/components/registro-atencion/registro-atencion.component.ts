@@ -39,7 +39,7 @@ import { ModalCompromisosPersonaComponent } from '../modal-compromisos-persona/m
 import { ModalCompromisosProfesionalesComponent } from '../modal-compromisos-profesionales/modal-compromisos-profesionales.component';
 import { ModalSeguimientosComponent } from '../modal-seguimiento/modal-seguimiento.component';
 import { AuthService } from '../../services/auth.service';
-import { CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, SolicitudService } from '../../services/solicitud.service';
+import { CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, RegistroAtencionCompleteRequestDto, SeguimientoAtencionRequestDto, SolicitudService } from '../../services/solicitud.service';
 import { MaestroDto } from '../../services/listas.service';
 import { environment } from '../../../environments/environment';
 
@@ -134,11 +134,13 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   seguimientosRegistrados: any[] = [];
   guardandoCompromisos = false;
 
-  psicologicaSel: string[] = [];
-  fisicaSel: string[] = [];
-  sexualSel: string[] = [];
-  institucionalSel: string[] = [];
-  economicaSel: string[] = [];
+  psicologicaSel: number[] = [];
+  fisicaSel: number[] = [];
+  sexualSel: number[] = [];
+  institucionalSel: number[] = [];
+  economicaSel: number[] = [];
+  informaticaSel: number[] = [];
+  prejuicioSel: number[] = [];
 
   listaSexo: string[] = [];
   listaEtnias: string[] = [];
@@ -155,6 +157,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   municipiosEntrevista: MaestroDto[] = [];
   listaDepartamentos: MaestroDto[] = [];
   municipiosNacimiento: MaestroDto[] = [];
+  municipiosResidencia: MaestroDto[] = [];
   municipiosHechos: MaestroDto[] = [];
   listaRegimenSalud: string[] = [];
   listaEPSRegimen: string[] = [];
@@ -168,13 +171,13 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   estadosAtencion: string[] = [];
   grupoAtencion: string[] = [];
 
-  listaPsicologica: string[] = [];
-  listaFisica: string[] = [];
-  listaSexual: string[] = [];
-  listaInstitucional: string[] = [];
-  listaPatrimonial: string[] = [];
-  listaInformatica: string[] = [];
-  listaPrejuicio: string[] = [];
+  listaPsicologica: MaestroDto[] = [];
+  listaFisica: MaestroDto[] = [];
+  listaSexual: MaestroDto[] = [];
+  listaInstitucional: MaestroDto[] = [];
+  listaPatrimonial: MaestroDto[] = [];
+  listaInformatica: MaestroDto[] = [];
+  listaPrejuicio: MaestroDto[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -189,7 +192,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     this.initForm();
     this.configurarDependenciaMunicipios();
     this.cargarListasMaestras();
-    this.simularCargaBackend();
     this.cargarCitas();
     const nombreUsuario = this.authService.currentUser?.nombre || '';
     this.atencionForm.get('personaRegistra')?.setValue(nombreUsuario);
@@ -280,13 +282,13 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         this.actividadesMisionales = this.mapNombres(data.actividadesMisionales);
         this.estadosAtencion = this.mapNombres(data.estadosAtencion);
         this.grupoAtencion = this.mapNombres(data.gruposAtencion);
-        this.listaPsicologica = this.mapNombres(data.modalidadesPsicologicas);
-        this.listaFisica = this.mapNombres(data.modalidadesFisicas);
-        this.listaSexual = this.mapNombres(data.modalidadesSexuales);
-        this.listaInstitucional = this.mapNombres(data.modalidadesInstitucionales);
-        this.listaPatrimonial = this.mapNombres(data.modalidadesPatrimoniales);
-        this.listaInformatica = this.mapNombres(data.modalidadesInformaticas);
-        this.listaPrejuicio = this.mapNombres(data.modalidadesPrejuicio);
+        this.listaPsicologica = data.modalidadesPsicologicas;
+        this.listaFisica = data.modalidadesFisicas;
+        this.listaSexual = data.modalidadesSexuales;
+        this.listaInstitucional = data.modalidadesInstitucionales;
+        this.listaPatrimonial = data.modalidadesPatrimoniales;
+        this.listaInformatica = data.modalidadesInformaticas;
+        this.listaPrejuicio = data.modalidadesPrejuicio;
       },
       error: (error) => {
         console.error('Error cargando listas maestras de registro de atención:', error);
@@ -311,6 +313,14 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       }
     });
 
+    this.atencionForm.get('departamentoResidencia')?.valueChanges.subscribe((departamentoId) => {
+      this.atencionForm.patchValue({ ciudadResidencia: '' });
+      this.municipiosResidencia = [];
+      if (departamentoId) {
+        this.cargarMunicipiosPorDepartamento(Number(departamentoId), 'residencia');
+      }
+    });
+
     this.atencionForm.get('departamentoHechos')?.valueChanges.subscribe((departamentoId) => {
       this.atencionForm.patchValue({ ciudadHechos: '' });
       this.municipiosHechos = [];
@@ -320,7 +330,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private cargarMunicipiosPorDepartamento(departamentoId: number, destino: 'entrevista' | 'nacimiento' | 'hechos'): void {
+  private cargarMunicipiosPorDepartamento(departamentoId: number, destino: 'entrevista' | 'nacimiento' | 'residencia' | 'hechos'): void {
     this.http.get<MaestroDto[]>(`${this.maestrosUrl}/departamentos/${departamentoId}/ciudades`).subscribe({
       next: (lista) => {
         if (destino === 'entrevista') {
@@ -330,6 +340,11 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
         if (destino === 'nacimiento') {
           this.municipiosNacimiento = lista;
+          return;
+        }
+
+        if (destino === 'residencia') {
+          this.municipiosResidencia = lista;
           return;
         }
 
@@ -343,6 +358,11 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
         if (destino === 'nacimiento') {
           this.municipiosNacimiento = [];
+          return;
+        }
+
+        if (destino === 'residencia') {
+          this.municipiosResidencia = [];
           return;
         }
 
@@ -380,8 +400,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onCheckboxChange(event: any, valor: string, arrayName: string) {
-    const lista = this[arrayName as keyof RegistroAtencionComponent] as string[];
+  onCheckboxChange(event: any, valor: number, arrayName: string) {
+    const lista = this[arrayName as keyof RegistroAtencionComponent] as number[];
     if (event.checked) {
       lista.push(valor);
     } else {
@@ -394,7 +414,9 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       'fisicaSel': 'detalleViolenciaFisica',
       'sexualSel': 'detalleViolenciaSexual',
       'institucionalSel': 'detalleViolenciaInstitucional',
-      'economicaSel': 'detalleViolenciaEconomica'
+      'economicaSel': 'detalleViolenciaEconomica',
+      'informaticaSel': 'detalleViolenciaInformatica',
+      'prejuicioSel': 'detalleViolenciaPrejuicio'
     };
 
     if (controlMap[arrayName]) {
@@ -491,7 +513,10 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
             dependencia: solicitud.remitenteDependencia || solicitud.dependencia || caso.dependencia || '',
             facultad: solicitud.remitenteFacultad || caso.facultad || '',
             campus: solicitud.remitenteCampus || caso.campus || '',
-            identidadSexual: solicitud.identidadGenero || ''
+            identidadSexual: solicitud.identidadGenero || '',
+            departamentoResidencia: solicitud.idDepartamentoResidencia ?? '',
+            ciudadResidencia: solicitud.idCiudadResidencia ?? '',
+            direccionResidencia: solicitud.direccionResidencia || ''
           });
         },
         error: (error) => {
@@ -521,7 +546,9 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         const letra = letraVia ? ` ${letraVia}` : '';
         const comp = complemento ? `, ${complemento}` : '';
         const direccionFinal = `${viaPrincipal} ${numeroVia}${letra} #${numeroCruce}-${placa}, Barrio ${barrio}${comp}, ${municipio}, ${departamento}`;
-        this.atencionForm.patchValue({ direccionLugar: direccionFinal.replace(/\s+/g, ' ').trim() });
+        this.atencionForm.patchValue({
+          direccionResidencia: direccionFinal.replace(/\s+/g, ' ').trim()
+        });
       }
     });
   }
@@ -734,6 +761,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       tipoSolicitud: [{ value: 'Indirecta', disabled: true }, Validators.required],
       departamentoNacimiento: [''],
       ciudadNacimiento: ['', Validators.required],
+      departamentoResidencia: [''],
+      ciudadResidencia: [''],
       fechaHora: [{ value: new Date(), disabled: true }, Validators.required],
       personaRegistra: [{ value: '', disabled: true }, Validators.required],
       tipoServicio: ['', Validators.required],
@@ -778,7 +807,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       presuntoSegundoApellido: [''],
       presuntoVinculoUniversidad: ['', Validators.required],
       presuntoVinculoVictima: ['', Validators.required],
-      direccionLugar: [''],
+      direccionResidencia: [''],
       violenciaPsicologica: ['NO'],
       detalleViolenciaPsicologica: [''],
       violenciaFisica: ['NO'],
@@ -798,32 +827,13 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     });
   }
 
-  simularCargaBackend(): void {
-    setTimeout(() => {
-      const nombreUsuario = this.authService.currentUser?.nombre || 'Usuario_Sistema_01';
-      this.atencionForm.patchValue({
-        tipoSolicitud: 'Indirecta',
-        personaRegistra: nombreUsuario,
-        quienRemite: 'Unidad de Bienestar Universitario',
-        fechaHora: new Date(),
-        tipoDocumento: 'Cédula de Ciudadanía',
-        documento: '1234567890',
-        fechaNacimiento: new Date(1998, 4, 15),
-        primerNombre: 'Laura',
-        segundoNombre: 'María',
-        primerApellido: 'Gómez',
-        segundoApellido: 'Restrepo'
-      });
-    }, 500);
-  }
-
   subirArchivo(): void {
     const input = document.createElement('input');
     input.type = 'file';
     input.onchange = (e: any) => {
       const file = e.target.files[0];
       if (file) {
-        this.atencionForm.patchValue({ consentimientoArchivo: file.name });
+          this.atencionForm.patchValue({ consentimientoArchivo: file });
         this.snackBar.open(`Archivo ${file.name} cargado`, 'Cerrar', { duration: 2000 });
       }
     };
@@ -832,92 +842,177 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
   guardarAtencion(): void {
     if (this.atencionForm.valid) {
-      const dataFinal = {
-        ...this.atencionForm.getRawValue(),
-        discapacidades: this.discapacidadesRegistradas,
-        correosExtra: this.correoRegistrados,
-        telefonosExtra: this.telefonosRegistrados,
-        otrosHechos: this.hechosRegistrados,
-        remisiones: this.remisionesRegistrados,
-        rutas: this.activarRutasRegistrados,
-        apreciacionesJuridicas: this.apreciacionesJuridicas,
-        compromisosPersona: this.compromisosPersona,
-        compromisosProfesional: this.compromisosProfesional,
-        seguimientos: this.seguimientosRegistrados,
-        apreciacionesPsicologicas: this.apreciacionesPsicologicas,
-        detalleVbg: {
-          psicologica: this.psicologicaSel,
-          fisica: this.fisicaSel,
-          sexual: this.sexualSel,
-          institucional: this.institucionalSel,
-          economica: this.economicaSel
-        }
-      };
-
-      const idAtencion = this.obtenerIdAtencionActual();
-      const requierePersistirCompromisos = this.compromisosPersona.length > 0 || this.compromisosProfesional.length > 0;
-
-      if (requierePersistirCompromisos && idAtencion == null) {
-        this.snackBar.open('No se encontró el id de atención para persistir compromisos', 'Cerrar', { duration: 3500 });
-        return;
-      }
-
-      if (!requierePersistirCompromisos || idAtencion == null) {
-        console.log('Datos a enviar:', dataFinal);
-        this.snackBar.open('Registro guardado exitosamente', 'OK', { duration: 3000 });
-        return;
-      }
-
-      const compromisosPersonaRequest: CompromisoPersonaRequestDto[] = this.compromisosPersona
-        .map((compromiso) => this.mapearCompromisoPersonaRequest(compromiso, idAtencion))
-        .filter((compromiso): compromiso is CompromisoPersonaRequestDto => compromiso !== null);
-
-      const compromisosProfesionalRequest: CompromisoProfesionalRequestDto[] = this.compromisosProfesional
-        .map((compromiso) => this.mapearCompromisoProfesionalRequest(compromiso, idAtencion))
-        .filter((compromiso): compromiso is CompromisoProfesionalRequestDto => compromiso !== null);
-
-      const peticionesCompromisosPersona = compromisosPersonaRequest.map((compromiso) =>
-        this.solicitudService.crearCompromisoPersona(compromiso)
-      );
-
-      const peticionesCompromisosProfesional = compromisosProfesionalRequest.map((compromiso) =>
-        this.solicitudService.crearCompromisoProfesional(compromiso)
-      );
-
       this.guardandoCompromisos = true;
-      forkJoin({
-        persona: peticionesCompromisosPersona.length ? forkJoin(peticionesCompromisosPersona) : of([]),
-        profesional: peticionesCompromisosProfesional.length ? forkJoin(peticionesCompromisosProfesional) : of([])
-      }).subscribe({
-        next: () => {
+      this.construirRegistroAtencionRequest()
+        .then((dataFinal) => {
+          this.solicitudService.registrarAtencionCompleta(dataFinal).subscribe({
+            next: () => {
+              this.guardandoCompromisos = false;
+              this.snackBar.open('Registro guardado exitosamente', 'OK', { duration: 3000 });
+              // Opcionalmente resetear el formulario
+              this.atencionForm.reset();
+            },
+            error: (error) => {
+              this.guardandoCompromisos = false;
+              console.error('Error registrando atención completa:', error);
+              this.snackBar.open('No fue posible registrar la atención', 'Cerrar', { duration: 3500 });
+            }
+          });
+        })
+        .catch((error) => {
           this.guardandoCompromisos = false;
-          console.log('Datos a enviar:', dataFinal);
-          this.snackBar.open('Registro guardado exitosamente', 'OK', { duration: 3000 });
-        },
-        error: (error) => {
-          this.guardandoCompromisos = false;
-          console.error('Error persistiendo compromisos:', error);
-          this.snackBar.open('No fue posible persistir los compromisos', 'Cerrar', { duration: 3500 });
-        }
-      });
+          console.error('Error preparando request de atención:', error);
+          this.snackBar.open('No fue posible preparar el archivo o los seguimientos', 'Cerrar', { duration: 3500 });
+        });
     } else {
       this.atencionForm.markAllAsTouched();
       this.snackBar.open('Por favor complete los campos obligatorios', 'Cerrar', { duration: 3000 });
     }
   }
 
-  private obtenerIdAtencionActual(): number | null {
-    const idCrudo = this.casoSeleccionado?.atencionId
-      ?? this.casoSeleccionado?.idAtencion
-      ?? this.casoSeleccionado?.idatencion
-      ?? null;
+  private async construirRegistroAtencionRequest(): Promise<RegistroAtencionCompleteRequestDto> {
+    const formRawValue = this.atencionForm.getRawValue();
+    const {
+      fechaHora,
+      tipoServicio,
+      formaEntrevista,
+      regimenSalud,
+      eps,
+      logroAcuerdo,
+      consentimientoArchivo,
+      sexo,
+      etnia,
+      identidadSexual,
+      orientacionSexual,
+      ciudadResidencia,
+      direccionResidencia,
+      dependencia,
+      campus,
+      facultad,
+      vinculo,
+      subVinculo,
+      programa,
+      tiempoOcurrido,
+      queForma,
+      lugarHechos,
+      violenciaGenero,
+      violenciaMisional,
+      actividadMisional,
+      direccionLugar,
+      presuntoPrimerNombre,
+      presuntoSegundoNombre,
+      presuntoPrimerApellido,
+      presuntoSegundoApellido,
+      presuntoVinculoUniversidad,
+      presuntoVinculoVictima
+    } = formRawValue;
 
-    if (idCrudo == null) {
+    const archivoConsentimientoContenido = consentimientoArchivo instanceof File
+      ? await this.solicitudService.convertirArchivoABase64(consentimientoArchivo)
+      : undefined;
+
+    // Los compromisos se enviarán con idatencion = 0 inicialmente.
+    // El backend asignará el ID real después de crear la atención.
+    const seguimientos = await this.mapearSeguimientosRequest(0);
+
+    const compromisosPersona = this.compromisosPersona
+      .map((compromiso) => this.mapearCompromisoPersonaRequest(compromiso, 0))
+      .filter((compromiso): compromiso is CompromisoPersonaRequestDto => compromiso !== null);
+
+    const compromisosProfesional = this.compromisosProfesional
+      .map((compromiso) => this.mapearCompromisoProfesionalRequest(compromiso, 0))
+      .filter((compromiso): compromiso is CompromisoProfesionalRequestDto => compromiso !== null);
+
+    return {
+      atencion: {
+        citaId: Number(this.casoSeleccionado?.citaId ?? this.casoSeleccionado?.idCita ?? this.casoSeleccionado?.idcita ?? 0),
+        idTipoServicio: Number(tipoServicio),
+        idMunicipioEntrevista: Number(formaEntrevista),
+        idRegimen: Number(regimenSalud),
+        idEps: Number(eps),
+        logroAcuerdo: logroAcuerdo === true || logroAcuerdo === 'SI',
+        archivoConsentimientoNombre: consentimientoArchivo?.name,
+        archivoConsentimientoTipo: consentimientoArchivo?.type,
+        archivoConsentimientoContenido
+      },
+      persona: {
+        idSexo: Number(sexo),
+        idEtnia: Number(etnia),
+        idCiudadResidencia: ciudadResidencia ? Number(ciudadResidencia) : null,
+        direccionResidencia: direccionResidencia || null
+      },
+      caso: {
+        idDependencia: Number(dependencia),
+        idCampus: Number(campus),
+        idFacultad: Number(facultad),
+        idVinculoUniversidad: Number(vinculo),
+        idSubVinculoUniversidad: subVinculo ? Number(subVinculo) : null,
+        idPrograma: Number(programa),
+        idIdentidadGenero: Number(identidadSexual),
+        idOrientacionSexual: Number(orientacionSexual),
+        tiempoOcurrido,
+        idFormaOcurrencia: Number(queForma),
+        idLugarOcurrencia: Number(lugarHechos),
+        violenciaGenero: violenciaGenero === true || violenciaGenero === 'SI',
+        violenciaMisional: violenciaMisional === true || violenciaMisional === 'SI',
+        idActividadMisional: actividadMisional ? Number(actividadMisional) : null,
+        modalidadesViolenciaPsicologica: this.psicologicaSel,
+        modalidadesViolenciaFisica: this.fisicaSel,
+        modalidadesViolenciaSexual: this.sexualSel,
+        modalidadesViolenciaInstitucional: this.institucionalSel,
+        modalidadesViolenciaEconomica: this.economicaSel,
+        modalidadesViolenciaInformatica: this.informaticaSel,
+        modalidadesViolenciaPrejuicio: this.prejuicioSel,
+        agresorVictima: {
+          primerNombre: presuntoPrimerNombre,
+          segundoNombre: presuntoSegundoNombre || null,
+          primerApellido: presuntoPrimerApellido,
+          segundoApellido: presuntoSegundoApellido || null,
+          idVinculoUniversidad: Number(presuntoVinculoUniversidad),
+          idVinculoVictima: Number(presuntoVinculoVictima)
+        },
+        direccionLugar: direccionResidencia || null
+      },
+      seguimientos: seguimientos.length ? seguimientos : undefined,
+      compromisos: (compromisosPersona.length || compromisosProfesional.length)
+        ? {
+            persona: compromisosPersona.length ? compromisosPersona : undefined,
+            profesional: compromisosProfesional.length ? compromisosProfesional : undefined
+          }
+        : undefined
+    };
+  }
+
+  private async mapearSeguimientosRequest(idAtencion: number): Promise<SeguimientoAtencionRequestDto[]> {
+    const seguimientos = await Promise.all(
+      this.seguimientosRegistrados.map((seguimiento) => this.mapearSeguimientoRequest(seguimiento, idAtencion))
+    );
+
+    return seguimientos.filter((seguimiento): seguimiento is SeguimientoAtencionRequestDto => seguimiento !== null);
+  }
+
+  private async mapearSeguimientoRequest(seguimiento: any, idAtencion: number): Promise<SeguimientoAtencionRequestDto | null> {
+    const fecha = this.formatearFechaLocalDateTime(seguimiento?.fecha);
+    if (!fecha) {
       return null;
     }
 
-    const idAtencion = Number(idCrudo);
-    return Number.isFinite(idAtencion) ? idAtencion : null;
+    const archivo = seguimiento?.archivo instanceof File ? seguimiento.archivo : null;
+    const archivoContenido = archivo ? await this.solicitudService.convertirArchivoABase64(archivo) : undefined;
+
+    return {
+      idAtencion,
+      idTipoSeguimiento: Number(seguimiento?.idtiposeguimiento),
+      fecha,
+      idAccion: Number(seguimiento?.idaccion),
+      idActividad: Number(seguimiento?.idactividad),
+      descripcion: String(seguimiento?.descripcion ?? ''),
+      idEstadoSeguimiento: Number(seguimiento?.idestadoseguimiento),
+      idMotivoEstadoSeguimiento: Number(seguimiento?.idmotivoestado),
+      archivoNombre: archivo?.name,
+      archivoTipo: archivo?.type,
+      archivoContenido
+    };
   }
 
   private mapearCompromisoPersonaRequest(compromiso: any, idAtencion: number): CompromisoPersonaRequestDto | null {

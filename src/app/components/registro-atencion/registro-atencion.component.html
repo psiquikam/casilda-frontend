@@ -154,6 +154,23 @@
                                         </mat-select>
                                     </mat-form-field>
                                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>Departamento de Residencia</mat-label>
+                                        <mat-select formControlName="departamentoResidencia">
+                                            @for (d of listaDepartamentos; track d) {
+                                            <mat-option [value]="d.id">{{d.nombre}}</mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>Ciudad de Residencia</mat-label>
+                                        <mat-select formControlName="ciudadResidencia"
+                                            [disabled]="!atencionForm.get('departamentoResidencia')?.value">
+                                            @for (c of municipiosResidencia; track c.id) {
+                                            <mat-option [value]="c.id">{{c.nombre}}</mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
                                         <mat-label>Sexo</mat-label>
                                         <mat-select formControlName="sexo">
                                             @for (s of listaSexo; track s) { <mat-option [value]="s">{{s}}</mat-option>
@@ -186,7 +203,7 @@
                                             (click)="abrirModalDireccion()">
                                             <mat-icon>location_on</mat-icon>
                                             <span>
-                                                {{ atencionForm.get('direccionLugar')?.value
+                                                {{ atencionForm.get('direccionResidencia')?.value
                                                 ? 'Cambiar dirección'
                                                 : 'Capturar dirección' }}
                                             </span>
@@ -195,7 +212,7 @@
                                         <mat-form-field appearance="outline" subscriptSizing="dynamic"
                                             class="direccion-field">
                                             <mat-label>Dirección de Residencia Registrada</mat-label>
-                                            <input matInput formControlName="direccionLugar" readonly
+                                            <input matInput formControlName="direccionResidencia" readonly
                                                 placeholder="No se ha registrado dirección">
                                             <mat-icon matSuffix color="primary">location_on</mat-icon>
                                         </mat-form-field>
@@ -570,8 +587,9 @@
 
                                     @if (atencionForm.get('violenciaPsicologica')?.value === 'SI') {
                                     <div class="vbg-options">
-                                        @for (c of listaPsicologica; track c) {
-                                        <mat-checkbox [value]="c">{{c}}</mat-checkbox>
+                                        @for (c of listaPsicologica; track c.id) {
+                                        <mat-checkbox [checked]="psicologicaSel.includes(c.id)"
+                                            (change)="onCheckboxChange($event, c.id, 'psicologicaSel')">{{c.nombre}}</mat-checkbox>
                                         }
                                     </div>
                                     }
@@ -590,8 +608,9 @@
 
                                     @if (atencionForm.get('violenciaFisica')?.value === 'SI') {
                                     <div class="vbg-options">
-                                        @for (c of listaFisica; track c) {
-                                        <mat-checkbox [value]="c">{{c}}</mat-checkbox>
+                                        @for (c of listaFisica; track c.id) {
+                                        <mat-checkbox [checked]="fisicaSel.includes(c.id)"
+                                            (change)="onCheckboxChange($event, c.id, 'fisicaSel')">{{c.nombre}}</mat-checkbox>
                                         }
                                     </div>
                                     }
@@ -610,8 +629,9 @@
 
                                     @if (atencionForm.get('violenciaSexual')?.value === 'SI') {
                                     <div class="vbg-options">
-                                        @for (c of listaSexual; track c) {
-                                        <mat-checkbox [value]="c">{{c}}</mat-checkbox>
+                                        @for (c of listaSexual; track c.id) {
+                                        <mat-checkbox [checked]="sexualSel.includes(c.id)"
+                                            (change)="onCheckboxChange($event, c.id, 'sexualSel')">{{c.nombre}}</mat-checkbox>
                                         }
                                     </div>
                                     }
@@ -629,8 +649,9 @@
 
                                     @if (atencionForm.get('violenciaInstitucional')?.value === 'SI') {
                                     <div class="vbg-options">
-                                        @for (c of listaInstitucional; track c) {
-                                        <mat-checkbox [value]="c">{{c}}</mat-checkbox>
+                                        @for (c of listaInstitucional; track c.id) {
+                                        <mat-checkbox [checked]="institucionalSel.includes(c.id)"
+                                            (change)="onCheckboxChange($event, c.id, 'institucionalSel')">{{c.nombre}}</mat-checkbox>
                                         }
                                     </div>
                                     }
@@ -648,8 +669,9 @@
 
                                     @if (atencionForm.get('violenciaEconomica')?.value === 'SI') {
                                     <div class="vbg-options">
-                                        @for (c of listaPatrimonial; track c) {
-                                        <mat-checkbox [value]="c">{{c}}</mat-checkbox>
+                                        @for (c of listaPatrimonial; track c.id) {
+                                        <mat-checkbox [checked]="economicaSel.includes(c.id)"
+                                            (change)="onCheckboxChange($event, c.id, 'economicaSel')">{{c.nombre}}</mat-checkbox>
                                         }
                                     </div>
                                     }
@@ -667,8 +689,9 @@
 
                                     @if (atencionForm.get('violenciaInformatica')?.value === 'SI') {
                                     <div class="vbg-options">
-                                        @for (c of listaInformatica; track c) {
-                                        <mat-checkbox [value]="c">{{c}}</mat-checkbox>
+                                        @for (c of listaInformatica; track c.id) {
+                                        <mat-checkbox [checked]="informaticaSel.includes(c.id)"
+                                            (change)="onCheckboxChange($event, c.id, 'informaticaSel')">{{c.nombre}}</mat-checkbox>
                                         }
                                     </div>
                                     }
@@ -686,8 +709,9 @@
 
                                     @if (atencionForm.get('violenciaPrejuicio')?.value === 'SI') {
                                     <div class="vbg-options">
-                                        @for (c of listaPrejuicio; track c) {
-                                        <mat-checkbox [value]="c">{{c}}</mat-checkbox>
+                                        @for (c of listaPrejuicio; track c.id) {
+                                        <mat-checkbox [checked]="prejuicioSel.includes(c.id)"
+                                            (change)="onCheckboxChange($event, c.id, 'prejuicioSel')">{{c.nombre}}</mat-checkbox>
                                         }
                                     </div>
                                     }
