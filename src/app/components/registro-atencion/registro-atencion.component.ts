@@ -39,7 +39,7 @@ import { ModalCompromisosPersonaComponent } from '../modal-compromisos-persona/m
 import { ModalCompromisosProfesionalesComponent } from '../modal-compromisos-profesionales/modal-compromisos-profesionales.component';
 import { ModalSeguimientosComponent } from '../modal-seguimiento/modal-seguimiento.component';
 import { AuthService } from '../../services/auth.service';
-import { CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, RegistroAtencionCompleteRequestDto, SeguimientoAtencionRequestDto, SolicitudService } from '../../services/solicitud.service';
+import { CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, HechoRequestDto, RegistroAtencionCompleteRequestDto, SeguimientoAtencionRequestDto, SolicitudService } from '../../services/solicitud.service';
 import { MaestroDto } from '../../services/listas.service';
 import { environment } from '../../../environments/environment';
 
@@ -914,6 +914,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     // Los compromisos se enviarán con idatencion = 0 inicialmente.
     // El backend asignará el ID real después de crear la atención.
     const seguimientos = await this.mapearSeguimientosRequest(0);
+    const hechos = this.mapearHechosRequest();
 
     const compromisosPersona = this.compromisosPersona
       .map((compromiso) => this.mapearCompromisoPersonaRequest(compromiso, 0))
@@ -974,6 +975,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         direccionLugar: direccionResidencia || null
       },
       seguimientos: seguimientos.length ? seguimientos : undefined,
+      hechos: hechos.length ? hechos : undefined,
       compromisos: (compromisosPersona.length || compromisosProfesional.length)
         ? {
             persona: compromisosPersona.length ? compromisosPersona : undefined,
@@ -981,6 +983,26 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
           }
         : undefined
     };
+  }
+
+  private mapearHechosRequest(): HechoRequestDto[] {
+    return this.hechosRegistrados
+      .map((hecho): HechoRequestDto | null => {
+        const lugar = String(hecho?.lugar ?? '').trim();
+        const descripcion = String(hecho?.descripcion ?? '').trim();
+        const fecha = this.formatearFechaLocalDateTime(hecho?.fecha) ?? String(hecho?.fecha ?? '').trim();
+
+        if (!lugar || !descripcion) {
+          return null;
+        }
+
+        return {
+          fecha: fecha || null,
+          lugar,
+          descripcion
+        };
+      })
+      .filter((hecho): hecho is HechoRequestDto => hecho !== null);
   }
 
   private async mapearSeguimientosRequest(idAtencion: number): Promise<SeguimientoAtencionRequestDto[]> {

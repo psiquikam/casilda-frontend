@@ -232,6 +232,12 @@ export interface SeguimientoAtencionRequestDto {
   archivoContenido?: string; // Base64 encoded file content
 }
 
+export interface HechoRequestDto {
+  fecha?: string | null;
+  lugar: string;
+  descripcion: string;
+}
+
 export interface AgresorVictimaRequestDto {
   primerNombre: string;
   segundoNombre?: string | null;
@@ -296,6 +302,7 @@ export interface RegistroAtencionCompleteRequestDto {
   persona: PersonaAtencionRequestDto;
   caso: CasoAtencionRequestDto;
   seguimientos?: SeguimientoAtencionRequestDto[];
+  hechos?: HechoRequestDto[];
   compromisos?: CompromisosAtencionRequestDto;
 }
 
