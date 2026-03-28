@@ -20,7 +20,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { ListasService, MaestroDto } from '../../services/listas.service';
-import { SolicitudService, RemitenteSearchDto } from '../../services/solicitud.service';
+import { PersonaSearchDto, SolicitudService } from '../../services/solicitud.service';
 import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
 import { ModalCorreoComponent } from '../modal-correo/modal-correo.component';
 import { ModalTelefonoComponent } from '../modal-telefono/modal-telefono.component';
@@ -57,6 +57,7 @@ export class FormularioAcompanamientoComponent implements OnInit {
   telefonosRegistrados: any[] = [];
   enviando = false;
   buscandoRemitente = false;
+  buscandoSolicitante = false;
 
   constructor() {
     this.listasService.listas$
@@ -123,29 +124,88 @@ export class FormularioAcompanamientoComponent implements OnInit {
     });
   }
 
-  buscarRemitente(): void {
+  buscarRemitente(event?: Event): void {
+    event?.preventDefault();
+
+    const tipoDocumentoId = this.acompanamientoForm.get('remitenteTipoDocumento')?.value;
     const documento = this.acompanamientoForm.get('remitenteNumeroDocumento')?.value?.trim();
-    if (!documento) return;
+
+    if (!tipoDocumentoId) {
+      this.snackBar.open('Selecciona el tipo de documento del remitente.', 'Cerrar', { duration: 3000 });
+      return;
+    }
+
+    if (!documento) {
+      this.snackBar.open('Ingresa el número de documento del remitente.', 'Cerrar', { duration: 3000 });
+      return;
+    }
 
     this.buscandoRemitente = true;
-    this.solicitudService.buscarRemitentePorDocumento(documento).subscribe({
-      next: (res: RemitenteSearchDto) => {
+    this.solicitudService.buscarPersonaPorDocumento(Number(tipoDocumentoId), documento).subscribe({
+      next: (res: PersonaSearchDto) => {
         this.buscandoRemitente = false;
         this.acompanamientoForm.patchValue({
           remitentePrimerNombre: res.primerNombre ?? '',
           remitenteSegundoNombre: res.segundoNombre ?? '',
           remitentePrimerApellido: res.primerApellido ?? '',
           remitenteSegundoApellido: res.segundoApellido ?? '',
-          remitenteTipoDocumento: res.tipoDocumentoId ?? null,
-          remitenteCargo: res.cargoId ?? null,
-          remitenteCampus: res.campusId ?? null,
-          remitenteDependencia: res.dependenciaId ?? null,
-          remitenteFacultad: res.facultadId ?? null,
+          remitenteTipoDocumento: res.tipoDocumentoId ?? null
         });
       },
-      error: () => {
+      error: (err) => {
         this.buscandoRemitente = false;
-        this.snackBar.open('No se encontró ningún funcionario con ese documento.', 'Cerrar', { duration: 3000 });
+        const mensaje = err?.error?.message || 'No se encontró ningún funcionario con ese documento.';
+        this.snackBar.open(mensaje, 'Cerrar', { duration: 5000 });
+      }
+    });
+  }
+
+  buscarSolicitante(event?: Event): void {
+    event?.preventDefault();
+
+    const tipoDocumentoId = this.acompanamientoForm.get('tipoDocumento')?.value;
+    const documento = this.acompanamientoForm.get('numeroDocumento')?.value?.trim();
+
+    if (!tipoDocumentoId) {
+      this.snackBar.open('Selecciona el tipo de documento del solicitante.', 'Cerrar', { duration: 3000 });
+      return;
+    }
+
+    if (!documento) {
+      this.snackBar.open('Ingresa el número de documento del solicitante.', 'Cerrar', { duration: 3000 });
+      return;
+    }
+
+    this.buscandoSolicitante = true;
+    this.solicitudService.buscarPersonaPorDocumento(Number(tipoDocumentoId), documento).subscribe({
+      next: (res: PersonaSearchDto) => {
+        this.buscandoSolicitante = false;
+        this.acompanamientoForm.patchValue({
+          tipoDocumento: res.tipoDocumentoId ?? tipoDocumentoId,
+          numeroDocumento: res.numeroDocumento ?? documento,
+          fechaNacimiento: this.toDateControlValue(res.fechaNacimiento),
+          primerNombre: res.primerNombre ?? '',
+          segundoNombre: res.segundoNombre ?? '',
+          primerApellido: res.primerApellido ?? '',
+          segundoApellido: res.segundoApellido ?? ''
+        });
+        this.correoRegistrados = (res.correos ?? []).map(c => ({
+          tipoId: c.tipoId,
+          tipo: c.tipo ?? '',
+          correo: c.correo,
+          descripcion: c.descripcion ?? ''
+        }));
+        this.telefonosRegistrados = (res.telefonos ?? []).map(t => ({
+          tipoId: t.tipoId,
+          tipo: t.tipo ?? '',
+          telefono: t.telefono,
+          descripcion: t.descripcion ?? ''
+        }));
+      },
+      error: (err) => {
+        this.buscandoSolicitante = false;
+        const mensaje = err?.error?.message || 'No se encontró solicitante con ese documento.';
+        this.snackBar.open(mensaje, 'Cerrar', { duration: 5000 });
       }
     });
   }
@@ -162,6 +222,11 @@ export class FormularioAcompanamientoComponent implements OnInit {
 
   eliminarCorreo(i: number) { this.correoRegistrados = this.correoRegistrados.filter((_, idx) => idx !== i); }
   eliminarTelefono(i: number) { this.telefonosRegistrados = this.telefonosRegistrados.filter((_, idx) => idx !== i); }
+
+  private toDateControlValue(value?: string | null): Date | null {
+    if (!value) return null;
+    return new Date(`${value}T00:00:00`);
+  }
 
   private formatDate(date: Date | null): string | null {
     if (!date) return null;

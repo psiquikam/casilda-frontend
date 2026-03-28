@@ -39,7 +39,7 @@ import { ModalCompromisosPersonaComponent } from '../modal-compromisos-persona/m
 import { ModalCompromisosProfesionalesComponent } from '../modal-compromisos-profesionales/modal-compromisos-profesionales.component';
 import { ModalSeguimientosComponent } from '../modal-seguimiento/modal-seguimiento.component';
 import { AuthService } from '../../services/auth.service';
-import { CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, HechoRequestDto, RegistroAtencionCompleteRequestDto, SeguimientoAtencionRequestDto, SolicitudService } from '../../services/solicitud.service';
+import { AtencionContextoRequestDto, CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, HechoRequestDto, RegistroAtencionCompleteRequestDto, SeguimientoAtencionRequestDto, SolicitudService } from '../../services/solicitud.service';
 import { MaestroDto } from '../../services/listas.service';
 import { environment } from '../../../environments/environment';
 
@@ -924,6 +924,18 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       .map((compromiso) => this.mapearCompromisoProfesionalRequest(compromiso, 0))
       .filter((compromiso): compromiso is CompromisoProfesionalRequestDto => compromiso !== null);
 
+    const atencionContexto: AtencionContextoRequestDto = {
+      idDependencia: Number(dependencia),
+      idCampus: Number(campus),
+      idFacultad: Number(facultad),
+      idVinculoUniversidad: Number(vinculo),
+      idSubVinculoUniversidad: subVinculo ? Number(subVinculo) : null,
+      idPrograma: Number(programa),
+      idEtnia: etnia ? Number(etnia) : null,
+      idCiudadResidencia: ciudadResidencia ? Number(ciudadResidencia) : null,
+      direccionResidencia: direccionResidencia || null
+    };
+
     return {
       atencion: {
         citaId: Number(this.casoSeleccionado?.citaId ?? this.casoSeleccionado?.idCita ?? this.casoSeleccionado?.idcita ?? 0),
@@ -936,6 +948,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         archivoConsentimientoTipo: consentimientoArchivo?.type,
         archivoConsentimientoContenido
       },
+      atencionContexto,
       persona: {
         idSexo: Number(sexo),
         idEtnia: Number(etnia),
@@ -943,20 +956,21 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         direccionResidencia: direccionResidencia || null
       },
       caso: {
-        idDependencia: Number(dependencia),
-        idCampus: Number(campus),
-        idFacultad: Number(facultad),
-        idVinculoUniversidad: Number(vinculo),
-        idSubVinculoUniversidad: subVinculo ? Number(subVinculo) : null,
-        idPrograma: Number(programa),
-        idIdentidadGenero: Number(identidadSexual),
         idOrientacionSexual: Number(orientacionSexual),
+        idIdentidadSexual: Number(identidadSexual),
         tiempoOcurrido,
         idFormaOcurrencia: Number(queForma),
         idLugarOcurrencia: Number(lugarHechos),
         violenciaGenero: violenciaGenero === true || violenciaGenero === 'SI',
         violenciaMisional: violenciaMisional === true || violenciaMisional === 'SI',
         idActividadMisional: actividadMisional ? Number(actividadMisional) : null,
+        tipoViolenciaPsicologica: this.psicologicaSel.length > 0,
+        tipoViolenciaFisica: this.fisicaSel.length > 0,
+        tipoViolenciaSexual: this.sexualSel.length > 0,
+        tipoViolenciaInstitucional: this.institucionalSel.length > 0,
+        tipoViolenciaEconomicaPatrimonial: this.economicaSel.length > 0,
+        tipoViolenciaSexualInformatica: this.informaticaSel.length > 0,
+        tipoViolenciaPorPrejuicio: this.prejuicioSel.length > 0,
         modalidadesViolenciaPsicologica: this.psicologicaSel,
         modalidadesViolenciaFisica: this.fisicaSel,
         modalidadesViolenciaSexual: this.sexualSel,
@@ -971,8 +985,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
           segundoApellido: presuntoSegundoApellido || null,
           idVinculoUniversidad: Number(presuntoVinculoUniversidad),
           idVinculoVictima: Number(presuntoVinculoVictima)
-        },
-        direccionLugar: direccionResidencia || null
+        }
       },
       seguimientos: seguimientos.length ? seguimientos : undefined,
       hechos: hechos.length ? hechos : undefined,

@@ -45,9 +45,10 @@
                   <mat-form-field appearance="outline">
                     <mat-label>Número Documento</mat-label>
                     <input matInput formControlName="remitenteNumeroDocumento"
-                      (keyup.enter)="buscarRemitente()">
+                      (keyup.enter)="buscarRemitente($event)">
                     <button matSuffix mat-icon-button class="btn-search-doc"
-                      (click)="buscarRemitente()"
+                      type="button"
+                      (click)="buscarRemitente($event)"
                       [disabled]="buscandoRemitente"
                       matTooltip="Buscar funcionario">
                       <mat-icon *ngIf="!buscandoRemitente">search</mat-icon>
@@ -141,7 +142,16 @@
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Número Documento</mat-label>
-              <input matInput formControlName="numeroDocumento">
+              <input matInput formControlName="numeroDocumento"
+                (keyup.enter)="buscarSolicitante($event)">
+              <button matSuffix mat-icon-button class="btn-search-doc"
+                type="button"
+                (click)="buscarSolicitante($event)"
+                [disabled]="buscandoSolicitante"
+                matTooltip="Buscar solicitante">
+                <mat-icon *ngIf="!buscandoSolicitante">search</mat-icon>
+                <mat-spinner *ngIf="buscandoSolicitante" diameter="18"></mat-spinner>
+              </button>
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Fecha de Nacimiento</mat-label>
