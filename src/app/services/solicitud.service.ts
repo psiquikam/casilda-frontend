@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { MaestroDto } from './listas.service';
@@ -96,17 +96,30 @@ export interface SolicitudAcompanamientoResponse {
   remitenteNumeroDocumento: string;
 }
 
-export interface RemitenteSearchDto {
+export interface PersonaSearchDto {
   primerNombre: string;
   segundoNombre?: string | null;
   primerApellido: string;
   segundoApellido?: string | null;
   tipoDocumentoId?: number | null;
   numeroDocumento?: string | null;
-  cargoId?: number | null;
-  campusId?: number | null;
-  dependenciaId?: number | null;
-  facultadId?: number | null;
+  fechaNacimiento?: string | null;
+  correos?: CorreoBusquedaDto[];
+  telefonos?: TelefonoBusquedaDto[];
+}
+
+export interface CorreoBusquedaDto {
+  tipoId: number;
+  tipo?: string | null;
+  correo: string;
+  descripcion?: string | null;
+}
+
+export interface TelefonoBusquedaDto {
+  tipoId: number;
+  tipo?: string | null;
+  telefono: string;
+  descripcion?: string | null;
 }
 
 export interface UpdateSolicitudDto {
@@ -161,6 +174,7 @@ export interface CitaDto {
   solicitudId: number;
   codigoSolicitud: string;
   nombreSolicitante: string;
+  tipoDocumento?: string | null;
   documento: string;
   fechaCita: string;
   idEstadoCita: number;
@@ -252,6 +266,20 @@ export interface PersonaAtencionRequestDto {
   idEtnia: number;
   idCiudadResidencia?: number | null;
   direccionResidencia?: string | null;
+  correos?: CorreoSolicitanteDto[];
+  telefonos?: TelefonoSolicitanteDto[];
+}
+
+export interface AtencionContextoRequestDto {
+  idDependencia: number;
+  idCampus: number;
+  idFacultad: number;
+  idVinculoUniversidad: number;
+  idSubVinculoUniversidad?: number | null;
+  idPrograma: number;
+  idEtnia?: number | null;
+  idCiudadResidencia?: number | null;
+  direccionResidencia?: string | null;
 }
 
 export interface AtencionRegistroRequestDto {
@@ -272,20 +300,22 @@ export interface CompromisosAtencionRequestDto {
 }
 
 export interface CasoAtencionRequestDto {
-  idDependencia: number;
-  idCampus: number;
-  idFacultad: number;
-  idVinculoUniversidad: number;
-  idSubVinculoUniversidad?: number | null;
-  idPrograma: number;
-  idIdentidadGenero: number;
   idOrientacionSexual: number;
+  idIdentidadSexual: number;
   tiempoOcurrido: string;
   idFormaOcurrencia: number;
   idLugarOcurrencia: number;
   violenciaGenero: boolean;
   violenciaMisional: boolean;
   idActividadMisional?: number | null;
+  idPrograma?: number | null;
+  tipoViolenciaPsicologica?: boolean;
+  tipoViolenciaFisica?: boolean;
+  tipoViolenciaSexual?: boolean;
+  tipoViolenciaInstitucional?: boolean;
+  tipoViolenciaEconomicaPatrimonial?: boolean;
+  tipoViolenciaSexualInformatica?: boolean;
+  tipoViolenciaPorPrejuicio?: boolean;
   modalidadesViolenciaPsicologica?: number[];
   modalidadesViolenciaFisica?: number[];
   modalidadesViolenciaSexual?: number[];
@@ -294,11 +324,11 @@ export interface CasoAtencionRequestDto {
   modalidadesViolenciaInformatica?: number[];
   modalidadesViolenciaPrejuicio?: number[];
   agresorVictima: AgresorVictimaRequestDto;
-  direccionLugar?: string | null;
 }
 
 export interface RegistroAtencionCompleteRequestDto {
   atencion: AtencionRegistroRequestDto;
+  atencionContexto: AtencionContextoRequestDto;
   persona: PersonaAtencionRequestDto;
   caso: CasoAtencionRequestDto;
   seguimientos?: SeguimientoAtencionRequestDto[];
@@ -313,8 +343,12 @@ export class SolicitudService {
   private readonly citasUrl = `${environment.apiBaseUrl}/citas`;
   private readonly compromisosUrl = `${environment.apiBaseUrl}/compromisos`;
 
-  buscarRemitentePorDocumento(documento: string): Observable<RemitenteSearchDto> {
-    return this.http.get<RemitenteSearchDto>(`${environment.apiBaseUrl}/personas/documento/${documento}`);
+  buscarPersonaPorDocumento(tipoDocumentoId: number, documento: string): Observable<PersonaSearchDto> {
+    const params = new HttpParams()
+      .set('tipoDocumentoId', String(tipoDocumentoId))
+      .set('numeroDocumento', documento);
+
+    return this.http.get<PersonaSearchDto>(`${environment.apiBaseUrl}/personas/documento/${documento}`, { params });
   }
 
   crearAcompanamiento(request: SolicitudAcompanamientoRequest): Observable<SolicitudAcompanamientoResponse> {
