@@ -171,6 +171,24 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   estadosAtencion: string[] = [];
   grupoAtencion: string[] = [];
 
+  catalogoSexos: MaestroDto[] = [];
+  catalogoEtnias: MaestroDto[] = [];
+  catalogoProgramas: MaestroDto[] = [];
+  catalogoIdentidadesSexuales: MaestroDto[] = [];
+  catalogoOrientacionesSexuales: MaestroDto[] = [];
+  catalogoVinculosUdea: MaestroDto[] = [];
+  catalogoSubVinculosUdea: MaestroDto[] = [];
+  catalogoVinculosAgresorVictima: MaestroDto[] = [];
+  catalogoDependencias: MaestroDto[] = [];
+  catalogoRegimenes: MaestroDto[] = [];
+  catalogoEps: MaestroDto[] = [];
+  catalogoTiposServicio: MaestroDto[] = [];
+  catalogoCampus: MaestroDto[] = [];
+  catalogoFacultades: MaestroDto[] = [];
+  catalogoFormasOcurrencia: MaestroDto[] = [];
+  catalogoLugaresOcurrencia: MaestroDto[] = [];
+  catalogoActividadesMisionales: MaestroDto[] = [];
+
   listaPsicologica: MaestroDto[] = [];
   listaFisica: MaestroDto[] = [];
   listaSexual: MaestroDto[] = [];
@@ -190,6 +208,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.initForm();
+    this.configurarValidacionActividadMisional();
     this.configurarDependenciaMunicipios();
     this.cargarListasMaestras();
     this.cargarCitas();
@@ -222,6 +241,28 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         this.activarRutasRegistrados = [];
       }
     });
+  }
+
+  private configurarValidacionActividadMisional(): void {
+    const controlViolenciaMisional = this.atencionForm.get('violenciaMisional');
+    const controlActividadMisional = this.atencionForm.get('actividadMisional');
+
+    if (!controlViolenciaMisional || !controlActividadMisional) {
+      return;
+    }
+
+    const aplicarRegla = (valor: unknown) => {
+      if (valor === 'SI') {
+        controlActividadMisional.setValidators([Validators.required]);
+      } else {
+        controlActividadMisional.clearValidators();
+        controlActividadMisional.setValue('');
+      }
+      controlActividadMisional.updateValueAndValidity({ emitEvent: false });
+    };
+
+    aplicarRegla(controlViolenciaMisional.value);
+    controlViolenciaMisional.valueChanges.subscribe(aplicarRegla);
   }
 
   private cargarListasMaestras(): void {
@@ -258,6 +299,24 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       modalidadesPrejuicio: this.obtenerMaestro('modalidades-violencia/tipo/7')
     }).subscribe({
       next: (data) => {
+        this.catalogoSexos = data.sexos;
+        this.catalogoEtnias = data.etnias;
+        this.catalogoProgramas = data.programas;
+        this.catalogoIdentidadesSexuales = data.identidadesSexuales;
+        this.catalogoOrientacionesSexuales = data.orientacionesSexuales;
+        this.catalogoVinculosUdea = data.vinculosUdea;
+        this.catalogoSubVinculosUdea = data.subVinculosUdea;
+        this.catalogoVinculosAgresorVictima = data.vinculosAgresorVictima;
+        this.catalogoDependencias = data.dependencias;
+        this.catalogoRegimenes = data.regimenes;
+        this.catalogoEps = data.eps;
+        this.catalogoTiposServicio = data.tiposServicio;
+        this.catalogoCampus = data.campus;
+        this.catalogoFacultades = data.facultades;
+        this.catalogoFormasOcurrencia = data.formasOcurrencia;
+        this.catalogoLugaresOcurrencia = data.lugaresOcurrencia;
+        this.catalogoActividadesMisionales = data.actividadesMisionales;
+
         this.listaSexo = this.mapNombres(data.sexos);
         this.listaEtnias = this.mapNombres(data.etnias);
         this.listaProgramas = this.mapNombres(data.programas);
@@ -382,6 +441,31 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
   private mapNombres(lista: MaestroDto[]): string[] {
     return lista.map(item => item.nombre);
+  }
+
+  private resolverIdMaestro(valor: unknown, catalogo: MaestroDto[]): number {
+    if (typeof valor === 'number' && Number.isFinite(valor)) {
+      return valor;
+    }
+
+    const texto = String(valor ?? '').trim();
+    if (!texto) {
+      return Number.NaN;
+    }
+
+    const numero = Number(texto);
+    if (Number.isFinite(numero)) {
+      return numero;
+    }
+
+    const textoNormalizado = texto.toLowerCase();
+    const maestro = catalogo.find((item) => {
+      const nombre = item.nombre?.trim().toLowerCase();
+      const codigo = item.codigo?.trim().toLowerCase();
+      return nombre === textoNormalizado || codigo === textoNormalizado;
+    });
+
+    return maestro?.id ?? Number.NaN;
   }
 
   ngAfterViewInit() {
@@ -791,8 +875,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       subVinculo: ['', Validators.required],
       programa: ['', Validators.required],
       logroAcuerdo: ['NO'],
-      tipoViolencia: ['', Validators.required],
-      subcategoriaViolencia: ['', Validators.required],
+      tipoViolencia: [''],
+      subcategoriaViolencia: [''],
       tiempoOcurrido: ['', Validators.required],
       queForma: ['', Validators.required],
       departamentoHechos: [''],
@@ -925,24 +1009,40 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       .filter((compromiso): compromiso is CompromisoProfesionalRequestDto => compromiso !== null);
 
     const atencionContexto: AtencionContextoRequestDto = {
-      idDependencia: Number(dependencia),
-      idCampus: Number(campus),
-      idFacultad: Number(facultad),
-      idVinculoUniversidad: Number(vinculo),
-      idSubVinculoUniversidad: subVinculo ? Number(subVinculo) : null,
-      idPrograma: Number(programa),
-      idEtnia: etnia ? Number(etnia) : null,
+      idDependencia: this.resolverIdMaestro(dependencia, this.catalogoDependencias),
+      idCampus: this.resolverIdMaestro(campus, this.catalogoCampus),
+      idFacultad: this.resolverIdMaestro(facultad, this.catalogoFacultades),
+      idVinculoUniversidad: this.resolverIdMaestro(vinculo, this.catalogoVinculosUdea),
+      idSubVinculoUniversidad: subVinculo ? this.resolverIdMaestro(subVinculo, this.catalogoSubVinculosUdea) : null,
+      idPrograma: this.resolverIdMaestro(programa, this.catalogoProgramas),
+      idEtnia: etnia ? this.resolverIdMaestro(etnia, this.catalogoEtnias) : null,
       idCiudadResidencia: ciudadResidencia ? Number(ciudadResidencia) : null,
       direccionResidencia: direccionResidencia || null
     };
 
+    const correos = this.correoRegistrados
+      .filter((c) => c?.correo && c?.tipoId)
+      .map((c) => ({
+        tipoId: Number(c.tipoId),
+        correo: String(c.correo).trim(),
+        descripcion: c.descripcion ? String(c.descripcion).trim() : undefined
+      }));
+
+    const telefonos = this.telefonosRegistrados
+      .filter((t) => t?.telefono && t?.tipoId)
+      .map((t) => ({
+        tipoId: Number(t.tipoId),
+        telefono: String(t.telefono).trim(),
+        descripcion: t.descripcion ? String(t.descripcion).trim() : undefined
+      }));
+
     return {
       atencion: {
         citaId: Number(this.casoSeleccionado?.citaId ?? this.casoSeleccionado?.idCita ?? this.casoSeleccionado?.idcita ?? 0),
-        idTipoServicio: Number(tipoServicio),
+        idTipoServicio: this.resolverIdMaestro(tipoServicio, this.catalogoTiposServicio),
         idMunicipioEntrevista: Number(formaEntrevista),
-        idRegimen: Number(regimenSalud),
-        idEps: Number(eps),
+        idRegimen: this.resolverIdMaestro(eps, this.catalogoRegimenes),
+        idEps: this.resolverIdMaestro(regimenSalud, this.catalogoEps),
         logroAcuerdo: logroAcuerdo === true || logroAcuerdo === 'SI',
         archivoConsentimientoNombre: consentimientoArchivo?.name,
         archivoConsentimientoTipo: consentimientoArchivo?.type,
@@ -950,20 +1050,22 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       },
       atencionContexto,
       persona: {
-        idSexo: Number(sexo),
-        idEtnia: Number(etnia),
+        idSexo: this.resolverIdMaestro(sexo, this.catalogoSexos),
+        idEtnia: this.resolverIdMaestro(etnia, this.catalogoEtnias),
         idCiudadResidencia: ciudadResidencia ? Number(ciudadResidencia) : null,
-        direccionResidencia: direccionResidencia || null
+        direccionResidencia: direccionResidencia || null,
+        correos: correos.length ? correos : undefined,
+        telefonos: telefonos.length ? telefonos : undefined
       },
       caso: {
-        idOrientacionSexual: Number(orientacionSexual),
-        idIdentidadSexual: Number(identidadSexual),
+        idOrientacionSexual: this.resolverIdMaestro(orientacionSexual, this.catalogoOrientacionesSexuales),
+        idIdentidadSexual: this.resolverIdMaestro(identidadSexual, this.catalogoIdentidadesSexuales),
         tiempoOcurrido,
-        idFormaOcurrencia: Number(queForma),
-        idLugarOcurrencia: Number(lugarHechos),
+        idFormaOcurrencia: this.resolverIdMaestro(queForma, this.catalogoFormasOcurrencia),
+        idLugarOcurrencia: this.resolverIdMaestro(lugarHechos, this.catalogoLugaresOcurrencia),
         violenciaGenero: violenciaGenero === true || violenciaGenero === 'SI',
         violenciaMisional: violenciaMisional === true || violenciaMisional === 'SI',
-        idActividadMisional: actividadMisional ? Number(actividadMisional) : null,
+        idActividadMisional: actividadMisional ? this.resolverIdMaestro(actividadMisional, this.catalogoActividadesMisionales) : null,
         tipoViolenciaPsicologica: this.psicologicaSel.length > 0,
         tipoViolenciaFisica: this.fisicaSel.length > 0,
         tipoViolenciaSexual: this.sexualSel.length > 0,
@@ -983,8 +1085,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
           segundoNombre: presuntoSegundoNombre || null,
           primerApellido: presuntoPrimerApellido,
           segundoApellido: presuntoSegundoApellido || null,
-          idVinculoUniversidad: Number(presuntoVinculoUniversidad),
-          idVinculoVictima: Number(presuntoVinculoVictima)
+          idVinculoUniversidad: this.resolverIdMaestro(presuntoVinculoUniversidad, this.catalogoVinculosUdea),
+          idVinculoVictima: this.resolverIdMaestro(presuntoVinculoVictima, this.catalogoVinculosAgresorVictima)
         }
       },
       seguimientos: seguimientos.length ? seguimientos : undefined,

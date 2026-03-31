@@ -341,6 +341,7 @@ export class SolicitudService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiBaseUrl}/solicitudes`;
   private readonly citasUrl = `${environment.apiBaseUrl}/citas`;
+  private readonly atencionesUrl = `${environment.apiBaseUrl}/atenciones`;
   private readonly compromisosUrl = `${environment.apiBaseUrl}/compromisos`;
 
   buscarPersonaPorDocumento(tipoDocumentoId: number, documento: string): Observable<PersonaSearchDto> {
@@ -357,10 +358,6 @@ export class SolicitudService {
 
   obtenerPorId(id: number): Observable<SolicitudAcompanamientoResponse> {
     return this.http.get<SolicitudAcompanamientoResponse>(`${this.apiUrl}/acompanamiento/${id}`);
-  }
-
-  obtenerPorCodigo(codigo: string): Observable<SolicitudAcompanamientoResponse> {
-    return this.http.get<SolicitudAcompanamientoResponse>(`${this.apiUrl}/acompanamiento/codigo/${codigo}`);
   }
 
   listarTodas(): Observable<SolicitudAcompanamientoResponse[]> {
@@ -416,7 +413,7 @@ export class SolicitudService {
   }
 
   registrarAtencionCompleta(datos: RegistroAtencionCompleteRequestDto): Observable<AtencionResponseDto> {
-    return this.http.post<AtencionResponseDto>(`${this.apiUrl}/atenciones`, datos);
+    return this.http.post<AtencionResponseDto>(this.atencionesUrl, datos);
   }
 
   crearSeguimiento(datos: SeguimientoAtencionRequestDto): Observable<unknown> {

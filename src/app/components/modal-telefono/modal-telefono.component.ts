@@ -39,6 +39,7 @@ export class ModalTelefonoComponent implements OnInit {
 
   data = {
     tipoId: null as number | null,
+    tipo: '',
     telefono: '',
     descripcion: ''
   };
@@ -50,6 +51,11 @@ export class ModalTelefonoComponent implements OnInit {
       next: (tipos) => this.tiposTelefono = tipos,
       error: (err) => console.error('Error al cargar tipos de teléfono:', err)
     });
+  }
+
+  onTipoChange(id: number): void {
+    const found = this.tiposTelefono.find((t) => t.id === id);
+    this.data.tipo = found ? found.nombre : '';
   }
 
   onNoClick(): void {
