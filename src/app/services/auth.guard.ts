@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthService } from './auth.service';
+import { AUTH_REQUIRED_MESSAGE, AuthService } from './auth.service';
 import Swal from 'sweetalert2';
 
 export const authGuard: CanActivateFn = (route, state) => {
@@ -10,8 +10,11 @@ export const authGuard: CanActivateFn = (route, state) => {
   if (authService.isAuthenticated()) {
     return true;
   } else {
-    Swal.fire({ icon: 'warning', title: 'Acceso requerido', text: 'Debes iniciar sesión para reportar un caso' });
-    router.navigate(['/seguimiento']);
-    return false;
+    void Swal.fire({
+      icon: 'warning',
+      title: 'Acceso requerido',
+      text: AUTH_REQUIRED_MESSAGE
+    });
+    return router.createUrlTree(['/login']);
   }
 };

@@ -1,7 +1,7 @@
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
-import { AuthService } from './auth.service';
+import { AUTH_REQUIRED_MESSAGE, AuthService } from './auth.service';
 import Swal from 'sweetalert2';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
@@ -14,12 +14,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401) {
+      const isAuthEndpoint = req.url.includes('/auth/login');
+
+      if ((error.status === 401 || error.status === 403) && !isAuthEndpoint) {
         authService.logout();
-        Swal.fire({
+        void Swal.fire({
           icon: 'warning',
           title: 'Sesión expirada',
-          text: 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.',
+          text: AUTH_REQUIRED_MESSAGE,
           confirmButtonText: 'Iniciar sesión',
           allowOutsideClick: false
         });
