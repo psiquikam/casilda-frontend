@@ -8,7 +8,7 @@
 
     <mat-form-field appearance="outline" class="field-tipo">
       <mat-label>Tipo</mat-label>
-      <mat-select [(ngModel)]="data.tipoId">
+      <mat-select [(ngModel)]="data.tipoId" (selectionChange)="onTipoChange($event.value)">
         <mat-option *ngFor="let tipo of tiposTelefono" [value]="tipo.id">{{ tipo.nombre }}</mat-option>
       </mat-select>
     </mat-form-field>
