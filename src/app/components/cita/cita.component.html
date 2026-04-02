@@ -1,7 +1,7 @@
 <div class="cita-container">
 
   <div class="section-header">
-    <h2>Citas Programadas</h2>
+    <h2>Citas</h2>
     <span class="subtitle">Gestión de atención y seguimiento de casos con cita activa</span>
   </div>
 
@@ -134,7 +134,7 @@
 
       <div *ngIf="!cargando && dataSource.data.length === 0" class="no-results-msg">
         <mat-icon>event_available</mat-icon>
-        <p>No hay citas programadas pendientes.</p>
+        <p>No hay citas.</p>
       </div>
       <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
     </div>

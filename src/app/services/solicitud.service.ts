@@ -145,7 +145,7 @@ export interface GrupoProfesionalDto {
 
 export interface ContactoTelefonicoDto {
   fecha: string;
-  hora: string;
+  hora?: string;
   jornada: string;
   resultado: string;
   observacion: string;
@@ -156,7 +156,6 @@ export interface ContactoTelefonicoDto {
 
 export interface ContactoTelefonicoRequestDto {
   fecha: string;
-  hora: string;
   resultado: string;
   observacion: string;
   fechaCita?: string;

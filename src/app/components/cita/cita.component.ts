@@ -91,7 +91,7 @@ export class CitaComponent implements OnInit, AfterViewInit {
     this.cargando = true;
     this.solicitudService.listarCitas().subscribe({
       next: (citas) => {
-        this.dataSource.data = citas.filter(c => c.idEstadoCita !== EstadoCitaEnum.CANCELADA);
+        this.dataSource.data = citas;
         this.cargando = false;
       },
       error: () => { this.cargando = false; }
