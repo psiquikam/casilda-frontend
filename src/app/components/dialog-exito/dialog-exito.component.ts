@@ -12,14 +12,9 @@ import { MatIconModule } from '@angular/material/icon';
     <div class="dialog-container">
       <mat-icon class="success-icon">check_circle</mat-icon>
       <h2 mat-dialog-title>{{ data.titulo }}</h2>
-      
+
       <mat-dialog-content>
         <p>{{ data.mensaje }}</p>
-        
-        <div class="code-box">
-          <span class="label">RADICADO</span>
-          <strong class="code">{{ data.codigo }}</strong>
-        </div>
       </mat-dialog-content>
 
       <mat-dialog-actions align="center">

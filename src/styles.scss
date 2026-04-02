@@ -153,6 +153,14 @@ body {
   --mat-option-selected-state-layer-color: rgba(52, 143, 65, 0.08);
 }
 
+.snack-error .mdc-snackbar__surface {
+  background-color: #dc2626 !important;
+}
+.snack-error .mat-mdc-snack-bar-label,
+.snack-error .mat-mdc-button {
+  color: white !important;
+}
+
 .custom-modal-container .mat-mdc-dialog-container .mdc-dialog__surface {
   padding: 0 !important;
   overflow: hidden !important;

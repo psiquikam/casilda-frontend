@@ -134,27 +134,98 @@
             <input matInput formControlName="identidadGenero">
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Celular</mat-label>
-            <input matInput formControlName="celular">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Teléfono Alterno</mat-label>
-            <input matInput formControlName="telefonoAlterno">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Correo Institucional</mat-label>
-            <input matInput formControlName="correoInstitucional">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Correo Personal</mat-label>
-            <input matInput formControlName="correoPersonal">
-          </mat-form-field>
-
         </div>
+
+        <!-- Correos -->
+        <div class="discapacidad-container">
+          <div class="section-header-inline">
+            <div class="section-title">
+              <mat-icon color="primary">email</mat-icon>
+              <span>Correos Electrónicos</span>
+            </div>
+            <button *ngIf="!esVisualizacion" mat-icon-button class="btn-add-inline"
+              (click)="abrirModalCorreo()" matTooltip="Agregar Correo">
+              <mat-icon>add_circle</mat-icon>
+            </button>
+          </div>
+          <div class="table-responsive">
+            <table mat-table [dataSource]="correoRegistrados" class="atencion-table">
+              <ng-container matColumnDef="tipo">
+                <th mat-header-cell *matHeaderCellDef> Tipo </th>
+                <td mat-cell *matCellDef="let element"> {{element.tipo}} </td>
+              </ng-container>
+              <ng-container matColumnDef="correo">
+                <th mat-header-cell *matHeaderCellDef> Correo Electrónico </th>
+                <td mat-cell *matCellDef="let element"> {{element.correo}} </td>
+              </ng-container>
+              <ng-container matColumnDef="descripcion">
+                <th mat-header-cell *matHeaderCellDef> Descripción </th>
+                <td mat-cell *matCellDef="let element"> {{element.descripcion}} </td>
+              </ng-container>
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef style="text-align: center;"> Acciones </th>
+                <td mat-cell *matCellDef="let i = index" style="text-align: center;">
+                  <button *ngIf="!esVisualizacion" mat-icon-button color="warn"
+                    (click)="eliminarCorreo(i)" matTooltip="Eliminar">
+                    <mat-icon svgIcon="icono-eliminar"></mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="['tipo', 'correo', 'descripcion', 'acciones']"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['tipo', 'correo', 'descripcion', 'acciones'];"></tr>
+            </table>
+            <div *ngIf="correoRegistrados.length === 0" class="no-results-msg">
+              <mat-icon>mail_outline</mat-icon>
+              <p>No hay correos registrados.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Teléfonos -->
+        <div class="discapacidad-container">
+          <div class="section-header-inline">
+            <div class="section-title">
+              <mat-icon color="primary">phone_enabled</mat-icon>
+              <span>Teléfonos</span>
+            </div>
+            <button *ngIf="!esVisualizacion" mat-icon-button class="btn-add-inline"
+              (click)="abrirModalTelefono()" matTooltip="Agregar Teléfono">
+              <mat-icon>add_circle</mat-icon>
+            </button>
+          </div>
+          <div class="table-responsive">
+            <table mat-table [dataSource]="telefonosRegistrados" class="atencion-table">
+              <ng-container matColumnDef="tipo">
+                <th mat-header-cell *matHeaderCellDef> Tipo </th>
+                <td mat-cell *matCellDef="let element"> {{element.tipo}} </td>
+              </ng-container>
+              <ng-container matColumnDef="telefono">
+                <th mat-header-cell *matHeaderCellDef> Teléfono </th>
+                <td mat-cell *matCellDef="let element"> {{element.telefono}} </td>
+              </ng-container>
+              <ng-container matColumnDef="descripcion">
+                <th mat-header-cell *matHeaderCellDef> Descripción </th>
+                <td mat-cell *matCellDef="let element"> {{element.descripcion}} </td>
+              </ng-container>
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef style="text-align: center;"> Acciones </th>
+                <td mat-cell *matCellDef="let i = index" style="text-align: center;">
+                  <button *ngIf="!esVisualizacion" mat-icon-button color="warn"
+                    (click)="eliminarTelefono(i)" matTooltip="Eliminar">
+                    <mat-icon svgIcon="icono-eliminar"></mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="['tipo', 'telefono', 'descripcion', 'acciones']"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['tipo', 'telefono', 'descripcion', 'acciones'];"></tr>
+            </table>
+            <div *ngIf="telefonosRegistrados.length === 0" class="no-results-msg">
+              <mat-icon>phone_enabled</mat-icon>
+              <p>No hay teléfonos registrados.</p>
+            </div>
+          </div>
+        </div>
+
       </mat-tab>
 
     </mat-tab-group>

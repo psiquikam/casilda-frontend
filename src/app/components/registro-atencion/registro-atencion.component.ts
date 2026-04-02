@@ -30,6 +30,7 @@ import { ModalCorreoComponent } from '../modal-correo/modal-correo.component';
 import { ModalTelefonoComponent } from '../modal-telefono/modal-telefono.component';
 import { ModalHechosComponent } from '../modal-hechos/modal-hechos.component';
 import { ModalRemisionComponent } from '../modal-remision/modal-remision.component';
+import { ModalMedidasProteccionComponent } from '../modal-medidas-proteccion/modal-medidas-proteccion.component';
 import { ModalActivarRutaComponent } from '../modal-activar-ruta/modal-activar-ruta.component';
 import { ModalApreciacionJuridicaComponent } from '../modal-apreciacion-juridica/modal-apreciacion-juridica.component';
 import { ModalApreciacionPsicologicaComponent } from '../modal-apreciacion-psicologica/modal-apreciacion-psicologica.component';
@@ -129,10 +130,50 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   hechosRegistrados: any[] = [];
   remisionesRegistrados: any[] = [];
   activarRutasRegistrados: any[] = [];
+  medidasRegistradas: any[] = [];
   compromisosPersona: any[] = [];
   compromisosProfesional: any[] = [];
   seguimientosRegistrados: any[] = [];
   guardandoCompromisos = false;
+  tabErrors = new Set<string>();
+
+  private readonly tabFieldMap: { tab: string; label: string; control: string; condition?: () => boolean }[] = [
+    { tab: 'Registro de atención', label: 'Tipo de servicio', control: 'tipoServicio' },
+    { tab: 'Registro de atención', label: 'Forma de entrevista', control: 'formaEntrevista' },
+    { tab: 'Datos de la persona', label: 'Tipo de documento', control: 'tipoDocumento' },
+    { tab: 'Datos de la persona', label: 'Número de documento', control: 'documento' },
+    { tab: 'Datos de la persona', label: 'Fecha de nacimiento', control: 'fechaNacimiento' },
+    { tab: 'Datos de la persona', label: 'Primer nombre', control: 'primerNombre' },
+    { tab: 'Datos de la persona', label: 'Primer apellido', control: 'primerApellido' },
+    { tab: 'Datos de la persona', label: 'Sexo', control: 'sexo' },
+    { tab: 'Datos de la persona', label: 'Etnia', control: 'etnia' },
+    { tab: 'Datos de la persona', label: 'Identidad sexual', control: 'identidadSexual' },
+    { tab: 'Datos de la persona', label: 'Orientación sexual', control: 'orientacionSexual' },
+    { tab: 'Datos de la persona', label: 'EPS', control: 'eps' },
+    { tab: 'Datos de la persona', label: 'Régimen de salud', control: 'regimenSalud' },
+    { tab: 'Datos de la persona', label: 'Ciudad de nacimiento', control: 'ciudadNacimiento' },
+    { tab: 'Datos complementarios', label: 'Vínculo', control: 'vinculo' },
+    { tab: 'Datos complementarios', label: 'Sub-vínculo', control: 'subVinculo' },
+    { tab: 'Datos complementarios', label: 'Facultad', control: 'facultad' },
+    { tab: 'Datos complementarios', label: 'Programa', control: 'programa' },
+    { tab: 'Datos complementarios', label: 'Dependencia', control: 'dependencia' },
+    { tab: 'Datos complementarios', label: 'Campus', control: 'campus' },
+    { tab: 'Documentación', label: 'Tiempo ocurrido', control: 'tiempoOcurrido' },
+    { tab: 'Documentación', label: '¿De qué forma?', control: 'queForma' },
+    { tab: 'Documentación', label: 'Lugar de los hechos', control: 'lugarHechos' },
+    { tab: 'Documentación', label: 'Violencia de género', control: 'violenciaGenero' },
+    { tab: 'Documentación', label: 'Violencia misional', control: 'violenciaMisional' },
+    {
+      tab: 'Documentación', label: 'Actividad misional', control: 'actividadMisional',
+      condition: () => this.atencionForm?.get('violenciaMisional')?.value === 'SI'
+    },
+    { tab: 'Presunto agresor', label: 'Primer nombre (agresor)', control: 'presuntoPrimerNombre' },
+    { tab: 'Presunto agresor', label: 'Primer apellido (agresor)', control: 'presuntoPrimerApellido' },
+    { tab: 'Presunto agresor', label: 'Vínculo con la universidad', control: 'presuntoVinculoUniversidad' },
+    { tab: 'Presunto agresor', label: 'Vínculo con la víctima', control: 'presuntoVinculoVictima' },
+    { tab: 'Estado de la atención', label: 'Estado de la atención', control: 'estadosAtencion' },
+    { tab: 'Estado de la atención', label: 'Grupo de atención', control: 'grupoAtencion' },
+  ];
 
   psicologicaSel: number[] = [];
   fisicaSel: number[] = [];
@@ -721,6 +762,20 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     });
   }
 
+  abrirModalMedida(): void {
+    const dialogRef = this.dialog.open(ModalMedidasProteccionComponent, {
+      width: '700px',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.medidasRegistradas = [...this.medidasRegistradas, result];
+        this.snackBar.open('Medida de protección agregada', 'Cerrar', { duration: 2000 });
+      }
+    });
+  }
+
   abrirModalRemision(): void {
     const dialogRef = this.dialog.open(ModalRemisionComponent, {
       width: '800px',
@@ -824,6 +879,10 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     this.activarRutasRegistrados.splice(i, 1);
     this.activarRutasRegistrados = [...this.activarRutasRegistrados];
   }
+  eliminarMedida(i: number) {
+    this.medidasRegistradas.splice(i, 1);
+    this.medidasRegistradas = [...this.medidasRegistradas];
+  }
   eliminarApreciacionJuridica(i: number) {
     this.apreciacionesJuridicas.splice(i, 1);
     this.apreciacionesJuridicas = [...this.apreciacionesJuridicas];
@@ -924,34 +983,59 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     input.click();
   }
 
-  guardarAtencion(): void {
-    if (this.atencionForm.valid) {
-      this.guardandoCompromisos = true;
-      this.construirRegistroAtencionRequest()
-        .then((dataFinal) => {
-          this.solicitudService.registrarAtencionCompleta(dataFinal).subscribe({
-            next: () => {
-              this.guardandoCompromisos = false;
-              this.snackBar.open('Registro guardado exitosamente', 'OK', { duration: 3000 });
-              // Opcionalmente resetear el formulario
-              this.atencionForm.reset();
-            },
-            error: (error) => {
-              this.guardandoCompromisos = false;
-              console.error('Error registrando atención completa:', error);
-              this.snackBar.open('No fue posible registrar la atención', 'Cerrar', { duration: 3500 });
-            }
-          });
-        })
-        .catch((error) => {
-          this.guardandoCompromisos = false;
-          console.error('Error preparando request de atención:', error);
-          this.snackBar.open('No fue posible preparar el archivo o los seguimientos', 'Cerrar', { duration: 3500 });
-        });
-    } else {
-      this.atencionForm.markAllAsTouched();
-      this.snackBar.open('Por favor complete los campos obligatorios', 'Cerrar', { duration: 3000 });
+  private validarFormulario(): boolean {
+    this.atencionForm.markAllAsTouched();
+    this.tabErrors = new Set<string>();
+    const errorsByTab: Record<string, string[]> = {};
+
+    for (const field of this.tabFieldMap) {
+      if (field.condition && !field.condition()) continue;
+      const ctrl = this.atencionForm.get(field.control);
+      if (ctrl && ctrl.invalid) {
+        this.tabErrors.add(field.tab);
+        if (!errorsByTab[field.tab]) errorsByTab[field.tab] = [];
+        errorsByTab[field.tab].push(field.label);
+      }
     }
+
+    if (this.tabErrors.size > 0) {
+      const partes = Object.entries(errorsByTab)
+        .map(([tab, fields]) => `[${tab}]: ${fields.join(', ')}`)
+        .join(' · ');
+      this.snackBar.open(`Campos requeridos faltantes — ${partes}`, 'Cerrar', {
+        duration: 12000,
+        panelClass: ['snack-error'],
+      });
+      return false;
+    }
+    return true;
+  }
+
+  guardarAtencion(): void {
+    if (!this.validarFormulario()) return;
+
+    this.guardandoCompromisos = true;
+    this.construirRegistroAtencionRequest()
+      .then((dataFinal) => {
+        this.solicitudService.registrarAtencionCompleta(dataFinal).subscribe({
+          next: () => {
+            this.guardandoCompromisos = false;
+            this.tabErrors = new Set<string>();
+            this.snackBar.open('Registro guardado exitosamente', 'OK', { duration: 3000 });
+            this.atencionForm.reset();
+          },
+          error: (error) => {
+            this.guardandoCompromisos = false;
+            console.error('Error registrando atención completa:', error);
+            this.snackBar.open('No fue posible registrar la atención', 'Cerrar', { duration: 3500 });
+          }
+        });
+      })
+      .catch((error) => {
+        this.guardandoCompromisos = false;
+        console.error('Error preparando request de atención:', error);
+        this.snackBar.open('No fue posible preparar el archivo o los seguimientos', 'Cerrar', { duration: 3500 });
+      });
   }
 
   private async construirRegistroAtencionRequest(): Promise<RegistroAtencionCompleteRequestDto> {

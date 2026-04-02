@@ -1,0 +1,52 @@
+<h2 mat-dialog-title class="modal-title">
+  <mat-icon>security</mat-icon>
+  Medidas de protección
+</h2>
+
+<mat-dialog-content class="modal-content">
+  <div class="form-grid">
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Tipo de medida <span class="required">*</span></mat-label>
+      <mat-select [(ngModel)]="data.tipoMedida" (ngModelChange)="onTipoChange()">
+        @for (t of tiposMedida; track t) {
+          <mat-option [value]="t">{{ t }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Subtipo de medida <span class="required">*</span></mat-label>
+      <mat-select [(ngModel)]="data.subtipoMedida" [disabled]="!data.tipoMedida">
+        @for (s of subtiposMedida; track s) {
+          <mat-option [value]="s">{{ s }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Responsable <span class="required">*</span></mat-label>
+      <mat-select [(ngModel)]="data.responsable">
+        @for (r of responsables; track r) {
+          <mat-option [value]="r">{{ r }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Descripción de la medida <span class="required">*</span></mat-label>
+      <input matInput [(ngModel)]="data.descripcion" placeholder="Ingrese una descripción">
+    </mat-form-field>
+
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="modal-actions">
+  <button mat-button (click)="onNoClick()">Cancelar</button>
+  <button mat-flat-button class="btn-confirm"
+    [mat-dialog-close]="data"
+    [disabled]="!data.tipoMedida || !data.subtipoMedida || !data.responsable || !data.descripcion">
+    <mat-icon>check</mat-icon>
+    Guardar
+  </button>
+</mat-dialog-actions>

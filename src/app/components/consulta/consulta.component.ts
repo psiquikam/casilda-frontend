@@ -42,7 +42,7 @@ export class ConsultaComponent implements OnInit {
 
   constructor(private dialog: MatDialog) { }
 
-  displayedColumns: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'dependencia', 'estado', 'profesional', 'acciones'];
+  displayedColumns: string[] = ['expand', 'nombre', 'documento', 'fecha', 'dependencia', 'estado', 'profesional', 'acciones'];
   expandedElement: any | null;
   expandedDetailColumns: string[] = ['expandedDetail'];
 

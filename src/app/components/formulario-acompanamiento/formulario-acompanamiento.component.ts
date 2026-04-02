@@ -96,9 +96,9 @@ export class FormularioAcompanamientoComponent implements OnInit {
       tipoDocumento: [null, Validators.required],
       numeroDocumento: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
       fechaNacimiento: [null, Validators.required],
-      primerNombre: ['', [Validators.required, Validators.minLength(2)]],
+      primerNombre: ['', Validators.required],
       segundoNombre: [''],
-      primerApellido: ['', [Validators.required, Validators.minLength(2)]],
+      primerApellido: ['', Validators.required],
       segundoApellido: [''],
       identidadGenero: [null, Validators.required]
     });
@@ -296,7 +296,6 @@ export class FormularioAcompanamientoComponent implements OnInit {
           data: {
             titulo: '¡Solicitud Creada!',
             mensaje: 'Tu requerimiento ha sido registrado en el sistema.',
-            codigo: response.codigo
           }
         });
         this.acompanamientoForm.reset();

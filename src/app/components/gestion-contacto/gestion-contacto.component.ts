@@ -84,7 +84,7 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
   cargando = false;
 
 
-  displayedColumns: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'dependencia', 'profesional', 'acciones'];
+  displayedColumns: string[] = ['expand', 'nombre', 'documento', 'fecha', 'dependencia', 'profesional', 'acciones'];
   expandedElement: any | null;
   numIntentosMap: Record<number, number> = {};
   maxLlamadas = 2;
