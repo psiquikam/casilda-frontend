@@ -17,6 +17,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { SolicitudService, ContactoTelefonicoDto } from '../../services/solicitud.service';
 import { forkJoin, Observable } from 'rxjs';
 
+enum EstadoSolicitudEnum {
+  ASIGNADA = 2
+}
+
 
 export function getSpanishPaginatorIntl() {
   const paginatorIntl = new MatPaginatorIntl();
@@ -70,10 +74,7 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
   private dialog = inject(MatDialog);
   private solicitudService = inject(SolicitudService);
 
-  dataSourceActivos = new MatTableDataSource<any>([]);
-  dataSourceTransicion = new MatTableDataSource<any>([]);
-  dataSourceCerrados = new MatTableDataSource<any>([]);
-  dataSourceSinRepartir = new MatTableDataSource<any>([]);
+  dataSourceAsignados = new MatTableDataSource<any>([]);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -84,7 +85,6 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
 
 
   displayedColumns: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'dependencia', 'profesional', 'acciones'];
-  dataSource = new MatTableDataSource<any>([]);
   expandedElement: any | null;
   numIntentosMap: Record<number, number> = {};
   maxLlamadas = 2;
@@ -99,7 +99,7 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.cargarSolicitudes();
-    this.dataSource.filterPredicate = this.createFilter();
+    this.dataSourceAsignados.filterPredicate = this.createFilter();
 
     this.contactoForm = this.fb.group({
       fecha: [new Date().toISOString().substring(0, 10), Validators.required],
@@ -111,7 +111,7 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
+    this.dataSourceAsignados.paginator = this.paginator;
   }
 
   cargarSolicitudes(): void {
@@ -121,6 +121,7 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
         const mapped = solicitudes.map(s => ({
           id: s.id,
           solicitudId: s.id,
+          estadoId: Number((s as any).idEstadoSolicitud ?? (s as any).estadoId ?? (s as any).idestado ?? 0),
           codigo: s.codigo,
           profesional: s.profesional,
           tipoDocumento: s.tipoDocumento,
@@ -134,13 +135,14 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
           celular: s.celular || '',
           correoInst: s.correoInstitucional || ''
         }));
-        this.dataSource.data = mapped;
+
+        const asignadas = mapped.filter(s => s.estadoId === EstadoSolicitudEnum.ASIGNADA);
+        this.dataSourceAsignados.data = asignadas;
         this.cargando = false;
 
-        const asignados = mapped.filter(e => e.profesional && e.profesional !== 'Sin asignar');
-        if (asignados.length === 0) return;
+        if (asignadas.length === 0) return;
         const calls: Record<string, Observable<ContactoTelefonicoDto[]>> = {};
-        asignados.forEach(e => { calls[String(e.id)] = this.solicitudService.listarContactos(e.id); });
+        asignadas.forEach(e => { calls[String(e.id)] = this.solicitudService.listarContactos(e.id); });
         forkJoin(calls).subscribe({
           next: (results) => {
             Object.keys(results).forEach(idStr => {
@@ -157,43 +159,13 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
     });
   }
 
-  inicializarTablas() {
-    this.dataSourceSinRepartir.data = this.solicitudes.filter(c =>
-      !c.profesional || c.profesional === 'Sin asignar'
-    );
-
-    this.dataSourceActivos.data = this.solicitudes.filter(c =>
-      c.profesional && c.profesional !== 'Sin asignar' &&
-      c.estado !== 'Cerrado' && c.estado !== 'Abierto en transición'
-    );
-
-    this.dataSourceTransicion.data = this.solicitudes.filter(c =>
-      c.estado === 'Abierto en transición'
-    );
-
-    this.dataSourceCerrados.data = this.solicitudes.filter(c =>
-      c.estado === 'Cerrado'
-    );
-
-    const filterPredicate = this.createFilter();
-    [this.dataSourceSinRepartir, this.dataSourceActivos, this.dataSourceTransicion, this.dataSourceCerrados]
-      .forEach(ds => ds.filterPredicate = filterPredicate);
-  }
-
   applyFilter(column: string, event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.filterValues[column] = filterValue.trim().toLowerCase();
     const filterString = JSON.stringify(this.filterValues);
 
-    [
-      this.dataSourceSinRepartir,
-      this.dataSourceActivos,
-      this.dataSourceTransicion,
-      this.dataSourceCerrados
-    ].forEach(ds => {
-      ds.filter = filterString;
-      if (ds.paginator) ds.paginator.firstPage();
-    });
+    this.dataSourceAsignados.filter = filterString;
+    if (this.dataSourceAsignados.paginator) this.dataSourceAsignados.paginator.firstPage();
   }
 
   createFilter(): (data: any, filter: string) => boolean {

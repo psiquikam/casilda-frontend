@@ -133,7 +133,13 @@ export class ModalGestionComponent implements OnInit {
     if (!this.data?.id) return;
     this.cargandoHistorial = true;
     this.solicitudService.listarContactos(this.data.id).subscribe({
-      next: (contactos) => { this.historialContactos = contactos; this.cargandoHistorial = false; },
+      next: (contactos) => {
+        this.historialContactos = contactos.map((c) => {
+          const { fecha, hora } = this.separarFechaHora(c.fecha);
+          return { ...c, fecha, hora };
+        });
+        this.cargandoHistorial = false;
+      },
       error: () => { this.cargandoHistorial = false; }
     });
   }
@@ -164,8 +170,7 @@ export class ModalGestionComponent implements OnInit {
     this.guardando = true;
 
     this.solicitudService.registrarContacto(this.data.id, {
-      fecha: val.fecha,
-      hora: val.hora,
+      fecha: this.combinarFechaHoraParaBackend(val.fecha, val.hora),
       resultado: val.resultado,
       observacion: val.observacion,
       fechaCita: val.fechaCita ? this.formatFecha(val.fechaCita) : undefined,
@@ -198,6 +203,36 @@ export class ModalGestionComponent implements OnInit {
     const h = now.getHours().toString().padStart(2, '0');
     const m = now.getMinutes().toString().padStart(2, '0');
     return `${h}:${m}`;
+  }
+
+  private combinarFechaHoraParaBackend(fecha: string, hora: string): string {
+    if (!fecha) return '';
+    const horaNormalizada = hora && hora.trim() ? hora.trim() : '00:00';
+    return `${fecha}T${horaNormalizada}:00`;
+  }
+
+  private separarFechaHora(fechaRaw: string): { fecha: string; hora: string } {
+    if (!fechaRaw) {
+      return { fecha: '', hora: '' };
+    }
+
+    const iso = fechaRaw.replace(' ', 'T');
+    const parsed = new Date(iso);
+    if (!Number.isNaN(parsed.getTime())) {
+      const year = parsed.getFullYear();
+      const month = (parsed.getMonth() + 1).toString().padStart(2, '0');
+      const day = parsed.getDate().toString().padStart(2, '0');
+      const fecha = `${year}-${month}-${day}`;
+      const hora = `${parsed.getHours().toString().padStart(2, '0')}:${parsed.getMinutes().toString().padStart(2, '0')}`;
+      return { fecha, hora };
+    }
+
+    if (fechaRaw.includes('T')) {
+      const [f, t] = fechaRaw.split('T');
+      return { fecha: f ?? '', hora: (t ?? '').substring(0, 5) };
+    }
+
+    return { fecha: fechaRaw.substring(0, 10), hora: '' };
   }
 
   private calcularJornada(hora: string): string {

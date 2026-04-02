@@ -33,7 +33,7 @@
 
     <mat-form-field appearance="outline" class="flex-field">
       <mat-label>Actividad *</mat-label>
-      <mat-select [(ngModel)]="data.idactividad" (ngModelChange)="seleccionarActividad($event)">
+      <mat-select [(ngModel)]="data.idactividad" (ngModelChange)="seleccionarActividad($event)" [disabled]="data.idaccion == null">
         <mat-option *ngFor="let opcion of actividades" [value]="opcion.id">{{opcion.nombre}}</mat-option>
       </mat-select>
     </mat-form-field>

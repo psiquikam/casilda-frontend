@@ -86,6 +86,19 @@ export class ModalSeguimientosComponent implements OnInit {
     const item = this.acciones.find((x) => x.id === id);
     this.data.idaccion = id;
     this.data.accion = item?.nombre ?? '';
+
+    this.data.idactividad = null;
+    this.data.actividad = '';
+    this.actividades = [];
+
+    if (id == null) {
+      return;
+    }
+
+    this.http.get<MaestroDto[]>(`${this.maestrosUrl}/actividades/por-accion/${id}`).subscribe({
+      next: (data) => { this.actividades = data; },
+      error: () => { this.actividades = []; }
+    });
   }
 
   seleccionarActividad(id: number | null): void {
@@ -143,11 +156,6 @@ export class ModalSeguimientosComponent implements OnInit {
     this.http.get<MaestroDto[]>(`${this.maestrosUrl}/acciones`).subscribe({
       next: (data) => { this.acciones = data; },
       error: () => { this.acciones = []; }
-    });
-
-    this.http.get<MaestroDto[]>(`${this.maestrosUrl}/actividades`).subscribe({
-      next: (data) => { this.actividades = data; },
-      error: () => { this.actividades = []; }
     });
 
     this.http.get<MaestroDto[]>(`${this.maestrosUrl}/estados-seguimiento`).subscribe({

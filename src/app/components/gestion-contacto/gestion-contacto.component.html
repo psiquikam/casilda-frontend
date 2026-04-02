@@ -11,7 +11,7 @@
 
   <mat-card class="table-card">
     <div class="table-responsive">
-      <table mat-table [dataSource]="dataSource" multiTemplateDataRows>
+      <table mat-table [dataSource]="dataSourceAsignados" multiTemplateDataRows>
 
         <ng-container matColumnDef="expand">
           <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
@@ -136,7 +136,7 @@
         <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
       </table>
 
-      <div *ngIf="dataSource.data.length === 0" class="no-results-msg">
+      <div *ngIf="dataSourceAsignados.data.length === 0" class="no-results-msg">
         <mat-icon>info_outline</mat-icon>
         <p>No se encontraron registros para gestionar.</p>
       </div>
