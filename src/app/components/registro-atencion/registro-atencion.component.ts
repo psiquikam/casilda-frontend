@@ -39,6 +39,7 @@ import { TablaOtrosCasosComponent } from '../tabla-otros-casos/tabla-otros-casos
 import { ModalCompromisosPersonaComponent } from '../modal-compromisos-persona/modal-compromisos-persona.component';
 import { ModalCompromisosProfesionalesComponent } from '../modal-compromisos-profesionales/modal-compromisos-profesionales.component';
 import { ModalSeguimientosComponent } from '../modal-seguimiento/modal-seguimiento.component';
+import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
 import { AuthService } from '../../services/auth.service';
 import { AtencionContextoRequestDto, CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, HechoRequestDto, RegistroAtencionCompleteRequestDto, SeguimientoAtencionRequestDto, SolicitudService } from '../../services/solicitud.service';
 import { MaestroDto } from '../../services/listas.service';
@@ -1018,11 +1019,19 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     this.construirRegistroAtencionRequest()
       .then((dataFinal) => {
         this.solicitudService.registrarAtencionCompleta(dataFinal).subscribe({
-          next: () => {
+          next: (atencion) => {
             this.guardandoCompromisos = false;
             this.tabErrors = new Set<string>();
-            this.snackBar.open('Registro guardado exitosamente', 'OK', { duration: 3000 });
             this.atencionForm.reset();
+
+            this.dialog.open(DialogoExitoComponent, {
+              width: '420px',
+              data: {
+                titulo: 'Atención registrada',
+                mensaje: 'La atención fue registrada exitosamente.',
+                codigo: String(atencion?.id ?? '')
+              }
+            });
           },
           error: (error) => {
             this.guardandoCompromisos = false;

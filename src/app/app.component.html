@@ -32,3 +32,9 @@
     </div>
   }
 }
+
+@if (loadingService.loading$ | async) {
+  <div class="global-loading-overlay" aria-live="polite" aria-busy="true">
+    <mat-spinner diameter="54"></mat-spinner>
+  </div>
+}

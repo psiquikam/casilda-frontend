@@ -7,9 +7,10 @@ import { SidebarComponent } from './components/layout/sidebar/sidebar.component'
 import { MatIconRegistry, MatIconModule } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AuthService } from './services/auth.service';
-import { CasildaHomeComponent } from './components/casilda-home/casilda-home.component';
 import { PublicHeaderComponent } from './components/public-header/public-header.component';
 import { PublicFooterComponent } from './components/public-footer/public-footer.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { LoadingService } from './services/loading.service';
 
 @Component({
   selector: 'app-root',
@@ -21,15 +22,16 @@ import { PublicFooterComponent } from './components/public-footer/public-footer.
     MatIconModule,
     HeaderComponent,
     SidebarComponent,
-    CasildaHomeComponent,
     PublicHeaderComponent,
-    PublicFooterComponent
+    PublicFooterComponent,
+    MatProgressSpinnerModule
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
   private router = inject(Router);
+  readonly loadingService = inject(LoadingService);
 
   constructor(
     private matIconRegistry: MatIconRegistry,
