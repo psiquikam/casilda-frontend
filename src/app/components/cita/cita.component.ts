@@ -7,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { MatPaginator, MatPaginatorModule, MatPaginatorIntl } from '@angular/material/paginator';
+import { MatPaginatorModule, MatPaginatorIntl, PageEvent } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -61,11 +61,12 @@ export class CitaComponent implements OnInit, AfterViewInit {
   private dialog = inject(MatDialog);
   private solicitudService = inject(SolicitudService);
 
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-
   displayedColumns: string[] = ['expand', 'id', 'nombre', 'documento', 'dependencia', 'tipoSolicitud', 'estadoCita', 'acciones'];
   dataSource = new MatTableDataSource<CitaDto>([]);
   expandedElement: CitaDto | null = null;
+  totalElementos = 0;
+  pageIndex = 0;
+  pageSize = 10;
 
   cargando = false;
 
@@ -80,22 +81,29 @@ export class CitaComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.dataSource.filterPredicate = this.createFilter();
-    this.cargarCitas();
+    this.cargarCitas(0, this.pageSize);
   }
 
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-  }
+  ngAfterViewInit() {}
 
-  cargarCitas(): void {
+  cargarCitas(page: number, size: number): void {
     this.cargando = true;
-    this.solicitudService.listarCitas().subscribe({
-      next: (citas) => {
-        this.dataSource.data = citas;
+    this.solicitudService.listarCitasPaginadas(page, size).subscribe({
+      next: (respuesta) => {
+        this.dataSource.data = respuesta.content;
+        this.totalElementos = respuesta.totalElements;
+        this.pageIndex = respuesta.number;
+        this.pageSize = respuesta.size;
         this.cargando = false;
       },
       error: () => { this.cargando = false; }
     });
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.cargarCitas(this.pageIndex, this.pageSize);
   }
 
   applyFilter(column: string, event: Event) {
@@ -140,7 +148,7 @@ export class CitaComponent implements OnInit, AfterViewInit {
           idMotivoEstadoCita: f.idMotivoEstadoCita,
           observaciones: f.observaciones
         }).subscribe({
-          next: () => this.cargarCitas(),
+          next: () => this.cargarCitas(this.pageIndex, this.pageSize),
           error: (err) => console.error('Error al cancelar cita:', err)
         });
       } else {
@@ -151,7 +159,7 @@ export class CitaComponent implements OnInit, AfterViewInit {
           idMotivoEstadoCita: f.idMotivoEstadoCita,
           observaciones: f.observaciones
         }).subscribe({
-          next: () => this.cargarCitas(),
+          next: () => this.cargarCitas(this.pageIndex, this.pageSize),
           error: (err) => console.error('Error al reprogramar cita:', err)
         });
       }

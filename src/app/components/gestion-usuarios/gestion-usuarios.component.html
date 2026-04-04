@@ -63,7 +63,11 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
 
-    <mat-paginator [pageSizeOptions]="[5, 10, 20]"
+    <mat-paginator [length]="totalElementos"
+                   [pageIndex]="pageIndex"
+                   [pageSize]="pageSize"
+                   [pageSizeOptions]="[5, 10, 20]"
+                   (page)="onPageChange($event)"
                    showFirstLastButtons
                    aria-label="Seleccionar página de usuarios">
     </mat-paginator>

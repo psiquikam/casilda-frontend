@@ -7,7 +7,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { DialogUsuarioComponent } from '../dialog-usuario/dialog-usuario.component';
 import { UsuarioService } from '../../services/usuario.service';
 import Swal from 'sweetalert2';
@@ -35,19 +35,22 @@ export interface Usuario {
 export class GestionUsuariosComponent implements OnInit {
   displayedColumns: string[] = ['nombre', 'email', 'rol', 'estado', 'acciones'];
   dataSource = new MatTableDataSource<Usuario>([]);
+  totalElementos = 0;
+  pageIndex = 0;
+  pageSize = 10;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(private dialog: MatDialog, private usuarioService: UsuarioService) {}
 
   ngOnInit(): void {
-    this.cargarUsuarios();
+    this.cargarUsuarios(0, this.pageSize);
   }
 
-  private cargarUsuarios(): void {
-    this.usuarioService.obtenerTodos().subscribe({
-      next: (data) => {
-        const usuariosTransformados = data.map(u => ({
+  private cargarUsuarios(page: number, size: number): void {
+    this.usuarioService.obtenerPaginados(page, size).subscribe({
+      next: (respuesta) => {
+        const usuariosTransformados = respuesta.content.map(u => ({
           id: Number(u.id),
           nombre: u.nombre,
           email: u.email,
@@ -56,10 +59,18 @@ export class GestionUsuariosComponent implements OnInit {
           idRol: u.idRol
         }));
         this.dataSource.data = usuariosTransformados;
-        this.dataSource.paginator = this.paginator;
+        this.totalElementos = respuesta.totalElements;
+        this.pageIndex = respuesta.number;
+        this.pageSize = respuesta.size;
       },
       error: (err) => console.error('Error cargando usuarios', err)
     });
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.cargarUsuarios(this.pageIndex, this.pageSize);
   }
 
   abrirFormulario(usuario?: Usuario) {
@@ -80,12 +91,12 @@ export class GestionUsuariosComponent implements OnInit {
 
       if (usuario) {
         this.usuarioService.actualizar(usuario.id, request).subscribe({
-          next: () => this.cargarUsuarios(),
+          next: () => this.cargarUsuarios(this.pageIndex, this.pageSize),
           error: (err) => console.error('Error actualizando usuario', err)
         });
       } else {
         this.usuarioService.crear(request).subscribe({
-          next: () => this.cargarUsuarios(),
+          next: () => this.cargarUsuarios(this.pageIndex, this.pageSize),
           error: (err) => console.error('Error creando usuario', err)
         });
       }
@@ -104,7 +115,7 @@ export class GestionUsuariosComponent implements OnInit {
     }).then(result => {
       if (result.isConfirmed) {
         this.usuarioService.eliminar(id).subscribe({
-          next: () => this.cargarUsuarios(),
+          next: () => this.cargarUsuarios(this.pageIndex, this.pageSize),
           error: (err) => console.error('Error eliminando usuario', err)
         });
       }
@@ -114,7 +125,7 @@ export class GestionUsuariosComponent implements OnInit {
   toggleEstado(usuario: Usuario) {
     const nuevoActivo = usuario.estado !== 'Activo';
     this.usuarioService.cambiarEstado(usuario.id, nuevoActivo).subscribe({
-      next: () => this.cargarUsuarios(),
+      next: () => this.cargarUsuarios(this.pageIndex, this.pageSize),
       error: (err) => console.error('Error cambiando estado', err)
     });
   }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
@@ -20,6 +20,14 @@ export interface UsuarioUpsertDto {
   activo: boolean;
 }
 
+export interface PagedResponseDto<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
   private readonly apiUrl = `${environment.apiBaseUrl}/usuarios`;
@@ -28,6 +36,13 @@ export class UsuarioService {
 
   obtenerTodos(): Observable<UsuarioDto[]> {
     return this.http.get<UsuarioDto[]>(this.apiUrl);
+  }
+
+  obtenerPaginados(page: number, size: number): Observable<PagedResponseDto<UsuarioDto>> {
+    const params = new HttpParams()
+      .set('page', String(page))
+      .set('size', String(size));
+    return this.http.get<PagedResponseDto<UsuarioDto>>(`${this.apiUrl}/paginado`, { params });
   }
 
   crear(request: UsuarioUpsertDto): Observable<UsuarioDto> {

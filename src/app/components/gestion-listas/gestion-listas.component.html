@@ -7,10 +7,9 @@
     </header>
 
     <mat-card class="table-card">
-        <mat-tab-group color="primary" mat-stretch-tabs="false">
+        <mat-tab-group color="primary" mat-stretch-tabs="false" (selectedIndexChange)="onTabChange($event)">
 
-            @for (listKey of ['tiposSolicitud', 'campus', 'dependencias', 'facultades', 'tiposDocumento']; track
-            listKey) {
+            @for (listKey of listKeys; track listKey) {
             <mat-tab>
                 <ng-template mat-tab-label>
                     <mat-icon class="tab-icon">settings_input_component</mat-icon>
@@ -94,6 +93,14 @@
                                 }
                             </tbody>
                         </table>
+
+                        <mat-paginator [length]="paginacion[listKey].totalElements"
+                                       [pageIndex]="paginacion[listKey].pageIndex"
+                                       [pageSize]="paginacion[listKey].pageSize"
+                                       [pageSizeOptions]="[5, 10, 20]"
+                                       (page)="onPageChange(listKey, $event)"
+                                       showFirstLastButtons>
+                        </mat-paginator>
                     </div>
                 </div>
             </mat-tab>

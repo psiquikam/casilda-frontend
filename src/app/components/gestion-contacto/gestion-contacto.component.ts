@@ -10,7 +10,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
-import { MatPaginator, MatPaginatorModule, MatPaginatorIntl } from '@angular/material/paginator';
+import { MatPaginatorModule, MatPaginatorIntl, PageEvent } from '@angular/material/paginator';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ModalGestionComponent } from '../modal-gestion-contacto/modal-gestion-contacto.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -75,8 +75,9 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
   private solicitudService = inject(SolicitudService);
 
   dataSourceAsignados = new MatTableDataSource<any>([]);
-
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  totalElementos = 0;
+  pageIndex = 0;
+  pageSize = 10;
 
   idCaso: string = 'Seleccione un caso';
   contactoForm!: FormGroup;
@@ -98,7 +99,7 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
   };
 
   ngOnInit(): void {
-    this.cargarSolicitudes();
+    this.cargarSolicitudes(0, this.pageSize);
     this.dataSourceAsignados.filterPredicate = this.createFilter();
 
     this.contactoForm = this.fb.group({
@@ -110,15 +111,13 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
     });
   }
 
-  ngAfterViewInit() {
-    this.dataSourceAsignados.paginator = this.paginator;
-  }
+  ngAfterViewInit() {}
 
-  cargarSolicitudes(): void {
+  cargarSolicitudes(page: number, size: number): void {
     this.cargando = true;
-    this.solicitudService.listarTodas().subscribe({
-      next: (solicitudes) => {
-        const mapped = solicitudes.map(s => ({
+    this.solicitudService.listarPaginadas(page, size, EstadoSolicitudEnum.ASIGNADA).subscribe({
+      next: (respuesta) => {
+        const mapped = respuesta.content.map(s => ({
           id: s.id,
           solicitudId: s.id,
           estadoId: Number((s as any).idEstadoSolicitud ?? (s as any).estadoId ?? (s as any).idestado ?? 0),
@@ -136,13 +135,15 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
           correoInst: s.correoInstitucional || ''
         }));
 
-        const asignadas = mapped.filter(s => s.estadoId === EstadoSolicitudEnum.ASIGNADA);
-        this.dataSourceAsignados.data = asignadas;
+        this.dataSourceAsignados.data = mapped;
+        this.totalElementos = respuesta.totalElements;
+        this.pageIndex = respuesta.number;
+        this.pageSize = respuesta.size;
         this.cargando = false;
 
-        if (asignadas.length === 0) return;
+        if (mapped.length === 0) return;
         const calls: Record<string, Observable<ContactoTelefonicoDto[]>> = {};
-        asignadas.forEach(e => { calls[String(e.id)] = this.solicitudService.listarContactos(e.id); });
+        mapped.forEach(e => { calls[String(e.id)] = this.solicitudService.listarContactos(e.id); });
         forkJoin(calls).subscribe({
           next: (results) => {
             Object.keys(results).forEach(idStr => {
@@ -165,7 +166,12 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
     const filterString = JSON.stringify(this.filterValues);
 
     this.dataSourceAsignados.filter = filterString;
-    if (this.dataSourceAsignados.paginator) this.dataSourceAsignados.paginator.firstPage();
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.cargarSolicitudes(this.pageIndex, this.pageSize);
   }
 
   createFilter(): (data: any, filter: string) => boolean {
@@ -202,7 +208,7 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.cargarSolicitudes();
+        this.cargarSolicitudes(this.pageIndex, this.pageSize);
       }
     });
   }

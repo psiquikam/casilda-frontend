@@ -123,7 +123,12 @@
                 <p>No hay citas.</p>
             </div>
 
-            <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+            <mat-paginator [length]="serverSidePagination ? totalElements : dataSource.data.length"
+                           [pageIndex]="serverSidePagination ? pageIndex : 0"
+                           [pageSize]="serverSidePagination ? pageSize : 5"
+                           [pageSizeOptions]="[5, 10, 20]"
+                           (page)="onPageChange($event)"
+                           showFirstLastButtons></mat-paginator>
         </div>
     </mat-card>
 </div>

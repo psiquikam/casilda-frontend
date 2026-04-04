@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { MatPaginator, MatPaginatorModule, MatPaginatorIntl } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorModule, MatPaginatorIntl, PageEvent } from '@angular/material/paginator';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -55,17 +55,28 @@ export class TablaCasosComponent implements AfterViewInit {
   @Input() dataSource!: MatTableDataSource<any>;
   @Input() displayedColumns!: string[];
   @Input() expandedElement!: any;
+  @Input() serverSidePagination = false;
+  @Input() totalElements = 0;
+  @Input() pageIndex = 0;
+  @Input() pageSize = 10;
 
   @Output() iniciar = new EventEmitter<any>();
   @Output() reprogramar = new EventEmitter<any>();
   @Output() cancelar = new EventEmitter<any>();
   @Output() expand = new EventEmitter<any>();
   @Output() filter = new EventEmitter<{ column: string, event: Event }>();
+  @Output() pageChange = new EventEmitter<PageEvent>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
+    if (!this.serverSidePagination) {
+      this.dataSource.paginator = this.paginator;
+    }
+  }
+
+  onPageChange(event: PageEvent) {
+    this.pageChange.emit(event);
   }
 
   iniciarAtencion(element: any) {

@@ -122,6 +122,14 @@ export interface TelefonoBusquedaDto {
   descripcion?: string | null;
 }
 
+export interface PagedResponseDto<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+}
+
 export interface UpdateSolicitudDto {
   primerNombre?: string;
   segundoNombre?: string | null;
@@ -359,8 +367,22 @@ export class SolicitudService {
     return this.http.get<SolicitudAcompanamientoResponse>(`${this.apiUrl}/acompanamiento/${id}`);
   }
 
-  listarTodas(): Observable<SolicitudAcompanamientoResponse[]> {
-    return this.http.get<SolicitudAcompanamientoResponse[]>(`${this.apiUrl}/acompanamiento`);
+  listarTodas(idEstadoSolicitud?: number): Observable<SolicitudAcompanamientoResponse[]> {
+    let params = new HttpParams();
+    if (idEstadoSolicitud != null) {
+      params = params.set('idEstadoSolicitud', String(idEstadoSolicitud));
+    }
+    return this.http.get<SolicitudAcompanamientoResponse[]>(`${this.apiUrl}/acompanamiento`, { params });
+  }
+
+  listarPaginadas(page: number, size: number, idEstadoSolicitud?: number): Observable<PagedResponseDto<SolicitudAcompanamientoResponse>> {
+    let params = new HttpParams()
+      .set('page', String(page))
+      .set('size', String(size));
+    if (idEstadoSolicitud != null) {
+      params = params.set('idEstadoSolicitud', String(idEstadoSolicitud));
+    }
+    return this.http.get<PagedResponseDto<SolicitudAcompanamientoResponse>>(`${this.apiUrl}/acompanamiento/paginado`, { params });
   }
 
   eliminar(id: number): Observable<void> {
@@ -389,6 +411,21 @@ export class SolicitudService {
 
   listarCitas(): Observable<CitaDto[]> {
     return this.http.get<CitaDto[]>(this.citasUrl);
+  }
+
+  listarCitasPaginadas(page: number, size: number, idEstadoCita?: number, excluirEstadoCitaId?: number): Observable<PagedResponseDto<CitaDto>> {
+    let params = new HttpParams()
+      .set('page', String(page))
+      .set('size', String(size));
+
+    if (idEstadoCita != null) {
+      params = params.set('idEstadoCita', String(idEstadoCita));
+    }
+    if (excluirEstadoCitaId != null) {
+      params = params.set('excluirEstadoCitaId', String(excluirEstadoCitaId));
+    }
+
+    return this.http.get<PagedResponseDto<CitaDto>>(`${this.citasUrl}/paginado`, { params });
   }
 
   reprogramarCita(id: number, datos: ReprogramarCitaRequestDto): Observable<CitaDto> {

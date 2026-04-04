@@ -16,7 +16,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -92,15 +92,16 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
   dataSource = new MatTableDataSource<any>(this.casoPorAtender);
   dataSourceOtros = new MatTableDataSource<any>(this.casosRelacionados);
+  totalElementosCitas = 0;
+  pageIndexCitas = 0;
+  pageSizeCitas = 10;
   displayedColumnsTablaInicial: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'dependencia', 'profesional', 'acciones'];
   displayedColumnsOtros: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'dependencia', 'profesional',];
   catalogoSeguimiento: string[] = ['Presencial', 'Telefónico', 'Virtual', 'Visita Domiciliaria'];
 
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatSort) sort?: MatSort;
 
-  @ViewChild('paginatorOtros') paginatorOtros!: MatPaginator;
-  @ViewChild('sortOtros') sortOtros!: MatSort;
+  @ViewChild('sortOtros') sortOtros?: MatSort;
 
   tipoSeguimientoControl = new FormControl<string | null>(null);
 
@@ -511,19 +512,24 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
-    this.dataSourceOtros.paginator = this.paginatorOtros;
-    this.dataSourceOtros.sort = this.sortOtros;
+    if (this.sort) {
+      this.dataSource.sort = this.sort;
+    }
+    if (this.sortOtros) {
+      this.dataSourceOtros.sort = this.sortOtros;
+    }
   }
 
   applyFilter(column: string, event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.filterValues[column] = filterValue.trim().toLowerCase();
     this.dataSource.filter = JSON.stringify(this.filterValues);
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
+  }
+
+  onPageChangeCitas(event: PageEvent): void {
+    this.pageIndexCitas = event.pageIndex;
+    this.pageSizeCitas = event.pageSize;
+    this.cargarCitas(this.pageIndexCitas, this.pageSizeCitas);
   }
 
   onCheckboxChange(event: any, valor: number, arrayName: string) {
@@ -555,15 +561,17 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     this.casoSeleccionado = null;
   }
 
-  private cargarCitas(): void {
-    this.solicitudService.listarCitas().subscribe({
-      next: (citas) => {
-        const citasActivas = citas.filter((cita) => cita.idEstadoCita !== EstadoCitaEnum.CANCELADA);
-        const filas = citasActivas.map((cita) => this.mapearCitaATabla(cita));
+  private cargarCitas(page: number = 0, size: number = this.pageSizeCitas): void {
+    this.solicitudService.listarCitasPaginadas(page, size, undefined, EstadoCitaEnum.CANCELADA).subscribe({
+      next: (respuesta) => {
+        const filas = respuesta.content.map((cita) => this.mapearCitaATabla(cita));
         this.casoPorAtender = filas;
         this.casosRelacionados = filas;
         this.dataSource.data = filas;
         this.dataSourceOtros.data = filas;
+        this.totalElementosCitas = respuesta.totalElements;
+        this.pageIndexCitas = respuesta.number;
+        this.pageSizeCitas = respuesta.size;
       },
       error: (error) => {
         console.error('Error al cargar citas:', error);
@@ -571,6 +579,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         this.casosRelacionados = [];
         this.dataSource.data = [];
         this.dataSourceOtros.data = [];
+        this.totalElementosCitas = 0;
       }
     });
   }

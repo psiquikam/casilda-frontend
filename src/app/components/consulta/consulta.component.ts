@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -9,13 +9,30 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorIntl, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { ModalDetalleSolicitudComponent } from '../modal-detalle-solicitud/modal-detalle-solicitud.component';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { RepartoModalComponent } from '../modal-reparto/modal-reparto.component';
 import { Router } from '@angular/router';
 import { SolicitudService } from '../../services/solicitud.service';
+
+export function getSpanishPaginatorIntl() {
+  const paginatorIntl = new MatPaginatorIntl();
+  paginatorIntl.itemsPerPageLabel = 'Elementos por página:';
+  paginatorIntl.nextPageLabel = 'Siguiente';
+  paginatorIntl.previousPageLabel = 'Anterior';
+  paginatorIntl.firstPageLabel = 'Primera página';
+  paginatorIntl.lastPageLabel = 'Última página';
+  paginatorIntl.getRangeLabel = (page: number, pageSize: number, length: number) => {
+    if (length === 0 || pageSize === 0) return `0 de ${length}`;
+    length = Math.max(length, 0);
+    const startIndex = page * pageSize;
+    const endIndex = startIndex < length ? Math.min(startIndex + pageSize, length) : startIndex + pageSize;
+    return `${startIndex + 1} – ${endIndex} de ${length}`;
+  };
+  return paginatorIntl;
+}
 
 @Component({
   selector: 'app-consulta',
@@ -24,6 +41,9 @@ import { SolicitudService } from '../../services/solicitud.service';
     CommonModule, FormsModule, MatTabsModule, MatTableModule,
     MatButtonModule, MatIconModule, MatChipsModule, MatCardModule,
     MatInputModule, MatDialogModule, MatPaginatorModule
+  ],
+  providers: [
+    { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
   ],
   templateUrl: './consulta.component.html',
   styleUrls: ['./consulta.component.scss'],
@@ -35,12 +55,14 @@ import { SolicitudService } from '../../services/solicitud.service';
     ]),
   ],
 })
-export class ConsultaComponent implements OnInit {
+export class ConsultaComponent implements OnInit, AfterViewInit {
 
   private solicitudService = inject(SolicitudService);
   private router = inject(Router);
 
   constructor(private dialog: MatDialog) { }
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   displayedColumns: string[] = ['expand', 'nombre', 'documento', 'fecha', 'dependencia', 'estado', 'profesional', 'acciones'];
   expandedElement: any | null;
@@ -51,6 +73,9 @@ export class ConsultaComponent implements OnInit {
   dataSourceTransicion = new MatTableDataSource<any>([]);
   dataSourceCerrados = new MatTableDataSource<any>([]);
   dataSourceSinRepartir = new MatTableDataSource<any>([]);
+  totalElementos = 0;
+  pageIndex = 0;
+  pageSize = 10;
 
   solicitudes: any[] = [];
   cargando = false;
@@ -65,14 +90,21 @@ export class ConsultaComponent implements OnInit {
   };
 
   ngOnInit() {
-    this.cargarDatos();
+    this.cargarDatos(0, this.pageSize);
   }
 
-  cargarDatos() {
+  ngAfterViewInit(): void {
+    // Paginacion server-side: el paginator dispara recargas al backend.
+  }
+
+  cargarDatos(page: number, size: number) {
     this.cargando = true;
-    this.solicitudService.listarTodas().subscribe({
-      next: (respuestas) => {
-        this.solicitudes = respuestas.map(r => this.mapToItem(r));
+    this.solicitudService.listarPaginadas(page, size).subscribe({
+      next: (respuesta) => {
+        this.solicitudes = respuesta.content.map(r => this.mapToItem(r));
+        this.totalElementos = respuesta.totalElements;
+        this.pageIndex = respuesta.number;
+        this.pageSize = respuesta.size;
         this.inicializarTablas();
         this.cargando = false;
       },
@@ -158,8 +190,13 @@ export class ConsultaComponent implements OnInit {
       this.dataSourceCerrados
     ].forEach(ds => {
       ds.filter = filterString;
-      if (ds.paginator) ds.paginator.firstPage();
     });
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.cargarDatos(this.pageIndex, this.pageSize);
   }
 
   createFilter(): (data: any, filter: string) => boolean {
@@ -227,7 +264,7 @@ export class ConsultaComponent implements OnInit {
     dialogRef.afterClosed().subscribe(confirmado => {
       if (confirmado) {
         this.solicitudService.eliminar(element.solicitudId).subscribe({
-          next: () => this.cargarDatos(),
+          next: () => this.cargarDatos(this.pageIndex, this.pageSize),
           error: (err) => console.error('Error al eliminar solicitud:', err)
         });
       }
@@ -250,7 +287,7 @@ export class ConsultaComponent implements OnInit {
           observaciones: result.observaciones,
           fechaReparto: result.fechaReparto
         }).subscribe({
-          next: () => this.cargarDatos(),
+          next: () => this.cargarDatos(this.pageIndex, this.pageSize),
           error: (err) => console.error('Error al asignar solicitud:', err)
         });
       }

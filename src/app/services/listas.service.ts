@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, forkJoin, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
@@ -8,6 +9,14 @@ export interface MaestroDto {
   id: number;
   codigo?: string | null;
   nombre: string;
+}
+
+export interface PagedResponseDto<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
 }
 
 type ListaKey = 'tiposSolicitud' | 'campus' | 'dependencias' | 'facultades' | 'tiposDocumento' | 'identidadesGenero' | 'cargos';
@@ -69,15 +78,47 @@ export class ListasService {
     );
   }
 
+  obtenerListaPaginada(lista: string, page: number, size: number): Observable<PagedResponseDto<MaestroDto>> {
+    const listaKey = lista as ListaKey;
+    const endpoint = this.endpointByList[listaKey];
+    const params = new HttpParams()
+      .set('page', String(page))
+      .set('size', String(size));
+    return this.http.get<PagedResponseDto<MaestroDto>>(`${this.apiBaseUrl}/catalogos/${endpoint}/paginado`, { params });
+  }
+
+  agregarItem$(lista: string, nombre: string, codigo?: string): Observable<MaestroDto> {
+    const listaKey = lista as ListaKey;
+    const endpoint = this.endpointByList[listaKey];
+    const body: any = { nombre: nombre.trim() };
+    if (codigo?.trim()) {
+      body['codigo'] = codigo.trim();
+    }
+    return this.http.post<MaestroDto>(`${this.apiBaseUrl}/${endpoint}`, body);
+  }
+
+  eliminarItem$(lista: string, id: number): Observable<void> {
+    const listaKey = lista as ListaKey;
+    const endpoint = this.endpointByList[listaKey];
+    return this.http.delete<void>(`${this.apiBaseUrl}/${endpoint}/${id}`);
+  }
+
+  editarItem$(lista: string, id: number, nombre: string, codigo?: string): Observable<MaestroDto> {
+    const listaKey = lista as ListaKey;
+    const endpoint = this.endpointByList[listaKey];
+    const body: any = { nombre: nombre.trim() };
+    if (codigo !== undefined) {
+      body['codigo'] = codigo?.trim() || null;
+    }
+    return this.http.put<MaestroDto>(`${this.apiBaseUrl}/${endpoint}/${id}`, body);
+  }
+
   agregarItem(lista: string, nombre: string, codigo?: string) {
     const listaKey = lista as ListaKey;
     const endpoint = this.endpointByList[listaKey];
     if (!endpoint || !nombre.trim()) return;
 
-    const body: any = { nombre: nombre.trim() };
-    if (codigo?.trim()) body['codigo'] = codigo.trim();
-
-    this.http.post<MaestroDto>(`${this.apiBaseUrl}/${endpoint}`, body)
+    this.agregarItem$(lista, nombre, codigo)
       .subscribe({
         next: () => this.cargarListas(),
         error: (error) => console.error(`Error agregando item en ${listaKey}:`, error)
@@ -89,7 +130,7 @@ export class ListasService {
     const endpoint = this.endpointByList[listaKey];
     if (!endpoint || !id) return;
 
-    this.http.delete<void>(`${this.apiBaseUrl}/${endpoint}/${id}`)
+    this.eliminarItem$(lista, id)
       .subscribe({
         next: () => this.cargarListas(),
         error: (error) => console.error(`Error eliminando item en ${listaKey}:`, error)
@@ -101,10 +142,7 @@ export class ListasService {
     const endpoint = this.endpointByList[listaKey];
     if (!endpoint || !id || !nombre.trim()) return;
 
-    const body: any = { nombre: nombre.trim() };
-    if (codigo !== undefined) body['codigo'] = codigo?.trim() || null;
-
-    this.http.put<MaestroDto>(`${this.apiBaseUrl}/${endpoint}/${id}`, body)
+    this.editarItem$(lista, id, nombre, codigo)
       .subscribe({
         next: () => this.cargarListas(),
         error: (error) => console.error(`Error editando item en ${listaKey}:`, error)

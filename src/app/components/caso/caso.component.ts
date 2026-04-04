@@ -9,7 +9,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { ModalDetalleSolicitudComponent } from '../modal-detalle-solicitud/modal-detalle-solicitud.component';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
@@ -50,6 +50,9 @@ export class CasoComponent implements OnInit {
   dataSourceTransicion = new MatTableDataSource<any>([]);
   dataSourceCerrados = new MatTableDataSource<any>([]);
   dataSourceSinRepartir = new MatTableDataSource<any>([]);
+  totalElementos = 0;
+  pageIndex = 0;
+  pageSize = 10;
 
   solicitudes: any[] = [];
   cargando = false;
@@ -64,14 +67,17 @@ export class CasoComponent implements OnInit {
   };
 
   ngOnInit() {
-    this.cargarDatos();
+    this.cargarDatos(0, this.pageSize);
   }
 
-  cargarDatos() {
+  cargarDatos(page: number, size: number) {
     this.cargando = true;
-    this.solicitudService.listarTodas().subscribe({
-      next: (respuestas) => {
-        this.solicitudes = respuestas.map(r => this.mapToItem(r));
+    this.solicitudService.listarPaginadas(page, size).subscribe({
+      next: (respuesta) => {
+        this.solicitudes = respuesta.content.map(r => this.mapToItem(r));
+        this.totalElementos = respuesta.totalElements;
+        this.pageIndex = respuesta.number;
+        this.pageSize = respuesta.size;
         this.inicializarTablas();
         this.cargando = false;
       },
@@ -152,8 +158,13 @@ export class CasoComponent implements OnInit {
       this.dataSourceCerrados
     ].forEach(ds => {
       ds.filter = filterString;
-      if (ds.paginator) ds.paginator.firstPage();
     });
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.cargarDatos(this.pageIndex, this.pageSize);
   }
 
   createFilter(): (data: any, filter: string) => boolean {
@@ -221,7 +232,7 @@ export class CasoComponent implements OnInit {
     dialogRef.afterClosed().subscribe(confirmado => {
       if (confirmado) {
         this.solicitudService.eliminar(element.solicitudId).subscribe({
-          next: () => this.cargarDatos(),
+          next: () => this.cargarDatos(this.pageIndex, this.pageSize),
           error: (err) => console.error('Error al eliminar caso:', err)
         });
       }
@@ -244,7 +255,7 @@ export class CasoComponent implements OnInit {
           observaciones: result.observaciones,
           fechaReparto: result.fechaReparto
         }).subscribe({
-          next: () => this.cargarDatos(),
+          next: () => this.cargarDatos(this.pageIndex, this.pageSize),
           error: (err) => console.error('Error al asignar caso:', err)
         });
       }
