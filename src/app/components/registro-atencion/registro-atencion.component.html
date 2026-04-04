@@ -527,7 +527,7 @@
 
                                             <ng-container matColumnDef="fecha">
                                                 <th mat-header-cell *matHeaderCellDef> Fecha </th>
-                                                <td mat-cell *matCellDef="let element"> {{element.fecha}} </td>
+                                                <td mat-cell *matCellDef="let element"> {{element.fecha | date:'dd/MM/yyyy'}} </td>
                                             </ng-container>
 
                                             <ng-container matColumnDef="lugar">
@@ -1000,7 +1000,7 @@
 
                                             <ng-container matColumnDef="fecha">
                                                 <th mat-header-cell *matHeaderCellDef> Fecha </th>
-                                                <td mat-cell *matCellDef="let element"> {{element.fecha}} </td>
+                                                <td mat-cell *matCellDef="let element"> {{element.fecha | date:'dd/MM/yyyy'}} </td>
                                             </ng-container>
 
                                             <ng-container matColumnDef="cual">
@@ -1100,7 +1100,7 @@
 
                                         <ng-container matColumnDef="fechaRegistro">
                                             <th mat-header-cell *matHeaderCellDef> Fecha de registro </th>
-                                            <td mat-cell *matCellDef="let element"> {{element.fechaRegistro}} </td>
+                                            <td mat-cell *matCellDef="let element"> {{element.fechaRegistro | date:'dd/MM/yyyy'}} </td>
                                         </ng-container>
 
                                         <ng-container matColumnDef="descripcion">
@@ -1152,7 +1152,7 @@
 
                                         <ng-container matColumnDef="fecha">
                                             <th mat-header-cell *matHeaderCellDef> Fecha </th>
-                                            <td mat-cell *matCellDef="let element"> {{element.fecha}} </td>
+                                            <td mat-cell *matCellDef="let element"> {{element.fecha | date:'dd/MM/yyyy'}} </td>
                                         </ng-container>
 
                                         <ng-container matColumnDef="compromisos">
@@ -1200,7 +1200,7 @@
 
                                         <ng-container matColumnDef="fecha">
                                             <th mat-header-cell *matHeaderCellDef> Fecha </th>
-                                            <td mat-cell *matCellDef="let element"> {{element.fecha}} </td>
+                                            <td mat-cell *matCellDef="let element"> {{element.fecha | date:'dd/MM/yyyy'}} </td>
                                         </ng-container>
 
                                         <ng-container matColumnDef="profesional">
