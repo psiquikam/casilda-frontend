@@ -1127,7 +1127,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       .map((c) => ({
         tipoId: Number(c.tipoId),
         correo: String(c.correo).trim(),
-        descripcion: c.descripcion ? String(c.descripcion).trim() : undefined
+        descripcion: String(c.descripcion).trim()
       }));
 
     const telefonos = this.telefonosRegistrados
@@ -1135,7 +1135,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       .map((t) => ({
         tipoId: Number(t.tipoId),
         telefono: String(t.telefono).trim(),
-        descripcion: t.descripcion ? String(t.descripcion).trim() : undefined
+        descripcion: String(t.descripcion).trim()
       }));
 
     return {

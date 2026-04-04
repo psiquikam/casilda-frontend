@@ -237,10 +237,36 @@ export class FormularioAcompanamientoComponent implements OnInit {
     return `${year}-${month}-${day}`;
   }
 
+  private validarDescripcionesContacto(): boolean {
+    const correoSinDescripcion = this.correoRegistrados.some((correo) =>
+      correo?.correo && correo?.tipoId && !String(correo?.descripcion ?? '').trim()
+    );
+
+    if (correoSinDescripcion) {
+      this.snackBar.open('Cada correo debe incluir una descripción.', 'Cerrar', { duration: 4000 });
+      return false;
+    }
+
+    const telefonoSinDescripcion = this.telefonosRegistrados.some((telefono) =>
+      telefono?.telefono && telefono?.tipoId && !String(telefono?.descripcion ?? '').trim()
+    );
+
+    if (telefonoSinDescripcion) {
+      this.snackBar.open('Cada teléfono debe incluir una descripción.', 'Cerrar', { duration: 4000 });
+      return false;
+    }
+
+    return true;
+  }
+
   enviarSolicitud(): void {
     if (this.acompanamientoForm.invalid) {
       this.acompanamientoForm.markAllAsTouched();
       this.snackBar.open('Por favor, revisa los campos marcados en rojo', 'Cerrar', { duration: 3000 });
+      return;
+    }
+
+    if (!this.validarDescripcionesContacto()) {
       return;
     }
 
@@ -253,11 +279,19 @@ export class FormularioAcompanamientoComponent implements OnInit {
     // Mapear todos los correos y teléfonos registrados en los modales
     const correos = this.correoRegistrados
       .filter(c => c.correo)
-      .map(c => ({ tipoId: c.tipoId as number, correo: c.correo as string, descripcion: c.descripcion || undefined }));
+      .map(c => ({
+        tipoId: c.tipoId as number,
+        correo: String(c.correo).trim(),
+        descripcion: String(c.descripcion).trim()
+      }));
 
     const telefonos = this.telefonosRegistrados
       .filter(t => t.telefono)
-      .map(t => ({ tipoId: t.tipoId as number, telefono: t.telefono as string, descripcion: t.descripcion || undefined }));
+      .map(t => ({
+        tipoId: t.tipoId as number,
+        telefono: String(t.telefono).trim(),
+        descripcion: String(t.descripcion).trim()
+      }));
 
     const payload = {
       tipoSolicitudId,

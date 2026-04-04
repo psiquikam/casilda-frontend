@@ -20,7 +20,10 @@
 
     <mat-form-field appearance="outline" class="field-desc">
       <mat-label>Descripción</mat-label>
-      <input matInput [(ngModel)]="data.descripcion" placeholder="Observaciones">
+      <input matInput [(ngModel)]="data.descripcion" name="descripcionCorreo" #descripcionCorreo="ngModel" required placeholder="Observaciones">
+      <mat-error *ngIf="descripcionCorreo.invalid && (descripcionCorreo.dirty || descripcionCorreo.touched)">
+        La descripción es obligatoria
+      </mat-error>
     </mat-form-field>
 
   </div>
@@ -29,7 +32,7 @@
 <mat-dialog-actions align="end" class="modal-actions">
   <button mat-button (click)="onNoClick()">Cancelar</button>
 
-  <button mat-flat-button class="btn-confirm" [mat-dialog-close]="data" [disabled]="!data.tipoId || !data.correo">
+  <button mat-flat-button class="btn-confirm" (click)="guardar()" [disabled]="!canSubmit">
     <mat-icon>check</mat-icon>
     Agregar a la lista
   </button>

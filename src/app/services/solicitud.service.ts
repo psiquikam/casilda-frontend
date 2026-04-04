@@ -7,13 +7,13 @@ import { MaestroDto } from './listas.service';
 export interface CorreoSolicitanteDto {
   tipoId: number;
   correo: string;
-  descripcion?: string;
+  descripcion: string;
 }
 
 export interface TelefonoSolicitanteDto {
   tipoId: number;
   telefono: string;
-  descripcion?: string;
+  descripcion: string;
 }
 
 export interface DatosSolicitanteRequest {

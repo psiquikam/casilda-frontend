@@ -58,6 +58,24 @@ export class ModalTelefonoComponent implements OnInit {
     this.data.tipo = found ? found.nombre : '';
   }
 
+  get canSubmit(): boolean {
+    return this.data.tipoId !== null
+      && this.data.telefono.trim().length > 0
+      && this.data.descripcion.trim().length > 0;
+  }
+
+  guardar(): void {
+    if (!this.canSubmit) {
+      return;
+    }
+
+    this.dialogRef.close({
+      ...this.data,
+      telefono: this.data.telefono.trim(),
+      descripcion: this.data.descripcion.trim()
+    });
+  }
+
   onNoClick(): void {
     this.dialogRef.close();
   }
