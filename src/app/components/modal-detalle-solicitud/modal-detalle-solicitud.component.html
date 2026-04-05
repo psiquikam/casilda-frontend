@@ -4,6 +4,7 @@
       {{ data.modo === 'editar' ? 'edit' : 'visibility' }}
     </mat-icon>
     {{ data.modo === 'editar' ? 'Editar Solicitud' : 'Visualizar Solicitud' }} #{{ data.info.id }}
+    <span *ngIf="data.info.tipoSolicitud"> - {{ data.info.tipoSolicitud }}</span>
   </div>
 
   <button mat-icon-button class="close-btn" (click)="dialogRef.close()">
@@ -18,11 +19,6 @@
 
       <mat-tab label="Remitente" *ngIf="tieneRemitente">
         <div class="form-grid">
-
-          <mat-form-field appearance="outline">
-            <mat-label>Tipo Solicitud</mat-label>
-            <input matInput formControlName="remitenteTipoSolicitud">
-          </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Primer Nombre</mat-label>
@@ -46,27 +42,30 @@
 
           <mat-form-field appearance="outline">
             <mat-label>Cargo</mat-label>
-            <input matInput formControlName="remitenteCargo">
+            <mat-select formControlName="remitenteCargo">
+              <mat-option *ngFor="let c of cargos" [value]="c.id">{{ c.nombre }}</mat-option>
+            </mat-select>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Campus</mat-label>
-            <input matInput formControlName="remitenteCampus">
+            <mat-select formControlName="remitenteCampus">
+              <mat-option *ngFor="let c of campusLista" [value]="c.id">{{ c.nombre }}</mat-option>
+            </mat-select>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Dependencia</mat-label>
-            <input matInput formControlName="remitenteDependencia">
+            <mat-select formControlName="remitenteDependencia">
+              <mat-option *ngFor="let d of dependencias" [value]="d.id">{{ d.nombre }}</mat-option>
+            </mat-select>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Facultad</mat-label>
-            <input matInput formControlName="remitenteFacultad">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Otra Facultad</mat-label>
-            <input matInput formControlName="remitenteOtraFacultad">
+            <mat-select formControlName="remitenteFacultad">
+              <mat-option *ngFor="let f of facultades" [value]="f.id">{{ f.nombre }}</mat-option>
+            </mat-select>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
@@ -78,7 +77,9 @@
 
           <mat-form-field appearance="outline">
             <mat-label>Tipo Documento</mat-label>
-            <input matInput formControlName="remitenteTipoDocumento">
+            <mat-select formControlName="remitenteTipoDocumento">
+              <mat-option *ngFor="let t of tiposDocumento" [value]="t.id">{{ t.nombre }}</mat-option>
+            </mat-select>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
@@ -94,7 +95,9 @@
 
           <mat-form-field appearance="outline">
             <mat-label>Tipo Documento</mat-label>
-            <input matInput formControlName="tipoDocumento">
+            <mat-select formControlName="tipoDocumento">
+              <mat-option *ngFor="let t of tiposDocumento" [value]="t.id">{{ t.nombre }}</mat-option>
+            </mat-select>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
@@ -131,7 +134,9 @@
 
           <mat-form-field appearance="outline">
             <mat-label>Identidad de Género</mat-label>
-            <input matInput formControlName="identidadGenero">
+            <mat-select formControlName="identidadGenero">
+              <mat-option *ngFor="let ig of identidadesGenero" [value]="ig.id">{{ ig.nombre }}</mat-option>
+            </mat-select>
           </mat-form-field>
 
         </div>
@@ -239,9 +244,10 @@
   <button *ngIf="data.modo === 'editar'"
           mat-raised-button
           class="btn-guardar"
-          [disabled]="detalleForm.invalid"
+          [disabled]="detalleForm.invalid || guardando"
           (click)="guardar()">
-    <mat-icon>save</mat-icon>
-    Guardar
+    <mat-icon *ngIf="!guardando">save</mat-icon>
+    <mat-spinner *ngIf="guardando" diameter="18"></mat-spinner>
+    {{ guardando ? 'Guardando...' : 'Guardar' }}
   </button>
 </mat-dialog-actions>

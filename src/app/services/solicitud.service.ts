@@ -64,6 +64,7 @@ export interface SolicitudAcompanamientoResponse {
   nombreSolicitante: string;
   documentoSolicitante: string;
   // Solicitante completo
+  tipoDocumentoId?: number | null;
   tipoDocumento: string;
   numeroDocumento: string;
   fechaNacimiento: string | null;
@@ -71,6 +72,7 @@ export interface SolicitudAcompanamientoResponse {
   segundoNombre: string;
   primerApellido: string;
   segundoApellido: string;
+  identidadGeneroId?: number | null;
   identidadGenero: string;
   idDepartamentoResidencia?: number | null;
   idCiudadResidencia?: number | null;
@@ -79,6 +81,8 @@ export interface SolicitudAcompanamientoResponse {
   telefonoAlterno: string;
   correoInstitucional: string;
   correoPersonal: string;
+  correos?: CorreoBusquedaDto[];
+  telefonos?: TelefonoBusquedaDto[];
   // Remitente
   nombreRemitente: string | null;
   remitenteTipoSolicitud: string;
@@ -86,12 +90,17 @@ export interface SolicitudAcompanamientoResponse {
   remitenteSegundoNombre: string;
   remitentePrimerApellido: string;
   remitenteSegundoApellido: string;
+  remitenteCargoId?: number | null;
   remitenteCargo: string;
+  remitenteCampusId?: number | null;
   remitenteCampus: string;
+  remitenteDependenciaId?: number | null;
   remitenteDependencia: string;
+  remitenteFacultadId?: number | null;
   remitenteFacultad: string;
   remitenteOtraFacultad: string;
   remitenteFechaSolicitud: string;
+  remitenteTipoDocumentoId?: number | null;
   remitenteTipoDocumento: string;
   remitenteNumeroDocumento: string;
 }
@@ -135,7 +144,32 @@ export interface UpdateSolicitudDto {
   segundoNombre?: string | null;
   primerApellido?: string;
   segundoApellido?: string | null;
-  identidadGenero?: string | null;
+  tipoDocumentoId?: number | null;
+  numeroDocumento?: string | null;
+  fechaNacimiento?: string | null;
+  identidadGeneroId?: number | null;
+  correos?: Array<{
+    tipoId?: number | null;
+    tipo?: string | null;
+    correo: string;
+    descripcion: string;
+  }>;
+  telefonos?: Array<{
+    tipoId?: number | null;
+    tipo?: string | null;
+    telefono: string;
+    descripcion: string;
+  }>;
+  remitentePrimerNombre?: string | null;
+  remitenteSegundoNombre?: string | null;
+  remitentePrimerApellido?: string | null;
+  remitenteSegundoApellido?: string | null;
+  remitenteCargoId?: number | null;
+  remitenteCampusId?: number | null;
+  remitenteDependenciaId?: number | null;
+  remitenteFacultadId?: number | null;
+  remitenteTipoDocumentoId?: number | null;
+  remitenteNumeroDocumento?: string | null;
 }
 
 export interface AsignarSolicitudDto {

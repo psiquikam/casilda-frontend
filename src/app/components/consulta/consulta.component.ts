@@ -137,6 +137,8 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
       telefonoAlterno: r.telefonoAlterno || '',
       correoInstitucional: r.correoInstitucional || '',
       correoPersonal: r.correoPersonal || '',
+      correos: Array.isArray(r.correos) ? r.correos : [],
+      telefonos: Array.isArray(r.telefonos) ? r.telefonos : [],
       // Remitente
       remitentePrimerNombre: r.remitentePrimerNombre || '',
       remitenteSegundoNombre: r.remitenteSegundoNombre || '',
@@ -235,19 +237,8 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && modo === 'editar') {
-        this.solicitudService.actualizar(element.solicitudId, {
-          primerNombre: result.primerNombre,
-          segundoNombre: result.segundoNombre || null,
-          primerApellido: result.primerApellido,
-          segundoApellido: result.segundoApellido || null,
-          identidadGenero: result.identidadGenero || null
-        }).subscribe({
-          next: (updated) => {
-            Object.assign(element, this.mapToItem(updated));
-            this.inicializarTablas();
-          },
-          error: (err) => console.error('Error al actualizar solicitud:', err)
-        });
+        Object.assign(element, this.mapToItem(result));
+        this.inicializarTablas();
       }
     });
   }
