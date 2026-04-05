@@ -125,6 +125,7 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
       fecha: r.fechaCreacion ? r.fechaCreacion.substring(0, 10) : '',
       dependencia: r.dependencia || '',
       // Solicitante
+      tipoDocumentoId: r.tipoDocumentoId ?? null,
       tipoDocumento: r.tipoDocumento || '',
       numeroDocumento: r.numeroDocumento || '',
       fechaNacimiento: r.fechaNacimiento || null,
@@ -132,6 +133,7 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
       segundoNombre: r.segundoNombre || '',
       primerApellido: r.primerApellido || '',
       segundoApellido: r.segundoApellido || '',
+      identidadGeneroId: r.identidadGeneroId ?? null,
       identidadGenero: r.identidadGenero || '',
       celular: r.celular || '',
       telefonoAlterno: r.telefonoAlterno || '',
@@ -144,11 +146,16 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
       remitenteSegundoNombre: r.remitenteSegundoNombre || '',
       remitentePrimerApellido: r.remitentePrimerApellido || '',
       remitenteSegundoApellido: r.remitenteSegundoApellido || '',
+      remitenteCargoId: r.remitenteCargoId ?? null,
       remitenteCargo: r.remitenteCargo || '',
+      remitenteCampusId: r.remitenteCampusId ?? null,
       remitenteCampus: r.remitenteCampus || '',
+      remitenteDependenciaId: r.remitenteDependenciaId ?? null,
       remitenteDependencia: r.remitenteDependencia || '',
+      remitenteFacultadId: r.remitenteFacultadId ?? null,
       remitenteFacultad: r.remitenteFacultad || '',
       remitenteFechaSolicitud: r.remitenteFechaSolicitud || r.fecha || '',
+      remitenteTipoDocumentoId: r.remitenteTipoDocumentoId ?? null,
       remitenteTipoDocumento: r.remitenteTipoDocumento || '',
       remitenteNumeroDocumento: r.remitenteNumeroDocumento || ''
     };

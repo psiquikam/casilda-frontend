@@ -108,7 +108,6 @@ export class ModalDetalleSolicitudComponent implements OnInit {
     const info = this.data?.info ?? {};
     const esIndirecta = !!(info.remitentePrimerNombre || info.remitentePrimerApellido);
     const fechaNacimiento = this.parsearFechaParaControl(info.fechaNacimiento);
-    const remitenteFechaSolicitud = this.parsearFechaParaControl(info.remitenteFechaSolicitud);
 
     this.detalleForm = this.fb.group({
       remitentePrimerNombre: [info.remitentePrimerNombre ?? '', esIndirecta ? Validators.required : []],
@@ -119,7 +118,6 @@ export class ModalDetalleSolicitudComponent implements OnInit {
       remitenteCampus: [info.remitenteCampusId ?? null],
       remitenteDependencia: [info.remitenteDependenciaId ?? null],
       remitenteFacultad: [info.remitenteFacultadId ?? null],
-      remitenteFechaSolicitud: [remitenteFechaSolicitud],
       remitenteTipoDocumento: [info.remitenteTipoDocumentoId ?? null],
       remitenteNumeroDocumento: [info.remitenteNumeroDocumento ?? ''],
 

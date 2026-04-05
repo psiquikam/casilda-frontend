@@ -69,13 +69,6 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Fecha Solicitud</mat-label>
-            <input matInput [matDatepicker]="pickerRem" formControlName="remitenteFechaSolicitud">
-            <mat-datepicker-toggle matSuffix [for]="pickerRem"></mat-datepicker-toggle>
-            <mat-datepicker #pickerRem></mat-datepicker>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
             <mat-label>Tipo Documento</mat-label>
             <mat-select formControlName="remitenteTipoDocumento">
               <mat-option *ngFor="let t of tiposDocumento" [value]="t.id">{{ t.nombre }}</mat-option>
