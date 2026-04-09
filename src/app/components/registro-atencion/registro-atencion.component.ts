@@ -1143,8 +1143,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         citaId: Number(this.casoSeleccionado?.citaId ?? this.casoSeleccionado?.idCita ?? this.casoSeleccionado?.idcita ?? 0),
         idTipoServicio: this.resolverIdMaestro(tipoServicio, this.catalogoTiposServicio),
         idMunicipioEntrevista: Number(formaEntrevista),
-        idRegimen: this.resolverIdMaestro(eps, this.catalogoRegimenes),
-        idEps: this.resolverIdMaestro(regimenSalud, this.catalogoEps),
+        idRegimen: this.resolverIdMaestro(regimenSalud, this.catalogoRegimenes),
+        idEps: this.resolverIdMaestro(eps, this.catalogoEps),
         logroAcuerdo: logroAcuerdo === true || logroAcuerdo === 'SI',
         archivoConsentimientoNombre: consentimientoArchivo?.name,
         archivoConsentimientoTipo: consentimientoArchivo?.type,
@@ -1236,18 +1236,34 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       return null;
     }
 
+    const idTipoSeguimiento = Number(seguimiento?.idtiposeguimiento);
+    const idAccion = Number(seguimiento?.idaccion);
+    const idActividad = Number(seguimiento?.idactividad);
+    const idEstadoSeguimiento = Number(seguimiento?.idestadoseguimiento);
+    const idMotivoEstadoSeguimiento = Number(seguimiento?.idmotivoestado);
+
+    if (
+      !Number.isFinite(idTipoSeguimiento)
+      || !Number.isFinite(idAccion)
+      || !Number.isFinite(idActividad)
+      || !Number.isFinite(idEstadoSeguimiento)
+      || !Number.isFinite(idMotivoEstadoSeguimiento)
+    ) {
+      return null;
+    }
+
     const archivo = seguimiento?.archivo instanceof File ? seguimiento.archivo : null;
     const archivoContenido = archivo ? await this.solicitudService.convertirArchivoABase64(archivo) : undefined;
 
     return {
       idAtencion,
-      idTipoSeguimiento: Number(seguimiento?.idtiposeguimiento),
+      idTipoSeguimiento,
       fecha,
-      idAccion: Number(seguimiento?.idaccion),
-      idActividad: Number(seguimiento?.idactividad),
+      idAccion,
+      idActividad,
       descripcion: String(seguimiento?.descripcion ?? ''),
-      idEstadoSeguimiento: Number(seguimiento?.idestadoseguimiento),
-      idMotivoEstadoSeguimiento: Number(seguimiento?.idmotivoestado),
+      idEstadoSeguimiento,
+      idMotivoEstadoSeguimiento,
       archivoNombre: archivo?.name,
       archivoTipo: archivo?.type,
       archivoContenido

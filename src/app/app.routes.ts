@@ -17,6 +17,7 @@ import { CasoComponent } from './components/caso/caso.component';
 import { RegistroAtencionComponent } from './components/registro-atencion/registro-atencion.component';
 import { CitaComponent } from './components/cita/cita.component';
 import { CasildaHomeComponent } from './components/casilda-home/casilda-home.component';
+import { AtencionPrComponent } from './components/linea-alma/atencion-pr/atencion-pr.component';
 
 export const routes: Routes = [
   { path: 'home', component: CasildaHomeComponent },
@@ -97,6 +98,13 @@ export const routes: Routes = [
   {
     path: 'cita',
     component: CitaComponent,
+    canActivate: [roleGuard],
+    data: { roles: ['Admin', 'Revisor'] }
+  },
+
+  {
+    path: 'linea-alma/atencion-pr',
+    component: AtencionPrComponent,
     canActivate: [roleGuard],
     data: { roles: ['Admin', 'Revisor'] }
   },
