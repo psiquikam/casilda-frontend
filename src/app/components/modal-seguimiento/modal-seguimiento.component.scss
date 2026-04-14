@@ -109,27 +109,34 @@ $purple-buttons: #348F41;
 
     &.field-textarea {
   .mat-mdc-text-field-wrapper {
-    min-height: 115px !important;
+    min-height: 90px !important;
     height: auto !important;
     overflow: visible;
   }
 
+      .mat-mdc-form-field-flex {
+        height: auto !important;
+        min-height: 90px !important;
+        align-items: flex-start !important;
+        padding-top: 4px !important;
+      }
+
       .mat-mdc-form-field-infix {
-        padding-top: 12px !important;
+        padding-top: 6px !important;
         padding-bottom: 4px !important;
-        min-height: 115px !important;
+        min-height: 90px !important;
         display: flex;
       }
 
       .mat-mdc-floating-label {
-        top: 24px !important;
+        top: 16px !important;
       }
 
       textarea.mat-mdc-input-element {
-        margin-top: 10px !important;
+        margin-top: 4px !important;
         padding: 0 4px;
         line-height: 1.4;
-        height: 90px !important;
+        height: 72px !important;
         overflow-y: auto !important;
         resize: none;
 
