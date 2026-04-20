@@ -121,7 +121,7 @@ export class AtencionPrComponent implements OnInit {
       fechaHora: [{ value: '', disabled: true }, Validators.required],
       personaAtiende: [{ value: '', disabled: true }, Validators.required],
       tipoServicio: [{ value: 'Atención APH', disabled: true }],
-      personaRegistra: [{ value: this.authService.currentUser?.nombre || '', disabled: true }, Validators.required],
+      personaRegistra: [{ value: this.obtenerIdUsuarioActual(), disabled: true }, Validators.required],
       formaLugarEntrevista: [{ value: '', disabled: true }, Validators.required],
       documento: [''],
       tipoDocumento: [''],
@@ -187,7 +187,7 @@ export class AtencionPrComponent implements OnInit {
             fechaHora: '',
             personaAtiende: '',
             tipoServicio: this.remisionDefaults.tipoServicio,
-            personaRegistra: this.authService.currentUser?.nombre || '',
+            personaRegistra: this.obtenerIdUsuarioActual(),
             formaLugarEntrevista: ''
           },
           { emitEvent: false }
@@ -207,11 +207,13 @@ export class AtencionPrComponent implements OnInit {
           { emitEvent: false }
         );
 
-        ['canal', 'personaAtiende', 'personaRegistra', 'formaLugarEntrevista'].forEach((campo) => {
+        ['canal', 'personaAtiende', 'formaLugarEntrevista'].forEach((campo) => {
           this.registroCasoForm.get(campo)?.enable({ emitEvent: false });
         });
 
+        this.registroCasoForm.get('personaRegistra')?.setValue(this.obtenerIdUsuarioActual(), { emitEvent: false });
         this.registroCasoForm.get('fechaHora')?.disable({ emitEvent: false });
+        this.registroCasoForm.get('personaRegistra')?.disable({ emitEvent: false });
 
         return;
       }
@@ -227,11 +229,13 @@ export class AtencionPrComponent implements OnInit {
         { emitEvent: false }
       );
 
-      ['quienRemite', 'personaAtiende', 'personaRegistra', 'formaLugarEntrevista'].forEach((campo) => {
+      ['quienRemite', 'personaAtiende', 'formaLugarEntrevista'].forEach((campo) => {
         this.registroCasoForm.get(campo)?.enable({ emitEvent: false });
       });
 
-      ['canal', 'tipoAtencion', 'fechaHora', 'tipoServicio'].forEach((campo) => {
+      this.registroCasoForm.get('personaRegistra')?.setValue(this.obtenerIdUsuarioActual(), { emitEvent: false });
+
+      ['canal', 'tipoAtencion', 'fechaHora', 'tipoServicio', 'personaRegistra'].forEach((campo) => {
         this.registroCasoForm.get(campo)?.disable({ emitEvent: false });
       });
     });
@@ -355,6 +359,10 @@ export class AtencionPrComponent implements OnInit {
   private obtenerIdUsuarioActual(): number | null {
     const usuario = this.usuarios.find((u) => u.email === this.authService.currentUser?.email);
     return usuario?.id ?? null;
+  }
+
+  get nombreUsuarioActual(): string {
+    return this.authService.currentUser?.nombre ?? '';
   }
 
   private formatearFechaParaDatetimeLocal(fecha: Date): string {

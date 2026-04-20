@@ -71,11 +71,7 @@
 
 									<mat-form-field appearance="outline">
 										<mat-label>Persona que registra</mat-label>
-										<mat-select formControlName="personaRegistra">
-											@for (persona of usuarios; track persona.id) {
-											<mat-option [value]="persona.id">{{persona.nombre}}</mat-option>
-											}
-										</mat-select>
+										<input matInput [value]="nombreUsuarioActual" readonly>
 									</mat-form-field>
 								</div>
 
@@ -133,11 +129,7 @@
 								<div class="row-3">
 									<mat-form-field appearance="outline">
 										<mat-label>Persona que registra</mat-label>
-										<mat-select formControlName="personaRegistra">
-											@for (persona of usuarios; track persona.id) {
-											<mat-option [value]="persona.id">{{persona.nombre}}</mat-option>
-											}
-										</mat-select>
+										<input matInput [value]="nombreUsuarioActual" readonly>
 									</mat-form-field>
 
 									<mat-form-field appearance="outline">
