@@ -58,8 +58,8 @@
 									<mat-form-field appearance="outline">
 										<mat-label>Persona que atiende</mat-label>
 										<mat-select formControlName="personaAtiende">
-											@for (persona of usuarios; track persona.id) {
-											<mat-option [value]="persona.id">{{persona.nombre}}</mat-option>
+											@for (grupo of gruposProfesionales; track grupo.id) {
+											<mat-option [value]="grupo.id">{{grupo.nombre}}</mat-option>
 											}
 										</mat-select>
 									</mat-form-field>
@@ -114,8 +114,8 @@
 									<mat-form-field appearance="outline">
 										<mat-label>Persona que atiende</mat-label>
 										<mat-select formControlName="personaAtiende">
-											@for (persona of usuarios; track persona.id) {
-											<mat-option [value]="persona.id">{{persona.nombre}}</mat-option>
+											@for (grupo of gruposProfesionales; track grupo.id) {
+											<mat-option [value]="grupo.id">{{grupo.nombre}}</mat-option>
 											}
 										</mat-select>
 									</mat-form-field>

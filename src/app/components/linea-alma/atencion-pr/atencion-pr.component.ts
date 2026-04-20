@@ -26,13 +26,14 @@ import { ModalRemisionComponent } from '../../modal-remision/modal-remision.comp
 import { ListasService, MaestroDto } from '../../../services/listas.service';
 import { UsuarioDto, UsuarioService } from '../../../services/usuario.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { DialogoExitoComponent } from '../../dialog-exito/dialog-exito.component';
 import {
   AtencionAphRequestDto,
   LineaAlmaService,
   RegistroLineaAlmaRequestDto,
   RemisionRegistroAlmaRequestDto
 } from '../../../services/linea-alma.service';
-import { SolicitudService } from '../../../services/solicitud.service';
+import { GrupoProfesionalDto, SolicitudService } from '../../../services/solicitud.service';
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -102,6 +103,7 @@ export class AtencionPrComponent implements OnInit {
   aphProtocolos: MaestroDto[] = [];
   aphResultadosTriage: MaestroDto[] = [];
   usuarios: UsuarioDto[] = [];
+  gruposProfesionales: GrupoProfesionalDto[] = [];
   readonly tipoServicioAphId = 5;
   discapacidadesRegistradas: any[] = [];
   correoRegistrados: any[] = [];
@@ -267,7 +269,8 @@ export class AtencionPrComponent implements OnInit {
       aphAmbitos: this.listasService.obtenerMaestro('ambitos-aph'),
       aphProtocolos: this.listasService.obtenerMaestro('protocolos-aph'),
       aphResultadosTriage: this.listasService.obtenerMaestro('resultados-triage'),
-      usuarios: this.usuarioService.obtenerTodos()
+      usuarios: this.usuarioService.obtenerTodos(),
+      gruposProfesionales: this.solicitudService.listarGruposProfesionales()
     }).subscribe({
       next: (catalogos) => {
         this.tiposReporteAlma = catalogos.tiposReporteAlma;
@@ -294,6 +297,7 @@ export class AtencionPrComponent implements OnInit {
         this.aphProtocolos = catalogos.aphProtocolos;
         this.aphResultadosTriage = catalogos.aphResultadosTriage;
         this.usuarios = catalogos.usuarios;
+        this.gruposProfesionales = catalogos.gruposProfesionales;
 
         this.configurarValoresPorDefecto();
         this.cargandoCatalogos = false;
@@ -569,7 +573,13 @@ export class AtencionPrComponent implements OnInit {
       .subscribe({
         next: (response) => {
           this.idRegistroCreado = response.id;
-          this.snackBar.open(`Registro Linea ALMA creado con ID ${response.id}.`, 'Cerrar', { duration: 4500 });
+          this.dialog.open(DialogoExitoComponent, {
+            width: '400px',
+            data: {
+              titulo: '¡Registro Creado!',
+              mensaje: `Registro Línea ALMA creado con ID ${response.id}.`
+            }
+          });
         },
         error: (error) => {
           const mensaje = error?.error?.message || 'No fue posible guardar el registro de Linea ALMA.';
