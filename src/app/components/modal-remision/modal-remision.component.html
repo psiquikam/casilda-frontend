@@ -10,7 +10,7 @@
       <mat-label>Tipo de Remisión</mat-label>
       <mat-select [(ngModel)]="data.tipo">
         @for (tipo of tiposRemision; track tipo.id) {
-          <mat-option [value]="tipo.nombre">{{ tipo.nombre }}</mat-option>
+          <mat-option [value]="tipo">{{ tipo.nombre }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
@@ -33,7 +33,12 @@
 <mat-dialog-actions align="end" class="modal-actions">
   <button mat-button (click)="onNoClick()">Cancelar</button>
 
-  <button mat-flat-button class="btn-confirm" [mat-dialog-close]="data" [disabled]="!data.tipo || !data.fecha">
+  <button
+    mat-flat-button
+    class="btn-confirm"
+    [mat-dialog-close]="{ idTipoRemision: data.tipo?.id, tipo: data.tipo?.nombre, cual: data.cual, fecha: data.fecha }"
+    [disabled]="!data.tipo || !data.fecha"
+  >
     <mat-icon>check</mat-icon>
     Agregar a la lista
   </button>

@@ -6,6 +6,10 @@
 
 	<mat-card class="form-card">
 		<mat-card-content>
+			<div class="no-results-msg" *ngIf="cargandoCatalogos">
+				<mat-icon>hourglass_top</mat-icon>
+				<p>Cargando catálogos...</p>
+			</div>
 			<form [formGroup]="registroCasoForm">
 				<mat-tab-group animationDuration="200ms" color="primary">
 				<mat-tab label="Registro de atención de caso">
@@ -33,8 +37,8 @@
 									<mat-form-field appearance="outline">
 										<mat-label>Canal</mat-label>
 										<mat-select formControlName="canal">
-											@for (canal of canales; track canal) {
-											<mat-option [value]="canal">{{canal}}</mat-option>
+											@for (canal of canalesContacto; track canal.id) {
+											<mat-option [value]="canal.id">{{canal.nombre}}</mat-option>
 											}
 										</mat-select>
 									</mat-form-field>
@@ -46,14 +50,18 @@
 
 									<mat-form-field appearance="outline">
 										<mat-label>Fecha y hora</mat-label>
-										<input matInput type="datetime-local" formControlName="fechaHora">
+										<input matInput type="datetime-local" formControlName="fechaHora" readonly>
 									</mat-form-field>
 								</div>
 
 								<div class="row-3">
 									<mat-form-field appearance="outline">
 										<mat-label>Persona que atiende</mat-label>
-										<input matInput formControlName="personaAtiende">
+										<mat-select formControlName="personaAtiende">
+											@for (persona of usuarios; track persona.id) {
+											<mat-option [value]="persona.id">{{persona.nombre}}</mat-option>
+											}
+										</mat-select>
 									</mat-form-field>
 
 									<mat-form-field appearance="outline">
@@ -63,14 +71,22 @@
 
 									<mat-form-field appearance="outline">
 										<mat-label>Persona que registra</mat-label>
-										<input matInput formControlName="personaRegistra">
+										<mat-select formControlName="personaRegistra">
+											@for (persona of usuarios; track persona.id) {
+											<mat-option [value]="persona.id">{{persona.nombre}}</mat-option>
+											}
+										</mat-select>
 									</mat-form-field>
 								</div>
 
 								<div class="row-3">
 									<mat-form-field appearance="outline">
 										<mat-label>Forma y lugar de la entrevista</mat-label>
-										<input matInput formControlName="formaLugarEntrevista">
+										<mat-select formControlName="formaLugarEntrevista">
+											@for (forma of formasEntrevista; track forma.id) {
+											<mat-option [value]="forma.id">{{forma.nombre}}</mat-option>
+											}
+										</mat-select>
 									</mat-form-field>
 								</div>
 							</div>
@@ -101,7 +117,11 @@
 
 									<mat-form-field appearance="outline">
 										<mat-label>Persona que atiende</mat-label>
-										<input matInput formControlName="personaAtiende">
+										<mat-select formControlName="personaAtiende">
+											@for (persona of usuarios; track persona.id) {
+											<mat-option [value]="persona.id">{{persona.nombre}}</mat-option>
+											}
+										</mat-select>
 									</mat-form-field>
 
 									<mat-form-field appearance="outline">
@@ -114,8 +134,8 @@
 									<mat-form-field appearance="outline">
 										<mat-label>Persona que registra</mat-label>
 										<mat-select formControlName="personaRegistra">
-											@for (persona of remisionMockCatalogs.personasRegistra; track persona) {
-											<mat-option [value]="persona">{{persona}}</mat-option>
+											@for (persona of usuarios; track persona.id) {
+											<mat-option [value]="persona.id">{{persona.nombre}}</mat-option>
 											}
 										</mat-select>
 									</mat-form-field>
@@ -123,8 +143,8 @@
 									<mat-form-field appearance="outline">
 										<mat-label>Forma y lugar de la entrevista</mat-label>
 										<mat-select formControlName="formaLugarEntrevista">
-											@for (forma of remisionMockCatalogs.formasEntrevista; track forma) {
-											<mat-option [value]="forma">{{forma}}</mat-option>
+											@for (forma of formasEntrevista; track forma.id) {
+											<mat-option [value]="forma.id">{{forma.nombre}}</mat-option>
 											}
 										</mat-select>
 									</mat-form-field>
@@ -137,16 +157,23 @@
 					<div class="tab-padding">
 						<div class="grid-3">
 							<mat-form-field appearance="outline" subscriptSizing="dynamic">
-								<mat-label>Número de Documento</mat-label>
-								<input matInput formControlName="documento">
-							</mat-form-field>
-							<mat-form-field appearance="outline" subscriptSizing="dynamic">
 								<mat-label>Tipo Documento</mat-label>
 								<mat-select formControlName="tipoDocumento">
-									@for (t of tiposDocumentoMock; track t) {
-									<mat-option [value]="t">{{t}}</mat-option>
+									@for (t of tiposDocumento; track t.id) {
+									<mat-option [value]="t.id">{{t.nombre}}</mat-option>
 									}
 								</mat-select>
+							</mat-form-field>
+							<mat-form-field appearance="outline" subscriptSizing="dynamic">
+								<mat-label>Número de Documento</mat-label>
+								<input matInput formControlName="documento" (keyup.enter)="buscarPersona($event)">
+								<button matSuffix mat-icon-button type="button"
+									(click)="buscarPersona($event)"
+									[disabled]="buscandoPersona"
+									matTooltip="Buscar persona">
+									<mat-icon *ngIf="!buscandoPersona">search</mat-icon>
+									<mat-spinner *ngIf="buscandoPersona" diameter="18"></mat-spinner>
+								</button>
 							</mat-form-field>
 							<mat-form-field appearance="outline" subscriptSizing="dynamic">
 								<mat-label>Fecha Nacimiento</mat-label>
@@ -172,24 +199,24 @@
 							</mat-form-field>
 							<mat-form-field appearance="outline">
 								<mat-label>Regimen de Salud</mat-label>
-								<mat-select formControlName="eps">
-									@for (v of regimenSaludMock; track v) {
-									<mat-option [value]="v">{{v}}</mat-option>
+								<mat-select formControlName="regimenSalud">
+									@for (v of regimenes; track v.id) {
+									<mat-option [value]="v.id">{{v.nombre}}</mat-option>
 									}
 								</mat-select>
 							</mat-form-field>
 							<mat-form-field appearance="outline">
 								<mat-label>EPS - Regimen de Salud</mat-label>
-								<mat-select formControlName="regimenSalud">
-									@for (v of epsMock; track v) {
-									<mat-option [value]="v">{{v}}</mat-option>
+								<mat-select formControlName="eps">
+									@for (v of eps; track v.id) {
+									<mat-option [value]="v.id">{{v.nombre}}</mat-option>
 									}
 								</mat-select>
 							</mat-form-field>
 							<mat-form-field appearance="outline" subscriptSizing="dynamic">
 								<mat-label>Departamento de Nacimiento</mat-label>
 								<mat-select formControlName="departamentoNacimiento">
-									@for (d of departamentosMock; track d.id) {
+									@for (d of departamentos; track d.id) {
 									<mat-option [value]="d.id">{{d.nombre}}</mat-option>
 									}
 								</mat-select>
@@ -197,7 +224,7 @@
 							<mat-form-field appearance="outline" subscriptSizing="dynamic">
 								<mat-label>Ciudad de Nacimiento</mat-label>
 								<mat-select formControlName="ciudadNacimiento">
-									@for (c of municipiosNacimientoMock; track c.id) {
+								@for (c of municipiosNacimiento; track c.id) {
 									<mat-option [value]="c.id">{{c.nombre}}</mat-option>
 									}
 								</mat-select>
@@ -205,7 +232,7 @@
 							<mat-form-field appearance="outline" subscriptSizing="dynamic">
 								<mat-label>Departamento de Residencia</mat-label>
 								<mat-select formControlName="departamentoResidencia">
-									@for (d of departamentosMock; track d.id) {
+									@for (d of departamentos; track d.id) {
 									<mat-option [value]="d.id">{{d.nombre}}</mat-option>
 									}
 								</mat-select>
@@ -213,7 +240,7 @@
 							<mat-form-field appearance="outline" subscriptSizing="dynamic">
 								<mat-label>Ciudad de Residencia</mat-label>
 								<mat-select formControlName="ciudadResidencia">
-									@for (c of municipiosResidenciaMock; track c.id) {
+								@for (c of municipiosResidencia; track c.id) {
 									<mat-option [value]="c.id">{{c.nombre}}</mat-option>
 									}
 								</mat-select>
@@ -221,32 +248,32 @@
 							<mat-form-field appearance="outline" subscriptSizing="dynamic">
 								<mat-label>Sexo</mat-label>
 								<mat-select formControlName="sexo">
-									@for (s of sexosMock; track s) {
-									<mat-option [value]="s">{{s}}</mat-option>
+									@for (s of sexos; track s.id) {
+									<mat-option [value]="s.id">{{s.nombre}}</mat-option>
 									}
 								</mat-select>
 							</mat-form-field>
 							<mat-form-field appearance="outline" subscriptSizing="dynamic">
-								<mat-label>Identidad Sexual</mat-label>
+								<mat-label>Identidad de Género</mat-label>
 								<mat-select formControlName="identidadSexual">
-									@for (i of identidadesSexualesMock; track i) {
-									<mat-option [value]="i">{{i}}</mat-option>
+									@for (i of identidadesGenero; track i.id) {
+									<mat-option [value]="i.id">{{i.nombre}}</mat-option>
 									}
 								</mat-select>
 							</mat-form-field>
 							<mat-form-field appearance="outline" subscriptSizing="dynamic">
 								<mat-label>Orientación Sexual</mat-label>
 								<mat-select formControlName="orientacionSexual">
-									@for (o of orientacionesSexualesMock; track o) {
-									<mat-option [value]="o">{{o}}</mat-option>
+									@for (o of orientacionesSexuales; track o.id) {
+									<mat-option [value]="o.id">{{o.nombre}}</mat-option>
 									}
 								</mat-select>
 							</mat-form-field>
 							<mat-form-field appearance="outline" subscriptSizing="dynamic">
 								<mat-label>¿Pertenece a alguna Etnia?</mat-label>
 								<mat-select formControlName="etnia">
-									@for (e of etniasMock; track e) {
-									<mat-option [value]="e">{{e}}</mat-option>
+									@for (e of etnias; track e.id) {
+									<mat-option [value]="e.id">{{e.nombre}}</mat-option>
 									}
 								</mat-select>
 							</mat-form-field>
@@ -322,8 +349,8 @@
 							<mat-form-field appearance="outline" subscriptSizing="dynamic">
 								<mat-label>Vínculo de la persona atendida con la universidad</mat-label>
 								<mat-select formControlName="vinculo">
-									@for (v of listaVinculos; track v) {
-									<mat-option [value]="v">{{v}}</mat-option>
+									@for (v of vinculos; track v.id) {
+									<mat-option [value]="v.id">{{v.nombre}}</mat-option>
 									}
 								</mat-select>
 							</mat-form-field>
@@ -331,8 +358,8 @@
 							<mat-form-field appearance="outline" subscriptSizing="dynamic">
 								<mat-label>Sub Vinculo</mat-label>
 								<mat-select formControlName="subVinculo">
-									@for (v of listaSubVinculos; track v) {
-									<mat-option [value]="v">{{v}}</mat-option>
+									@for (v of subVinculos; track v.id) {
+									<mat-option [value]="v.id">{{v.nombre}}</mat-option>
 									}
 								</mat-select>
 							</mat-form-field>
@@ -340,8 +367,8 @@
 							<mat-form-field appearance="outline" subscriptSizing="dynamic">
 								<mat-label>Facultad</mat-label>
 								<mat-select formControlName="facultad">
-									@for (f of facultadesM; track f) {
-									<mat-option [value]="f">{{f}}</mat-option>
+									@for (f of facultades; track f.id) {
+									<mat-option [value]="f.id">{{f.nombre}}</mat-option>
 									}
 								</mat-select>
 							</mat-form-field>
@@ -349,8 +376,8 @@
 							<mat-form-field appearance="outline" subscriptSizing="dynamic">
 								<mat-label>Programa</mat-label>
 								<mat-select formControlName="programa">
-									@for (f of listaProgramas; track f) {
-									<mat-option [value]="f">{{f}}</mat-option>
+									@for (f of programas; track f.id) {
+									<mat-option [value]="f.id">{{f.nombre}}</mat-option>
 									}
 								</mat-select>
 							</mat-form-field>
@@ -358,8 +385,8 @@
 							<mat-form-field appearance="outline" subscriptSizing="dynamic">
 								<mat-label>Dependencia</mat-label>
 								<mat-select formControlName="dependencia">
-									@for (f of listaDependencia; track f) {
-									<mat-option [value]="f">{{f}}</mat-option>
+									@for (f of dependencias; track f.id) {
+									<mat-option [value]="f.id">{{f.nombre}}</mat-option>
 									}
 								</mat-select>
 							</mat-form-field>
@@ -367,8 +394,8 @@
 							<mat-form-field appearance="outline" subscriptSizing="dynamic">
 								<mat-label>Campus</mat-label>
 								<mat-select formControlName="campus">
-									@for (c of campusM; track c) {
-									<mat-option [value]="c">{{c}}</mat-option>
+									@for (c of campus; track c.id) {
+									<mat-option [value]="c.id">{{c.nombre}}</mat-option>
 									}
 								</mat-select>
 							</mat-form-field>
@@ -480,8 +507,8 @@
 								<mat-form-field appearance="outline" subscriptSizing="dynamic">
 									<mat-label>Canal</mat-label>
 									<mat-select formControlName="aphCanal">
-										@for (canal of aphCanales; track canal) {
-										<mat-option [value]="canal">{{canal}}</mat-option>
+										@for (canal of aphCanales; track canal.id) {
+										<mat-option [value]="canal.id">{{canal.nombre}}</mat-option>
 										}
 									</mat-select>
 								</mat-form-field>
@@ -503,8 +530,8 @@
 								<mat-form-field appearance="outline" subscriptSizing="dynamic">
 									<mat-label>Convenio</mat-label>
 									<mat-select formControlName="aphConvenio">
-										@for (convenio of aphConvenios; track convenio) {
-										<mat-option [value]="convenio">{{convenio}}</mat-option>
+										@for (convenio of aphConvenios; track convenio.id) {
+										<mat-option [value]="convenio.id">{{convenio.nombre}}</mat-option>
 										}
 									</mat-select>
 								</mat-form-field>
@@ -512,8 +539,8 @@
 								<mat-form-field appearance="outline" subscriptSizing="dynamic">
 									<mat-label>Ambito</mat-label>
 									<mat-select formControlName="aphAmbito">
-										@for (ambito of aphAmbitos; track ambito) {
-										<mat-option [value]="ambito">{{ambito}}</mat-option>
+										@for (ambito of aphAmbitos; track ambito.id) {
+										<mat-option [value]="ambito.id">{{ambito.nombre}}</mat-option>
 										}
 									</mat-select>
 								</mat-form-field>
@@ -521,8 +548,8 @@
 								<mat-form-field appearance="outline" subscriptSizing="dynamic">
 									<mat-label>Protocolo</mat-label>
 									<mat-select formControlName="aphProtocolo">
-										@for (protocolo of aphProtocolos; track protocolo) {
-										<mat-option [value]="protocolo">{{protocolo}}</mat-option>
+										@for (protocolo of aphProtocolos; track protocolo.id) {
+										<mat-option [value]="protocolo.id">{{protocolo.nombre}}</mat-option>
 										}
 									</mat-select>
 								</mat-form-field>
@@ -539,15 +566,11 @@
 							<div class="aph-result-row">
 								<div class="aph-question-label aph-result-label">Resultado del triage<span>*</span></div>
 								<mat-radio-group formControlName="aphResultadoTriage" class="aph-result-group">
-									<label class="aph-result-option aph-result-alta">
-										<mat-radio-button value="Alta">Alta</mat-radio-button>
+									@for (resultado of aphResultadosTriage; track resultado.id) {
+									<label class="aph-result-option">
+										<mat-radio-button [value]="resultado.id">{{resultado.nombre}}</mat-radio-button>
 									</label>
-									<label class="aph-result-option aph-result-media">
-										<mat-radio-button value="Media">Media</mat-radio-button>
-									</label>
-									<label class="aph-result-option aph-result-baja">
-										<mat-radio-button value="Baja">Baja</mat-radio-button>
-									</label>
+									}
 								</mat-radio-group>
 							</div>
 
@@ -639,6 +662,13 @@
 					</div>
 				</mat-tab>
 				</mat-tab-group>
+
+				<div class="section-header-inline" style="justify-content: flex-end; margin-top: 16px;">
+					<button mat-raised-button color="primary" type="button" (click)="guardarRegistro()" [disabled]="guardandoRegistro || cargandoCatalogos">
+						<mat-icon>{{ guardandoRegistro ? 'hourglass_top' : 'save' }}</mat-icon>
+						<span>{{ guardandoRegistro ? 'Guardando...' : 'Guardar registro Línea ALMA' }}</span>
+					</button>
+				</div>
 			</form>
 		</mat-card-content>
 	</mat-card>

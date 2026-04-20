@@ -106,6 +106,7 @@ export interface SolicitudAcompanamientoResponse {
 }
 
 export interface PersonaSearchDto {
+  id?: number | null;
   primerNombre: string;
   segundoNombre?: string | null;
   primerApellido: string;
@@ -342,7 +343,7 @@ export interface CompromisosAtencionRequestDto {
 
 export interface CasoAtencionRequestDto {
   idOrientacionSexual: number;
-  idIdentidadSexual: number;
+  idIdentidadGenero: number;
   tiempoOcurrido: string;
   idFormaOcurrencia: number;
   idLugarOcurrencia: number;

@@ -78,6 +78,15 @@ export class ListasService {
     );
   }
 
+  obtenerMaestro(endpoint: string): Observable<MaestroDto[]> {
+    return this.http.get<MaestroDto[]>(`${this.apiBaseUrl}/${endpoint}`).pipe(
+      catchError((error) => {
+        console.error(`Error consultando maestros para endpoint ${endpoint}:`, error);
+        return of([] as MaestroDto[]);
+      })
+    );
+  }
+
   obtenerListaPaginada(lista: string, page: number, size: number): Observable<PagedResponseDto<MaestroDto>> {
     const listaKey = lista as ListaKey;
     const endpoint = this.endpointByList[listaKey];

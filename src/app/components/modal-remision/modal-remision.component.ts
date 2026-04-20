@@ -9,13 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
-
-export interface MaestroDto {
-  id: number;
-  nombre: string;
-}
+import { ListasService, MaestroDto } from '../../services/listas.service';
 
 @Component({
   selector: 'app-modal-remision',
@@ -36,11 +30,10 @@ export interface MaestroDto {
   styleUrls: ['./modal-remision.component.scss']
 })
 export class ModalRemisionComponent implements OnInit {
-  private readonly http = inject(HttpClient);
-  private readonly maestrosUrl = `${environment.apiBaseUrl}/maestros`;
+  private readonly listasService = inject(ListasService);
 
   data = {
-    tipo: '',
+    tipo: null as MaestroDto | null,
     cual: '',
     fecha: null as Date | null
   };
@@ -54,7 +47,7 @@ export class ModalRemisionComponent implements OnInit {
   }
 
   private cargarTiposRemision(): void {
-    this.http.get<MaestroDto[]>(`${this.maestrosUrl}/tipos-remision`).subscribe({
+    this.listasService.obtenerMaestro('tipos-remision').subscribe({
       next: (lista) => {
         this.tiposRemision = lista;
       },
