@@ -1047,23 +1047,28 @@
                           </ng-template>
                             <div class="tab-padding">
 
-                                <app-tabla-otros-casos [dataSource]="dataSourceOtros"
-                                    [displayedColumns]="displayedColumnsOtros"
+                                <div class="section-header-inline">
+                                    <div class="section-title">
+                                        <mat-icon color="primary">cases</mat-icon>
+                                        <span>Consulta de casos</span>
+                                    </div>
+                                    <button mat-icon-button class="btn-add-inline"
+                                        (click)="onAgregarOtroCaso()" matTooltip="Agregar Caso">
+                                        <mat-icon>add_circle</mat-icon>
+                                    </button>
+                                </div>
+
+                                <app-tabla-otros-casos
+                                    [dataSource]="dataSourceOtros"
                                     [serverSidePagination]="true"
                                     [totalElements]="totalElementosCitas"
                                     [pageIndex]="pageIndexCitas"
                                     [pageSize]="pageSizeCitas"
-                                    [expandedElement]="expandedElement"
-                                    (iniciar)="iniciarAtencion($event)"
-                                    (expand)="expandedElement = expandedElement === $event ? null : $event"
-                                    (filter)="applyFilter($event.column, $event.event)"
+                                    (editar)="onEditarOtroCaso($event)"
+                                    (eliminar)="onEliminarOtroCaso($event)"
+                                    (filter)="applyFilterOtros($event.column, $event.event)"
                                     (pageChange)="onPageChangeCitas($event)">
                                 </app-tabla-otros-casos>
-
-                                <div *ngIf="dataSourceOtros.data.length === 0" class="empty-tab">
-                                    <mat-icon>inbox</mat-icon>
-                                    <span>No hay otros casos registrados</span>
-                                </div>
 
                             </div>
                         </mat-tab>

@@ -1,0 +1,326 @@
+<div class="modal-header">
+  <span class="modal-header-title">Agregar Caso</span>
+  <button mat-icon-button class="btn-close" (click)="onCerrar()" type="button">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content class="modal-content">
+  <form [formGroup]="casoForm">
+    <mat-tab-group animationDuration="150ms">
+
+      <!-- ===================== TAB 1: Documentación del caso ===================== -->
+      <mat-tab label="Documentación del caso">
+        <div class="tab-body">
+
+          <div class="grid-2">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Orientación sexual *</mat-label>
+              <mat-select formControlName="orientacionSexual">
+                @for (o of data.listaOrientacionSexual; track o) {
+                  <mat-option [value]="o">{{o}}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>¿Hace cuánto ocurrió el último hecho de violencia? *</mat-label>
+              <input matInput formControlName="tiempoOcurrido">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>¿En qué forma ocurrió el hecho? *</mat-label>
+              <mat-select formControlName="queForma">
+                @for (q of data.queForma; track q) {
+                  <mat-option [value]="q">{{q}}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Lugar de ocurrencia de hechos de violencia *</mat-label>
+              <mat-select formControlName="lugarHechos">
+                @for (l of data.lugarHechos; track l) {
+                  <mat-option [value]="l">{{l}}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <!-- Documentación de hechos -->
+          <div class="hechos-acciones-row">
+            <span class="hechos-doc-label">Documentación de hechos</span>
+            <button mat-icon-button class="btn-add-green" type="button" (click)="abrirModalHechos()"
+              matTooltip="Agregar Hecho">
+              <mat-icon>add_circle</mat-icon>
+            </button>
+          </div>
+
+          <!-- Tabla de hechos -->
+          <div class="hechos-table-wrapper">
+            <div class="hechos-col-header">
+              <span class="hechos-main-label">Hechos en circunstancias de tiempo, modo y lugar</span>
+              <span class="hechos-opcion-label">Opción</span>
+            </div>
+
+            <table mat-table [dataSource]="hechosRegistrados" class="hechos-table">
+
+              <ng-container matColumnDef="fecha">
+                <td mat-cell *matCellDef="let element">{{element.fecha | date:'dd/MM/yyyy'}}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="lugar">
+                <td mat-cell *matCellDef="let element">{{element.lugar}}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="descripcion">
+                <td mat-cell *matCellDef="let element">{{element.descripcion}}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="opcion">
+                <td mat-cell *matCellDef="let element; let i = index" class="opcion-cell">
+                  <button mat-icon-button type="button" (click)="eliminarHecho(i)" matTooltip="Eliminar">
+                    <mat-icon svgIcon="icono-eliminar"></mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-row *matRowDef="let row; columns: hechosColumns;"></tr>
+            </table>
+
+            @if (hechosRegistrados.length === 0) {
+              <div class="hechos-empty">No hay hechos registrados.</div>
+            }
+          </div>
+
+          <!-- Violencia de género -->
+          <div class="pregunta-container">
+            <label class="pregunta-label">¿Violencia basada en género?</label>
+            <mat-radio-group formControlName="violenciaGenero" class="radio-group">
+              <mat-radio-button value="SI">Sí</mat-radio-button>
+              <mat-radio-button value="NO">No</mat-radio-button>
+            </mat-radio-group>
+          </div>
+
+          <!-- Violencia misional -->
+          <div class="pregunta-container">
+            <label class="pregunta-label">
+              ¿El hecho de violencia ocurrió en el desarrollo de actividades misionales, o en representación de la
+              Universidad? O ¿Dentro o fuera de los bienes inmuebles de la universidad con ocasión, en razón o como
+              consecuencia de su vínculo o el vínculo del presunto(a) agresor(a) con la institución educativa?
+            </label>
+            <mat-radio-group formControlName="violenciaMisional" class="radio-group">
+              <mat-radio-button value="SI">Sí</mat-radio-button>
+              <mat-radio-button value="NO">No</mat-radio-button>
+            </mat-radio-group>
+          </div>
+
+          @if (violenciaMisionalValue === 'SI') {
+            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="field-full">
+              <mat-label>Actividad misional *</mat-label>
+              <mat-select formControlName="actividadMisional">
+                @for (a of data.actividadesMisionales; track a) {
+                  <mat-option [value]="a">{{a}}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          }
+
+        </div>
+      </mat-tab>
+
+      <!-- ===================== TAB 2: Detalle VBG ===================== -->
+      <mat-tab label="Detalle VBG">
+        <div class="tab-body">
+          <div class="vbg-grid">
+
+            <div class="vbg-card">
+              <div class="vbg-header">
+                <span>Tipo de violencia psicológica *</span>
+                <mat-radio-group formControlName="violenciaPsicologica">
+                  <mat-radio-button value="SI">Sí</mat-radio-button>
+                  <mat-radio-button value="NO">No</mat-radio-button>
+                </mat-radio-group>
+              </div>
+              @if (violenciaPsicologicaValue === 'SI') {
+                <div class="vbg-options">
+                  @for (c of data.listaPsicologica; track c.id) {
+                    <mat-checkbox [checked]="psicologicaSel.includes(c.id)"
+                      (change)="onCheckboxChange($event, c.id, 'psicologicaSel')">{{c.nombre}}</mat-checkbox>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="vbg-card">
+              <div class="vbg-header">
+                <span>Tipo de violencia física *</span>
+                <mat-radio-group formControlName="violenciaFisica">
+                  <mat-radio-button value="SI">Sí</mat-radio-button>
+                  <mat-radio-button value="NO">No</mat-radio-button>
+                </mat-radio-group>
+              </div>
+              @if (violenciaFisicaValue === 'SI') {
+                <div class="vbg-options">
+                  @for (c of data.listaFisica; track c.id) {
+                    <mat-checkbox [checked]="fisicaSel.includes(c.id)"
+                      (change)="onCheckboxChange($event, c.id, 'fisicaSel')">{{c.nombre}}</mat-checkbox>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="vbg-card">
+              <div class="vbg-header">
+                <span>Tipo de violencia sexual *</span>
+                <mat-radio-group formControlName="violenciaSexual">
+                  <mat-radio-button value="SI">Sí</mat-radio-button>
+                  <mat-radio-button value="NO">No</mat-radio-button>
+                </mat-radio-group>
+              </div>
+              @if (violenciaSexualValue === 'SI') {
+                <div class="vbg-options">
+                  @for (c of data.listaSexual; track c.id) {
+                    <mat-checkbox [checked]="sexualSel.includes(c.id)"
+                      (change)="onCheckboxChange($event, c.id, 'sexualSel')">{{c.nombre}}</mat-checkbox>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="vbg-card">
+              <div class="vbg-header">
+                <span>Tipo de violencia Institucional *</span>
+                <mat-radio-group formControlName="violenciaInstitucional">
+                  <mat-radio-button value="SI">Sí</mat-radio-button>
+                  <mat-radio-button value="NO">No</mat-radio-button>
+                </mat-radio-group>
+              </div>
+              @if (violenciaInstitucionalValue === 'SI') {
+                <div class="vbg-options">
+                  @for (c of data.listaInstitucional; track c.id) {
+                    <mat-checkbox [checked]="institucionalSel.includes(c.id)"
+                      (change)="onCheckboxChange($event, c.id, 'institucionalSel')">{{c.nombre}}</mat-checkbox>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="vbg-card">
+              <div class="vbg-header">
+                <span>Tipo de violencia económica/Patrimonial *</span>
+                <mat-radio-group formControlName="violenciaEconomica">
+                  <mat-radio-button value="SI">Sí</mat-radio-button>
+                  <mat-radio-button value="NO">No</mat-radio-button>
+                </mat-radio-group>
+              </div>
+              @if (violenciaEconomicaValue === 'SI') {
+                <div class="vbg-options">
+                  @for (c of data.listaPatrimonial; track c.id) {
+                    <mat-checkbox [checked]="economicaSel.includes(c.id)"
+                      (change)="onCheckboxChange($event, c.id, 'economicaSel')">{{c.nombre}}</mat-checkbox>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="vbg-card">
+              <div class="vbg-header">
+                <span>Tipo de violencia sexual informática *</span>
+                <mat-radio-group formControlName="violenciaInformatica">
+                  <mat-radio-button value="SI">Sí</mat-radio-button>
+                  <mat-radio-button value="NO">No</mat-radio-button>
+                </mat-radio-group>
+              </div>
+              @if (violenciaInformaticaValue === 'SI') {
+                <div class="vbg-options">
+                  @for (c of data.listaInformatica; track c.id) {
+                    <mat-checkbox [checked]="informaticaSel.includes(c.id)"
+                      (change)="onCheckboxChange($event, c.id, 'informaticaSel')">{{c.nombre}}</mat-checkbox>
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="vbg-card">
+              <div class="vbg-header">
+                <span>Tipo de violencia por prejuicio *</span>
+                <mat-radio-group formControlName="violenciaPrejuicio">
+                  <mat-radio-button value="SI">Sí</mat-radio-button>
+                  <mat-radio-button value="NO">No</mat-radio-button>
+                </mat-radio-group>
+              </div>
+              @if (violenciaPrejuicioValue === 'SI') {
+                <div class="vbg-options">
+                  @for (c of data.listaPrejuicio; track c.id) {
+                    <mat-checkbox [checked]="prejuicioSel.includes(c.id)"
+                      (change)="onCheckboxChange($event, c.id, 'prejuicioSel')">{{c.nombre}}</mat-checkbox>
+                  }
+                </div>
+              }
+            </div>
+
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- ===================== TAB 3: Presunto agresor ===================== -->
+      <mat-tab label="Presunto agresor">
+        <div class="tab-body">
+
+          <div class="agresor-section-title">
+            <span>Datos del presunto agresor</span>
+          </div>
+          <div class="agresor-divider"></div>
+
+          <div class="grid-3">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Primer nombre *</mat-label>
+              <input matInput formControlName="presuntoPrimerNombre">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Segundo nombre *</mat-label>
+              <input matInput formControlName="presuntoSegundoNombre">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Primer apellido *</mat-label>
+              <input matInput formControlName="presuntoPrimerApellido">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Segundo apellido *</mat-label>
+              <input matInput formControlName="presuntoSegundoApellido">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Vínculo con la universidad *</mat-label>
+              <mat-select formControlName="presuntoVinculoUniversidad">
+                @for (v of data.listaVinculos; track v) {
+                  <mat-option [value]="v">{{v}}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Vínculo con la víctima *</mat-label>
+              <mat-select formControlName="presuntoVinculoVictima">
+                @for (v of data.listaVinculosAgresorVictima; track v) {
+                  <mat-option [value]="v">{{v}}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="modal-actions">
+  <button mat-stroked-button class="btn-cerrar" type="button" (click)="onCerrar()">Cerrar</button>
+  <button mat-flat-button class="btn-guardar" type="button" (click)="onGuardar()">Guardar</button>
+</mat-dialog-actions>

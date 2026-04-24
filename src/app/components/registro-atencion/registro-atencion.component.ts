@@ -40,6 +40,7 @@ import { ModalCompromisosPersonaComponent } from '../modal-compromisos-persona/m
 import { ModalCompromisosProfesionalesComponent } from '../modal-compromisos-profesionales/modal-compromisos-profesionales.component';
 import { ModalSeguimientosComponent } from '../modal-seguimiento/modal-seguimiento.component';
 import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
+import { ModalAgregarCasoComponent } from '../modal-agregar-caso/modal-agregar-caso.component';
 import { AuthService } from '../../services/auth.service';
 import { AtencionContextoRequestDto, CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, HechoRequestDto, RegistroAtencionCompleteRequestDto, SeguimientoAtencionRequestDto, SolicitudService } from '../../services/solicitud.service';
 import { MaestroDto } from '../../services/listas.service';
@@ -69,6 +70,7 @@ import { environment } from '../../../environments/environment';
     MatTooltipModule,
     TablaCasosComponent,
     TablaOtrosCasosComponent,
+    ModalAgregarCasoComponent,
     MatCheckboxModule,
     FormsModule
   ],
@@ -88,7 +90,43 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
   casoPorAtender: any[] = [];
 
-  casosRelacionados: any[] = [];
+  casosRelacionados: any[] = [
+    {
+      id: 'CASO-001',
+      tiempoHechos: 'Hace 2 meses',
+      tipoViolencia: 'Psicológica',
+      subcategoriaViolencia: 'Intimidación y amenazas',
+      descripcion: 'Amenazas reiteradas por parte de compañero de trabajo.',
+    },
+    {
+      id: 'CASO-002',
+      tiempoHechos: 'Hace 6 meses',
+      tipoViolencia: 'Sexual',
+      subcategoriaViolencia: 'Acoso sexual',
+      descripcion: 'Comentarios inapropiados y contacto no consentido en espacios académicos.',
+    },
+    {
+      id: 'CASO-003',
+      tiempoHechos: 'Hace 1 año',
+      tipoViolencia: 'Física',
+      subcategoriaViolencia: 'Violencia interpersonal',
+      descripcion: 'Agresión física reportada fuera de las instalaciones universitarias.',
+    },
+    {
+      id: 'CASO-004',
+      tiempoHechos: 'Hace 3 semanas',
+      tipoViolencia: 'Institucional',
+      subcategoriaViolencia: 'Revictimización',
+      descripcion: 'La persona fue sometida a interrogatorios reiterados sin acompañamiento.',
+    },
+    {
+      id: 'CASO-005',
+      tiempoHechos: 'Hace 4 meses',
+      tipoViolencia: 'Económica/Patrimonial',
+      subcategoriaViolencia: 'Control económico',
+      descripcion: 'Restricción del acceso a recursos económicos por parte de la pareja.',
+    },
+  ];
 
   dataSource = new MatTableDataSource<any>(this.casoPorAtender);
   dataSourceOtros = new MatTableDataSource<any>(this.casosRelacionados);
@@ -96,7 +134,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   pageIndexCitas = 0;
   pageSizeCitas = 10;
   displayedColumnsTablaInicial: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'dependencia', 'profesional', 'acciones'];
-  displayedColumnsOtros: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'dependencia', 'profesional',];
   catalogoSeguimiento: string[] = ['Presencial', 'Telefónico', 'Virtual', 'Visita Domiciliaria'];
 
   @ViewChild(MatSort) sort?: MatSort;
@@ -566,9 +603,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       next: (respuesta) => {
         const filas = respuesta.content.map((cita) => this.mapearCitaATabla(cita));
         this.casoPorAtender = filas;
-        this.casosRelacionados = filas;
         this.dataSource.data = filas;
-        this.dataSourceOtros.data = filas;
         this.totalElementosCitas = respuesta.totalElements;
         this.pageIndexCitas = respuesta.number;
         this.pageSizeCitas = respuesta.size;
@@ -576,9 +611,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       error: (error) => {
         console.error('Error al cargar citas:', error);
         this.casoPorAtender = [];
-        this.casosRelacionados = [];
         this.dataSource.data = [];
-        this.dataSourceOtros.data = [];
         this.totalElementosCitas = 0;
       }
     });
@@ -666,7 +699,57 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   }
 
   applyFilterOtros(column: string, event: Event) {
-    console.log(column, event);
+    const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
+    this.filterValues[column] = filterValue;
+    this.dataSourceOtros.filter = JSON.stringify(this.filterValues);
+  }
+
+  onAgregarOtroCaso(): void {
+    const dialogRef = this.dialog.open(ModalAgregarCasoComponent, {
+      width: '950px',
+      maxWidth: '98vw',
+      disableClose: true,
+      data: {
+        listaOrientacionSexual: this.listaOrientacionSexual,
+        queForma: this.queForma,
+        lugarHechos: this.lugarHechos,
+        actividadesMisionales: this.actividadesMisionales,
+        listaPsicologica: this.listaPsicologica,
+        listaFisica: this.listaFisica,
+        listaSexual: this.listaSexual,
+        listaInstitucional: this.listaInstitucional,
+        listaPatrimonial: this.listaPatrimonial,
+        listaInformatica: this.listaInformatica,
+        listaPrejuicio: this.listaPrejuicio,
+        listaVinculos: this.listaVinculos,
+        listaVinculosAgresorVictima: this.listaVinculosAgresorVictima,
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const nuevoCaso = {
+          id: `CASO-${Date.now()}`,
+          tiempoHechos: result.tiempoOcurrido || '',
+          tipoViolencia: result.violenciaGenero === 'SI' ? 'VBG' : '',
+          subcategoriaViolencia: '',
+          descripcion: result.hechos?.map((h: any) => h.descripcion).join('; ') || '',
+        };
+        this.casosRelacionados = [...this.casosRelacionados, nuevoCaso];
+        this.dataSourceOtros.data = this.casosRelacionados;
+        this.snackBar.open('Caso agregado correctamente', 'Cerrar', { duration: 2500 });
+      }
+    });
+  }
+
+  onEditarOtroCaso(element: any): void {
+    // TODO: abrir dialog para editar caso
+    console.log('Editar caso:', element);
+  }
+
+  onEliminarOtroCaso(index: number): void {
+    this.casosRelacionados.splice(index, 1);
+    this.dataSourceOtros.data = [...this.casosRelacionados];
   }
 
   mostrarQuienRemite(): boolean {
