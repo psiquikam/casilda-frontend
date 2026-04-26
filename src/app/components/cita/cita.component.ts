@@ -9,7 +9,6 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginatorModule, MatPaginatorIntl, PageEvent } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { MatDialog } from '@angular/material/dialog';
@@ -39,8 +38,7 @@ export function getSpanishPaginatorIntl() {
   imports: [
     CommonModule, MatCardModule, MatFormFieldModule,
     MatInputModule, MatButtonModule, MatIconModule,
-    MatDividerModule, MatTableModule, MatPaginatorModule, MatTooltipModule,
-    MatProgressSpinnerModule
+    MatDividerModule, MatTableModule, MatPaginatorModule, MatTooltipModule
   ],
   providers: [
     { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }

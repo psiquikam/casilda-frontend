@@ -6,10 +6,7 @@
   </div>
 
   <mat-card class="pendientes-card">
-    <div *ngIf="cargando" class="loading-container">
-      <mat-spinner diameter="48"></mat-spinner>
-    </div>
-    <div class="table-responsive" [hidden]="cargando">
+    <div class="table-responsive">
       <table mat-table [dataSource]="dataSource" multiTemplateDataRows>
 
         <ng-container matColumnDef="expand">
