@@ -376,6 +376,53 @@ export interface RegistroAtencionCompleteRequestDto {
   seguimientos?: SeguimientoAtencionRequestDto[];
   hechos?: HechoRequestDto[];
   compromisos?: CompromisosAtencionRequestDto;
+  otrosCasos?: RegistroOtroCasoRequestDto[];
+  otrosCasosActualizar?: ActualizarOtroCasoRequestDto[];
+  otrosCasosEliminar?: number[];
+}
+
+export interface RegistroOtroCasoRequestDto {
+  caso: CasoAtencionRequestDto;
+  hechos?: HechoRequestDto[];
+}
+
+export interface ActualizarOtroCasoRequestDto {
+  idCaso: number;
+  caso: CasoAtencionRequestDto;
+  hechos?: HechoRequestDto[];
+}
+
+export interface OtroCasoDto {
+  idCaso: number;
+  id: string;
+  tiempoHechos: string;
+  tipoViolencia: string;
+  subcategoriaViolencia: string;
+  descripcion: string;
+
+  idOrientacionSexual?: number | null;
+  idIdentidadGenero?: number | null;
+  idFormaOcurrencia?: number | null;
+  idLugarOcurrencia?: number | null;
+  violenciaGenero?: boolean | null;
+  violenciaMisional?: boolean | null;
+  idActividadMisional?: number | null;
+
+  modalidadesViolenciaPsicologica?: number[];
+  modalidadesViolenciaFisica?: number[];
+  modalidadesViolenciaSexual?: number[];
+  modalidadesViolenciaInstitucional?: number[];
+  modalidadesViolenciaEconomica?: number[];
+  modalidadesViolenciaInformatica?: number[];
+  modalidadesViolenciaPrejuicio?: number[];
+
+  presuntoPrimerNombre?: string | null;
+  presuntoSegundoNombre?: string | null;
+  presuntoPrimerApellido?: string | null;
+  presuntoSegundoApellido?: string | null;
+  idVinculoUniversidad?: number | null;
+  idVinculoVictima?: number | null;
+  hechos?: HechoRequestDto[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -485,6 +532,22 @@ export class SolicitudService {
 
   registrarAtencionCompleta(datos: RegistroAtencionCompleteRequestDto): Observable<AtencionResponseDto> {
     return this.http.post<AtencionResponseDto>(this.atencionesUrl, datos);
+  }
+
+  listarOtrosCasos(solicitudId: number): Observable<OtroCasoDto[]> {
+    return this.http.get<OtroCasoDto[]>(`${this.atencionesUrl}/solicitudes/${solicitudId}/otros-casos`);
+  }
+
+  crearOtroCaso(solicitudId: number, datos: RegistroOtroCasoRequestDto): Observable<OtroCasoDto> {
+    return this.http.post<OtroCasoDto>(`${this.atencionesUrl}/solicitudes/${solicitudId}/otros-casos`, datos);
+  }
+
+  actualizarOtroCaso(idCaso: number, datos: RegistroOtroCasoRequestDto): Observable<OtroCasoDto> {
+    return this.http.put<OtroCasoDto>(`${this.atencionesUrl}/otros-casos/${idCaso}`, datos);
+  }
+
+  eliminarOtroCaso(idCaso: number): Observable<void> {
+    return this.http.delete<void>(`${this.atencionesUrl}/otros-casos/${idCaso}`);
   }
 
   crearSeguimiento(datos: SeguimientoAtencionRequestDto): Observable<unknown> {

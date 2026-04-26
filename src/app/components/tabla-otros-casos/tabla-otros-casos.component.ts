@@ -53,7 +53,7 @@ export class TablaOtrosCasosComponent implements AfterViewInit {
   @Input() pageSize = 10;
 
   @Output() editar = new EventEmitter<any>();
-  @Output() eliminar = new EventEmitter<number>();
+  @Output() eliminar = new EventEmitter<any>();
   @Output() filter = new EventEmitter<{ column: string; event: Event }>();
   @Output() pageChange = new EventEmitter<PageEvent>();
 
@@ -73,8 +73,8 @@ export class TablaOtrosCasosComponent implements AfterViewInit {
     this.editar.emit(element);
   }
 
-  onEliminar(index: number) {
-    this.eliminar.emit(index);
+  onEliminar(element: any) {
+    this.eliminar.emit(element);
   }
 
   applyFilter(column: string, event: Event) {

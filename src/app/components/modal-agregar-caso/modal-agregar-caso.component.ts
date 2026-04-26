@@ -29,6 +29,8 @@ export interface ModalAgregarCasoData {
   listaPrejuicio: MaestroDto[];
   listaVinculos: string[];
   listaVinculosAgresorVictima: string[];
+  titulo?: string;
+  initialData?: any;
 }
 
 @Component({
@@ -89,12 +91,18 @@ export class ModalAgregarCasoComponent {
       violenciaInformatica: ['NO'],
       violenciaPrejuicio: ['NO'],
       presuntoPrimerNombre: ['', Validators.required],
-      presuntoSegundoNombre: ['', Validators.required],
+      presuntoSegundoNombre: [''],
       presuntoPrimerApellido: ['', Validators.required],
-      presuntoSegundoApellido: ['', Validators.required],
+      presuntoSegundoApellido: [''],
       presuntoVinculoUniversidad: ['', Validators.required],
       presuntoVinculoVictima: ['', Validators.required],
     });
+
+    this.aplicarDatosIniciales();
+  }
+
+  get tituloModal(): string {
+    return this.data.titulo?.trim() || 'Agregar Caso';
   }
 
   get violenciaMisionalValue(): string {
@@ -154,6 +162,46 @@ export class ModalAgregarCasoComponent {
       const idx = lista.indexOf(valor);
       if (idx >= 0) lista.splice(idx, 1);
     }
+  }
+
+  private aplicarDatosIniciales(): void {
+    const initial = this.data.initialData;
+    if (!initial) {
+      return;
+    }
+
+    this.psicologicaSel = [...(initial.psicologicaSel ?? [])];
+    this.fisicaSel = [...(initial.fisicaSel ?? [])];
+    this.sexualSel = [...(initial.sexualSel ?? [])];
+    this.institucionalSel = [...(initial.institucionalSel ?? [])];
+    this.economicaSel = [...(initial.economicaSel ?? [])];
+    this.informaticaSel = [...(initial.informaticaSel ?? [])];
+    this.prejuicioSel = [...(initial.prejuicioSel ?? [])];
+
+    this.hechosRegistrados = [...(initial.hechos ?? [])];
+
+    this.casoForm.patchValue({
+      orientacionSexual: initial.orientacionSexual ?? '',
+      tiempoOcurrido: initial.tiempoOcurrido ?? '',
+      queForma: initial.queForma ?? '',
+      lugarHechos: initial.lugarHechos ?? '',
+      violenciaGenero: initial.violenciaGenero ?? 'NO',
+      violenciaMisional: initial.violenciaMisional ?? 'NO',
+      actividadMisional: initial.actividadMisional ?? '',
+      violenciaPsicologica: initial.violenciaPsicologica ?? 'NO',
+      violenciaFisica: initial.violenciaFisica ?? 'NO',
+      violenciaSexual: initial.violenciaSexual ?? 'NO',
+      violenciaInstitucional: initial.violenciaInstitucional ?? 'NO',
+      violenciaEconomica: initial.violenciaEconomica ?? 'NO',
+      violenciaInformatica: initial.violenciaInformatica ?? 'NO',
+      violenciaPrejuicio: initial.violenciaPrejuicio ?? 'NO',
+      presuntoPrimerNombre: initial.presuntoPrimerNombre ?? '',
+      presuntoSegundoNombre: initial.presuntoSegundoNombre ?? '',
+      presuntoPrimerApellido: initial.presuntoPrimerApellido ?? '',
+      presuntoSegundoApellido: initial.presuntoSegundoApellido ?? '',
+      presuntoVinculoUniversidad: initial.presuntoVinculoUniversidad ?? '',
+      presuntoVinculoVictima: initial.presuntoVinculoVictima ?? '',
+    });
   }
 
   onGuardar(): void {

@@ -20,6 +20,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -42,7 +43,7 @@ import { ModalSeguimientosComponent } from '../modal-seguimiento/modal-seguimien
 import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
 import { ModalAgregarCasoComponent } from '../modal-agregar-caso/modal-agregar-caso.component';
 import { AuthService } from '../../services/auth.service';
-import { AtencionContextoRequestDto, CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, HechoRequestDto, RegistroAtencionCompleteRequestDto, SeguimientoAtencionRequestDto, SolicitudService } from '../../services/solicitud.service';
+import { AtencionContextoRequestDto, CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, HechoRequestDto, OtroCasoDto, RegistroAtencionCompleteRequestDto, RegistroOtroCasoRequestDto, SeguimientoAtencionRequestDto, SolicitudService } from '../../services/solicitud.service';
 import { MaestroDto } from '../../services/listas.service';
 import { environment } from '../../../environments/environment';
 
@@ -68,9 +69,9 @@ import { environment } from '../../../environments/environment';
     MatPaginatorModule,
     MatSortModule,
     MatTooltipModule,
+    MatProgressSpinnerModule,
     TablaCasosComponent,
     TablaOtrosCasosComponent,
-    ModalAgregarCasoComponent,
     MatCheckboxModule,
     FormsModule
   ],
@@ -89,44 +90,10 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   private readonly maestrosUrl = `${environment.apiBaseUrl}/maestros`;
 
   casoPorAtender: any[] = [];
-
-  casosRelacionados: any[] = [
-    {
-      id: 'CASO-001',
-      tiempoHechos: 'Hace 2 meses',
-      tipoViolencia: 'Psicológica',
-      subcategoriaViolencia: 'Intimidación y amenazas',
-      descripcion: 'Amenazas reiteradas por parte de compañero de trabajo.',
-    },
-    {
-      id: 'CASO-002',
-      tiempoHechos: 'Hace 6 meses',
-      tipoViolencia: 'Sexual',
-      subcategoriaViolencia: 'Acoso sexual',
-      descripcion: 'Comentarios inapropiados y contacto no consentido en espacios académicos.',
-    },
-    {
-      id: 'CASO-003',
-      tiempoHechos: 'Hace 1 año',
-      tipoViolencia: 'Física',
-      subcategoriaViolencia: 'Violencia interpersonal',
-      descripcion: 'Agresión física reportada fuera de las instalaciones universitarias.',
-    },
-    {
-      id: 'CASO-004',
-      tiempoHechos: 'Hace 3 semanas',
-      tipoViolencia: 'Institucional',
-      subcategoriaViolencia: 'Revictimización',
-      descripcion: 'La persona fue sometida a interrogatorios reiterados sin acompañamiento.',
-    },
-    {
-      id: 'CASO-005',
-      tiempoHechos: 'Hace 4 meses',
-      tipoViolencia: 'Económica/Patrimonial',
-      subcategoriaViolencia: 'Control económico',
-      descripcion: 'Restricción del acceso a recursos económicos por parte de la pareja.',
-    },
-  ];
+  casosRelacionados: any[] = [];
+  private otrosCasosPendientes: { _tempId: string, formResult: any, request: RegistroOtroCasoRequestDto }[] = [];
+  private otrosCasosEditados: { idCaso: number, request: RegistroOtroCasoRequestDto, displayRow: any }[] = [];
+  private otrosCasosEliminados: number[] = [];
 
   dataSource = new MatTableDataSource<any>(this.casoPorAtender);
   dataSourceOtros = new MatTableDataSource<any>(this.casosRelacionados);
@@ -148,6 +115,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
   modoAtencion = false;
   casoSeleccionado: any = null;
+  cargandoOtrosCasos = false;
   expandedElement: any | null = null;
   expandedElementOtros: any | null = null;
   tipoSeguimientoSeleccionado?: string;
@@ -667,6 +635,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     });
 
     if (caso?.solicitudId) {
+      this.cargarOtrosCasos(caso.solicitudId);
       this.solicitudService.obtenerPorId(caso.solicitudId).subscribe({
         next: (solicitud) => {
           this.atencionForm.patchValue({
@@ -691,7 +660,29 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
           console.error('Error al cargar detalle de solicitud para la cita:', error);
         }
       });
+    } else {
+      this.casosRelacionados = [];
+      this.dataSourceOtros.data = [];
     }
+  }
+
+  private cargarOtrosCasos(solicitudId: number): void {
+    this.otrosCasosPendientes = [];
+    this.otrosCasosEditados = [];
+    this.otrosCasosEliminados = [];
+    this.cargandoOtrosCasos = true;
+    this.solicitudService.listarOtrosCasos(solicitudId).subscribe({
+      next: (casos) => {
+        this.casosRelacionados = casos;
+        this.dataSourceOtros.data = casos;
+        this.cargandoOtrosCasos = false;
+      },
+      error: () => {
+        this.casosRelacionados = [];
+        this.dataSourceOtros.data = [];
+        this.cargandoOtrosCasos = false;
+      }
+    });
   }
 
   seleccionarCaso(element: any) {
@@ -710,6 +701,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       maxWidth: '98vw',
       disableClose: true,
       data: {
+        titulo: 'Agregar Caso',
         listaOrientacionSexual: this.listaOrientacionSexual,
         queForma: this.queForma,
         lugarHechos: this.lugarHechos,
@@ -727,29 +719,263 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        const nuevoCaso = {
-          id: `CASO-${Date.now()}`,
-          tiempoHechos: result.tiempoOcurrido || '',
-          tipoViolencia: result.violenciaGenero === 'SI' ? 'VBG' : '',
-          subcategoriaViolencia: '',
-          descripcion: result.hechos?.map((h: any) => h.descripcion).join('; ') || '',
-        };
-        this.casosRelacionados = [...this.casosRelacionados, nuevoCaso];
-        this.dataSourceOtros.data = this.casosRelacionados;
-        this.snackBar.open('Caso agregado correctamente', 'Cerrar', { duration: 2500 });
+      if (!result) {
+        return;
       }
+
+      const _tempId = `temp_${Date.now()}`;
+      const request = this.construirRegistroOtroCasoRequest(result);
+      this.otrosCasosPendientes.push({ _tempId, formResult: result, request });
+      const displayRow = this.construirDisplayOtroCaso(_tempId, result);
+      this.casosRelacionados = [displayRow, ...this.casosRelacionados];
+      this.dataSourceOtros.data = this.casosRelacionados;
+      this.snackBar.open('Caso agregado. Se guardará al registrar la atención.', 'Cerrar', { duration: 3000 });
     });
   }
 
-  onEditarOtroCaso(element: any): void {
-    // TODO: abrir dialog para editar caso
-    console.log('Editar caso:', element);
+  onEditarOtroCaso(caso: any): void {
+    const esPendiente = !caso?.idCaso && !!caso?._tempId;
+    const initialData = esPendiente
+      ? this.otrosCasosPendientes.find(p => p._tempId === caso._tempId)?.formResult
+      : (caso?.idCaso ? this.construirDatosInicialesOtroCaso(caso as OtroCasoDto) : null);
+
+    if (!initialData && !esPendiente) {
+      this.snackBar.open('No fue posible identificar el caso a editar.', 'Cerrar', { duration: 3500 });
+      return;
+    }
+
+    const dialogRef = this.dialog.open(ModalAgregarCasoComponent, {
+      width: '950px',
+      maxWidth: '98vw',
+      disableClose: true,
+      data: {
+        titulo: 'Editar Caso',
+        listaOrientacionSexual: this.listaOrientacionSexual,
+        queForma: this.queForma,
+        lugarHechos: this.lugarHechos,
+        actividadesMisionales: this.actividadesMisionales,
+        listaPsicologica: this.listaPsicologica,
+        listaFisica: this.listaFisica,
+        listaSexual: this.listaSexual,
+        listaInstitucional: this.listaInstitucional,
+        listaPatrimonial: this.listaPatrimonial,
+        listaInformatica: this.listaInformatica,
+        listaPrejuicio: this.listaPrejuicio,
+        listaVinculos: this.listaVinculos,
+        listaVinculosAgresorVictima: this.listaVinculosAgresorVictima,
+        initialData
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (!result) {
+        return;
+      }
+
+      const request = this.construirRegistroOtroCasoRequest(result);
+
+      if (esPendiente) {
+        const idx = this.otrosCasosPendientes.findIndex(p => p._tempId === caso._tempId);
+        if (idx >= 0) {
+          this.otrosCasosPendientes[idx] = { _tempId: caso._tempId, formResult: result, request };
+        }
+        const displayRow = this.construirDisplayOtroCaso(caso._tempId, result);
+        this.casosRelacionados = this.casosRelacionados.map(c =>
+          c._tempId === caso._tempId ? displayRow : c
+        );
+      } else {
+        const displayRow = this.construirDisplayOtroCasoExistente(caso.idCaso, result);
+        const idx = this.otrosCasosEditados.findIndex(e => e.idCaso === caso.idCaso);
+        if (idx >= 0) {
+          this.otrosCasosEditados[idx] = { idCaso: caso.idCaso, request, displayRow };
+        } else {
+          this.otrosCasosEditados.push({ idCaso: caso.idCaso, request, displayRow });
+        }
+        this.casosRelacionados = this.casosRelacionados.map(c =>
+          c.idCaso === caso.idCaso ? displayRow : c
+        );
+      }
+
+      this.dataSourceOtros.data = [...this.casosRelacionados];
+      this.snackBar.open('Caso actualizado. Se guardará al registrar la atención.', 'Cerrar', { duration: 2500 });
+    });
   }
 
-  onEliminarOtroCaso(index: number): void {
-    this.casosRelacionados.splice(index, 1);
+  onEliminarOtroCaso(caso: any): void {
+    const esPendiente = !caso?.idCaso && !!caso?._tempId;
+
+    if (esPendiente) {
+      this.otrosCasosPendientes = this.otrosCasosPendientes.filter(p => p._tempId !== caso._tempId);
+      this.casosRelacionados = this.casosRelacionados.filter(c => c._tempId !== caso._tempId);
+    } else if (caso?.idCaso) {
+      this.otrosCasosEliminados.push(caso.idCaso);
+      this.otrosCasosEditados = this.otrosCasosEditados.filter(e => e.idCaso !== caso.idCaso);
+      this.casosRelacionados = this.casosRelacionados.filter(c => c.idCaso !== caso.idCaso);
+    } else {
+      return;
+    }
+
     this.dataSourceOtros.data = [...this.casosRelacionados];
+  }
+
+  private construirDisplayOtroCaso(_tempId: string, result: any): any {
+    const violencias: string[] = [];
+    if (result.violenciaPsicologica === 'SI') violencias.push('Psicológica');
+    if (result.violenciaFisica === 'SI') violencias.push('Física');
+    if (result.violenciaSexual === 'SI') violencias.push('Sexual');
+    if (result.violenciaInstitucional === 'SI') violencias.push('Institucional');
+    if (result.violenciaEconomica === 'SI') violencias.push('Económica');
+    if (result.violenciaInformatica === 'SI') violencias.push('Informática');
+    if (result.violenciaPrejuicio === 'SI') violencias.push('Por prejuicio');
+
+    return {
+      _tempId,
+      idCaso: null,
+      id: 'Pendiente',
+      tiempoHechos: result.tiempoOcurrido ?? '',
+      tipoViolencia: result.violenciaGenero === 'SI' ? 'Género' : result.violenciaMisional === 'SI' ? 'Misional' : '',
+      subcategoriaViolencia: violencias.join(', '),
+      descripcion: result.hechos?.[0]?.descripcion ?? ''
+    };
+  }
+
+  private construirDisplayOtroCasoExistente(idCaso: number, result: any): any {
+    const violencias: string[] = [];
+    if (result.violenciaPsicologica === 'SI') violencias.push('Psicológica');
+    if (result.violenciaFisica === 'SI') violencias.push('Física');
+    if (result.violenciaSexual === 'SI') violencias.push('Sexual');
+    if (result.violenciaInstitucional === 'SI') violencias.push('Institucional');
+    if (result.violenciaEconomica === 'SI') violencias.push('Económica');
+    if (result.violenciaInformatica === 'SI') violencias.push('Informática');
+    if (result.violenciaPrejuicio === 'SI') violencias.push('Por prejuicio');
+
+    return {
+      idCaso,
+      id: String(idCaso),
+      tiempoHechos: result.tiempoOcurrido ?? '',
+      tipoViolencia: result.violenciaGenero === 'SI' ? 'Género' : result.violenciaMisional === 'SI' ? 'Misional' : '',
+      subcategoriaViolencia: violencias.join(', '),
+      descripcion: result.hechos?.[0]?.descripcion ?? ''
+    };
+  }
+
+  private construirRegistroOtroCasoRequest(result: any): RegistroOtroCasoRequestDto {
+    const idOrientacionSexual = this.resolverIdMaestro(result.orientacionSexual, this.catalogoOrientacionesSexuales);
+    const idIdentidadGenero = this.resolverIdMaestro(this.atencionForm.getRawValue().identidadSexual, this.catalogoIdentidadesSexuales);
+    const idFormaOcurrencia = this.resolverIdMaestro(result.queForma, this.catalogoFormasOcurrencia);
+    const idLugarOcurrencia = this.resolverIdMaestro(result.lugarHechos, this.catalogoLugaresOcurrencia);
+    const idActividadMisional = result.violenciaMisional === 'SI'
+      ? this.resolverIdMaestro(result.actividadMisional, this.catalogoActividadesMisionales)
+      : Number.NaN;
+    const idVinculoUniversidad = this.resolverIdMaestro(result.presuntoVinculoUniversidad, this.catalogoVinculosUdea);
+    const idVinculoVictima = this.resolverIdMaestro(result.presuntoVinculoVictima, this.catalogoVinculosAgresorVictima);
+
+    const hechos = (result.hechos ?? [])
+      .map((hecho: any): HechoRequestDto | null => {
+        const lugar = String(hecho?.lugar ?? '').trim();
+        const descripcion = String(hecho?.descripcion ?? '').trim();
+        if (!lugar || !descripcion) {
+          return null;
+        }
+
+        return {
+          fecha: this.formatearFechaLocalDateTime(hecho?.fecha),
+          lugar,
+          descripcion
+        };
+      })
+      .filter((hecho: HechoRequestDto | null): hecho is HechoRequestDto => hecho !== null);
+
+    return {
+      caso: {
+        idOrientacionSexual,
+        idIdentidadGenero,
+        tiempoOcurrido: String(result.tiempoOcurrido ?? ''),
+        idFormaOcurrencia,
+        idLugarOcurrencia,
+        violenciaGenero: result.violenciaGenero === 'SI',
+        violenciaMisional: result.violenciaMisional === 'SI',
+        idActividadMisional: Number.isFinite(idActividadMisional) ? idActividadMisional : null,
+        modalidadesViolenciaPsicologica: result.psicologicaSel ?? [],
+        modalidadesViolenciaFisica: result.fisicaSel ?? [],
+        modalidadesViolenciaSexual: result.sexualSel ?? [],
+        modalidadesViolenciaInstitucional: result.institucionalSel ?? [],
+        modalidadesViolenciaEconomica: result.economicaSel ?? [],
+        modalidadesViolenciaInformatica: result.informaticaSel ?? [],
+        modalidadesViolenciaPrejuicio: result.prejuicioSel ?? [],
+        agresorVictima: {
+          primerNombre: String(result.presuntoPrimerNombre ?? ''),
+          segundoNombre: String(result.presuntoSegundoNombre ?? ''),
+          primerApellido: String(result.presuntoPrimerApellido ?? ''),
+          segundoApellido: String(result.presuntoSegundoApellido ?? ''),
+          idVinculoUniversidad,
+          idVinculoVictima,
+        }
+      },
+      hechos: hechos.length ? hechos : undefined
+    };
+  }
+
+  private construirDatosInicialesOtroCaso(caso: OtroCasoDto): any {
+    const orientacionSexual = this.resolverNombreMaestroPorId(caso.idOrientacionSexual, this.catalogoOrientacionesSexuales);
+    const queForma = this.resolverNombreMaestroPorId(caso.idFormaOcurrencia, this.catalogoFormasOcurrencia);
+    const lugarHechos = this.resolverNombreMaestroPorId(caso.idLugarOcurrencia, this.catalogoLugaresOcurrencia);
+    const actividadMisional = this.resolverNombreMaestroPorId(caso.idActividadMisional, this.catalogoActividadesMisionales);
+    const presuntoVinculoUniversidad = this.resolverNombreMaestroPorId(caso.idVinculoUniversidad, this.catalogoVinculosUdea);
+    const presuntoVinculoVictima = this.resolverNombreMaestroPorId(caso.idVinculoVictima, this.catalogoVinculosAgresorVictima);
+
+    const psicologicaSel = caso.modalidadesViolenciaPsicologica ?? [];
+    const fisicaSel = caso.modalidadesViolenciaFisica ?? [];
+    const sexualSel = caso.modalidadesViolenciaSexual ?? [];
+    const institucionalSel = caso.modalidadesViolenciaInstitucional ?? [];
+    const economicaSel = caso.modalidadesViolenciaEconomica ?? [];
+    const informaticaSel = caso.modalidadesViolenciaInformatica ?? [];
+    const prejuicioSel = caso.modalidadesViolenciaPrejuicio ?? [];
+
+    return {
+      orientacionSexual,
+      tiempoOcurrido: caso.tiempoHechos ?? '',
+      queForma,
+      lugarHechos,
+      violenciaGenero: caso.violenciaGenero ? 'SI' : 'NO',
+      violenciaMisional: caso.violenciaMisional ? 'SI' : 'NO',
+      actividadMisional,
+      violenciaPsicologica: psicologicaSel.length ? 'SI' : 'NO',
+      violenciaFisica: fisicaSel.length ? 'SI' : 'NO',
+      violenciaSexual: sexualSel.length ? 'SI' : 'NO',
+      violenciaInstitucional: institucionalSel.length ? 'SI' : 'NO',
+      violenciaEconomica: economicaSel.length ? 'SI' : 'NO',
+      violenciaInformatica: informaticaSel.length ? 'SI' : 'NO',
+      violenciaPrejuicio: prejuicioSel.length ? 'SI' : 'NO',
+      presuntoPrimerNombre: caso.presuntoPrimerNombre ?? '',
+      presuntoSegundoNombre: caso.presuntoSegundoNombre ?? '',
+      presuntoPrimerApellido: caso.presuntoPrimerApellido ?? '',
+      presuntoSegundoApellido: caso.presuntoSegundoApellido ?? '',
+      presuntoVinculoUniversidad,
+      presuntoVinculoVictima,
+      hechos: (caso.hechos ?? []).map((hecho) => ({
+        fecha: hecho.fecha,
+        lugar: hecho.lugar,
+        descripcion: hecho.descripcion
+      })),
+      psicologicaSel,
+      fisicaSel,
+      sexualSel,
+      institucionalSel,
+      economicaSel,
+      informaticaSel,
+      prejuicioSel
+    };
+  }
+
+  private resolverNombreMaestroPorId(id: unknown, catalogo: MaestroDto[]): string {
+    const idNumerico = Number(id);
+    if (!Number.isFinite(idNumerico)) {
+      return '';
+    }
+
+    const maestro = catalogo.find((item) => item.id === idNumerico);
+    return maestro?.nombre ?? '';
   }
 
   mostrarQuienRemite(): boolean {
@@ -1116,13 +1342,21 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
             this.tabErrors = new Set<string>();
             this.atencionForm.reset();
 
-            this.dialog.open(DialogoExitoComponent, {
+            this.otrosCasosPendientes = [];
+            this.otrosCasosEditados = [];
+            this.otrosCasosEliminados = [];
+
+            const dialogRef = this.dialog.open(DialogoExitoComponent, {
               width: '420px',
               data: {
                 titulo: 'Atención registrada',
                 mensaje: 'La atención fue registrada exitosamente.',
                 codigo: String(atencion?.id ?? '')
               }
+            });
+            dialogRef.afterClosed().subscribe(() => {
+              this.regresar();
+              this.cargarCitas();
             });
           },
           error: (error) => {
@@ -1281,6 +1515,15 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
             persona: compromisosPersona.length ? compromisosPersona : undefined,
             profesional: compromisosProfesional.length ? compromisosProfesional : undefined
           }
+        : undefined,
+      otrosCasos: this.otrosCasosPendientes.length
+        ? this.otrosCasosPendientes.map(p => p.request)
+        : undefined,
+      otrosCasosActualizar: this.otrosCasosEditados.length
+        ? this.otrosCasosEditados.map(e => ({ idCaso: e.idCaso, ...e.request }))
+        : undefined,
+      otrosCasosEliminar: this.otrosCasosEliminados.length
+        ? [...this.otrosCasosEliminados]
         : undefined
     };
   }

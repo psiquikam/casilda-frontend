@@ -1058,16 +1058,17 @@
                                     </button>
                                 </div>
 
+                                <div *ngIf="cargandoOtrosCasos" class="spinner-container">
+                                    <mat-spinner diameter="40"></mat-spinner>
+                                </div>
+
                                 <app-tabla-otros-casos
+                                    *ngIf="!cargandoOtrosCasos"
                                     [dataSource]="dataSourceOtros"
-                                    [serverSidePagination]="true"
-                                    [totalElements]="totalElementosCitas"
-                                    [pageIndex]="pageIndexCitas"
-                                    [pageSize]="pageSizeCitas"
+                                    [serverSidePagination]="false"
                                     (editar)="onEditarOtroCaso($event)"
                                     (eliminar)="onEliminarOtroCaso($event)"
-                                    (filter)="applyFilterOtros($event.column, $event.event)"
-                                    (pageChange)="onPageChangeCitas($event)">
+                                    (filter)="applyFilterOtros($event.column, $event.event)">
                                 </app-tabla-otros-casos>
 
                             </div>
