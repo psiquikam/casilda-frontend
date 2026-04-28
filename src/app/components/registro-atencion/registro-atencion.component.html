@@ -21,7 +21,105 @@
 </div>
 
 <div *ngIf="modoAtencion">
-    <div class="form-container">
+
+    <div class="modo-toggle-bar">
+        <label class="modo-option" [class.active]="modoVista === 'registrar'">
+            <input type="radio" name="modoVista" value="registrar" [(ngModel)]="modoVista">
+            <span class="radio-dot" [class.red]="modoVista === 'registrar'"></span>
+            Registrar
+        </label>
+        <label class="modo-option" [class.active]="modoVista === 'consultar'">
+            <input type="radio" name="modoVista" value="consultar" [(ngModel)]="modoVista">
+            <span class="radio-dot" [class.red]="modoVista === 'consultar'"></span>
+            Consultar
+        </label>
+    </div>
+
+    <div *ngIf="modoVista === 'consultar'" class="consulta-container">
+        <mat-card class="consulta-card">
+            <mat-card-content>
+                <h2 class="consulta-title">Consulta de atención</h2>
+
+                <div class="consulta-tabs">
+                    <button class="ctab" [class.ctab-active]="tabConsulta === 'abierta-activo'" (click)="tabConsulta = 'abierta-activo'">Abierta activo</button>
+                    <button class="ctab" [class.ctab-active]="tabConsulta === 'abierta-transicion'" (click)="tabConsulta = 'abierta-transicion'">Abierta en transición</button>
+                    <button class="ctab" [class.ctab-active]="tabConsulta === 'cerrada'" (click)="tabConsulta = 'cerrada'">Cerrada</button>
+                </div>
+
+                <div class="consulta-toolbar">
+                    <div class="consulta-left">
+                        <span class="mostrar-label">Mostrar</span>
+                        <button mat-mini-fab color="primary" class="btn-mostrar-mas" matTooltip="Cargar más registros">
+                            <mat-icon>add</mat-icon>
+                        </button>
+                        <span class="mostrar-label">registros</span>
+                    </div>
+                    <div class="consulta-right">
+                        <span class="buscar-label">Buscar:</span>
+                        <input class="buscar-input" [(ngModel)]="busquedaConsulta" placeholder="">
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table mat-table [dataSource]="consultaFiltrada" class="consulta-table">
+
+                        <ng-container matColumnDef="documento">
+                            <th mat-header-cell *matHeaderCellDef>Número de documento</th>
+                            <td mat-cell *matCellDef="let row">{{row.documento}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="fecha">
+                            <th mat-header-cell *matHeaderCellDef>Fecha de atención</th>
+                            <td mat-cell *matCellDef="let row">{{row.fecha}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="servicio">
+                            <th mat-header-cell *matHeaderCellDef>Servicio</th>
+                            <td mat-cell *matCellDef="let row">{{row.servicio}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="profesional">
+                            <th mat-header-cell *matHeaderCellDef>Profesional</th>
+                            <td mat-cell *matCellDef="let row">{{row.profesional}}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="opciones">
+                            <th mat-header-cell *matHeaderCellDef class="col-opciones">Opciones</th>
+                            <td mat-cell *matCellDef="let row" class="col-opciones">
+                                <div class="consulta-actions">
+                                    <button mat-icon-button matTooltip="Descargar PDF" class="btn-pdf">
+                                        <mat-icon>picture_as_pdf</mat-icon>
+                                    </button>
+                                    <button mat-icon-button matTooltip="Ver detalle" class="btn-ver">
+                                        <mat-icon svgIcon="icono-ver"></mat-icon>
+                                    </button>
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumnsConsulta"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumnsConsulta;"></tr>
+                    </table>
+
+                    <div *ngIf="consultaFiltrada.length === 0" class="no-results-consulta">
+                        <mat-icon>inbox</mat-icon>
+                        <p>No hay atenciones en esta categoría.</p>
+                    </div>
+                </div>
+
+                <div class="consulta-footer">
+                    <span class="footer-info">Mostrando registros del 1 al {{consultaFiltrada.length}} de un total de {{consultaFiltrada.length}} registros</span>
+                    <div class="footer-pag">
+                        <button mat-stroked-button disabled>Anterior</button>
+                        <span class="pag-num active-pag">1</span>
+                        <button mat-stroked-button disabled>Siguiente</button>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+
+    <div *ngIf="modoVista === 'registrar'" class="form-container">
         <mat-card class="form-card">
             <mat-card-content>
                 <form [formGroup]="atencionForm">
@@ -1382,4 +1480,5 @@
             </mat-card-actions>
         </mat-card>
     </div>
+
 </div>

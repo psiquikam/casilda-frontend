@@ -114,8 +114,36 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   });
 
   modoAtencion = false;
+  modoVista: 'registrar' | 'consultar' = 'registrar';
+  tabConsulta: 'abierta-activo' | 'abierta-transicion' | 'cerrada' = 'abierta-activo';
+  busquedaConsulta = '';
   casoSeleccionado: any = null;
   cargandoOtrosCasos = false;
+
+  consultaAtenciones: any[] = [
+    { documento: '1234567890', fecha: '16 julio 2025', servicio: 'Equipo violeta', profesional: 'María González López', estado: 'abierta-activo' },
+    { documento: '1234567890', fecha: '14 septiembre 2025', servicio: 'Línea Alma', profesional: 'Carlos Pérez Ruiz', estado: 'abierta-activo' },
+    { documento: '1234567890', fecha: '30 octubre 2025', servicio: 'Equipo violeta', profesional: 'Ana Martínez Soto', estado: 'abierta-activo' },
+    { documento: '1234567890', fecha: '2 enero 2026', servicio: 'Línea Alma', profesional: 'Luis Rodríguez Mora', estado: 'abierta-activo' },
+    { documento: '1234567890', fecha: '16 enero 2026', servicio: 'Línea Alma', profesional: 'Sandra Torres Vega', estado: 'abierta-transicion' },
+    { documento: '9876543210', fecha: '5 febrero 2026', servicio: 'Equipo violeta', profesional: 'Jorge Castillo Díaz', estado: 'abierta-transicion' },
+    { documento: '5551112233', fecha: '20 noviembre 2025', servicio: 'Línea Alma', profesional: 'Paola Rivera Cruz', estado: 'cerrada' },
+    { documento: '4449998877', fecha: '3 agosto 2025', servicio: 'Equipo violeta', profesional: 'Andrés Vargas Leal', estado: 'cerrada' },
+  ];
+  dataSourceConsulta = new MatTableDataSource<any>(this.consultaAtenciones);
+  displayedColumnsConsulta = ['documento', 'fecha', 'servicio', 'profesional', 'opciones'];
+
+  get consultaFiltrada(): any[] {
+    const fuente = this.consultaAtenciones.filter(a => a.estado === this.tabConsulta);
+    if (!this.busquedaConsulta.trim()) return fuente;
+    const q = this.busquedaConsulta.toLowerCase();
+    return fuente.filter(a =>
+      a.documento.toLowerCase().includes(q) ||
+      a.fecha.toLowerCase().includes(q) ||
+      a.servicio.toLowerCase().includes(q) ||
+      a.profesional.toLowerCase().includes(q)
+    );
+  }
   expandedElement: any | null = null;
   expandedElementOtros: any | null = null;
   tipoSeguimientoSeleccionado?: string;

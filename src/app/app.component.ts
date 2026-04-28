@@ -59,7 +59,8 @@ export class AppComponent {
       { name: 'logo-login', url: 'assets/login.svg' },
       { name: 'icono-eliminar', url: 'assets/eliminar.svg' },
       { name: 'icono-editar', url: 'assets/editar.svg' },
-      { name: 'icono-ver', url: 'assets/ver.svg' }
+      { name: 'icono-ver', url: 'assets/ver.svg' },
+      { name: 'estadisticas-vbg', url: 'assets/estadisticas-vbg.svg' }
     ];
 
     icons.forEach(icon => {

@@ -56,7 +56,7 @@ export class CasildaHomeComponent {
       tooltip: 'Visualización de datos y métricas del sistema Casilda.'
     },
     { 
-      icon: 'logo-Reportes', 
+      icon: 'estadisticas-vbg',
       title: 'Estadísticas en VBG', 
       variant: 'light',
       tooltip: 'Informes detallados sobre la situación de VBG en la institución.'
