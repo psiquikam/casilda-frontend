@@ -76,7 +76,7 @@ import { environment } from '../../../environments/environment';
     FormsModule
   ],
   templateUrl: './registro-atencion.component.html',
-  styleUrls: ['./registro-atencion.component.scss'],
+  styleUrls: ['./registro-atencion.component.scss', './registro-atencion.consulta.scss'],
   animations: [
     trigger('detailExpand', [
       state('collapsed', style({ height: '0px', minHeight: '0', visibility: 'hidden' })),
@@ -133,6 +133,32 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   dataSourceConsulta = new MatTableDataSource<any>(this.consultaAtenciones);
   displayedColumnsConsulta = ['documento', 'fecha', 'servicio', 'profesional', 'opciones'];
 
+  private readonly longitudesPorTipoDocumento: Record<string, number> = {
+    CC: 10, TI: 11, CE: 7, RC: 11, NUIP: 11, NIP: 11, PA: 12
+  };
+
+  get maxLongitudDocumento(): number {
+    const tipo = String(this.atencionForm?.get('tipoDocumento')?.value ?? '').toUpperCase().trim();
+    if (!tipo) {
+      return 12;
+    }
+    for (const key of Object.keys(this.longitudesPorTipoDocumento)) {
+      if (tipo.includes(key)) {
+        return this.longitudesPorTipoDocumento[key];
+      }
+    }
+    return 12;
+  }
+
+  soloDigitos(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const limpio = input.value.replace(/\D/g, '').slice(0, this.maxLongitudDocumento);
+    if (input.value !== limpio) {
+      input.value = limpio;
+      this.atencionForm.get('documento')?.setValue(limpio, { emitEvent: false });
+    }
+  }
+
   get consultaFiltrada(): any[] {
     const fuente = this.consultaAtenciones.filter(a => a.estado === this.tabConsulta);
     if (!this.busquedaConsulta.trim()) return fuente;
@@ -188,7 +214,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     { tab: 'Datos de la persona', label: 'Régimen de salud', control: 'regimenSalud' },
     { tab: 'Datos de la persona', label: 'Ciudad de nacimiento', control: 'ciudadNacimiento' },
     { tab: 'Datos complementarios', label: 'Vínculo', control: 'vinculo' },
-    { tab: 'Datos complementarios', label: 'Sub-vínculo', control: 'subVinculo' },
     { tab: 'Datos complementarios', label: 'Facultad', control: 'facultad' },
     { tab: 'Datos complementarios', label: 'Programa', control: 'programa' },
     { tab: 'Datos complementarios', label: 'Dependencia', control: 'dependencia' },
@@ -224,7 +249,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   listaIdentidadSexual: string[] = [];
   listaOrientacionSexual: string[] = [];
   listaVinculos: string[] = [];
-  listaSubVinculos: string[] = [];
   listaVinculosAgresorVictima: string[] = [];
   listaDependencia: string[] = [];
   listaTipoViolencia: string[] = [];
@@ -290,6 +314,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     this.cargarCitas();
     const nombreUsuario = this.authService.currentUser?.nombre || '';
     this.atencionForm.get('personaRegistra')?.setValue(nombreUsuario);
+    this.atencionForm.get('personaAtiende')?.setValue(nombreUsuario);
 
     this.dataSource.filterPredicate = (data: any, filter: string): boolean => {
       const searchTerms = JSON.parse(filter);
@@ -399,7 +424,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         this.listaIdentidadSexual = this.mapNombres(data.identidadesSexuales);
         this.listaOrientacionSexual = this.mapNombres(data.orientacionesSexuales);
         this.listaVinculos = this.mapNombres(data.vinculosUdea);
-        this.listaSubVinculos = this.mapNombres(data.subVinculosUdea);
         this.listaVinculosAgresorVictima = this.mapNombres(data.vinculosAgresorVictima);
         this.listaDependencia = this.mapNombres(data.dependencias);
         this.listaTipoViolencia = this.mapNombres(data.tiposViolencia);
@@ -657,7 +681,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     this.modoAtencion = true;
     this.atencionForm.patchValue({
       tipoSolicitud: caso.tipoSolicitud || 'Indirecta',
-      personaAtiende: this.obtenerPersonaAtiende(caso),
       documento: caso.documento || '',
       tipoViolencia: caso.tipoViolencia || ''
     });
@@ -667,7 +690,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       this.solicitudService.obtenerPorId(caso.solicitudId).subscribe({
         next: (solicitud) => {
           this.atencionForm.patchValue({
-            personaAtiende: solicitud.profesional || this.obtenerPersonaAtiende(caso),
             tipoDocumento: solicitud.tipoDocumento || this.atencionForm.get('tipoDocumento')?.value,
             documento: solicitud.numeroDocumento || caso.documento || '',
             primerNombre: solicitud.primerNombre || '',
@@ -1278,7 +1300,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       campus: ['', Validators.required],
       facultad: ['', Validators.required],
       vinculo: ['', Validators.required],
-      subVinculo: ['', Validators.required],
       programa: ['', Validators.required],
       logroAcuerdo: ['NO'],
       tipoViolencia: [''],
@@ -1421,7 +1442,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       campus,
       facultad,
       vinculo,
-      subVinculo,
       programa,
       tiempoOcurrido,
       queForma,
@@ -1460,7 +1480,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       idCampus: this.resolverIdMaestro(campus, this.catalogoCampus),
       idFacultad: this.resolverIdMaestro(facultad, this.catalogoFacultades),
       idVinculoUniversidad: this.resolverIdMaestro(vinculo, this.catalogoVinculosUdea),
-      idSubVinculoUniversidad: subVinculo ? this.resolverIdMaestro(subVinculo, this.catalogoSubVinculosUdea) : null,
+      idSubVinculoUniversidad: null,
       idPrograma: this.resolverIdMaestro(programa, this.catalogoProgramas),
       idEtnia: etnia ? this.resolverIdMaestro(etnia, this.catalogoEtnias) : null,
       idCiudadResidencia: ciudadResidencia ? Number(ciudadResidencia) : null,

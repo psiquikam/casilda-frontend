@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { finalize, forkJoin } from 'rxjs';
+import { catchError, finalize, forkJoin, Observable, of } from 'rxjs';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -76,11 +76,11 @@ export class AtencionPrComponent implements OnInit {
   cargandoCatalogos = false;
   guardandoRegistro = false;
   buscandoPersona = false;
+  tabSeleccionada = 0;
   idRegistroCreado: number | null = null;
   idPersonaEncontrada: number | null = null;
   tiposReporteAlma: MaestroDto[] = [];
   canalesContacto: MaestroDto[] = [];
-  formasEntrevista: MaestroDto[] = [];
   tiposDocumento: MaestroDto[] = [];
   regimenes: MaestroDto[] = [];
   eps: MaestroDto[] = [];
@@ -92,19 +92,22 @@ export class AtencionPrComponent implements OnInit {
   orientacionesSexuales: MaestroDto[] = [];
   etnias: MaestroDto[] = [];
   vinculos: MaestroDto[] = [];
-  subVinculos: MaestroDto[] = [];
   facultades: MaestroDto[] = [];
   programas: MaestroDto[] = [];
+  programasFiltrados: MaestroDto[] = [];
   dependencias: MaestroDto[] = [];
   campus: MaestroDto[] = [];
-  aphCanales: MaestroDto[] = [];
-  aphConvenios: MaestroDto[] = [];
-  aphAmbitos: MaestroDto[] = [];
   aphProtocolos: MaestroDto[] = [];
   aphResultadosTriage: MaestroDto[] = [];
   usuarios: UsuarioDto[] = [];
   gruposProfesionales: GrupoProfesionalDto[] = [];
   readonly tipoServicioAphId = 5;
+  // TODO: reemplazar por maestro del backend cuando exista (`obtenerMaestro('actores-remitentes')`).
+  readonly actoresRemitentes: string[] = [
+    'Bienestar Universitario',
+    'Masculinidades',
+    'Otros'
+  ];
   discapacidadesRegistradas: any[] = [];
   correoRegistrados: any[] = [];
   telefonosRegistrados: any[] = [];
@@ -120,11 +123,9 @@ export class AtencionPrComponent implements OnInit {
       canal: [{ value: '', disabled: true }, Validators.required],
       tipoAtencion: [{ value: '', disabled: true }],
       quienRemite: [{ value: '', disabled: true }, Validators.required],
-      fechaHora: [{ value: '', disabled: true }, Validators.required],
+      fechaHora: [{ value: this.formatearFechaParaDatetimeLocal(new Date()), disabled: true }, Validators.required],
       personaAtiende: [{ value: '', disabled: true }, Validators.required],
       tipoServicio: [{ value: 'Atención APH', disabled: true }],
-      personaRegistra: [{ value: this.obtenerIdUsuarioActual(), disabled: true }, Validators.required],
-      formaLugarEntrevista: [{ value: '', disabled: true }, Validators.required],
       documento: [''],
       tipoDocumento: [''],
       fechaNacimiento: [''],
@@ -139,30 +140,29 @@ export class AtencionPrComponent implements OnInit {
       departamentoResidencia: [''],
       ciudadResidencia: [''],
       sexo: [''],
-      identidadSexual: [''],
+      identidadSexual: ['', Validators.required],
       orientacionSexual: [''],
       etnia: [''],
       direccionResidencia: [''],
-      vinculo: ['', Validators.required],
-      subVinculo: ['', Validators.required],
-      facultad: ['', Validators.required],
-      programa: ['', Validators.required],
-      dependencia: ['', Validators.required],
-      campus: ['', Validators.required],
-      aphCanal: ['', Validators.required],
+      vinculo: [''],
+      facultad: [{ value: '', disabled: true }],
+      programa: [{ value: '', disabled: true }],
+      dependencia: [{ value: '', disabled: true }],
+      campus: [{ value: '', disabled: true }],
       aphFecha: ['', Validators.required],
       aphHora: ['', Validators.required],
-      aphConvenio: ['', Validators.required],
-      aphAmbito: ['', Validators.required],
       aphProtocolo: ['', Validators.required],
       aphPracticoTriage: ['si', Validators.required],
       aphResultadoTriage: ['', Validators.required],
-      aphMotivoNoRealizacionTriage: ['', Validators.required],
+      aphMotivoNoRealizacionTriage: [''],
       aphAceptaPsicologia: ['si', Validators.required],
       aphRequiereRemision: ['si', Validators.required]
     });
 
     this.cargarCatalogos();
+    this.configurarValidadoresTriage();
+    this.configurarDependenciaCamposPorVinculo();
+    this.configurarDependenciaProgramasPorFacultad();
 
     this.registroCasoForm.get('tipoReporte')?.valueChanges.subscribe((valor) => {
       const esDirecta = valor === 'directa';
@@ -174,9 +174,7 @@ export class AtencionPrComponent implements OnInit {
         'quienRemite',
         'fechaHora',
         'personaAtiende',
-        'tipoServicio',
-        'personaRegistra',
-        'formaLugarEntrevista'
+        'tipoServicio'
       ];
       controls.forEach((campo) => this.registroCasoForm.get(campo)?.disable({ emitEvent: false }));
 
@@ -187,10 +185,8 @@ export class AtencionPrComponent implements OnInit {
             tipoAtencion: '',
             quienRemite: '',
             fechaHora: '',
-            personaAtiende: '',
-            tipoServicio: this.remisionDefaults.tipoServicio,
-            personaRegistra: this.obtenerIdUsuarioActual(),
-            formaLugarEntrevista: ''
+            personaAtiende: this.obtenerIdUsuarioActual(),
+            tipoServicio: this.remisionDefaults.tipoServicio
           },
           { emitEvent: false }
         );
@@ -204,40 +200,38 @@ export class AtencionPrComponent implements OnInit {
             quienRemite: '',
             canal: '',
             fechaHora: this.formatearFechaParaDatetimeLocal(new Date()),
+            personaAtiende: this.obtenerIdUsuarioActual(),
             tipoServicio: this.remisionDefaults.tipoServicio
           },
           { emitEvent: false }
         );
 
-        ['canal', 'personaAtiende', 'formaLugarEntrevista'].forEach((campo) => {
+        ['canal'].forEach((campo) => {
           this.registroCasoForm.get(campo)?.enable({ emitEvent: false });
         });
 
-        this.registroCasoForm.get('personaRegistra')?.setValue(this.obtenerIdUsuarioActual(), { emitEvent: false });
         this.registroCasoForm.get('fechaHora')?.disable({ emitEvent: false });
-        this.registroCasoForm.get('personaRegistra')?.disable({ emitEvent: false });
+        this.registroCasoForm.get('personaAtiende')?.disable({ emitEvent: false });
 
         return;
       }
 
       this.registroCasoForm.patchValue(
         {
-          canal: this.obtenerIdCanalRemision(),
+          canal: '',
           tipoAtencion: this.remisionDefaults.tipoAtencion,
           fechaHora: this.formatearFechaParaDatetimeLocal(new Date()),
-          tipoServicio: this.remisionDefaults.tipoServicio,
-          personaRegistra: this.obtenerIdUsuarioActual()
+          personaAtiende: this.obtenerIdUsuarioActual(),
+          tipoServicio: this.remisionDefaults.tipoServicio
         },
         { emitEvent: false }
       );
 
-      ['quienRemite', 'personaAtiende', 'formaLugarEntrevista'].forEach((campo) => {
+      ['canal', 'quienRemite'].forEach((campo) => {
         this.registroCasoForm.get(campo)?.enable({ emitEvent: false });
       });
 
-      this.registroCasoForm.get('personaRegistra')?.setValue(this.obtenerIdUsuarioActual(), { emitEvent: false });
-
-      ['canal', 'tipoAtencion', 'fechaHora', 'tipoServicio', 'personaRegistra'].forEach((campo) => {
+      ['tipoAtencion', 'fechaHora', 'tipoServicio', 'personaAtiende'].forEach((campo) => {
         this.registroCasoForm.get(campo)?.disable({ emitEvent: false });
       });
     });
@@ -249,7 +243,6 @@ export class AtencionPrComponent implements OnInit {
     forkJoin({
       tiposReporteAlma: this.listasService.obtenerMaestro('tipos-reporte-alma'),
       canalesContacto: this.listasService.obtenerMaestro('canales-contacto'),
-      formasEntrevista: this.listasService.obtenerMaestro('formas-entrevista'),
       tiposDocumento: this.listasService.obtenerMaestro('tipos-identificacion'),
       regimenes: this.listasService.obtenerMaestro('regimenes'),
       eps: this.listasService.obtenerMaestro('eps'),
@@ -259,14 +252,10 @@ export class AtencionPrComponent implements OnInit {
       orientacionesSexuales: this.listasService.obtenerMaestro('orientaciones-sexuales'),
       etnias: this.listasService.obtenerMaestro('etnias'),
       vinculos: this.listasService.obtenerMaestro('vinculos-udea'),
-      subVinculos: this.listasService.obtenerMaestro('subvinculos-udea'),
       facultades: this.listasService.obtenerMaestro('facultades'),
       programas: this.listasService.obtenerMaestro('programas'),
       dependencias: this.listasService.obtenerMaestro('dependencias'),
       campus: this.listasService.obtenerMaestro('campus'),
-      aphCanales: this.listasService.obtenerMaestro('canales-aph'),
-      aphConvenios: this.listasService.obtenerMaestro('convenios-aph'),
-      aphAmbitos: this.listasService.obtenerMaestro('ambitos-aph'),
       aphProtocolos: this.listasService.obtenerMaestro('protocolos-aph'),
       aphResultadosTriage: this.listasService.obtenerMaestro('resultados-triage'),
       usuarios: this.usuarioService.obtenerTodos(),
@@ -275,7 +264,6 @@ export class AtencionPrComponent implements OnInit {
       next: (catalogos) => {
         this.tiposReporteAlma = catalogos.tiposReporteAlma;
         this.canalesContacto = catalogos.canalesContacto;
-        this.formasEntrevista = catalogos.formasEntrevista;
         this.tiposDocumento = catalogos.tiposDocumento;
         this.regimenes = catalogos.regimenes;
         this.eps = catalogos.eps;
@@ -286,14 +274,10 @@ export class AtencionPrComponent implements OnInit {
         this.orientacionesSexuales = catalogos.orientacionesSexuales;
         this.etnias = catalogos.etnias;
         this.vinculos = catalogos.vinculos;
-        this.subVinculos = catalogos.subVinculos;
         this.facultades = catalogos.facultades;
         this.programas = catalogos.programas;
         this.dependencias = catalogos.dependencias;
         this.campus = catalogos.campus;
-        this.aphCanales = catalogos.aphCanales;
-        this.aphConvenios = catalogos.aphConvenios;
-        this.aphAmbitos = catalogos.aphAmbitos;
         this.aphProtocolos = catalogos.aphProtocolos;
         this.aphResultadosTriage = catalogos.aphResultadosTriage;
         this.usuarios = catalogos.usuarios;
@@ -306,6 +290,116 @@ export class AtencionPrComponent implements OnInit {
         this.cargandoCatalogos = false;
       }
     });
+  }
+
+  private readonly camposMeta: Record<string, { etiqueta: string; tab: number }> = {
+    tipoReporte: { etiqueta: 'Tipo de solicitud', tab: 0 },
+    canal: { etiqueta: 'Canal de comunicación', tab: 0 },
+    quienRemite: { etiqueta: 'Quién remite', tab: 0 },
+    fechaHora: { etiqueta: 'Fecha y hora', tab: 0 },
+    personaAtiende: { etiqueta: 'APH que atiende', tab: 0 },
+    identidadSexual: { etiqueta: 'Identidad de género', tab: 1 },
+    aphFecha: { etiqueta: 'APH: Fecha', tab: 3 },
+    aphHora: { etiqueta: 'APH: Hora', tab: 3 },
+    aphProtocolo: { etiqueta: 'APH: Protocolo', tab: 3 },
+    aphPracticoTriage: { etiqueta: 'APH: ¿Practicó triage?', tab: 3 },
+    aphResultadoTriage: { etiqueta: 'APH: Resultado del triage', tab: 3 },
+    aphMotivoNoRealizacionTriage: { etiqueta: 'APH: Motivo de no realización del triage', tab: 3 },
+    aphAceptaPsicologia: { etiqueta: 'APH: ¿Acepta atención por psicología?', tab: 3 },
+    aphRequiereRemision: { etiqueta: 'APH: ¿Requiere remisión?', tab: 3 }
+  };
+
+  private obtenerNombresInvalidos(): string[] {
+    return Object.keys(this.registroCasoForm.controls).filter((nombre) => {
+      const control = this.registroCasoForm.get(nombre);
+      return !!control && control.enabled && control.invalid;
+    });
+  }
+
+  private describirCamposInvalidos(): string {
+    return this.obtenerNombresInvalidos()
+      .map((nombre) => this.camposMeta[nombre]?.etiqueta ?? nombre)
+      .join(', ');
+  }
+
+  private tabDelPrimerCampoInvalido(): number | null {
+    for (const nombre of this.obtenerNombresInvalidos()) {
+      const meta = this.camposMeta[nombre];
+      if (meta) {
+        return meta.tab;
+      }
+    }
+    return null;
+  }
+
+  private configurarValidadoresTriage(): void {
+    const resultado = this.registroCasoForm.get('aphResultadoTriage');
+    const motivo = this.registroCasoForm.get('aphMotivoNoRealizacionTriage');
+
+    this.registroCasoForm.get('aphPracticoTriage')?.valueChanges.subscribe((valor) => {
+      if (valor === 'si') {
+        resultado?.setValidators([Validators.required]);
+        motivo?.clearValidators();
+      } else {
+        motivo?.setValidators([Validators.required]);
+        resultado?.clearValidators();
+      }
+      resultado?.updateValueAndValidity({ emitEvent: false });
+      motivo?.updateValueAndValidity({ emitEvent: false });
+    });
+  }
+
+  private configurarDependenciaCamposPorVinculo(): void {
+    this.registroCasoForm.get('vinculo')?.valueChanges.subscribe((vinculoId) => {
+      const vinculo = this.vinculos.find((v) => v.id === Number(vinculoId));
+      this.categoriaVinculo = vinculo ? this.clasificarVinculo(vinculo.nombre) : 'ninguno';
+
+      ['facultad', 'programa', 'dependencia', 'campus'].forEach((nombre) => {
+        const ctrl = this.registroCasoForm.get(nombre);
+        ctrl?.setValue('', { emitEvent: false });
+        ctrl?.disable({ emitEvent: false });
+      });
+      this.programasFiltrados = [];
+
+      if (this.categoriaVinculo !== 'ninguno') {
+        this.registroCasoForm.get('facultad')?.enable({ emitEvent: false });
+        this.registroCasoForm.get('dependencia')?.enable({ emitEvent: false });
+        this.registroCasoForm.get('campus')?.enable({ emitEvent: false });
+        // Programa permanece deshabilitado hasta elegir facultad,
+        // y solo si la categoría es estudiante/otro vínculo.
+      }
+    });
+  }
+
+  private configurarDependenciaProgramasPorFacultad(): void {
+    const programaCtrl = this.registroCasoForm.get('programa');
+    this.registroCasoForm.get('facultad')?.valueChanges.subscribe((facultadId) => {
+      programaCtrl?.setValue('', { emitEvent: false });
+      this.programasFiltrados = [];
+
+      if (!facultadId || this.categoriaVinculo !== 'con-programa') {
+        programaCtrl?.disable({ emitEvent: false });
+        return;
+      }
+      this.cargarProgramasPorFacultad(Number(facultadId)).subscribe((lista) => {
+        this.programasFiltrados = lista;
+        if (lista.length > 0) {
+          programaCtrl?.enable({ emitEvent: false });
+        } else {
+          programaCtrl?.disable({ emitEvent: false });
+        }
+      });
+    });
+  }
+
+  // TODO: reemplazar por el endpoint real cuando el backend exponga
+  // /maestros/facultades/{id}/programas. Mientras tanto, filtramos en cliente
+  // si los programas trajeran metadata; en su defecto devolvemos vacío para
+  // forzar que el usuario consulte al área correspondiente.
+  private cargarProgramasPorFacultad(facultadId: number): Observable<MaestroDto[]> {
+    return this.http
+      .get<MaestroDto[]>(`${this.maestrosUrl}/facultades/${facultadId}/programas`)
+      .pipe(catchError(() => of(this.programas)));
   }
 
   private configurarDependenciaMunicipios(): void {
@@ -350,8 +444,8 @@ export class AtencionPrComponent implements OnInit {
       this.registroCasoForm.get('aphResultadoTriage')?.setValue(this.aphResultadosTriage[0].id, { emitEvent: false });
     }
 
-    if (!this.registroCasoForm.get('personaRegistra')?.value) {
-      this.registroCasoForm.get('personaRegistra')?.setValue(this.obtenerIdUsuarioActual(), { emitEvent: false });
+    if (!this.registroCasoForm.get('personaAtiende')?.value) {
+      this.registroCasoForm.get('personaAtiende')?.setValue(this.obtenerIdUsuarioActual(), { emitEvent: false });
     }
   }
 
@@ -369,6 +463,44 @@ export class AtencionPrComponent implements OnInit {
     return this.authService.currentUser?.nombre ?? '';
   }
 
+  get canalesContactoSinRemision(): MaestroDto[] {
+    return this.canalesContacto.filter((canal) => !canal.nombre.toLowerCase().includes('remisi'));
+  }
+
+  get vinculosFiltrados(): MaestroDto[] {
+    return this.vinculos.filter((v) => {
+      const n = v.nombre.trim().toLowerCase();
+      if (/t[eé]cnic/.test(n)) return false;
+      if (n === 'n/a' || n === 'na' || n === 'n.a.' || n === 'no aplica') return false;
+      return true;
+    });
+  }
+
+  private categoriaVinculo: 'con-programa' | 'sin-programa' | 'ninguno' = 'ninguno';
+
+  // con-programa  → habilita Facultad, Programa, Dependencia, Campus
+  // sin-programa  → habilita Facultad, Dependencia, Campus (sin Programa)
+  // ninguno       → todos deshabilitados
+  private clasificarVinculo(nombre: string): 'con-programa' | 'sin-programa' | 'ninguno' {
+    const n = nombre.toLowerCase();
+
+    // Docentes y Jubilado: sin Programa.
+    if (n.includes('docente') || n.includes('jubilad')) {
+      return 'sin-programa';
+    }
+
+    // Estudiantes (pregrado/tecnología/posgrado), Otro tipo de vínculo,
+    // Prestador de Servicios, Pensionado, Contratista, Externo, Otro: con Programa.
+    if (/estudiante.*(pregrado|tecnolog|posgrado)/.test(n)) return 'con-programa';
+    if (n.includes('otro')) return 'con-programa';
+    if (n.includes('prestador')) return 'con-programa';
+    if (n.includes('pensionad')) return 'con-programa';
+    if (n.includes('contratista')) return 'con-programa';
+    if (n.includes('externo')) return 'con-programa';
+
+    return 'ninguno';
+  }
+
   private formatearFechaParaDatetimeLocal(fecha: Date): string {
     const yyyy = fecha.getFullYear();
     const mm = String(fecha.getMonth() + 1).padStart(2, '0');
@@ -382,6 +514,34 @@ export class AtencionPrComponent implements OnInit {
     return this.registroCasoForm.get('aphPracticoTriage')?.value === 'no'
       ? 'Motivo no realización del triage'
       : 'Nota del APH';
+  }
+
+  private readonly longitudesPorTipoDocumento: Record<string, number> = {
+    CC: 10, TI: 11, CE: 7, RC: 11, NUIP: 11, NIP: 11, PA: 12
+  };
+
+  get maxLongitudDocumento(): number {
+    const tipoId = this.registroCasoForm?.get('tipoDocumento')?.value;
+    if (!tipoId) {
+      return 12;
+    }
+    const tipo = this.tiposDocumento.find((t) => t.id === Number(tipoId));
+    const clave = (tipo?.codigo || tipo?.nombre || '').toUpperCase().trim();
+    for (const key of Object.keys(this.longitudesPorTipoDocumento)) {
+      if (clave.includes(key)) {
+        return this.longitudesPorTipoDocumento[key];
+      }
+    }
+    return 12;
+  }
+
+  soloDigitos(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const limpio = input.value.replace(/\D/g, '').slice(0, this.maxLongitudDocumento);
+    if (input.value !== limpio) {
+      input.value = limpio;
+      this.registroCasoForm.get('documento')?.setValue(limpio, { emitEvent: false });
+    }
   }
 
   abrirModalDireccion(): void {
@@ -522,7 +682,15 @@ export class AtencionPrComponent implements OnInit {
   guardarRegistro(): void {
     if (this.registroCasoForm.invalid) {
       this.registroCasoForm.markAllAsTouched();
-      this.snackBar.open('Completa los campos obligatorios para guardar el registro.', 'Cerrar', { duration: 4000 });
+      const tab = this.tabDelPrimerCampoInvalido();
+      if (tab !== null) {
+        this.tabSeleccionada = tab;
+      }
+      const detalle = this.describirCamposInvalidos();
+      const mensaje = detalle
+        ? `Faltan campos obligatorios: ${detalle}`
+        : 'Completa los campos obligatorios para guardar el registro.';
+      this.snackBar.open(mensaje, 'Cerrar', { duration: 7000 });
       return;
     }
 
@@ -530,38 +698,45 @@ export class AtencionPrComponent implements OnInit {
     const documento = String(this.registroCasoForm.get('documento')?.value ?? '').trim();
 
     if (!tipoDocumentoId || !documento) {
-      this.snackBar.open('Debe ingresar tipo y numero de documento para identificar la persona.', 'Cerrar', { duration: 4000 });
+      this.snackBar.open('Debes ingresar tipo y número de documento para identificar la persona.', 'Cerrar', { duration: 4000 });
+      return;
+    }
+
+    const idUsuario = this.obtenerIdUsuarioActual();
+    if (!idUsuario) {
+      this.snackBar.open('No se pudo identificar al usuario actual. Vuelve a iniciar sesión o espera a que carguen los catálogos.', 'Cerrar', { duration: 6000 });
       return;
     }
 
     this.guardandoRegistro = true;
 
     if (this.idPersonaEncontrada) {
-      const payload = this.construirPayloadRegistro(this.idPersonaEncontrada);
-      this.enviarRegistro(payload);
+      this.enviarRegistro(this.construirPayloadRegistro(this.idPersonaEncontrada));
       return;
     }
 
     this.solicitudService.buscarPersonaPorDocumento(tipoDocumentoId, documento)
-      .pipe(finalize(() => { this.guardandoRegistro = false; }))
       .subscribe({
         next: (persona) => {
           const idPersona = Number(persona.id);
           if (!idPersona) {
+            this.guardandoRegistro = false;
             this.snackBar.open(
-              'No se pudo obtener el ID de la persona desde la busqueda por documento. Contacta al administrador para habilitar ese campo en el endpoint.',
+              'No se pudo obtener el ID de la persona desde la búsqueda por documento.',
               'Cerrar',
-              { duration: 7000 }
+              { duration: 6000 }
             );
             return;
           }
 
-          const payload = this.construirPayloadRegistro(idPersona);
-          this.enviarRegistro(payload);
+          this.idPersonaEncontrada = idPersona;
+          this.enviarRegistro(this.construirPayloadRegistro(idPersona));
         },
         error: (error) => {
-          const mensaje = error?.error?.message || 'No se encontro la persona por documento.';
-          this.snackBar.open(mensaje, 'Cerrar', { duration: 5000 });
+          this.guardandoRegistro = false;
+          const mensaje = error?.error?.message
+            ?? 'No se encontró la persona por documento. Búscala primero desde "Datos de la persona".';
+          this.snackBar.open(mensaje, 'Cerrar', { duration: 5500 });
         }
       });
   }
@@ -597,10 +772,10 @@ export class AtencionPrComponent implements OnInit {
     }
 
     const atencionAph: AtencionAphRequestDto = {
-      idCanalAph: Number(raw.aphCanal),
+      idCanalAph: null,
       fechaHora: this.combinarFechaHora(raw.aphFecha, raw.aphHora),
-      idConvenioAph: Number(raw.aphConvenio),
-      idAmbitoAph: Number(raw.aphAmbito),
+      idConvenioAph: null,
+      idAmbitoAph: null,
       idProtocoloAph: Number(raw.aphProtocolo),
       practicoTriage: raw.aphPracticoTriage === 'si',
       idResultadoTriage: raw.aphPracticoTriage === 'si' ? Number(raw.aphResultadoTriage) : null,
@@ -615,23 +790,25 @@ export class AtencionPrComponent implements OnInit {
       fecha: this.toIsoDateTime(r.fecha)
     }));
 
+    const idUsuario = this.obtenerIdUsuarioActual() ?? 0;
+
     return {
       idPersona,
       idTipoReporte,
       idCanalContacto: Number(raw.canal),
       quienRemite: raw.tipoReporte === 'indirecta' ? (raw.quienRemite || null) : null,
-      fechaHoraAtencion: this.toIsoDateTime(raw.fechaHora),
-      idPersonaAtiende: Number(raw.personaAtiende),
+      fechaHoraAtencion: this.toIsoDateTime(raw.fechaHora || new Date()),
+      idPersonaAtiende: Number(raw.personaAtiende) || idUsuario,
       idTipoServicio: this.tipoServicioAphId,
-      idPersonaRegistra: Number(raw.personaRegistra),
-      idFormaEntrevista: raw.formaLugarEntrevista ? Number(raw.formaLugarEntrevista) : null,
+      idPersonaRegistra: idUsuario,
+      idFormaEntrevista: null,
       idIdentidadGenero: Number(raw.identidadSexual),
       idOrientacionSexual: raw.orientacionSexual ? Number(raw.orientacionSexual) : null,
       idEtnia: raw.etnia ? Number(raw.etnia) : null,
       idCiudadResidencia: raw.ciudadResidencia ? Number(raw.ciudadResidencia) : null,
       direccionResidencia: raw.direccionResidencia || null,
       idVinculoUdeA: raw.vinculo ? Number(raw.vinculo) : null,
-      idSubVinculoUdeA: raw.subVinculo ? Number(raw.subVinculo) : null,
+      idSubVinculoUdeA: null,
       idFacultad: raw.facultad ? Number(raw.facultad) : null,
       idPrograma: raw.programa ? Number(raw.programa) : null,
       idDependencia: raw.dependencia ? Number(raw.dependencia) : null,

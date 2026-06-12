@@ -11,7 +11,7 @@
       <form [formGroup]="acompanamientoForm">
 
         <div class="profile-selector">
-          <h3 class="section-title">¿Cómo desea realizar su solicitud?</h3>
+          <h3 class="section-title">Tipo de solicitud</h3>
           <mat-radio-group formControlName="tipoReporte" class="profile-grid">
             <div class="profile-card" [class.selected]="acompanamientoForm.get('tipoReporte')?.value === 'directa'">
               <mat-radio-button value="directa">

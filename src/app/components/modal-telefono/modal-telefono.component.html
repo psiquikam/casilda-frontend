@@ -15,7 +15,12 @@
 
     <mat-form-field appearance="outline" class="field-tel">
       <mat-label>Teléfono</mat-label>
-      <input matInput [(ngModel)]="data.telefono" placeholder="Ej: 3001234567">
+      <input matInput [(ngModel)]="data.telefono"
+        inputmode="numeric"
+        pattern="\d*"
+        maxlength="15"
+        (input)="soloDigitosTelefono($event)"
+        placeholder="Ej: 3001234567">
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="field-desc">

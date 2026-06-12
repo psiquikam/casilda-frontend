@@ -58,6 +58,15 @@ export class ModalTelefonoComponent implements OnInit {
     this.data.tipo = found ? found.nombre : '';
   }
 
+  soloDigitosTelefono(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const limpio = input.value.replace(/\D/g, '').slice(0, 15);
+    if (input.value !== limpio) {
+      input.value = limpio;
+    }
+    this.data.telefono = limpio;
+  }
+
   get canSubmit(): boolean {
     return this.data.tipoId !== null
       && this.data.telefono.trim().length > 0

@@ -67,15 +67,24 @@
       width: calc(100% - 24px) !important;
       border-radius: 8px;
       color: #64748b;
-      height: 36px !important;
+      min-height: 36px !important;
+      height: auto !important;
       transition: all 0.2s ease;
 
       ::ng-deep .mdc-list-item__content {
         padding-left: 38px !important;
+        padding-right: 8px !important;
 
         @media (max-width: 768px) {
           padding-left: 30px !important;
         }
+      }
+
+      ::ng-deep .mdc-list-item__primary-text {
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        line-height: 1.2 !important;
       }
 
       &:hover {
@@ -86,7 +95,7 @@
       &.active-item {
         background-color: #f5f3ff !important;
         color: #6B2D95 !important;
-        
+
         ::ng-deep .mdc-list-item__primary-text {
           font-weight: 700 !important;
         }

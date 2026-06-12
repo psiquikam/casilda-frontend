@@ -4,10 +4,10 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface AtencionAphRequestDto {
-  idCanalAph: number;
+  idCanalAph?: number | null;
   fechaHora: string;
-  idConvenioAph: number;
-  idAmbitoAph: number;
+  idConvenioAph?: number | null;
+  idAmbitoAph?: number | null;
   idProtocoloAph: number;
   practicoTriage: boolean;
   idResultadoTriage?: number | null;

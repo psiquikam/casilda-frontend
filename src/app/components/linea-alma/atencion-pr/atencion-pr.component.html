@@ -1,7 +1,6 @@
 <div class="atencion-pr-container animate-fade-in">
 	<div class="section-header">
-		<h2>Atención PR</h2>
-		<span class="subtitle">Línea ALMA</span>
+		<h2>Atención Primer Respondiente</h2>
 	</div>
 
 	<mat-card class="form-card">
@@ -11,11 +10,11 @@
 				<p>Cargando catálogos...</p>
 			</div>
 			<form [formGroup]="registroCasoForm">
-				<mat-tab-group animationDuration="200ms" color="primary">
+				<mat-tab-group animationDuration="200ms" color="primary" [(selectedIndex)]="tabSeleccionada">
 				<mat-tab label="Registro de atención de caso">
 					<div class="tab-padding">
 							<div class="profile-selector">
-								<h3 class="section-title">¿Cómo desea realizar su solicitud?</h3>
+								<h3 class="section-title">Tipo de solicitud</h3>
 								<mat-radio-group formControlName="tipoReporte" class="profile-grid">
 									<div class="profile-card" [class.selected]="registroCasoForm.get('tipoReporte')?.value === 'directa'">
 										<mat-radio-button value="directa">
@@ -35,9 +34,9 @@
 							<div class="directa-section" *ngIf="registroCasoForm.get('tipoReporte')?.value === 'directa'">
 								<div class="row-3">
 									<mat-form-field appearance="outline">
-										<mat-label>Canal</mat-label>
+										<mat-label>Canal de comunicación por donde se recibe la solicitud</mat-label>
 										<mat-select formControlName="canal">
-											@for (canal of canalesContacto; track canal.id) {
+											@for (canal of canalesContactoSinRemision; track canal.id) {
 											<mat-option [value]="canal.id">{{canal.nombre}}</mat-option>
 											}
 										</mat-select>
@@ -56,33 +55,13 @@
 
 								<div class="row-3">
 									<mat-form-field appearance="outline">
-										<mat-label>Persona que atiende</mat-label>
-										<mat-select formControlName="personaAtiende">
-											@for (grupo of gruposProfesionales; track grupo.id) {
-											<mat-option [value]="grupo.id">{{grupo.nombre}}</mat-option>
-											}
-										</mat-select>
+										<mat-label>APH que atiende</mat-label>
+										<input matInput [value]="nombreUsuarioActual" readonly>
 									</mat-form-field>
 
 									<mat-form-field appearance="outline">
 										<mat-label>Tipo de servicio</mat-label>
 										<input matInput formControlName="tipoServicio" readonly>
-									</mat-form-field>
-
-									<mat-form-field appearance="outline">
-										<mat-label>Persona que registra</mat-label>
-										<input matInput [value]="nombreUsuarioActual" readonly>
-									</mat-form-field>
-								</div>
-
-								<div class="row-3">
-									<mat-form-field appearance="outline">
-										<mat-label>Forma y lugar de la entrevista</mat-label>
-										<mat-select formControlName="formaLugarEntrevista">
-											@for (forma of formasEntrevista; track forma.id) {
-											<mat-option [value]="forma.id">{{forma.nombre}}</mat-option>
-											}
-										</mat-select>
 									</mat-form-field>
 								</div>
 							</div>
@@ -90,8 +69,12 @@
 							<div class="directa-section" *ngIf="registroCasoForm.get('tipoReporte')?.value === 'indirecta'">
 								<div class="row-3">
 									<mat-form-field appearance="outline">
-										<mat-label>Canal</mat-label>
-										<input matInput formControlName="canal" readonly>
+										<mat-label>Canal de comunicación por donde se recibe la solicitud</mat-label>
+										<mat-select formControlName="canal">
+											@for (canal of canalesContactoSinRemision; track canal.id) {
+											<mat-option [value]="canal.id">{{canal.nombre}}</mat-option>
+											}
+										</mat-select>
 									</mat-form-field>
 
 									<mat-form-field appearance="outline">
@@ -101,7 +84,11 @@
 
 									<mat-form-field appearance="outline">
 										<mat-label>Quién remite</mat-label>
-										<input matInput formControlName="quienRemite">
+										<mat-select formControlName="quienRemite">
+											@for (actor of actoresRemitentes; track actor) {
+											<mat-option [value]="actor">{{actor}}</mat-option>
+											}
+										</mat-select>
 									</mat-form-field>
 								</div>
 
@@ -112,33 +99,13 @@
 									</mat-form-field>
 
 									<mat-form-field appearance="outline">
-										<mat-label>Persona que atiende</mat-label>
-										<mat-select formControlName="personaAtiende">
-											@for (grupo of gruposProfesionales; track grupo.id) {
-											<mat-option [value]="grupo.id">{{grupo.nombre}}</mat-option>
-											}
-										</mat-select>
+										<mat-label>APH que atiende</mat-label>
+										<input matInput [value]="nombreUsuarioActual" readonly>
 									</mat-form-field>
 
 									<mat-form-field appearance="outline">
 										<mat-label>Fecha y hora</mat-label>
 										<input matInput type="datetime-local" formControlName="fechaHora" readonly>
-									</mat-form-field>
-								</div>
-
-								<div class="row-3">
-									<mat-form-field appearance="outline">
-										<mat-label>Persona que registra</mat-label>
-										<input matInput [value]="nombreUsuarioActual" readonly>
-									</mat-form-field>
-
-									<mat-form-field appearance="outline">
-										<mat-label>Forma y lugar de la entrevista</mat-label>
-										<mat-select formControlName="formaLugarEntrevista">
-											@for (forma of formasEntrevista; track forma.id) {
-											<mat-option [value]="forma.id">{{forma.nombre}}</mat-option>
-											}
-										</mat-select>
 									</mat-form-field>
 								</div>
 							</div>
@@ -158,7 +125,12 @@
 							</mat-form-field>
 							<mat-form-field appearance="outline" subscriptSizing="dynamic">
 								<mat-label>Número de Documento</mat-label>
-								<input matInput formControlName="documento" (keyup.enter)="buscarPersona($event)">
+								<input matInput formControlName="documento"
+									inputmode="numeric"
+									pattern="\d*"
+									[maxlength]="maxLongitudDocumento"
+									(input)="soloDigitos($event)"
+									(keyup.enter)="buscarPersona($event)">
 								<button matSuffix mat-icon-button type="button"
 									(click)="buscarPersona($event)"
 									[disabled]="buscandoPersona"
@@ -339,25 +311,16 @@
 					<div class="tab-padding">
 						<div class="grid-3">
 							<mat-form-field appearance="outline" subscriptSizing="dynamic">
-								<mat-label>Vínculo de la persona atendida con la universidad</mat-label>
+								<mat-label>Vínculo de la persona atendida con la UdeA</mat-label>
 								<mat-select formControlName="vinculo">
-									@for (v of vinculos; track v.id) {
+									@for (v of vinculosFiltrados; track v.id) {
 									<mat-option [value]="v.id">{{v.nombre}}</mat-option>
 									}
 								</mat-select>
 							</mat-form-field>
 
 							<mat-form-field appearance="outline" subscriptSizing="dynamic">
-								<mat-label>Sub Vinculo</mat-label>
-								<mat-select formControlName="subVinculo">
-									@for (v of subVinculos; track v.id) {
-									<mat-option [value]="v.id">{{v.nombre}}</mat-option>
-									}
-								</mat-select>
-							</mat-form-field>
-
-							<mat-form-field appearance="outline" subscriptSizing="dynamic">
-								<mat-label>Facultad</mat-label>
+								<mat-label>Facultad, Escuela o instituto</mat-label>
 								<mat-select formControlName="facultad">
 									@for (f of facultades; track f.id) {
 									<mat-option [value]="f.id">{{f.nombre}}</mat-option>
@@ -367,8 +330,9 @@
 
 							<mat-form-field appearance="outline" subscriptSizing="dynamic">
 								<mat-label>Programa</mat-label>
-								<mat-select formControlName="programa">
-									@for (f of programas; track f.id) {
+								<mat-select formControlName="programa"
+									[matTooltip]="!registroCasoForm.get('facultad')?.value ? 'Primero selecciona una facultad' : ''">
+									@for (f of programasFiltrados; track f.id) {
 									<mat-option [value]="f.id">{{f.nombre}}</mat-option>
 									}
 								</mat-select>
@@ -497,15 +461,6 @@
 					<div class="tab-padding aph-tab">
 						<div class="grid-3 aph-top-grid">
 								<mat-form-field appearance="outline" subscriptSizing="dynamic">
-									<mat-label>Canal</mat-label>
-									<mat-select formControlName="aphCanal">
-										@for (canal of aphCanales; track canal.id) {
-										<mat-option [value]="canal.id">{{canal.nombre}}</mat-option>
-										}
-									</mat-select>
-								</mat-form-field>
-
-								<mat-form-field appearance="outline" subscriptSizing="dynamic">
 									<mat-label>Fecha</mat-label>
 									<input matInput [matDatepicker]="aphFechaPicker" formControlName="aphFecha">
 									<mat-datepicker-toggle matIconSuffix [for]="aphFechaPicker"></mat-datepicker-toggle>
@@ -519,24 +474,6 @@
 							</div>
 
 							<div class="grid-3 aph-top-grid">
-								<mat-form-field appearance="outline" subscriptSizing="dynamic">
-									<mat-label>Convenio</mat-label>
-									<mat-select formControlName="aphConvenio">
-										@for (convenio of aphConvenios; track convenio.id) {
-										<mat-option [value]="convenio.id">{{convenio.nombre}}</mat-option>
-										}
-									</mat-select>
-								</mat-form-field>
-
-								<mat-form-field appearance="outline" subscriptSizing="dynamic">
-									<mat-label>Ambito</mat-label>
-									<mat-select formControlName="aphAmbito">
-										@for (ambito of aphAmbitos; track ambito.id) {
-										<mat-option [value]="ambito.id">{{ambito.nombre}}</mat-option>
-										}
-									</mat-select>
-								</mat-form-field>
-
 								<mat-form-field appearance="outline" subscriptSizing="dynamic">
 									<mat-label>Protocolo</mat-label>
 									<mat-select formControlName="aphProtocolo">
