@@ -492,7 +492,7 @@
 								</mat-radio-group>
 							</div>
 
-							<div class="aph-result-row">
+							<div class="aph-result-row" *ngIf="registroCasoForm.get('aphPracticoTriage')?.value === 'si'">
 								<div class="aph-question-label aph-result-label">Resultado del triage<span>*</span></div>
 								<mat-radio-group formControlName="aphResultadoTriage" class="aph-result-group">
 									@for (resultado of aphResultadosTriage; track resultado.id) {
@@ -503,10 +503,17 @@
 								</mat-radio-group>
 							</div>
 
+							<div class="aph-nota-block" *ngIf="registroCasoForm.get('aphPracticoTriage')?.value === 'no'">
+								<mat-form-field appearance="outline" subscriptSizing="dynamic" class="aph-nota-field">
+									<mat-label>Motivo no realización del triage</mat-label>
+									<textarea matInput rows="4" class="aph-nota-textarea" formControlName="aphMotivoNoRealizacionTriage"></textarea>
+								</mat-form-field>
+							</div>
+
 							<div class="aph-nota-block">
 								<mat-form-field appearance="outline" subscriptSizing="dynamic" class="aph-nota-field">
-									<mat-label>{{ etiquetaTriageNota }}</mat-label>
-									<textarea matInput rows="4" class="aph-nota-textarea" formControlName="aphMotivoNoRealizacionTriage"></textarea>
+									<mat-label>Nota del APH</mat-label>
+									<textarea matInput rows="4" class="aph-nota-textarea" formControlName="aphNotaAph"></textarea>
 								</mat-form-field>
 							</div>
 
@@ -530,11 +537,72 @@
 
 				<mat-tab label="Contacto">
 					<div class="tab-padding">
-						<div class="construction-box">
-							<mat-icon>phone_enabled</mat-icon>
-							<h3>Contacto</h3>
-							<p>Contenido en construcción.</p>
+						<div *ngIf="!idRegistroCreado" class="no-results-msg">
+							<mat-icon>info</mat-icon>
+							<p>Guarda primero el registro Línea ALMA para poder agregar intentos de contacto.</p>
 						</div>
+
+						<ng-container *ngIf="idRegistroCreado">
+							<div class="row-3">
+								<mat-form-field appearance="outline" subscriptSizing="dynamic">
+									<mat-label>Fecha y hora del intento</mat-label>
+									<input matInput type="datetime-local" [formControl]="contactoFechaCtrl">
+								</mat-form-field>
+
+								<mat-form-field appearance="outline" subscriptSizing="dynamic">
+									<mat-label>Resultado del contacto</mat-label>
+									<mat-select [formControl]="contactoResultadoCtrl">
+										@for (r of resultadosContacto; track r.id) {
+										<mat-option [value]="r.id">{{r.nombre}}</mat-option>
+										}
+									</mat-select>
+								</mat-form-field>
+
+								<div class="section-header-inline" style="align-items: center;">
+									<button mat-raised-button color="primary" type="button"
+										(click)="registrarIntentoContacto()"
+										[disabled]="guardandoContacto || contactoFechaCtrl.invalid || contactoResultadoCtrl.invalid">
+										<mat-icon>{{ guardandoContacto ? 'hourglass_top' : 'phone_callback' }}</mat-icon>
+										<span>{{ guardandoContacto ? 'Registrando...' : 'Registrar intento' }}</span>
+									</button>
+								</div>
+							</div>
+
+							<div class="discapacidad-container">
+								<div class="section-header-inline">
+									<div class="section-title">
+										<mat-icon color="primary">history</mat-icon>
+										<span>Intentos de contacto registrados</span>
+									</div>
+								</div>
+
+								<div class="table-responsive">
+									<table mat-table [dataSource]="contactosRegistrados" class="atencion-table">
+										<ng-container matColumnDef="fecha">
+											<th mat-header-cell *matHeaderCellDef> Fecha y hora </th>
+											<td mat-cell *matCellDef="let c"> {{ c.fecha | date:'dd/MM/yyyy HH:mm' }} </td>
+										</ng-container>
+
+										<ng-container matColumnDef="resultado">
+											<th mat-header-cell *matHeaderCellDef> Resultado </th>
+											<td mat-cell *matCellDef="let c"> {{ c.resultado }} </td>
+										</ng-container>
+
+										<tr mat-header-row *matHeaderRowDef="['fecha', 'resultado']"></tr>
+										<tr mat-row *matRowDef="let row; columns: ['fecha', 'resultado'];"></tr>
+									</table>
+
+									<div *ngIf="contactosRegistrados.length === 0 && !cargandoContactos" class="no-results-msg">
+										<mat-icon>phone_disabled</mat-icon>
+										<p>No hay intentos de contacto registrados.</p>
+									</div>
+									<div *ngIf="cargandoContactos" class="no-results-msg">
+										<mat-icon>hourglass_top</mat-icon>
+										<p>Cargando intentos...</p>
+									</div>
+								</div>
+							</div>
+						</ng-container>
 					</div>
 				</mat-tab>
 

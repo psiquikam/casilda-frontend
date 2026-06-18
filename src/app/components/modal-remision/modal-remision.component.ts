@@ -40,6 +40,31 @@ export class ModalRemisionComponent implements OnInit {
 
   tiposRemision: MaestroDto[] = [];
 
+  // Opciones por tipo de remisión. Se irán alimentando con el tiempo.
+  // TODO: reemplazar por el maestro del backend cuando exista
+  // (p.ej. `obtenerMaestro('instancias-remision-interna')` y `...-externa`).
+  private readonly instanciasInternasFallback: string[] = [
+    'Seguridad a personas y bienes'
+  ];
+
+  private readonly instanciasExternasFallback: string[] = [
+    'Policía',
+    'Fiscalía General de la Nación',
+    'IPS-Salud',
+    'EPS-Salud'
+  ];
+
+  get instanciasRemision(): string[] {
+    const nombre = (this.data.tipo?.nombre ?? '').toLowerCase();
+    if (nombre.includes('interna')) return this.instanciasInternasFallback;
+    if (nombre.includes('externa')) return this.instanciasExternasFallback;
+    return [];
+  }
+
+  onTipoRemisionChange(): void {
+    this.data.cual = '';
+  }
+
   constructor(public dialogRef: MatDialogRef<ModalRemisionComponent>) {}
 
   ngOnInit(): void {
