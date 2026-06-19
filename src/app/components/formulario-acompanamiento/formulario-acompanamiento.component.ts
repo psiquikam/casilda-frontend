@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -81,6 +81,7 @@ export class FormularioAcompanamientoComponent implements OnInit {
   initForm(): void {
     this.acompanamientoForm = this.fb.group({
       tipoReporte: ['', Validators.required],
+      medioSolicitud: [null, Validators.required],
 
       remitentePrimerNombre: [''],
       remitenteSegundoNombre: [''],
@@ -276,6 +277,9 @@ export class FormularioAcompanamientoComponent implements OnInit {
     // tipoSolicitudId: 1 = Solicitud Directa, 2 = Solicitud Indirecta
     const tipoSolicitudId = tipoReporte === 'directa' ? 1 : 2;
 
+    // medioSolicitudId: 1 = Presencial, 2 = Virtual
+    const medioSolicitudId = fv.medioSolicitud === 'presencial' ? 1 : 2;
+
     // Mapear todos los correos y teléfonos registrados en los modales
     const correos = this.correoRegistrados
       .filter(c => c.correo)
@@ -295,6 +299,7 @@ export class FormularioAcompanamientoComponent implements OnInit {
 
     const payload = {
       tipoSolicitudId,
+      medioSolicitudId,
       datosSolicitante: {
         primerNombre: fv.primerNombre,
         segundoNombre: fv.segundoNombre || null,

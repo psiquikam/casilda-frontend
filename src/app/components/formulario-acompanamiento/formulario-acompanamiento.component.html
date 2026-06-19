@@ -11,7 +11,7 @@
       <form [formGroup]="acompanamientoForm">
 
         <div class="profile-selector">
-          <h3 class="section-title">Tipo de solicitud</h3>
+          <h3 class="section-title">¿Desea registrar una solicitud?</h3>
           <mat-radio-group formControlName="tipoReporte" class="profile-grid">
             <div class="profile-card" [class.selected]="acompanamientoForm.get('tipoReporte')?.value === 'directa'">
               <mat-radio-button value="directa">
@@ -23,6 +23,24 @@
               <mat-radio-button value="indirecta">
                 <strong>Solicitud Indirecta</strong>
                 <p>Usted reporta el caso de un tercero que requiere apoyo.</p>
+              </mat-radio-button>
+            </div>
+          </mat-radio-group>
+        </div>
+
+        <div class="profile-selector">
+          <h3 class="section-title">¿Cuál es el medio por donde llegó la solicitud?</h3>
+          <mat-radio-group formControlName="medioSolicitud" class="profile-grid">
+            <div class="profile-card" [class.selected]="acompanamientoForm.get('medioSolicitud')?.value === 'presencial'">
+              <mat-radio-button value="presencial">
+                <strong>Presencial</strong>
+                <p>Solicitud realizada de manera presencial.</p>
+              </mat-radio-button>
+            </div>
+            <div class="profile-card" [class.selected]="acompanamientoForm.get('medioSolicitud')?.value === 'virtual'">
+              <mat-radio-button value="virtual">
+                <strong>Virtual</strong>
+                <p>Solicitud realizada de manera virtual.</p>
               </mat-radio-button>
             </div>
           </mat-radio-group>
@@ -44,13 +62,9 @@
                   </mat-form-field>
                   <mat-form-field appearance="outline">
                     <mat-label>Número Documento</mat-label>
-                    <input matInput formControlName="remitenteNumeroDocumento"
-                      (keyup.enter)="buscarRemitente($event)">
-                    <button matSuffix mat-icon-button class="btn-search-doc"
-                      type="button"
-                      (click)="buscarRemitente($event)"
-                      [disabled]="buscandoRemitente"
-                      matTooltip="Buscar funcionario">
+                    <input matInput formControlName="remitenteNumeroDocumento" (keyup.enter)="buscarRemitente($event)">
+                    <button matSuffix mat-icon-button class="btn-search-doc" type="button"
+                      (click)="buscarRemitente($event)" [disabled]="buscandoRemitente" matTooltip="Buscar funcionario">
                       <mat-icon *ngIf="!buscandoRemitente">search</mat-icon>
                       <mat-spinner *ngIf="buscandoRemitente" diameter="18"></mat-spinner>
                     </button>
@@ -142,13 +156,9 @@
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Número Documento</mat-label>
-              <input matInput formControlName="numeroDocumento"
-                (keyup.enter)="buscarSolicitante($event)">
-              <button matSuffix mat-icon-button class="btn-search-doc"
-                type="button"
-                (click)="buscarSolicitante($event)"
-                [disabled]="buscandoSolicitante"
-                matTooltip="Buscar solicitante">
+              <input matInput formControlName="numeroDocumento" (keyup.enter)="buscarSolicitante($event)">
+              <button matSuffix mat-icon-button class="btn-search-doc" type="button" (click)="buscarSolicitante($event)"
+                [disabled]="buscandoSolicitante" matTooltip="Buscar solicitante">
                 <mat-icon *ngIf="!buscandoSolicitante">search</mat-icon>
                 <mat-spinner *ngIf="buscandoSolicitante" diameter="18"></mat-spinner>
               </button>
@@ -276,7 +286,7 @@
                     Acciones </th>
                   <td mat-cell *matCellDef="let i = index" style="text-align: center;">
                     <button mat-icon-button (click)="eliminarTelefono(i)" matTooltip="Eliminar">
-<mat-icon svgIcon="icono-eliminar"></mat-icon>
+                      <mat-icon svgIcon="icono-eliminar"></mat-icon>
                     </button>
                   </td>
                 </ng-container>

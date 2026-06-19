@@ -19,7 +19,7 @@ export interface PagedResponseDto<T> {
   number: number;
 }
 
-type ListaKey = 'tiposSolicitud' | 'campus' | 'dependencias' | 'facultades' | 'tiposDocumento' | 'identidadesGenero' | 'cargos';
+type ListaKey = 'tiposSolicitud' | 'campus' | 'dependencias' | 'facultades' | 'tiposDocumento' | 'identidadesGenero' | 'cargos' | 'medioSolicitud';
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +33,8 @@ export class ListasService {
     facultades: 'facultades',
     tiposDocumento: 'tipos-identificacion',
     identidadesGenero: 'identidades-genero',
-    cargos: 'cargos'
+    cargos: 'cargos',
+    medioSolicitud: 'medio-solicitud'
   };
 
   private data: Record<ListaKey, MaestroDto[]> = {
@@ -43,7 +44,8 @@ export class ListasService {
     facultades: [],
     tiposDocumento: [],
     identidadesGenero: [],
-    cargos: []
+    cargos: [],
+    medioSolicitud: []
   };
 
   private listasSubject = new BehaviorSubject<Record<ListaKey, MaestroDto[]>>(this.data);
@@ -61,7 +63,8 @@ export class ListasService {
       facultades: this.obtenerListaDesdeEndpoint('facultades'),
       tiposDocumento: this.obtenerListaDesdeEndpoint('tiposDocumento'),
       identidadesGenero: this.obtenerListaDesdeEndpoint('identidadesGenero'),
-      cargos: this.obtenerListaDesdeEndpoint('cargos')
+      cargos: this.obtenerListaDesdeEndpoint('cargos'),
+      medioSolicitud: this.obtenerListaDesdeEndpoint('medioSolicitud')
     }).subscribe(result => {
       this.data = result;
       this.listasSubject.next(this.data);
