@@ -12,6 +12,7 @@ export interface AtencionAphRequestDto {
   practicoTriage: boolean;
   idResultadoTriage?: number | null;
   notaOMotivoTriage?: string | null;
+  notaAph?: string | null;
   aceptaPsicologia: boolean;
   requiereRemision: boolean;
 }

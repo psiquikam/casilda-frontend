@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { catchError, finalize, forkJoin, Observable, of } from 'rxjs';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
@@ -29,6 +29,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { DialogoExitoComponent } from '../../dialog-exito/dialog-exito.component';
 import {
   AtencionAphRequestDto,
+  ContactoLineaAlmaResponseDto,
   LineaAlmaService,
   RegistroLineaAlmaRequestDto,
   RemisionRegistroAlmaRequestDto
@@ -112,6 +113,12 @@ export class AtencionPrComponent implements OnInit {
   correoRegistrados: any[] = [];
   telefonosRegistrados: any[] = [];
   remisionesRegistrados: any[] = [];
+  resultadosContacto: MaestroDto[] = [];
+  contactosRegistrados: ContactoLineaAlmaResponseDto[] = [];
+  cargandoContactos = false;
+  guardandoContacto = false;
+  contactoFechaCtrl = new FormControl<string>(this.formatearFechaParaDatetimeLocal(new Date()), { nonNullable: true, validators: [Validators.required] });
+  contactoResultadoCtrl = new FormControl<number | null>(null, { validators: [Validators.required] });
   readonly remisionDefaults = {
     canal: 'Remisión',
     tipoAtencion: 'Remisión',
@@ -155,6 +162,7 @@ export class AtencionPrComponent implements OnInit {
       aphPracticoTriage: ['si', Validators.required],
       aphResultadoTriage: ['', Validators.required],
       aphMotivoNoRealizacionTriage: [''],
+      aphNotaAph: [''],
       aphAceptaPsicologia: ['si', Validators.required],
       aphRequiereRemision: ['si', Validators.required]
     });
@@ -258,6 +266,7 @@ export class AtencionPrComponent implements OnInit {
       campus: this.listasService.obtenerMaestro('campus'),
       aphProtocolos: this.listasService.obtenerMaestro('protocolos-aph'),
       aphResultadosTriage: this.listasService.obtenerMaestro('resultados-triage'),
+      resultadosContacto: this.listasService.obtenerMaestro('resultados-contacto-telefonico'),
       usuarios: this.usuarioService.obtenerTodos(),
       gruposProfesionales: this.solicitudService.listarGruposProfesionales()
     }).subscribe({
@@ -280,6 +289,7 @@ export class AtencionPrComponent implements OnInit {
         this.campus = catalogos.campus;
         this.aphProtocolos = catalogos.aphProtocolos;
         this.aphResultadosTriage = catalogos.aphResultadosTriage;
+        this.resultadosContacto = catalogos.resultadosContacto;
         this.usuarios = catalogos.usuarios;
         this.gruposProfesionales = catalogos.gruposProfesionales;
 
@@ -508,12 +518,6 @@ export class AtencionPrComponent implements OnInit {
     const hh = String(fecha.getHours()).padStart(2, '0');
     const min = String(fecha.getMinutes()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
-  }
-
-  get etiquetaTriageNota(): string {
-    return this.registroCasoForm.get('aphPracticoTriage')?.value === 'no'
-      ? 'Motivo no realización del triage'
-      : 'Nota del APH';
   }
 
   private readonly longitudesPorTipoDocumento: Record<string, number> = {
@@ -748,6 +752,7 @@ export class AtencionPrComponent implements OnInit {
       .subscribe({
         next: (response) => {
           this.idRegistroCreado = response.id;
+          this.cargarContactos(response.id);
           this.dialog.open(DialogoExitoComponent, {
             width: '400px',
             data: {
@@ -779,7 +784,8 @@ export class AtencionPrComponent implements OnInit {
       idProtocoloAph: Number(raw.aphProtocolo),
       practicoTriage: raw.aphPracticoTriage === 'si',
       idResultadoTriage: raw.aphPracticoTriage === 'si' ? Number(raw.aphResultadoTriage) : null,
-      notaOMotivoTriage: raw.aphMotivoNoRealizacionTriage || null,
+      notaOMotivoTriage: raw.aphPracticoTriage === 'no' ? (raw.aphMotivoNoRealizacionTriage || null) : null,
+      notaAph: raw.aphNotaAph || null,
       aceptaPsicologia: raw.aphAceptaPsicologia === 'si',
       requiereRemision: raw.aphRequiereRemision === 'si'
     };
@@ -873,6 +879,48 @@ export class AtencionPrComponent implements OnInit {
   eliminarRemision(i: number): void {
     this.remisionesRegistrados.splice(i, 1);
     this.remisionesRegistrados = [...this.remisionesRegistrados];
+  }
+
+  cargarContactos(idRegistro: number): void {
+    this.cargandoContactos = true;
+    this.lineaAlmaService.listarContactos(idRegistro)
+      .pipe(finalize(() => { this.cargandoContactos = false; }))
+      .subscribe({
+        next: (lista) => { this.contactosRegistrados = lista; },
+        error: () => { this.contactosRegistrados = []; }
+      });
+  }
+
+  registrarIntentoContacto(): void {
+    if (!this.idRegistroCreado) {
+      this.snackBar.open('Primero guarda el registro Línea ALMA.', 'Cerrar', { duration: 4000 });
+      return;
+    }
+    if (this.contactoFechaCtrl.invalid || this.contactoResultadoCtrl.invalid) {
+      this.contactoFechaCtrl.markAsTouched();
+      this.contactoResultadoCtrl.markAsTouched();
+      return;
+    }
+
+    const idResultado = Number(this.contactoResultadoCtrl.value);
+    const fecha = this.toIsoDateTime(this.contactoFechaCtrl.value);
+
+    this.guardandoContacto = true;
+    this.lineaAlmaService.registrarContacto(this.idRegistroCreado, { fecha, idResultado })
+      .pipe(finalize(() => { this.guardandoContacto = false; }))
+      .subscribe({
+        next: (contacto) => {
+          this.contactosRegistrados = [...this.contactosRegistrados, contacto];
+          this.contactoFechaCtrl.setValue(this.formatearFechaParaDatetimeLocal(new Date()));
+          this.contactoResultadoCtrl.setValue(null);
+          this.contactoResultadoCtrl.markAsUntouched();
+          this.snackBar.open('Intento de contacto registrado.', 'Cerrar', { duration: 3000 });
+        },
+        error: (error) => {
+          const mensaje = error?.error?.message ?? 'No fue posible registrar el intento de contacto.';
+          this.snackBar.open(mensaje, 'Cerrar', { duration: 5000 });
+        }
+      });
   }
 
 }
