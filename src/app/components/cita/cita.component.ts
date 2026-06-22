@@ -14,6 +14,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { MatDialog } from '@angular/material/dialog';
 import { ReprogramarCitaModalComponent } from '../modal-reprogramar-cita/modal-reprogramar-cita.component';
 import { SolicitudService, CitaDto, EstadoCitaEnum } from '../../services/solicitud.service';
+import { formatOnlyDate } from '../../custom-date-adapter';
 
 export function getSpanishPaginatorIntl() {
   const paginatorIntl = new MatPaginatorIntl();
@@ -58,8 +59,9 @@ export class CitaComponent implements OnInit, AfterViewInit {
   private router = inject(Router);
   private dialog = inject(MatDialog);
   private solicitudService = inject(SolicitudService);
+  formatOnlyDate = formatOnlyDate;
 
-  displayedColumns: string[] = ['expand', 'id', 'nombre', 'documento', 'dependencia', 'tipoSolicitud', 'estadoCita', 'acciones'];
+  displayedColumns: string[] = ['expand', 'id', 'nombre', 'documento', 'fechaCita', 'profesional', 'tipoSolicitud', 'estadoCita', 'acciones'];
   dataSource = new MatTableDataSource<CitaDto>([]);
   expandedElement: CitaDto | null = null;
   totalElementos = 0;
@@ -72,7 +74,7 @@ export class CitaComponent implements OnInit, AfterViewInit {
     id: '',
     nombre: '',
     documento: '',
-    dependencia: '',
+    profesional: '',
     tipoSolicitud: '',
     estadoCita: '',
   };
@@ -116,8 +118,37 @@ export class CitaComponent implements OnInit, AfterViewInit {
       return (data.codigoSolicitud || '').toLowerCase().includes(f.id)
         && (data.nombreSolicitante || '').toLowerCase().includes(f.nombre)
         && (data.fechaCita || '').toLowerCase().includes(f.fecha)
-        && (data.dependencia || '').toLowerCase().includes(f.dependencia);
+        && (data.profesional || '').toLowerCase().includes(f.profesional);
     };
+  }
+
+  estaCitaCaducada(fechaCitaStr: string | null | undefined): boolean {
+    if (!fechaCitaStr) return true;
+    try {
+      const parts = fechaCitaStr.split(' ');
+      const dateParts = parts[0].indexOf('/') > -1 ? parts[0].split('/') : parts[0].split('-');
+      const timeParts = parts[1].split(':');
+      let year, month, day;
+      if (parts[0].indexOf('/') > -1) {
+        day = Number(dateParts[0]);
+        month = Number(dateParts[1]) - 1;
+        year = Number(dateParts[2]);
+      } else {
+        year = Number(dateParts[0]);
+        month = Number(dateParts[1]) - 1;
+        day = Number(dateParts[2]);
+      }
+      const date = new Date(
+        year,
+        month,
+        day,
+        Number(timeParts[0]),
+        Number(timeParts[1])
+      );
+      return date.getTime() < Date.now();
+    } catch (e) {
+      return false;
+    }
   }
 
   reprogramarCita(cita: CitaDto) {
@@ -132,7 +163,7 @@ export class CitaComponent implements OnInit, AfterViewInit {
     const dialogRef = this.dialog.open(ReprogramarCitaModalComponent, {
       width: '600px',
       data: {
-        caso: { ...cita, fecha: cita.fechaCita ? cita.fechaCita.split(' ')[0] : '' },
+        caso: { ...cita, fecha: formatOnlyDate(cita.fechaCita) },
         accion
       }
     });

@@ -37,12 +37,11 @@ export class ModalTelefonoComponent implements OnInit {
 
   tiposTelefono: TipoTelefonoDto[] = [];
 
-  data = {
-    tipoId: null as number | null,
-    tipo: '',
-    telefono: '',
-    descripcion: ''
-  };
+    data = {
+      tipoId: null as number | null,
+      tipo: '',
+      telefono: ''
+    };
 
   constructor(public dialogRef: MatDialogRef<ModalTelefonoComponent>) {}
 
@@ -60,7 +59,7 @@ export class ModalTelefonoComponent implements OnInit {
 
   soloDigitosTelefono(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const limpio = input.value.replace(/\D/g, '').slice(0, 15);
+    const limpio = input.value.replace(/\D/g, '').slice(0, 10);
     if (input.value !== limpio) {
       input.value = limpio;
     }
@@ -68,9 +67,8 @@ export class ModalTelefonoComponent implements OnInit {
   }
 
   get canSubmit(): boolean {
-    return this.data.tipoId !== null
-      && this.data.telefono.trim().length > 0
-      && this.data.descripcion.trim().length > 0;
+    return this.data.tipoId !== null &&
+      this.data.telefono.trim().length === 10;
   }
 
   guardar(): void {
@@ -80,8 +78,7 @@ export class ModalTelefonoComponent implements OnInit {
 
     this.dialogRef.close({
       ...this.data,
-      telefono: this.data.telefono.trim(),
-      descripcion: this.data.descripcion.trim()
+      telefono: this.data.telefono.trim()
     });
   }
 

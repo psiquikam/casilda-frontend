@@ -40,8 +40,7 @@ export class ModalCorreoComponent implements OnInit {
   data = {
     tipoId: null as number | null,
     tipo: '',
-    correo: '',
-    descripcion: '',
+    correo: ''
   };
 
   constructor(public dialogRef: MatDialogRef<ModalCorreoComponent>) { }
@@ -58,10 +57,14 @@ export class ModalCorreoComponent implements OnInit {
     this.data.tipo = found ? found.nombre : '';
   }
 
+  isValidEmail(email: string): boolean {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
+  }
+
   get canSubmit(): boolean {
-    return this.data.tipoId !== null
-      && this.data.correo.trim().length > 0
-      && this.data.descripcion.trim().length > 0;
+    return this.data.tipoId !== null &&
+      this.isValidEmail(this.data.correo.trim());
   }
 
   guardar(): void {
@@ -71,8 +74,7 @@ export class ModalCorreoComponent implements OnInit {
 
     this.dialogRef.close({
       ...this.data,
-      correo: this.data.correo.trim(),
-      descripcion: this.data.descripcion.trim()
+      correo: this.data.correo.trim()
     });
   }
 

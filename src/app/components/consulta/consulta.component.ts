@@ -16,6 +16,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 import { RepartoModalComponent } from '../modal-reparto/modal-reparto.component';
 import { Router } from '@angular/router';
 import { SolicitudService } from '../../services/solicitud.service';
+import { formatFechaCreacion } from '../../custom-date-adapter';
 
 export function getSpanishPaginatorIntl() {
   const paginatorIntl = new MatPaginatorIntl();
@@ -122,7 +123,7 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
       tipoSolicitud: r.tipoSolicitud || '',
       estado: r.estado || '',
       profesional: r.profesional || 'Sin asignar',
-      fecha: r.fechaCreacion ? r.fechaCreacion.substring(0, 10) : '',
+      fecha: formatFechaCreacion(r.fechaCreacion),
       dependencia: r.dependencia || '',
       // Solicitante
       tipoDocumentoId: r.tipoDocumentoId ?? null,

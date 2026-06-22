@@ -7,13 +7,11 @@ import { MaestroDto } from './listas.service';
 export interface CorreoSolicitanteDto {
   tipoId: number;
   correo: string;
-  descripcion: string;
 }
 
 export interface TelefonoSolicitanteDto {
   tipoId: number;
   telefono: string;
-  descripcion: string;
 }
 
 export interface DatosSolicitanteRequest {
@@ -47,6 +45,9 @@ export interface DatosRemitenteRequest {
 
 export interface SolicitudAcompanamientoRequest {
   tipoSolicitudId: number;
+  medioSolicitudId: number;
+  observacionesTelefono?: string | null;
+  observacionesCorreo?: string | null;
   datosSolicitante: DatosSolicitanteRequest;
   datosRemitente?: DatosRemitenteRequest | null;
 }
@@ -57,6 +58,8 @@ export interface SolicitudAcompanamientoResponse {
   tipoSolicitud: string;
   estado: string;
   fechaCreacion: string;
+  observacionesTelefono?: string | null;
+  observacionesCorreo?: string | null;
   // Para la tabla
   dependencia: string;
   profesional: string;
@@ -153,13 +156,11 @@ export interface UpdateSolicitudDto {
     tipoId?: number | null;
     tipo?: string | null;
     correo: string;
-    descripcion: string;
   }>;
   telefonos?: Array<{
     tipoId?: number | null;
     tipo?: string | null;
     telefono: string;
-    descripcion: string;
   }>;
   remitentePrimerNombre?: string | null;
   remitenteSegundoNombre?: string | null;
@@ -171,6 +172,8 @@ export interface UpdateSolicitudDto {
   remitenteFacultadId?: number | null;
   remitenteTipoDocumentoId?: number | null;
   remitenteNumeroDocumento?: string | null;
+  observacionesTelefono?: string | null;
+  observacionesCorreo?: string | null;
 }
 
 export interface AsignarSolicitudDto {
@@ -211,6 +214,17 @@ export enum EstadoCitaEnum {
   REPROGRAMADA = 3
 }
 
+export enum VinculoUdeAEnum {
+  ESTUDIANTE = 1,
+  PERSONAL_ADMINISTRATIVO = 2,
+  DOCENTE = 3,
+  EGRESADO = 4,
+  PERSONA_EMPLEADA_ASEO_UDEA = 5,
+  CONTRATISTA_FUNDACION_UDEA = 6,
+  CONTRATISTA_CIS = 7,
+  OTRAS = 8
+}
+
 export interface CitaDto {
   id: number;
   solicitudId: number;
@@ -225,6 +239,7 @@ export interface CitaDto {
   observaciones?: string;
   tipoSolicitud: string;
   dependencia: string;
+  profesional: string;
   facultad?: string;
   campus?: string;
   identidadGenero?: string;
@@ -317,7 +332,7 @@ export interface AtencionContextoRequestDto {
   idCampus: number;
   idFacultad: number;
   idVinculoUniversidad: number;
-  idSubVinculoUniversidad?: number | null;
+  otroVinculo?: string | null;
   idPrograma: number;
   idEtnia?: number | null;
   idCiudadResidencia?: number | null;
@@ -327,13 +342,16 @@ export interface AtencionContextoRequestDto {
 export interface AtencionRegistroRequestDto {
   citaId: number;
   idTipoServicio: number;
-  idMunicipioEntrevista: number;
+  idMunicipioEntrevista?: number | null;
+  idLugarEntrevista: number;
   idRegimen: number;
   idEps: number;
   logroAcuerdo?: boolean;
   archivoConsentimientoNombre?: string;
   archivoConsentimientoTipo?: string;
   archivoConsentimientoContenido?: string;
+  observacionesTelefono?: string | null;
+  observacionesCorreo?: string | null;
 }
 
 export interface CompromisosAtencionRequestDto {
@@ -344,7 +362,8 @@ export interface CompromisosAtencionRequestDto {
 export interface CasoAtencionRequestDto {
   idOrientacionSexual: number;
   idIdentidadGenero: number;
-  tiempoOcurrido: string;
+  tiempoOcurridoValor: number;
+  idTiempoOcurridoUnidad: number;
   idFormaOcurrencia: number;
   idLugarOcurrencia: number;
   violenciaGenero: boolean;
@@ -396,6 +415,8 @@ export interface OtroCasoDto {
   idCaso: number;
   id: string;
   tiempoHechos: string;
+  tiempoOcurridoValor?: number;
+  idTiempoOcurridoUnidad?: number;
   tipoViolencia: string;
   subcategoriaViolencia: string;
   descripcion: string;

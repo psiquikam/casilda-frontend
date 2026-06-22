@@ -15,21 +15,18 @@
 
     <mat-form-field appearance="outline" class="field-tel">
       <mat-label>Teléfono</mat-label>
-      <input matInput [(ngModel)]="data.telefono"
+      <input matInput [(ngModel)]="data.telefono" name="telefonoVal" #telefonoVal="ngModel"
+        minlength="10"
+        maxlength="10"
         inputmode="numeric"
         pattern="\d*"
-        maxlength="15"
         (input)="soloDigitosTelefono($event)"
         placeholder="Ej: 3001234567">
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="field-desc">
-      <mat-label>Descripción</mat-label>
-      <input matInput [(ngModel)]="data.descripcion" name="descripcionTelefono" #descripcionTelefono="ngModel" required placeholder="Nota breve">
-      <mat-error *ngIf="descripcionTelefono.invalid && (descripcionTelefono.dirty || descripcionTelefono.touched)">
-        La descripción es obligatoria
+      <mat-error *ngIf="telefonoVal.invalid && (telefonoVal.dirty || telefonoVal.touched)">
+        El teléfono debe tener 10 dígitos
       </mat-error>
     </mat-form-field>
+
 
   </div>
 </mat-dialog-content>

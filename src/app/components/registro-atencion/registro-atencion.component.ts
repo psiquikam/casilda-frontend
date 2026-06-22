@@ -43,7 +43,7 @@ import { ModalSeguimientosComponent } from '../modal-seguimiento/modal-seguimien
 import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
 import { ModalAgregarCasoComponent } from '../modal-agregar-caso/modal-agregar-caso.component';
 import { AuthService } from '../../services/auth.service';
-import { AtencionContextoRequestDto, CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, HechoRequestDto, OtroCasoDto, RegistroAtencionCompleteRequestDto, RegistroOtroCasoRequestDto, SeguimientoAtencionRequestDto, SolicitudService } from '../../services/solicitud.service';
+import { AtencionContextoRequestDto, CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, HechoRequestDto, OtroCasoDto, RegistroAtencionCompleteRequestDto, RegistroOtroCasoRequestDto, SeguimientoAtencionRequestDto, SolicitudService, VinculoUdeAEnum } from '../../services/solicitud.service';
 import { MaestroDto } from '../../services/listas.service';
 import { environment } from '../../../environments/environment';
 
@@ -200,7 +200,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
   private readonly tabFieldMap: { tab: string; label: string; control: string; condition?: () => boolean }[] = [
     { tab: 'Registro de atención', label: 'Tipo de servicio', control: 'tipoServicio' },
-    { tab: 'Registro de atención', label: 'Forma de entrevista', control: 'formaEntrevista' },
+    { tab: 'Registro de atención', label: 'Lugar de la entrevista', control: 'lugarEntrevista' },
     { tab: 'Datos de la persona', label: 'Tipo de documento', control: 'tipoDocumento' },
     { tab: 'Datos de la persona', label: 'Número de documento', control: 'documento' },
     { tab: 'Datos de la persona', label: 'Fecha de nacimiento', control: 'fechaNacimiento' },
@@ -218,7 +218,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     { tab: 'Datos complementarios', label: 'Programa', control: 'programa' },
     { tab: 'Datos complementarios', label: 'Dependencia', control: 'dependencia' },
     { tab: 'Datos complementarios', label: 'Campus', control: 'campus' },
-    { tab: 'Documentación', label: 'Tiempo ocurrido', control: 'tiempoOcurrido' },
+    { tab: 'Documentación', label: 'Tiempo ocurrido (valor)', control: 'tiempoOcurridoValor' },
+    { tab: 'Documentación', label: 'Tiempo ocurrido (unidad)', control: 'tiempoOcurridoUnidad' },
     { tab: 'Documentación', label: '¿De qué forma?', control: 'queForma' },
     { tab: 'Documentación', label: 'Lugar de los hechos', control: 'lugarHechos' },
     { tab: 'Documentación', label: 'Violencia de género', control: 'violenciaGenero' },
@@ -255,6 +256,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   listaSubTipoViolencia: string[] = [];
   tiposSolicitud: string[] = [];
   municipiosEntrevista: MaestroDto[] = [];
+  lugaresEntrevista: MaestroDto[] = [];
   listaDepartamentos: MaestroDto[] = [];
   municipiosNacimiento: MaestroDto[] = [];
   municipiosResidencia: MaestroDto[] = [];
@@ -270,6 +272,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   actividadesMisionales: string[] = [];
   estadosAtencion: string[] = [];
   grupoAtencion: string[] = [];
+  listaTiemposOcurridoUnidad: string[] = [];
+  catalogoTiemposOcurridoUnidad: MaestroDto[] = [];
 
   catalogoSexos: MaestroDto[] = [];
   catalogoEtnias: MaestroDto[] = [];
@@ -277,7 +281,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   catalogoIdentidadesSexuales: MaestroDto[] = [];
   catalogoOrientacionesSexuales: MaestroDto[] = [];
   catalogoVinculosUdea: MaestroDto[] = [];
-  catalogoSubVinculosUdea: MaestroDto[] = [];
   catalogoVinculosAgresorVictima: MaestroDto[] = [];
   catalogoDependencias: MaestroDto[] = [];
   catalogoRegimenes: MaestroDto[] = [];
@@ -342,6 +345,20 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         this.activarRutasRegistrados = [];
       }
     });
+
+    this.atencionForm.get('vinculo')?.valueChanges.subscribe(valor => {
+      const controlOtro = this.atencionForm.get('otroVinculo');
+      if (controlOtro) {
+        const idVinculo = this.resolverIdMaestro(valor, this.catalogoVinculosUdea);
+        if (idVinculo === VinculoUdeAEnum.OTRAS) {
+          controlOtro.setValidators([Validators.required]);
+        } else {
+          controlOtro.clearValidators();
+          controlOtro.setValue('');
+        }
+        controlOtro.updateValueAndValidity({ emitEvent: false });
+      }
+    });
   }
 
   private configurarValidacionActividadMisional(): void {
@@ -374,7 +391,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       identidadesSexuales: this.obtenerMaestro('identidades-genero'),
       orientacionesSexuales: this.obtenerMaestro('orientaciones-sexuales'),
       vinculosUdea: this.obtenerMaestro('vinculos-udea'),
-      subVinculosUdea: this.obtenerMaestro('subvinculos-udea'),
       vinculosAgresorVictima: this.obtenerMaestro('vinculos-agresor-victima'),
       dependencias: this.obtenerMaestro('dependencias'),
       tiposViolencia: this.obtenerMaestro('tipos-violencia'),
@@ -397,7 +413,9 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       modalidadesInstitucionales: this.obtenerMaestro('modalidades-violencia/tipo/4'),
       modalidadesPatrimoniales: this.obtenerMaestro('modalidades-violencia/tipo/5'),
       modalidadesInformaticas: this.obtenerMaestro('modalidades-violencia/tipo/6'),
-      modalidadesPrejuicio: this.obtenerMaestro('modalidades-violencia/tipo/7')
+      modalidadesPrejuicio: this.obtenerMaestro('modalidades-violencia/tipo/7'),
+      tiemposOcurridoUnidad: this.obtenerMaestro('tiempos-ocurrido-unidad'),
+      lugaresEntrevista: this.obtenerMaestro('lugares-entrevista')
     }).subscribe({
       next: (data) => {
         this.catalogoSexos = data.sexos;
@@ -406,7 +424,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         this.catalogoIdentidadesSexuales = data.identidadesSexuales;
         this.catalogoOrientacionesSexuales = data.orientacionesSexuales;
         this.catalogoVinculosUdea = data.vinculosUdea;
-        this.catalogoSubVinculosUdea = data.subVinculosUdea;
         this.catalogoVinculosAgresorVictima = data.vinculosAgresorVictima;
         this.catalogoDependencias = data.dependencias;
         this.catalogoRegimenes = data.regimenes;
@@ -448,6 +465,9 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         this.listaPatrimonial = data.modalidadesPatrimoniales;
         this.listaInformatica = data.modalidadesInformaticas;
         this.listaPrejuicio = data.modalidadesPrejuicio;
+        this.catalogoTiemposOcurridoUnidad = data.tiemposOcurridoUnidad;
+        this.listaTiemposOcurridoUnidad = this.mapNombres(data.tiemposOcurridoUnidad);
+        this.lugaresEntrevista = data.lugaresEntrevista;
       },
       error: (error) => {
         console.error('Error cargando listas maestras de registro de atención:', error);
@@ -456,14 +476,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   }
 
   private configurarDependenciaMunicipios(): void {
-    this.atencionForm.get('departamentoEntrevista')?.valueChanges.subscribe((departamentoId) => {
-      this.atencionForm.patchValue({ formaEntrevista: '' });
-      this.municipiosEntrevista = [];
-      if (departamentoId) {
-        this.cargarMunicipiosPorDepartamento(Number(departamentoId), 'entrevista');
-      }
-    });
-
     this.atencionForm.get('departamentoNacimiento')?.valueChanges.subscribe((departamentoId) => {
       this.atencionForm.patchValue({ ciudadNacimiento: '' });
       this.municipiosNacimiento = [];
@@ -679,6 +691,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   iniciarAtencion(caso: any): void {
     this.casoSeleccionado = caso;
     this.modoAtencion = true;
+    this.correoRegistrados = [];
+    this.telefonosRegistrados = [];
     this.atencionForm.patchValue({
       tipoSolicitud: caso.tipoSolicitud || 'Indirecta',
       documento: caso.documento || '',
@@ -705,6 +719,17 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
             ciudadResidencia: solicitud.idCiudadResidencia ?? '',
             direccionResidencia: solicitud.direccionResidencia || ''
           });
+
+          this.correoRegistrados = (solicitud.correos ?? []).map(c => ({
+            tipoId: c.tipoId,
+            tipo: c.tipo || '',
+            correo: c.correo
+          }));
+          this.telefonosRegistrados = (solicitud.telefonos ?? []).map(t => ({
+            tipoId: t.tipoId,
+            tipo: t.tipo || '',
+            telefono: t.telefono
+          }));
         },
         error: (error) => {
           console.error('Error al cargar detalle de solicitud para la cita:', error);
@@ -765,6 +790,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         listaPrejuicio: this.listaPrejuicio,
         listaVinculos: this.listaVinculos,
         listaVinculosAgresorVictima: this.listaVinculosAgresorVictima,
+        listaTiemposOcurridoUnidad: this.listaTiemposOcurridoUnidad
       }
     });
 
@@ -813,6 +839,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         listaPrejuicio: this.listaPrejuicio,
         listaVinculos: this.listaVinculos,
         listaVinculosAgresorVictima: this.listaVinculosAgresorVictima,
+        listaTiemposOcurridoUnidad: this.listaTiemposOcurridoUnidad,
         initialData
       }
     });
@@ -940,7 +967,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       caso: {
         idOrientacionSexual,
         idIdentidadGenero,
-        tiempoOcurrido: String(result.tiempoOcurrido ?? ''),
+        tiempoOcurridoValor: Number(result.tiempoOcurridoValor),
+        idTiempoOcurridoUnidad: this.resolverIdMaestro(result.tiempoOcurridoUnidad, this.catalogoTiemposOcurridoUnidad),
         idFormaOcurrencia,
         idLugarOcurrencia,
         violenciaGenero: result.violenciaGenero === 'SI',
@@ -984,7 +1012,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
     return {
       orientacionSexual,
-      tiempoOcurrido: caso.tiempoHechos ?? '',
+      tiempoOcurridoValor: caso.tiempoOcurridoValor ?? '',
+      tiempoOcurridoUnidad: this.resolverNombreMaestroPorId(caso.idTiempoOcurridoUnidad, this.catalogoTiemposOcurridoUnidad),
       queForma,
       lugarHechos,
       violenciaGenero: caso.violenciaGenero ? 'SI' : 'NO',
@@ -1030,6 +1059,11 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
   mostrarQuienRemite(): boolean {
     return this.atencionForm.getRawValue().tipoSolicitud === 'Indirecta';
+  }
+
+  esOtroVinculo(): boolean {
+    const valor = this.atencionForm.get('vinculo')?.value;
+    return this.resolverIdMaestro(valor, this.catalogoVinculosUdea) === VinculoUdeAEnum.OTRAS;
   }
 
   abrirModalDireccion(): void {
@@ -1278,9 +1312,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       fechaHora: [{ value: new Date(), disabled: true }, Validators.required],
       personaRegistra: [{ value: '', disabled: true }, Validators.required],
       tipoServicio: ['', Validators.required],
-      departamentoEntrevista: [''],
       quienRemite: [{ value: 'Unidad de Bienestar Universitario', disabled: true }],
-      formaEntrevista: ['', Validators.required],
+      lugarEntrevista: ['', Validators.required],
       consentimientoArchivo: [null],
       personaAtiende: [{ value: 'Sin asignar', disabled: true }, Validators.required],
       tipoDocumento: [{ value: '', disabled: true }, Validators.required],
@@ -1300,11 +1333,13 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       campus: ['', Validators.required],
       facultad: ['', Validators.required],
       vinculo: ['', Validators.required],
+      otroVinculo: [''],
       programa: ['', Validators.required],
       logroAcuerdo: ['NO'],
       tipoViolencia: [''],
       subcategoriaViolencia: [''],
-      tiempoOcurrido: ['', Validators.required],
+      tiempoOcurridoValor: ['', [Validators.required, Validators.min(0)]],
+      tiempoOcurridoUnidad: ['meses', Validators.required],
       queForma: ['', Validators.required],
       departamentoHechos: [''],
       ciudadHechos: [''],
@@ -1335,6 +1370,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       estadosAtencion: ['', Validators.required],
       grupoAtencion: ['', Validators.required],
       detalleViolenciaPrejuicio: [''],
+      observacionesTelefono: [''],
+      observacionesCorreo: [''],
     });
   }
 
@@ -1427,7 +1464,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     const {
       fechaHora,
       tipoServicio,
-      formaEntrevista,
+      lugarEntrevista,
       regimenSalud,
       eps,
       logroAcuerdo,
@@ -1443,7 +1480,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       facultad,
       vinculo,
       programa,
-      tiempoOcurrido,
+      tiempoOcurridoValor,
+      tiempoOcurridoUnidad,
       queForma,
       lugarHechos,
       violenciaGenero,
@@ -1455,7 +1493,9 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       presuntoPrimerApellido,
       presuntoSegundoApellido,
       presuntoVinculoUniversidad,
-      presuntoVinculoVictima
+      presuntoVinculoVictima,
+      observacionesTelefono,
+      observacionesCorreo
     } = formRawValue;
 
     const archivoConsentimientoContenido = consentimientoArchivo instanceof File
@@ -1480,7 +1520,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       idCampus: this.resolverIdMaestro(campus, this.catalogoCampus),
       idFacultad: this.resolverIdMaestro(facultad, this.catalogoFacultades),
       idVinculoUniversidad: this.resolverIdMaestro(vinculo, this.catalogoVinculosUdea),
-      idSubVinculoUniversidad: null,
+      otroVinculo: this.resolverIdMaestro(vinculo, this.catalogoVinculosUdea) === VinculoUdeAEnum.OTRAS ? formRawValue.otroVinculo : null,
       idPrograma: this.resolverIdMaestro(programa, this.catalogoProgramas),
       idEtnia: etnia ? this.resolverIdMaestro(etnia, this.catalogoEtnias) : null,
       idCiudadResidencia: ciudadResidencia ? Number(ciudadResidencia) : null,
@@ -1491,29 +1531,29 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       .filter((c) => c?.correo && c?.tipoId)
       .map((c) => ({
         tipoId: Number(c.tipoId),
-        correo: String(c.correo).trim(),
-        descripcion: String(c.descripcion).trim()
+        correo: String(c.correo).trim()
       }));
 
     const telefonos = this.telefonosRegistrados
       .filter((t) => t?.telefono && t?.tipoId)
       .map((t) => ({
         tipoId: Number(t.tipoId),
-        telefono: String(t.telefono).trim(),
-        descripcion: String(t.descripcion).trim()
+        telefono: String(t.telefono).trim()
       }));
 
     return {
       atencion: {
         citaId: Number(this.casoSeleccionado?.citaId ?? this.casoSeleccionado?.idCita ?? this.casoSeleccionado?.idcita ?? 0),
         idTipoServicio: this.resolverIdMaestro(tipoServicio, this.catalogoTiposServicio),
-        idMunicipioEntrevista: Number(formaEntrevista),
+        idLugarEntrevista: Number(lugarEntrevista),
         idRegimen: this.resolverIdMaestro(regimenSalud, this.catalogoRegimenes),
         idEps: this.resolverIdMaestro(eps, this.catalogoEps),
         logroAcuerdo: logroAcuerdo === true || logroAcuerdo === 'SI',
         archivoConsentimientoNombre: consentimientoArchivo?.name,
         archivoConsentimientoTipo: consentimientoArchivo?.type,
-        archivoConsentimientoContenido
+        archivoConsentimientoContenido,
+        observacionesTelefono: observacionesTelefono || null,
+        observacionesCorreo: observacionesCorreo || null
       },
       atencionContexto,
       persona: {
@@ -1527,7 +1567,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       caso: {
         idOrientacionSexual: this.resolverIdMaestro(orientacionSexual, this.catalogoOrientacionesSexuales),
         idIdentidadGenero: this.resolverIdMaestro(identidadSexual, this.catalogoIdentidadesSexuales),
-        tiempoOcurrido,
+        tiempoOcurridoValor: tiempoOcurridoValor ? Number(tiempoOcurridoValor) : 0,
+        idTiempoOcurridoUnidad: this.resolverIdMaestro(tiempoOcurridoUnidad, this.catalogoTiemposOcurridoUnidad),
         idFormaOcurrencia: this.resolverIdMaestro(queForma, this.catalogoFormasOcurrencia),
         idLugarOcurrencia: this.resolverIdMaestro(lugarHechos, this.catalogoLugaresOcurrencia),
         violenciaGenero: violenciaGenero === true || violenciaGenero === 'SI',

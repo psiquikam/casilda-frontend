@@ -16,6 +16,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 import { RepartoModalComponent } from '../modal-reparto/modal-reparto.component';
 import { Router } from '@angular/router';
 import { SolicitudService } from '../../services/solicitud.service';
+import { formatFechaCreacion } from '../../custom-date-adapter';
 
 @Component({
   selector: 'app-caso',
@@ -95,7 +96,7 @@ export class CasoComponent implements OnInit {
       tipoSolicitud: r.tipoSolicitud || '',
       estado: r.estado || '',
       profesional: r.profesional || 'Sin asignar',
-      fecha: r.fechaCreacion ? r.fechaCreacion.substring(0, 10) : '',
+      fecha: formatFechaCreacion(r.fechaCreacion),
       dependencia: r.dependencia || '',
       tipoDocumentoId: r.tipoDocumentoId ?? null,
       tipoDocumento: r.tipoDocumento || '',

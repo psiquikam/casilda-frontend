@@ -15,16 +15,15 @@
 
     <mat-form-field appearance="outline" class="field-correo">
       <mat-label>Correo</mat-label>
-      <input matInput [(ngModel)]="data.correo" placeholder="Ej: user@gmail.com">
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="field-desc">
-      <mat-label>Descripción</mat-label>
-      <input matInput [(ngModel)]="data.descripcion" name="descripcionCorreo" #descripcionCorreo="ngModel" required placeholder="Observaciones">
-      <mat-error *ngIf="descripcionCorreo.invalid && (descripcionCorreo.dirty || descripcionCorreo.touched)">
-        La descripción es obligatoria
+      <input matInput [(ngModel)]="data.correo" name="correoVal" #correoVal="ngModel"
+        required
+        pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+        placeholder="Ej: user@gmail.com">
+      <mat-error *ngIf="correoVal.invalid && (correoVal.dirty || correoVal.touched)">
+        Ingrese un correo electrónico válido (ej: usuario&#64;dominio.com)
       </mat-error>
     </mat-form-field>
+
 
   </div>
 </mat-dialog-content>

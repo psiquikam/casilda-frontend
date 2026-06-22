@@ -807,7 +807,7 @@ export class AtencionPrComponent implements OnInit {
       idPersonaAtiende: Number(raw.personaAtiende) || idUsuario,
       idTipoServicio: this.tipoServicioAphId,
       idPersonaRegistra: idUsuario,
-      idFormaEntrevista: null,
+      idLugarEntrevista: null,
       idIdentidadGenero: Number(raw.identidadSexual),
       idOrientacionSexual: raw.orientacionSexual ? Number(raw.orientacionSexual) : null,
       idEtnia: raw.etnia ? Number(raw.etnia) : null,

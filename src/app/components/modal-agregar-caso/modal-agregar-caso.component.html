@@ -18,21 +18,31 @@
               <mat-label>Orientación sexual *</mat-label>
               <mat-select formControlName="orientacionSexual">
                 @for (o of data.listaOrientacionSexual; track o) {
-                  <mat-option [value]="o">{{o}}</mat-option>
+                <mat-option [value]="o">{{o}}</mat-option>
                 }
               </mat-select>
             </mat-form-field>
 
-            <mat-form-field appearance="outline" subscriptSizing="dynamic">
-              <mat-label>¿Hace cuánto ocurrió el último hecho de violencia? *</mat-label>
-              <input matInput formControlName="tiempoOcurrido">
-            </mat-form-field>
+            <div style="display: flex; gap: 8px;">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" style="flex: 1;">
+                <mat-label>¿Hace cuánto ocurrió el hecho?</mat-label>
+                <input matInput type="number" formControlName="tiempoOcurridoValor" min="0">
+              </mat-form-field>
+              <mat-form-field appearance="outline" subscriptSizing="dynamic" style="width: 140px;">
+                <mat-label>Unidad</mat-label>
+                <mat-select formControlName="tiempoOcurridoUnidad">
+                  @for (u of data.listaTiemposOcurridoUnidad; track u) {
+                  <mat-option [value]="u">{{u}}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
 
             <mat-form-field appearance="outline" subscriptSizing="dynamic">
               <mat-label>¿En qué forma ocurrió el hecho? *</mat-label>
               <mat-select formControlName="queForma">
                 @for (q of data.queForma; track q) {
-                  <mat-option [value]="q">{{q}}</mat-option>
+                <mat-option [value]="q">{{q}}</mat-option>
                 }
               </mat-select>
             </mat-form-field>
@@ -41,7 +51,7 @@
               <mat-label>Lugar de ocurrencia de hechos de violencia *</mat-label>
               <mat-select formControlName="lugarHechos">
                 @for (l of data.lugarHechos; track l) {
-                  <mat-option [value]="l">{{l}}</mat-option>
+                <mat-option [value]="l">{{l}}</mat-option>
                 }
               </mat-select>
             </mat-form-field>
@@ -66,7 +76,7 @@
             <table mat-table [dataSource]="hechosRegistrados" class="hechos-table">
 
               <ng-container matColumnDef="fecha">
-                <td mat-cell *matCellDef="let element">{{element.fecha | date:'dd/MM/yyyy'}}</td>
+                <td mat-cell *matCellDef="let element">{{element.fecha | date:'MM/yyyy'}}</td>
               </ng-container>
 
               <ng-container matColumnDef="lugar">
@@ -89,7 +99,7 @@
             </table>
 
             @if (hechosRegistrados.length === 0) {
-              <div class="hechos-empty">No hay hechos registrados.</div>
+            <div class="hechos-empty">No hay hechos registrados.</div>
             }
           </div>
 
@@ -116,14 +126,14 @@
           </div>
 
           @if (violenciaMisionalValue === 'SI') {
-            <mat-form-field appearance="outline" subscriptSizing="dynamic" class="field-full">
-              <mat-label>Actividad misional *</mat-label>
-              <mat-select formControlName="actividadMisional">
-                @for (a of data.actividadesMisionales; track a) {
-                  <mat-option [value]="a">{{a}}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="field-full">
+            <mat-label>Actividad misional *</mat-label>
+            <mat-select formControlName="actividadMisional">
+              @for (a of data.actividadesMisionales; track a) {
+              <mat-option [value]="a">{{a}}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
           }
 
         </div>
@@ -143,12 +153,12 @@
                 </mat-radio-group>
               </div>
               @if (violenciaPsicologicaValue === 'SI') {
-                <div class="vbg-options">
-                  @for (c of data.listaPsicologica; track c.id) {
-                    <mat-checkbox [checked]="psicologicaSel.includes(c.id)"
-                      (change)="onCheckboxChange($event, c.id, 'psicologicaSel')">{{c.nombre}}</mat-checkbox>
-                  }
-                </div>
+              <div class="vbg-options">
+                @for (c of data.listaPsicologica; track c.id) {
+                <mat-checkbox [checked]="psicologicaSel.includes(c.id)"
+                  (change)="onCheckboxChange($event, c.id, 'psicologicaSel')">{{c.nombre}}</mat-checkbox>
+                }
+              </div>
               }
             </div>
 
@@ -161,12 +171,12 @@
                 </mat-radio-group>
               </div>
               @if (violenciaFisicaValue === 'SI') {
-                <div class="vbg-options">
-                  @for (c of data.listaFisica; track c.id) {
-                    <mat-checkbox [checked]="fisicaSel.includes(c.id)"
-                      (change)="onCheckboxChange($event, c.id, 'fisicaSel')">{{c.nombre}}</mat-checkbox>
-                  }
-                </div>
+              <div class="vbg-options">
+                @for (c of data.listaFisica; track c.id) {
+                <mat-checkbox [checked]="fisicaSel.includes(c.id)"
+                  (change)="onCheckboxChange($event, c.id, 'fisicaSel')">{{c.nombre}}</mat-checkbox>
+                }
+              </div>
               }
             </div>
 
@@ -179,12 +189,12 @@
                 </mat-radio-group>
               </div>
               @if (violenciaSexualValue === 'SI') {
-                <div class="vbg-options">
-                  @for (c of data.listaSexual; track c.id) {
-                    <mat-checkbox [checked]="sexualSel.includes(c.id)"
-                      (change)="onCheckboxChange($event, c.id, 'sexualSel')">{{c.nombre}}</mat-checkbox>
-                  }
-                </div>
+              <div class="vbg-options">
+                @for (c of data.listaSexual; track c.id) {
+                <mat-checkbox [checked]="sexualSel.includes(c.id)"
+                  (change)="onCheckboxChange($event, c.id, 'sexualSel')">{{c.nombre}}</mat-checkbox>
+                }
+              </div>
               }
             </div>
 
@@ -197,12 +207,12 @@
                 </mat-radio-group>
               </div>
               @if (violenciaInstitucionalValue === 'SI') {
-                <div class="vbg-options">
-                  @for (c of data.listaInstitucional; track c.id) {
-                    <mat-checkbox [checked]="institucionalSel.includes(c.id)"
-                      (change)="onCheckboxChange($event, c.id, 'institucionalSel')">{{c.nombre}}</mat-checkbox>
-                  }
-                </div>
+              <div class="vbg-options">
+                @for (c of data.listaInstitucional; track c.id) {
+                <mat-checkbox [checked]="institucionalSel.includes(c.id)"
+                  (change)="onCheckboxChange($event, c.id, 'institucionalSel')">{{c.nombre}}</mat-checkbox>
+                }
+              </div>
               }
             </div>
 
@@ -215,12 +225,12 @@
                 </mat-radio-group>
               </div>
               @if (violenciaEconomicaValue === 'SI') {
-                <div class="vbg-options">
-                  @for (c of data.listaPatrimonial; track c.id) {
-                    <mat-checkbox [checked]="economicaSel.includes(c.id)"
-                      (change)="onCheckboxChange($event, c.id, 'economicaSel')">{{c.nombre}}</mat-checkbox>
-                  }
-                </div>
+              <div class="vbg-options">
+                @for (c of data.listaPatrimonial; track c.id) {
+                <mat-checkbox [checked]="economicaSel.includes(c.id)"
+                  (change)="onCheckboxChange($event, c.id, 'economicaSel')">{{c.nombre}}</mat-checkbox>
+                }
+              </div>
               }
             </div>
 
@@ -233,12 +243,12 @@
                 </mat-radio-group>
               </div>
               @if (violenciaInformaticaValue === 'SI') {
-                <div class="vbg-options">
-                  @for (c of data.listaInformatica; track c.id) {
-                    <mat-checkbox [checked]="informaticaSel.includes(c.id)"
-                      (change)="onCheckboxChange($event, c.id, 'informaticaSel')">{{c.nombre}}</mat-checkbox>
-                  }
-                </div>
+              <div class="vbg-options">
+                @for (c of data.listaInformatica; track c.id) {
+                <mat-checkbox [checked]="informaticaSel.includes(c.id)"
+                  (change)="onCheckboxChange($event, c.id, 'informaticaSel')">{{c.nombre}}</mat-checkbox>
+                }
+              </div>
               }
             </div>
 
@@ -251,12 +261,12 @@
                 </mat-radio-group>
               </div>
               @if (violenciaPrejuicioValue === 'SI') {
-                <div class="vbg-options">
-                  @for (c of data.listaPrejuicio; track c.id) {
-                    <mat-checkbox [checked]="prejuicioSel.includes(c.id)"
-                      (change)="onCheckboxChange($event, c.id, 'prejuicioSel')">{{c.nombre}}</mat-checkbox>
-                  }
-                </div>
+              <div class="vbg-options">
+                @for (c of data.listaPrejuicio; track c.id) {
+                <mat-checkbox [checked]="prejuicioSel.includes(c.id)"
+                  (change)="onCheckboxChange($event, c.id, 'prejuicioSel')">{{c.nombre}}</mat-checkbox>
+                }
+              </div>
               }
             </div>
 
@@ -298,7 +308,7 @@
               <mat-label>Vínculo con la universidad *</mat-label>
               <mat-select formControlName="presuntoVinculoUniversidad">
                 @for (v of data.listaVinculos; track v) {
-                  <mat-option [value]="v">{{v}}</mat-option>
+                <mat-option [value]="v">{{v}}</mat-option>
                 }
               </mat-select>
             </mat-form-field>
@@ -307,7 +317,7 @@
               <mat-label>Vínculo con la víctima *</mat-label>
               <mat-select formControlName="presuntoVinculoVictima">
                 @for (v of data.listaVinculosAgresorVictima; track v) {
-                  <mat-option [value]="v">{{v}}</mat-option>
+                <mat-option [value]="v">{{v}}</mat-option>
                 }
               </mat-select>
             </mat-form-field>

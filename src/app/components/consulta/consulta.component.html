@@ -70,7 +70,7 @@
         <th mat-header-cell *matHeaderCellDef>
           <div class="header-inline-container">
             <span class="column-title">Fecha</span>
-            <div class="search-box-slim"><input (keyup)="applyFilter('fecha', $event)" placeholder="AAAA-MM"></div>
+            <div class="search-box-slim"><input (keyup)="applyFilter('fecha', $event)" placeholder="dd/MM/yyyy"></div>
           </div>
         </th>
         <td mat-cell *matCellDef="let element">{{element.fecha}}</td>
@@ -107,7 +107,8 @@
         <th mat-header-cell *matHeaderCellDef>
           <div class="header-inline-container">
             <span class="column-title">Asignado</span>
-            <div class="search-box-slim"><input (keyup)="applyFilter('profesional', $event)" placeholder="Filtrar..."></div>
+            <div class="search-box-slim"><input (keyup)="applyFilter('profesional', $event)" placeholder="Filtrar...">
+            </div>
           </div>
         </th>
         <td mat-cell *matCellDef="let element">
@@ -195,11 +196,7 @@
       <mat-icon>info_outline</mat-icon>
       <p>{{ msgVacio }}</p>
     </div>
-    <mat-paginator [length]="totalElementos"
-                   [pageIndex]="pageIndex"
-                   [pageSize]="pageSize"
-                   [pageSizeOptions]="[5, 10, 20]"
-                   (page)="onPageChange($event)"
-                   showFirstLastButtons></mat-paginator>
+    <mat-paginator [length]="totalElementos" [pageIndex]="pageIndex" [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 20]" (page)="onPageChange($event)" showFirstLastButtons></mat-paginator>
   </div>
 </ng-template>

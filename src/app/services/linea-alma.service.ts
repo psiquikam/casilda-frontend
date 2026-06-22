@@ -32,7 +32,7 @@ export interface RegistroLineaAlmaRequestDto {
   idPersonaAtiende: number;
   idTipoServicio: number;
   idPersonaRegistra: number;
-  idFormaEntrevista?: number | null;
+  idLugarEntrevista?: number | null;
   idIdentidadGenero: number;
   idOrientacionSexual?: number | null;
   idEtnia?: number | null;
@@ -89,8 +89,8 @@ export interface RegistroLineaAlmaResponseDto {
   idTipoServicio: number;
   tipoServicio: string;
   idPersonaRegistra: number;
-  idFormaEntrevista?: number | null;
-  formaEntrevista?: string | null;
+  idLugarEntrevista?: number | null;
+  lugarEntrevista?: string | null;
   idIdentidadGenero: number;
   idOrientacionSexual?: number | null;
   idEtnia?: number | null;

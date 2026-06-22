@@ -15,6 +15,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ModalGestionComponent } from '../modal-gestion-contacto/modal-gestion-contacto.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { SolicitudService, ContactoTelefonicoDto } from '../../services/solicitud.service';
+import { formatFechaCreacion } from '../../custom-date-adapter';
 import { forkJoin, Observable } from 'rxjs';
 
 enum EstadoSolicitudEnum {
@@ -126,7 +127,7 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
           tipoDocumento: s.tipoDocumento,
           nombre: s.nombreSolicitante,
           documento: s.documentoSolicitante,
-          fecha: s.fechaCreacion ? String(s.fechaCreacion).substring(0, 10) : '',
+          fecha: formatFechaCreacion(s.fechaCreacion),
           dependencia: s.remitenteDependencia || s.dependencia || '',
           tipoSolicitud: s.tipoSolicitud,
           campus: s.remitenteCampus || '',

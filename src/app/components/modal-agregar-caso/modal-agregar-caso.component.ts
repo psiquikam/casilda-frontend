@@ -29,6 +29,7 @@ export interface ModalAgregarCasoData {
   listaPrejuicio: MaestroDto[];
   listaVinculos: string[];
   listaVinculosAgresorVictima: string[];
+  listaTiemposOcurridoUnidad: string[];
   titulo?: string;
   initialData?: any;
 }
@@ -77,7 +78,8 @@ export class ModalAgregarCasoComponent {
   ) {
     this.casoForm = this.fb.group({
       orientacionSexual: ['', Validators.required],
-      tiempoOcurrido: ['', Validators.required],
+      tiempoOcurridoValor: ['', [Validators.required, Validators.min(0)]],
+      tiempoOcurridoUnidad: ['meses', Validators.required],
       queForma: ['', Validators.required],
       lugarHechos: ['', Validators.required],
       violenciaGenero: ['NO'],
@@ -182,7 +184,8 @@ export class ModalAgregarCasoComponent {
 
     this.casoForm.patchValue({
       orientacionSexual: initial.orientacionSexual ?? '',
-      tiempoOcurrido: initial.tiempoOcurrido ?? '',
+      tiempoOcurridoValor: initial.tiempoOcurridoValor ?? '',
+      tiempoOcurridoUnidad: initial.tiempoOcurridoUnidad ?? 'meses',
       queForma: initial.queForma ?? '',
       lugarHechos: initial.lugarHechos ?? '',
       violenciaGenero: initial.violenciaGenero ?? 'NO',

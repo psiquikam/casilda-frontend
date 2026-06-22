@@ -8,14 +8,10 @@
     </div>
 
     <app-tabla-casos [dataSource]="dataSource" [displayedColumns]="displayedColumnsTablaInicial"
-        [serverSidePagination]="true"
-        [totalElements]="totalElementosCitas"
-        [pageIndex]="pageIndexCitas"
-        [pageSize]="pageSizeCitas"
-        [expandedElement]="expandedElement" (iniciar)="iniciarAtencion($event)"
+        [serverSidePagination]="true" [totalElements]="totalElementosCitas" [pageIndex]="pageIndexCitas"
+        [pageSize]="pageSizeCitas" [expandedElement]="expandedElement" (iniciar)="iniciarAtencion($event)"
         (expand)="expandedElement = expandedElement === $event ? null : $event"
-        (filter)="applyFilter($event.column, $event.event)"
-        (pageChange)="onPageChangeCitas($event)">
+        (filter)="applyFilter($event.column, $event.event)" (pageChange)="onPageChangeCitas($event)">
     </app-tabla-casos>
 
 </div>
@@ -41,9 +37,12 @@
                 <h2 class="consulta-title">Consulta de atención</h2>
 
                 <div class="consulta-tabs">
-                    <button class="ctab" [class.ctab-active]="tabConsulta === 'abierta-activo'" (click)="tabConsulta = 'abierta-activo'">Abierta activo</button>
-                    <button class="ctab" [class.ctab-active]="tabConsulta === 'abierta-transicion'" (click)="tabConsulta = 'abierta-transicion'">Abierta en transición</button>
-                    <button class="ctab" [class.ctab-active]="tabConsulta === 'cerrada'" (click)="tabConsulta = 'cerrada'">Cerrada</button>
+                    <button class="ctab" [class.ctab-active]="tabConsulta === 'abierta-activo'"
+                        (click)="tabConsulta = 'abierta-activo'">Abierta activo</button>
+                    <button class="ctab" [class.ctab-active]="tabConsulta === 'abierta-transicion'"
+                        (click)="tabConsulta = 'abierta-transicion'">Abierta en transición</button>
+                    <button class="ctab" [class.ctab-active]="tabConsulta === 'cerrada'"
+                        (click)="tabConsulta = 'cerrada'">Cerrada</button>
                 </div>
 
                 <div class="consulta-toolbar">
@@ -108,7 +107,8 @@
                 </div>
 
                 <div class="consulta-footer">
-                    <span class="footer-info">Mostrando registros del 1 al {{consultaFiltrada.length}} de un total de {{consultaFiltrada.length}} registros</span>
+                    <span class="footer-info">Mostrando registros del 1 al {{consultaFiltrada.length}} de un total de
+                        {{consultaFiltrada.length}} registros</span>
                     <div class="footer-pag">
                         <button mat-stroked-button disabled>Anterior</button>
                         <span class="pag-num active-pag">1</span>
@@ -126,12 +126,13 @@
                     <mat-tab-group animationDuration="200ms" color="primary">
 
                         <mat-tab>
-                          <ng-template matTabLabel>
-                            <span [class.tab-label-error]="tabErrors.has('Registro de atención')">
-                              @if (tabErrors.has('Registro de atención')) { <mat-icon class="tab-error-icon">error</mat-icon> }
-                              Registro de atención
-                            </span>
-                          </ng-template>
+                            <ng-template matTabLabel>
+                                <span [class.tab-label-error]="tabErrors.has('Registro de atención')">
+                                    @if (tabErrors.has('Registro de atención')) { <mat-icon
+                                        class="tab-error-icon">error</mat-icon> }
+                                    Registro de atención
+                                </span>
+                            </ng-template>
                             <div class="tab-padding grid-2">
                                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
                                     <mat-label>Tipo solicitud</mat-label>
@@ -167,20 +168,13 @@
                                     </mat-select>
                                 </mat-form-field>
 
-                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                    <mat-label>Departamento de la entrevista</mat-label>
-                                    <mat-select formControlName="departamentoEntrevista">
-                                        @for (d of listaDepartamentos; track d) {
-                                        <mat-option [value]="d.id">{{d.nombre}}</mat-option>
-                                        }
-                                    </mat-select>
-                                </mat-form-field>
+
 
                                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                    <mat-label>Forma y lugar de la entrevista</mat-label>
-                                    <mat-select formControlName="formaEntrevista"
-                                        [disabled]="!atencionForm.get('departamentoEntrevista')?.value">
-                                        @for (m of municipiosEntrevista; track m.id) { <mat-option [value]="m.id">{{m.nombre}}</mat-option>
+                                    <mat-label>Lugar de la entrevista</mat-label>
+                                    <mat-select formControlName="lugarEntrevista">
+                                        @for (m of lugaresEntrevista; track m.id) {
+                                        <mat-option [value]="m.id">{{m.nombre}}</mat-option>
                                         }
                                     </mat-select>
                                 </mat-form-field>
@@ -195,21 +189,19 @@
                         </mat-tab>
 
                         <mat-tab>
-                          <ng-template matTabLabel>
-                            <span [class.tab-label-error]="tabErrors.has('Datos de la persona')">
-                              @if (tabErrors.has('Datos de la persona')) { <mat-icon class="tab-error-icon">error</mat-icon> }
-                              Datos de la persona
-                            </span>
-                          </ng-template>
+                            <ng-template matTabLabel>
+                                <span [class.tab-label-error]="tabErrors.has('Datos de la persona')">
+                                    @if (tabErrors.has('Datos de la persona')) { <mat-icon
+                                        class="tab-error-icon">error</mat-icon> }
+                                    Datos de la persona
+                                </span>
+                            </ng-template>
                             <div class="tab-padding">
                                 <div class="grid-3">
                                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
                                         <mat-label>Número de Documento</mat-label>
-                                        <input matInput formControlName="documento"
-                                            inputmode="numeric"
-                                            pattern="\d*"
-                                            [maxlength]="maxLongitudDocumento"
-                                            (input)="soloDigitos($event)">
+                                        <input matInput formControlName="documento" inputmode="numeric" pattern="\d*"
+                                            [maxlength]="maxLongitudDocumento" (input)="soloDigitos($event)">
                                     </mat-form-field>
                                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
                                         <mat-label>Tipo Documento</mat-label>
@@ -398,12 +390,13 @@
                         </mat-tab>
 
                         <mat-tab>
-                          <ng-template matTabLabel>
-                            <span [class.tab-label-error]="tabErrors.has('Datos complementarios')">
-                              @if (tabErrors.has('Datos complementarios')) { <mat-icon class="tab-error-icon">error</mat-icon> }
-                              Datos complementarios
-                            </span>
-                          </ng-template>
+                            <ng-template matTabLabel>
+                                <span [class.tab-label-error]="tabErrors.has('Datos complementarios')">
+                                    @if (tabErrors.has('Datos complementarios')) { <mat-icon
+                                        class="tab-error-icon">error</mat-icon> }
+                                    Datos complementarios
+                                </span>
+                            </ng-template>
                             <div class="tab-padding">
                                 <div class="grid-3">
                                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
@@ -414,6 +407,12 @@
                                             }
                                         </mat-select>
                                     </mat-form-field>
+                                    @if (esOtroVinculo()) {
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                        <mat-label>¿Cuál?</mat-label>
+                                        <input matInput formControlName="otroVinculo" placeholder="Escriba el vínculo">
+                                    </mat-form-field>
+                                    }
                                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
                                         <mat-label>Facultad</mat-label>
                                         <mat-select formControlName="facultad">
@@ -470,11 +469,6 @@
                                                 <td mat-cell *matCellDef="let element"> {{element.correo}} </td>
                                             </ng-container>
 
-                                            <ng-container matColumnDef="descripcion">
-                                                <th mat-header-cell *matHeaderCellDef> Descripción </th>
-                                                <td mat-cell *matCellDef="let element"> {{element.descripcion}} </td>
-                                            </ng-container>
-
                                             <ng-container matColumnDef="acciones">
                                                 <th mat-header-cell *matHeaderCellDef style="text-align: center;">
                                                     Acciones </th>
@@ -486,10 +480,8 @@
                                                 </td>
                                             </ng-container>
 
-                                            <tr mat-header-row
-                                                *matHeaderRowDef="['tipo', 'correo', 'descripcion', 'acciones']"></tr>
-                                            <tr mat-row
-                                                *matRowDef="let row; columns: ['tipo', 'correo', 'descripcion', 'acciones'];">
+                                            <tr mat-header-row *matHeaderRowDef="['tipo', 'correo', 'acciones']"></tr>
+                                            <tr mat-row *matRowDef="let row; columns: ['tipo', 'correo', 'acciones'];">
                                             </tr>
                                         </table>
 
@@ -497,6 +489,14 @@
                                             <mat-icon>mail_outline</mat-icon>
                                             <p>No hay correos adicionales registrados.</p>
                                         </div>
+                                    </div>
+
+                                    <div style="margin-top: 10px; width: 100%;">
+                                        <mat-form-field appearance="outline" style="width: 100%;">
+                                            <mat-label>Observaciones de Correo</mat-label>
+                                            <textarea matInput formControlName="observacionesCorreo"
+                                                placeholder="Observaciones adicionales sobre los correos..."></textarea>
+                                        </mat-form-field>
                                     </div>
                                 </div>
 
@@ -526,11 +526,6 @@
                                                 <td mat-cell *matCellDef="let element"> {{element.telefono}} </td>
                                             </ng-container>
 
-                                            <ng-container matColumnDef="descripcion">
-                                                <th mat-header-cell *matHeaderCellDef> Descripcion </th>
-                                                <td mat-cell *matCellDef="let element"> {{element.descripcion}} </td>
-                                            </ng-container>
-
                                             <ng-container matColumnDef="acciones">
                                                 <th mat-header-cell *matHeaderCellDef style="text-align: center;">
                                                     Acciones </th>
@@ -542,10 +537,8 @@
                                                 </td>
                                             </ng-container>
 
-                                            <tr mat-header-row
-                                                *matHeaderRowDef="['tipo', 'correo', 'descripcion', 'acciones']"></tr>
-                                            <tr mat-row
-                                                *matRowDef="let row; columns: ['tipo', 'correo', 'descripcion', 'acciones'];">
+                                            <tr mat-header-row *matHeaderRowDef="['tipo', 'correo', 'acciones']"></tr>
+                                            <tr mat-row *matRowDef="let row; columns: ['tipo', 'correo', 'acciones'];">
                                             </tr>
                                         </table>
 
@@ -554,22 +547,42 @@
                                             <p>No hay Telefonos adicionales registrados.</p>
                                         </div>
                                     </div>
+
+                                    <div style="margin-top: 10px; width: 100%;">
+                                        <mat-form-field appearance="outline" style="width: 100%;">
+                                            <mat-label>Observaciones de Teléfono</mat-label>
+                                            <textarea matInput formControlName="observacionesTelefono"
+                                                placeholder="Observaciones adicionales sobre los teléfonos..."></textarea>
+                                        </mat-form-field>
+                                    </div>
                                 </div>
                             </div>
                         </mat-tab>
 
                         <mat-tab>
-                          <ng-template matTabLabel>
-                            <span [class.tab-label-error]="tabErrors.has('Documentación')">
-                              @if (tabErrors.has('Documentación')) { <mat-icon class="tab-error-icon">error</mat-icon> }
-                              Documentación
-                            </span>
-                          </ng-template>
+                            <ng-template matTabLabel>
+                                <span [class.tab-label-error]="tabErrors.has('Documentación')">
+                                    @if (tabErrors.has('Documentación')) { <mat-icon
+                                        class="tab-error-icon">error</mat-icon> }
+                                    Documentación
+                                </span>
+                            </ng-template>
                             <div class="tab-padding grid-2">
-                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                    <mat-label>Hace cuánto ocurrió</mat-label>
-                                    <input matInput formControlName="tiempoOcurrido">
-                                </mat-form-field>
+                                <div style="display: flex; gap: 8px;">
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic" style="flex: 1;">
+                                        <mat-label>¿Hace cuánto ocurrió el hecho?</mat-label>
+                                        <input matInput type="number" formControlName="tiempoOcurridoValor" min="0">
+                                    </mat-form-field>
+                                    <mat-form-field appearance="outline" subscriptSizing="dynamic"
+                                        style="width: 140px;">
+                                        <mat-label>Unidad</mat-label>
+                                        <mat-select formControlName="tiempoOcurridoUnidad">
+                                            @for (u of listaTiemposOcurridoUnidad; track u) {
+                                            <mat-option [value]="u">{{u}}</mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
 
                                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
                                     <mat-label>¿En qué forma ocurrió el hecho?</mat-label>
@@ -608,7 +621,7 @@
                                     <div class="section-header-inline">
                                         <div class="section-title">
                                             <mat-icon color="primary">assignment</mat-icon>
-                                            <span>Hechos registrados</span>
+                                            <span>Agregar Hecho</span>
                                         </div>
 
                                         <button mat-icon-button class="btn-add-inline" (click)="abrirModalHechos()"
@@ -622,7 +635,8 @@
 
                                             <ng-container matColumnDef="fecha">
                                                 <th mat-header-cell *matHeaderCellDef> Fecha </th>
-                                                <td mat-cell *matCellDef="let element"> {{element.fecha | date:'dd/MM/yyyy'}} </td>
+                                                <td mat-cell *matCellDef="let element"> {{element.fecha |
+                                                    date:'MM/yyyy'}} </td>
                                             </ng-container>
 
                                             <ng-container matColumnDef="lugar">
@@ -655,7 +669,7 @@
 
                                         <div *ngIf="hechosRegistrados.length === 0" class="no-results-msg">
                                             <mat-icon>assignment</mat-icon>
-                                            <p>No hay Hechos registrados.</p>
+                                            <p>No hay hechos registrados.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -697,9 +711,9 @@
                         @if (atencionForm.get('violenciaGenero')?.value === 'SI') {
 
                         <mat-tab>
-                          <ng-template matTabLabel>
-                            <span>VBG</span>
-                          </ng-template>
+                            <ng-template matTabLabel>
+                                <span>VBG</span>
+                            </ng-template>
                             <div class="vbg-grid">
 
                                 <div class="vbg-card">
@@ -851,12 +865,13 @@
                         }
 
                         <mat-tab>
-                          <ng-template matTabLabel>
-                            <span [class.tab-label-error]="tabErrors.has('Presunto agresor')">
-                              @if (tabErrors.has('Presunto agresor')) { <mat-icon class="tab-error-icon">error</mat-icon> }
-                              Presunto agresor
-                            </span>
-                          </ng-template>
+                            <ng-template matTabLabel>
+                                <span [class.tab-label-error]="tabErrors.has('Presunto agresor')">
+                                    @if (tabErrors.has('Presunto agresor')) { <mat-icon
+                                        class="tab-error-icon">error</mat-icon> }
+                                    Presunto agresor
+                                </span>
+                            </ng-template>
                             <div class="tab-padding grid-3">
 
                                 <mat-form-field appearance="outline">
@@ -902,9 +917,9 @@
                         </mat-tab>
 
                         <mat-tab>
-                          <ng-template matTabLabel>
-                            <span>Apreciaciones psicojuridicas</span>
-                          </ng-template>
+                            <ng-template matTabLabel>
+                                <span>Apreciaciones psicojuridicas</span>
+                            </ng-template>
                             <div class="discapacidad-container">
                                 <div class="section-header-inline">
                                     <div class="section-title">
@@ -943,8 +958,7 @@
                                         </ng-container>
 
                                         <tr mat-header-row *matHeaderRowDef="['tipo', 'descripcion', 'acciones']"></tr>
-                                        <tr mat-row
-                                            *matRowDef="let row; columns: ['tipo', 'descripcion', 'acciones'];">
+                                        <tr mat-row *matRowDef="let row; columns: ['tipo', 'descripcion', 'acciones'];">
                                         </tr>
                                     </table>
 
@@ -993,8 +1007,7 @@
                                         </ng-container>
 
                                         <tr mat-header-row *matHeaderRowDef="['tipo', 'descripcion', 'acciones']"></tr>
-                                        <tr mat-row
-                                            *matRowDef="let row; columns: ['tipo', 'descripcion', 'acciones'];">
+                                        <tr mat-row *matRowDef="let row; columns: ['tipo', 'descripcion', 'acciones'];">
                                         </tr>
                                     </table>
 
@@ -1007,9 +1020,9 @@
                         </mat-tab>
 
                         <mat-tab>
-                          <ng-template matTabLabel>
-                            <span>Acuerdos y compromisos</span>
-                          </ng-template>
+                            <ng-template matTabLabel>
+                                <span>Acuerdos y compromisos</span>
+                            </ng-template>
                             <div class="tab-padding">
 
                                 <div class="pregunta-acuerdo-header">
@@ -1053,8 +1066,8 @@
                                                 <th mat-header-cell *matHeaderCellDef style="text-align: center;">
                                                     Acciones </th>
                                                 <td mat-cell *matCellDef="let i = index" style="text-align: center;">
-                                                    <button mat-icon-button color="warn"
-                                                        (click)="eliminarRemision(i)" matTooltip="Eliminar">
+                                                    <button mat-icon-button color="warn" (click)="eliminarRemision(i)"
+                                                        matTooltip="Eliminar">
                                                         <mat-icon svgIcon="icono-eliminar"></mat-icon>
                                                     </button>
                                                 </td>
@@ -1095,7 +1108,8 @@
 
                                             <ng-container matColumnDef="fecha">
                                                 <th mat-header-cell *matHeaderCellDef> Fecha </th>
-                                                <td mat-cell *matCellDef="let element"> {{element.fecha | date:'dd/MM/yyyy'}} </td>
+                                                <td mat-cell *matCellDef="let element"> {{element.fecha |
+                                                    date:'dd/MM/yyyy'}} </td>
                                             </ng-container>
 
                                             <ng-container matColumnDef="cual">
@@ -1114,7 +1128,8 @@
                                                 </td>
                                             </ng-container>
 
-                                            <tr mat-header-row *matHeaderRowDef="['tipo', 'fecha', 'cual', 'acciones']"></tr>
+                                            <tr mat-header-row *matHeaderRowDef="['tipo', 'fecha', 'cual', 'acciones']">
+                                            </tr>
                                             <tr mat-row
                                                 *matRowDef="let row; columns: ['tipo','fecha', 'cual', 'acciones'];">
                                             </tr>
@@ -1137,9 +1152,9 @@
                         </mat-tab>
 
                         <mat-tab>
-                          <ng-template matTabLabel>
-                            <span>Otros Casos</span>
-                          </ng-template>
+                            <ng-template matTabLabel>
+                                <span>Otros Casos</span>
+                            </ng-template>
                             <div class="tab-padding">
 
                                 <div class="section-header-inline">
@@ -1147,8 +1162,8 @@
                                         <mat-icon color="primary">cases</mat-icon>
                                         <span>Consulta de casos</span>
                                     </div>
-                                    <button mat-icon-button class="btn-add-inline"
-                                        (click)="onAgregarOtroCaso()" matTooltip="Agregar Caso">
+                                    <button mat-icon-button class="btn-add-inline" (click)="onAgregarOtroCaso()"
+                                        matTooltip="Agregar Caso">
                                         <mat-icon>add_circle</mat-icon>
                                     </button>
                                 </div>
@@ -1157,11 +1172,8 @@
                                     <mat-spinner diameter="40"></mat-spinner>
                                 </div>
 
-                                <app-tabla-otros-casos
-                                    *ngIf="!cargandoOtrosCasos"
-                                    [dataSource]="dataSourceOtros"
-                                    [serverSidePagination]="false"
-                                    (editar)="onEditarOtroCaso($event)"
+                                <app-tabla-otros-casos *ngIf="!cargandoOtrosCasos" [dataSource]="dataSourceOtros"
+                                    [serverSidePagination]="false" (editar)="onEditarOtroCaso($event)"
                                     (eliminar)="onEliminarOtroCaso($event)"
                                     (filter)="applyFilterOtros($event.column, $event.event)">
                                 </app-tabla-otros-casos>
@@ -1170,17 +1182,16 @@
                         </mat-tab>
 
                         <mat-tab>
-                          <ng-template matTabLabel>
-                            <span>Medidas de protección</span>
-                          </ng-template>
+                            <ng-template matTabLabel>
+                                <span>Medidas de protección</span>
+                            </ng-template>
                             <div class="discapacidad-container">
                                 <div class="section-header-inline">
                                     <div class="section-title">
                                         <mat-icon color="primary">security</mat-icon>
                                         <span>Medidas de protección</span>
                                     </div>
-                                    <button mat-icon-button class="btn-add-inline"
-                                        (click)="abrirModalMedida()"
+                                    <button mat-icon-button class="btn-add-inline" (click)="abrirModalMedida()"
                                         matTooltip="Agregar Medida">
                                         <mat-icon>add_circle</mat-icon>
                                     </button>
@@ -1201,7 +1212,8 @@
 
                                         <ng-container matColumnDef="fechaRegistro">
                                             <th mat-header-cell *matHeaderCellDef> Fecha de registro </th>
-                                            <td mat-cell *matCellDef="let element"> {{element.fechaRegistro | date:'dd/MM/yyyy'}} </td>
+                                            <td mat-cell *matCellDef="let element"> {{element.fechaRegistro |
+                                                date:'dd/MM/yyyy'}} </td>
                                         </ng-container>
 
                                         <ng-container matColumnDef="descripcion">
@@ -1210,7 +1222,8 @@
                                         </ng-container>
 
                                         <ng-container matColumnDef="opcion">
-                                            <th mat-header-cell *matHeaderCellDef style="text-align: center;"> Opción </th>
+                                            <th mat-header-cell *matHeaderCellDef style="text-align: center;"> Opción
+                                            </th>
                                             <td mat-cell *matCellDef="let i = index" style="text-align: center;">
                                                 <button mat-icon-button color="warn" (click)="eliminarMedida(i)"
                                                     matTooltip="Eliminar">
@@ -1219,8 +1232,12 @@
                                             </td>
                                         </ng-container>
 
-                                        <tr mat-header-row *matHeaderRowDef="['tipoMedida', 'responsable', 'fechaRegistro', 'descripcion', 'opcion']"></tr>
-                                        <tr mat-row *matRowDef="let row; columns: ['tipoMedida', 'responsable', 'fechaRegistro', 'descripcion', 'opcion'];"></tr>
+                                        <tr mat-header-row
+                                            *matHeaderRowDef="['tipoMedida', 'responsable', 'fechaRegistro', 'descripcion', 'opcion']">
+                                        </tr>
+                                        <tr mat-row
+                                            *matRowDef="let row; columns: ['tipoMedida', 'responsable', 'fechaRegistro', 'descripcion', 'opcion'];">
+                                        </tr>
                                     </table>
 
                                     <div *ngIf="medidasRegistradas.length === 0" class="no-results-msg">
@@ -1232,9 +1249,9 @@
                         </mat-tab>
 
                         <mat-tab>
-                          <ng-template matTabLabel>
-                            <span>Otros compromisos</span>
-                          </ng-template>
+                            <ng-template matTabLabel>
+                                <span>Otros compromisos</span>
+                            </ng-template>
                             <div class="tab-padding">
                                 <div class="discapacidad-container">
                                     <div class="section-header-inline">
@@ -1253,7 +1270,8 @@
 
                                         <ng-container matColumnDef="fecha">
                                             <th mat-header-cell *matHeaderCellDef> Fecha </th>
-                                            <td mat-cell *matCellDef="let element"> {{element.fecha | date:'dd/MM/yyyy'}} </td>
+                                            <td mat-cell *matCellDef="let element"> {{element.fecha |
+                                                date:'dd/MM/yyyy'}} </td>
                                         </ng-container>
 
                                         <ng-container matColumnDef="compromisos">
@@ -1301,7 +1319,8 @@
 
                                         <ng-container matColumnDef="fecha">
                                             <th mat-header-cell *matHeaderCellDef> Fecha </th>
-                                            <td mat-cell *matCellDef="let element"> {{element.fecha | date:'dd/MM/yyyy'}} </td>
+                                            <td mat-cell *matCellDef="let element"> {{element.fecha |
+                                                date:'dd/MM/yyyy'}} </td>
                                         </ng-container>
 
                                         <ng-container matColumnDef="profesional">
@@ -1340,9 +1359,9 @@
                         </mat-tab>
 
                         <mat-tab>
-                          <ng-template matTabLabel>
-                            <span>Seguimientos</span>
-                          </ng-template>
+                            <ng-template matTabLabel>
+                                <span>Seguimientos</span>
+                            </ng-template>
                             <div class="tab-padding">
 
                                 <div class="discapacidad-container">
@@ -1441,12 +1460,13 @@
                         </mat-tab>
 
                         <mat-tab>
-                          <ng-template matTabLabel>
-                            <span [class.tab-label-error]="tabErrors.has('Estado de la atención')">
-                              @if (tabErrors.has('Estado de la atención')) { <mat-icon class="tab-error-icon">error</mat-icon> }
-                              Estado de la atención
-                            </span>
-                          </ng-template>
+                            <ng-template matTabLabel>
+                                <span [class.tab-label-error]="tabErrors.has('Estado de la atención')">
+                                    @if (tabErrors.has('Estado de la atención')) { <mat-icon
+                                        class="tab-error-icon">error</mat-icon> }
+                                    Estado de la atención
+                                </span>
+                            </ng-template>
                             <div class="tab-padding grid-2">
 
                                 <mat-form-field appearance="outline" subscriptSizing="dynamic">

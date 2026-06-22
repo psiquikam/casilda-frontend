@@ -24,14 +24,12 @@ type CorreoRegistrado = {
   tipoId?: number | null;
   tipo?: string;
   correo: string;
-  descripcion: string;
 };
 
 type TelefonoRegistrado = {
   tipoId?: number | null;
   tipo?: string;
   telefono: string;
-  descripcion: string;
 };
 
 type ContactoInfo = {
@@ -39,7 +37,6 @@ type ContactoInfo = {
   tipo?: string | null;
   correo?: string | null;
   telefono?: string | null;
-  descripcion?: string | null;
 };
 
 @Component({
@@ -129,6 +126,8 @@ export class ModalDetalleSolicitudComponent implements OnInit {
       primerApellido: [info.primerApellido ?? '', Validators.required],
       segundoApellido: [info.segundoApellido ?? ''],
       identidadGenero: [info.identidadGeneroId ?? null],
+      observacionesTelefono: [info.observacionesTelefono ?? ''],
+      observacionesCorreo: [info.observacionesCorreo ?? '']
     });
 
     const correosInfo = Array.isArray(info?.correos) ? (info.correos as ContactoInfo[]) : [];
@@ -137,8 +136,7 @@ export class ModalDetalleSolicitudComponent implements OnInit {
       .map((correo) => ({
         tipoId: correo.tipoId ?? null,
         tipo: this.normalizarTexto(correo.tipo),
-        correo: this.normalizarTexto(correo.correo),
-        descripcion: this.normalizarTexto(correo.descripcion) || 'Correo'
+        correo: this.normalizarTexto(correo.correo)
       }));
 
     const telefonosInfo = Array.isArray(info?.telefonos) ? (info.telefonos as ContactoInfo[]) : [];
@@ -147,8 +145,7 @@ export class ModalDetalleSolicitudComponent implements OnInit {
       .map((telefono) => ({
         tipoId: telefono.tipoId ?? null,
         tipo: this.normalizarTexto(telefono.tipo),
-        telefono: this.normalizarTexto(telefono.telefono),
-        descripcion: this.normalizarTexto(telefono.descripcion) || 'Teléfono'
+        telefono: this.normalizarTexto(telefono.telefono)
       }));
 
     if (this.data.modo === 'visualizar') {
@@ -237,16 +234,14 @@ export class ModalDetalleSolicitudComponent implements OnInit {
         .map((correo) => ({
         tipoId: correo.tipoId as number,
         tipo: this.normalizarTextoOpcional(correo.tipo),
-        correo: this.normalizarTexto(correo.correo),
-        descripcion: this.normalizarTexto(correo.descripcion)
+        correo: this.normalizarTexto(correo.correo)
       })),
       telefonos: this.telefonosRegistrados
         .filter((telefono) => telefono.telefono && telefono.tipoId != null)
         .map((telefono) => ({
         tipoId: telefono.tipoId as number,
         tipo: this.normalizarTextoOpcional(telefono.tipo),
-        telefono: this.normalizarTexto(telefono.telefono),
-        descripcion: this.normalizarTexto(telefono.descripcion)
+        telefono: this.normalizarTexto(telefono.telefono)
       })),
       remitentePrimerNombre: this.tieneRemitente ? this.normalizarTextoOpcional(formValue.remitentePrimerNombre) : null,
       remitenteSegundoNombre: this.tieneRemitente ? this.normalizarTextoOpcional(formValue.remitenteSegundoNombre) : null,
@@ -257,7 +252,9 @@ export class ModalDetalleSolicitudComponent implements OnInit {
       remitenteDependenciaId: this.tieneRemitente ? (formValue.remitenteDependencia ?? null) : null,
       remitenteFacultadId: this.tieneRemitente ? (formValue.remitenteFacultad ?? null) : null,
       remitenteTipoDocumentoId: this.tieneRemitente ? (formValue.remitenteTipoDocumento ?? null) : null,
-      remitenteNumeroDocumento: this.tieneRemitente ? this.normalizarTextoOpcional(formValue.remitenteNumeroDocumento) : null
+      remitenteNumeroDocumento: this.tieneRemitente ? this.normalizarTextoOpcional(formValue.remitenteNumeroDocumento) : null,
+      observacionesTelefono: this.normalizarTextoOpcional(formValue.observacionesTelefono),
+      observacionesCorreo: this.normalizarTextoOpcional(formValue.observacionesCorreo)
     };
   }
 

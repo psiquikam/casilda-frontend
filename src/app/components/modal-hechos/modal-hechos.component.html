@@ -8,23 +8,26 @@
 
     <div class="form-row-full">
       <mat-form-field appearance="outline">
-        <mat-label>Fecha</mat-label>
-        <input matInput [matDatepicker]="picker" [(ngModel)]="data.fecha" placeholder="Seleccione fecha">
+        <mat-label>Fecha de ocurrencia del hecho *</mat-label>
+        <input matInput [matDatepicker]="picker" [(ngModel)]="data.fecha" readonly placeholder="Seleccione mes y año">
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
+        <mat-datepicker #picker
+                        startView="multi-year"
+                        (monthSelected)="setMonthAndYear($event, picker)">
+        </mat-datepicker>
       </mat-form-field>
     </div>
 
     <div class="form-row-full">
       <mat-form-field appearance="outline">
-        <mat-label>Lugar</mat-label>
+        <mat-label>Lugar de ocurrencia del hecho *</mat-label>
         <input matInput [(ngModel)]="data.lugar" placeholder="Ej: Aula 204, Oficina, Virtual...">
       </mat-form-field>
     </div>
 
     <div class="form-row-full">
       <mat-form-field appearance="outline" class="field-descripcion">
-        <mat-label>Descripción del hecho</mat-label>
+        <mat-label>Descripción del hecho *</mat-label>
         <textarea matInput [(ngModel)]="data.descripcion" rows="4"
           placeholder="Describa en detalle lo ocurrido..."></textarea>
       </mat-form-field>
@@ -36,7 +39,7 @@
 <mat-dialog-actions align="end" class="modal-actions">
   <button mat-button (click)="onNoClick()">Cancelar</button>
 
-  <button mat-flat-button class="btn-confirm" [mat-dialog-close]="data" [disabled]="!data.fecha || !data.descripcion">
+  <button mat-flat-button class="btn-confirm" [mat-dialog-close]="data" [disabled]="!data.fecha || !data.descripcion || !data.lugar">
     <mat-icon>check</mat-icon>
     Agregar
   </button>
