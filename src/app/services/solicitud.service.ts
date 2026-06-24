@@ -63,6 +63,7 @@ export interface SolicitudAcompanamientoResponse {
   // Para la tabla
   dependencia: string;
   profesional: string;
+  tipoAsignacion: string;
   // Solicitante resumen
   nombreSolicitante: string;
   documentoSolicitante: string;
@@ -341,6 +342,7 @@ export interface AtencionContextoRequestDto {
 
 export interface AtencionRegistroRequestDto {
   citaId: number;
+  idAtencion?: number | null;
   idTipoServicio: number;
   idMunicipioEntrevista?: number | null;
   idLugarEntrevista: number;
@@ -352,6 +354,7 @@ export interface AtencionRegistroRequestDto {
   archivoConsentimientoContenido?: string;
   observacionesTelefono?: string | null;
   observacionesCorreo?: string | null;
+  idEstadoAtencion?: number;
 }
 
 export interface CompromisosAtencionRequestDto {
@@ -388,16 +391,102 @@ export interface CasoAtencionRequestDto {
 }
 
 export interface RegistroAtencionCompleteRequestDto {
-  atencion: AtencionRegistroRequestDto;
-  atencionContexto: AtencionContextoRequestDto;
-  persona: PersonaAtencionRequestDto;
-  caso: CasoAtencionRequestDto;
+  atencion?: AtencionRegistroRequestDto;
+  atencionContexto?: AtencionContextoRequestDto;
+  persona?: PersonaAtencionRequestDto;
+  caso?: CasoAtencionRequestDto;
   seguimientos?: SeguimientoAtencionRequestDto[];
   hechos?: HechoRequestDto[];
   compromisos?: CompromisosAtencionRequestDto;
   otrosCasos?: RegistroOtroCasoRequestDto[];
   otrosCasosActualizar?: ActualizarOtroCasoRequestDto[];
   otrosCasosEliminar?: number[];
+}
+
+export interface Pestana1RequestDto {
+  citaId: number;
+  idAtencion?: number | null;
+  persona: PersonaAtencionRequestDto;
+  idRegimen?: number;
+  idEps?: number;
+}
+
+export interface Pestana2RequestDto {
+  citaId: number;
+  idAtencion?: number | null;
+  atencionContexto: AtencionContextoRequestDto;
+  observacionesTelefono?: string | null;
+  observacionesCorreo?: string | null;
+}
+
+export interface Pestana3RequestDto {
+  citaId: number;
+  idAtencion?: number | null;
+  caso: CasoAtencionRequestDto;
+  hechos?: HechoRequestDto[];
+}
+
+export interface Pestana4RequestDto {
+  citaId: number;
+  idAtencion?: number | null;
+  caso: CasoAtencionRequestDto;
+}
+
+export interface Pestana5RequestDto {
+  citaId: number;
+  idAtencion?: number | null;
+  agresorVictima: AgresorVictimaRequestDto;
+}
+
+export interface Pestana6RequestDto {
+  citaId: number;
+  idAtencion?: number | null;
+}
+
+export interface Pestana7RequestDto {
+  citaId: number;
+  idAtencion?: number | null;
+  logroAcuerdo: boolean;
+}
+
+export interface Pestana8RequestDto {
+  citaId: number;
+  idAtencion?: number | null;
+  otrosCasos?: RegistroOtroCasoRequestDto[];
+  otrosCasosActualizar?: ActualizarOtroCasoRequestDto[];
+  otrosCasosEliminar?: number[];
+}
+
+export interface MedidaProteccionRequestDto {
+  tipoMedidaId: number;
+  subtipoMedidaId: number;
+  responsableId: number;
+  fechaRegistro: string;
+  descripcion: string;
+}
+
+export interface Pestana9RequestDto {
+  citaId: number;
+  idAtencion?: number | null;
+  medidas?: MedidaProteccionRequestDto[];
+}
+
+export interface Pestana10RequestDto {
+  citaId: number;
+  idAtencion?: number | null;
+  compromisos: CompromisosAtencionRequestDto;
+}
+
+export interface Pestana11RequestDto {
+  citaId: number;
+  idAtencion?: number | null;
+  seguimientos: SeguimientoAtencionRequestDto[];
+}
+
+export interface Pestana12RequestDto {
+  citaId: number;
+  idAtencion?: number | null;
+  idEstadoAtencion: number;
 }
 
 export interface RegistroOtroCasoRequestDto {
@@ -543,6 +632,22 @@ export class SolicitudService {
     return this.http.get<MaestroDto[]>(`${environment.apiBaseUrl}/maestros/motivos-estado-cita`);
   }
 
+  listarTiposMedida(): Observable<MaestroDto[]> {
+    return this.http.get<MaestroDto[]>(`${environment.apiBaseUrl}/maestros/tipos-medida`);
+  }
+
+  listarSubTiposMedida(): Observable<MaestroDto[]> {
+    return this.http.get<MaestroDto[]>(`${environment.apiBaseUrl}/maestros/subtipos-medida`);
+  }
+
+  listarSubTiposMedidaPorTipo(tipoId: number): Observable<MaestroDto[]> {
+    return this.http.get<MaestroDto[]>(`${environment.apiBaseUrl}/maestros/subtipos-medida/${tipoId}`);
+  }
+
+  listarResponsablesMedida(): Observable<MaestroDto[]> {
+    return this.http.get<MaestroDto[]>(`${environment.apiBaseUrl}/maestros/responsables-medida`);
+  }
+
   crearCompromisoPersona(datos: CompromisoPersonaRequestDto): Observable<unknown> {
     return this.http.post(`${this.compromisosUrl}/persona`, datos);
   }
@@ -553,6 +658,14 @@ export class SolicitudService {
 
   registrarAtencionCompleta(datos: RegistroAtencionCompleteRequestDto): Observable<AtencionResponseDto> {
     return this.http.post<AtencionResponseDto>(this.atencionesUrl, datos);
+  }
+
+  registrarPestana(tabIndex: number, datos: any): Observable<AtencionResponseDto> {
+    return this.http.post<AtencionResponseDto>(`${this.atencionesUrl}/pestana/${tabIndex}`, datos);
+  }
+
+  obtenerAtencionPorCita(citaId: number): Observable<AtencionResponseDto> {
+    return this.http.get<AtencionResponseDto>(`${this.atencionesUrl}/cita/${citaId}`);
   }
 
   listarOtrosCasos(solicitudId: number): Observable<OtroCasoDto[]> {

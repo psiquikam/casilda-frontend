@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -7,6 +7,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
+import { SolicitudService } from '../../services/solicitud.service';
+import { MaestroDto } from '../../services/listas.service';
 
 @Component({
   selector: 'app-modal-medidas-proteccion',
@@ -24,65 +26,62 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './modal-medidas-proteccion.component.html',
   styleUrls: ['./modal-medidas-proteccion.component.scss']
 })
-export class ModalMedidasProteccionComponent {
+export class ModalMedidasProteccionComponent implements OnInit {
+
+  private readonly solicitudService = inject(SolicitudService);
+  public readonly dialogRef = inject(MatDialogRef<ModalMedidasProteccionComponent>);
 
   data = {
+    tipoMedidaId: null as number | null,
     tipoMedida: '',
+    subtipoMedidaId: null as number | null,
     subtipoMedida: '',
+    responsableId: null as number | null,
     responsable: '',
     descripcion: '',
-    fechaRegistro: new Date().toLocaleDateString('es-CO'),
+    fechaRegistro: new Date().toISOString(),
   };
 
-  tiposMedida = [
-    'Medida de protección académica',
-    'Medida de protección laboral',
-    'Medida de protección personal',
-    'Medida cautelar',
-    'Otra',
-  ];
+  tiposMedidaList: MaestroDto[] = [];
+  subtiposMedidaList: MaestroDto[] = [];
+  responsablesList: MaestroDto[] = [];
 
-  subtiposMap: Record<string, string[]> = {
-    'Medida de protección académica': [
-      'Cambio de grupo',
-      'Cambio de horario',
-      'Cambio de docente',
-      'Traslado de programa',
-    ],
-    'Medida de protección laboral': [
-      'Cambio de área',
-      'Cambio de jornada',
-      'Comisión de servicio',
-    ],
-    'Medida de protección personal': [
-      'Acompañamiento institucional',
-      'Restricción de acceso',
-    ],
-    'Medida cautelar': [
-      'Orden de alejamiento',
-      'Prohibición de acercamiento',
-    ],
-    'Otra': ['Otra'],
-  };
+  ngOnInit(): void {
+    this.solicitudService.listarTiposMedida().subscribe({
+      next: (tipos) => this.tiposMedidaList = tipos,
+      error: (err) => console.error('Error cargando tipos de medida:', err)
+    });
 
-  responsables = [
-    'Bienestar Universitario',
-    'Dirección de Personal',
-    'Decanatura',
-    'Unidad de Género',
-    'Dirección de Docencia',
-    'Otra dependencia',
-  ];
-
-  get subtiposMedida(): string[] {
-    return this.subtiposMap[this.data.tipoMedida] ?? [];
+    this.solicitudService.listarResponsablesMedida().subscribe({
+      next: (resps) => this.responsablesList = resps,
+      error: (err) => console.error('Error cargando responsables de medida:', err)
+    });
   }
 
-  onTipoChange(): void {
+  onTipoChange(tipoId: number): void {
+    const selectedTipo = this.tiposMedidaList.find(t => t.id === tipoId);
+    this.data.tipoMedida = selectedTipo ? selectedTipo.nombre : '';
+    this.data.subtipoMedidaId = null;
     this.data.subtipoMedida = '';
+    this.subtiposMedidaList = [];
+
+    if (tipoId) {
+      this.solicitudService.listarSubTiposMedidaPorTipo(tipoId).subscribe({
+        next: (subtipos) => this.subtiposMedidaList = subtipos,
+        error: (err) => console.error('Error cargando subtipos de medida:', err)
+      });
+    }
   }
 
-  constructor(public dialogRef: MatDialogRef<ModalMedidasProteccionComponent>) {}
+  onSubtipoChange(subtipoId: number): void {
+    const selectedSubtipo = this.subtiposMedidaList.find(s => s.id === subtipoId);
+    this.data.subtipoMedida = selectedSubtipo ? selectedSubtipo.nombre : '';
+  }
+
+  onResponsableChange(responsableId: number): void {
+    const selectedResp = this.responsablesList.find(r => r.id === responsableId);
+    this.data.responsable = selectedResp ? selectedResp.nombre : '';
+  }
 
   onNoClick(): void {
     this.dialogRef.close();

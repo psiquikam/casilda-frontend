@@ -8,27 +8,27 @@
 
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Tipo de medida <span class="required">*</span></mat-label>
-      <mat-select [(ngModel)]="data.tipoMedida" (ngModelChange)="onTipoChange()">
-        @for (t of tiposMedida; track t) {
-          <mat-option [value]="t">{{ t }}</mat-option>
+      <mat-select [(ngModel)]="data.tipoMedidaId" (ngModelChange)="onTipoChange($event)">
+        @for (t of tiposMedidaList; track t.id) {
+          <mat-option [value]="t.id">{{ t.nombre }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
 
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Subtipo de medida <span class="required">*</span></mat-label>
-      <mat-select [(ngModel)]="data.subtipoMedida" [disabled]="!data.tipoMedida">
-        @for (s of subtiposMedida; track s) {
-          <mat-option [value]="s">{{ s }}</mat-option>
+      <mat-select [(ngModel)]="data.subtipoMedidaId" (ngModelChange)="onSubtipoChange($event)" [disabled]="!data.tipoMedidaId">
+        @for (s of subtiposMedidaList; track s.id) {
+          <mat-option [value]="s.id">{{ s.nombre }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
 
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Responsable <span class="required">*</span></mat-label>
-      <mat-select [(ngModel)]="data.responsable">
-        @for (r of responsables; track r) {
-          <mat-option [value]="r">{{ r }}</mat-option>
+      <mat-select [(ngModel)]="data.responsableId" (ngModelChange)="onResponsableChange($event)">
+        @for (r of responsablesList; track r.id) {
+          <mat-option [value]="r.id">{{ r.nombre }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
@@ -45,7 +45,7 @@
   <button mat-button (click)="onNoClick()">Cancelar</button>
   <button mat-flat-button class="btn-confirm"
     [mat-dialog-close]="data"
-    [disabled]="!data.tipoMedida || !data.subtipoMedida || !data.responsable || !data.descripcion">
+    [disabled]="!data.tipoMedidaId || !data.subtipoMedidaId || !data.responsableId || !data.descripcion">
     <mat-icon>check</mat-icon>
     Guardar
   </button>

@@ -123,7 +123,7 @@
         <mat-card class="form-card">
             <mat-card-content>
                 <form [formGroup]="atencionForm">
-                    <mat-tab-group animationDuration="200ms" color="primary">
+                    <mat-tab-group [(selectedIndex)]="activeTabIndex" animationDuration="200ms" color="primary">
 
                         <mat-tab>
                             <ng-template matTabLabel>
@@ -147,7 +147,7 @@
                                     <input matInput formControlName="quienRemite">
                                 </mat-form-field>
                                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                    <mat-label>APH que atiende</mat-label>
+                                    <mat-label>Profesional que atiende</mat-label>
                                     <input matInput formControlName="personaAtiende" readonly>
                                 </mat-form-field>
                                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
@@ -167,9 +167,6 @@
                                         }
                                     </mat-select>
                                 </mat-form-field>
-
-
-
                                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
                                     <mat-label>Lugar de la entrevista</mat-label>
                                     <mat-select formControlName="lugarEntrevista">
@@ -188,7 +185,7 @@
                             </div>
                         </mat-tab>
 
-                        <mat-tab>
+                        <mat-tab [disabled]="!atencionId">
                             <ng-template matTabLabel>
                                 <span [class.tab-label-error]="tabErrors.has('Datos de la persona')">
                                     @if (tabErrors.has('Datos de la persona')) { <mat-icon
@@ -389,7 +386,7 @@
                             </div>
                         </mat-tab>
 
-                        <mat-tab>
+                        <mat-tab [disabled]="!atencionId">
                             <ng-template matTabLabel>
                                 <span [class.tab-label-error]="tabErrors.has('Datos complementarios')">
                                     @if (tabErrors.has('Datos complementarios')) { <mat-icon
@@ -559,7 +556,7 @@
                             </div>
                         </mat-tab>
 
-                        <mat-tab>
+                        <mat-tab [disabled]="!atencionId">
                             <ng-template matTabLabel>
                                 <span [class.tab-label-error]="tabErrors.has('Documentación')">
                                     @if (tabErrors.has('Documentación')) { <mat-icon
@@ -710,7 +707,7 @@
 
                         @if (atencionForm.get('violenciaGenero')?.value === 'SI') {
 
-                        <mat-tab>
+                        <mat-tab [disabled]="!atencionId">
                             <ng-template matTabLabel>
                                 <span>VBG</span>
                             </ng-template>
@@ -864,59 +861,70 @@
 
                         }
 
-                        <mat-tab>
+                        <mat-tab [disabled]="!atencionId">
                             <ng-template matTabLabel>
-                                <span [class.tab-label-error]="tabErrors.has('Presunto agresor')">
-                                    @if (tabErrors.has('Presunto agresor')) { <mat-icon
-                                        class="tab-error-icon">error</mat-icon> }
-                                    Presunto agresor
-                                </span>
+                                <span>Presunto agresor</span>
                             </ng-template>
-                            <div class="tab-padding grid-3">
+                            <div class="discapacidad-container">
+                                <div class="section-header-inline">
+                                    <div class="section-title">
+                                        <mat-icon color="primary">person</mat-icon>
+                                        <span>Presunto agresor</span>
+                                    </div>
+                                    <button mat-icon-button class="btn-add-inline" (click)="abrirModalAgresor()"
+                                        matTooltip="Agregar Agresor">
+                                        <mat-icon>add_circle</mat-icon>
+                                    </button>
+                                </div>
 
-                                <mat-form-field appearance="outline">
-                                    <mat-label>Primer Nombre</mat-label>
-                                    <input matInput formControlName="presuntoPrimerNombre">
-                                </mat-form-field>
+                                <div class="table-responsive">
+                                    <table mat-table [dataSource]="agresoresRegistrados" class="atencion-table">
 
-                                <mat-form-field appearance="outline">
-                                    <mat-label>Segundo Nombre</mat-label>
-                                    <input matInput formControlName="presuntoSegundoNombre">
-                                </mat-form-field>
+                                        <ng-container matColumnDef="nombre">
+                                            <th mat-header-cell *matHeaderCellDef> Nombre del agresor </th>
+                                            <td mat-cell *matCellDef="let element"> 
+                                                {{ formatearNombreAgresor(element) }} 
+                                            </td>
+                                        </ng-container>
 
-                                <mat-form-field appearance="outline">
-                                    <mat-label>Primer Apellido</mat-label>
-                                    <input matInput formControlName="presuntoPrimerApellido">
-                                </mat-form-field>
+                                        <ng-container matColumnDef="vinculoUniversidad">
+                                            <th mat-header-cell *matHeaderCellDef> Vínculo con la UdeA </th>
+                                            <td mat-cell *matCellDef="let element"> {{element.vinculoUniversidad || 'No registrado'}} </td>
+                                        </ng-container>
 
-                                <mat-form-field appearance="outline">
-                                    <mat-label>Segundo Apellido</mat-label>
-                                    <input matInput formControlName="presuntoSegundoApellido">
-                                </mat-form-field>
+                                        <ng-container matColumnDef="vinculoVictima">
+                                            <th mat-header-cell *matHeaderCellDef> Vínculo con la víctima </th>
+                                            <td mat-cell *matCellDef="let element"> {{element.vinculoVictima || 'No registrado'}} </td>
+                                        </ng-container>
 
-                                <mat-form-field appearance="outline">
-                                    <mat-label>Vínculo con la universidad</mat-label>
-                                    <mat-select formControlName="presuntoVinculoUniversidad">
-                                        @for (v of listaVinculos; track v) {
-                                        <mat-option [value]="v">{{v}}</mat-option>
-                                        }
-                                    </mat-select>
-                                </mat-form-field>
+                                        <ng-container matColumnDef="opcion">
+                                            <th mat-header-cell *matHeaderCellDef style="text-align: center;"> Opción
+                                            </th>
+                                            <td mat-cell *matCellDef="let i = index" style="text-align: center;">
+                                                <button mat-icon-button color="warn" (click)="eliminarAgresor(i)"
+                                                    matTooltip="Eliminar">
+                                                    <mat-icon svgIcon="icono-eliminar"></mat-icon>
+                                                </button>
+                                            </td>
+                                        </ng-container>
 
-                                <mat-form-field appearance="outline">
-                                    <mat-label>Vínculo con la víctima</mat-label>
-                                    <mat-select formControlName="presuntoVinculoVictima">
-                                        @for (v of listaVinculosAgresorVictima; track v) {
-                                        <mat-option [value]="v">{{v}}</mat-option>
-                                        }
-                                    </mat-select>
-                                </mat-form-field>
+                                        <tr mat-header-row
+                                            *matHeaderRowDef="['nombre', 'vinculoUniversidad', 'vinculoVictima', 'opcion']">
+                                        </tr>
+                                        <tr mat-row
+                                            *matRowDef="let row; columns: ['nombre', 'vinculoUniversidad', 'vinculoVictima', 'opcion'];">
+                                        </tr>
+                                    </table>
 
+                                    <div *ngIf="agresoresRegistrados.length === 0" class="no-results-msg">
+                                        <mat-icon>person</mat-icon>
+                                        <p>No hay presuntos agresores registrados.</p>
+                                    </div>
+                                </div>
                             </div>
-
                         </mat-tab>
 
-                        <mat-tab>
+                        <mat-tab [disabled]="!atencionId">
                             <ng-template matTabLabel>
                                 <span>Apreciaciones psicojuridicas</span>
                             </ng-template>
@@ -1019,7 +1027,7 @@
                             </div>
                         </mat-tab>
 
-                        <mat-tab>
+                        <mat-tab [disabled]="!atencionId">
                             <ng-template matTabLabel>
                                 <span>Acuerdos y compromisos</span>
                             </ng-template>
@@ -1151,7 +1159,7 @@
                             </div>
                         </mat-tab>
 
-                        <mat-tab>
+                        <mat-tab [disabled]="!atencionId">
                             <ng-template matTabLabel>
                                 <span>Otros Casos</span>
                             </ng-template>
@@ -1181,7 +1189,7 @@
                             </div>
                         </mat-tab>
 
-                        <mat-tab>
+                        <mat-tab [disabled]="!atencionId">
                             <ng-template matTabLabel>
                                 <span>Medidas de protección</span>
                             </ng-template>
@@ -1248,7 +1256,7 @@
                             </div>
                         </mat-tab>
 
-                        <mat-tab>
+                        <mat-tab [disabled]="!atencionId">
                             <ng-template matTabLabel>
                                 <span>Otros compromisos</span>
                             </ng-template>
@@ -1358,7 +1366,7 @@
                             </div>
                         </mat-tab>
 
-                        <mat-tab>
+                        <mat-tab [disabled]="!atencionId">
                             <ng-template matTabLabel>
                                 <span>Seguimientos</span>
                             </ng-template>
@@ -1459,7 +1467,7 @@
                             </div>
                         </mat-tab>
 
-                        <mat-tab>
+                        <mat-tab [disabled]="!atencionId">
                             <ng-template matTabLabel>
                                 <span [class.tab-label-error]="tabErrors.has('Estado de la atención')">
                                     @if (tabErrors.has('Estado de la atención')) { <mat-icon

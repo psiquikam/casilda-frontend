@@ -65,7 +65,7 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  displayedColumns: string[] = ['expand', 'nombre', 'documento', 'fecha', 'dependencia', 'estado', 'profesional', 'acciones'];
+  displayedColumns: string[] = ['expand', 'nombre', 'documento', 'fecha', 'tipoAsignacion', 'estado', 'profesional', 'acciones'];
   expandedElement: any | null;
   expandedDetailColumns: string[] = ['expandedDetail'];
 
@@ -86,7 +86,7 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
     nombre: '',
     documento: '',
     fecha: '',
-    dependencia: '',
+    tipoAsignacion: '',
     profesional: ''
   };
 
@@ -124,7 +124,7 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
       estado: r.estado || '',
       profesional: r.profesional || 'Sin asignar',
       fecha: formatFechaCreacion(r.fechaCreacion),
-      dependencia: r.dependencia || '',
+      tipoAsignacion: r.tipoAsignacion || 'Sin asignar',
       // Solicitante
       tipoDocumentoId: r.tipoDocumentoId ?? null,
       tipoDocumento: r.tipoDocumento || '',
@@ -229,7 +229,7 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
         && (!searchTerms.nombre || nombreCompleto.includes(searchTerms.nombre))
         && (!searchTerms.documento || documentoCompleto.includes(searchTerms.documento))
         && (!searchTerms.fecha || data.fecha?.toLowerCase().includes(searchTerms.fecha))
-        && (!searchTerms.dependencia || data.dependencia?.toLowerCase().includes(searchTerms.dependencia))
+        && (!searchTerms.tipoAsignacion || data.tipoAsignacion?.toLowerCase().includes(searchTerms.tipoAsignacion))
         && (!searchTerms.profesional || data.profesional?.toLowerCase().includes(searchTerms.profesional));
     };
   }

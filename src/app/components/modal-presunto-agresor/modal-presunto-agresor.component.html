@@ -1,0 +1,58 @@
+<h2 mat-dialog-title class="modal-title">
+  <mat-icon>person</mat-icon>
+  Datos de presunto agresor
+</h2>
+
+<mat-dialog-content class="modal-content">
+  <div class="form-grid">
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Primer Nombre</mat-label>
+      <input matInput [(ngModel)]="data.primerNombre" placeholder="Primer Nombre">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Segundo Nombre</mat-label>
+      <input matInput [(ngModel)]="data.segundoNombre" placeholder="Segundo Nombre">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Primer Apellido</mat-label>
+      <input matInput [(ngModel)]="data.primerApellido" placeholder="Primer Apellido">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Segundo Apellido</mat-label>
+      <input matInput [(ngModel)]="data.segundoApellido" placeholder="Segundo Apellido">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Vínculo con la universidad</mat-label>
+      <mat-select [(ngModel)]="data.idVinculoUniversidad" (ngModelChange)="onVinculoUdeaChange($event)">
+        @for (v of catalogoVinculosUdea; track v.id) {
+          <mat-option [value]="v.id">{{ v.nombre }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Vínculo con la víctima</mat-label>
+      <mat-select [(ngModel)]="data.idVinculoVictima" (ngModelChange)="onVinculoVictimaChange($event)">
+        @for (v of catalogoVinculosAgresorVictima; track v.id) {
+          <mat-option [value]="v.id">{{ v.nombre }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="modal-actions">
+  <button mat-button (click)="onNoClick()">Cancelar</button>
+  <button mat-flat-button class="btn-confirm"
+    [mat-dialog-close]="data"
+    [disabled]="!data.primerNombre && !data.primerApellido && !data.idVinculoUniversidad && !data.idVinculoVictima">
+    <mat-icon>check</mat-icon>
+    Guardar
+  </button>
+</mat-dialog-actions>

@@ -10,7 +10,7 @@
       <mat-label>Tipo de Ruta</mat-label>
       <mat-select [(ngModel)]="data.tipo" (ngModelChange)="onTipoChange()">
         @for (tipo of tiposRutaActivacion; track tipo.id) {
-          <mat-option [value]="tipo.nombre">{{ tipo.nombre }}</mat-option>
+          <mat-option [value]="tipo">{{ tipo.nombre }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
@@ -19,7 +19,7 @@
       <mat-label>¿Cuál?</mat-label>
       <mat-select [(ngModel)]="data.cual" [disabled]="!data.tipo">
         @for (ruta of rutasActivacion; track ruta.id) {
-          <mat-option [value]="ruta.nombre">{{ ruta.nombre }}</mat-option>
+          <mat-option [value]="ruta">{{ ruta.nombre }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
@@ -30,7 +30,7 @@
 <mat-dialog-actions align="end" class="modal-actions">
   <button mat-button (click)="onNoClick()">Cancelar</button>
 
-  <button mat-flat-button class="btn-confirm" [mat-dialog-close]="data" [disabled]="!data.tipo || !data.cual">
+  <button mat-flat-button class="btn-confirm" [mat-dialog-close]="{ idTipoRutaActivacion: data.tipo?.id, tipo: data.tipo?.nombre, idRutaActivacion: data.cual?.id, cual: data.cual?.nombre }" [disabled]="!data.tipo || !data.cual">
     <mat-icon>check</mat-icon>
     Agregar a la lista
   </button>

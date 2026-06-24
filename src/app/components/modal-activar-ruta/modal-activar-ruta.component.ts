@@ -36,8 +36,8 @@ export class ModalActivarRutaComponent implements OnInit {
   private readonly maestrosUrl = `${environment.apiBaseUrl}/maestros`;
 
   data = {
-    tipo: '',
-    cual: '',
+    tipo: null as MaestroDto | null,
+    cual: null as MaestroDto | null,
   };
 
   tiposRutaActivacion: MaestroDto[] = [];
@@ -73,7 +73,7 @@ export class ModalActivarRutaComponent implements OnInit {
   }
 
   onTipoChange(): void {
-    this.data.cual = '';
+    this.data.cual = null;
   }
 
   onNoClick(): void {

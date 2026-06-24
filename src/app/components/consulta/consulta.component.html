@@ -76,15 +76,15 @@
         <td mat-cell *matCellDef="let element">{{element.fecha}}</td>
       </ng-container>
 
-      <ng-container matColumnDef="dependencia">
+      <ng-container matColumnDef="tipoAsignacion">
         <th mat-header-cell *matHeaderCellDef>
           <div class="header-inline-container">
-            <span class="column-title">Dependencia</span>
-            <div class="search-box-slim"><input (keyup)="applyFilter('dependencia', $event)" placeholder="Filtrar...">
+            <span class="column-title">Tipo de Asignación</span>
+            <div class="search-box-slim"><input (keyup)="applyFilter('tipoAsignacion', $event)" placeholder="Filtrar...">
             </div>
           </div>
         </th>
-        <td mat-cell *matCellDef="let element"><span class="badge-soft">{{element.dependencia}}</span></td>
+        <td mat-cell *matCellDef="let element"><span class="badge-soft">{{element.tipoAsignacion}}</span></td>
       </ng-container>
 
       <ng-container matColumnDef="estado">
