@@ -129,7 +129,9 @@ export class CasoComponent implements OnInit {
       remitenteFechaSolicitud: r.remitenteFechaSolicitud || r.fecha || '',
       remitenteTipoDocumentoId: r.remitenteTipoDocumentoId ?? null,
       remitenteTipoDocumento: r.remitenteTipoDocumento || '',
-      remitenteNumeroDocumento: r.remitenteNumeroDocumento || ''
+      remitenteNumeroDocumento: r.remitenteNumeroDocumento || '',
+      medioSolicitudId: r.medioSolicitudId ?? null,
+      medioSolicitud: r.medioSolicitud || ''
     };
   }
 

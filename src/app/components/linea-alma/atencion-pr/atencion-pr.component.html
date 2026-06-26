@@ -58,7 +58,7 @@
 
 								<div class="row-3">
 									<mat-form-field appearance="outline">
-										<mat-label>Profesional que atiende</mat-label>
+										<mat-label>APH que atiende</mat-label>
 										<input matInput [value]="nombreUsuarioActual" readonly>
 									</mat-form-field>
 
@@ -89,8 +89,8 @@
 									<mat-form-field appearance="outline">
 										<mat-label>Quién remite</mat-label>
 										<mat-select formControlName="quienRemite">
-											@for (actor of actoresRemitentes; track actor) {
-											<mat-option [value]="actor">{{actor}}</mat-option>
+											@for (actor of actoresRemitentes; track actor.id) {
+											<mat-option [value]="actor.id">{{actor.nombre}}</mat-option>
 											}
 										</mat-select>
 									</mat-form-field>
@@ -103,7 +103,7 @@
 									</mat-form-field>
 
 									<mat-form-field appearance="outline">
-										<mat-label>Profesional que atiende</mat-label>
+										<mat-label>APH que atiende</mat-label>
 										<input matInput [value]="nombreUsuarioActual" readonly>
 									</mat-form-field>
 
@@ -317,7 +317,7 @@
 						</div>
 					</mat-tab>
 
-					<mat-tab label="Datos complementarios">
+					<mat-tab label="Datos complementarios" [disabled]="!idRegistroCreado">
 						<div class="tab-padding">
 							<div class="grid-3">
 								<mat-form-field appearance="outline" subscriptSizing="dynamic">
@@ -479,7 +479,7 @@
 						</div>
 					</mat-tab>
 
-					<mat-tab label="Atención APH">
+					<mat-tab label="Atención APH" [disabled]="!idRegistroCreado">
 						<div class="tab-padding aph-tab">
 							<div class="grid-3 aph-top-grid">
 								<mat-form-field appearance="outline" subscriptSizing="dynamic">
@@ -562,7 +562,7 @@
 						</div>
 					</mat-tab>
 
-					<mat-tab label="Contacto">
+					<mat-tab label="Contacto" [disabled]="!idRegistroCreado">
 						<div class="tab-padding">
 							<div *ngIf="!idRegistroCreado" class="no-results-msg">
 								<mat-icon>info</mat-icon>
@@ -618,8 +618,18 @@
 												<td mat-cell *matCellDef="let c"> {{ c.resultado }} </td>
 											</ng-container>
 
-											<tr mat-header-row *matHeaderRowDef="['fecha', 'resultado']"></tr>
-											<tr mat-row *matRowDef="let row; columns: ['fecha', 'resultado'];"></tr>
+											<ng-container matColumnDef="acciones">
+												<th mat-header-cell *matHeaderCellDef style="text-align: center;"> Acciones </th>
+												<td mat-cell *matCellDef="let i = index" style="text-align: center;">
+													<button mat-icon-button color="warn" type="button"
+														(click)="eliminarContacto(i)">
+														<mat-icon svgIcon="icono-eliminar"></mat-icon>
+													</button>
+												</td>
+											</ng-container>
+
+											<tr mat-header-row *matHeaderRowDef="['fecha', 'resultado', 'acciones']"></tr>
+											<tr mat-row *matRowDef="let row; columns: ['fecha', 'resultado', 'acciones'];"></tr>
 										</table>
 
 										<div *ngIf="contactosRegistrados.length === 0 && !cargandoContactos"
@@ -637,7 +647,7 @@
 						</div>
 					</mat-tab>
 
-					<mat-tab label="Remision">
+					<mat-tab label="Remision" [disabled]="!idRegistroCreado">
 						<div class="tab-padding">
 							<div class="discapacidad-container">
 								<div class="section-header-inline">
@@ -701,7 +711,7 @@
 					<button mat-raised-button color="primary" type="button" (click)="guardarRegistro()"
 						[disabled]="guardandoRegistro || cargandoCatalogos">
 						<mat-icon>{{ guardandoRegistro ? 'hourglass_top' : 'save' }}</mat-icon>
-						<span>{{ guardandoRegistro ? 'Guardando...' : 'Guardar registro Línea ALMA' }}</span>
+						<span>{{ guardandoRegistro ? 'Guardando...' : 'Guardar' }}</span>
 					</button>
 				</div>
 			</form>

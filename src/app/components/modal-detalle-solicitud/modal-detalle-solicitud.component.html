@@ -15,6 +15,15 @@
 <mat-dialog-content class="custom-content">
   <form [formGroup]="detalleForm">
 
+    <div class="medio-solicitud-wrapper" style="margin-bottom: 20px; display: grid; grid-template-columns: 1fr; width: 100%;">
+      <mat-form-field appearance="outline" style="width: 100%;">
+        <mat-label>¿Cuál es el medio por donde llegó la solicitud?</mat-label>
+        <mat-select formControlName="medioSolicitud">
+          <mat-option *ngFor="let ms of mediosSolicitud" [value]="ms.id">{{ ms.nombre }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
     <mat-tab-group animationDuration="200ms">
 
       <mat-tab label="Remitente" *ngIf="tieneRemitente">

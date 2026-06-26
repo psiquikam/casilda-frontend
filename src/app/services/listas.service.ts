@@ -160,4 +160,12 @@ export class ListasService {
         error: (error) => console.error(`Error editando item en ${listaKey}:`, error)
       });
   }
+
+  obtenerInstanciasRemision(tipoRemisionId?: number): Observable<MaestroDto[]> {
+    let params: { [param: string]: string } = {};
+    if (tipoRemisionId) {
+      params['tipoRemisionId'] = tipoRemisionId.toString();
+    }
+    return this.http.get<MaestroDto[]>(`${this.apiBaseUrl}/instancias-remision`, { params });
+  }
 }

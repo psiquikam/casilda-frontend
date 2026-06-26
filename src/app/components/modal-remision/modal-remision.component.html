@@ -25,8 +25,8 @@
     <mat-form-field appearance="outline" class="field-cual">
       <mat-label>Instancia a la que se remite</mat-label>
       <mat-select [(ngModel)]="data.cual">
-        @for (instancia of instanciasRemision; track instancia) {
-          <mat-option [value]="instancia">{{ instancia }}</mat-option>
+        @for (instancia of instanciasRemision; track instancia.id) {
+          <mat-option [value]="instancia.nombre">{{ instancia.nombre }}</mat-option>
         }
       </mat-select>
     </mat-form-field>

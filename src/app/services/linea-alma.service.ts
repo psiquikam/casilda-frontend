@@ -4,14 +4,11 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface AtencionAphRequestDto {
-  idCanalAph?: number | null;
   fechaHora: string;
-  idConvenioAph?: number | null;
-  idAmbitoAph?: number | null;
   idProtocoloAph: number;
   practicoTriage: boolean;
   idResultadoTriage?: number | null;
-  notaOMotivoTriage?: string | null;
+  motivoNoTriage?: string | null;
   notaAph?: string | null;
   aceptaPsicologia: boolean;
   requiereRemision: boolean;
@@ -24,10 +21,12 @@ export interface RemisionRegistroAlmaRequestDto {
 }
 
 export interface RegistroLineaAlmaRequestDto {
+  id?: number | null;
   idPersona: number;
   idTipoReporte: number;
   idCanalContacto: number;
-  quienRemite?: string | null;
+  fechaNacimiento?: string | null;
+  idQuienRemite?: number | null;
   fechaHoraAtencion: string;
   idPersonaAtiende: number;
   idTipoServicio: number;
@@ -46,24 +45,20 @@ export interface RegistroLineaAlmaRequestDto {
   idCampus?: number | null;
   atencionAph?: AtencionAphRequestDto | null;
   remisiones?: RemisionRegistroAlmaRequestDto[];
+  contactos?: ContactoLineaAlmaRequestDto[];
 }
 
 export interface AtencionAphResponseDto {
   id: number;
   idRegistroLineaAlma: number;
-  idCanalAph: number;
-  canalAph: string;
   fechaHora: string;
-  idConvenioAph: number;
-  convenioAph: string;
-  idAmbitoAph: number;
-  ambitoAph: string;
   idProtocoloAph: number;
   protocoloAph: string;
   practicoTriage: boolean;
   idResultadoTriage?: number | null;
   resultadoTriage?: string | null;
-  notaOMotivoTriage?: string | null;
+  motivoNoTriage?: string | null;
+  notaAph?: string | null;
   aceptaPsicologia: boolean;
   requiereRemision: boolean;
 }
@@ -84,6 +79,7 @@ export interface RegistroLineaAlmaResponseDto {
   idCanalContacto: number;
   canalContacto: string;
   quienRemite?: string | null;
+  idQuienRemite?: number | null;
   fechaHoraAtencion: string;
   idPersonaAtiende: number;
   idTipoServicio: number;
@@ -146,5 +142,9 @@ export class LineaAlmaService {
 
   listarContactos(idRegistro: number): Observable<ContactoLineaAlmaResponseDto[]> {
     return this.http.get<ContactoLineaAlmaResponseDto[]>(`${this.apiUrl}/registros/${idRegistro}/contactos`);
+  }
+
+  registrarPestana(tabIndex: number, request: RegistroLineaAlmaRequestDto): Observable<RegistroLineaAlmaResponseDto> {
+    return this.http.post<RegistroLineaAlmaResponseDto>(`${this.apiUrl}/registros/pestana/${tabIndex}`, request);
   }
 }

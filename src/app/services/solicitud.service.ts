@@ -175,6 +175,7 @@ export interface UpdateSolicitudDto {
   remitenteNumeroDocumento?: string | null;
   observacionesTelefono?: string | null;
   observacionesCorreo?: string | null;
+  medioSolicitudId?: number | null;
 }
 
 export interface AsignarSolicitudDto {
@@ -216,14 +217,20 @@ export enum EstadoCitaEnum {
 }
 
 export enum VinculoUdeAEnum {
-  ESTUDIANTE = 1,
+  ESTUDIANTE_PREGRADO = 1,
   PERSONAL_ADMINISTRATIVO = 2,
-  DOCENTE = 3,
+  DOCENTE_VINCULADO = 3,
   EGRESADO = 4,
-  PERSONA_EMPLEADA_ASEO_UDEA = 5,
-  CONTRATISTA_FUNDACION_UDEA = 6,
-  CONTRATISTA_CIS = 7,
-  OTRAS = 8
+  DOCENTE_OCASIONAL = 5,
+  DOCENTE_DE_CATEDRA = 6,
+  CONTRATISTA = 7,
+  OTRO_TIPO_DE_VINCULO = 8,
+  ESTUDIANTE_DE_TECNOLOGIA = 9,
+  ESTUDIANTE_DE_POSGRADO = 10,
+  DOCENTE_CATEDRA_50 = 11,
+  JUBILADO_PENSIONADO = 12,
+  PRESTADOR_DE_SERVICIOS = 13,
+  EXTERNO = 14
 }
 
 export interface CitaDto {

@@ -29,13 +29,15 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { DialogoExitoComponent } from '../../dialog-exito/dialog-exito.component';
 import {
   AtencionAphRequestDto,
+  ContactoLineaAlmaRequestDto,
   ContactoLineaAlmaResponseDto,
   LineaAlmaService,
   RegistroLineaAlmaRequestDto,
   RemisionRegistroAlmaRequestDto
 } from '../../../services/linea-alma.service';
-import { GrupoProfesionalDto, SolicitudService } from '../../../services/solicitud.service';
+import { GrupoProfesionalDto, SolicitudService, VinculoUdeAEnum } from '../../../services/solicitud.service';
 import { environment } from '../../../../environments/environment';
+import { TipoReporteAlma } from '../../../enums/tipo-reporte-alma.enum';
 
 @Component({
   selector: 'app-atencion-pr',
@@ -103,12 +105,7 @@ export class AtencionPrComponent implements OnInit {
   usuarios: UsuarioDto[] = [];
   gruposProfesionales: GrupoProfesionalDto[] = [];
   readonly tipoServicioAphId = 5;
-  // TODO: reemplazar por maestro del backend cuando exista (`obtenerMaestro('actores-remitentes')`).
-  readonly actoresRemitentes: string[] = [
-    'Bienestar Universitario',
-    'Masculinidades',
-    'Otros'
-  ];
+  actoresRemitentes: MaestroDto[] = [];
   discapacidadesRegistradas: any[] = [];
   correoRegistrados: any[] = [];
   telefonosRegistrados: any[] = [];
@@ -268,7 +265,8 @@ export class AtencionPrComponent implements OnInit {
       aphResultadosTriage: this.listasService.obtenerMaestro('resultados-triage'),
       resultadosContacto: this.listasService.obtenerMaestro('resultados-contacto-telefonico'),
       usuarios: this.usuarioService.obtenerTodos(),
-      gruposProfesionales: this.solicitudService.listarGruposProfesionales()
+      gruposProfesionales: this.solicitudService.listarGruposProfesionales(),
+      actoresRemitentes: this.listasService.obtenerMaestro('actores-remitentes')
     }).subscribe({
       next: (catalogos) => {
         this.tiposReporteAlma = catalogos.tiposReporteAlma;
@@ -292,6 +290,7 @@ export class AtencionPrComponent implements OnInit {
         this.resultadosContacto = catalogos.resultadosContacto;
         this.usuarios = catalogos.usuarios;
         this.gruposProfesionales = catalogos.gruposProfesionales;
+        this.actoresRemitentes = catalogos.actoresRemitentes;
 
         this.configurarValoresPorDefecto();
         this.cargandoCatalogos = false;
@@ -342,17 +341,55 @@ export class AtencionPrComponent implements OnInit {
     return null;
   }
 
+  private validarPestanaActiva(tabIndex: number): boolean {
+    const invalidos = this.obtenerNombresInvalidos().filter((nombre) => {
+      const meta = this.camposMeta[nombre];
+      return meta && meta.tab === tabIndex;
+    });
+
+    if (invalidos.length > 0) {
+      const detalle = invalidos.map((n) => this.camposMeta[n]?.etiqueta ?? n).join(', ');
+      this.snackBar.open(`Campos requeridos faltantes en esta pestaña: ${detalle}`, 'Cerrar', { duration: 5000 });
+      return false;
+    }
+
+    if (tabIndex === 0 || tabIndex === 1) {
+      if (!this.idPersonaEncontrada) {
+        this.snackBar.open('Debe identificar/buscar a la persona en la pestaña "Datos de la persona" antes de guardar.', 'Cerrar', { duration: 5000 });
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   private configurarValidadoresTriage(): void {
     const resultado = this.registroCasoForm.get('aphResultadoTriage');
     const motivo = this.registroCasoForm.get('aphMotivoNoRealizacionTriage');
 
+    // Set initial state
+    const valorInicial = this.registroCasoForm.get('aphPracticoTriage')?.value;
+    if (valorInicial === 'si') {
+      resultado?.setValidators([Validators.required]);
+      resultado?.enable({ emitEvent: false });
+      motivo?.clearValidators();
+    } else {
+      motivo?.setValidators([Validators.required]);
+      resultado?.clearValidators();
+      resultado?.setValue('', { emitEvent: false });
+      resultado?.disable({ emitEvent: false });
+    }
+
     this.registroCasoForm.get('aphPracticoTriage')?.valueChanges.subscribe((valor) => {
       if (valor === 'si') {
         resultado?.setValidators([Validators.required]);
+        resultado?.enable({ emitEvent: false });
         motivo?.clearValidators();
       } else {
         motivo?.setValidators([Validators.required]);
         resultado?.clearValidators();
+        resultado?.setValue('', { emitEvent: false });
+        resultado?.disable({ emitEvent: false });
       }
       resultado?.updateValueAndValidity({ emitEvent: false });
       motivo?.updateValueAndValidity({ emitEvent: false });
@@ -361,8 +398,7 @@ export class AtencionPrComponent implements OnInit {
 
   private configurarDependenciaCamposPorVinculo(): void {
     this.registroCasoForm.get('vinculo')?.valueChanges.subscribe((vinculoId) => {
-      const vinculo = this.vinculos.find((v) => v.id === Number(vinculoId));
-      this.categoriaVinculo = vinculo ? this.clasificarVinculo(vinculo.nombre) : 'ninguno';
+      this.categoriaVinculo = vinculoId ? this.clasificarVinculo(Number(vinculoId)) : 'ninguno';
 
       ['facultad', 'programa', 'dependencia', 'campus'].forEach((nombre) => {
         const ctrl = this.registroCasoForm.get(nombre);
@@ -491,22 +527,33 @@ export class AtencionPrComponent implements OnInit {
   // con-programa  → habilita Facultad, Programa, Dependencia, Campus
   // sin-programa  → habilita Facultad, Dependencia, Campus (sin Programa)
   // ninguno       → todos deshabilitados
-  private clasificarVinculo(nombre: string): 'con-programa' | 'sin-programa' | 'ninguno' {
-    const n = nombre.toLowerCase();
-
-    // Docentes y Jubilado: sin Programa.
-    if (n.includes('docente') || n.includes('jubilad')) {
+  private clasificarVinculo(id: number): 'con-programa' | 'sin-programa' | 'ninguno' {
+    // Docente Vinculado, Docente Ocasional, Docente de Cátedra, Docente Cátedra 50, Jubilado / Pensionado
+    if (
+      id === VinculoUdeAEnum.DOCENTE_VINCULADO ||
+      id === VinculoUdeAEnum.DOCENTE_OCASIONAL ||
+      id === VinculoUdeAEnum.DOCENTE_DE_CATEDRA ||
+      id === VinculoUdeAEnum.DOCENTE_CATEDRA_50 ||
+      id === VinculoUdeAEnum.JUBILADO_PENSIONADO
+    ) {
       return 'sin-programa';
     }
 
-    // Estudiantes (pregrado/tecnología/posgrado), Otro tipo de vínculo,
-    // Prestador de Servicios, Pensionado, Contratista, Externo, Otro: con Programa.
-    if (/estudiante.*(pregrado|tecnolog|posgrado)/.test(n)) return 'con-programa';
-    if (n.includes('otro')) return 'con-programa';
-    if (n.includes('prestador')) return 'con-programa';
-    if (n.includes('pensionad')) return 'con-programa';
-    if (n.includes('contratista')) return 'con-programa';
-    if (n.includes('externo')) return 'con-programa';
+    // Estudiante de Pregrado, Estudiante de Tecnología, Estudiante de Posgrado, Otro tipo de vínculo,
+    // Prestador de Servicios, Contratista, Externo, Personal Administrativo, Egresado
+    if (
+      id === VinculoUdeAEnum.ESTUDIANTE_PREGRADO ||
+      id === VinculoUdeAEnum.PERSONAL_ADMINISTRATIVO ||
+      id === VinculoUdeAEnum.EGRESADO ||
+      id === VinculoUdeAEnum.CONTRATISTA ||
+      id === VinculoUdeAEnum.OTRO_TIPO_DE_VINCULO ||
+      id === VinculoUdeAEnum.ESTUDIANTE_DE_TECNOLOGIA ||
+      id === VinculoUdeAEnum.ESTUDIANTE_DE_POSGRADO ||
+      id === VinculoUdeAEnum.PRESTADOR_DE_SERVICIOS ||
+      id === VinculoUdeAEnum.EXTERNO
+    ) {
+      return 'con-programa';
+    }
 
     return 'ninguno';
   }
@@ -650,7 +697,13 @@ export class AtencionPrComponent implements OnInit {
           this.registroCasoForm.patchValue({
             tipoDocumento: res.tipoDocumentoId ?? tipoDocumentoId,
             documento: res.numeroDocumento ?? documento,
-            fechaNacimiento: res.fechaNacimiento ? new Date(res.fechaNacimiento + 'T00:00:00') : null,
+            fechaNacimiento: res.fechaNacimiento ? (() => {
+              const parts = res.fechaNacimiento.split('/');
+              if (parts.length === 3) {
+                return new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+              }
+              return new Date(res.fechaNacimiento + 'T00:00:00');
+            })() : null,
             primerNombre: res.primerNombre ?? '',
             segundoNombre: res.segundoNombre ?? '',
             primerApellido: res.primerApellido ?? '',
@@ -684,25 +737,7 @@ export class AtencionPrComponent implements OnInit {
   }
 
   guardarRegistro(): void {
-    if (this.registroCasoForm.invalid) {
-      this.registroCasoForm.markAllAsTouched();
-      const tab = this.tabDelPrimerCampoInvalido();
-      if (tab !== null) {
-        this.tabSeleccionada = tab;
-      }
-      const detalle = this.describirCamposInvalidos();
-      const mensaje = detalle
-        ? `Faltan campos obligatorios: ${detalle}`
-        : 'Completa los campos obligatorios para guardar el registro.';
-      this.snackBar.open(mensaje, 'Cerrar', { duration: 7000 });
-      return;
-    }
-
-    const tipoDocumentoId = Number(this.registroCasoForm.get('tipoDocumento')?.value);
-    const documento = String(this.registroCasoForm.get('documento')?.value ?? '').trim();
-
-    if (!tipoDocumentoId || !documento) {
-      this.snackBar.open('Debes ingresar tipo y número de documento para identificar la persona.', 'Cerrar', { duration: 4000 });
+    if (!this.validarPestanaActiva(this.tabSeleccionada)) {
       return;
     }
 
@@ -713,56 +748,24 @@ export class AtencionPrComponent implements OnInit {
     }
 
     this.guardandoRegistro = true;
+    const payload = this.construirPayloadRegistro(this.idPersonaEncontrada!);
+    payload.id = this.idRegistroCreado;
 
-    if (this.idPersonaEncontrada) {
-      this.enviarRegistro(this.construirPayloadRegistro(this.idPersonaEncontrada));
-      return;
-    }
-
-    this.solicitudService.buscarPersonaPorDocumento(tipoDocumentoId, documento)
-      .subscribe({
-        next: (persona) => {
-          const idPersona = Number(persona.id);
-          if (!idPersona) {
-            this.guardandoRegistro = false;
-            this.snackBar.open(
-              'No se pudo obtener el ID de la persona desde la búsqueda por documento.',
-              'Cerrar',
-              { duration: 6000 }
-            );
-            return;
-          }
-
-          this.idPersonaEncontrada = idPersona;
-          this.enviarRegistro(this.construirPayloadRegistro(idPersona));
-        },
-        error: (error) => {
-          this.guardandoRegistro = false;
-          const mensaje = error?.error?.message
-            ?? 'No se encontró la persona por documento. Búscala primero desde "Datos de la persona".';
-          this.snackBar.open(mensaje, 'Cerrar', { duration: 5500 });
-        }
-      });
-  }
-
-  private enviarRegistro(payload: RegistroLineaAlmaRequestDto): void {
-    this.guardandoRegistro = true;
-    this.lineaAlmaService.crearRegistro(payload)
+    this.lineaAlmaService.registrarPestana(this.tabSeleccionada, payload)
       .pipe(finalize(() => { this.guardandoRegistro = false; }))
       .subscribe({
         next: (response) => {
           this.idRegistroCreado = response.id;
-          this.cargarContactos(response.id);
           this.dialog.open(DialogoExitoComponent, {
             width: '400px',
             data: {
-              titulo: '¡Registro Creado!',
-              mensaje: `Registro Línea ALMA creado con ID ${response.id}.`
+              titulo: '¡Guardado Exitoso!',
+              mensaje: 'Los datos de la pestaña se guardaron correctamente.'
             }
           });
         },
         error: (error) => {
-          const mensaje = error?.error?.message || 'No fue posible guardar el registro de Linea ALMA.';
+          const mensaje = error?.error?.message || 'No fue posible guardar los datos de la pestaña.';
           this.snackBar.open(mensaje, 'Cerrar', { duration: 5500 });
         }
       });
@@ -776,24 +779,26 @@ export class AtencionPrComponent implements OnInit {
       throw new Error('No fue posible resolver el tipo de reporte.');
     }
 
-    const atencionAph: AtencionAphRequestDto = {
-      idCanalAph: null,
+    const atencionAph: AtencionAphRequestDto | null = raw.aphFecha ? {
       fechaHora: this.combinarFechaHora(raw.aphFecha, raw.aphHora),
-      idConvenioAph: null,
-      idAmbitoAph: null,
       idProtocoloAph: Number(raw.aphProtocolo),
       practicoTriage: raw.aphPracticoTriage === 'si',
       idResultadoTriage: raw.aphPracticoTriage === 'si' ? Number(raw.aphResultadoTriage) : null,
-      notaOMotivoTriage: raw.aphPracticoTriage === 'no' ? (raw.aphMotivoNoRealizacionTriage || null) : null,
+      motivoNoTriage: raw.aphPracticoTriage === 'no' ? (raw.aphMotivoNoRealizacionTriage || null) : null,
       notaAph: raw.aphNotaAph || null,
       aceptaPsicologia: raw.aphAceptaPsicologia === 'si',
       requiereRemision: raw.aphRequiereRemision === 'si'
-    };
+    } : null;
 
     const remisiones: RemisionRegistroAlmaRequestDto[] = (this.remisionesRegistrados ?? []).map((r) => ({
       idTipoRemision: Number(r.idTipoRemision),
       cual: r.cual || null,
       fecha: this.toIsoDateTime(r.fecha)
+    }));
+
+    const contactos: ContactoLineaAlmaRequestDto[] = (this.contactosRegistrados ?? []).map((c) => ({
+      fecha: this.toIsoDateTime(c.fecha),
+      idResultado: Number(c.idResultado)
     }));
 
     const idUsuario = this.obtenerIdUsuarioActual() ?? 0;
@@ -802,8 +807,9 @@ export class AtencionPrComponent implements OnInit {
       idPersona,
       idTipoReporte,
       idCanalContacto: Number(raw.canal),
-      quienRemite: raw.tipoReporte === 'indirecta' ? (raw.quienRemite || null) : null,
+      idQuienRemite: raw.tipoReporte === 'indirecta' ? (Number(raw.quienRemite) || null) : null,
       fechaHoraAtencion: this.toIsoDateTime(raw.fechaHora || new Date()),
+      fechaNacimiento: raw.fechaNacimiento ? this.toIsoDateTime(raw.fechaNacimiento) : null,
       idPersonaAtiende: Number(raw.personaAtiende) || idUsuario,
       idTipoServicio: this.tipoServicioAphId,
       idPersonaRegistra: idUsuario,
@@ -814,22 +820,22 @@ export class AtencionPrComponent implements OnInit {
       idCiudadResidencia: raw.ciudadResidencia ? Number(raw.ciudadResidencia) : null,
       direccionResidencia: raw.direccionResidencia || null,
       idVinculoUdeA: raw.vinculo ? Number(raw.vinculo) : null,
-      idSubVinculoUdeA: null,
       idFacultad: raw.facultad ? Number(raw.facultad) : null,
       idPrograma: raw.programa ? Number(raw.programa) : null,
       idDependencia: raw.dependencia ? Number(raw.dependencia) : null,
       idCampus: raw.campus ? Number(raw.campus) : null,
       atencionAph,
-      remisiones
+      remisiones,
+      contactos
     };
   }
 
   private obtenerIdTipoReporte(valor: string): number | null {
     if (valor === 'directa') {
-      return this.tiposReporteAlma.find((t) => t.nombre.toLowerCase().includes('direct'))?.id ?? null;
+      return this.tiposReporteAlma.find((t) => t.id === TipoReporteAlma.DIRECTA)?.id ?? null;
     }
     if (valor === 'indirecta') {
-      return this.tiposReporteAlma.find((t) => t.nombre.toLowerCase().includes('remisi'))?.id ?? null;
+      return this.tiposReporteAlma.find((t) => t.id === TipoReporteAlma.INDIRECTA)?.id ?? null;
     }
     return null;
   }
@@ -904,23 +910,25 @@ export class AtencionPrComponent implements OnInit {
 
     const idResultado = Number(this.contactoResultadoCtrl.value);
     const fecha = this.toIsoDateTime(this.contactoFechaCtrl.value);
+    const resultadoMaestro = this.resultadosContacto.find((r) => r.id === idResultado);
+    const resultadoNombre = resultadoMaestro ? resultadoMaestro.nombre : '';
 
-    this.guardandoContacto = true;
-    this.lineaAlmaService.registrarContacto(this.idRegistroCreado, { fecha, idResultado })
-      .pipe(finalize(() => { this.guardandoContacto = false; }))
-      .subscribe({
-        next: (contacto) => {
-          this.contactosRegistrados = [...this.contactosRegistrados, contacto];
-          this.contactoFechaCtrl.setValue(this.formatearFechaParaDatetimeLocal(new Date()));
-          this.contactoResultadoCtrl.setValue(null);
-          this.contactoResultadoCtrl.markAsUntouched();
-          this.snackBar.open('Intento de contacto registrado.', 'Cerrar', { duration: 3000 });
-        },
-        error: (error) => {
-          const mensaje = error?.error?.message ?? 'No fue posible registrar el intento de contacto.';
-          this.snackBar.open(mensaje, 'Cerrar', { duration: 5000 });
-        }
-      });
+    const nuevoContacto: ContactoLineaAlmaResponseDto = {
+      id: 0,
+      idRegistroLineaAlma: this.idRegistroCreado,
+      fecha: fecha,
+      idResultado: idResultado,
+      resultado: resultadoNombre
+    };
+
+    this.contactosRegistrados = [...this.contactosRegistrados, nuevoContacto];
+    this.contactoFechaCtrl.setValue(this.formatearFechaParaDatetimeLocal(new Date()));
+    this.contactoResultadoCtrl.setValue(null);
+    this.contactoResultadoCtrl.markAsUntouched();
   }
 
+  eliminarContacto(i: number): void {
+    this.contactosRegistrados.splice(i, 1);
+    this.contactosRegistrados = [...this.contactosRegistrados];
+  }
 }

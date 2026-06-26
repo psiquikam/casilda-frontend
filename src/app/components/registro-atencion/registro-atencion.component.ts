@@ -356,7 +356,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       const controlOtro = this.atencionForm.get('otroVinculo');
       if (controlOtro) {
         const idVinculo = this.resolverIdMaestro(valor, this.catalogoVinculosUdea);
-        if (idVinculo === VinculoUdeAEnum.OTRAS) {
+        if (idVinculo === VinculoUdeAEnum.OTRO_TIPO_DE_VINCULO) {
           controlOtro.setValidators([Validators.required]);
         } else {
           controlOtro.clearValidators();
@@ -1072,7 +1072,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
   esOtroVinculo(): boolean {
     const valor = this.atencionForm.get('vinculo')?.value;
-    return this.resolverIdMaestro(valor, this.catalogoVinculosUdea) === VinculoUdeAEnum.OTRAS;
+    return this.resolverIdMaestro(valor, this.catalogoVinculosUdea) === VinculoUdeAEnum.OTRO_TIPO_DE_VINCULO;
   }
 
   abrirModalDireccion(): void {
@@ -1485,8 +1485,13 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
               this.atencionId = atencion.id;
             }
             
-            const msg = 'Datos de la pestaña guardados exitosamente.';
-            this.snackBar.open(msg, 'Cerrar', { duration: 3000 });
+            this.dialog.open(DialogoExitoComponent, {
+              width: '400px',
+              data: {
+                titulo: '¡Guardado Exitoso!',
+                mensaje: 'Datos de la pestaña guardados exitosamente.'
+              }
+            });
           },
           error: (error) => {
             this.guardandoCompromisos = false;
@@ -1562,7 +1567,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       idCampus: this.resolverIdMaestro(campus, this.catalogoCampus),
       idFacultad: this.resolverIdMaestro(facultad, this.catalogoFacultades),
       idVinculoUniversidad: this.resolverIdMaestro(vinculo, this.catalogoVinculosUdea),
-      otroVinculo: this.resolverIdMaestro(vinculo, this.catalogoVinculosUdea) === VinculoUdeAEnum.OTRAS ? formRawValue.otroVinculo : null,
+      otroVinculo: this.resolverIdMaestro(vinculo, this.catalogoVinculosUdea) === VinculoUdeAEnum.OTRO_TIPO_DE_VINCULO ? formRawValue.otroVinculo : null,
       idPrograma: this.resolverIdMaestro(programa, this.catalogoProgramas),
       idEtnia: etnia ? this.resolverIdMaestro(etnia, this.catalogoEtnias) : null,
       idCiudadResidencia: ciudadResidencia ? Number(ciudadResidencia) : null,

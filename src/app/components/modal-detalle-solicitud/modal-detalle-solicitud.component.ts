@@ -77,6 +77,7 @@ export class ModalDetalleSolicitudComponent implements OnInit {
   campusLista: MaestroDto[] = [];
   dependencias: MaestroDto[] = [];
   facultades: MaestroDto[] = [];
+  mediosSolicitud: MaestroDto[] = [];
 
   correoRegistrados: CorreoRegistrado[] = [];
   telefonosRegistrados: TelefonoRegistrado[] = [];
@@ -94,6 +95,7 @@ export class ModalDetalleSolicitudComponent implements OnInit {
         this.campusLista = data.campus;
         this.dependencias = data.dependencias;
         this.facultades = data.facultades;
+        this.mediosSolicitud = data.medioSolicitud;
       });
   }
 
@@ -126,6 +128,7 @@ export class ModalDetalleSolicitudComponent implements OnInit {
       primerApellido: [info.primerApellido ?? '', Validators.required],
       segundoApellido: [info.segundoApellido ?? ''],
       identidadGenero: [info.identidadGeneroId ?? null],
+      medioSolicitud: [info.medioSolicitudId ?? null, Validators.required],
       observacionesTelefono: [info.observacionesTelefono ?? ''],
       observacionesCorreo: [info.observacionesCorreo ?? '']
     });
@@ -254,7 +257,8 @@ export class ModalDetalleSolicitudComponent implements OnInit {
       remitenteTipoDocumentoId: this.tieneRemitente ? (formValue.remitenteTipoDocumento ?? null) : null,
       remitenteNumeroDocumento: this.tieneRemitente ? this.normalizarTextoOpcional(formValue.remitenteNumeroDocumento) : null,
       observacionesTelefono: this.normalizarTextoOpcional(formValue.observacionesTelefono),
-      observacionesCorreo: this.normalizarTextoOpcional(formValue.observacionesCorreo)
+      observacionesCorreo: this.normalizarTextoOpcional(formValue.observacionesCorreo),
+      medioSolicitudId: formValue.medioSolicitud ?? null
     };
   }
 
@@ -263,31 +267,39 @@ export class ModalDetalleSolicitudComponent implements OnInit {
       return null;
     }
 
+    let dateObj: Date | null = null;
+
     if (valor instanceof Date) {
-      const year = valor.getFullYear();
-      const month = String(valor.getMonth() + 1).padStart(2, '0');
-      const day = String(valor.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
+      dateObj = valor;
+    } else {
+      const strVal = this.normalizarTexto(String(valor));
+      if (!strVal) return null;
+      
+      // If it is already in dd/MM/yyyy format
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(strVal)) {
+        return strVal;
+      }
+      
+      // If it is in yyyy-MM-dd format
+      if (/^\d{4}-\d{2}-\d{2}/.test(strVal)) {
+        const parts = strVal.slice(0, 10).split('-');
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+      
+      const parsed = new Date(strVal);
+      if (!Number.isNaN(parsed.getTime())) {
+        dateObj = parsed;
+      }
     }
 
-    const fecha = this.normalizarTexto(String(valor));
-    if (!fecha) {
-      return null;
+    if (dateObj) {
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      return `${day}/${month}/${year}`;
     }
 
-    if (/^\d{4}-\d{2}-\d{2}/.test(fecha)) {
-      return fecha.slice(0, 10);
-    }
-
-    const parseada = new Date(fecha);
-    if (!Number.isNaN(parseada.getTime())) {
-      const year = parseada.getFullYear();
-      const month = String(parseada.getMonth() + 1).padStart(2, '0');
-      const day = String(parseada.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    }
-
-    return fecha;
+    return String(valor);
   }
 
   private parsearFechaParaControl(valor: unknown): Date | null {
