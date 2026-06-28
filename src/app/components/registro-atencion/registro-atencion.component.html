@@ -411,9 +411,9 @@
                                     </mat-form-field>
                                     }
                                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                        <mat-label>Facultad</mat-label>
-                                        <mat-select formControlName="facultad">
-                                            @for (f of facultadesM; track f) { <mat-option
+                                        <mat-label>Unidad Académica</mat-label>
+                                        <mat-select formControlName="unidadAcademica">
+                                            @for (f of unidadesAcademicasM; track f) { <mat-option
                                                 [value]="f">{{f}}</mat-option> }
                                         </mat-select>
                                     </mat-form-field>
@@ -426,9 +426,9 @@
                                         </mat-select>
                                     </mat-form-field>
                                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                        <mat-label>Dependencia</mat-label>
-                                        <mat-select formControlName="dependencia">
-                                            @for (f of listaDependencia; track f) { <mat-option
+                                        <mat-label>Unidad Administrativa</mat-label>
+                                        <mat-select formControlName="unidadAdministrativa">
+                                            @for (f of listaUnidadesAdministrativas; track f) { <mat-option
                                                 [value]="f">{{f}}</mat-option> }
                                         </mat-select>
                                     </mat-form-field>

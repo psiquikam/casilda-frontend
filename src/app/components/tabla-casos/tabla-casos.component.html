@@ -64,16 +64,16 @@
                     <td mat-cell *matCellDef="let element">{{element.fecha}}</td>
                 </ng-container>
 
-                <ng-container matColumnDef="dependencia">
+                <ng-container matColumnDef="unidadAdministrativa">
                     <th mat-header-cell *matHeaderCellDef>
                         <div class="header-inline-container">
-                            <span class="column-title">Dependencia</span>
-                            <div class="search-box-slim"><input (keyup)="applyFilter('dependencia', $event)"
+                            <span class="column-title">Unidad Administrativa</span>
+                            <div class="search-box-slim"><input (keyup)="applyFilter('unidadAdministrativa', $event)"
                                     placeholder="..."></div>
                         </div>
                     </th>
                     <td mat-cell *matCellDef="let element">
-                        <span class="badge-soft">{{element.dependencia}}</span>
+                        <span class="badge-soft">{{element.unidadAdministrativa}}</span>
                     </td>
                 </ng-container>
 
@@ -111,7 +111,7 @@
                             <div class="detail-grid">
                                 <div class="detail-item"><strong>Tipo Solicitud:</strong> {{element.tipoSolicitud}}
                                 </div>
-                                <div class="detail-item"><strong>Facultad:</strong> {{element.facultad}}</div>
+                                <div class="detail-item"><strong>Unidad Académica:</strong> {{element.unidadAcademica}}</div>
                                 <div class="detail-item"><strong>Campus:</strong> {{element.campus}}</div>
                                 <div class="detail-item"><strong>Identidad Género:</strong> {{element.genero}}</div>
                                 <div class="detail-item"><strong>Edad:</strong> {{element.edad}} años</div>

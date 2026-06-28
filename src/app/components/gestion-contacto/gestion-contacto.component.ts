@@ -86,7 +86,7 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
   cargando = false;
 
 
-  displayedColumns: string[] = ['expand', 'nombre', 'documento', 'fecha', 'dependencia', 'profesional', 'acciones'];
+  displayedColumns: string[] = ['expand', 'nombre', 'documento', 'fecha', 'unidadAdministrativa', 'profesional', 'acciones'];
   expandedElement: any | null;
   numIntentosMap: Record<number, number> = {};
   maxLlamadas = 2;
@@ -95,7 +95,7 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
     nombre: '',
     documento: '',
     fecha: '',
-    dependencia: '',
+    unidadAdministrativa: '',
     profesional: ''
   };
 
@@ -128,10 +128,10 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
           nombre: s.nombreSolicitante,
           documento: s.documentoSolicitante,
           fecha: formatFechaCreacion(s.fechaCreacion),
-          dependencia: s.remitenteDependencia || s.dependencia || '',
+          unidadAdministrativa: s.remitenteUnidadAdministrativa || s.unidadAdministrativa || '',
           tipoSolicitud: s.tipoSolicitud,
           campus: s.remitenteCampus || '',
-          facultad: s.remitenteFacultad || '',
+          facultad: s.remitenteUnidadAcademica || '',
           celular: s.celular || '',
           correoInst: s.correoInstitucional || ''
         }));
@@ -195,7 +195,7 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
         && (!searchTerms.nombre || nombreCompleto.includes(searchTerms.nombre))
         && (!searchTerms.documento || documentoCompleto.includes(searchTerms.documento))
         && (!searchTerms.fecha || data.fecha?.toLowerCase().includes(searchTerms.fecha))
-        && (!searchTerms.dependencia || data.dependencia?.toLowerCase().includes(searchTerms.dependencia))
+        && (!searchTerms.unidadAdministrativa || data.unidadAdministrativa?.toLowerCase().includes(searchTerms.unidadAdministrativa))
         && (!searchTerms.profesional || data.profesional?.toLowerCase().includes(searchTerms.profesional));
     };
   }

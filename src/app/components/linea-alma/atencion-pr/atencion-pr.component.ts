@@ -12,7 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, DateAdapter, MAT_DATE_FORMATS } from '@angular/material/core';
 import { MatTableModule } from '@angular/material/table';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -38,6 +38,7 @@ import {
 import { GrupoProfesionalDto, SolicitudService, VinculoUdeAEnum } from '../../../services/solicitud.service';
 import { environment } from '../../../../environments/environment';
 import { TipoReporteAlma } from '../../../enums/tipo-reporte-alma.enum';
+import { CustomDateAdapter, CUSTOM_DATE_FORMATS } from '../../../custom-date-adapter';
 
 @Component({
   selector: 'app-atencion-pr',
@@ -59,6 +60,10 @@ import { TipoReporteAlma } from '../../../enums/tipo-reporte-alma.enum';
     MatDialogModule,
     MatProgressSpinnerModule,
     MatTooltipModule
+  ],
+  providers: [
+    { provide: DateAdapter, useClass: CustomDateAdapter },
+    { provide: MAT_DATE_FORMATS, useValue: CUSTOM_DATE_FORMATS }
   ],
   templateUrl: './atencion-pr.component.html',
   styleUrl: './atencion-pr.component.scss'
@@ -95,10 +100,10 @@ export class AtencionPrComponent implements OnInit {
   orientacionesSexuales: MaestroDto[] = [];
   etnias: MaestroDto[] = [];
   vinculos: MaestroDto[] = [];
-  facultades: MaestroDto[] = [];
+  unidadesAcademicas: MaestroDto[] = [];
   programas: MaestroDto[] = [];
   programasFiltrados: MaestroDto[] = [];
-  dependencias: MaestroDto[] = [];
+  unidadesAdministrativas: MaestroDto[] = [];
   campus: MaestroDto[] = [];
   aphProtocolos: MaestroDto[] = [];
   aphResultadosTriage: MaestroDto[] = [];
@@ -149,9 +154,9 @@ export class AtencionPrComponent implements OnInit {
       etnia: [''],
       direccionResidencia: [''],
       vinculo: [''],
-      facultad: [{ value: '', disabled: true }],
+      unidadAcademica: [{ value: '', disabled: true }],
       programa: [{ value: '', disabled: true }],
-      dependencia: [{ value: '', disabled: true }],
+      unidadAdministrativa: [{ value: '', disabled: true }],
       campus: [{ value: '', disabled: true }],
       aphFecha: ['', Validators.required],
       aphHora: ['', Validators.required],
@@ -166,8 +171,8 @@ export class AtencionPrComponent implements OnInit {
 
     this.cargarCatalogos();
     this.configurarValidadoresTriage();
-    this.configurarDependenciaCamposPorVinculo();
-    this.configurarDependenciaProgramasPorFacultad();
+    this.configurarUnidadAdministrativaCamposPorVinculo();
+    this.configurarUnidadAdministrativaProgramasPorUnidadAcademica();
 
     this.registroCasoForm.get('tipoReporte')?.valueChanges.subscribe((valor) => {
       const esDirecta = valor === 'directa';
@@ -257,9 +262,9 @@ export class AtencionPrComponent implements OnInit {
       orientacionesSexuales: this.listasService.obtenerMaestro('orientaciones-sexuales'),
       etnias: this.listasService.obtenerMaestro('etnias'),
       vinculos: this.listasService.obtenerMaestro('vinculos-udea'),
-      facultades: this.listasService.obtenerMaestro('facultades'),
+      unidadesAcademicas: this.listasService.obtenerMaestro('unidades-academicas'),
       programas: this.listasService.obtenerMaestro('programas'),
-      dependencias: this.listasService.obtenerMaestro('dependencias'),
+      unidadesAdministrativas: this.listasService.obtenerMaestro('unidades-administrativas'),
       campus: this.listasService.obtenerMaestro('campus'),
       aphProtocolos: this.listasService.obtenerMaestro('protocolos-aph'),
       aphResultadosTriage: this.listasService.obtenerMaestro('resultados-triage'),
@@ -275,15 +280,15 @@ export class AtencionPrComponent implements OnInit {
         this.regimenes = catalogos.regimenes;
         this.eps = catalogos.eps;
         this.departamentos = catalogos.departamentos;
-        this.configurarDependenciaMunicipios();
+        this.configurarMunicipios();
         this.sexos = catalogos.sexos;
         this.identidadesGenero = catalogos.identidadesGenero;
         this.orientacionesSexuales = catalogos.orientacionesSexuales;
         this.etnias = catalogos.etnias;
         this.vinculos = catalogos.vinculos;
-        this.facultades = catalogos.facultades;
+        this.unidadesAcademicas = catalogos.unidadesAcademicas;
         this.programas = catalogos.programas;
-        this.dependencias = catalogos.dependencias;
+        this.unidadesAdministrativas = catalogos.unidadesAdministrativas;
         this.campus = catalogos.campus;
         this.aphProtocolos = catalogos.aphProtocolos;
         this.aphResultadosTriage = catalogos.aphResultadosTriage;
@@ -353,13 +358,6 @@ export class AtencionPrComponent implements OnInit {
       return false;
     }
 
-    if (tabIndex === 0 || tabIndex === 1) {
-      if (!this.idPersonaEncontrada) {
-        this.snackBar.open('Debe identificar/buscar a la persona en la pestaña "Datos de la persona" antes de guardar.', 'Cerrar', { duration: 5000 });
-        return false;
-      }
-    }
-
     return true;
   }
 
@@ -396,11 +394,11 @@ export class AtencionPrComponent implements OnInit {
     });
   }
 
-  private configurarDependenciaCamposPorVinculo(): void {
+  private configurarUnidadAdministrativaCamposPorVinculo(): void {
     this.registroCasoForm.get('vinculo')?.valueChanges.subscribe((vinculoId) => {
       this.categoriaVinculo = vinculoId ? this.clasificarVinculo(Number(vinculoId)) : 'ninguno';
 
-      ['facultad', 'programa', 'dependencia', 'campus'].forEach((nombre) => {
+      ['unidadAcademica', 'programa', 'unidadAdministrativa', 'campus'].forEach((nombre) => {
         const ctrl = this.registroCasoForm.get(nombre);
         ctrl?.setValue('', { emitEvent: false });
         ctrl?.disable({ emitEvent: false });
@@ -408,26 +406,26 @@ export class AtencionPrComponent implements OnInit {
       this.programasFiltrados = [];
 
       if (this.categoriaVinculo !== 'ninguno') {
-        this.registroCasoForm.get('facultad')?.enable({ emitEvent: false });
-        this.registroCasoForm.get('dependencia')?.enable({ emitEvent: false });
+        this.registroCasoForm.get('unidadAcademica')?.enable({ emitEvent: false });
+        this.registroCasoForm.get('unidadAdministrativa')?.enable({ emitEvent: false });
         this.registroCasoForm.get('campus')?.enable({ emitEvent: false });
-        // Programa permanece deshabilitado hasta elegir facultad,
+        // Programa permanece deshabilitado hasta elegir unidad académica,
         // y solo si la categoría es estudiante/otro vínculo.
       }
     });
   }
 
-  private configurarDependenciaProgramasPorFacultad(): void {
+  private configurarUnidadAdministrativaProgramasPorUnidadAcademica(): void {
     const programaCtrl = this.registroCasoForm.get('programa');
-    this.registroCasoForm.get('facultad')?.valueChanges.subscribe((facultadId) => {
+    this.registroCasoForm.get('unidadAcademica')?.valueChanges.subscribe((unidadAcademicaId) => {
       programaCtrl?.setValue('', { emitEvent: false });
       this.programasFiltrados = [];
 
-      if (!facultadId || this.categoriaVinculo !== 'con-programa') {
+      if (!unidadAcademicaId || this.categoriaVinculo !== 'con-programa') {
         programaCtrl?.disable({ emitEvent: false });
         return;
       }
-      this.cargarProgramasPorFacultad(Number(facultadId)).subscribe((lista) => {
+      this.cargarProgramasPorUnidadAcademica(Number(unidadAcademicaId)).subscribe((lista) => {
         this.programasFiltrados = lista;
         if (lista.length > 0) {
           programaCtrl?.enable({ emitEvent: false });
@@ -438,17 +436,16 @@ export class AtencionPrComponent implements OnInit {
     });
   }
 
-  // TODO: reemplazar por el endpoint real cuando el backend exponga
-  // /maestros/facultades/{id}/programas. Mientras tanto, filtramos en cliente
-  // si los programas trajeran metadata; en su defecto devolvemos vacío para
-  // forzar que el usuario consulte al área correspondiente.
-  private cargarProgramasPorFacultad(facultadId: number): Observable<MaestroDto[]> {
+  private cargarProgramasPorUnidadAcademica(unidadAcademicaId: number): Observable<MaestroDto[]> {
+    const vinculoVal = this.registroCasoForm.get('vinculo')?.value;
+    const pregrado = Number(vinculoVal) === VinculoUdeAEnum.ESTUDIANTE_PREGRADO;
+
     return this.http
-      .get<MaestroDto[]>(`${this.maestrosUrl}/facultades/${facultadId}/programas`)
-      .pipe(catchError(() => of(this.programas)));
+      .get<MaestroDto[]>(`${this.maestrosUrl}/programas?unidadAcademicaId=${unidadAcademicaId}&pregrado=${pregrado}`)
+      .pipe(catchError(() => of([] as MaestroDto[])));
   }
 
-  private configurarDependenciaMunicipios(): void {
+  private configurarMunicipios(): void {
     this.registroCasoForm.get('departamentoNacimiento')?.valueChanges.subscribe((departamentoId) => {
       this.registroCasoForm.patchValue({ ciudadNacimiento: '' }, { emitEvent: false });
       this.municipiosNacimiento = [];
@@ -524,35 +521,32 @@ export class AtencionPrComponent implements OnInit {
 
   private categoriaVinculo: 'con-programa' | 'sin-programa' | 'ninguno' = 'ninguno';
 
-  // con-programa  → habilita Facultad, Programa, Dependencia, Campus
-  // sin-programa  → habilita Facultad, Dependencia, Campus (sin Programa)
+  // con-programa  → habilita Facultad, Programa, Unidad Administrativa, Campus (solo Estudiante de Pregrado o Posgrado)
+  // sin-programa  → habilita Facultad, Unidad Administrativa, Campus (sin Programa)
   // ninguno       → todos deshabilitados
   private clasificarVinculo(id: number): 'con-programa' | 'sin-programa' | 'ninguno' {
-    // Docente Vinculado, Docente Ocasional, Docente de Cátedra, Docente Cátedra 50, Jubilado / Pensionado
+    if (
+      id === VinculoUdeAEnum.ESTUDIANTE_PREGRADO ||
+      id === VinculoUdeAEnum.ESTUDIANTE_DE_POSGRADO
+    ) {
+      return 'con-programa';
+    }
+
     if (
       id === VinculoUdeAEnum.DOCENTE_VINCULADO ||
       id === VinculoUdeAEnum.DOCENTE_OCASIONAL ||
       id === VinculoUdeAEnum.DOCENTE_DE_CATEDRA ||
       id === VinculoUdeAEnum.DOCENTE_CATEDRA_50 ||
-      id === VinculoUdeAEnum.JUBILADO_PENSIONADO
-    ) {
-      return 'sin-programa';
-    }
-
-    // Estudiante de Pregrado, Estudiante de Tecnología, Estudiante de Posgrado, Otro tipo de vínculo,
-    // Prestador de Servicios, Contratista, Externo, Personal Administrativo, Egresado
-    if (
-      id === VinculoUdeAEnum.ESTUDIANTE_PREGRADO ||
+      id === VinculoUdeAEnum.JUBILADO_PENSIONADO ||
       id === VinculoUdeAEnum.PERSONAL_ADMINISTRATIVO ||
       id === VinculoUdeAEnum.EGRESADO ||
       id === VinculoUdeAEnum.CONTRATISTA ||
       id === VinculoUdeAEnum.OTRO_TIPO_DE_VINCULO ||
       id === VinculoUdeAEnum.ESTUDIANTE_DE_TECNOLOGIA ||
-      id === VinculoUdeAEnum.ESTUDIANTE_DE_POSGRADO ||
       id === VinculoUdeAEnum.PRESTADOR_DE_SERVICIOS ||
       id === VinculoUdeAEnum.EXTERNO
     ) {
-      return 'con-programa';
+      return 'sin-programa';
     }
 
     return 'ninguno';
@@ -748,7 +742,7 @@ export class AtencionPrComponent implements OnInit {
     }
 
     this.guardandoRegistro = true;
-    const payload = this.construirPayloadRegistro(this.idPersonaEncontrada!);
+    const payload = this.construirPayloadRegistro(this.idPersonaEncontrada);
     payload.id = this.idRegistroCreado;
 
     this.lineaAlmaService.registrarPestana(this.tabSeleccionada, payload)
@@ -756,6 +750,9 @@ export class AtencionPrComponent implements OnInit {
       .subscribe({
         next: (response) => {
           this.idRegistroCreado = response.id;
+          if (response.idPersona) {
+            this.idPersonaEncontrada = response.idPersona;
+          }
           this.dialog.open(DialogoExitoComponent, {
             width: '400px',
             data: {
@@ -771,63 +768,88 @@ export class AtencionPrComponent implements OnInit {
       });
   }
 
-  private construirPayloadRegistro(idPersona: number): RegistroLineaAlmaRequestDto {
+  private construirPayloadRegistro(idPersona: number | null): RegistroLineaAlmaRequestDto {
     const raw = this.registroCasoForm.getRawValue();
-    const idTipoReporte = this.obtenerIdTipoReporte(raw.tipoReporte);
+    const idUsuario = this.obtenerIdUsuarioActual() ?? 0;
+    const payload: RegistroLineaAlmaRequestDto = {};
 
-    if (!idTipoReporte) {
-      throw new Error('No fue posible resolver el tipo de reporte.');
+    if (this.idRegistroCreado) {
+      payload.id = this.idRegistroCreado;
     }
 
-    const atencionAph: AtencionAphRequestDto | null = raw.aphFecha ? {
-      fechaHora: this.combinarFechaHora(raw.aphFecha, raw.aphHora),
-      idProtocoloAph: Number(raw.aphProtocolo),
-      practicoTriage: raw.aphPracticoTriage === 'si',
-      idResultadoTriage: raw.aphPracticoTriage === 'si' ? Number(raw.aphResultadoTriage) : null,
-      motivoNoTriage: raw.aphPracticoTriage === 'no' ? (raw.aphMotivoNoRealizacionTriage || null) : null,
-      notaAph: raw.aphNotaAph || null,
-      aceptaPsicologia: raw.aphAceptaPsicologia === 'si',
-      requiereRemision: raw.aphRequiereRemision === 'si'
-    } : null;
+    switch (this.tabSeleccionada) {
+      case 0: {
+        const idTipoReporte = this.obtenerIdTipoReporte(raw.tipoReporte);
+        if (!idTipoReporte) {
+          throw new Error('No fue posible resolver el tipo de reporte.');
+        }
+        payload.idPersona = idPersona || null;
+        payload.idTipoReporte = idTipoReporte;
+        payload.idCanalContacto = Number(raw.canal);
+        payload.idQuienRemite = raw.tipoReporte === 'indirecta' ? (Number(raw.quienRemite) || null) : null;
+        payload.fechaHoraAtencion = this.toIsoDateTime(raw.fechaHora || new Date());
+        payload.idPersonaAtiende = Number(raw.personaAtiende) || idUsuario;
+        payload.idTipoServicio = this.tipoServicioAphId;
+        payload.idPersonaRegistra = idUsuario;
+        payload.idIdentidadGenero = null;
+        break;
+      }
+      case 1: {
+        payload.idPersona = idPersona || null;
+        payload.primerNombre = raw.primerNombre || null;
+        payload.segundoNombre = raw.segundoNombre || null;
+        payload.primerApellido = raw.primerApellido || null;
+        payload.segundoApellido = raw.segundoApellido || null;
+        payload.numeroDocumento = raw.documento || null;
+        payload.idTipoIdentificacion = raw.tipoDocumento ? Number(raw.tipoDocumento) : null;
+        payload.idCiudadNacimiento = raw.ciudadNacimiento ? Number(raw.ciudadNacimiento) : null;
+        payload.fechaNacimiento = raw.fechaNacimiento ? this.toIsoDateTime(raw.fechaNacimiento) : null;
+        payload.idIdentidadGenero = Number(raw.identidadSexual);
+        payload.idOrientacionSexual = raw.orientacionSexual ? Number(raw.orientacionSexual) : null;
+        payload.idEtnia = raw.etnia ? Number(raw.etnia) : null;
+        payload.idCiudadResidencia = raw.ciudadResidencia ? Number(raw.ciudadResidencia) : null;
+        payload.direccionResidencia = raw.direccionResidencia || null;
+        break;
+      }
+      case 2: {
+        payload.idVinculoUdeA = raw.vinculo ? Number(raw.vinculo) : null;
+        payload.idUnidadAcademica = raw.unidadAcademica ? Number(raw.unidadAcademica) : null;
+        payload.idPrograma = raw.programa ? Number(raw.programa) : null;
+        payload.idUnidadAdministrativa = raw.unidadAdministrativa ? Number(raw.unidadAdministrativa) : null;
+        payload.idCampus = raw.campus ? Number(raw.campus) : null;
+        break;
+      }
+      case 3: {
+        payload.atencionAph = raw.aphFecha ? {
+          fechaHora: this.combinarFechaHora(raw.aphFecha, raw.aphHora),
+          idProtocoloAph: Number(raw.aphProtocolo),
+          practicoTriage: raw.aphPracticoTriage === 'si',
+          idResultadoTriage: raw.aphPracticoTriage === 'si' ? Number(raw.aphResultadoTriage) : null,
+          motivoNoTriage: raw.aphPracticoTriage === 'no' ? (raw.aphMotivoNoRealizacionTriage || null) : null,
+          notaAph: raw.aphNotaAph || null,
+          aceptaPsicologia: raw.aphAceptaPsicologia === 'si',
+          requiereRemision: raw.aphRequiereRemision === 'si'
+        } : null;
+        break;
+      }
+      case 4: {
+        payload.contactos = (this.contactosRegistrados ?? []).map((c) => ({
+          fecha: this.toIsoDateTime(c.fecha),
+          idResultado: Number(c.idResultado)
+        }));
+        break;
+      }
+      case 5: {
+        payload.remisiones = (this.remisionesRegistrados ?? []).map((r) => ({
+          idTipoRemision: Number(r.idTipoRemision),
+          cual: r.cual || null,
+          fecha: this.toIsoDateTime(r.fecha)
+        }));
+        break;
+      }
+    }
 
-    const remisiones: RemisionRegistroAlmaRequestDto[] = (this.remisionesRegistrados ?? []).map((r) => ({
-      idTipoRemision: Number(r.idTipoRemision),
-      cual: r.cual || null,
-      fecha: this.toIsoDateTime(r.fecha)
-    }));
-
-    const contactos: ContactoLineaAlmaRequestDto[] = (this.contactosRegistrados ?? []).map((c) => ({
-      fecha: this.toIsoDateTime(c.fecha),
-      idResultado: Number(c.idResultado)
-    }));
-
-    const idUsuario = this.obtenerIdUsuarioActual() ?? 0;
-
-    return {
-      idPersona,
-      idTipoReporte,
-      idCanalContacto: Number(raw.canal),
-      idQuienRemite: raw.tipoReporte === 'indirecta' ? (Number(raw.quienRemite) || null) : null,
-      fechaHoraAtencion: this.toIsoDateTime(raw.fechaHora || new Date()),
-      fechaNacimiento: raw.fechaNacimiento ? this.toIsoDateTime(raw.fechaNacimiento) : null,
-      idPersonaAtiende: Number(raw.personaAtiende) || idUsuario,
-      idTipoServicio: this.tipoServicioAphId,
-      idPersonaRegistra: idUsuario,
-      idLugarEntrevista: null,
-      idIdentidadGenero: Number(raw.identidadSexual),
-      idOrientacionSexual: raw.orientacionSexual ? Number(raw.orientacionSexual) : null,
-      idEtnia: raw.etnia ? Number(raw.etnia) : null,
-      idCiudadResidencia: raw.ciudadResidencia ? Number(raw.ciudadResidencia) : null,
-      direccionResidencia: raw.direccionResidencia || null,
-      idVinculoUdeA: raw.vinculo ? Number(raw.vinculo) : null,
-      idFacultad: raw.facultad ? Number(raw.facultad) : null,
-      idPrograma: raw.programa ? Number(raw.programa) : null,
-      idDependencia: raw.dependencia ? Number(raw.dependencia) : null,
-      idCampus: raw.campus ? Number(raw.campus) : null,
-      atencionAph,
-      remisiones,
-      contactos
-    };
+    return payload;
   }
 
   private obtenerIdTipoReporte(valor: string): number | null {

@@ -75,8 +75,8 @@ export class ModalDetalleSolicitudComponent implements OnInit {
   identidadesGenero: MaestroDto[] = [];
   cargos: MaestroDto[] = [];
   campusLista: MaestroDto[] = [];
-  dependencias: MaestroDto[] = [];
-  facultades: MaestroDto[] = [];
+  unidadesAdministrativas: MaestroDto[] = [];
+  unidadesAcademicas: MaestroDto[] = [];
   mediosSolicitud: MaestroDto[] = [];
 
   correoRegistrados: CorreoRegistrado[] = [];
@@ -93,8 +93,8 @@ export class ModalDetalleSolicitudComponent implements OnInit {
         this.identidadesGenero = data.identidadesGenero;
         this.cargos = data.cargos;
         this.campusLista = data.campus;
-        this.dependencias = data.dependencias;
-        this.facultades = data.facultades;
+        this.unidadesAdministrativas = data.unidadesAdministrativas;
+        this.unidadesAcademicas = data.unidadesAcademicas;
         this.mediosSolicitud = data.medioSolicitud;
       });
   }
@@ -115,8 +115,8 @@ export class ModalDetalleSolicitudComponent implements OnInit {
       remitenteSegundoApellido: [info.remitenteSegundoApellido ?? ''],
       remitenteCargo: [info.remitenteCargoId ?? null],
       remitenteCampus: [info.remitenteCampusId ?? null],
-      remitenteDependencia: [info.remitenteDependenciaId ?? null],
-      remitenteFacultad: [info.remitenteFacultadId ?? null],
+      remitenteUnidadAdministrativa: [info.remitenteUnidadAdministrativaId ?? null],
+      remitenteUnidadAcademica: [info.remitenteUnidadAcademicaId ?? null],
       remitenteTipoDocumento: [info.remitenteTipoDocumentoId ?? null],
       remitenteNumeroDocumento: [info.remitenteNumeroDocumento ?? ''],
 
@@ -252,8 +252,8 @@ export class ModalDetalleSolicitudComponent implements OnInit {
       remitenteSegundoApellido: this.tieneRemitente ? this.normalizarTextoOpcional(formValue.remitenteSegundoApellido) : null,
       remitenteCargoId: this.tieneRemitente ? (formValue.remitenteCargo ?? null) : null,
       remitenteCampusId: this.tieneRemitente ? (formValue.remitenteCampus ?? null) : null,
-      remitenteDependenciaId: this.tieneRemitente ? (formValue.remitenteDependencia ?? null) : null,
-      remitenteFacultadId: this.tieneRemitente ? (formValue.remitenteFacultad ?? null) : null,
+      remitenteUnidadAdministrativaId: this.tieneRemitente ? (formValue.remitenteUnidadAdministrativa ?? null) : null,
+      remitenteUnidadAcademicaId: this.tieneRemitente ? (formValue.remitenteUnidadAcademica ?? null) : null,
       remitenteTipoDocumentoId: this.tieneRemitente ? (formValue.remitenteTipoDocumento ?? null) : null,
       remitenteNumeroDocumento: this.tieneRemitente ? this.normalizarTextoOpcional(formValue.remitenteNumeroDocumento) : null,
       observacionesTelefono: this.normalizarTextoOpcional(formValue.observacionesTelefono),

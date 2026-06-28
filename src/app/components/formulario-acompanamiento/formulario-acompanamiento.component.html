@@ -108,18 +108,18 @@
 
                 <div class="row">
                   <mat-form-field appearance="outline">
-                    <mat-label>Dependencia</mat-label>
-                    <mat-select formControlName="remitenteDependencia">
-                      @for (d of dependencias; track d.id) {
+                    <mat-label>Unidad Administrativa</mat-label>
+                    <mat-select formControlName="remitenteUnidadAdministrativa">
+                      @for (d of unidadesAdministrativas; track d.id) {
                       <mat-option [value]="d.id">{{d.nombre}}</mat-option>
                       }
                     </mat-select>
                   </mat-form-field>
 
                   <mat-form-field appearance="outline">
-                    <mat-label>Facultad</mat-label>
-                    <mat-select formControlName="remitenteFacultad">
-                      @for (f of facultades; track f.id) {
+                    <mat-label>Unidad Académica</mat-label>
+                    <mat-select formControlName="remitenteUnidadAcademica">
+                      @for (f of unidadesAcademicas; track f.id) {
                       <mat-option [value]="f.id">{{f.nombre}}</mat-option>
                       }
                     </mat-select>

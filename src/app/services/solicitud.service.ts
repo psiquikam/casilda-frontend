@@ -24,8 +24,8 @@ export interface DatosSolicitanteRequest {
   fechaNacimiento: string; // formato yyyy-MM-dd
   identidadGeneroId: number;
   campusId?: number | null;
-  dependenciaId?: number | null;
-  facultadId?: number | null;
+  unidadAdministrativaId?: number | null;
+  unidadAcademicaId?: number | null;
   correos?: CorreoSolicitanteDto[];
   telefonos?: TelefonoSolicitanteDto[];
 }
@@ -39,8 +39,8 @@ export interface DatosRemitenteRequest {
   numeroDocumento?: string | null;
   cargoId: number;
   campusId?: number | null;
-  dependenciaId?: number | null;
-  facultadId?: number | null;
+  unidadAdministrativaId?: number | null;
+  unidadAcademicaId?: number | null;
 }
 
 export interface SolicitudAcompanamientoRequest {
@@ -61,7 +61,7 @@ export interface SolicitudAcompanamientoResponse {
   observacionesTelefono?: string | null;
   observacionesCorreo?: string | null;
   // Para la tabla
-  dependencia: string;
+  unidadAdministrativa: string;
   profesional: string;
   tipoAsignacion: string;
   // Solicitante resumen
@@ -98,11 +98,11 @@ export interface SolicitudAcompanamientoResponse {
   remitenteCargo: string;
   remitenteCampusId?: number | null;
   remitenteCampus: string;
-  remitenteDependenciaId?: number | null;
-  remitenteDependencia: string;
-  remitenteFacultadId?: number | null;
-  remitenteFacultad: string;
-  remitenteOtraFacultad: string;
+  remitenteUnidadAdministrativaId?: number | null;
+  remitenteUnidadAdministrativa: string;
+  remitenteUnidadAcademicaId?: number | null;
+  remitenteUnidadAcademica: string;
+  remitenteOtraUnidadAcademica: string;
   remitenteFechaSolicitud: string;
   remitenteTipoDocumentoId?: number | null;
   remitenteTipoDocumento: string;
@@ -169,8 +169,8 @@ export interface UpdateSolicitudDto {
   remitenteSegundoApellido?: string | null;
   remitenteCargoId?: number | null;
   remitenteCampusId?: number | null;
-  remitenteDependenciaId?: number | null;
-  remitenteFacultadId?: number | null;
+  remitenteUnidadAdministrativaId?: number | null;
+  remitenteUnidadAcademicaId?: number | null;
   remitenteTipoDocumentoId?: number | null;
   remitenteNumeroDocumento?: string | null;
   observacionesTelefono?: string | null;
@@ -246,9 +246,9 @@ export interface CitaDto {
   motivoEstadoCita?: string;
   observaciones?: string;
   tipoSolicitud: string;
-  dependencia: string;
+  unidadAdministrativa: string;
   profesional: string;
-  facultad?: string;
+  unidadAcademica?: string;
   campus?: string;
   identidadGenero?: string;
   celular?: string;
@@ -336,9 +336,9 @@ export interface PersonaAtencionRequestDto {
 }
 
 export interface AtencionContextoRequestDto {
-  idDependencia: number;
+  idUnidadAdministrativa: number;
   idCampus: number;
-  idFacultad: number;
+  idUnidadAcademica: number;
   idVinculoUniversidad: number;
   otroVinculo?: string | null;
   idPrograma: number;

@@ -47,11 +47,6 @@ export class ModalDiscapacidadComponent implements OnInit {
   tiposDiscapacidad: MaestroDto[] = [];
   subTiposDiscapacidad: MaestroDto[] = [];
 
-  private readonly tiposExtra: MaestroDto[] = [
-    { id: -1, nombre: 'Ninguna' },
-    { id: -2, nombre: 'Otra/s' }
-  ];
-
   constructor(
     public dialogRef: MatDialogRef<ModalDiscapacidadComponent>
   ) {}
@@ -63,10 +58,10 @@ export class ModalDiscapacidadComponent implements OnInit {
   private cargarTiposDiscapacidad(): void {
     this.http.get<MaestroDto[]>(`${this.maestrosUrl}/tipo-discapacidad`).subscribe({
       next: (lista) => {
-        this.tiposDiscapacidad = [...lista, ...this.tiposExtra];
+        this.tiposDiscapacidad = lista;
       },
       error: () => {
-        this.tiposDiscapacidad = [...this.tiposExtra];
+        this.tiposDiscapacidad = [];
       }
     });
   }
@@ -78,7 +73,7 @@ export class ModalDiscapacidadComponent implements OnInit {
     const tipoSeleccionado = this.tiposDiscapacidad.find((t) => t.id === tipoId);
     this.data.tipo = tipoSeleccionado?.nombre ?? '';
 
-    if (!tipoId || tipoId < 0) {
+    if (!tipoId) {
       this.subTiposDiscapacidad = [];
       return;
     }

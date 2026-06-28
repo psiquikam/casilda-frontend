@@ -19,7 +19,7 @@ export interface PagedResponseDto<T> {
   number: number;
 }
 
-type ListaKey = 'tiposSolicitud' | 'campus' | 'dependencias' | 'facultades' | 'tiposDocumento' | 'identidadesGenero' | 'cargos' | 'medioSolicitud';
+type ListaKey = 'tiposSolicitud' | 'campus' | 'unidadesAdministrativas' | 'unidadesAcademicas' | 'tiposDocumento' | 'identidadesGenero' | 'cargos' | 'medioSolicitud';
 
 @Injectable({
   providedIn: 'root'
@@ -29,8 +29,8 @@ export class ListasService {
   private readonly endpointByList: Record<ListaKey, string> = {
     tiposSolicitud: 'tipos-solicitud',
     campus: 'campus',
-    dependencias: 'dependencias',
-    facultades: 'facultades',
+    unidadesAdministrativas: 'unidades-administrativas',
+    unidadesAcademicas: 'unidades-academicas',
     tiposDocumento: 'tipos-identificacion',
     identidadesGenero: 'identidades-genero',
     cargos: 'cargos',
@@ -40,8 +40,8 @@ export class ListasService {
   private data: Record<ListaKey, MaestroDto[]> = {
     tiposSolicitud: [],
     campus: [],
-    dependencias: [],
-    facultades: [],
+    unidadesAdministrativas: [],
+    unidadesAcademicas: [],
     tiposDocumento: [],
     identidadesGenero: [],
     cargos: [],
@@ -59,8 +59,8 @@ export class ListasService {
     forkJoin({
       tiposSolicitud: this.obtenerListaDesdeEndpoint('tiposSolicitud'),
       campus: this.obtenerListaDesdeEndpoint('campus'),
-      dependencias: this.obtenerListaDesdeEndpoint('dependencias'),
-      facultades: this.obtenerListaDesdeEndpoint('facultades'),
+      unidadesAdministrativas: this.obtenerListaDesdeEndpoint('unidadesAdministrativas'),
+      unidadesAcademicas: this.obtenerListaDesdeEndpoint('unidadesAcademicas'),
       tiposDocumento: this.obtenerListaDesdeEndpoint('tiposDocumento'),
       identidadesGenero: this.obtenerListaDesdeEndpoint('identidadesGenero'),
       cargos: this.obtenerListaDesdeEndpoint('cargos'),

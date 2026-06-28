@@ -48,8 +48,8 @@ export class FormularioAcompanamientoComponent implements OnInit {
   acompanamientoForm!: FormGroup;
   tiposSolicitud: MaestroDto[] = [];
   campusLista: MaestroDto[] = [];
-  dependencias: MaestroDto[] = [];
-  facultades: MaestroDto[] = [];
+  unidadesAdministrativas: MaestroDto[] = [];
+  unidadesAcademicas: MaestroDto[] = [];
   tiposDocumento: MaestroDto[] = [];
   identidadesGenero: MaestroDto[] = [];
   cargos: MaestroDto[] = [];
@@ -65,8 +65,8 @@ export class FormularioAcompanamientoComponent implements OnInit {
       .subscribe(data => {
         this.tiposSolicitud = data.tiposSolicitud;
         this.campusLista = data.campus;
-        this.dependencias = data.dependencias;
-        this.facultades = data.facultades;
+        this.unidadesAdministrativas = data.unidadesAdministrativas;
+        this.unidadesAcademicas = data.unidadesAcademicas;
         this.tiposDocumento = data.tiposDocumento;
         this.identidadesGenero = data.identidadesGenero;
         this.cargos = data.cargos;
@@ -89,8 +89,8 @@ export class FormularioAcompanamientoComponent implements OnInit {
       remitenteSegundoApellido: [''],
       remitenteCargo: [null],
       remitenteCampus: [null],
-      remitenteDependencia: [null],
-      remitenteFacultad: [null],
+      remitenteUnidadAdministrativa: [null],
+      remitenteUnidadAcademica: [null],
       remitenteTipoDocumento: [null],
       remitenteNumeroDocumento: [''],
 
@@ -111,7 +111,7 @@ export class FormularioAcompanamientoComponent implements OnInit {
     this.acompanamientoForm.get('tipoReporte')?.valueChanges.subscribe(tipo => {
       const remitenteFields = [
         'remitentePrimerNombre', 'remitentePrimerApellido',
-        'remitenteCargo', 'remitenteCampus', 'remitenteDependencia', 'remitenteFacultad'
+        'remitenteCargo', 'remitenteCampus', 'remitenteUnidadAdministrativa', 'remitenteUnidadAcademica'
       ];
 
       remitenteFields.forEach(f => {
@@ -120,7 +120,7 @@ export class FormularioAcompanamientoComponent implements OnInit {
           control?.setValidators([Validators.required]);
         } else {
           control?.clearValidators();
-          control?.setValue(['remitenteCargo', 'remitenteCampus', 'remitenteDependencia', 'remitenteFacultad'].includes(f) ? null : '');
+          control?.setValue(['remitenteCargo', 'remitenteCampus', 'remitenteUnidadAdministrativa', 'remitenteUnidadAcademica'].includes(f) ? null : '');
         }
         control?.updateValueAndValidity();
       });
@@ -297,8 +297,8 @@ export class FormularioAcompanamientoComponent implements OnInit {
         numeroDocumento: fv.remitenteNumeroDocumento || null,
         cargoId: fv.remitenteCargo,
         campusId: fv.remitenteCampus,
-        dependenciaId: fv.remitenteDependencia,
-        facultadId: fv.remitenteFacultad
+        unidadAdministrativaId: fv.remitenteUnidadAdministrativa,
+        unidadAcademicaId: fv.remitenteUnidadAcademica
       } : null
     };
 

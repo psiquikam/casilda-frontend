@@ -104,7 +104,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   totalElementosCitas = 0;
   pageIndexCitas = 0;
   pageSizeCitas = 10;
-  displayedColumnsTablaInicial: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'dependencia', 'profesional', 'acciones'];
+  displayedColumnsTablaInicial: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'unidadAdministrativa', 'profesional', 'acciones'];
   catalogoSeguimiento: string[] = ['Presencial', 'Telefónico', 'Virtual', 'Visita Domiciliaria'];
 
   @ViewChild(MatSort) sort?: MatSort;
@@ -183,7 +183,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     nombre: '',
     documento: '',
     fecha: '',
-    dependencia: '',
+    unidadAdministrativa: '',
     profesional: ''
   };
 
@@ -220,9 +220,9 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     { tab: 'Datos de la persona', label: 'Régimen de salud', control: 'regimenSalud' },
     { tab: 'Datos de la persona', label: 'Ciudad de nacimiento', control: 'ciudadNacimiento' },
     { tab: 'Datos complementarios', label: 'Vínculo', control: 'vinculo' },
-    { tab: 'Datos complementarios', label: 'Facultad', control: 'facultad' },
+    { tab: 'Datos complementarios', label: 'Unidad Académica', control: 'unidadAcademica' },
     { tab: 'Datos complementarios', label: 'Programa', control: 'programa' },
-    { tab: 'Datos complementarios', label: 'Dependencia', control: 'dependencia' },
+    { tab: 'Datos complementarios', label: 'Unidad Administrativa', control: 'unidadAdministrativa' },
     { tab: 'Datos complementarios', label: 'Campus', control: 'campus' },
     { tab: 'Documentación', label: 'Tiempo ocurrido (valor)', control: 'tiempoOcurridoValor' },
     { tab: 'Documentación', label: 'Tiempo ocurrido (unidad)', control: 'tiempoOcurridoUnidad' },
@@ -257,7 +257,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   listaOrientacionSexual: string[] = [];
   listaVinculos: string[] = [];
   listaVinculosAgresorVictima: string[] = [];
-  listaDependencia: string[] = [];
+  listaUnidadesAdministrativas: string[] = [];
   listaTipoViolencia: string[] = [];
   listaSubTipoViolencia: string[] = [];
   tiposSolicitud: string[] = [];
@@ -272,7 +272,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   tiposServicio: string[] = [];
   tiposDoc: string[] = [];
   campusM: string[] = [];
-  facultadesM: string[] = [];
+  unidadesAcademicasM: string[] = [];
   queForma: string[] = [];
   lugarHechos: string[] = [];
   actividadesMisionales: string[] = [];
@@ -288,12 +288,12 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   catalogoOrientacionesSexuales: MaestroDto[] = [];
   catalogoVinculosUdea: MaestroDto[] = [];
   catalogoVinculosAgresorVictima: MaestroDto[] = [];
-  catalogoDependencias: MaestroDto[] = [];
+  catalogoUnidadesAdministrativas: MaestroDto[] = [];
   catalogoRegimenes: MaestroDto[] = [];
   catalogoEps: MaestroDto[] = [];
   catalogoTiposServicio: MaestroDto[] = [];
   catalogoCampus: MaestroDto[] = [];
-  catalogoFacultades: MaestroDto[] = [];
+  catalogoUnidadesAcademicas: MaestroDto[] = [];
   catalogoFormasOcurrencia: MaestroDto[] = [];
   catalogoLugaresOcurrencia: MaestroDto[] = [];
   catalogoActividadesMisionales: MaestroDto[] = [];
@@ -318,7 +318,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.initForm();
     this.configurarValidacionActividadMisional();
-    this.configurarDependenciaMunicipios();
+    this.configurarUnidadAdministrativaMunicipios();
     this.cargarListasMaestras();
     this.cargarCitas();
     const nombreUsuario = this.authService.currentUser?.nombre || '';
@@ -331,7 +331,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         && (data.nombre || '').toLowerCase().includes(searchTerms.nombre)
         && `${data.tipoDocumento || ''} ${data.documento || ''}`.toLowerCase().includes(searchTerms.documento)
         && (data.fecha || '').toLowerCase().includes(searchTerms.fecha)
-        && (data.dependencia || '').toLowerCase().includes(searchTerms.dependencia)
+        && (data.unidadAdministrativa || '').toLowerCase().includes(searchTerms.unidadAdministrativa)
         && (data.profesional || '').toLowerCase().includes(searchTerms.profesional);
     };
 
@@ -341,7 +341,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         && (data.nombre || '').toLowerCase().includes(searchTerms.nombre)
         && `${data.tipoDocumento || ''} ${data.documento || ''}`.toLowerCase().includes(searchTerms.documento)
         && (data.fecha || '').toLowerCase().includes(searchTerms.fecha)
-        && (data.dependencia || '').toLowerCase().includes(searchTerms.dependencia)
+        && (data.unidadAdministrativa || '').toLowerCase().includes(searchTerms.unidadAdministrativa)
         && (data.profesional || '').toLowerCase().includes(searchTerms.profesional);
     };
 
@@ -364,8 +364,69 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         }
         controlOtro.updateValueAndValidity({ emitEvent: false });
       }
+
+      // Habilitar/Deshabilitar programa según vínculo
+      this.evaluarYcargarProgramas();
+    });
+
+    this.atencionForm.get('unidadAcademica')?.valueChanges.subscribe(() => {
+      this.evaluarYcargarProgramas();
     });
   }
+
+  esVinculoHabilitadoParaPrograma(): boolean {
+    const vinculoVal = this.atencionForm.get('vinculo')?.value;
+    if (!vinculoVal) return false;
+    const idVinculo = this.resolverIdMaestro(vinculoVal, this.catalogoVinculosUdea);
+    // Habilitar para "Estudiante de Pregrado" (1) o "Estudiante de Posgrado" (10)
+    return idVinculo === VinculoUdeAEnum.ESTUDIANTE_PREGRADO || idVinculo === VinculoUdeAEnum.ESTUDIANTE_DE_POSGRADO;
+  }
+
+
+  evaluarYcargarProgramas(): void {
+    const controlPrograma = this.atencionForm.get('programa');
+    if (!this.esVinculoHabilitadoParaPrograma()) {
+      controlPrograma?.setValue('');
+      controlPrograma?.disable({ emitEvent: false });
+      this.listaProgramas = [];
+      return;
+    }
+
+    const unidadAcademicaVal = this.atencionForm.get('unidadAcademica')?.value;
+    if (!unidadAcademicaVal) {
+      controlPrograma?.setValue('');
+      controlPrograma?.disable({ emitEvent: false });
+      this.listaProgramas = [];
+      return;
+    }
+
+    const idUnidad = this.resolverIdMaestro(unidadAcademicaVal, this.catalogoUnidadesAcademicas);
+    if (!idUnidad || Number.isNaN(idUnidad)) {
+      controlPrograma?.setValue('');
+      controlPrograma?.disable({ emitEvent: false });
+      this.listaProgramas = [];
+      return;
+    }
+
+    const vinculoVal = this.atencionForm.get('vinculo')?.value;
+    const idVinculo = this.resolverIdMaestro(vinculoVal, this.catalogoVinculosUdea);
+    const pregrado = idVinculo === VinculoUdeAEnum.ESTUDIANTE_PREGRADO;
+
+    this.http.get<MaestroDto[]>(`${this.maestrosUrl}/programas?unidadAcademicaId=${idUnidad}&pregrado=${pregrado}`).subscribe({
+      next: (data) => {
+        this.catalogoProgramas = data;
+        this.listaProgramas = this.mapNombres(data);
+        controlPrograma?.enable({ emitEvent: false });
+      },
+      error: (err) => {
+        console.error('Error cargando programas filtrados:', err);
+        this.listaProgramas = [];
+        controlPrograma?.disable({ emitEvent: false });
+      }
+    });
+  }
+
+
 
   private configurarValidacionActividadMisional(): void {
     const controlViolenciaMisional = this.atencionForm.get('violenciaMisional');
@@ -398,7 +459,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       orientacionesSexuales: this.obtenerMaestro('orientaciones-sexuales'),
       vinculosUdea: this.obtenerMaestro('vinculos-udea'),
       vinculosAgresorVictima: this.obtenerMaestro('vinculos-agresor-victima'),
-      dependencias: this.obtenerMaestro('dependencias'),
+      unidadesAdministrativas: this.obtenerMaestro('unidades-administrativas'),
       tiposViolencia: this.obtenerMaestro('tipos-violencia'),
       tiposSolicitud: this.obtenerMaestro('tipos-solicitud'),
       departamentos: this.obtenerMaestro('departamentos'),
@@ -407,7 +468,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       tiposServicio: this.obtenerMaestro('tipos-servicio'),
       tiposIdentificacion: this.obtenerMaestro('tipos-identificacion'),
       campus: this.obtenerMaestro('campus'),
-      facultades: this.obtenerMaestro('facultades'),
+      unidadesAcademicas: this.obtenerMaestro('unidades-academicas'),
       formasOcurrencia: this.obtenerMaestro('formas-ocurrencia'),
       lugaresOcurrencia: this.obtenerMaestro('lugares-ocurrencia'),
       actividadesMisionales: this.obtenerMaestro('actividades-misionales'),
@@ -431,12 +492,12 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         this.catalogoOrientacionesSexuales = data.orientacionesSexuales;
         this.catalogoVinculosUdea = data.vinculosUdea;
         this.catalogoVinculosAgresorVictima = data.vinculosAgresorVictima;
-        this.catalogoDependencias = data.dependencias;
+        this.catalogoUnidadesAdministrativas = data.unidadesAdministrativas;
         this.catalogoRegimenes = data.regimenes;
         this.catalogoEps = data.eps;
         this.catalogoTiposServicio = data.tiposServicio;
         this.catalogoCampus = data.campus;
-        this.catalogoFacultades = data.facultades;
+        this.catalogoUnidadesAcademicas = data.unidadesAcademicas;
         this.catalogoFormasOcurrencia = data.formasOcurrencia;
         this.catalogoLugaresOcurrencia = data.lugaresOcurrencia;
         this.catalogoActividadesMisionales = data.actividadesMisionales;
@@ -448,7 +509,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         this.listaOrientacionSexual = this.mapNombres(data.orientacionesSexuales);
         this.listaVinculos = this.mapNombres(data.vinculosUdea);
         this.listaVinculosAgresorVictima = this.mapNombres(data.vinculosAgresorVictima);
-        this.listaDependencia = this.mapNombres(data.dependencias);
+        this.listaUnidadesAdministrativas = this.mapNombres(data.unidadesAdministrativas);
         this.listaTipoViolencia = this.mapNombres(data.tiposViolencia);
         this.listaSubTipoViolencia = this.mapNombres(data.modalidadesPsicologicas);
         this.tiposSolicitud = this.mapNombres(data.tiposSolicitud);
@@ -458,7 +519,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         this.tiposServicio = this.mapNombres(data.tiposServicio);
         this.tiposDoc = this.mapNombres(data.tiposIdentificacion);
         this.campusM = this.mapNombres(data.campus);
-        this.facultadesM = this.mapNombres(data.facultades);
+        this.unidadesAcademicasM = this.mapNombres(data.unidadesAcademicas);
         this.queForma = this.mapNombres(data.formasOcurrencia);
         this.lugarHechos = this.mapNombres(data.lugaresOcurrencia);
         this.actividadesMisionales = this.mapNombres(data.actividadesMisionales);
@@ -481,7 +542,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private configurarDependenciaMunicipios(): void {
+  private configurarUnidadAdministrativaMunicipios(): void {
     this.atencionForm.get('departamentoNacimiento')?.valueChanges.subscribe((departamentoId) => {
       this.atencionForm.patchValue({ ciudadNacimiento: '' });
       this.municipiosNacimiento = [];
@@ -665,9 +726,9 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       tipoDocumento: '',
       tipoSolicitud: cita.tipoSolicitud || '',
       fecha: cita.fechaCita ? cita.fechaCita.substring(0, 10) : '',
-      dependencia: cita.dependencia || '',
+      unidadAdministrativa: cita.unidadAdministrativa || '',
       profesional: (cita as any).grupoProfesional || (cita as any).profesional || 'Sin asignar',
-      facultad: cita.facultad || '',
+      unidadAcademica: cita.unidadAcademica || '',
       campus: cita.campus || '',
       genero: cita.identidadGenero || '',
       edad: null,
@@ -701,7 +762,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     this.telefonosRegistrados = [];
     this.agresoresRegistrados = [];
     this.atencionId = null;
-    
+
     this.atencionForm.patchValue({
       tipoSolicitud: caso.tipoSolicitud || 'Indirecta',
       documento: caso.documento || '',
@@ -720,8 +781,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
             primerApellido: solicitud.primerApellido || '',
             segundoApellido: solicitud.segundoApellido || '',
             fechaNacimiento: solicitud.fechaNacimiento ? new Date(solicitud.fechaNacimiento) : '',
-            dependencia: solicitud.remitenteDependencia || solicitud.dependencia || caso.dependencia || '',
-            facultad: solicitud.remitenteFacultad || caso.facultad || '',
+            unidadAdministrativa: solicitud.remitenteUnidadAdministrativa || solicitud.unidadAdministrativa || caso.unidadAdministrativa || '',
+            unidadAcademica: solicitud.remitenteUnidadAcademica || caso.unidadAcademica || '',
             campus: solicitud.remitenteCampus || caso.campus || '',
             identidadSexual: solicitud.identidadGenero || '',
             departamentoResidencia: solicitud.idDepartamentoResidencia ?? '',
@@ -1368,12 +1429,12 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       orientacionSexual: [''],
       eps: [''],
       regimenSalud: [''],
-      dependencia: [''],
+      unidadAdministrativa: [''],
       campus: [''],
-      facultad: [''],
+      unidadAcademica: [''],
       vinculo: [''],
       otroVinculo: [''],
-      programa: [''],
+      programa: [{ value: '', disabled: true }],
       logroAcuerdo: ['NO'],
       tipoViolencia: [''],
       subcategoriaViolencia: [''],
@@ -1420,7 +1481,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     input.onchange = (e: any) => {
       const file = e.target.files[0];
       if (file) {
-          this.atencionForm.patchValue({ consentimientoArchivo: file });
+        this.atencionForm.patchValue({ consentimientoArchivo: file });
         this.snackBar.open(`Archivo ${file.name} cargado`, 'Cerrar', { duration: 2000 });
       }
     };
@@ -1480,11 +1541,11 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
           next: (atencion) => {
             this.guardandoCompromisos = false;
             this.tabErrors = new Set<string>();
-            
+
             if (atencion && atencion.id) {
               this.atencionId = atencion.id;
             }
-            
+
             this.dialog.open(DialogoExitoComponent, {
               width: '400px',
               data: {
@@ -1524,9 +1585,9 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       orientacionSexual,
       ciudadResidencia,
       direccionResidencia,
-      dependencia,
+      unidadAdministrativa,
       campus,
-      facultad,
+      unidadAcademica,
       vinculo,
       programa,
       tiempoOcurridoValor,
@@ -1563,9 +1624,9 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       .filter((compromiso): compromiso is CompromisoProfesionalRequestDto => compromiso !== null);
 
     const atencionContexto: AtencionContextoRequestDto = {
-      idDependencia: this.resolverIdMaestro(dependencia, this.catalogoDependencias),
+      idUnidadAdministrativa: this.resolverIdMaestro(unidadAdministrativa, this.catalogoUnidadesAdministrativas),
       idCampus: this.resolverIdMaestro(campus, this.catalogoCampus),
-      idFacultad: this.resolverIdMaestro(facultad, this.catalogoFacultades),
+      idUnidadAcademica: this.resolverIdMaestro(unidadAcademica, this.catalogoUnidadesAcademicas),
       idVinculoUniversidad: this.resolverIdMaestro(vinculo, this.catalogoVinculosUdea),
       otroVinculo: this.resolverIdMaestro(vinculo, this.catalogoVinculosUdea) === VinculoUdeAEnum.OTRO_TIPO_DE_VINCULO ? formRawValue.otroVinculo : null,
       idPrograma: this.resolverIdMaestro(programa, this.catalogoProgramas),
@@ -1590,7 +1651,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
     const citaId = Number(this.casoSeleccionado?.citaId ?? this.casoSeleccionado?.idCita ?? this.casoSeleccionado?.idcita ?? 0);
 
-    switch(tabIndex) {
+    switch (tabIndex) {
       case 0:
         return {
           citaId,

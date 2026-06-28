@@ -14,7 +14,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCardModule } from '@angular/material/card';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 
-type ListaTabKey = 'tiposSolicitud' | 'campus' | 'dependencias' | 'facultades' | 'tiposDocumento';
+type ListaTabKey = 'tiposSolicitud' | 'campus' | 'unidadesAdministrativas' | 'facultades' | 'tiposDocumento';
 
 interface PaginacionEstado {
   pageIndex: number;
@@ -36,11 +36,11 @@ export class GestionListasComponent implements OnInit {
   listas: Record<ListaTabKey, MaestroDto[]> = {
     tiposSolicitud: [],
     campus: [],
-    dependencias: [],
+    unidadesAdministrativas: [],
     facultades: [],
     tiposDocumento: []
   };
-  readonly listKeys: ListaTabKey[] = ['tiposSolicitud', 'campus', 'dependencias', 'facultades', 'tiposDocumento'];
+  readonly listKeys: ListaTabKey[] = ['tiposSolicitud', 'campus', 'unidadesAdministrativas', 'facultades', 'tiposDocumento'];
   tabIndex = 0;
   nuevoNombre: string = '';
   nuevoCodigo: string = '';
@@ -48,7 +48,7 @@ export class GestionListasComponent implements OnInit {
   paginacion: Record<ListaTabKey, PaginacionEstado> = {
     tiposSolicitud: { pageIndex: 0, pageSize: 10, totalElements: 0 },
     campus: { pageIndex: 0, pageSize: 10, totalElements: 0 },
-    dependencias: { pageIndex: 0, pageSize: 10, totalElements: 0 },
+    unidadesAdministrativas: { pageIndex: 0, pageSize: 10, totalElements: 0 },
     facultades: { pageIndex: 0, pageSize: 10, totalElements: 0 },
     tiposDocumento: { pageIndex: 0, pageSize: 10, totalElements: 0 }
   };
@@ -56,7 +56,7 @@ export class GestionListasComponent implements OnInit {
   readonly etiquetas: Record<string, string> = {
     tiposSolicitud: 'Tipos de Solicitud',
     campus: 'Campus',
-    dependencias: 'Dependencias',
+    unidadesAdministrativas: 'Unidades Administrativas',
     facultades: 'Facultades',
     tiposDocumento: 'Tipos de Documento'
   };

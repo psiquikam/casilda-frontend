@@ -116,7 +116,7 @@
 						</div>
 					</mat-tab>
 
-					<mat-tab label="Datos de la persona">
+					<mat-tab label="Datos de la persona" [disabled]="!idRegistroCreado">
 						<div class="tab-padding">
 							<div class="grid-3">
 								<mat-form-field appearance="outline" subscriptSizing="dynamic">
@@ -330,9 +330,9 @@
 								</mat-form-field>
 
 								<mat-form-field appearance="outline" subscriptSizing="dynamic">
-									<mat-label>Facultad, Escuela o instituto</mat-label>
-									<mat-select formControlName="facultad">
-										@for (f of facultades; track f.id) {
+									<mat-label>Unidad Académica, Escuela o instituto</mat-label>
+									<mat-select formControlName="unidadAcademica">
+										@for (f of unidadesAcademicas; track f.id) {
 										<mat-option [value]="f.id">{{f.nombre}}</mat-option>
 										}
 									</mat-select>
@@ -341,7 +341,7 @@
 								<mat-form-field appearance="outline" subscriptSizing="dynamic">
 									<mat-label>Programa</mat-label>
 									<mat-select formControlName="programa"
-										[matTooltip]="!registroCasoForm.get('facultad')?.value ? 'Primero selecciona una facultad' : ''">
+										[matTooltip]="!registroCasoForm.get('unidadAcademica')?.value ? 'Primero selecciona una unidad académica' : ''">
 										@for (f of programasFiltrados; track f.id) {
 										<mat-option [value]="f.id">{{f.nombre}}</mat-option>
 										}
@@ -349,9 +349,9 @@
 								</mat-form-field>
 
 								<mat-form-field appearance="outline" subscriptSizing="dynamic">
-									<mat-label>Dependencia</mat-label>
-									<mat-select formControlName="dependencia">
-										@for (f of dependencias; track f.id) {
+									<mat-label>Unidad Administrativa</mat-label>
+									<mat-select formControlName="unidadAdministrativa">
+										@for (f of unidadesAdministrativas; track f.id) {
 										<mat-option [value]="f.id">{{f.nombre}}</mat-option>
 										}
 									</mat-select>

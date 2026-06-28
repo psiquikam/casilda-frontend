@@ -43,7 +43,7 @@ export class CasoComponent implements OnInit {
 
   constructor(private dialog: MatDialog) { }
 
-  displayedColumns: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'dependencia', 'profesional', 'acciones'];
+  displayedColumns: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'unidadAdministrativa', 'profesional', 'acciones'];
   expandedElement: any | null;
   expandedDetailColumns: string[] = ['expandedDetail'];
 
@@ -63,7 +63,7 @@ export class CasoComponent implements OnInit {
     nombre: '',
     documento: '',
     fecha: '',
-    dependencia: '',
+    unidadAdministrativa: '',
     profesional: ''
   };
 
@@ -97,7 +97,7 @@ export class CasoComponent implements OnInit {
       estado: r.estado || '',
       profesional: r.profesional || 'Sin asignar',
       fecha: formatFechaCreacion(r.fechaCreacion),
-      dependencia: r.dependencia || '',
+      unidadAdministrativa: r.unidadAdministrativa || '',
       tipoDocumentoId: r.tipoDocumentoId ?? null,
       tipoDocumento: r.tipoDocumento || '',
       numeroDocumento: r.numeroDocumento || '',
@@ -122,8 +122,8 @@ export class CasoComponent implements OnInit {
       remitenteCargo: r.remitenteCargo || '',
       remitenteCampusId: r.remitenteCampusId ?? null,
       remitenteCampus: r.remitenteCampus || '',
-      remitenteDependenciaId: r.remitenteDependenciaId ?? null,
-      remitenteDependencia: r.remitenteDependencia || '',
+      remitenteUnidadAdministrativaId: r.remitenteUnidadAdministrativaId ?? null,
+      remitenteUnidadAdministrativa: r.remitenteUnidadAdministrativa || '',
       remitenteFacultadId: r.remitenteFacultadId ?? null,
       remitenteFacultad: r.remitenteFacultad || '',
       remitenteFechaSolicitud: r.remitenteFechaSolicitud || r.fecha || '',
@@ -199,7 +199,7 @@ export class CasoComponent implements OnInit {
         && (!searchTerms.nombre || nombreCompleto.includes(searchTerms.nombre))
         && (!searchTerms.documento || documentoCompleto.includes(searchTerms.documento))
         && (!searchTerms.fecha || data.fecha?.toLowerCase().includes(searchTerms.fecha))
-        && (!searchTerms.dependencia || data.dependencia?.toLowerCase().includes(searchTerms.dependencia))
+        && (!searchTerms.unidadAdministrativa || data.unidadAdministrativa?.toLowerCase().includes(searchTerms.unidadAdministrativa))
         && (!searchTerms.profesional || data.profesional?.toLowerCase().includes(searchTerms.profesional));
     };
   }

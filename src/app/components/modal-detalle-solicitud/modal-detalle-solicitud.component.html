@@ -64,16 +64,16 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Dependencia</mat-label>
-            <mat-select formControlName="remitenteDependencia">
-              <mat-option *ngFor="let d of dependencias" [value]="d.id">{{ d.nombre }}</mat-option>
+            <mat-label>Unidad Administrativa</mat-label>
+            <mat-select formControlName="remitenteUnidadAdministrativa">
+              <mat-option *ngFor="let d of unidadesAdministrativas" [value]="d.id">{{ d.nombre }}</mat-option>
             </mat-select>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Facultad</mat-label>
-            <mat-select formControlName="remitenteFacultad">
-              <mat-option *ngFor="let f of facultades" [value]="f.id">{{ f.nombre }}</mat-option>
+            <mat-label>Unidad Académica</mat-label>
+            <mat-select formControlName="remitenteUnidadAcademica">
+               <mat-option *ngFor="let f of unidadesAcademicas" [value]="f.id">{{ f.nombre }}</mat-option>
             </mat-select>
           </mat-form-field>
 
