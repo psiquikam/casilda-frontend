@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { CorreoBusquedaDto, TelefonoBusquedaDto } from './solicitud.service';
 import { environment } from '../../environments/environment';
 
 export interface AtencionAphRequestDto {
@@ -33,6 +34,7 @@ export interface RegistroLineaAlmaRequestDto {
   idPersonaRegistra?: number;
   idLugarEntrevista?: number | null;
   idIdentidadGenero?: number | null;
+  idSexo?: number | null;
   idOrientacionSexual?: number | null;
   idEtnia?: number | null;
   idCiudadResidencia?: number | null;
@@ -43,6 +45,9 @@ export interface RegistroLineaAlmaRequestDto {
   idPrograma?: number | null;
   idUnidadAdministrativa?: number | null;
   idCampus?: number | null;
+  correos?: CorreoBusquedaDto[];
+  telefonos?: TelefonoBusquedaDto[];
+  discapacidades?: DiscapacidadRequestDto[];
   primerNombre?: string | null;
   segundoNombre?: string | null;
   primerApellido?: string | null;
@@ -154,4 +159,9 @@ export class LineaAlmaService {
   registrarPestana(tabIndex: number, request: RegistroLineaAlmaRequestDto): Observable<RegistroLineaAlmaResponseDto> {
     return this.http.post<RegistroLineaAlmaResponseDto>(`${this.apiUrl}/registros/pestana/${tabIndex}`, request);
   }
+}
+
+export interface DiscapacidadRequestDto {
+  idSubTipoDiscapacidad: number;
+  descripcion?: string | null;
 }

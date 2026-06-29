@@ -17,9 +17,9 @@
 
     <mat-form-field appearance="outline" class="field-subtipo">
       <mat-label>Subtipo</mat-label>
-      <mat-select [(ngModel)]="data.subTipo" [disabled]="!selectedTipoId">
+      <mat-select [ngModel]="selectedSubTipoId" (ngModelChange)="onSubTipoChange($event)" [disabled]="!selectedTipoId">
         @for (subtipo of subTiposDiscapacidad; track subtipo.id) {
-          <mat-option [value]="subtipo.nombre">{{ subtipo.nombre }}</mat-option>
+          <mat-option [value]="subtipo.id">{{ subtipo.nombre }}</mat-option>
         }
       </mat-select>
     </mat-form-field>

@@ -597,10 +597,11 @@ export class AtencionPrComponent implements OnInit {
         return;
       }
 
-      const { viaPrincipal, numeroVia, letraVia, numeroCruce, placa, barrio, municipio, departamento, complemento } = result;
+      const { viaPrincipal, numeroVia, letraVia, numeroCruce, placa, barrio, complemento } = result;
       const letra = letraVia ? ` ${letraVia}` : '';
       const comp = complemento ? `, ${complemento}` : '';
-      const direccionFinal = `${viaPrincipal} ${numeroVia}${letra} #${numeroCruce}-${placa}, Barrio ${barrio}${comp}, ${municipio}, ${departamento}`;
+      const barr = barrio ? `, Barrio ${barrio}` : '';
+      const direccionFinal = `${viaPrincipal} ${numeroVia}${letra} #${numeroCruce}-${placa}${barr}${comp}`;
 
       this.registroCasoForm.patchValue(
         { direccionResidencia: direccionFinal.replace(/\s+/g, ' ').trim() },
@@ -688,6 +689,10 @@ export class AtencionPrComponent implements OnInit {
             this.idPersonaEncontrada = idPersona;
           }
 
+          if (res.departamentoNacimientoId) {
+            this.cargarMunicipiosPorDepartamento(res.departamentoNacimientoId, 'nacimiento');
+          }
+
           this.registroCasoForm.patchValue({
             tipoDocumento: res.tipoDocumentoId ?? tipoDocumentoId,
             documento: res.numeroDocumento ?? documento,
@@ -701,25 +706,32 @@ export class AtencionPrComponent implements OnInit {
             primerNombre: res.primerNombre ?? '',
             segundoNombre: res.segundoNombre ?? '',
             primerApellido: res.primerApellido ?? '',
-            segundoApellido: res.segundoApellido ?? ''
+            segundoApellido: res.segundoApellido ?? '',
+            sexo: res.sexoId ?? '',
+            departamentoNacimiento: res.departamentoNacimientoId ?? '',
+            ciudadNacimiento: res.ciudadNacimientoId ?? ''
           }, { emitEvent: false });
 
-          if (res.correos?.length) {
-            this.correoRegistrados = res.correos.map(c => ({
-              tipoId: c.tipoId,
-              tipo: c.tipo ?? '',
-              correo: c.correo,
-              descripcion: c.descripcion ?? ''
-            }));
-          }
-          if (res.telefonos?.length) {
-            this.telefonosRegistrados = res.telefonos.map(t => ({
-              tipoId: t.tipoId,
-              tipo: t.tipo ?? '',
-              telefono: t.telefono,
-              descripcion: t.descripcion ?? ''
-            }));
-          }
+          this.correoRegistrados = (res.correos || []).map(c => ({
+            tipoId: c.tipoId,
+            tipo: c.tipo ?? '',
+            correo: c.correo,
+            descripcion: c.descripcion ?? ''
+          }));
+
+          this.telefonosRegistrados = (res.telefonos || []).map(t => ({
+            tipoId: t.tipoId,
+            tipo: t.tipo ?? '',
+            telefono: t.telefono,
+            descripcion: t.descripcion ?? ''
+          }));
+
+          this.discapacidadesRegistradas = (res.discapacidades || []).map(d => ({
+            idSubTipoDiscapacidad: d.idSubTipoDiscapacidad,
+            subTipo: d.subTipo ?? '',
+            tipo: d.tipo ?? '',
+            descripcion: d.descripcion ?? ''
+          }));
 
           this.snackBar.open('Persona encontrada.', 'Cerrar', { duration: 2500 });
         },
@@ -783,7 +795,6 @@ export class AtencionPrComponent implements OnInit {
         if (!idTipoReporte) {
           throw new Error('No fue posible resolver el tipo de reporte.');
         }
-        payload.idPersona = idPersona || null;
         payload.idTipoReporte = idTipoReporte;
         payload.idCanalContacto = Number(raw.canal);
         payload.idQuienRemite = raw.tipoReporte === 'indirecta' ? (Number(raw.quienRemite) || null) : null;
@@ -804,11 +815,16 @@ export class AtencionPrComponent implements OnInit {
         payload.idTipoIdentificacion = raw.tipoDocumento ? Number(raw.tipoDocumento) : null;
         payload.idCiudadNacimiento = raw.ciudadNacimiento ? Number(raw.ciudadNacimiento) : null;
         payload.fechaNacimiento = raw.fechaNacimiento ? this.toIsoDateTime(raw.fechaNacimiento) : null;
+        payload.idSexo = raw.sexo ? Number(raw.sexo) : null;
         payload.idIdentidadGenero = Number(raw.identidadSexual);
         payload.idOrientacionSexual = raw.orientacionSexual ? Number(raw.orientacionSexual) : null;
         payload.idEtnia = raw.etnia ? Number(raw.etnia) : null;
         payload.idCiudadResidencia = raw.ciudadResidencia ? Number(raw.ciudadResidencia) : null;
         payload.direccionResidencia = raw.direccionResidencia || null;
+        payload.discapacidades = (this.discapacidadesRegistradas ?? []).map(d => ({
+          idSubTipoDiscapacidad: Number(d.idSubTipoDiscapacidad || d.idSubtipo || d.id),
+          descripcion: d.descripcion || ''
+        }));
         break;
       }
       case 2: {
@@ -817,6 +833,14 @@ export class AtencionPrComponent implements OnInit {
         payload.idPrograma = raw.programa ? Number(raw.programa) : null;
         payload.idUnidadAdministrativa = raw.unidadAdministrativa ? Number(raw.unidadAdministrativa) : null;
         payload.idCampus = raw.campus ? Number(raw.campus) : null;
+        payload.correos = (this.correoRegistrados ?? []).map(c => ({
+          tipoId: Number(c.tipoId),
+          correo: c.correo
+        }));
+        payload.telefonos = (this.telefonosRegistrados ?? []).map(t => ({
+          tipoId: Number(t.tipoId),
+          telefono: t.telefono
+        }));
         break;
       }
       case 3: {

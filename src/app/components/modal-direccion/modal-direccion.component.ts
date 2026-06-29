@@ -30,8 +30,6 @@ export class ModalDireccionComponent implements OnInit {
 
   direccionForm!: FormGroup;
 
-  departamentos: MaestroDto[] = [];
-  ciudades: MaestroDto[] = [];
   vias = ['Calle', 'Carrera', 'Avenida', 'Transversal', 'Diagonal', 'Circular'];
 
   constructor(
@@ -40,56 +38,18 @@ export class ModalDireccionComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.cargarDepartamentos();
     this.inicializarFormulario();
-    this.suscribirCambiosDepartamento();
   }
 
   private inicializarFormulario(): void {
     this.direccionForm = this.fb.group({
-      departamento: ['', Validators.required],
-      ciudad: [null, Validators.required],
       viaPrincipal: ['', Validators.required],
       numeroVia: ['', Validators.required],
       letraVia: [''],
       numeroCruce: ['', Validators.required],
       placa: ['', Validators.required],
-      barrio: ['', Validators.required],
+      barrio: [''],
       complemento: ['']
-    });
-  }
-
-  private cargarDepartamentos(): void {
-    this.http.get<MaestroDto[]>(`${this.maestrosUrl}/departamentos`).pipe(
-      catchError((error) => {
-        console.error('Error cargando departamentos:', error);
-        return of([] as MaestroDto[]);
-      })
-    ).subscribe((depts) => {
-      this.departamentos = depts.sort((a, b) => a.nombre.localeCompare(b.nombre));
-    });
-  }
-
-  private suscribirCambiosDepartamento(): void {
-    this.direccionForm.get('departamento')?.valueChanges.subscribe((departamentoId) => {
-      this.cargarCiudadesPorDepartamento(departamentoId);
-      this.direccionForm.get('ciudad')?.setValue('');
-    });
-  }
-
-  private cargarCiudadesPorDepartamento(departamentoId: number | null): void {
-    if (!departamentoId) {
-      this.ciudades = [];
-      return;
-    }
-
-    this.http.get<MaestroDto[]>(`${this.maestrosUrl}/departamentos/${departamentoId}/ciudades`).pipe(
-      catchError((error) => {
-        console.error(`Error cargando ciudades del departamento ${departamentoId}:`, error);
-        return of([] as MaestroDto[]);
-      })
-    ).subscribe((ciudades) => {
-      this.ciudades = ciudades;
     });
   }
   
@@ -105,10 +65,6 @@ export class ModalDireccionComponent implements OnInit {
     }
     if (v.barrio) partes.push(`Barrio ${v.barrio}`);
     if (v.complemento) partes.push(v.complemento);
-    const municipio = this.ciudades.find((c) => c.id === v.ciudad)?.nombre;
-    const departamento = this.departamentos.find((d) => d.id === v.departamento)?.nombre;
-    if (municipio) partes.push(municipio);
-    if (departamento) partes.push(departamento);
     return partes.length ? partes.join(', ') : 'La dirección aparecerá aquí...';
   }
 
@@ -119,15 +75,9 @@ export class ModalDireccionComponent implements OnInit {
   guardar(): void {
     if (this.direccionForm.valid) {
       const formValue = this.direccionForm.getRawValue();
-      const departamentoNombre = this.departamentos.find((d) => d.id === formValue.departamento)?.nombre ?? '';
-      const municipioNombre = this.ciudades.find((c) => c.id === formValue.ciudad)?.nombre ?? '';
 
       this.dialogRef.close({
         ...formValue,
-        departamentoId: formValue.departamento,
-        ciudadId: formValue.ciudad,
-        departamento: departamentoNombre,
-        municipio: municipioNombre,
         barrio: formValue.barrio
       });
     }

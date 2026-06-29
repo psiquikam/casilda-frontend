@@ -120,6 +120,17 @@ export interface PersonaSearchDto {
   fechaNacimiento?: string | null;
   correos?: CorreoBusquedaDto[];
   telefonos?: TelefonoBusquedaDto[];
+  sexoId?: number | null;
+  ciudadNacimientoId?: number | null;
+  departamentoNacimientoId?: number | null;
+  discapacidades?: DiscapacidadSearchDto[];
+}
+
+export interface DiscapacidadSearchDto {
+  idSubTipoDiscapacidad: number;
+  subTipo?: string | null;
+  tipo?: string | null;
+  descripcion: string;
 }
 
 export interface CorreoBusquedaDto {

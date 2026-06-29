@@ -43,6 +43,14 @@ export class ModalDiscapacidadComponent implements OnInit {
   };
 
   selectedTipoId: number | null = null;
+  selectedSubTipoId: number | null = null;
+
+  onSubTipoChange(subTipoId: number | null): void {
+    this.selectedSubTipoId = subTipoId;
+    const subTipoSeleccionado = this.subTiposDiscapacidad.find((s) => s.id === subTipoId);
+    this.data.subTipo = subTipoSeleccionado?.nombre ?? '';
+    (this.data as any).idSubTipoDiscapacidad = subTipoId;
+  }
 
   tiposDiscapacidad: MaestroDto[] = [];
   subTiposDiscapacidad: MaestroDto[] = [];
