@@ -142,6 +142,8 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
       correoPersonal: r.correoPersonal || '',
       correos: Array.isArray(r.correos) ? r.correos : [],
       telefonos: Array.isArray(r.telefonos) ? r.telefonos : [],
+      observacionesTelefono: r.observacionesTelefono || '',
+      observacionesCorreo: r.observacionesCorreo || '',
       // Remitente
       remitentePrimerNombre: r.remitentePrimerNombre || '',
       remitenteSegundoNombre: r.remitenteSegundoNombre || '',

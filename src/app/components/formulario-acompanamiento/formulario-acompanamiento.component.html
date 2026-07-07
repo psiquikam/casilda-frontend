@@ -31,7 +31,8 @@
         <div class="profile-selector">
           <h3 class="section-title">¿Cuál es el medio por donde llegó la solicitud?</h3>
           <mat-radio-group formControlName="medioSolicitud" class="profile-grid">
-            <div class="profile-card" [class.selected]="acompanamientoForm.get('medioSolicitud')?.value === 'presencial'">
+            <div class="profile-card"
+              [class.selected]="acompanamientoForm.get('medioSolicitud')?.value === 'presencial'">
               <mat-radio-button value="presencial">
                 <strong>Presencial</strong>
                 <p>Solicitud realizada de manera presencial.</p>
@@ -244,11 +245,11 @@
                 <p>No hay correos adicionales registrados.</p>
               </div>
             </div>
-
             <div style="margin-top: 10px; width: 100%;">
               <mat-form-field appearance="outline" style="width: 100%;">
                 <mat-label>Observaciones de Correo</mat-label>
-                <textarea matInput formControlName="observacionesCorreo" placeholder="Observaciones adicionales sobre los correos..."></textarea>
+                <textarea matInput formControlName="observacionesCorreo"
+                  placeholder="Observaciones adicionales sobre los correos..."></textarea>
               </mat-form-field>
             </div>
           </div>
@@ -298,11 +299,11 @@
                 <p>No hay Telefonos adicionales registrados.</p>
               </div>
             </div>
-
             <div style="margin-top: 10px; width: 100%;">
               <mat-form-field appearance="outline" style="width: 100%;">
                 <mat-label>Observaciones de Teléfono</mat-label>
-                <textarea matInput formControlName="observacionesTelefono" placeholder="Observaciones adicionales sobre los teléfonos..."></textarea>
+                <textarea matInput formControlName="observacionesTelefono"
+                  placeholder="Observaciones adicionales sobre los teléfonos..."></textarea>
               </mat-form-field>
             </div>
           </div>

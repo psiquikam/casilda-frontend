@@ -114,6 +114,8 @@ export class CasoComponent implements OnInit {
       correoPersonal: r.correoPersonal || '',
       correos: Array.isArray(r.correos) ? r.correos : [],
       telefonos: Array.isArray(r.telefonos) ? r.telefonos : [],
+      observacionesTelefono: r.observacionesTelefono || '',
+      observacionesCorreo: r.observacionesCorreo || '',
       remitentePrimerNombre: r.remitentePrimerNombre || '',
       remitenteSegundoNombre: r.remitenteSegundoNombre || '',
       remitentePrimerApellido: r.remitentePrimerApellido || '',

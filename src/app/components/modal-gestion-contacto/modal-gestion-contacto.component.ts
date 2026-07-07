@@ -56,6 +56,14 @@ export class ModalGestionComponent implements OnInit {
 
   mostrarCamposCita = false;
 
+  minCitaDate: Date = (() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow;
+  })();
+
   /** Máximo de llamadas antes de asignación unilateral de cita */
   maxLlamadas = 2;
 
@@ -144,9 +152,18 @@ export class ModalGestionComponent implements OnInit {
     });
   }
 
+  private dateGreaterThanTodayValidator(control: any) {
+    if (!control.value) return null;
+    const selectedDate = new Date(control.value);
+    selectedDate.setHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return selectedDate > today ? null : { dateNotGreaterThanToday: true };
+  }
+
   private actualizarValidadoresCita(): void {
     if (this.mostrarCamposCita) {
-      this.contactoForm.get('fechaCita')?.setValidators([Validators.required]);
+      this.contactoForm.get('fechaCita')?.setValidators([Validators.required, this.dateGreaterThanTodayValidator.bind(this)]);
       this.contactoForm.get('horaCita')?.setValidators([Validators.required]);
     } else {
       this.contactoForm.get('fechaCita')?.clearValidators();

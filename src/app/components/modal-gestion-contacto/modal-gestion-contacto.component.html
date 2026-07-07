@@ -44,9 +44,11 @@
 
               <mat-form-field appearance="outline">
                 <mat-label>Fecha de Cita</mat-label>
-                <input matInput [matDatepicker]="pickerCita" formControlName="fechaCita">
+                <input matInput [matDatepicker]="pickerCita" formControlName="fechaCita" [min]="minCitaDate">
                 <mat-datepicker-toggle matIconSuffix [for]="pickerCita"></mat-datepicker-toggle>
                 <mat-datepicker #pickerCita></mat-datepicker>
+                <mat-error *ngIf="contactoForm.get('fechaCita')?.hasError('required')">La fecha es requerida</mat-error>
+                <mat-error *ngIf="contactoForm.get('fechaCita')?.hasError('dateNotGreaterThanToday')">La fecha debe ser posterior a hoy</mat-error>
               </mat-form-field>
 
               <mat-form-field appearance="outline">

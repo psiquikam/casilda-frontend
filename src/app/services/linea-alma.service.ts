@@ -58,6 +58,8 @@ export interface RegistroLineaAlmaRequestDto {
   atencionAph?: AtencionAphRequestDto | null;
   remisiones?: RemisionRegistroAlmaRequestDto[];
   contactos?: ContactoLineaAlmaRequestDto[];
+  observacionesCorreo?: string | null;
+  observacionesTelefono?: string | null;
 }
 
 export interface AtencionAphResponseDto {
@@ -116,6 +118,8 @@ export interface RegistroLineaAlmaResponseDto {
   idUsuarioCreacion?: number | null;
   fechaActualizacion: string;
   idUsuarioActualizacion?: number | null;
+  observacionesCorreo?: string | null;
+  observacionesTelefono?: string | null;
 }
 
 export interface ContactoLineaAlmaRequestDto {

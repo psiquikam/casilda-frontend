@@ -220,6 +220,23 @@ $purple-sys: #348F41;
       align-items: center;
     }
 
+    &.mat-form-field-type-mat-textarea, &:has(textarea) {
+      .mat-mdc-text-field-wrapper {
+        height: auto !important;
+      }
+      .mat-mdc-form-field-flex {
+        height: auto !important;
+        align-items: stretch !important;
+      }
+      .mat-mdc-form-field-infix {
+        min-height: auto !important;
+        height: auto !important;
+        align-items: stretch !important;
+        padding-top: 15px !important;
+        padding-bottom: 4px !important;
+      }
+    }
+
     .mat-mdc-input-element, 
     .mat-mdc-select-value {
       font-size: 13px !important;

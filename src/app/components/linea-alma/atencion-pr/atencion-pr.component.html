@@ -392,11 +392,6 @@
 											<td mat-cell *matCellDef="let element"> {{element.correo}} </td>
 										</ng-container>
 
-										<ng-container matColumnDef="descripcion">
-											<th mat-header-cell *matHeaderCellDef> Descripción </th>
-											<td mat-cell *matCellDef="let element"> {{element.descripcion}} </td>
-										</ng-container>
-
 										<ng-container matColumnDef="acciones">
 											<th mat-header-cell *matHeaderCellDef style="text-align: center;"> Acciones
 											</th>
@@ -408,10 +403,8 @@
 											</td>
 										</ng-container>
 
-										<tr mat-header-row
-											*matHeaderRowDef="['tipo', 'correo', 'descripcion', 'acciones']"></tr>
-										<tr mat-row
-											*matRowDef="let row; columns: ['tipo', 'correo', 'descripcion', 'acciones'];">
+										<tr mat-header-row *matHeaderRowDef="['tipo', 'correo', 'acciones']"></tr>
+										<tr mat-row *matRowDef="let row; columns: ['tipo', 'correo', 'acciones'];">
 										</tr>
 									</table>
 
@@ -419,6 +412,14 @@
 										<mat-icon>mail_outline</mat-icon>
 										<p>No hay correos adicionales registrados.</p>
 									</div>
+								</div>
+
+								<div style="margin-top: 10px; width: 100%;">
+									<mat-form-field appearance="outline" style="width: 100%;">
+										<mat-label>Observaciones de Correo</mat-label>
+										<textarea matInput formControlName="observacionesCorreo"
+											placeholder="Observaciones adicionales sobre los correos..."></textarea>
+									</mat-form-field>
 								</div>
 							</div>
 
@@ -447,11 +448,6 @@
 											<td mat-cell *matCellDef="let element"> {{element.telefono}} </td>
 										</ng-container>
 
-										<ng-container matColumnDef="descripcion">
-											<th mat-header-cell *matHeaderCellDef> Descripcion </th>
-											<td mat-cell *matCellDef="let element"> {{element.descripcion}} </td>
-										</ng-container>
-
 										<ng-container matColumnDef="acciones">
 											<th mat-header-cell *matHeaderCellDef style="text-align: center;"> Acciones
 											</th>
@@ -463,10 +459,8 @@
 											</td>
 										</ng-container>
 
-										<tr mat-header-row
-											*matHeaderRowDef="['tipo', 'correo', 'descripcion', 'acciones']"></tr>
-										<tr mat-row
-											*matRowDef="let row; columns: ['tipo', 'correo', 'descripcion', 'acciones'];">
+										<tr mat-header-row *matHeaderRowDef="['tipo', 'correo', 'acciones']"></tr>
+										<tr mat-row *matRowDef="let row; columns: ['tipo', 'correo', 'acciones'];">
 										</tr>
 									</table>
 
@@ -474,6 +468,14 @@
 										<mat-icon>phone_enabled</mat-icon>
 										<p>No hay Telefonos adicionales registrados.</p>
 									</div>
+								</div>
+
+								<div style="margin-top: 10px; width: 100%;">
+									<mat-form-field appearance="outline" style="width: 100%;">
+										<mat-label>Observaciones de Teléfono</mat-label>
+										<textarea matInput formControlName="observacionesTelefono"
+											placeholder="Observaciones adicionales sobre los teléfonos..."></textarea>
+									</mat-form-field>
 								</div>
 							</div>
 						</div>
@@ -619,7 +621,8 @@
 											</ng-container>
 
 											<ng-container matColumnDef="acciones">
-												<th mat-header-cell *matHeaderCellDef style="text-align: center;"> Acciones </th>
+												<th mat-header-cell *matHeaderCellDef style="text-align: center;">
+													Acciones </th>
 												<td mat-cell *matCellDef="let i = index" style="text-align: center;">
 													<button mat-icon-button color="warn" type="button"
 														(click)="eliminarContacto(i)">
@@ -628,8 +631,10 @@
 												</td>
 											</ng-container>
 
-											<tr mat-header-row *matHeaderRowDef="['fecha', 'resultado', 'acciones']"></tr>
-											<tr mat-row *matRowDef="let row; columns: ['fecha', 'resultado', 'acciones'];"></tr>
+											<tr mat-header-row *matHeaderRowDef="['fecha', 'resultado', 'acciones']">
+											</tr>
+											<tr mat-row
+												*matRowDef="let row; columns: ['fecha', 'resultado', 'acciones'];"></tr>
 										</table>
 
 										<div *ngIf="contactosRegistrados.length === 0 && !cargandoContactos"

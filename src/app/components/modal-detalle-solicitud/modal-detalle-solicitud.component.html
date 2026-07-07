@@ -15,7 +15,8 @@
 <mat-dialog-content class="custom-content">
   <form [formGroup]="detalleForm">
 
-    <div class="medio-solicitud-wrapper" style="margin-bottom: 20px; display: grid; grid-template-columns: 1fr; width: 100%;">
+    <div class="medio-solicitud-wrapper"
+      style="margin-bottom: 20px; display: grid; grid-template-columns: 1fr; width: 100%;">
       <mat-form-field appearance="outline" style="width: 100%;">
         <mat-label>¿Cuál es el medio por donde llegó la solicitud?</mat-label>
         <mat-select formControlName="medioSolicitud">
@@ -73,7 +74,7 @@
           <mat-form-field appearance="outline">
             <mat-label>Unidad Académica</mat-label>
             <mat-select formControlName="remitenteUnidadAcademica">
-               <mat-option *ngFor="let f of unidadesAcademicas" [value]="f.id">{{ f.nombre }}</mat-option>
+              <mat-option *ngFor="let f of unidadesAcademicas" [value]="f.id">{{ f.nombre }}</mat-option>
             </mat-select>
           </mat-form-field>
 
@@ -150,8 +151,8 @@
               <mat-icon color="primary">email</mat-icon>
               <span>Correos Electrónicos</span>
             </div>
-            <button *ngIf="!esVisualizacion" mat-icon-button class="btn-add-inline"
-              (click)="abrirModalCorreo()" matTooltip="Agregar Correo">
+            <button *ngIf="!esVisualizacion" mat-icon-button class="btn-add-inline" (click)="abrirModalCorreo()"
+              matTooltip="Agregar Correo">
               <mat-icon>add_circle</mat-icon>
             </button>
           </div>
@@ -168,8 +169,8 @@
               <ng-container matColumnDef="acciones">
                 <th mat-header-cell *matHeaderCellDef style="text-align: center;"> Acciones </th>
                 <td mat-cell *matCellDef="let i = index" style="text-align: center;">
-                  <button *ngIf="!esVisualizacion" mat-icon-button color="warn"
-                    (click)="eliminarCorreo(i)" matTooltip="Eliminar">
+                  <button *ngIf="!esVisualizacion" mat-icon-button color="warn" (click)="eliminarCorreo(i)"
+                    matTooltip="Eliminar">
                     <mat-icon svgIcon="icono-eliminar"></mat-icon>
                   </button>
                 </td>
@@ -185,7 +186,8 @@
           <div style="margin-top: 10px; width: 100%;">
             <mat-form-field appearance="outline" style="width: 100%;">
               <mat-label>Observaciones de Correo</mat-label>
-              <textarea matInput formControlName="observacionesCorreo" placeholder="Observaciones adicionales sobre los correos..."></textarea>
+              <textarea matInput formControlName="observacionesCorreo"
+                placeholder="Observaciones adicionales sobre los correos..."></textarea>
             </mat-form-field>
           </div>
         </div>
@@ -197,8 +199,8 @@
               <mat-icon color="primary">phone_enabled</mat-icon>
               <span>Teléfonos</span>
             </div>
-            <button *ngIf="!esVisualizacion" mat-icon-button class="btn-add-inline"
-              (click)="abrirModalTelefono()" matTooltip="Agregar Teléfono">
+            <button *ngIf="!esVisualizacion" mat-icon-button class="btn-add-inline" (click)="abrirModalTelefono()"
+              matTooltip="Agregar Teléfono">
               <mat-icon>add_circle</mat-icon>
             </button>
           </div>
@@ -215,8 +217,8 @@
               <ng-container matColumnDef="acciones">
                 <th mat-header-cell *matHeaderCellDef style="text-align: center;"> Acciones </th>
                 <td mat-cell *matCellDef="let i = index" style="text-align: center;">
-                  <button *ngIf="!esVisualizacion" mat-icon-button color="warn"
-                    (click)="eliminarTelefono(i)" matTooltip="Eliminar">
+                  <button *ngIf="!esVisualizacion" mat-icon-button color="warn" (click)="eliminarTelefono(i)"
+                    matTooltip="Eliminar">
                     <mat-icon svgIcon="icono-eliminar"></mat-icon>
                   </button>
                 </td>
@@ -232,7 +234,8 @@
           <div style="margin-top: 10px; width: 100%;">
             <mat-form-field appearance="outline" style="width: 100%;">
               <mat-label>Observaciones de Teléfono</mat-label>
-              <textarea matInput formControlName="observacionesTelefono" placeholder="Observaciones adicionales sobre los teléfonos..."></textarea>
+              <textarea matInput formControlName="observacionesTelefono"
+                placeholder="Observaciones adicionales sobre los teléfonos..."></textarea>
             </mat-form-field>
           </div>
         </div>
@@ -247,11 +250,8 @@
 <mat-dialog-actions class="modal-footer">
   <button mat-button class="btn-cancelar" (click)="dialogRef.close()">Cancelar</button>
 
-  <button *ngIf="data.modo === 'editar'"
-          mat-raised-button
-          class="btn-guardar"
-          [disabled]="detalleForm.invalid || guardando"
-          (click)="guardar()">
+  <button *ngIf="data.modo === 'editar'" mat-raised-button class="btn-guardar"
+    [disabled]="detalleForm.invalid || guardando" (click)="guardar()">
     <mat-icon *ngIf="!guardando">save</mat-icon>
     <mat-spinner *ngIf="guardando" diameter="18"></mat-spinner>
     {{ guardando ? 'Guardando...' : 'Guardar' }}

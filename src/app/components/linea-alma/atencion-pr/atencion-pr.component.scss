@@ -53,6 +53,21 @@
 
 	.mat-mdc-form-field {
 		width: 100%;
+
+		&.mat-form-field-type-mat-textarea, &:has(textarea) {
+			.mat-mdc-form-field-flex {
+				height: auto !important;
+				min-height: auto !important;
+				align-items: stretch !important;
+			}
+			.mat-mdc-form-field-infix {
+				min-height: auto !important;
+				height: auto !important;
+				align-items: stretch !important;
+				padding-top: 12px !important;
+				padding-bottom: 4px !important;
+			}
+		}
 	}
 
 	.mat-mdc-form-field-flex {

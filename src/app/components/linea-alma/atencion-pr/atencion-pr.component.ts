@@ -166,7 +166,9 @@ export class AtencionPrComponent implements OnInit {
       aphMotivoNoRealizacionTriage: [''],
       aphNotaAph: [''],
       aphAceptaPsicologia: ['si', Validators.required],
-      aphRequiereRemision: ['si', Validators.required]
+      aphRequiereRemision: ['si', Validators.required],
+      observacionesCorreo: [''],
+      observacionesTelefono: ['']
     });
 
     this.cargarCatalogos();
@@ -542,7 +544,6 @@ export class AtencionPrComponent implements OnInit {
       id === VinculoUdeAEnum.EGRESADO ||
       id === VinculoUdeAEnum.CONTRATISTA ||
       id === VinculoUdeAEnum.OTRO_TIPO_DE_VINCULO ||
-      id === VinculoUdeAEnum.ESTUDIANTE_DE_TECNOLOGIA ||
       id === VinculoUdeAEnum.PRESTADOR_DE_SERVICIOS ||
       id === VinculoUdeAEnum.EXTERNO
     ) {
@@ -715,15 +716,13 @@ export class AtencionPrComponent implements OnInit {
           this.correoRegistrados = (res.correos || []).map(c => ({
             tipoId: c.tipoId,
             tipo: c.tipo ?? '',
-            correo: c.correo,
-            descripcion: c.descripcion ?? ''
+            correo: c.correo
           }));
 
           this.telefonosRegistrados = (res.telefonos || []).map(t => ({
             tipoId: t.tipoId,
             tipo: t.tipo ?? '',
-            telefono: t.telefono,
-            descripcion: t.descripcion ?? ''
+            telefono: t.telefono
           }));
 
           this.discapacidadesRegistradas = (res.discapacidades || []).map(d => ({
@@ -841,6 +840,8 @@ export class AtencionPrComponent implements OnInit {
           tipoId: Number(t.tipoId),
           telefono: t.telefono
         }));
+        payload.observacionesCorreo = raw.observacionesCorreo || null;
+        payload.observacionesTelefono = raw.observacionesTelefono || null;
         break;
       }
       case 3: {
