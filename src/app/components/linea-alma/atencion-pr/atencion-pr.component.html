@@ -180,35 +180,47 @@
 								</mat-form-field>
 								<mat-form-field appearance="outline" subscriptSizing="dynamic">
 									<mat-label>Departamento de Nacimiento</mat-label>
-									<mat-select formControlName="departamentoNacimiento">
-										@for (d of departamentos; track d.id) {
+									<input type="text" placeholder="Seleccione..." matInput
+										formControlName="departamentoNacimiento" [matAutocomplete]="autoDepNac">
+									<mat-autocomplete #autoDepNac="matAutocomplete"
+										[displayWith]="displayDepartamento.bind(this)">
+										@for (d of departamentosFiltrados; track d.id) {
 										<mat-option [value]="d.id">{{d.nombre}}</mat-option>
 										}
-									</mat-select>
+									</mat-autocomplete>
 								</mat-form-field>
 								<mat-form-field appearance="outline" subscriptSizing="dynamic">
 									<mat-label>Ciudad de Nacimiento</mat-label>
-									<mat-select formControlName="ciudadNacimiento">
-										@for (c of municipiosNacimiento; track c.id) {
+									<input type="text" placeholder="Seleccione..." matInput
+										formControlName="ciudadNacimiento" [matAutocomplete]="autoMunNac">
+									<mat-autocomplete #autoMunNac="matAutocomplete"
+										[displayWith]="displayMunicipioNacimiento.bind(this)">
+										@for (c of municipiosNacimientoFiltrados; track c.id) {
 										<mat-option [value]="c.id">{{c.nombre}}</mat-option>
 										}
-									</mat-select>
+									</mat-autocomplete>
 								</mat-form-field>
 								<mat-form-field appearance="outline" subscriptSizing="dynamic">
 									<mat-label>Departamento de Residencia</mat-label>
-									<mat-select formControlName="departamentoResidencia">
-										@for (d of departamentos; track d.id) {
+									<input type="text" placeholder="Seleccione..." matInput
+										formControlName="departamentoResidencia" [matAutocomplete]="autoDepRes">
+									<mat-autocomplete #autoDepRes="matAutocomplete"
+										[displayWith]="displayDepartamento.bind(this)">
+										@for (d of departamentosFiltrados; track d.id) {
 										<mat-option [value]="d.id">{{d.nombre}}</mat-option>
 										}
-									</mat-select>
+									</mat-autocomplete>
 								</mat-form-field>
 								<mat-form-field appearance="outline" subscriptSizing="dynamic">
 									<mat-label>Ciudad de Residencia</mat-label>
-									<mat-select formControlName="ciudadResidencia">
-										@for (c of municipiosResidencia; track c.id) {
+									<input type="text" placeholder="Seleccione..." matInput
+										formControlName="ciudadResidencia" [matAutocomplete]="autoMunRes">
+									<mat-autocomplete #autoMunRes="matAutocomplete"
+										[displayWith]="displayMunicipioResidencia.bind(this)">
+										@for (c of municipiosResidenciaFiltrados; track c.id) {
 										<mat-option [value]="c.id">{{c.nombre}}</mat-option>
 										}
-									</mat-select>
+									</mat-autocomplete>
 								</mat-form-field>
 								<mat-form-field appearance="outline" subscriptSizing="dynamic">
 									<mat-label>Sexo</mat-label>

@@ -3,7 +3,7 @@
     <app-header (toggleSidenav)="sidenav.toggle()"></app-header>
 
     <mat-sidenav-container class="sidenav-container">
-      <mat-sidenav #sidenav mode="side" opened class="aside-menu">
+      <mat-sidenav #sidenav mode="side" [opened]="!isHomeRoute()" [hidden]="isHomeRoute()" class="aside-menu">
         <app-sidebar></app-sidebar>
       </mat-sidenav>
 

@@ -45,6 +45,10 @@ export class AppComponent {
     return this.router.url === '/login';
   }
 
+  isHomeRoute(): boolean {
+    return this.router.url === '/home';
+  }
+
   private registerIcons(): void {
     const icons = [
       { name: 'logo-custom', url: 'assets/distintivo_casilda.svg' },

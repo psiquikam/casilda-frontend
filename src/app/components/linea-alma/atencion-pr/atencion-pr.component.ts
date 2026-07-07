@@ -17,6 +17,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { AuthService } from '../../../services/auth.service';
 import { ModalDireccionComponent } from '../../modal-direccion/modal-direccion.component';
 import { ModalDiscapacidadComponent } from '../../modal-discapacidad/modal-discapacidad.component';
@@ -59,7 +60,8 @@ import { CustomDateAdapter, CUSTOM_DATE_FORMATS } from '../../../custom-date-ada
     MatTableModule,
     MatDialogModule,
     MatProgressSpinnerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatAutocompleteModule
   ],
   providers: [
     { provide: DateAdapter, useClass: CustomDateAdapter },
@@ -93,8 +95,11 @@ export class AtencionPrComponent implements OnInit {
   regimenes: MaestroDto[] = [];
   eps: MaestroDto[] = [];
   departamentos: MaestroDto[] = [];
+  departamentosFiltrados: MaestroDto[] = [];
   municipiosNacimiento: MaestroDto[] = [];
+  municipiosNacimientoFiltrados: MaestroDto[] = [];
   municipiosResidencia: MaestroDto[] = [];
+  municipiosResidenciaFiltrados: MaestroDto[] = [];
   sexos: MaestroDto[] = [];
   identidadesGenero: MaestroDto[] = [];
   orientacionesSexuales: MaestroDto[] = [];
@@ -282,6 +287,7 @@ export class AtencionPrComponent implements OnInit {
         this.regimenes = catalogos.regimenes;
         this.eps = catalogos.eps;
         this.departamentos = catalogos.departamentos;
+        this.departamentosFiltrados = catalogos.departamentos;
         this.configurarMunicipios();
         this.sexos = catalogos.sexos;
         this.identidadesGenero = catalogos.identidadesGenero;
@@ -448,19 +454,41 @@ export class AtencionPrComponent implements OnInit {
   }
 
   private configurarMunicipios(): void {
-    this.registroCasoForm.get('departamentoNacimiento')?.valueChanges.subscribe((departamentoId) => {
-      this.registroCasoForm.patchValue({ ciudadNacimiento: '' }, { emitEvent: false });
-      this.municipiosNacimiento = [];
-      if (departamentoId) {
-        this.cargarMunicipiosPorDepartamento(Number(departamentoId), 'nacimiento');
+    this.registroCasoForm.get('departamentoNacimiento')?.valueChanges.subscribe((value) => {
+      if (typeof value === 'string') {
+        const filterValue = value.toLowerCase();
+        this.departamentosFiltrados = this.departamentos.filter(d => d.nombre.toLowerCase().includes(filterValue));
+      } else if (value) {
+        this.registroCasoForm.patchValue({ ciudadNacimiento: '' }, { emitEvent: false });
+        this.municipiosNacimiento = [];
+        this.municipiosNacimientoFiltrados = [];
+        this.cargarMunicipiosPorDepartamento(Number(value), 'nacimiento');
       }
     });
 
-    this.registroCasoForm.get('departamentoResidencia')?.valueChanges.subscribe((departamentoId) => {
-      this.registroCasoForm.patchValue({ ciudadResidencia: '' }, { emitEvent: false });
-      this.municipiosResidencia = [];
-      if (departamentoId) {
-        this.cargarMunicipiosPorDepartamento(Number(departamentoId), 'residencia');
+    this.registroCasoForm.get('ciudadNacimiento')?.valueChanges.subscribe((value) => {
+      if (typeof value === 'string') {
+        const filterValue = value.toLowerCase();
+        this.municipiosNacimientoFiltrados = this.municipiosNacimiento.filter(m => m.nombre.toLowerCase().includes(filterValue));
+      }
+    });
+
+    this.registroCasoForm.get('departamentoResidencia')?.valueChanges.subscribe((value) => {
+      if (typeof value === 'string') {
+        const filterValue = value.toLowerCase();
+        this.departamentosFiltrados = this.departamentos.filter(d => d.nombre.toLowerCase().includes(filterValue));
+      } else if (value) {
+        this.registroCasoForm.patchValue({ ciudadResidencia: '' }, { emitEvent: false });
+        this.municipiosResidencia = [];
+        this.municipiosResidenciaFiltrados = [];
+        this.cargarMunicipiosPorDepartamento(Number(value), 'residencia');
+      }
+    });
+
+    this.registroCasoForm.get('ciudadResidencia')?.valueChanges.subscribe((value) => {
+      if (typeof value === 'string') {
+        const filterValue = value.toLowerCase();
+        this.municipiosResidenciaFiltrados = this.municipiosResidencia.filter(m => m.nombre.toLowerCase().includes(filterValue));
       }
     });
   }
@@ -470,18 +498,40 @@ export class AtencionPrComponent implements OnInit {
       next: (lista) => {
         if (destino === 'nacimiento') {
           this.municipiosNacimiento = lista;
+          this.municipiosNacimientoFiltrados = lista;
         } else {
           this.municipiosResidencia = lista;
+          this.municipiosResidenciaFiltrados = lista;
         }
       },
       error: () => {
         if (destino === 'nacimiento') {
           this.municipiosNacimiento = [];
+          this.municipiosNacimientoFiltrados = [];
         } else {
           this.municipiosResidencia = [];
+          this.municipiosResidenciaFiltrados = [];
         }
       }
     });
+  }
+
+  displayDepartamento(id: number): string {
+    if (!id) return '';
+    const dep = this.departamentos.find(d => d.id === id);
+    return dep ? dep.nombre : '';
+  }
+
+  displayMunicipioNacimiento(id: number): string {
+    if (!id) return '';
+    const mun = this.municipiosNacimiento.find(m => m.id === id);
+    return mun ? mun.nombre : '';
+  }
+
+  displayMunicipioResidencia(id: number): string {
+    if (!id) return '';
+    const mun = this.municipiosResidencia.find(m => m.id === id);
+    return mun ? mun.nombre : '';
   }
 
   private configurarValoresPorDefecto(): void {
