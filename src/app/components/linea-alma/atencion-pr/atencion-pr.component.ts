@@ -446,7 +446,8 @@ export class AtencionPrComponent implements OnInit {
 
   private cargarProgramasPorUnidadAcademica(unidadAcademicaId: number): Observable<MaestroDto[]> {
     const vinculoVal = this.registroCasoForm.get('vinculo')?.value;
-    const pregrado = Number(vinculoVal) === VinculoUdeAEnum.ESTUDIANTE_PREGRADO;
+    const pregrado = Number(vinculoVal) === VinculoUdeAEnum.ESTUDIANTE_PREGRADO ||
+      Number(vinculoVal) === VinculoUdeAEnum.EGRESADO_PREGRADO;
 
     return this.http
       .get<MaestroDto[]>(`${this.maestrosUrl}/programas?unidadAcademicaId=${unidadAcademicaId}&pregrado=${pregrado}`)
@@ -579,7 +580,7 @@ export class AtencionPrComponent implements OnInit {
   private clasificarVinculo(id: number): 'con-programa' | 'sin-programa' | 'ninguno' {
     if (
       id === VinculoUdeAEnum.ESTUDIANTE_PREGRADO ||
-      id === VinculoUdeAEnum.ESTUDIANTE_DE_POSGRADO
+      id === VinculoUdeAEnum.ESTUDIANTE_POSGRADO
     ) {
       return 'con-programa';
     }
@@ -591,7 +592,8 @@ export class AtencionPrComponent implements OnInit {
       id === VinculoUdeAEnum.DOCENTE_CATEDRA_50 ||
       id === VinculoUdeAEnum.JUBILADO_PENSIONADO ||
       id === VinculoUdeAEnum.PERSONAL_ADMINISTRATIVO ||
-      id === VinculoUdeAEnum.EGRESADO ||
+      id === VinculoUdeAEnum.EGRESADO_PREGRADO ||
+      id === VinculoUdeAEnum.EGRESADO_POSGRADO ||
       id === VinculoUdeAEnum.CONTRATISTA ||
       id === VinculoUdeAEnum.OTRO_TIPO_DE_VINCULO ||
       id === VinculoUdeAEnum.PRESTADOR_DE_SERVICIOS ||

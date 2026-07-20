@@ -38,14 +38,14 @@ import { ModalActivarRutaComponent } from '../modal-activar-ruta/modal-activar-r
 import { ModalApreciacionJuridicaComponent } from '../modal-apreciacion-juridica/modal-apreciacion-juridica.component';
 import { ModalApreciacionPsicologicaComponent } from '../modal-apreciacion-psicologica/modal-apreciacion-psicologica.component';
 import { TablaCasosComponent } from '../tabla-casos/tabla-casos.component';
-import { TablaOtrosCasosComponent } from '../tabla-otros-casos/tabla-otros-casos.component';
+
 import { ModalCompromisosPersonaComponent } from '../modal-compromisos-persona/modal-compromisos-persona.component';
 import { ModalCompromisosProfesionalesComponent } from '../modal-compromisos-profesionales/modal-compromisos-profesionales.component';
 import { ModalSeguimientosComponent } from '../modal-seguimiento/modal-seguimiento.component';
 import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
 import { ModalAgregarCasoComponent } from '../modal-agregar-caso/modal-agregar-caso.component';
 import { AuthService } from '../../services/auth.service';
-import { AtencionContextoRequestDto, AtencionRegistroRequestDto, CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, HechoRequestDto, OtroCasoDto, RegistroAtencionCompleteRequestDto, RegistroOtroCasoRequestDto, SeguimientoAtencionRequestDto, SolicitudService, VinculoUdeAEnum } from '../../services/solicitud.service';
+import { AtencionContextoRequestDto, AtencionRegistroRequestDto, CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, HechoRequestDto, RegistroAtencionCompleteRequestDto, SeguimientoAtencionRequestDto, SolicitudService, VinculoUdeAEnum } from '../../services/solicitud.service';
 import { MaestroDto } from '../../services/listas.service';
 import { environment } from '../../../environments/environment';
 
@@ -74,7 +74,7 @@ import { environment } from '../../../environments/environment';
     MatProgressSpinnerModule,
     MatAutocompleteModule,
     TablaCasosComponent,
-    TablaOtrosCasosComponent,
+
     MatCheckboxModule,
     FormsModule,
     ModalPresuntoAgresorComponent
@@ -92,52 +92,23 @@ import { environment } from '../../../environments/environment';
 export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   atencionForm!: FormGroup;
   atencionId: number | null = null;
+  casoId: number | null = null;
   activeTabIndex = 0;
   private readonly maestrosUrl = `${environment.apiBaseUrl}/maestros`;
 
   casoPorAtender: any[] = [];
-  casosRelacionados: any[] = [];
-  private otrosCasosPendientes: { _tempId: string, formResult: any, request: RegistroOtroCasoRequestDto }[] = [];
-  private otrosCasosEditados: { idCaso: number, request: RegistroOtroCasoRequestDto, displayRow: any }[] = [];
-  private otrosCasosEliminados: number[] = [];
-
   dataSource = new MatTableDataSource<any>(this.casoPorAtender);
-  dataSourceOtros = new MatTableDataSource<any>(this.casosRelacionados);
   totalElementosCitas = 0;
   pageIndexCitas = 0;
   pageSizeCitas = 10;
-  displayedColumnsTablaInicial: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'unidadAdministrativa', 'profesional', 'acciones'];
+  displayedColumnsTablaInicial: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'tipoAsignacion', 'profesional', 'acciones'];
   catalogoSeguimiento: string[] = ['Presencial', 'Telefónico', 'Virtual', 'Visita Domiciliaria'];
 
   @ViewChild(MatSort) sort?: MatSort;
 
-  @ViewChild('sortOtros') sortOtros?: MatSort;
-
-  tipoSeguimientoControl = new FormControl<string | null>(null);
-
-  miFormulario = new FormGroup({
-    tipoSeguimiento: this.tipoSeguimientoControl
-  });
-
   modoAtencion = false;
-  modoVista: 'registrar' | 'consultar' = 'registrar';
-  tabConsulta: 'abierta-activo' | 'abierta-transicion' | 'cerrada' = 'abierta-activo';
-  busquedaConsulta = '';
   casoSeleccionado: any = null;
-  cargandoOtrosCasos = false;
 
-  consultaAtenciones: any[] = [
-    { documento: '1234567890', fecha: '16 julio 2025', servicio: 'Equipo violeta', profesional: 'María González López', estado: 'abierta-activo' },
-    { documento: '1234567890', fecha: '14 septiembre 2025', servicio: 'Línea Alma', profesional: 'Carlos Pérez Ruiz', estado: 'abierta-activo' },
-    { documento: '1234567890', fecha: '30 octubre 2025', servicio: 'Equipo violeta', profesional: 'Ana Martínez Soto', estado: 'abierta-activo' },
-    { documento: '1234567890', fecha: '2 enero 2026', servicio: 'Línea Alma', profesional: 'Luis Rodríguez Mora', estado: 'abierta-activo' },
-    { documento: '1234567890', fecha: '16 enero 2026', servicio: 'Línea Alma', profesional: 'Sandra Torres Vega', estado: 'abierta-transicion' },
-    { documento: '9876543210', fecha: '5 febrero 2026', servicio: 'Equipo violeta', profesional: 'Jorge Castillo Díaz', estado: 'abierta-transicion' },
-    { documento: '5551112233', fecha: '20 noviembre 2025', servicio: 'Línea Alma', profesional: 'Paola Rivera Cruz', estado: 'cerrada' },
-    { documento: '4449998877', fecha: '3 agosto 2025', servicio: 'Equipo violeta', profesional: 'Andrés Vargas Leal', estado: 'cerrada' },
-  ];
-  dataSourceConsulta = new MatTableDataSource<any>(this.consultaAtenciones);
-  displayedColumnsConsulta = ['documento', 'fecha', 'servicio', 'profesional', 'opciones'];
 
   private readonly longitudesPorTipoDocumento: Record<string, number> = {
     CC: 10, TI: 11, CE: 7, RC: 11, NUIP: 11, NIP: 11, PA: 12
@@ -165,19 +136,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  get consultaFiltrada(): any[] {
-    const fuente = this.consultaAtenciones.filter(a => a.estado === this.tabConsulta);
-    if (!this.busquedaConsulta.trim()) return fuente;
-    const q = this.busquedaConsulta.toLowerCase();
-    return fuente.filter(a =>
-      a.documento.toLowerCase().includes(q) ||
-      a.fecha.toLowerCase().includes(q) ||
-      a.servicio.toLowerCase().includes(q) ||
-      a.profesional.toLowerCase().includes(q)
-    );
-  }
+
   expandedElement: any | null = null;
-  expandedElementOtros: any | null = null;
   tipoSeguimientoSeleccionado?: string;
 
   filterValues: any = {
@@ -185,7 +145,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     nombre: '',
     documento: '',
     fecha: '',
-    unidadAdministrativa: '',
+    tipoAsignacion: '',
     profesional: ''
   };
 
@@ -240,8 +200,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     { tab: 'Presunto agresor', label: 'Primer apellido (agresor)', control: 'presuntoPrimerApellido' },
     { tab: 'Presunto agresor', label: 'Vínculo con la universidad', control: 'presuntoVinculoUniversidad' },
     { tab: 'Presunto agresor', label: 'Vínculo con la víctima', control: 'presuntoVinculoVictima' },
-    { tab: 'Estado de la atención', label: 'Estado de la atención', control: 'estadosAtencion' },
-    { tab: 'Estado de la atención', label: 'Grupo de atención', control: 'grupoAtencion' },
+    { tab: 'Estado del Caso', label: 'Estado del caso', control: 'estadosCaso' },
+    { tab: 'Estado del Caso', label: 'Grupo de atención', control: 'grupoAtencion' },
   ];
 
   psicologicaSel: number[] = [];
@@ -282,7 +242,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   queForma: string[] = [];
   lugarHechos: string[] = [];
   actividadesMisionales: string[] = [];
-  estadosAtencion: string[] = [];
+  estadosCaso: string[] = [];
+  catalogoEstadosCaso: MaestroDto[] = [];
   grupoAtencion: string[] = [];
   listaTiemposOcurridoUnidad: string[] = [];
   catalogoTiemposOcurridoUnidad: MaestroDto[] = [];
@@ -337,19 +298,11 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         && (data.nombre || '').toLowerCase().includes(searchTerms.nombre)
         && `${data.tipoDocumento || ''} ${data.documento || ''}`.toLowerCase().includes(searchTerms.documento)
         && (data.fecha || '').toLowerCase().includes(searchTerms.fecha)
-        && (data.unidadAdministrativa || '').toLowerCase().includes(searchTerms.unidadAdministrativa)
+        && (data.tipoAsignacion || '').toLowerCase().includes(searchTerms.tipoAsignacion)
         && (data.profesional || '').toLowerCase().includes(searchTerms.profesional);
     };
 
-    this.dataSourceOtros.filterPredicate = (data: any, filter: string): boolean => {
-      const searchTerms = JSON.parse(filter);
-      return (data.id || '').toString().toLowerCase().includes(searchTerms.id)
-        && (data.nombre || '').toLowerCase().includes(searchTerms.nombre)
-        && `${data.tipoDocumento || ''} ${data.documento || ''}`.toLowerCase().includes(searchTerms.documento)
-        && (data.fecha || '').toLowerCase().includes(searchTerms.fecha)
-        && (data.unidadAdministrativa || '').toLowerCase().includes(searchTerms.unidadAdministrativa)
-        && (data.profesional || '').toLowerCase().includes(searchTerms.profesional);
-    };
+
 
     this.atencionForm.get('logroAcuerdo')?.valueChanges.subscribe(valor => {
       if (valor === 'NO') {
@@ -384,8 +337,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     const vinculoVal = this.atencionForm.get('vinculo')?.value;
     if (!vinculoVal) return false;
     const idVinculo = this.resolverIdMaestro(vinculoVal, this.catalogoVinculosUdea);
-    // Habilitar para "Estudiante de Pregrado" (1) o "Estudiante de Posgrado" (10)
-    return idVinculo === VinculoUdeAEnum.ESTUDIANTE_PREGRADO || idVinculo === VinculoUdeAEnum.ESTUDIANTE_DE_POSGRADO;
+    return idVinculo === VinculoUdeAEnum.ESTUDIANTE_PREGRADO || idVinculo === VinculoUdeAEnum.ESTUDIANTE_POSGRADO ||
+      idVinculo === VinculoUdeAEnum.EGRESADO_PREGRADO || idVinculo === VinculoUdeAEnum.EGRESADO_POSGRADO;
   }
 
 
@@ -416,7 +369,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
     const vinculoVal = this.atencionForm.get('vinculo')?.value;
     const idVinculo = this.resolverIdMaestro(vinculoVal, this.catalogoVinculosUdea);
-    const pregrado = idVinculo === VinculoUdeAEnum.ESTUDIANTE_PREGRADO;
+    const pregrado = idVinculo === VinculoUdeAEnum.ESTUDIANTE_PREGRADO ||
+      idVinculo === VinculoUdeAEnum.EGRESADO_PREGRADO;
 
     this.http.get<MaestroDto[]>(`${this.maestrosUrl}/programas?unidadAcademicaId=${idUnidad}&pregrado=${pregrado}`).subscribe({
       next: (data) => {
@@ -478,7 +432,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       formasOcurrencia: this.obtenerMaestro('formas-ocurrencia'),
       lugaresOcurrencia: this.obtenerMaestro('lugares-ocurrencia'),
       actividadesMisionales: this.obtenerMaestro('actividades-misionales'),
-      estadosAtencion: this.obtenerMaestro('estados-atencion'),
+      estadosCaso: this.obtenerMaestro('estados-caso'),
       gruposAtencion: this.obtenerMaestro('grupos-atencion'),
       modalidadesPsicologicas: this.obtenerMaestro('modalidades-violencia/tipo/1'),
       modalidadesFisicas: this.obtenerMaestro('modalidades-violencia/tipo/2'),
@@ -530,7 +484,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         this.queForma = this.mapNombres(data.formasOcurrencia);
         this.lugarHechos = this.mapNombres(data.lugaresOcurrencia);
         this.actividadesMisionales = this.mapNombres(data.actividadesMisionales);
-        this.estadosAtencion = this.mapNombres(data.estadosAtencion);
+        this.catalogoEstadosCaso = data.estadosCaso;
+        this.estadosCaso = this.mapNombres(data.estadosCaso);
         this.grupoAtencion = this.mapNombres(data.gruposAtencion);
         this.listaPsicologica = data.modalidadesPsicologicas;
         this.listaFisica = data.modalidadesFisicas;
@@ -721,9 +676,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     if (this.sort) {
       this.dataSource.sort = this.sort;
     }
-    if (this.sortOtros) {
-      this.dataSourceOtros.sort = this.sortOtros;
-    }
+
   }
 
   applyFilter(column: string, event: Event) {
@@ -796,6 +749,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       tipoDocumento: '',
       tipoSolicitud: cita.tipoSolicitud || '',
       fecha: cita.fechaCita ? cita.fechaCita.substring(0, 10) : '',
+      tipoAsignacion: (cita as any).tipoAsignacion || '',
       unidadAdministrativa: cita.unidadAdministrativa || '',
       profesional: (cita as any).grupoProfesional || (cita as any).profesional || 'Sin asignar',
       unidadAcademica: cita.unidadAcademica || '',
@@ -832,6 +786,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     this.telefonosRegistrados = [];
     this.agresoresRegistrados = [];
     this.atencionId = null;
+    this.casoId = null;
 
     this.atencionForm.patchValue({
       tipoSolicitud: caso.tipoSolicitud || 'Indirecta',
@@ -840,7 +795,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     });
 
     if (caso?.solicitudId) {
-      this.cargarOtrosCasos(caso.solicitudId);
       this.solicitudService.obtenerPorId(caso.solicitudId).subscribe({
         next: (solicitud) => {
           this.atencionForm.patchValue({
@@ -875,317 +829,10 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
           console.error('Error al cargar detalle de solicitud para la cita:', error);
         }
       });
-    } else {
-      this.casosRelacionados = [];
-      this.dataSourceOtros.data = [];
     }
   }
 
-  private cargarOtrosCasos(solicitudId: number): void {
-    this.otrosCasosPendientes = [];
-    this.otrosCasosEditados = [];
-    this.otrosCasosEliminados = [];
-    this.cargandoOtrosCasos = true;
-    this.solicitudService.listarOtrosCasos(solicitudId).subscribe({
-      next: (casos) => {
-        this.casosRelacionados = casos;
-        this.dataSourceOtros.data = casos;
-        this.cargandoOtrosCasos = false;
-      },
-      error: () => {
-        this.casosRelacionados = [];
-        this.dataSourceOtros.data = [];
-        this.cargandoOtrosCasos = false;
-      }
-    });
-  }
 
-  seleccionarCaso(element: any) {
-    console.log(element);
-  }
-
-  applyFilterOtros(column: string, event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
-    this.filterValues[column] = filterValue;
-    this.dataSourceOtros.filter = JSON.stringify(this.filterValues);
-  }
-
-  onAgregarOtroCaso(): void {
-    const dialogRef = this.dialog.open(ModalAgregarCasoComponent, {
-      width: '950px',
-      maxWidth: '98vw',
-      disableClose: true,
-      data: {
-        titulo: 'Agregar Caso',
-        listaOrientacionSexual: this.listaOrientacionSexual,
-        queForma: this.queForma,
-        lugarHechos: this.lugarHechos,
-        actividadesMisionales: this.actividadesMisionales,
-        listaPsicologica: this.listaPsicologica,
-        listaFisica: this.listaFisica,
-        listaSexual: this.listaSexual,
-        listaInstitucional: this.listaInstitucional,
-        listaPatrimonial: this.listaPatrimonial,
-        listaInformatica: this.listaInformatica,
-        listaPrejuicio: this.listaPrejuicio,
-        listaVinculos: this.listaVinculos,
-        listaVinculosAgresorVictima: this.listaVinculosAgresorVictima,
-        listaTiemposOcurridoUnidad: this.listaTiemposOcurridoUnidad
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (!result) {
-        return;
-      }
-
-      const _tempId = `temp_${Date.now()}`;
-      const request = this.construirRegistroOtroCasoRequest(result);
-      this.otrosCasosPendientes.push({ _tempId, formResult: result, request });
-      const displayRow = this.construirDisplayOtroCaso(_tempId, result);
-      this.casosRelacionados = [displayRow, ...this.casosRelacionados];
-      this.dataSourceOtros.data = this.casosRelacionados;
-      this.snackBar.open('Caso agregado. Se guardará al registrar la atención.', 'Cerrar', { duration: 3000 });
-    });
-  }
-
-  onEditarOtroCaso(caso: any): void {
-    const esPendiente = !caso?.idCaso && !!caso?._tempId;
-    const initialData = esPendiente
-      ? this.otrosCasosPendientes.find(p => p._tempId === caso._tempId)?.formResult
-      : (caso?.idCaso ? this.construirDatosInicialesOtroCaso(caso as OtroCasoDto) : null);
-
-    if (!initialData && !esPendiente) {
-      this.snackBar.open('No fue posible identificar el caso a editar.', 'Cerrar', { duration: 3500 });
-      return;
-    }
-
-    const dialogRef = this.dialog.open(ModalAgregarCasoComponent, {
-      width: '950px',
-      maxWidth: '98vw',
-      disableClose: true,
-      data: {
-        titulo: 'Editar Caso',
-        listaOrientacionSexual: this.listaOrientacionSexual,
-        queForma: this.queForma,
-        lugarHechos: this.lugarHechos,
-        actividadesMisionales: this.actividadesMisionales,
-        listaPsicologica: this.listaPsicologica,
-        listaFisica: this.listaFisica,
-        listaSexual: this.listaSexual,
-        listaInstitucional: this.listaInstitucional,
-        listaPatrimonial: this.listaPatrimonial,
-        listaInformatica: this.listaInformatica,
-        listaPrejuicio: this.listaPrejuicio,
-        listaVinculos: this.listaVinculos,
-        listaVinculosAgresorVictima: this.listaVinculosAgresorVictima,
-        listaTiemposOcurridoUnidad: this.listaTiemposOcurridoUnidad,
-        initialData
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (!result) {
-        return;
-      }
-
-      const request = this.construirRegistroOtroCasoRequest(result);
-
-      if (esPendiente) {
-        const idx = this.otrosCasosPendientes.findIndex(p => p._tempId === caso._tempId);
-        if (idx >= 0) {
-          this.otrosCasosPendientes[idx] = { _tempId: caso._tempId, formResult: result, request };
-        }
-        const displayRow = this.construirDisplayOtroCaso(caso._tempId, result);
-        this.casosRelacionados = this.casosRelacionados.map(c =>
-          c._tempId === caso._tempId ? displayRow : c
-        );
-      } else {
-        const displayRow = this.construirDisplayOtroCasoExistente(caso.idCaso, result);
-        const idx = this.otrosCasosEditados.findIndex(e => e.idCaso === caso.idCaso);
-        if (idx >= 0) {
-          this.otrosCasosEditados[idx] = { idCaso: caso.idCaso, request, displayRow };
-        } else {
-          this.otrosCasosEditados.push({ idCaso: caso.idCaso, request, displayRow });
-        }
-        this.casosRelacionados = this.casosRelacionados.map(c =>
-          c.idCaso === caso.idCaso ? displayRow : c
-        );
-      }
-
-      this.dataSourceOtros.data = [...this.casosRelacionados];
-      this.snackBar.open('Caso actualizado. Se guardará al registrar la atención.', 'Cerrar', { duration: 2500 });
-    });
-  }
-
-  onEliminarOtroCaso(caso: any): void {
-    const esPendiente = !caso?.idCaso && !!caso?._tempId;
-
-    if (esPendiente) {
-      this.otrosCasosPendientes = this.otrosCasosPendientes.filter(p => p._tempId !== caso._tempId);
-      this.casosRelacionados = this.casosRelacionados.filter(c => c._tempId !== caso._tempId);
-    } else if (caso?.idCaso) {
-      this.otrosCasosEliminados.push(caso.idCaso);
-      this.otrosCasosEditados = this.otrosCasosEditados.filter(e => e.idCaso !== caso.idCaso);
-      this.casosRelacionados = this.casosRelacionados.filter(c => c.idCaso !== caso.idCaso);
-    } else {
-      return;
-    }
-
-    this.dataSourceOtros.data = [...this.casosRelacionados];
-  }
-
-  private construirDisplayOtroCaso(_tempId: string, result: any): any {
-    const violencias: string[] = [];
-    if (result.violenciaPsicologica === 'SI') violencias.push('Psicológica');
-    if (result.violenciaFisica === 'SI') violencias.push('Física');
-    if (result.violenciaSexual === 'SI') violencias.push('Sexual');
-    if (result.violenciaInstitucional === 'SI') violencias.push('Institucional');
-    if (result.violenciaEconomica === 'SI') violencias.push('Económica');
-    if (result.violenciaInformatica === 'SI') violencias.push('Informática');
-    if (result.violenciaPrejuicio === 'SI') violencias.push('Por prejuicio');
-
-    return {
-      _tempId,
-      idCaso: null,
-      id: 'Pendiente',
-      tiempoHechos: result.tiempoOcurrido ?? '',
-      tipoViolencia: result.violenciaGenero === 'SI' ? 'Género' : result.violenciaMisional === 'SI' ? 'Misional' : '',
-      subcategoriaViolencia: violencias.join(', '),
-      descripcion: result.hechos?.[0]?.descripcion ?? ''
-    };
-  }
-
-  private construirDisplayOtroCasoExistente(idCaso: number, result: any): any {
-    const violencias: string[] = [];
-    if (result.violenciaPsicologica === 'SI') violencias.push('Psicológica');
-    if (result.violenciaFisica === 'SI') violencias.push('Física');
-    if (result.violenciaSexual === 'SI') violencias.push('Sexual');
-    if (result.violenciaInstitucional === 'SI') violencias.push('Institucional');
-    if (result.violenciaEconomica === 'SI') violencias.push('Económica');
-    if (result.violenciaInformatica === 'SI') violencias.push('Informática');
-    if (result.violenciaPrejuicio === 'SI') violencias.push('Por prejuicio');
-
-    return {
-      idCaso,
-      id: String(idCaso),
-      tiempoHechos: result.tiempoOcurrido ?? '',
-      tipoViolencia: result.violenciaGenero === 'SI' ? 'Género' : result.violenciaMisional === 'SI' ? 'Misional' : '',
-      subcategoriaViolencia: violencias.join(', '),
-      descripcion: result.hechos?.[0]?.descripcion ?? ''
-    };
-  }
-
-  private construirRegistroOtroCasoRequest(result: any): RegistroOtroCasoRequestDto {
-    const idOrientacionSexual = this.resolverIdMaestro(result.orientacionSexual, this.catalogoOrientacionesSexuales);
-    const idIdentidadGenero = this.resolverIdMaestro(this.atencionForm.getRawValue().identidadSexual, this.catalogoIdentidadesSexuales);
-    const idFormaOcurrencia = this.resolverIdMaestro(result.queForma, this.catalogoFormasOcurrencia);
-    const idLugarOcurrencia = this.resolverIdMaestro(result.lugarHechos, this.catalogoLugaresOcurrencia);
-    const idActividadMisional = result.violenciaMisional === 'SI'
-      ? this.resolverIdMaestro(result.actividadMisional, this.catalogoActividadesMisionales)
-      : Number.NaN;
-    const idVinculoUniversidad = this.resolverIdMaestro(result.presuntoVinculoUniversidad, this.catalogoVinculosUdea);
-    const idVinculoVictima = this.resolverIdMaestro(result.presuntoVinculoVictima, this.catalogoVinculosAgresorVictima);
-
-    const hechos = (result.hechos ?? [])
-      .map((hecho: any): HechoRequestDto | null => {
-        const lugar = String(hecho?.lugar ?? '').trim();
-        const descripcion = String(hecho?.descripcion ?? '').trim();
-        if (!lugar || !descripcion) {
-          return null;
-        }
-
-        return {
-          fecha: this.formatearFechaLocalDateTime(hecho?.fecha),
-          lugar,
-          descripcion
-        };
-      })
-      .filter((hecho: HechoRequestDto | null): hecho is HechoRequestDto => hecho !== null);
-
-    return {
-      caso: {
-        idOrientacionSexual,
-        idIdentidadGenero,
-        tiempoOcurridoValor: Number(result.tiempoOcurridoValor),
-        idTiempoOcurridoUnidad: this.resolverIdMaestro(result.tiempoOcurridoUnidad, this.catalogoTiemposOcurridoUnidad),
-        idFormaOcurrencia,
-        idLugarOcurrencia,
-        violenciaGenero: result.violenciaGenero === 'SI',
-        violenciaMisional: result.violenciaMisional === 'SI',
-        idActividadMisional: Number.isFinite(idActividadMisional) ? idActividadMisional : null,
-        modalidadesViolenciaPsicologica: result.psicologicaSel ?? [],
-        modalidadesViolenciaFisica: result.fisicaSel ?? [],
-        modalidadesViolenciaSexual: result.sexualSel ?? [],
-        modalidadesViolenciaInstitucional: result.institucionalSel ?? [],
-        modalidadesViolenciaEconomica: result.economicaSel ?? [],
-        modalidadesViolenciaInformatica: result.informaticaSel ?? [],
-        modalidadesViolenciaPrejuicio: result.prejuicioSel ?? [],
-        agresorVictima: {
-          primerNombre: String(result.presuntoPrimerNombre ?? ''),
-          segundoNombre: String(result.presuntoSegundoNombre ?? ''),
-          primerApellido: String(result.presuntoPrimerApellido ?? ''),
-          segundoApellido: String(result.presuntoSegundoApellido ?? ''),
-          idVinculoUniversidad,
-          idVinculoVictima,
-        }
-      },
-      hechos: hechos.length ? hechos : undefined
-    };
-  }
-
-  private construirDatosInicialesOtroCaso(caso: OtroCasoDto): any {
-    const orientacionSexual = this.resolverNombreMaestroPorId(caso.idOrientacionSexual, this.catalogoOrientacionesSexuales);
-    const queForma = this.resolverNombreMaestroPorId(caso.idFormaOcurrencia, this.catalogoFormasOcurrencia);
-    const lugarHechos = this.resolverNombreMaestroPorId(caso.idLugarOcurrencia, this.catalogoLugaresOcurrencia);
-    const actividadMisional = this.resolverNombreMaestroPorId(caso.idActividadMisional, this.catalogoActividadesMisionales);
-    const presuntoVinculoUniversidad = this.resolverNombreMaestroPorId(caso.idVinculoUniversidad, this.catalogoVinculosUdea);
-    const presuntoVinculoVictima = this.resolverNombreMaestroPorId(caso.idVinculoVictima, this.catalogoVinculosAgresorVictima);
-
-    const psicologicaSel = caso.modalidadesViolenciaPsicologica ?? [];
-    const fisicaSel = caso.modalidadesViolenciaFisica ?? [];
-    const sexualSel = caso.modalidadesViolenciaSexual ?? [];
-    const institucionalSel = caso.modalidadesViolenciaInstitucional ?? [];
-    const economicaSel = caso.modalidadesViolenciaEconomica ?? [];
-    const informaticaSel = caso.modalidadesViolenciaInformatica ?? [];
-    const prejuicioSel = caso.modalidadesViolenciaPrejuicio ?? [];
-
-    return {
-      orientacionSexual,
-      tiempoOcurridoValor: caso.tiempoOcurridoValor ?? '',
-      tiempoOcurridoUnidad: this.resolverNombreMaestroPorId(caso.idTiempoOcurridoUnidad, this.catalogoTiemposOcurridoUnidad),
-      queForma,
-      lugarHechos,
-      violenciaGenero: caso.violenciaGenero ? 'SI' : 'NO',
-      violenciaMisional: caso.violenciaMisional ? 'SI' : 'NO',
-      actividadMisional,
-      violenciaPsicologica: psicologicaSel.length ? 'SI' : 'NO',
-      violenciaFisica: fisicaSel.length ? 'SI' : 'NO',
-      violenciaSexual: sexualSel.length ? 'SI' : 'NO',
-      violenciaInstitucional: institucionalSel.length ? 'SI' : 'NO',
-      violenciaEconomica: economicaSel.length ? 'SI' : 'NO',
-      violenciaInformatica: informaticaSel.length ? 'SI' : 'NO',
-      violenciaPrejuicio: prejuicioSel.length ? 'SI' : 'NO',
-      presuntoPrimerNombre: caso.presuntoPrimerNombre ?? '',
-      presuntoSegundoNombre: caso.presuntoSegundoNombre ?? '',
-      presuntoPrimerApellido: caso.presuntoPrimerApellido ?? '',
-      presuntoSegundoApellido: caso.presuntoSegundoApellido ?? '',
-      presuntoVinculoUniversidad,
-      presuntoVinculoVictima,
-      hechos: (caso.hechos ?? []).map((hecho) => ({
-        fecha: hecho.fecha,
-        lugar: hecho.lugar,
-        descripcion: hecho.descripcion
-      })),
-      psicologicaSel,
-      fisicaSel,
-      sexualSel,
-      institucionalSel,
-      economicaSel,
-      informaticaSel,
-      prejuicioSel
-    };
-  }
 
   private resolverNombreMaestroPorId(id: unknown, catalogo: MaestroDto[]): string {
     const idNumerico = Number(id);
@@ -1538,7 +1185,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       violenciaInformatica: ['NO'],
       detalleViolenciaInformatica: [''],
       violenciaPrejuicio: ['NO'],
-      estadosAtencion: [''],
+      estadosCaso: [''],
       grupoAtencion: [''],
       detalleViolenciaPrejuicio: [''],
       observacionesTelefono: [''],
@@ -1590,15 +1237,13 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   getLogicalTabIndex(visualIndex: number): number {
     const isVbgVisible = this.atencionForm.get('violenciaGenero')?.value === 'SI';
     if (isVbgVisible) {
-      if (visualIndex === 6) return 7;
-      if (visualIndex === 7) return 6;
       return visualIndex;
     } else {
-      if (visualIndex < 4) return visualIndex;
-      if (visualIndex === 4) return 5;
-      if (visualIndex === 5) return 7;
-      if (visualIndex === 6) return 6;
-      return visualIndex + 1;
+      if (visualIndex < 3) {
+        return visualIndex;
+      } else {
+        return visualIndex + 1;
+      }
     }
   }
 
@@ -1612,16 +1257,32 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
           next: (atencion) => {
             this.guardandoCompromisos = false;
             this.tabErrors = new Set<string>();
+            const res = atencion as any;
 
-            if (atencion && atencion.id) {
-              this.atencionId = atencion.id;
+            if (res) {
+              if (targetTabIndex === 0) {
+                if (res.id) {
+                  this.casoId = res.id;
+                }
+              } else {
+                if (res.id) {
+                  this.atencionId = res.id;
+                }
+              }
+            }
+
+            let titulo = '¡Guardado Exitoso!';
+            let mensaje = 'Datos de la pestaña guardados exitosamente.';
+            if (targetTabIndex === 0 && res && res.codigo) {
+              titulo = '¡Caso Registrado!';
+              mensaje = `Se ha registrado exitosamente el caso con código: ${res.codigo}`;
             }
 
             this.dialog.open(DialogoExitoComponent, {
               width: '400px',
               data: {
-                titulo: '¡Guardado Exitoso!',
-                mensaje: 'Datos de la pestaña guardados exitosamente.'
+                titulo: titulo,
+                mensaje: mensaje
               }
             });
           },
@@ -1664,6 +1325,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       tiempoOcurridoValor,
       tiempoOcurridoUnidad,
       queForma,
+      ciudadHechos,
       lugarHechos,
       violenciaGenero,
       violenciaMisional,
@@ -1724,19 +1386,12 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
     switch (tabIndex) {
       case 0:
+        const discapacidadesMapped = this.discapacidadesRegistradas.map(d => ({
+          idSubTipoDiscapacidad: Number(d.idSubTipoDiscapacidad || d.subTipoId || d.id)
+        }));
         return {
           citaId,
-          idAtencion: this.atencionId,
-          idTipoServicio: this.resolverIdMaestro(tipoServicio, this.catalogoTiposServicio),
-          idLugarEntrevista: Number(lugarEntrevista),
-          archivoConsentimientoNombre: consentimientoArchivo?.name,
-          archivoConsentimientoTipo: consentimientoArchivo?.type,
-          archivoConsentimientoContenido
-        };
-      case 1:
-        return {
-          citaId,
-          idAtencion: this.atencionId,
+          idCaso: this.casoId,
           idRegimen: this.resolverIdMaestro(regimenSalud, this.catalogoRegimenes),
           idEps: this.resolverIdMaestro(eps, this.catalogoEps),
           persona: {
@@ -1746,55 +1401,48 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
             direccionResidencia: direccionResidencia || null,
             correos: correos.length ? correos : undefined,
             telefonos: telefonos.length ? telefonos : undefined
-          }
+          },
+          discapacidades: discapacidadesMapped
+        };
+      case 1:
+        return {
+          idCaso: this.casoId,
+          idvinculoudea: this.resolverIdMaestro(vinculo, this.catalogoVinculosUdea),
+          otrovinculo: this.resolverIdMaestro(vinculo, this.catalogoVinculosUdea) === VinculoUdeAEnum.OTRO_TIPO_DE_VINCULO ? formRawValue.otroVinculo : null,
+          idprograma: this.resolverIdMaestro(programa, this.catalogoProgramas),
+          idunidadacademica: this.resolverIdMaestro(unidadAcademica, this.catalogoUnidadesAcademicas),
+          idunidadadministrativa: this.resolverIdMaestro(unidadAdministrativa, this.catalogoUnidadesAdministrativas),
+          idcampus: this.resolverIdMaestro(campus, this.catalogoCampus),
+          observacionesTelefono: observacionesTelefono || null,
+          observacionesCorreo: observacionesCorreo || null,
+          correos: correos.length ? correos : undefined,
+          telefonos: telefonos.length ? telefonos : undefined
         };
       case 2:
         return {
-          citaId,
-          idAtencion: this.atencionId,
-          atencionContexto,
-          observacionesTelefono: observacionesTelefono || null,
-          observacionesCorreo: observacionesCorreo || null
+          idCaso: this.casoId,
+          hechos: hechos.length ? hechos : undefined,
+          hacecuantooccurrio: tiempoOcurridoValor ? Number(tiempoOcurridoValor) : 0,
+          idtiempoocurridounidad: this.resolverIdMaestro(tiempoOcurridoUnidad, this.catalogoTiemposOcurridoUnidad),
+          idformaocurrencia: this.resolverIdMaestro(queForma, this.catalogoFormasOcurrencia),
+          idciudadhechos: ciudadHechos ? Number(ciudadHechos) : null,
+          idlugarocurrencia: this.resolverIdMaestro(lugarHechos, this.catalogoLugaresOcurrencia),
+          violenciabasadagenero: violenciaGenero === true || violenciaGenero === 'SI',
+          hechoviolenciaocurrioactividadesmisionales: violenciaMisional === true || violenciaMisional === 'SI',
+          idactivadmisional: actividadMisional ? this.resolverIdMaestro(actividadMisional, this.catalogoActividadesMisionales) : null
         };
       case 3:
         return {
-          citaId,
-          idAtencion: this.atencionId,
-          caso: {
-            idOrientacionSexual: this.resolverIdMaestro(orientacionSexual, this.catalogoOrientacionesSexuales),
-            idIdentidadGenero: this.resolverIdMaestro(identidadSexual, this.catalogoIdentidadesSexuales),
-            tiempoOcurridoValor: tiempoOcurridoValor ? Number(tiempoOcurridoValor) : 0,
-            idTiempoOcurridoUnidad: this.resolverIdMaestro(tiempoOcurridoUnidad, this.catalogoTiemposOcurridoUnidad),
-            idFormaOcurrencia: this.resolverIdMaestro(queForma, this.catalogoFormasOcurrencia),
-            idLugarOcurrencia: this.resolverIdMaestro(lugarHechos, this.catalogoLugaresOcurrencia),
-            violenciaGenero: violenciaGenero === true || violenciaGenero === 'SI',
-            violenciaMisional: violenciaMisional === true || violenciaMisional === 'SI',
-            idActividadMisional: actividadMisional ? this.resolverIdMaestro(actividadMisional, this.catalogoActividadesMisionales) : null
-          },
-          hechos: hechos.length ? hechos : undefined
+          idCaso: this.casoId,
+          modalidadesViolenciaPsicologica: this.psicologicaSel,
+          modalidadesViolenciaFisica: this.fisicaSel,
+          modalidadesViolenciaSexual: this.sexualSel,
+          modalidadesViolenciaInstitucional: this.institucionalSel,
+          modalidadesViolenciaEconomica: this.economicaSel,
+          modalidadesViolenciaInformatica: this.informaticaSel,
+          modalidadesViolenciaPrejuicio: this.prejuicioSel
         };
       case 4:
-        return {
-          citaId,
-          idAtencion: this.atencionId,
-          caso: {
-            tipoViolenciaPsicologica: this.psicologicaSel.length > 0,
-            tipoViolenciaFisica: this.fisicaSel.length > 0,
-            tipoViolenciaSexual: this.sexualSel.length > 0,
-            tipoViolenciaInstitucional: this.institucionalSel.length > 0,
-            tipoViolenciaEconomicaPatrimonial: this.economicaSel.length > 0,
-            tipoViolenciaSexualInformatica: this.informaticaSel.length > 0,
-            tipoViolenciaPorPrejuicio: this.prejuicioSel.length > 0,
-            modalidadesViolenciaPsicologica: this.psicologicaSel,
-            modalidadesViolenciaFisica: this.fisicaSel,
-            modalidadesViolenciaSexual: this.sexualSel,
-            modalidadesViolenciaInstitucional: this.institucionalSel,
-            modalidadesViolenciaEconomica: this.economicaSel,
-            modalidadesViolenciaInformatica: this.informaticaSel,
-            modalidadesViolenciaPrejuicio: this.prejuicioSel
-          }
-        };
-      case 5:
         const agresoresMapped = this.agresoresRegistrados.map(a => ({
           primerNombre: a.primerNombre || null,
           segundoNombre: a.segundoNombre || null,
@@ -1804,11 +1452,35 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
           idVinculoVictima: a.idVinculoVictima || null
         }));
         return {
-          citaId,
-          idAtencion: this.atencionId,
+          idCaso: this.casoId,
           agresores: agresoresMapped
         };
+      case 5:
+        return {
+          casoId: this.casoId,
+          idAtencion: this.atencionId,
+          idTipoServicio: this.resolverIdMaestro(tipoServicio, this.catalogoTiposServicio),
+          idLugarEntrevista: Number(lugarEntrevista),
+          archivoConsentimientoNombre: consentimientoArchivo?.name,
+          archivoConsentimientoTipo: consentimientoArchivo?.type,
+          archivoConsentimientoContenido
+        };
       case 6:
+        const apreciaciones = [
+          ...this.apreciacionesJuridicas.map(a => ({
+            idTipoApreciacion: a.idTipoApreciacion,
+            descripcion: a.descripcion
+          })),
+          ...this.apreciacionesPsicologicas.map(a => ({
+            idTipoApreciacion: a.idTipoApreciacion,
+            descripcion: a.descripcion
+          }))
+        ];
+        return {
+          idAtencion: this.atencionId,
+          apreciaciones
+        };
+      case 7:
         const rutasMapped = this.activarRutasRegistrados.map(r => ({
           idTipoRutaActivacion: r.idTipoRutaActivacion,
           idRutaActivacion: r.idRutaActivacion
@@ -1821,23 +1493,12 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         })).filter(r => r.idTipoRemision !== undefined);
 
         return {
-          citaId,
-          idAtencion: this.atencionId,
+          idAtencion: this.atencionId || 0,
           logroAcuerdo: logroAcuerdo === true || logroAcuerdo === 'SI',
           rutas: rutasMapped,
           remisiones: remisionesMapped
         };
-      case 7:
-        return { citaId, idAtencion: this.atencionId };
       case 8:
-        return {
-          citaId,
-          idAtencion: this.atencionId,
-          otrosCasos: this.otrosCasosPendientes.length ? this.otrosCasosPendientes.map(p => p.request) : undefined,
-          otrosCasosActualizar: this.otrosCasosEditados.length ? this.otrosCasosEditados.map(e => ({ idCaso: e.idCaso, ...e.request })) : undefined,
-          otrosCasosEliminar: this.otrosCasosEliminados.length ? [...this.otrosCasosEliminados] : undefined
-        };
-      case 9:
         const medidasMapped = this.medidasRegistradas.map(m => ({
           tipoMedidaId: m.tipoMedidaId,
           subtipoMedidaId: m.subtipoMedidaId,
@@ -1847,30 +1508,24 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         })).filter(m => m.tipoMedidaId !== undefined && m.tipoMedidaId !== null);
 
         return {
-          citaId,
-          idAtencion: this.atencionId,
+          idAtencion: this.atencionId || 0,
           medidas: medidasMapped
+        };
+      case 9:
+        return {
+          idAtencion: this.atencionId || 0,
+          persona: compromisosPersona,
+          profesional: compromisosProfesional
         };
       case 10:
         return {
-          citaId,
-          idAtencion: this.atencionId,
-          compromisos: (compromisosPersona.length || compromisosProfesional.length) ? {
-            persona: compromisosPersona.length ? compromisosPersona : undefined,
-            profesional: compromisosProfesional.length ? compromisosProfesional : undefined
-          } : undefined
+          idAtencion: this.atencionId || 0,
+          seguimientos: seguimientos
         };
       case 11:
         return {
-          citaId,
-          idAtencion: this.atencionId,
-          seguimientos: seguimientos.length ? seguimientos : undefined
-        };
-      case 12:
-        return {
-          citaId,
-          idAtencion: this.atencionId,
-          idEstadoAtencion: this.resolverIdMaestro(formRawValue.estadosAtencion, this.catalogoTiposServicio)
+          idCaso: this.casoId,
+          idEstadoCaso: this.resolverIdMaestro(formRawValue.estadosCaso, this.catalogoEstadosCaso)
         };
       default:
         return { citaId, idAtencion: this.atencionId };

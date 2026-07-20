@@ -16,12 +16,20 @@
           <input matInput [matDatepicker]="pickerCita" formControlName="fechaCita">
           <mat-datepicker-toggle matIconSuffix [for]="pickerCita"></mat-datepicker-toggle>
           <mat-datepicker #pickerCita></mat-datepicker>
+          <mat-error *ngIf="gestionForm.get('fechaCita')?.hasError('required')">
+            La fecha es requerida
+          </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" *ngIf="data.accion === 'reprogramar'">
           <mat-label>Hora de Cita</mat-label>
           <input matInput type="time" formControlName="horaCita">
         </mat-form-field>
+
+        <div *ngIf="data.accion === 'reprogramar' && gestionForm.hasError('invalidDateTime')" class="span-all error-message">
+          <mat-icon>error</mat-icon>
+          <span>La fecha y hora debe ser mayor o igual a la fecha y hora actual</span>
+        </div>
 
         <mat-form-field appearance="outline" class="span-all">
           <mat-label>Motivo</mat-label>

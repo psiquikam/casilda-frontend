@@ -36,11 +36,19 @@ export class ModalApreciacionPsicologicaComponent implements OnInit {
   private readonly maestrosUrl = `${environment.apiBaseUrl}/maestros`;
 
   data = {
+    idTipoApreciacion: null as number | null,
     tipo: '',
     descripcion: ''
   };
 
   tiposApreciacion: MaestroDto[] = [];
+
+  onTipoChange(id: number): void {
+    const selected = this.tiposApreciacion.find(t => t.id === id);
+    if (selected) {
+      this.data.tipo = selected.nombre;
+    }
+  }
 
   constructor(public dialogRef: MatDialogRef<ModalApreciacionPsicologicaComponent>) { }
 

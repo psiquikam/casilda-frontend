@@ -86,7 +86,7 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
   cargando = false;
 
 
-  displayedColumns: string[] = ['expand', 'nombre', 'documento', 'fecha', 'unidadAdministrativa', 'profesional', 'acciones'];
+  displayedColumns: string[] = ['expand', 'nombre', 'documento', 'fecha', 'tipoAsignacion', 'profesional', 'acciones'];
   expandedElement: any | null;
   numIntentosMap: Record<number, number> = {};
   maxLlamadas = 2;
@@ -95,7 +95,7 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
     nombre: '',
     documento: '',
     fecha: '',
-    unidadAdministrativa: '',
+    tipoAsignacion: '',
     profesional: ''
   };
 
@@ -128,6 +128,7 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
           nombre: s.nombreSolicitante,
           documento: s.documentoSolicitante,
           fecha: formatFechaCreacion(s.fechaCreacion),
+          tipoAsignacion: s.tipoAsignacion || '',
           unidadAdministrativa: s.remitenteUnidadAdministrativa || s.unidadAdministrativa || '',
           tipoSolicitud: s.tipoSolicitud,
           campus: s.remitenteCampus || '',
@@ -195,7 +196,7 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
         && (!searchTerms.nombre || nombreCompleto.includes(searchTerms.nombre))
         && (!searchTerms.documento || documentoCompleto.includes(searchTerms.documento))
         && (!searchTerms.fecha || data.fecha?.toLowerCase().includes(searchTerms.fecha))
-        && (!searchTerms.unidadAdministrativa || data.unidadAdministrativa?.toLowerCase().includes(searchTerms.unidadAdministrativa))
+        && (!searchTerms.tipoAsignacion || data.tipoAsignacion?.toLowerCase().includes(searchTerms.tipoAsignacion))
         && (!searchTerms.profesional || data.profesional?.toLowerCase().includes(searchTerms.profesional));
     };
   }

@@ -229,18 +229,19 @@ export enum EstadoCitaEnum {
 
 export enum VinculoUdeAEnum {
   ESTUDIANTE_PREGRADO = 1,
-  PERSONAL_ADMINISTRATIVO = 2,
-  DOCENTE_VINCULADO = 3,
-  EGRESADO = 4,
-  DOCENTE_OCASIONAL = 5,
-  DOCENTE_DE_CATEDRA = 6,
-  CONTRATISTA = 7,
-  OTRO_TIPO_DE_VINCULO = 8,
-  ESTUDIANTE_DE_POSGRADO = 9,
-  DOCENTE_CATEDRA_50 = 10,
-  JUBILADO_PENSIONADO = 11,
-  PRESTADOR_DE_SERVICIOS = 12,
-  EXTERNO = 13
+  ESTUDIANTE_POSGRADO = 2,
+  EGRESADO_PREGRADO = 3,
+  EGRESADO_POSGRADO = 4,
+  PERSONAL_ADMINISTRATIVO = 5,
+  DOCENTE_VINCULADO = 6,
+  DOCENTE_OCASIONAL = 7,
+  DOCENTE_DE_CATEDRA = 8,
+  CONTRATISTA = 9,
+  OTRO_TIPO_DE_VINCULO = 10,
+  DOCENTE_CATEDRA_50 = 11,
+  JUBILADO_PENSIONADO = 12,
+  PRESTADOR_DE_SERVICIOS = 13,
+  EXTERNO = 14
 }
 
 export interface CitaDto {
@@ -267,8 +268,15 @@ export interface CitaDto {
   correoPersonal?: string;
 }
 
+export interface CasoResponseDto {
+  id: number;
+  codigo?: string;
+}
+
 export interface AtencionResponseDto {
   id: number;
+  casoId?: number;
+  codigo?: string;
   fecha: string;
   citaId: number;
   tipoServicioId: number;
@@ -281,6 +289,7 @@ export interface AtencionResponseDto {
   eps: string;
   logroAcuerdo: boolean;
 }
+
 
 export interface ReprogramarCitaRequestDto {
   fechaCita: string;
@@ -407,71 +416,71 @@ export interface CasoAtencionRequestDto {
   agresorVictima: AgresorVictimaRequestDto;
 }
 
-export interface RegistroAtencionCompleteRequestDto {
-  atencion?: AtencionRegistroRequestDto;
-  atencionContexto?: AtencionContextoRequestDto;
-  persona?: PersonaAtencionRequestDto;
-  caso?: CasoAtencionRequestDto;
-  seguimientos?: SeguimientoAtencionRequestDto[];
+export interface PestanaDocumentacionRequestDto {
+  idCaso: number | null;
   hechos?: HechoRequestDto[];
-  compromisos?: CompromisosAtencionRequestDto;
-  otrosCasos?: RegistroOtroCasoRequestDto[];
-  otrosCasosActualizar?: ActualizarOtroCasoRequestDto[];
-  otrosCasosEliminar?: number[];
+  hacecuantooccurrio: number;
+  idtiempoocurridounidad?: number | null;
+  idformaocurrencia?: number | null;
+  idciudadhechos?: number | null;
+  idlugarocurrencia?: number | null;
+  violenciabasadagenero: boolean;
+  hechoviolenciaocurrioactividadesmisionales: boolean;
+  idactivadmisional?: number | null;
 }
 
-export interface Pestana1RequestDto {
-  citaId: number;
-  idAtencion?: number | null;
-  persona: PersonaAtencionRequestDto;
-  idRegimen?: number;
-  idEps?: number;
+export interface PestanaVBGRequestDto {
+  idCaso: number | null;
+  modalidadesViolenciaPsicologica: number[];
+  modalidadesViolenciaFisica: number[];
+  modalidadesViolenciaSexual: number[];
+  modalidadesViolenciaInstitucional: number[];
+  modalidadesViolenciaEconomica: number[];
+  modalidadesViolenciaInformatica: number[];
+  modalidadesViolenciaPrejuicio: number[];
 }
 
-export interface Pestana2RequestDto {
-  citaId: number;
-  idAtencion?: number | null;
-  atencionContexto: AtencionContextoRequestDto;
-  observacionesTelefono?: string | null;
-  observacionesCorreo?: string | null;
+export interface PestanaPresuntoAgresorRequestDto {
+  agresores: AgresorVictimaRequestDto[];
+  idCaso: number | null;
 }
 
-export interface Pestana3RequestDto {
-  citaId: number;
+export interface PestanaRegistroAtencionRequestDto {
+  casoId: number;
   idAtencion?: number | null;
-  caso: CasoAtencionRequestDto;
-  hechos?: HechoRequestDto[];
+  idTipoServicio: number;
+  idLugarEntrevista: number;
+  archivoConsentimientoNombre?: string;
+  archivoConsentimientoTipo?: string;
+  archivoConsentimientoContenido?: string;
 }
 
-export interface Pestana4RequestDto {
-  citaId: number;
-  idAtencion?: number | null;
-  caso: CasoAtencionRequestDto;
+export interface RutaAtencionRequestDto {
+  idTipoRutaActivacion: number;
+  idRutaActivacion: number;
 }
 
-export interface Pestana5RequestDto {
-  citaId: number;
-  idAtencion?: number | null;
-  agresorVictima: AgresorVictimaRequestDto;
+export interface RemisionAtencionRequestDto {
+  idTipoRemision: number;
+  cual?: string | null;
+  fecha?: string | null;
 }
 
-export interface Pestana6RequestDto {
-  citaId: number;
-  idAtencion?: number | null;
-}
-
-export interface Pestana7RequestDto {
-  citaId: number;
-  idAtencion?: number | null;
+export interface PestanaAcuerdosRequestDto {
+  idAtencion: number;
   logroAcuerdo: boolean;
+  rutas: RutaAtencionRequestDto[];
+  remisiones: RemisionAtencionRequestDto[];
 }
 
-export interface Pestana8RequestDto {
-  citaId: number;
-  idAtencion?: number | null;
-  otrosCasos?: RegistroOtroCasoRequestDto[];
-  otrosCasosActualizar?: ActualizarOtroCasoRequestDto[];
-  otrosCasosEliminar?: number[];
+export interface ApreciacionRequestDto {
+  idTipoApreciacion: number;
+  descripcion: string;
+}
+
+export interface PestanaApreciacionesRequestDto {
+  idAtencion: number;
+  apreciaciones: ApreciacionRequestDto[];
 }
 
 export interface MedidaProteccionRequestDto {
@@ -482,28 +491,25 @@ export interface MedidaProteccionRequestDto {
   descripcion: string;
 }
 
-export interface Pestana9RequestDto {
-  citaId: number;
-  idAtencion?: number | null;
-  medidas?: MedidaProteccionRequestDto[];
+export interface PestanaMedidasProteccionRequestDto {
+  idAtencion: number;
+  medidas: MedidaProteccionRequestDto[];
 }
 
-export interface Pestana10RequestDto {
-  citaId: number;
-  idAtencion?: number | null;
-  compromisos: CompromisosAtencionRequestDto;
+export interface PestanaOtrosCompromisosRequestDto {
+  idAtencion: number;
+  persona: CompromisoPersonaRequestDto[];
+  profesional: CompromisoProfesionalRequestDto[];
 }
 
-export interface Pestana11RequestDto {
-  citaId: number;
-  idAtencion?: number | null;
+export interface PestanaSeguimientosRequestDto {
+  idAtencion: number;
   seguimientos: SeguimientoAtencionRequestDto[];
 }
 
-export interface Pestana12RequestDto {
-  citaId: number;
-  idAtencion?: number | null;
-  idEstadoAtencion: number;
+export interface PestanaEstadoCasoRequestDto {
+  idCaso: number;
+  idEstadoCaso: number;
 }
 
 export interface RegistroOtroCasoRequestDto {
@@ -673,32 +679,12 @@ export class SolicitudService {
     return this.http.post(`${this.compromisosUrl}/profesional`, datos);
   }
 
-  registrarAtencionCompleta(datos: RegistroAtencionCompleteRequestDto): Observable<AtencionResponseDto> {
-    return this.http.post<AtencionResponseDto>(this.atencionesUrl, datos);
-  }
-
-  registrarPestana(tabIndex: number, datos: any): Observable<AtencionResponseDto> {
-    return this.http.post<AtencionResponseDto>(`${this.atencionesUrl}/pestana/${tabIndex}`, datos);
+  registrarPestana(tabIndex: number, datos: any): Observable<any> {
+    return this.http.post<any>(`${this.atencionesUrl}/pestana/${tabIndex}`, datos);
   }
 
   obtenerAtencionPorCita(citaId: number): Observable<AtencionResponseDto> {
     return this.http.get<AtencionResponseDto>(`${this.atencionesUrl}/cita/${citaId}`);
-  }
-
-  listarOtrosCasos(solicitudId: number): Observable<OtroCasoDto[]> {
-    return this.http.get<OtroCasoDto[]>(`${this.atencionesUrl}/solicitudes/${solicitudId}/otros-casos`);
-  }
-
-  crearOtroCaso(solicitudId: number, datos: RegistroOtroCasoRequestDto): Observable<OtroCasoDto> {
-    return this.http.post<OtroCasoDto>(`${this.atencionesUrl}/solicitudes/${solicitudId}/otros-casos`, datos);
-  }
-
-  actualizarOtroCaso(idCaso: number, datos: RegistroOtroCasoRequestDto): Observable<OtroCasoDto> {
-    return this.http.put<OtroCasoDto>(`${this.atencionesUrl}/otros-casos/${idCaso}`, datos);
-  }
-
-  eliminarOtroCaso(idCaso: number): Observable<void> {
-    return this.http.delete<void>(`${this.atencionesUrl}/otros-casos/${idCaso}`);
   }
 
   crearSeguimiento(datos: SeguimientoAtencionRequestDto): Observable<unknown> {

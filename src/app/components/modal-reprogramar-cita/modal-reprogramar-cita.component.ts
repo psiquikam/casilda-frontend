@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, Validators, ReactiveFormsModule, FormGroup } from '@angular/forms';
+import { FormBuilder, Validators, ReactiveFormsModule, FormGroup, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -12,6 +12,51 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { MaestroDto } from '../../services/listas.service';
+
+/**
+ * Validador personalizado a nivel de FormGroup que verifica que la fecha y hora sean mayor o igual a la actual
+ */
+export function futureDateTime(formGroup: AbstractControl): ValidationErrors | null {
+  if (!(formGroup instanceof FormGroup)) {
+    return null;
+  }
+
+  const fechaControl = formGroup.get('fechaCita');
+  const horaControl = formGroup.get('horaCita');
+
+  if (!fechaControl?.value || !horaControl?.value) {
+    return null;
+  }
+
+  try {
+    // Parsear la fecha seleccionada
+    const fechaStr = fechaControl.value;
+    const horaStr = horaControl.value;
+    
+    let selectedDateTime: Date;
+    if (typeof fechaStr === 'string') {
+      // Formato: YYYY-MM-DD
+      const [year, month, day] = fechaStr.split('-').map(Number);
+      const [hours, minutes] = horaStr.split(':').map(Number);
+      selectedDateTime = new Date(year, month - 1, day, hours, minutes, 0);
+    } else {
+      // Es un objeto Date
+      const [hours, minutes] = horaStr.split(':').map(Number);
+      selectedDateTime = new Date(fechaStr);
+      selectedDateTime.setHours(hours, minutes, 0, 0);
+    }
+
+    const now = new Date();
+
+    if (selectedDateTime < now) {
+      return { 'invalidDateTime': { value: `${fechaStr} ${horaStr}` } };
+    }
+  } catch (e) {
+    return null;
+  }
+
+  return null;
+}
 
 @Component({
   selector: 'app-reprogramar-modal',
@@ -49,6 +94,10 @@ export class ReprogramarCitaModalComponent implements OnInit {
       this.gestionForm.get('fechaCita')?.updateValueAndValidity();
       this.gestionForm.get('horaCita')?.clearValidators();
       this.gestionForm.get('horaCita')?.updateValueAndValidity();
+    } else if (this.data.accion === 'reprogramar') {
+      // Agregar validador de fecha y hora para reprogramación
+      this.gestionForm.setValidators(futureDateTime);
+      this.gestionForm.updateValueAndValidity();
     }
     if (this.data.caso && this.data.caso.fecha) {
       this.gestionForm.patchValue({
