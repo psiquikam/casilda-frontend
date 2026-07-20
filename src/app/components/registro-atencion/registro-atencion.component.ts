@@ -45,7 +45,7 @@ import { ModalSeguimientosComponent } from '../modal-seguimiento/modal-seguimien
 import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
 import { ModalAgregarCasoComponent } from '../modal-agregar-caso/modal-agregar-caso.component';
 import { AuthService } from '../../services/auth.service';
-import { AtencionContextoRequestDto, AtencionRegistroRequestDto, CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, HechoRequestDto, RegistroAtencionCompleteRequestDto, SeguimientoAtencionRequestDto, SolicitudService, VinculoUdeAEnum } from '../../services/solicitud.service';
+import { AtencionContextoRequestDto, AtencionRegistroRequestDto, CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, HechoRequestDto, SeguimientoAtencionRequestDto, SolicitudService, VinculoUdeAEnum } from '../../services/solicitud.service';
 import { MaestroDto } from '../../services/listas.service';
 import { environment } from '../../../environments/environment';
 
