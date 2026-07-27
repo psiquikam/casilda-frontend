@@ -26,7 +26,7 @@ export function getSpanishPaginatorIntl() {
 }
 
 @Component({
-  selector: 'app-tabla-casos',
+  selector: 'app-tabla-citas',
   standalone: true,
   imports: [
     CommonModule,
@@ -40,8 +40,8 @@ export function getSpanishPaginatorIntl() {
   providers: [
     { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
   ],
-  templateUrl: './tabla-casos.component.html',
-  styleUrls: ['./tabla-casos.component.scss'],
+  templateUrl: './tabla-citas.component.html',
+  styleUrls: ['./tabla-citas.component.scss'],
   animations: [
     trigger('detailExpand', [
       state('collapsed, void', style({ height: '0px', minHeight: '0' })),
@@ -50,7 +50,7 @@ export function getSpanishPaginatorIntl() {
     ]),
   ],
 })
-export class TablaCasosComponent implements AfterViewInit {
+export class TablaCitasComponent implements AfterViewInit {
 
   @Input() dataSource!: MatTableDataSource<any>;
   @Input() displayedColumns!: string[];
@@ -81,6 +81,14 @@ export class TablaCasosComponent implements AfterViewInit {
 
   iniciarAtencion(element: any) {
     this.iniciar.emit(element);
+  }
+
+  reprogramarCita(element: any) {
+    this.reprogramar.emit(element);
+  }
+
+  cancelarCita(element: any) {
+    this.cancelar.emit(element);
   }
 
   toggleExpand(element: any) {

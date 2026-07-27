@@ -44,13 +44,12 @@ import { ModalCompromisosProfesionalesComponent } from '../modal-compromisos-pro
 import { ModalSeguimientosComponent } from '../modal-seguimiento/modal-seguimiento.component';
 import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
 import { AuthService } from '../../services/auth.service';
-import { AtencionContextoRequestDto, AtencionRegistroRequestDto, CasoDto, CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, HechoRequestDto, SeguimientoAtencionRequestDto, SolicitudService, VinculoUdeAEnum } from '../../services/solicitud.service';
+import { AtencionContextoRequestDto, AtencionRegistroRequestDto, CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, HechoRequestDto, SeguimientoAtencionRequestDto, SolicitudService, VinculoUdeAEnum } from '../../services/solicitud.service';
 import { MaestroDto } from '../../services/listas.service';
 import { environment } from '../../../environments/environment';
-import { TablaCasosComponent } from '../tabla-casos/tabla-casos.component';
 
 @Component({
-  selector: 'app-registro-atencion',
+  selector: 'app-registro-caso',
   standalone: true,
   imports: [
     CommonModule,
@@ -73,12 +72,13 @@ import { TablaCasosComponent } from '../tabla-casos/tabla-casos.component';
     MatTooltipModule,
     MatProgressSpinnerModule,
     MatAutocompleteModule,
+    TablaCitasComponent,
     MatCheckboxModule,
     FormsModule,
-    TablaCasosComponent,
+    ModalPresuntoAgresorComponent
   ],
-  templateUrl: './registro-atencion.component.html',
-  styleUrls: ['./registro-atencion.component.scss', './registro-atencion.consulta.scss'],
+  templateUrl: './registro-caso.component.html',
+  styleUrls: ['./registro-caso.component.scss', './registro-caso.consulta.scss'],
   animations: [
     trigger('detailExpand', [
       state('collapsed', style({ height: '0px', minHeight: '0', visibility: 'hidden' })),
@@ -87,8 +87,8 @@ import { TablaCasosComponent } from '../tabla-casos/tabla-casos.component';
     ]),
   ],
 })
-export class RegistroAtencionComponent implements OnInit, AfterViewInit {
-  atencionForm!: FormGroup;
+export class RegistroCasoComponent implements OnInit, AfterViewInit {
+  casoForm!: FormGroup;
   atencionId: number | null = null;
   casoId: number | null = null;
   activeTabIndex = 0;
@@ -96,9 +96,9 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
   casoPorAtender: any[] = [];
   dataSource = new MatTableDataSource<any>(this.casoPorAtender);
-  totalElementosCasos = 0;
-  pageIndexCasos = 0;
-  pageSizeCasos = 10;
+  totalElementosCitas = 0;
+  pageIndexCitas = 0;
+  pageSizeCitas = 10;
   displayedColumnsTablaInicial: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'tipoAsignacion', 'profesional', 'acciones'];
   catalogoSeguimiento: string[] = ['Presencial', 'Telefónico', 'Virtual', 'Visita Domiciliaria'];
 
@@ -113,7 +113,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   };
 
   get maxLongitudDocumento(): number {
-    const tipo = String(this.atencionForm?.get('tipoDocumento')?.value ?? '').toUpperCase().trim();
+    const tipo = String(this.casoForm?.get('tipoDocumento')?.value ?? '').toUpperCase().trim();
     if (!tipo) {
       return 12;
     }
@@ -130,7 +130,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     const limpio = input.value.replace(/\D/g, '').slice(0, this.maxLongitudDocumento);
     if (input.value !== limpio) {
       input.value = limpio;
-      this.atencionForm.get('documento')?.setValue(limpio, { emitEvent: false });
+      this.casoForm.get('documento')?.setValue(limpio, { emitEvent: false });
     }
   }
 
@@ -192,7 +192,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     { tab: 'Documentación', label: 'Violencia misional', control: 'violenciaMisional' },
     {
       tab: 'Documentación', label: 'Actividad misional', control: 'actividadMisional',
-      condition: () => this.atencionForm?.get('violenciaMisional')?.value === 'SI'
+      condition: () => this.casoForm?.get('violenciaMisional')?.value === 'SI'
     },
     { tab: 'Presunto agresor', label: 'Primer nombre (agresor)', control: 'presuntoPrimerNombre' },
     { tab: 'Presunto agresor', label: 'Primer apellido (agresor)', control: 'presuntoPrimerApellido' },
@@ -285,10 +285,10 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     this.configurarValidacionActividadMisional();
     this.configurarUnidadAdministrativaMunicipios();
     this.cargarListasMaestras();
-    this.cargarCasos();
+    this.cargarCitas();
     const nombreUsuario = this.authService.currentUser?.nombre || '';
-    this.atencionForm.get('personaRegistra')?.setValue(nombreUsuario);
-    this.atencionForm.get('personaAtiende')?.setValue(nombreUsuario);
+    this.casoForm.get('personaRegistra')?.setValue(nombreUsuario);
+    this.casoForm.get('personaAtiende')?.setValue(nombreUsuario);
 
     this.dataSource.filterPredicate = (data: any, filter: string): boolean => {
       const searchTerms = JSON.parse(filter);
@@ -302,15 +302,15 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
 
 
-    this.atencionForm.get('logroAcuerdo')?.valueChanges.subscribe(valor => {
+    this.casoForm.get('logroAcuerdo')?.valueChanges.subscribe(valor => {
       if (valor === 'NO') {
         this.remisionesRegistrados = [];
         this.activarRutasRegistrados = [];
       }
     });
 
-    this.atencionForm.get('vinculo')?.valueChanges.subscribe(valor => {
-      const controlOtro = this.atencionForm.get('otroVinculo');
+    this.casoForm.get('vinculo')?.valueChanges.subscribe(valor => {
+      const controlOtro = this.casoForm.get('otroVinculo');
       if (controlOtro) {
         const idVinculo = this.resolverIdMaestro(valor, this.catalogoVinculosUdea);
         if (idVinculo === VinculoUdeAEnum.OTRO_TIPO_DE_VINCULO) {
@@ -326,13 +326,13 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       this.evaluarYcargarProgramas();
     });
 
-    this.atencionForm.get('unidadAcademica')?.valueChanges.subscribe(() => {
+    this.casoForm.get('unidadAcademica')?.valueChanges.subscribe(() => {
       this.evaluarYcargarProgramas();
     });
   }
 
   esVinculoHabilitadoParaPrograma(): boolean {
-    const vinculoVal = this.atencionForm.get('vinculo')?.value;
+    const vinculoVal = this.casoForm.get('vinculo')?.value;
     if (!vinculoVal) return false;
     const idVinculo = this.resolverIdMaestro(vinculoVal, this.catalogoVinculosUdea);
     return idVinculo === VinculoUdeAEnum.ESTUDIANTE_PREGRADO || idVinculo === VinculoUdeAEnum.ESTUDIANTE_POSGRADO ||
@@ -341,7 +341,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
 
   evaluarYcargarProgramas(): void {
-    const controlPrograma = this.atencionForm.get('programa');
+    const controlPrograma = this.casoForm.get('programa');
     if (!this.esVinculoHabilitadoParaPrograma()) {
       controlPrograma?.setValue('');
       controlPrograma?.disable({ emitEvent: false });
@@ -349,7 +349,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    const unidadAcademicaVal = this.atencionForm.get('unidadAcademica')?.value;
+    const unidadAcademicaVal = this.casoForm.get('unidadAcademica')?.value;
     if (!unidadAcademicaVal) {
       controlPrograma?.setValue('');
       controlPrograma?.disable({ emitEvent: false });
@@ -365,7 +365,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    const vinculoVal = this.atencionForm.get('vinculo')?.value;
+    const vinculoVal = this.casoForm.get('vinculo')?.value;
     const idVinculo = this.resolverIdMaestro(vinculoVal, this.catalogoVinculosUdea);
     const pregrado = idVinculo === VinculoUdeAEnum.ESTUDIANTE_PREGRADO ||
       idVinculo === VinculoUdeAEnum.EGRESADO_PREGRADO;
@@ -387,8 +387,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
 
   private configurarValidacionActividadMisional(): void {
-    const controlViolenciaMisional = this.atencionForm.get('violenciaMisional');
-    const controlActividadMisional = this.atencionForm.get('actividadMisional');
+    const controlViolenciaMisional = this.casoForm.get('violenciaMisional');
+    const controlActividadMisional = this.casoForm.get('actividadMisional');
 
     if (!controlViolenciaMisional || !controlActividadMisional) {
       return;
@@ -503,57 +503,57 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   }
 
   private configurarUnidadAdministrativaMunicipios(): void {
-    this.atencionForm.get('departamentoNacimiento')?.valueChanges.subscribe((value) => {
+    this.casoForm.get('departamentoNacimiento')?.valueChanges.subscribe((value) => {
       if (typeof value === 'string') {
         const filterValue = value.toLowerCase();
         this.listaDepartamentosFiltrados = this.listaDepartamentos.filter(d => d.nombre.toLowerCase().includes(filterValue));
       } else if (value) {
-        this.atencionForm.patchValue({ ciudadNacimiento: '' });
+        this.casoForm.patchValue({ ciudadNacimiento: '' });
         this.municipiosNacimiento = [];
         this.municipiosNacimientoFiltrados = [];
         this.cargarMunicipiosPorDepartamento(Number(value), 'nacimiento');
       }
     });
 
-    this.atencionForm.get('ciudadNacimiento')?.valueChanges.subscribe((value) => {
+    this.casoForm.get('ciudadNacimiento')?.valueChanges.subscribe((value) => {
       if (typeof value === 'string') {
         const filterValue = value.toLowerCase();
         this.municipiosNacimientoFiltrados = this.municipiosNacimiento.filter(m => m.nombre.toLowerCase().includes(filterValue));
       }
     });
 
-    this.atencionForm.get('departamentoResidencia')?.valueChanges.subscribe((value) => {
+    this.casoForm.get('departamentoResidencia')?.valueChanges.subscribe((value) => {
       if (typeof value === 'string') {
         const filterValue = value.toLowerCase();
         this.listaDepartamentosFiltrados = this.listaDepartamentos.filter(d => d.nombre.toLowerCase().includes(filterValue));
       } else if (value) {
-        this.atencionForm.patchValue({ ciudadResidencia: '' });
+        this.casoForm.patchValue({ ciudadResidencia: '' });
         this.municipiosResidencia = [];
         this.municipiosResidenciaFiltrados = [];
         this.cargarMunicipiosPorDepartamento(Number(value), 'residencia');
       }
     });
 
-    this.atencionForm.get('ciudadResidencia')?.valueChanges.subscribe((value) => {
+    this.casoForm.get('ciudadResidencia')?.valueChanges.subscribe((value) => {
       if (typeof value === 'string') {
         const filterValue = value.toLowerCase();
         this.municipiosResidenciaFiltrados = this.municipiosResidencia.filter(m => m.nombre.toLowerCase().includes(filterValue));
       }
     });
 
-    this.atencionForm.get('departamentoHechos')?.valueChanges.subscribe((value) => {
+    this.casoForm.get('departamentoHechos')?.valueChanges.subscribe((value) => {
       if (typeof value === 'string') {
         const filterValue = value.toLowerCase();
         this.listaDepartamentosFiltrados = this.listaDepartamentos.filter(d => d.nombre.toLowerCase().includes(filterValue));
       } else if (value) {
-        this.atencionForm.patchValue({ ciudadHechos: '' });
+        this.casoForm.patchValue({ ciudadHechos: '' });
         this.municipiosHechos = [];
         this.municipiosHechosFiltrados = [];
         this.cargarMunicipiosPorDepartamento(Number(value), 'hechos');
       }
     });
 
-    this.atencionForm.get('ciudadHechos')?.valueChanges.subscribe((value) => {
+    this.casoForm.get('ciudadHechos')?.valueChanges.subscribe((value) => {
       if (typeof value === 'string') {
         const filterValue = value.toLowerCase();
         this.municipiosHechosFiltrados = this.municipiosHechos.filter(m => m.nombre.toLowerCase().includes(filterValue));
@@ -683,14 +683,14 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     this.dataSource.filter = JSON.stringify(this.filterValues);
   }
 
-  onPageChangeCasos(event: PageEvent): void {
-    this.pageIndexCasos = event.pageIndex;
-    this.pageSizeCasos = event.pageSize;
-    this.cargarCasos(this.pageIndexCasos, this.pageSizeCasos);
+  onPageChangeCitas(event: PageEvent): void {
+    this.pageIndexCitas = event.pageIndex;
+    this.pageSizeCitas = event.pageSize;
+    this.cargarCitas(this.pageIndexCitas, this.pageSizeCitas);
   }
 
   onCheckboxChange(event: any, valor: number, arrayName: string) {
-    const lista = this[arrayName as keyof RegistroAtencionComponent] as number[];
+    const lista = this[arrayName as keyof RegistroCasoComponent] as number[];
     if (event.checked) {
       lista.push(valor);
     } else {
@@ -709,7 +709,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     };
 
     if (controlMap[arrayName]) {
-      this.atencionForm.get(controlMap[arrayName])?.setValue(lista.join(', '));
+      this.casoForm.get(controlMap[arrayName])?.setValue(lista.join(', '));
     }
   }
 
@@ -718,75 +718,47 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     this.casoSeleccionado = null;
   }
 
-  private cargarCasos(page: number = 0, size: number = this.pageSizeCasos): void {
-    this.solicitudService.listarCasosPaginados(page, size).subscribe({
+  private cargarCitas(page: number = 0, size: number = this.pageSizeCitas): void {
+    this.solicitudService.listarCitasPaginadas(page, size, undefined, EstadoCitaEnum.CANCELADA).subscribe({
       next: (respuesta) => {
-        const filas = respuesta.content.map((caso) => this.mapearCasoATabla(caso));
+        const filas = respuesta.content.map((cita) => this.mapearCitaATabla(cita));
         this.casoPorAtender = filas;
         this.dataSource.data = filas;
-        this.totalElementosCasos = respuesta.totalElements;
-        this.pageIndexCasos = respuesta.number;
-        this.pageSizeCasos = respuesta.size;
+        this.totalElementosCitas = respuesta.totalElements;
+        this.pageIndexCitas = respuesta.number;
+        this.pageSizeCitas = respuesta.size;
       },
       error: (error) => {
-        console.error('Error al cargar casos:', error);
+        console.error('Error al cargar citas:', error);
         this.casoPorAtender = [];
         this.dataSource.data = [];
-        this.totalElementosCasos = 0;
+        this.totalElementosCitas = 0;
       }
     });
   }
 
-  private mapearCasoATabla(caso: CasoDto): any {
-    let fechaCasoFormateada = '';
-    if (caso.fechaCaso) {
-      const stringFecha = caso.fechaCaso.substring(0, 10);
-      const partes = stringFecha.split('-');
-      if (partes.length === 3) {
-        fechaCasoFormateada = `${partes[2]}/${partes[1]}/${partes[0]}`;
-      } else {
-        fechaCasoFormateada = stringFecha;
-      }
-    }
-
+  private mapearCitaATabla(cita: CitaDto): any {
     return {
-      id: caso.codigo || String(caso.id),
-      solicitudId: caso.solicitudId,
-      citaId: caso.citaId,
-      casoId: caso.id,
-      nombre: caso.nombreSolicitante || '',
-      documento: caso.documento || '',
-      tipoDocumento: caso.tipoDocumento || '',
-      tipoSolicitud: caso.tipoSolicitud || '',
-      fecha: fechaCasoFormateada,
-      tipoAsignacion: caso.tipoAsignacion || '',
-      unidadAdministrativa: caso.unidadAdministrativa || '',
-      profesional: caso.profesional || 'Sin asignar',
-      unidadAcademica: caso.unidadAcademica || '',
-      campus: caso.campus || '',
-      genero: caso.identidadGenero || '',
-      element: null, // edad placeholder, matching mapping
+      id: cita.codigoSolicitud || String(cita.solicitudId),
+      solicitudId: cita.solicitudId,
+      citaId: cita.id,
+      nombre: cita.nombreSolicitante || '',
+      documento: cita.documento || '',
+      tipoDocumento: '',
+      tipoSolicitud: cita.tipoSolicitud || '',
+      fecha: cita.fechaCita ? cita.fechaCita.substring(0, 10) : '',
+      tipoAsignacion: (cita as any).tipoAsignacion || '',
+      unidadAdministrativa: cita.unidadAdministrativa || '',
+      profesional: (cita as any).grupoProfesional || (cita as any).profesional || 'Sin asignar',
+      unidadAcademica: cita.unidadAcademica || '',
+      campus: cita.campus || '',
+      genero: cita.identidadGenero || '',
       edad: null,
-      celular: caso.celular || '',
-      cargo: caso.estadoCaso || '',
-      telefono: caso.telefonoAlterno || '',
-      correoInst: caso.correoInstitucional || '',
-      correoPers: caso.correoPersonal || '',
-      primerNombre: caso.primerNombre || '',
-      segundoNombre: caso.segundoNombre || '',
-      primerApellido: caso.primerApellido || '',
-      segundoApellido: caso.segundoApellido || '',
-      fechaNacimiento: caso.fechaNacimiento || '',
-      sexo: caso.sexo || '',
-      etnia: caso.etnia || '',
-      orientacionSexual: caso.orientacionSexual || '',
-      eps: caso.eps || '',
-      regimenSalud: caso.regimenSalud || '',
-      departamentoNacimiento: caso.departamentoNacimiento || '',
-      ciudadNacimiento: caso.ciudadNacimiento || '',
-      departamentoResidencia: caso.departamentoResidencia || '',
-      ciudadResidencia: caso.ciudadResidencia || '',
-      direccionResidencia: caso.direccionResidencia || ''
+      celular: cita.celular || '',
+      cargo: cita.estadoCita || '',
+      telefono: cita.telefonoAlterno || '',
+      correoInst: cita.correoInstitucional || '',
+      correoPers: cita.correoPersonal || ''
     };
   }
 
@@ -812,47 +784,34 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     this.telefonosRegistrados = [];
     this.agresoresRegistrados = [];
     this.atencionId = null;
-    this.casoId = caso.casoId || null;
+    this.casoId = null;
 
-    let fechaNacimientoFormateada = '';
-    if (caso.fechaNacimiento) {
-      const partes = caso.fechaNacimiento.split('-');
-      if (partes.length === 3) {
-        fechaNacimientoFormateada = `${partes[2]}/${partes[1]}/${partes[0]}`;
-      } else {
-        fechaNacimientoFormateada = caso.fechaNacimiento;
-      }
-    }
-
-    this.atencionForm.patchValue({
+    this.casoForm.patchValue({
       tipoSolicitud: caso.tipoSolicitud || 'Indirecta',
       documento: caso.documento || '',
-      tipoViolencia: caso.tipoViolencia || '',
-      tipoDocumento: caso.tipoDocumento || '',
-      primerNombre: caso.primerNombre || '',
-      segundoNombre: caso.segundoNombre || '',
-      primerApellido: caso.primerApellido || '',
-      segundoApellido: caso.segundoApellido || '',
-      fechaNacimiento: fechaNacimientoFormateada,
-      sexo: caso.sexo || '',
-      etnia: caso.etnia || '',
-      orientacionSexual: caso.orientacionSexual || '',
-      eps: caso.eps || '',
-      regimenSalud: caso.regimenSalud || '',
-      departamentoNacimiento: caso.departamentoNacimiento || '',
-      ciudadNacimiento: caso.ciudadNacimiento || '',
-      departamentoResidencia: caso.departamentoResidencia || '',
-      ciudadResidencia: caso.ciudadResidencia || '',
-      direccionResidencia: caso.direccionResidencia || '',
-      identidadSexual: caso.genero || '',
-      unidadAdministrativa: caso.unidadAdministrativa || '',
-      unidadAcademica: caso.unidadAcademica || '',
-      campus: caso.campus || '',
+      tipoViolencia: caso.tipoViolencia || ''
     });
 
     if (caso?.solicitudId) {
       this.solicitudService.obtenerPorId(caso.solicitudId).subscribe({
         next: (solicitud) => {
+          this.casoForm.patchValue({
+            tipoDocumento: solicitud.tipoDocumento || this.casoForm.get('tipoDocumento')?.value,
+            documento: solicitud.numeroDocumento || caso.documento || '',
+            primerNombre: solicitud.primerNombre || '',
+            segundoNombre: solicitud.segundoNombre || '',
+            primerApellido: solicitud.primerApellido || '',
+            segundoApellido: solicitud.segundoApellido || '',
+            fechaNacimiento: solicitud.fechaNacimiento ? new Date(solicitud.fechaNacimiento) : '',
+            unidadAdministrativa: solicitud.remitenteUnidadAdministrativa || solicitud.unidadAdministrativa || caso.unidadAdministrativa || '',
+            unidadAcademica: solicitud.remitenteUnidadAcademica || caso.unidadAcademica || '',
+            campus: solicitud.remitenteCampus || caso.campus || '',
+            identidadSexual: solicitud.identidadGenero || '',
+            departamentoResidencia: solicitud.idDepartamentoResidencia ?? '',
+            ciudadResidencia: solicitud.idCiudadResidencia ?? '',
+            direccionResidencia: solicitud.direccionResidencia || ''
+          });
+
           this.correoRegistrados = (solicitud.correos ?? []).map(c => ({
             tipoId: c.tipoId,
             tipo: c.tipo || '',
@@ -884,11 +843,11 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   }
 
   mostrarQuienRemite(): boolean {
-    return this.atencionForm.getRawValue().tipoSolicitud === 'Indirecta';
+    return this.casoForm.getRawValue().tipoSolicitud === 'Indirecta';
   }
 
   esOtroVinculo(): boolean {
-    const valor = this.atencionForm.get('vinculo')?.value;
+    const valor = this.casoForm.get('vinculo')?.value;
     return this.resolverIdMaestro(valor, this.catalogoVinculosUdea) === VinculoUdeAEnum.OTRO_TIPO_DE_VINCULO;
   }
 
@@ -901,7 +860,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         const comp = complemento ? `, ${complemento}` : '';
         const barr = barrio ? `, Barrio ${barrio}` : '';
         const direccionFinal = `${viaPrincipal} ${numeroVia}${letra} #${numeroCruce}-${placa}${barr}${comp}`;
-        this.atencionForm.patchValue({
+        this.casoForm.patchValue({
           direccionResidencia: direccionFinal.replace(/\s+/g, ' ').trim()
         });
       }
@@ -1160,12 +1119,12 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   editarAcuerdo(element: any) { console.log('Editar', element); }
 
   initForm(): void {
-    this.atencionForm = this.fb.group({
+    this.casoForm = this.fb.group({
       tipoSolicitud: [{ value: 'Indirecta', disabled: true }],
-      departamentoNacimiento: [{ value: '', disabled: true }],
-      ciudadNacimiento: [{ value: '', disabled: true }],
-      departamentoResidencia: [{ value: '', disabled: true }],
-      ciudadResidencia: [{ value: '', disabled: true }],
+      departamentoNacimiento: [''],
+      ciudadNacimiento: [''],
+      departamentoResidencia: [''],
+      ciudadResidencia: [''],
       fechaHora: [{ value: new Date(), disabled: true }],
       personaRegistra: [{ value: '', disabled: true }],
       tipoServicio: [''],
@@ -1180,12 +1139,12 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       segundoNombre: [{ value: '', disabled: true }],
       primerApellido: [{ value: '', disabled: true }],
       segundoApellido: [{ value: '', disabled: true }],
-      sexo: [{ value: '', disabled: true }],
-      etnia: [{ value: '', disabled: true }],
-      identidadSexual: [{ value: '', disabled: true }],
-      orientacionSexual: [{ value: '', disabled: true }],
-      eps: [{ value: '', disabled: true }],
-      regimenSalud: [{ value: '', disabled: true }],
+      sexo: [''],
+      etnia: [''],
+      identidadSexual: [''],
+      orientacionSexual: [''],
+      eps: [''],
+      regimenSalud: [''],
       unidadAdministrativa: [''],
       campus: [''],
       unidadAcademica: [''],
@@ -1210,7 +1169,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       presuntoSegundoApellido: [''],
       presuntoVinculoUniversidad: [''],
       presuntoVinculoVictima: [''],
-      direccionResidencia: [{ value: '', disabled: true }],
+      direccionResidencia: [''],
       violenciaPsicologica: ['NO'],
       detalleViolenciaPsicologica: [''],
       violenciaFisica: ['NO'],
@@ -1238,7 +1197,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     input.onchange = (e: any) => {
       const file = e.target.files[0];
       if (file) {
-        this.atencionForm.patchValue({ consentimientoArchivo: file });
+        this.casoForm.patchValue({ consentimientoArchivo: file });
         this.snackBar.open(`Archivo ${file.name} cargado`, 'Cerrar', { duration: 2000 });
       }
     };
@@ -1246,13 +1205,13 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   }
 
   private validarFormulario(): boolean {
-    this.atencionForm.markAllAsTouched();
+    this.casoForm.markAllAsTouched();
     this.tabErrors = new Set<string>();
     const errorsByTab: Record<string, string[]> = {};
 
     for (const field of this.tabFieldMap) {
       if (field.condition && !field.condition()) continue;
-      const ctrl = this.atencionForm.get(field.control);
+      const ctrl = this.casoForm.get(field.control);
       if (ctrl && ctrl.invalid) {
         this.tabErrors.add(field.tab);
         if (!errorsByTab[field.tab]) errorsByTab[field.tab] = [];
@@ -1274,7 +1233,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   }
 
   getLogicalTabIndex(visualIndex: number): number {
-    const isVbgVisible = this.atencionForm.get('violenciaGenero')?.value === 'SI';
+    const isVbgVisible = this.casoForm.get('violenciaGenero')?.value === 'SI';
     if (isVbgVisible) {
       return visualIndex;
     } else {
@@ -1341,7 +1300,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   }
 
   private async construirRegistroAtencionRequest(tabIndex: number): Promise<any> {
-    const formRawValue = this.atencionForm.getRawValue();
+    const formRawValue = this.casoForm.getRawValue();
     const {
       fechaHora,
       tipoServicio,
@@ -1394,18 +1353,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     const compromisosProfesional = this.compromisosProfesional
       .map((compromiso) => this.mapearCompromisoProfesionalRequest(compromiso, this.atencionId ?? 0))
       .filter((compromiso): compromiso is CompromisoProfesionalRequestDto => compromiso !== null);
-
-    const atencionContexto: AtencionContextoRequestDto = {
-      idUnidadAdministrativa: this.resolverIdMaestro(unidadAdministrativa, this.catalogoUnidadesAdministrativas),
-      idCampus: this.resolverIdMaestro(campus, this.catalogoCampus),
-      idUnidadAcademica: this.resolverIdMaestro(unidadAcademica, this.catalogoUnidadesAcademicas),
-      idVinculoUniversidad: this.resolverIdMaestro(vinculo, this.catalogoVinculosUdea),
-      otroVinculo: this.resolverIdMaestro(vinculo, this.catalogoVinculosUdea) === VinculoUdeAEnum.OTRO_TIPO_DE_VINCULO ? formRawValue.otroVinculo : null,
-      idPrograma: this.resolverIdMaestro(programa, this.catalogoProgramas),
-      idEtnia: etnia ? this.resolverIdMaestro(etnia, this.catalogoEtnias) : null,
-      idCiudadResidencia: ciudadResidencia ? Number(ciudadResidencia) : null,
-      direccionResidencia: direccionResidencia || null
-    };
 
     const correos = this.correoRegistrados
       .filter((c) => c?.correo && c?.tipoId)

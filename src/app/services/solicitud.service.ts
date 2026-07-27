@@ -268,6 +268,44 @@ export interface CitaDto {
   correoPersonal?: string;
 }
 
+export interface CasoDto {
+  id: number;
+  codigo: string;
+  solicitudId?: number;
+  citaId?: number;
+  nombreSolicitante: string;
+  tipoDocumento?: string | null;
+  documento: string;
+  fechaCaso?: string;
+  estadoCaso?: string;
+  tipoSolicitud: string;
+  unidadAdministrativa: string;
+  profesional: string;
+  tipoAsignacion: string;
+  unidadAcademica?: string;
+  campus?: string;
+  identidadGenero?: string;
+  celular?: string;
+  telefonoAlterno?: string;
+  correoInstitucional?: string;
+  correoPersonal?: string;
+  primerNombre?: string;
+  segundoNombre?: string;
+  primerApellido?: string;
+  segundoApellido?: string;
+  fechaNacimiento?: string;
+  sexo?: string;
+  etnia?: string;
+  orientacionSexual?: string;
+  eps?: string;
+  regimenSalud?: string;
+  departamentoNacimiento?: string;
+  ciudadNacimiento?: string;
+  departamentoResidencia?: string;
+  ciudadResidencia?: string;
+  direccionResidencia?: string;
+}
+
 export interface CasoResponseDto {
   id: number;
   codigo?: string;
@@ -563,6 +601,7 @@ export class SolicitudService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiBaseUrl}/solicitudes`;
   private readonly citasUrl = `${environment.apiBaseUrl}/citas`;
+  private readonly casosUrl = `${environment.apiBaseUrl}/casos`;
   private readonly atencionesUrl = `${environment.apiBaseUrl}/atenciones`;
   private readonly compromisosUrl = `${environment.apiBaseUrl}/compromisos`;
 
@@ -624,10 +663,6 @@ export class SolicitudService {
     return this.http.post<ContactoTelefonicoDto>(`${this.apiUrl}/acompanamiento/${id}/contacto`, datos);
   }
 
-  listarCitas(): Observable<CitaDto[]> {
-    return this.http.get<CitaDto[]>(this.citasUrl);
-  }
-
   listarCitasPaginadas(page: number, size: number, idEstadoCita?: number, excluirEstadoCitaId?: number): Observable<PagedResponseDto<CitaDto>> {
     let params = new HttpParams()
       .set('page', String(page))
@@ -641,6 +676,14 @@ export class SolicitudService {
     }
 
     return this.http.get<PagedResponseDto<CitaDto>>(`${this.citasUrl}/paginado`, { params });
+  }
+
+  listarCasosPaginados(page: number, size: number): Observable<PagedResponseDto<CasoDto>> {
+    const params = new HttpParams()
+      .set('page', String(page))
+      .set('size', String(size));
+
+    return this.http.get<PagedResponseDto<CasoDto>>(`${this.casosUrl}/paginado`, { params });
   }
 
   reprogramarCita(id: number, datos: ReprogramarCitaRequestDto): Observable<CitaDto> {
@@ -680,7 +723,11 @@ export class SolicitudService {
   }
 
   registrarPestana(tabIndex: number, datos: any): Observable<any> {
-    return this.http.post<any>(`${this.atencionesUrl}/pestana/${tabIndex}`, datos);
+    if (tabIndex <= 4) {
+      return this.http.post<any>(`${this.casosUrl}/pestana/${tabIndex}`, datos);
+    } else {
+      return this.http.post<any>(`${this.atencionesUrl}/pestana/${tabIndex}`, datos);
+    }
   }
 
   obtenerAtencionPorCita(citaId: number): Observable<AtencionResponseDto> {

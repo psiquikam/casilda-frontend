@@ -14,6 +14,7 @@ import { MisAsignacionesComponent } from './components/mis-asignaciones/mis-asig
 import { DetalleAcompanamientoComponent } from './components/gestion-contacto/gestion-contacto.component';
 import { ConsultaComponent } from './components/consulta/consulta.component';
 import { CasoComponent } from './components/caso/caso.component';
+import { RegistroCasoComponent } from './components/registro-caso/registro-caso.component';
 import { RegistroAtencionComponent } from './components/registro-atencion/registro-atencion.component';
 import { CitaComponent } from './components/cita/cita.component';
 import { CasildaHomeComponent } from './components/casilda-home/casilda-home.component';
@@ -77,6 +78,13 @@ export const routes: Routes = [
   {
     path: 'consulta',
     component: ConsultaComponent,
+    canActivate: [roleGuard],
+    data: { roles: ['Admin', 'Revisor'] }
+  },
+
+  {
+    path: 'registro-caso',
+    component: RegistroCasoComponent,
     canActivate: [roleGuard],
     data: { roles: ['Admin', 'Revisor'] }
   },
