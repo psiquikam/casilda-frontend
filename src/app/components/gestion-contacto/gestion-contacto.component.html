@@ -135,13 +135,15 @@
         <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
       </table>
 
-      <div *ngIf="dataSourceAsignados.data.length === 0" class="no-results-msg">
-        <mat-icon>info_outline</mat-icon>
-        <p>No se encontraron registros para gestionar.</p>
-      </div>
+      @if (dataSourceAsignados.data.length === 0) {
+        <div class="no-results-msg">
+          <mat-icon>info_outline</mat-icon>
+          <p>No se encontraron registros para gestionar.</p>
+        </div>
+      }
 
       <mat-paginator [length]="totalElementos" [pageIndex]="pageIndex" [pageSize]="pageSize"
-        [pageSizeOptions]="[5, 10, 20]" (page)="onPageChange($event)" showFirstLastButtons></mat-paginator>
+      [pageSizeOptions]="[5, 10, 20]" (page)="onPageChange($event)" showFirstLastButtons></mat-paginator>
     </div>
   </mat-card>
 </div>

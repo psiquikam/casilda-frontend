@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 
@@ -24,21 +24,20 @@ const RESULTADO_EXITOSO = 'Contesta y se concerta cita';
 @Component({
     selector: 'app-modal-gestion',
     imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        MatDialogModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatSelectModule,
-        MatButtonModule,
-        MatTableModule,
-        MatTabsModule,
-        MatIconModule,
-        MatProgressSpinnerModule,
-        MatSnackBarModule,
-        MatDatepickerModule,
-        MatNativeDateModule
-    ],
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatTableModule,
+    MatTabsModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
+    MatDatepickerModule,
+    MatNativeDateModule
+],
     templateUrl: './modal-gestion-contacto.component.html',
     styleUrls: ['./modal-gestion-contacto.component.scss']
 })

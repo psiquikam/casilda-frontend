@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, ViewChild, AfterViewInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, MatPaginatorIntl, PageEvent } from '@angular/material/paginator';
 import { MatIconModule } from '@angular/material/icon';
@@ -27,14 +27,13 @@ export function getSpanishPaginatorIntl() {
 @Component({
     selector: 'app-tabla-otros-casos',
     imports: [
-        CommonModule,
-        MatTableModule,
-        MatPaginatorModule,
-        MatIconModule,
-        MatButtonModule,
-        MatTooltipModule,
-        MatCardModule,
-    ],
+    MatTableModule,
+    MatPaginatorModule,
+    MatIconModule,
+    MatButtonModule,
+    MatTooltipModule,
+    MatCardModule
+],
     providers: [
         { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
     ],

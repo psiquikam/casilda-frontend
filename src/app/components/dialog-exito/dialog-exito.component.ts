@@ -1,12 +1,12 @@
 import { Component, Inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
     selector: 'app-exito-dialog',
-    imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule],
+    imports: [MatDialogModule, MatButtonModule, MatIconModule],
     template: `
     <div class="dialog-container">
       <mat-icon class="success-icon">check_circle</mat-icon>

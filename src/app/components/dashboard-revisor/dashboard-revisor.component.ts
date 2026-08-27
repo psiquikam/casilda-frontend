@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -10,14 +10,13 @@ import { RouterLink } from '@angular/router';
 @Component({
     selector: 'app-dashboard-revisor',
     imports: [
-        CommonModule,
-        MatCardModule,
-        MatIconModule,
-        MatProgressBarModule,
-        MatButtonModule,
-        MatTableModule,
-        RouterLink
-    ],
+    MatCardModule,
+    MatIconModule,
+    MatProgressBarModule,
+    MatButtonModule,
+    MatTableModule,
+    RouterLink
+],
     templateUrl: './dashboard-revisor.component.html',
     styleUrls: ['./dashboard-revisor.component.scss']
 })

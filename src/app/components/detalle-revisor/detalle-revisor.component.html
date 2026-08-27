@@ -17,12 +17,16 @@
 
     <div class="botones-estado">
       <span class="label">GESTIONAR FASE:</span>
-      <button mat-flat-button color="primary" (click)="cambiarEstado(2)" *ngIf="caso.estadoActual === 1">
-        <mat-icon>play_arrow</mat-icon> Iniciar Indagación
-      </button>
-      <button mat-flat-button color="accent" (click)="cambiarEstado(3)" *ngIf="caso.estadoActual === 2">
-        <mat-icon>gavel</mat-icon> Elevar a Investigación
-      </button>
+      @if (caso.estadoActual === 1) {
+        <button mat-flat-button color="primary" (click)="cambiarEstado(2)">
+          <mat-icon>play_arrow</mat-icon> Iniciar Indagación
+        </button>
+      }
+      @if (caso.estadoActual === 2) {
+        <button mat-flat-button color="accent" (click)="cambiarEstado(3)">
+          <mat-icon>gavel</mat-icon> Elevar a Investigación
+        </button>
+      }
       <button mat-stroked-button color="warn">
         <mat-icon>block</mat-icon> Desestimar
       </button>
@@ -38,7 +42,7 @@
               <h3>Relato de los Hechos</h3>
               <div class="text-box">{{ caso.queja.descripcion }}</div>
             </div>
-            
+
             <div class="info-grid">
               <div class="item">
                 <label>Tipo de Falta</label>
@@ -77,14 +81,16 @@
         <mat-tab label="Evidencias ({{ caso.archivos.length }})">
           <div class="tab-content">
             <div class="file-grid">
-              <div *ngFor="let file of caso.archivos" class="file-card">
-                <mat-icon>description</mat-icon>
-                <div class="file-meta">
-                  <span class="name">{{ file.nombre }}</span>
-                  <span class="size">{{ file.tamano }}</span>
+              @for (file of caso.archivos; track file) {
+                <div class="file-card">
+                  <mat-icon>description</mat-icon>
+                  <div class="file-meta">
+                    <span class="name">{{ file.nombre }}</span>
+                    <span class="size">{{ file.tamano }}</span>
+                  </div>
+                  <button mat-icon-button color="primary"><mat-icon>download</mat-icon></button>
                 </div>
-                <button mat-icon-button color="primary"><mat-icon>download</mat-icon></button>
-              </div>
+              }
             </div>
           </div>
         </mat-tab>

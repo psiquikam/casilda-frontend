@@ -9,7 +9,9 @@
     <mat-form-field appearance="outline" class="field-tipo">
       <mat-label>Tipo de Correo</mat-label>
       <mat-select [(ngModel)]="data.tipoId" (ngModelChange)="onTipoChange($event)">
-        <mat-option *ngFor="let tipo of tiposCorreo" [value]="tipo.id">{{ tipo.nombre }}</mat-option>
+        @for (tipo of tiposCorreo; track tipo) {
+          <mat-option [value]="tipo.id">{{ tipo.nombre }}</mat-option>
+        }
       </mat-select>
     </mat-form-field>
 
@@ -19,20 +21,22 @@
         required
         pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
         placeholder="Ej: user@gmail.com">
-      <mat-error *ngIf="correoVal.invalid && (correoVal.dirty || correoVal.touched)">
-        Ingrese un correo electrónico válido (ej: usuario&#64;dominio.com)
-      </mat-error>
-    </mat-form-field>
+        @if (correoVal.invalid && (correoVal.dirty || correoVal.touched)) {
+          <mat-error>
+            Ingrese un correo electrónico válido (ej: usuario&#64;dominio.com)
+          </mat-error>
+        }
+      </mat-form-field>
 
 
-  </div>
-</mat-dialog-content>
+    </div>
+  </mat-dialog-content>
 
-<mat-dialog-actions align="end" class="modal-actions">
-  <button mat-button (click)="onNoClick()">Cancelar</button>
+  <mat-dialog-actions align="end" class="modal-actions">
+    <button mat-button (click)="onNoClick()">Cancelar</button>
 
-  <button mat-flat-button class="btn-confirm" (click)="guardar()" [disabled]="!canSubmit">
-    <mat-icon>check</mat-icon>
-    Agregar a la lista
-  </button>
-</mat-dialog-actions>
+    <button mat-flat-button class="btn-confirm" (click)="guardar()" [disabled]="!canSubmit">
+      <mat-icon>check</mat-icon>
+      Agregar a la lista
+    </button>
+  </mat-dialog-actions>

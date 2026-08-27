@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
@@ -13,9 +13,14 @@ import { MatIconModule } from '@angular/material/icon';
 @Component({
     selector: 'app-login',
     imports: [
-        CommonModule, ReactiveFormsModule, RouterLink,
-        MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule
-    ],
+    ReactiveFormsModule,
+    RouterLink,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule
+],
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.scss']
 })

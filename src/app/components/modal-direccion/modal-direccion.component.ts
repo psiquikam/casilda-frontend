@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -16,9 +16,14 @@ import { MatIconModule } from '@angular/material/icon';
 @Component({
     selector: 'app-modal-direccion',
     imports: [
-        CommonModule, ReactiveFormsModule, MatDialogModule,
-        MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatIconModule
-    ],
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatIconModule
+],
     templateUrl: './modal-direccion.component.html',
     styleUrls: ['./modal-direccion.component.scss']
 })

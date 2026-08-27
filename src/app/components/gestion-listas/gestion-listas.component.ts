@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { ListasService, MaestroDto } from '../../services/listas.service';
 import Swal from 'sweetalert2';
@@ -25,9 +25,16 @@ interface PaginacionEstado {
 @Component({
     selector: 'app-gestion-listas',
     imports: [
-        CommonModule, FormsModule, MatTabsModule, MatTableModule,
-        MatButtonModule, MatIconModule, MatInputModule, MatFormFieldModule, MatCardModule, MatPaginatorModule
-    ],
+    FormsModule,
+    MatTabsModule,
+    MatTableModule,
+    MatButtonModule,
+    MatIconModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatCardModule,
+    MatPaginatorModule
+],
     templateUrl: './gestion-listas.component.html',
     styleUrls: ['./gestion-listas.component.scss']
 })

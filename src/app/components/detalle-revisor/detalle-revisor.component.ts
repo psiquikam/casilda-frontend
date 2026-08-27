@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,9 +11,14 @@ import { MatDividerModule } from '@angular/material/divider';
 @Component({
     selector: 'app-detalle-revisor',
     imports: [
-        CommonModule, RouterLink, MatTabsModule, MatButtonModule,
-        MatIconModule, MatChipsModule, MatCardModule, MatDividerModule
-    ],
+    RouterLink,
+    MatTabsModule,
+    MatButtonModule,
+    MatIconModule,
+    MatChipsModule,
+    MatCardModule,
+    MatDividerModule
+],
     templateUrl: './detalle-revisor.component.html',
     styleUrls: ['./detalle-revisor.component.scss']
 })

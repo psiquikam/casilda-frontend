@@ -1,45 +1,49 @@
 <h2 mat-dialog-title class="modal-title">
-    <mat-icon>assignment</mat-icon>
-    Compromiso de la dupla
+  <mat-icon>assignment</mat-icon>
+  Compromiso de la dupla
 </h2>
 
 <mat-dialog-content class="modal-content">
-    <div class="form-row"> <mat-form-field appearance="outline" class="flex-field">
-            <mat-label>Fecha de Cumplimiento</mat-label>
-            <input matInput [matDatepicker]="picker" [(ngModel)]="data.fecha" placeholder="Seleccione fecha">
-            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker #picker></mat-datepicker>
-        </mat-form-field>
+  <div class="form-row"> <mat-form-field appearance="outline" class="flex-field">
+    <mat-label>Fecha de Cumplimiento</mat-label>
+    <input matInput [matDatepicker]="picker" [(ngModel)]="data.fecha" placeholder="Seleccione fecha">
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
 
-        <mat-form-field appearance="outline" class="flex-field">
-            <mat-label>Profesional que atiende</mat-label>
-            <mat-select [(ngModel)]="data.idgrupoprofesional" (ngModelChange)="seleccionarProfesional($event)"
-                [disabled]="cargandoProfesionales">
-                <mat-option *ngFor="let opcion of gruposProfesionales" [value]="opcion.id">
-                    {{opcion.nombre}}
-                </mat-option>
-            </mat-select>
-        </mat-form-field>
+  <mat-form-field appearance="outline" class="flex-field">
+    <mat-label>Profesional que atiende</mat-label>
+    <mat-select [(ngModel)]="data.idgrupoprofesional" (ngModelChange)="seleccionarProfesional($event)"
+      [disabled]="cargandoProfesionales">
+      @for (opcion of gruposProfesionales; track opcion) {
+        <mat-option [value]="opcion.id">
+          {{opcion.nombre}}
+        </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
 
-        <mat-form-field appearance="outline" class="flex-field">
-            <mat-label>Seleccione el Compromiso</mat-label>
-            <mat-select [(ngModel)]="data.idtipocompromiso" (ngModelChange)="seleccionarCompromiso($event)"
-                [disabled]="cargandoCompromisos">
-                <mat-option *ngFor="let opcion of tiposCompromiso" [value]="opcion.id">
-                    {{opcion.nombre}}
-                </mat-option>
-            </mat-select>
-        </mat-form-field>
+  <mat-form-field appearance="outline" class="flex-field">
+    <mat-label>Seleccione el Compromiso</mat-label>
+    <mat-select [(ngModel)]="data.idtipocompromiso" (ngModelChange)="seleccionarCompromiso($event)"
+      [disabled]="cargandoCompromisos">
+      @for (opcion of tiposCompromiso; track opcion) {
+        <mat-option [value]="opcion.id">
+          {{opcion.nombre}}
+        </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
 
-    </div>
+</div>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end" class="modal-actions">
-    <button mat-button (click)="onNoClick()">Cancelar</button>
+  <button mat-button (click)="onNoClick()">Cancelar</button>
 
-    <button mat-flat-button class="btn-confirm" (click)="guardar()"
-        [disabled]="data.idtipocompromiso == null || data.idgrupoprofesional == null || !data.fecha">
-        <mat-icon>check</mat-icon>
-        Agregar compromiso
-    </button>
+  <button mat-flat-button class="btn-confirm" (click)="guardar()"
+    [disabled]="data.idtipocompromiso == null || data.idgrupoprofesional == null || !data.fecha">
+    <mat-icon>check</mat-icon>
+    Agregar compromiso
+  </button>
 </mat-dialog-actions>

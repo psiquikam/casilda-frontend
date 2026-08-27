@@ -1,102 +1,104 @@
 <div class="cita-container">
-    <mat-card class="pendientes-card">
-        <div class="table-responsive">
-            <table mat-table [dataSource]="dataSource">
+  <mat-card class="pendientes-card">
+    <div class="table-responsive">
+      <table mat-table [dataSource]="dataSource">
 
-                <ng-container matColumnDef="id">
-                    <th mat-header-cell *matHeaderCellDef>
-                        <div class="header-inline-container">
-                            <span class="column-title">ID Caso</span>
-                            <div class="search-box-slim">
-                                <input (keyup)="applyFilter('id', $event)" placeholder="Filtrar">
-                            </div>
-                        </div>
-                    </th>
-                    <td mat-cell *matCellDef="let element" class="id-cell">{{element.id}}</td>
-                </ng-container>
-
-                <ng-container matColumnDef="tiempoHechos">
-                    <th mat-header-cell *matHeaderCellDef>
-                        <div class="header-inline-container">
-                            <span class="column-title">Tiempo de los hechos</span>
-                            <div class="search-box-slim">
-                                <input (keyup)="applyFilter('tiempoHechos', $event)" placeholder="Buscar...">
-                            </div>
-                        </div>
-                    </th>
-                    <td mat-cell *matCellDef="let element">{{element.tiempoHechos}}</td>
-                </ng-container>
-
-                <ng-container matColumnDef="tipoViolencia">
-                    <th mat-header-cell *matHeaderCellDef>
-                        <div class="header-inline-container">
-                            <span class="column-title">Tipo de violencia</span>
-                            <div class="search-box-slim">
-                                <input (keyup)="applyFilter('tipoViolencia', $event)" placeholder="Buscar...">
-                            </div>
-                        </div>
-                    </th>
-                    <td mat-cell *matCellDef="let element">{{element.tipoViolencia}}</td>
-                </ng-container>
-
-                <ng-container matColumnDef="subcategoriaViolencia">
-                    <th mat-header-cell *matHeaderCellDef>
-                        <div class="header-inline-container">
-                            <span class="column-title">Subcategoría de violencia</span>
-                            <div class="search-box-slim">
-                                <input (keyup)="applyFilter('subcategoriaViolencia', $event)" placeholder="Buscar...">
-                            </div>
-                        </div>
-                    </th>
-                    <td mat-cell *matCellDef="let element">{{element.subcategoriaViolencia}}</td>
-                </ng-container>
-
-                <ng-container matColumnDef="descripcion">
-                    <th mat-header-cell *matHeaderCellDef>
-                        <div class="header-inline-container">
-                            <span class="column-title">Descripción</span>
-                            <div class="search-box-slim">
-                                <input (keyup)="applyFilter('descripcion', $event)" placeholder="Buscar...">
-                            </div>
-                        </div>
-                    </th>
-                    <td mat-cell *matCellDef="let element">{{element.descripcion}}</td>
-                </ng-container>
-
-                <ng-container matColumnDef="opcion">
-                    <th mat-header-cell *matHeaderCellDef>
-                        <div class="column-title text-center">Opción</div>
-                    </th>
-                    <td mat-cell *matCellDef="let element; let i = index">
-                        <div class="action-buttons-container">
-                            <button mat-icon-button class="action-success" (click)="onEditar(element)"
-                                matTooltip="Editar">
-                                <mat-icon svgIcon="icono-editar"></mat-icon>
-                            </button>
-                            <button mat-icon-button class="action-danger" (click)="onEliminar(element)"
-                                matTooltip="Eliminar">
-                                <mat-icon svgIcon="icono-eliminar"></mat-icon>
-                            </button>
-                        </div>
-                    </td>
-                </ng-container>
-
-                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-
-            </table>
-
-            <div *ngIf="dataSource.data.length === 0" class="no-results-msg">
-                <mat-icon>inbox</mat-icon>
-                <p>No hay casos registrados.</p>
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="header-inline-container">
+              <span class="column-title">ID Caso</span>
+              <div class="search-box-slim">
+                <input (keyup)="applyFilter('id', $event)" placeholder="Filtrar">
+              </div>
             </div>
+          </th>
+          <td mat-cell *matCellDef="let element" class="id-cell">{{element.id}}</td>
+        </ng-container>
 
-            <mat-paginator [length]="serverSidePagination ? totalElements : dataSource.data.length"
-                [pageIndex]="serverSidePagination ? pageIndex : 0"
-                [pageSize]="serverSidePagination ? pageSize : 10"
-                [pageSizeOptions]="[5, 10, 20]"
-                (page)="onPageChange($event)"
-                showFirstLastButtons></mat-paginator>
+        <ng-container matColumnDef="tiempoHechos">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="header-inline-container">
+              <span class="column-title">Tiempo de los hechos</span>
+              <div class="search-box-slim">
+                <input (keyup)="applyFilter('tiempoHechos', $event)" placeholder="Buscar...">
+              </div>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let element">{{element.tiempoHechos}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="tipoViolencia">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="header-inline-container">
+              <span class="column-title">Tipo de violencia</span>
+              <div class="search-box-slim">
+                <input (keyup)="applyFilter('tipoViolencia', $event)" placeholder="Buscar...">
+              </div>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let element">{{element.tipoViolencia}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="subcategoriaViolencia">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="header-inline-container">
+              <span class="column-title">Subcategoría de violencia</span>
+              <div class="search-box-slim">
+                <input (keyup)="applyFilter('subcategoriaViolencia', $event)" placeholder="Buscar...">
+              </div>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let element">{{element.subcategoriaViolencia}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="descripcion">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="header-inline-container">
+              <span class="column-title">Descripción</span>
+              <div class="search-box-slim">
+                <input (keyup)="applyFilter('descripcion', $event)" placeholder="Buscar...">
+              </div>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let element">{{element.descripcion}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="opcion">
+          <th mat-header-cell *matHeaderCellDef>
+            <div class="column-title text-center">Opción</div>
+          </th>
+          <td mat-cell *matCellDef="let element; let i = index">
+            <div class="action-buttons-container">
+              <button mat-icon-button class="action-success" (click)="onEditar(element)"
+                matTooltip="Editar">
+                <mat-icon svgIcon="icono-editar"></mat-icon>
+              </button>
+              <button mat-icon-button class="action-danger" (click)="onEliminar(element)"
+                matTooltip="Eliminar">
+                <mat-icon svgIcon="icono-eliminar"></mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+      </table>
+
+      @if (dataSource.data.length === 0) {
+        <div class="no-results-msg">
+          <mat-icon>inbox</mat-icon>
+          <p>No hay casos registrados.</p>
         </div>
-    </mat-card>
+      }
+
+      <mat-paginator [length]="serverSidePagination ? totalElements : dataSource.data.length"
+        [pageIndex]="serverSidePagination ? pageIndex : 0"
+        [pageSize]="serverSidePagination ? pageSize : 10"
+        [pageSizeOptions]="[5, 10, 20]"
+        (page)="onPageChange($event)"
+      showFirstLastButtons></mat-paginator>
+    </div>
+  </mat-card>
 </div>

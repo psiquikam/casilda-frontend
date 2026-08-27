@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -18,9 +18,13 @@ interface RolDto {
 @Component({
     selector: 'app-dialog-usuario',
     imports: [
-        CommonModule, ReactiveFormsModule, MatDialogModule,
-        MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule
-    ],
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule
+],
     templateUrl: './dialog-usuario.component.html',
     styleUrls: ['./dialog-usuario.component.scss']
 })

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CasildaCardComponent } from '../casilda-card/casilda-card.component';
 
@@ -14,7 +14,7 @@ interface CasildaItem {
 
 @Component({
     selector: 'app-casilda-home',
-    imports: [CommonModule, CasildaCardComponent, MatTooltipModule],
+    imports: [CasildaCardComponent, MatTooltipModule],
     templateUrl: './casilda-home.component.html',
     styleUrls: ['./casilda-home.component.scss']
 })

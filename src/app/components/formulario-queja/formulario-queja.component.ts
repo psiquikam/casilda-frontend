@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,10 +15,17 @@ import { MatSelectModule } from '@angular/material/select';
 @Component({
     selector: 'app-formulario-queja',
     imports: [
-        CommonModule, ReactiveFormsModule, MatStepperModule,
-        MatFormFieldModule, MatInputModule, MatButtonModule,
-        MatRadioModule, MatCheckboxModule, MatIconModule, MatDialogModule, MatSelectModule
-    ],
+    ReactiveFormsModule,
+    MatStepperModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatRadioModule,
+    MatCheckboxModule,
+    MatIconModule,
+    MatDialogModule,
+    MatSelectModule
+],
     templateUrl: './formulario-queja.component.html',
     styleUrls: ['./formulario-queja.component.scss']
 })

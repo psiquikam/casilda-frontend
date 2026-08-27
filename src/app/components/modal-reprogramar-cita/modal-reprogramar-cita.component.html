@@ -11,32 +11,42 @@
       </p>
 
       <div class="form-grid">
-        <mat-form-field appearance="outline" *ngIf="data.accion === 'reprogramar'">
-          <mat-label>Fecha de Cita</mat-label>
-          <input matInput [matDatepicker]="pickerCita" formControlName="fechaCita">
-          <mat-datepicker-toggle matIconSuffix [for]="pickerCita"></mat-datepicker-toggle>
-          <mat-datepicker #pickerCita></mat-datepicker>
-          <mat-error *ngIf="gestionForm.get('fechaCita')?.hasError('required')">
-            La fecha es requerida
-          </mat-error>
-        </mat-form-field>
+        @if (data.accion === 'reprogramar') {
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de Cita</mat-label>
+            <input matInput [matDatepicker]="pickerCita" formControlName="fechaCita">
+            <mat-datepicker-toggle matIconSuffix [for]="pickerCita"></mat-datepicker-toggle>
+            <mat-datepicker #pickerCita></mat-datepicker>
+            @if (gestionForm.get('fechaCita')?.hasError('required')) {
+              <mat-error>
+                La fecha es requerida
+              </mat-error>
+            }
+          </mat-form-field>
+        }
 
-        <mat-form-field appearance="outline" *ngIf="data.accion === 'reprogramar'">
-          <mat-label>Hora de Cita</mat-label>
-          <input matInput type="time" formControlName="horaCita">
-        </mat-form-field>
+        @if (data.accion === 'reprogramar') {
+          <mat-form-field appearance="outline">
+            <mat-label>Hora de Cita</mat-label>
+            <input matInput type="time" formControlName="horaCita">
+          </mat-form-field>
+        }
 
-        <div *ngIf="data.accion === 'reprogramar' && gestionForm.hasError('invalidDateTime')" class="span-all error-message">
-          <mat-icon>error</mat-icon>
-          <span>La fecha y hora debe ser mayor o igual a la fecha y hora actual</span>
-        </div>
+        @if (data.accion === 'reprogramar' && gestionForm.hasError('invalidDateTime')) {
+          <div class="span-all error-message">
+            <mat-icon>error</mat-icon>
+            <span>La fecha y hora debe ser mayor o igual a la fecha y hora actual</span>
+          </div>
+        }
 
         <mat-form-field appearance="outline" class="span-all">
           <mat-label>Motivo</mat-label>
           <mat-select formControlName="idMotivoEstadoCita">
-            <mat-option *ngFor="let m of motivos" [value]="m.id">
-              {{ m.nombre }}
-            </mat-option>
+            @for (m of motivos; track m) {
+              <mat-option [value]="m.id">
+                {{ m.nombre }}
+              </mat-option>
+            }
           </mat-select>
         </mat-form-field>
 
@@ -52,10 +62,10 @@
   <mat-dialog-actions align="end" class="modal-footer">
     <button mat-button (click)="cerrar()">Volver</button>
     <button mat-flat-button
-            [color]="colorBoton"
-            class="btn-confirm"
-            (click)="guardar()"
-            [disabled]="gestionForm.invalid">
+      [color]="colorBoton"
+      class="btn-confirm"
+      (click)="guardar()"
+      [disabled]="gestionForm.invalid">
       <mat-icon>check_circle</mat-icon>
       Confirmar {{ data.accion === 'cancelar' ? 'Cancelación' : 'Reprogramación' }}
     </button>

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { AuthService } from '../../../services/auth.service';
 import { RouterLink } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -11,14 +11,13 @@ import { MatDividerModule } from '@angular/material/divider';
 @Component({
     selector: 'app-header',
     imports: [
-        CommonModule,
-        MatToolbarModule,
-        MatButtonModule,
-        MatIconModule,
-        MatMenuModule,
-        MatDividerModule,
-        RouterLink
-    ],
+    MatToolbarModule,
+    MatButtonModule,
+    MatIconModule,
+    MatMenuModule,
+    MatDividerModule,
+    RouterLink
+],
     templateUrl: './header.component.html',
     styleUrls: ['./header.component.scss']
 })

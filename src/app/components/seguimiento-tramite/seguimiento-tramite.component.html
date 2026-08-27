@@ -9,56 +9,63 @@
         <p>Ingrese su código <strong>CAS-</strong> o <strong>ACO-</strong> para conocer el estado.</p>
       </div>
     </div>
-    
+
     <div class="search-box">
       <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Código de Seguimiento</mat-label>
-        <input matInput [(ngModel)]="codigoBusqueda" 
-               placeholder="Ej: ACO-1234" 
-               (keyup.enter)="buscarCaso()">
-        <mat-icon matPrefix>qr_code</mat-icon>
-      </mat-form-field>
-      <button mat-raised-button color="primary" class="search-btn" (click)="buscarCaso()">
-        <mat-icon>search</mat-icon> Consultar
-      </button>
-    </div>
-  </mat-card>
-
-  <div *ngIf="casoEncontrado" class="result-area animate-fade">
-    <div class="info-header">
-      <div class="type-badge" [ngClass]="casoEncontrado.codigo.startsWith('ACO') ? 'aco' : 'cas'">
-        {{ casoEncontrado.tipo }}: {{ casoEncontrado.codigo }}
+        <input matInput [(ngModel)]="codigoBusqueda"
+          placeholder="Ej: ACO-1234"
+          (keyup.enter)="buscarCaso()">
+          <mat-icon matPrefix>qr_code</mat-icon>
+        </mat-form-field>
+        <button mat-raised-button color="primary" class="search-btn" (click)="buscarCaso()">
+          <mat-icon>search</mat-icon> Consultar
+        </button>
       </div>
-      <div class="meta-info">
-        <span><mat-icon>calendar_today</mat-icon> {{ casoEncontrado.fechaActualizacion }}</span>
-        <span class="days-badge">Días: {{ casoEncontrado.diasDesdeRecepcion }}</span>
-      </div>
-    </div>
+    </mat-card>
 
-    <div class="timeline-vertical">
-      <div *ngFor="let etapa of etapas" 
-           class="timeline-item"
-           [class.completed]="etapa.id < casoEncontrado.estadoActual"
-           [class.active]="etapa.id === casoEncontrado.estadoActual">
-        
-        <div class="timeline-icon">
-          <mat-icon>{{ etapa.id < casoEncontrado.estadoActual ? 'check' : etapa.icon }}</mat-icon>
-        </div>
-        
-        <div class="timeline-content">
-          <h3>{{ etapa.nombre }}</h3>
-          <div *ngIf="etapa.id === casoEncontrado.estadoActual" class="active-detail">
-            <p>{{ casoEncontrado.detalle }}</p>
+    @if (casoEncontrado) {
+      <div class="result-area animate-fade">
+        <div class="info-header">
+          <div class="type-badge" [ngClass]="casoEncontrado.codigo.startsWith('ACO') ? 'aco' : 'cas'">
+            {{ casoEncontrado.tipo }}: {{ casoEncontrado.codigo }}
           </div>
-          <span class="status-label" *ngIf="etapa.id > casoEncontrado.estadoActual">Pendiente</span>
+          <div class="meta-info">
+            <span><mat-icon>calendar_today</mat-icon> {{ casoEncontrado.fechaActualizacion }}</span>
+            <span class="days-badge">Días: {{ casoEncontrado.diasDesdeRecepcion }}</span>
+          </div>
+        </div>
+        <div class="timeline-vertical">
+          @for (etapa of etapas; track etapa) {
+            <div
+              class="timeline-item"
+              [class.completed]="etapa.id < casoEncontrado.estadoActual"
+              [class.active]="etapa.id === casoEncontrado.estadoActual">
+              <div class="timeline-icon">
+                <mat-icon>{{ etapa.id < casoEncontrado.estadoActual ? 'check' : etapa.icon }}</mat-icon>
+              </div>
+              <div class="timeline-content">
+                <h3>{{ etapa.nombre }}</h3>
+                @if (etapa.id === casoEncontrado.estadoActual) {
+                  <div class="active-detail">
+                    <p>{{ casoEncontrado.detalle }}</p>
+                  </div>
+                }
+                @if (etapa.id > casoEncontrado.estadoActual) {
+                  <span class="status-label">Pendiente</span>
+                }
+              </div>
+            </div>
+          }
         </div>
       </div>
-    </div>
-  </div>
+    }
 
-  <mat-card *ngIf="busquedaRealizada && !casoEncontrado" class="error-card">
-    <mat-icon color="warn">error_outline</mat-icon>
-    <p>No se encontró el radicado <strong>{{codigoBusqueda}}</strong></p>
-    <small>Verifique que el código incluya el guion y el prefijo correcto.</small>
-  </mat-card>
-</div>
+    @if (busquedaRealizada && !casoEncontrado) {
+      <mat-card class="error-card">
+        <mat-icon color="warn">error_outline</mat-icon>
+        <p>No se encontró el radicado <strong>{{codigoBusqueda}}</strong></p>
+        <small>Verifique que el código incluya el guion y el prefijo correcto.</small>
+      </mat-card>
+    }
+  </div>

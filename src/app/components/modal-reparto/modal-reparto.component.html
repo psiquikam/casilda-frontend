@@ -11,23 +11,29 @@
         <mat-form-field appearance="outline">
           <mat-label>Tipo de Asignación</mat-label>
           <mat-select formControlName="idTipoAsignacion">
-            <mat-option *ngFor="let tipo of tiposAsignacion" [value]="tipo.id">{{ tipo.nombre }}</mat-option>
+            @for (tipo of tiposAsignacion; track tipo) {
+              <mat-option [value]="tipo.id">{{ tipo.nombre }}</mat-option>
+            }
           </mat-select>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
           <mat-label>Servicio</mat-label>
           <mat-select formControlName="idTipoServicio">
-            <mat-option *ngFor="let serv of tiposServicio" [value]="serv.id">{{ serv.nombre }}</mat-option>
+            @for (serv of tiposServicio; track serv) {
+              <mat-option [value]="serv.id">{{ serv.nombre }}</mat-option>
+            }
           </mat-select>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Profesional o Dupla</mat-label>
           <mat-select formControlName="grupoProfesionalId">
-            <mat-option *ngFor="let grupo of gruposProfesionales" [value]="grupo.id">
-              {{ grupo.nombre }}
-            </mat-option>
+            @for (grupo of gruposProfesionales; track grupo) {
+              <mat-option [value]="grupo.id">
+                {{ grupo.nombre }}
+              </mat-option>
+            }
           </mat-select>
         </mat-form-field>
       </div>

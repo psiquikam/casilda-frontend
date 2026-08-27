@@ -47,9 +47,8 @@
           </mat-radio-group>
         </div>
 
-        <ng-container *ngIf="acompanamientoForm.get('tipoReporte')?.value === 'indirecta'">
+        @if (acompanamientoForm.get('tipoReporte')?.value === 'indirecta') {
           <mat-tab-group animationDuration="200ms" class="form-tabs">
-
             <mat-tab label="Información del Remitente">
               <div class="tab-body-padding">
                 <div class="row">
@@ -57,7 +56,7 @@
                     <mat-label>Tipo Documento</mat-label>
                     <mat-select formControlName="remitenteTipoDocumento">
                       @for (t of tiposDocumento; track t.id) {
-                      <mat-option [value]="t.id">{{t.nombre}}</mat-option>
+                        <mat-option [value]="t.id">{{t.nombre}}</mat-option>
                       }
                     </mat-select>
                   </mat-form-field>
@@ -66,8 +65,12 @@
                     <input matInput formControlName="remitenteNumeroDocumento" (keyup.enter)="buscarRemitente($event)">
                     <button matSuffix mat-icon-button class="btn-search-doc" type="button"
                       (click)="buscarRemitente($event)" [disabled]="buscandoRemitente" matTooltip="Buscar funcionario">
-                      <mat-icon *ngIf="!buscandoRemitente">search</mat-icon>
-                      <mat-spinner *ngIf="buscandoRemitente" diameter="18"></mat-spinner>
+                      @if (!buscandoRemitente) {
+                        <mat-icon>search</mat-icon>
+                      }
+                      @if (buscandoRemitente) {
+                        <mat-spinner diameter="18"></mat-spinner>
+                      }
                     </button>
                   </mat-form-field>
                   <mat-form-field appearance="outline">
@@ -79,7 +82,6 @@
                     <input matInput formControlName="remitenteSegundoNombre">
                   </mat-form-field>
                 </div>
-
                 <div class="row">
                   <mat-form-field appearance="outline">
                     <mat-label>Primer Apellido</mat-label>
@@ -93,7 +95,7 @@
                     <mat-label>Cargo</mat-label>
                     <mat-select formControlName="remitenteCargo">
                       @for (c of cargos; track c.id) {
-                      <mat-option [value]="c.id">{{c.nombre}}</mat-option>
+                        <mat-option [value]="c.id">{{c.nombre}}</mat-option>
                       }
                     </mat-select>
                   </mat-form-field>
@@ -101,49 +103,45 @@
                     <mat-label>Campus</mat-label>
                     <mat-select formControlName="remitenteCampus">
                       @for (c of campusLista; track c.id) {
-                      <mat-option [value]="c.id">{{c.nombre}}</mat-option>
+                        <mat-option [value]="c.id">{{c.nombre}}</mat-option>
                       }
                     </mat-select>
                   </mat-form-field>
                 </div>
-
                 <div class="row">
                   <mat-form-field appearance="outline">
                     <mat-label>Unidad Administrativa</mat-label>
                     <mat-select formControlName="remitenteUnidadAdministrativa">
                       @for (d of unidadesAdministrativas; track d.id) {
-                      <mat-option [value]="d.id">{{d.nombre}}</mat-option>
+                        <mat-option [value]="d.id">{{d.nombre}}</mat-option>
                       }
                     </mat-select>
                   </mat-form-field>
-
                   <mat-form-field appearance="outline">
                     <mat-label>Unidad Académica</mat-label>
                     <mat-select formControlName="remitenteUnidadAcademica">
                       @for (f of unidadesAcademicas; track f.id) {
-                      <mat-option [value]="f.id">{{f.nombre}}</mat-option>
+                        <mat-option [value]="f.id">{{f.nombre}}</mat-option>
                       }
                     </mat-select>
                   </mat-form-field>
                 </div>
               </div>
             </mat-tab>
-
             <mat-tab label="Información del Solicitante">
               <div class="tab-body-padding">
                 <ng-container *ngTemplateOutlet="camposSolicitante"></ng-container>
               </div>
             </mat-tab>
-
           </mat-tab-group>
-        </ng-container>
+        }
 
-        <ng-container *ngIf="acompanamientoForm.get('tipoReporte')?.value === 'directa'">
+        @if (acompanamientoForm.get('tipoReporte')?.value === 'directa') {
           <div class="form-section">
             <h3 class="section-title-divider">Datos del Solicitante</h3>
             <ng-container *ngTemplateOutlet="camposSolicitante"></ng-container>
           </div>
-        </ng-container>
+        }
 
         <ng-template #camposSolicitante>
           <div class="row">
@@ -151,7 +149,7 @@
               <mat-label>Tipo Documento</mat-label>
               <mat-select formControlName="tipoDocumento">
                 @for (t of tiposDocumento; track t.id) {
-                <mat-option [value]="t.id">{{t.nombre}}</mat-option>
+                  <mat-option [value]="t.id">{{t.nombre}}</mat-option>
                 }
               </mat-select>
             </mat-form-field>
@@ -160,8 +158,12 @@
               <input matInput formControlName="numeroDocumento" (keyup.enter)="buscarSolicitante($event)">
               <button matSuffix mat-icon-button class="btn-search-doc" type="button" (click)="buscarSolicitante($event)"
                 [disabled]="buscandoSolicitante" matTooltip="Buscar solicitante">
-                <mat-icon *ngIf="!buscandoSolicitante">search</mat-icon>
-                <mat-spinner *ngIf="buscandoSolicitante" diameter="18"></mat-spinner>
+                @if (!buscandoSolicitante) {
+                  <mat-icon>search</mat-icon>
+                }
+                @if (buscandoSolicitante) {
+                  <mat-spinner diameter="18"></mat-spinner>
+                }
               </button>
             </mat-form-field>
             <mat-form-field appearance="outline">
@@ -194,7 +196,7 @@
               <mat-label>Identidad de Género</mat-label>
               <mat-select formControlName="identidadGenero">
                 @for (ig of identidadesGenero; track ig.id) {
-                <mat-option [value]="ig.id">{{ig.nombre}}</mat-option>
+                  <mat-option [value]="ig.id">{{ig.nombre}}</mat-option>
                 }
               </mat-select>
             </mat-form-field>
@@ -227,7 +229,7 @@
 
                 <ng-container matColumnDef="acciones">
                   <th mat-header-cell *matHeaderCellDef style="text-align: center;">
-                    Acciones </th>
+                  Acciones </th>
                   <td mat-cell *matCellDef="let i = index" style="text-align: center;">
                     <button mat-icon-button (click)="eliminarCorreo(i)" matTooltip="Eliminar">
                       <mat-icon svgIcon="icono-eliminar"></mat-icon>
@@ -240,16 +242,18 @@
                 </tr>
               </table>
 
-              <div *ngIf="correoRegistrados.length === 0" class="no-results-msg">
-                <mat-icon>mail_outline</mat-icon>
-                <p>No hay correos adicionales registrados.</p>
-              </div>
+              @if (correoRegistrados.length === 0) {
+                <div class="no-results-msg">
+                  <mat-icon>mail_outline</mat-icon>
+                  <p>No hay correos adicionales registrados.</p>
+                </div>
+              }
             </div>
             <div style="margin-top: 10px; width: 100%;">
               <mat-form-field appearance="outline" style="width: 100%;">
                 <mat-label>Observaciones de Correo</mat-label>
                 <textarea matInput formControlName="observacionesCorreo"
-                  placeholder="Observaciones adicionales sobre los correos..."></textarea>
+                placeholder="Observaciones adicionales sobre los correos..."></textarea>
               </mat-form-field>
             </div>
           </div>
@@ -281,7 +285,7 @@
 
                 <ng-container matColumnDef="acciones">
                   <th mat-header-cell *matHeaderCellDef style="text-align: center;">
-                    Acciones </th>
+                  Acciones </th>
                   <td mat-cell *matCellDef="let i = index" style="text-align: center;">
                     <button mat-icon-button (click)="eliminarTelefono(i)" matTooltip="Eliminar">
                       <mat-icon svgIcon="icono-eliminar"></mat-icon>
@@ -294,16 +298,18 @@
                 </tr>
               </table>
 
-              <div *ngIf="telefonosRegistrados.length === 0" class="no-results-msg">
-                <mat-icon>phone_enabled</mat-icon>
-                <p>No hay Telefonos adicionales registrados.</p>
-              </div>
+              @if (telefonosRegistrados.length === 0) {
+                <div class="no-results-msg">
+                  <mat-icon>phone_enabled</mat-icon>
+                  <p>No hay Telefonos adicionales registrados.</p>
+                </div>
+              }
             </div>
             <div style="margin-top: 10px; width: 100%;">
               <mat-form-field appearance="outline" style="width: 100%;">
                 <mat-label>Observaciones de Teléfono</mat-label>
                 <textarea matInput formControlName="observacionesTelefono"
-                  placeholder="Observaciones adicionales sobre los teléfonos..."></textarea>
+                placeholder="Observaciones adicionales sobre los teléfonos..."></textarea>
               </mat-form-field>
             </div>
           </div>
@@ -312,12 +318,14 @@
       </form>
     </mat-card-content>
 
-    <mat-card-actions align="end" *ngIf="acompanamientoForm.get('tipoReporte')?.value">
-      <button mat-button color="warn" type="button" (click)="cancelar()">Limpiar</button>
-      <button mat-raised-button color="primary" [disabled]="acompanamientoForm.invalid || enviando"
-        (click)="enviarSolicitud()">
-        <mat-icon>send</mat-icon> Enviar Solicitud
-      </button>
-    </mat-card-actions>
+    @if (acompanamientoForm.get('tipoReporte')?.value) {
+      <mat-card-actions align="end">
+        <button mat-button color="warn" type="button" (click)="cancelar()">Limpiar</button>
+        <button mat-raised-button color="primary" [disabled]="acompanamientoForm.invalid || enviando"
+          (click)="enviarSolicitud()">
+          <mat-icon>send</mat-icon> Enviar Solicitud
+        </button>
+      </mat-card-actions>
+    }
   </mat-card>
 </div>
