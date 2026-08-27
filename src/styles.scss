@@ -115,7 +115,7 @@ body {
 
 /* Forzar ripple y state-layer a morado en todos los componentes */
 :root {
-  --mdc-ripple-color: #348F41;
+  --mat-ripple-color: #348F41;
   --mat-ripple-color: rgba(52, 143, 65, 0.12);
 }
 
@@ -126,27 +126,27 @@ body {
 .mat-mdc-flat-button,
 .mat-mdc-fab,
 .mat-mdc-mini-fab {
-  --mdc-ripple-color: #348F41;
+  --mat-ripple-color: #348F41;
   --mat-mdc-button-ripple-color: rgba(52, 143, 65, 0.12);
   --mat-mdc-button-persistent-ripple-color: #348F41;
 }
 
 .mat-mdc-icon-button {
-  --mdc-icon-button-state-layer-color: #348F41;
+  --mat-icon-button-state-layer-color: #348F41;
 }
 
 .mat-mdc-radio-button {
-  --mdc-radio-selected-focus-icon-color: #348F41;
-  --mdc-radio-selected-hover-icon-color: #348F41;
-  --mdc-radio-selected-icon-color: #348F41;
-  --mdc-radio-selected-pressed-icon-color: #348F41;
+  --mat-radio-selected-focus-icon-color: #348F41;
+  --mat-radio-selected-hover-icon-color: #348F41;
+  --mat-radio-selected-icon-color: #348F41;
+  --mat-radio-selected-pressed-icon-color: #348F41;
   --mat-radio-ripple-color: rgba(52, 143, 65, 0.12);
 }
 
 .mat-mdc-checkbox {
-  --mdc-checkbox-selected-focus-state-layer-color: #348F41;
-  --mdc-checkbox-selected-hover-state-layer-color: #348F41;
-  --mdc-checkbox-selected-pressed-state-layer-color: #348F41;
+  --mat-checkbox-selected-focus-state-layer-color: #348F41;
+  --mat-checkbox-selected-hover-state-layer-color: #348F41;
+  --mat-checkbox-selected-pressed-state-layer-color: #348F41;
 }
 
 .mat-mdc-option:hover,

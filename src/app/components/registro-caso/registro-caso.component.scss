@@ -165,7 +165,7 @@ $text-muted: #64748b;
   .mat-mdc-tab-group {
     height: auto !important;
     flex-grow: 0 !important;
-    --mdc-tab-indicator-active-indicator-color: #{$purple-sys};
+    --mat-tab-active-indicator-color: #{$purple-sys};
   }
 
   .mat-mdc-tab-header {

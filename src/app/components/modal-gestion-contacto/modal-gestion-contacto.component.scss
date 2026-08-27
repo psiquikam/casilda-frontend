@@ -63,8 +63,8 @@ $purple-sys: #348F41;
   }
 
   .mat-mdc-tab-group {
-    --mdc-tab-indicator-active-indicator-color: #{$purple-sys};
-    --mat-tab-header-active-label-text-color: #{$purple-sys};
+    --mat-tab-active-indicator-color: #{$purple-sys};
+    --mat-tab-active-label-text-color: #{$purple-sys};
     
     .mat-mdc-tab-header {
       margin-bottom: 4px;
