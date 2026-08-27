@@ -14,22 +14,21 @@ import { environment } from '../../../environments/environment';
 import { MaestroDto } from '../../services/listas.service';
 
 @Component({
-  selector: 'app-modal-compromisos-persona',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatIconModule,
-    MatDatepickerModule,
-    MatNativeDateModule
-  ],
-  templateUrl: './modal-compromisos-persona.component.html',
-  styleUrls: ['./modal-compromisos-persona.component.scss']
+    selector: 'app-modal-compromisos-persona',
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatButtonModule,
+        MatIconModule,
+        MatDatepickerModule,
+        MatNativeDateModule
+    ],
+    templateUrl: './modal-compromisos-persona.component.html',
+    styleUrls: ['./modal-compromisos-persona.component.scss']
 })
 export class ModalCompromisosPersonaComponent implements OnInit {
   private readonly http = inject(HttpClient);

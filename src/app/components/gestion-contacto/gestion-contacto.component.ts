@@ -39,34 +39,33 @@ export function getSpanishPaginatorIntl() {
 }
 
 @Component({
-  selector: 'app-detalle-acompanamiento',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatTableModule,
-    MatIconModule,
-    MatPaginatorModule,
-    MatDialogModule,
-    MatTooltipModule
-  ],
-  providers: [
-    { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
-  ],
-  templateUrl: './gestion-contacto.component.html',
-  styleUrls: ['./gestion-contacto.component.scss'],
-  animations: [
-    trigger('detailExpand', [
-      state('collapsed, void', style({ height: '0px', minHeight: '0', opacity: 0 })),
-      state('expanded', style({ height: '*', opacity: 1 })),
-      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
-    ]),
-  ],
+    selector: 'app-detalle-acompanamiento',
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        MatCardModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatButtonModule,
+        MatTableModule,
+        MatIconModule,
+        MatPaginatorModule,
+        MatDialogModule,
+        MatTooltipModule
+    ],
+    providers: [
+        { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
+    ],
+    templateUrl: './gestion-contacto.component.html',
+    styleUrls: ['./gestion-contacto.component.scss'],
+    animations: [
+        trigger('detailExpand', [
+            state('collapsed, void', style({ height: '0px', minHeight: '0', opacity: 0 })),
+            state('expanded', style({ height: '*', opacity: 1 })),
+            transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+        ]),
+    ]
 })
 export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
   private fb = inject(FormBuilder);

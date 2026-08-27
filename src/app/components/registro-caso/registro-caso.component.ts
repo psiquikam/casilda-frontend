@@ -49,43 +49,42 @@ import { MaestroDto } from '../../services/listas.service';
 import { environment } from '../../../environments/environment';
 
 @Component({
-  selector: 'app-registro-caso',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatTabsModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatButtonModule,
-    MatIconModule,
-    MatSnackBarModule,
-    MatDialogModule,
-    MatRadioModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatSortModule,
-    MatTooltipModule,
-    MatProgressSpinnerModule,
-    MatAutocompleteModule,
-    TablaCitasComponent,
-    MatCheckboxModule,
-    FormsModule,
-    ModalPresuntoAgresorComponent
-  ],
-  templateUrl: './registro-caso.component.html',
-  styleUrls: ['./registro-caso.component.scss', './registro-caso.consulta.scss'],
-  animations: [
-    trigger('detailExpand', [
-      state('collapsed', style({ height: '0px', minHeight: '0', visibility: 'hidden' })),
-      state('expanded', style({ height: '*', visibility: 'visible' })),
-      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
-    ]),
-  ],
+    selector: 'app-registro-caso',
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        MatTabsModule,
+        MatCardModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatButtonModule,
+        MatIconModule,
+        MatSnackBarModule,
+        MatDialogModule,
+        MatRadioModule,
+        MatTableModule,
+        MatPaginatorModule,
+        MatSortModule,
+        MatTooltipModule,
+        MatProgressSpinnerModule,
+        MatAutocompleteModule,
+        TablaCitasComponent,
+        MatCheckboxModule,
+        FormsModule,
+        ModalPresuntoAgresorComponent
+    ],
+    templateUrl: './registro-caso.component.html',
+    styleUrls: ['./registro-caso.component.scss', './registro-caso.consulta.scss'],
+    animations: [
+        trigger('detailExpand', [
+            state('collapsed', style({ height: '0px', minHeight: '0', visibility: 'hidden' })),
+            state('expanded', style({ height: '*', visibility: 'visible' })),
+            transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+        ]),
+    ]
 })
 export class RegistroCasoComponent implements OnInit, AfterViewInit {
   casoForm!: FormGroup;

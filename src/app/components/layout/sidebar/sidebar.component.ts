@@ -6,11 +6,10 @@ import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from '../../../services/auth.service';
 
 @Component({
-  selector: 'app-sidebar',
-  standalone: true,
-  imports: [MatListModule, MatIconModule, MatDividerModule, RouterLink, RouterLinkActive],
-  templateUrl: './sidebar.component.html',
-  styleUrl: './sidebar.component.scss'
+    selector: 'app-sidebar',
+    imports: [MatListModule, MatIconModule, MatDividerModule, RouterLink, RouterLinkActive],
+    templateUrl: './sidebar.component.html',
+    styleUrl: './sidebar.component.scss'
 })
 export class SidebarComponent {
   constructor(public auth: AuthService) {}

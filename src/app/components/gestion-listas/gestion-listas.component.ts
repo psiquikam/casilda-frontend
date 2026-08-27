@@ -23,14 +23,13 @@ interface PaginacionEstado {
 }
 
 @Component({
-  selector: 'app-gestion-listas',
-  standalone: true,
-  imports: [
-    CommonModule, FormsModule, MatTabsModule, MatTableModule,
-    MatButtonModule, MatIconModule, MatInputModule, MatFormFieldModule, MatCardModule, MatPaginatorModule
-  ],
-  templateUrl: './gestion-listas.component.html',
-  styleUrls: ['./gestion-listas.component.scss']
+    selector: 'app-gestion-listas',
+    imports: [
+        CommonModule, FormsModule, MatTabsModule, MatTableModule,
+        MatButtonModule, MatIconModule, MatInputModule, MatFormFieldModule, MatCardModule, MatPaginatorModule
+    ],
+    templateUrl: './gestion-listas.component.html',
+    styleUrls: ['./gestion-listas.component.scss']
 })
 export class GestionListasComponent implements OnInit {
   listas: Record<ListaTabKey, MaestroDto[]> = {

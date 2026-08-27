@@ -14,14 +14,13 @@ import { MaestroDto } from '../../services/listas.service';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'app-modal-direccion',
-  standalone: true,
-  imports: [
-    CommonModule, ReactiveFormsModule, MatDialogModule,
-    MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatIconModule
-  ],
-  templateUrl: './modal-direccion.component.html',
-  styleUrls: ['./modal-direccion.component.scss']
+    selector: 'app-modal-direccion',
+    imports: [
+        CommonModule, ReactiveFormsModule, MatDialogModule,
+        MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatIconModule
+    ],
+    templateUrl: './modal-direccion.component.html',
+    styleUrls: ['./modal-direccion.component.scss']
 })
 export class ModalDireccionComponent implements OnInit {
   private readonly fb = inject(FormBuilder);

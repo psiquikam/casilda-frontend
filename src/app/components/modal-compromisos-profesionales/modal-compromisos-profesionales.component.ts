@@ -15,22 +15,21 @@ import { MaestroDto } from '../../services/listas.service';
 import { GrupoProfesionalDto, SolicitudService } from '../../services/solicitud.service';
 
 @Component({
-  selector: 'app-modal-compromisos-profesionales',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatIconModule,
-    MatDatepickerModule,
-    MatNativeDateModule
-  ],
-  templateUrl: './modal-compromisos-profesionales.component.html',
-  styleUrls: ['./modal-compromisos-profesionales.component.scss']
+    selector: 'app-modal-compromisos-profesionales',
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatButtonModule,
+        MatIconModule,
+        MatDatepickerModule,
+        MatNativeDateModule
+    ],
+    templateUrl: './modal-compromisos-profesionales.component.html',
+    styleUrls: ['./modal-compromisos-profesionales.component.scss']
 })
 export class ModalCompromisosProfesionalesComponent implements OnInit {
   private readonly http = inject(HttpClient);

@@ -34,25 +34,24 @@ export function getSpanishPaginatorIntl() {
 }
 
 @Component({
-  selector: 'app-cita',
-  standalone: true,
-  imports: [
-    CommonModule, MatCardModule, MatFormFieldModule,
-    MatInputModule, MatButtonModule, MatIconModule,
-    MatDividerModule, MatTableModule, MatPaginatorModule, MatTooltipModule
-  ],
-  providers: [
-    { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
-  ],
-  templateUrl: './cita.component.html',
-  styleUrls: ['./cita.component.scss'],
-  animations: [
-    trigger('detailExpand', [
-      state('collapsed, void', style({ height: '0px', minHeight: '0' })),
-      state('expanded', style({ height: '*' })),
-      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
-    ]),
-  ],
+    selector: 'app-cita',
+    imports: [
+        CommonModule, MatCardModule, MatFormFieldModule,
+        MatInputModule, MatButtonModule, MatIconModule,
+        MatDividerModule, MatTableModule, MatPaginatorModule, MatTooltipModule
+    ],
+    providers: [
+        { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
+    ],
+    templateUrl: './cita.component.html',
+    styleUrls: ['./cita.component.scss'],
+    animations: [
+        trigger('detailExpand', [
+            state('collapsed, void', style({ height: '0px', minHeight: '0' })),
+            state('expanded', style({ height: '*' })),
+            transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+        ]),
+    ]
 })
 export class CitaComponent implements OnInit, AfterViewInit {
   private route = inject(ActivatedRoute);

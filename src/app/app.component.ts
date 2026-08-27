@@ -13,21 +13,20 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LoadingService } from './services/loading.service';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [
-    CommonModule,
-    RouterOutlet,
-    MatSidenavModule,
-    MatIconModule,
-    HeaderComponent,
-    SidebarComponent,
-    PublicHeaderComponent,
-    PublicFooterComponent,
-    MatProgressSpinnerModule
-  ],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+    selector: 'app-root',
+    imports: [
+        CommonModule,
+        RouterOutlet,
+        MatSidenavModule,
+        MatIconModule,
+        HeaderComponent,
+        SidebarComponent,
+        PublicHeaderComponent,
+        PublicFooterComponent,
+        MatProgressSpinnerModule
+    ],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.scss'
 })
 export class AppComponent {
   private router = inject(Router);

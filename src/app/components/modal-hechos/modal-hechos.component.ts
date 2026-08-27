@@ -47,25 +47,24 @@ export const HECHO_DATE_FORMATS = {
 };
 
 @Component({
-  selector: 'app-modal-hechos',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    MatDatepickerModule,
-    MatNativeDateModule
-  ],
-  providers: [
-    { provide: DateAdapter, useClass: HechoDateAdapter },
-    { provide: MAT_DATE_FORMATS, useValue: HECHO_DATE_FORMATS }
-  ],
-  templateUrl: './modal-hechos.component.html',
-  styleUrls: ['./modal-hechos.component.scss']
+    selector: 'app-modal-hechos',
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatButtonModule,
+        MatIconModule,
+        MatDatepickerModule,
+        MatNativeDateModule
+    ],
+    providers: [
+        { provide: DateAdapter, useClass: HechoDateAdapter },
+        { provide: MAT_DATE_FORMATS, useValue: HECHO_DATE_FORMATS }
+    ],
+    templateUrl: './modal-hechos.component.html',
+    styleUrls: ['./modal-hechos.component.scss']
 })
 export class ModalHechosComponent {
 

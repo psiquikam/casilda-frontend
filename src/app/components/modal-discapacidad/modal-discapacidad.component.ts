@@ -16,20 +16,19 @@ export interface MaestroDto {
 }
 
 @Component({
-  selector: 'app-modal-discapacidad',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
-    FormsModule,
-    MatIconModule
-  ],
-  templateUrl: './modal-discapacidad.component.html',
-  styleUrls: ['./modal-discapacidad.component.scss']
+    selector: 'app-modal-discapacidad',
+    imports: [
+        CommonModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatButtonModule,
+        FormsModule,
+        MatIconModule
+    ],
+    templateUrl: './modal-discapacidad.component.html',
+    styleUrls: ['./modal-discapacidad.component.scss']
 })
 export class ModalDiscapacidadComponent implements OnInit {
 

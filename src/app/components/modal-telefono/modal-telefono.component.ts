@@ -16,20 +16,19 @@ interface TipoTelefonoDto {
 }
 
 @Component({
-  selector: 'app-modal-telefono',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatIconModule
-  ],
-  templateUrl: './modal-telefono.component.html',
-  styleUrls: ['./modal-telefono.component.scss']
+    selector: 'app-modal-telefono',
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatButtonModule,
+        MatIconModule
+    ],
+    templateUrl: './modal-telefono.component.html',
+    styleUrls: ['./modal-telefono.component.scss']
 })
 export class ModalTelefonoComponent implements OnInit {
 

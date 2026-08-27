@@ -40,27 +40,26 @@ type ContactoInfo = {
 };
 
 @Component({
-  selector: 'app-modal-detalle-solicitud',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatDialogModule,
-    MatTabsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatIconModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatTableModule,
-    MatTooltipModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule,
-  ],
-  templateUrl: './modal-detalle-solicitud.component.html',
-  styleUrls: ['./modal-detalle-solicitud.component.scss']
+    selector: 'app-modal-detalle-solicitud',
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        MatDialogModule,
+        MatTabsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatButtonModule,
+        MatIconModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatTableModule,
+        MatTooltipModule,
+        MatProgressSpinnerModule,
+        MatSnackBarModule,
+    ],
+    templateUrl: './modal-detalle-solicitud.component.html',
+    styleUrls: ['./modal-detalle-solicitud.component.scss']
 })
 export class ModalDetalleSolicitudComponent implements OnInit {
   private fb = inject(FormBuilder);

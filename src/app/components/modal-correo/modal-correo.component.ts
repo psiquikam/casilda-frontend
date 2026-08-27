@@ -16,20 +16,19 @@ interface TipoCorreoDto {
 }
 
 @Component({
-  selector: 'app-modal-correo',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatIconModule,
-    FormsModule
-  ],
-  templateUrl: './modal-correo.component.html',
-  styleUrls: ['./modal-correo.component.scss']
+    selector: 'app-modal-correo',
+    imports: [
+        CommonModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatButtonModule,
+        MatIconModule,
+        FormsModule
+    ],
+    templateUrl: './modal-correo.component.html',
+    styleUrls: ['./modal-correo.component.scss']
 })
 export class ModalCorreoComponent implements OnInit {
 

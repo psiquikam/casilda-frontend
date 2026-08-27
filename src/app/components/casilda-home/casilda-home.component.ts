@@ -13,11 +13,10 @@ interface CasildaItem {
 }
 
 @Component({
-  selector: 'app-casilda-home',
-  standalone: true,
-  imports: [CommonModule, CasildaCardComponent, MatTooltipModule],
-  templateUrl: './casilda-home.component.html',
-  styleUrls: ['./casilda-home.component.scss']
+    selector: 'app-casilda-home',
+    imports: [CommonModule, CasildaCardComponent, MatTooltipModule],
+    templateUrl: './casilda-home.component.html',
+    styleUrls: ['./casilda-home.component.scss']
 })
 export class CasildaHomeComponent {
   acciones: CasildaItem[] = [

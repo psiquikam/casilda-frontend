@@ -25,22 +25,21 @@ export function getSpanishPaginatorIntl() {
 }
 
 @Component({
-  selector: 'app-tabla-otros-casos',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatIconModule,
-    MatButtonModule,
-    MatTooltipModule,
-    MatCardModule,
-  ],
-  providers: [
-    { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
-  ],
-  templateUrl: './tabla-otros-casos.component.html',
-  styleUrls: ['./tabla-otros-casos.component.scss'],
+    selector: 'app-tabla-otros-casos',
+    imports: [
+        CommonModule,
+        MatTableModule,
+        MatPaginatorModule,
+        MatIconModule,
+        MatButtonModule,
+        MatTooltipModule,
+        MatCardModule,
+    ],
+    providers: [
+        { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
+    ],
+    templateUrl: './tabla-otros-casos.component.html',
+    styleUrls: ['./tabla-otros-casos.component.scss']
 })
 export class TablaOtrosCasosComponent implements AfterViewInit {
 

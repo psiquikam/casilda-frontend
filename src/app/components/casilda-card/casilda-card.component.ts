@@ -3,11 +3,10 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'app-casilda-card',
-  standalone: true,
-  imports: [CommonModule, MatIconModule],
-  templateUrl: './casilda-card.component.html',
-  styleUrls: ['./casilda-card.component.scss']
+    selector: 'app-casilda-card',
+    imports: [CommonModule, MatIconModule],
+    templateUrl: './casilda-card.component.html',
+    styleUrls: ['./casilda-card.component.scss']
 })
 export class CasildaCardComponent {
   @Input() icon: string = '';

@@ -42,33 +42,32 @@ import { TipoReporteAlma } from '../../../enums/tipo-reporte-alma.enum';
 import { CustomDateAdapter, CUSTOM_DATE_FORMATS } from '../../../custom-date-adapter';
 
 @Component({
-  selector: 'app-atencion-pr',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatTabsModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatRadioModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatTableModule,
-    MatDialogModule,
-    MatProgressSpinnerModule,
-    MatTooltipModule,
-    MatAutocompleteModule
-  ],
-  providers: [
-    { provide: DateAdapter, useClass: CustomDateAdapter },
-    { provide: MAT_DATE_FORMATS, useValue: CUSTOM_DATE_FORMATS }
-  ],
-  templateUrl: './atencion-pr.component.html',
-  styleUrl: './atencion-pr.component.scss'
+    selector: 'app-atencion-pr',
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        MatTabsModule,
+        MatCardModule,
+        MatButtonModule,
+        MatIconModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatRadioModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatTableModule,
+        MatDialogModule,
+        MatProgressSpinnerModule,
+        MatTooltipModule,
+        MatAutocompleteModule
+    ],
+    providers: [
+        { provide: DateAdapter, useClass: CustomDateAdapter },
+        { provide: MAT_DATE_FORMATS, useValue: CUSTOM_DATE_FORMATS }
+    ],
+    templateUrl: './atencion-pr.component.html',
+    styleUrl: './atencion-pr.component.scss'
 })
 export class AtencionPrComponent implements OnInit {
   private readonly fb = inject(FormBuilder);

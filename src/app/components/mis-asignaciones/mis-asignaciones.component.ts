@@ -8,11 +8,10 @@ import { MatChipsModule } from '@angular/material/chips';
 import { RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-mis-asignaciones',
-  standalone: true,
-  imports: [CommonModule, MatTableModule, MatCardModule, MatIconModule, MatButtonModule, MatChipsModule, RouterLink],
-  templateUrl: './mis-asignaciones.component.html',
-  styleUrls: ['./mis-asignaciones.component.scss']
+    selector: 'app-mis-asignaciones',
+    imports: [CommonModule, MatTableModule, MatCardModule, MatIconModule, MatButtonModule, MatChipsModule, RouterLink],
+    templateUrl: './mis-asignaciones.component.html',
+    styleUrls: ['./mis-asignaciones.component.scss']
 })
 export class MisAsignacionesComponent {
   // Datos simulados de los casos asignados al profesional logueado

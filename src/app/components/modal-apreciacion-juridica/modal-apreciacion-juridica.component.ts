@@ -16,20 +16,19 @@ export interface MaestroDto {
 }
 
 @Component({
-  selector: 'app-modal-apreciacion-juridica',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatIconModule,
-    FormsModule
-  ],
-  templateUrl: './modal-apreciacion-juridica.component.html',
-  styleUrls: ['./modal-apreciacion-juridica.component.scss']
+    selector: 'app-modal-apreciacion-juridica',
+    imports: [
+        CommonModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatButtonModule,
+        MatIconModule,
+        FormsModule
+    ],
+    templateUrl: './modal-apreciacion-juridica.component.html',
+    styleUrls: ['./modal-apreciacion-juridica.component.scss']
 })
 export class ModalApreciacionJuridicaComponent implements OnInit {
   private readonly http = inject(HttpClient);

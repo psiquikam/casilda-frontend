@@ -16,20 +16,19 @@ export interface MaestroDto {
 }
 
 @Component({
-  selector: 'app-modal-apreciacion-psicologica',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatIconModule,
-    FormsModule
-  ],
-  templateUrl: './modal-apreciacion-psicologica.component.html',
-  styleUrls: ['./modal-apreciacion-psicologica.component.scss']
+    selector: 'app-modal-apreciacion-psicologica',
+    imports: [
+        CommonModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatButtonModule,
+        MatIconModule,
+        FormsModule
+    ],
+    templateUrl: './modal-apreciacion-psicologica.component.html',
+    styleUrls: ['./modal-apreciacion-psicologica.component.scss']
 })
 export class ModalApreciacionPsicologicaComponent implements OnInit {
   private readonly http = inject(HttpClient);

@@ -1,6 +1,7 @@
 @use '@angular/material' as mat;
 
-@include mat.core();
+@include mat.elevation-classes();
+@include mat.app-background();
 
 $casilda-purple-palette: (
   50: #f1eaf4,

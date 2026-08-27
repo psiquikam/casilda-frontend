@@ -15,21 +15,20 @@ import { MaestroDto } from '../../services/listas.service';
 import { environment } from '../../../environments/environment';
 
 @Component({
-  selector: 'app-reparto-modal',
-  standalone: true,
-  templateUrl: './modal-reparto.component.html',
-  styleUrls: ['./modal-reparto.component.scss'],
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule
-  ]
+    selector: 'app-reparto-modal',
+    templateUrl: './modal-reparto.component.html',
+    styleUrls: ['./modal-reparto.component.scss'],
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatSelectModule,
+        MatInputModule,
+        MatButtonModule,
+        MatIconModule,
+        MatProgressSpinnerModule
+    ]
 })
 export class RepartoModalComponent implements OnInit {
   repartoForm: FormGroup;

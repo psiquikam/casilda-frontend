@@ -16,14 +16,13 @@ interface RolDto {
 }
 
 @Component({
-  selector: 'app-dialog-usuario',
-  standalone: true,
-  imports: [
-    CommonModule, ReactiveFormsModule, MatDialogModule,
-    MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule
-  ],
-  templateUrl: './dialog-usuario.component.html',
-  styleUrls: ['./dialog-usuario.component.scss']
+    selector: 'app-dialog-usuario',
+    imports: [
+        CommonModule, ReactiveFormsModule, MatDialogModule,
+        MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule
+    ],
+    templateUrl: './dialog-usuario.component.html',
+    styleUrls: ['./dialog-usuario.component.scss']
 })
 export class DialogUsuarioComponent implements OnInit {
   userForm: FormGroup;

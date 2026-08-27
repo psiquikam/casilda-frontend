@@ -11,22 +11,21 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
-  selector: 'app-reparto-modal',
-  standalone: true,
-  templateUrl: './modal-asignar-cita.component.html',
-  styleUrls: ['./modal-asignar-cita.component.scss'],
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    MatDatepickerModule,
-    MatNativeDateModule
-  ]
+    selector: 'app-reparto-modal',
+    templateUrl: './modal-asignar-cita.component.html',
+    styleUrls: ['./modal-asignar-cita.component.scss'],
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatSelectModule,
+        MatInputModule,
+        MatButtonModule,
+        MatIconModule,
+        MatDatepickerModule,
+        MatNativeDateModule
+    ]
 })
 export class AsignarCitaModalComponent {
 

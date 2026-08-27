@@ -22,26 +22,25 @@ import { environment } from '../../../environments/environment';
 const RESULTADO_EXITOSO = 'Contesta y se concerta cita';
 
 @Component({
-  selector: 'app-modal-gestion',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatTableModule,
-    MatTabsModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule,
-    MatDatepickerModule,
-    MatNativeDateModule
-  ],
-  templateUrl: './modal-gestion-contacto.component.html',
-  styleUrls: ['./modal-gestion-contacto.component.scss']
+    selector: 'app-modal-gestion',
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatButtonModule,
+        MatTableModule,
+        MatTabsModule,
+        MatIconModule,
+        MatProgressSpinnerModule,
+        MatSnackBarModule,
+        MatDatepickerModule,
+        MatNativeDateModule
+    ],
+    templateUrl: './modal-gestion-contacto.component.html',
+    styleUrls: ['./modal-gestion-contacto.component.scss']
 })
 export class ModalGestionComponent implements OnInit {
 

@@ -36,25 +36,24 @@ export function getSpanishPaginatorIntl() {
 }
 
 @Component({
-  selector: 'app-consulta',
-  standalone: true,
-  imports: [
-    CommonModule, FormsModule, MatTabsModule, MatTableModule,
-    MatButtonModule, MatIconModule, MatChipsModule, MatCardModule,
-    MatInputModule, MatDialogModule, MatPaginatorModule
-  ],
-  providers: [
-    { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
-  ],
-  templateUrl: './consulta.component.html',
-  styleUrls: ['./consulta.component.scss'],
-  animations: [
-    trigger('detailExpand', [
-      state('collapsed, void', style({ height: '0px', minHeight: '0' })),
-      state('expanded', style({ height: '*' })),
-      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
-    ]),
-  ],
+    selector: 'app-consulta',
+    imports: [
+        CommonModule, FormsModule, MatTabsModule, MatTableModule,
+        MatButtonModule, MatIconModule, MatChipsModule, MatCardModule,
+        MatInputModule, MatDialogModule, MatPaginatorModule
+    ],
+    providers: [
+        { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
+    ],
+    templateUrl: './consulta.component.html',
+    styleUrls: ['./consulta.component.scss'],
+    animations: [
+        trigger('detailExpand', [
+            state('collapsed, void', style({ height: '0px', minHeight: '0' })),
+            state('expanded', style({ height: '*' })),
+            transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+        ]),
+    ]
 })
 export class ConsultaComponent implements OnInit, AfterViewInit {
 

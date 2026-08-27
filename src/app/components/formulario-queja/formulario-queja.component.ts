@@ -13,15 +13,14 @@ import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
 import { MatSelectModule } from '@angular/material/select';
 
 @Component({
-  selector: 'app-formulario-queja',
-  standalone: true,
-  imports: [
-    CommonModule, ReactiveFormsModule, MatStepperModule,
-    MatFormFieldModule, MatInputModule, MatButtonModule,
-    MatRadioModule, MatCheckboxModule, MatIconModule, MatDialogModule, MatSelectModule
-  ],
-  templateUrl: './formulario-queja.component.html',
-  styleUrls: ['./formulario-queja.component.scss']
+    selector: 'app-formulario-queja',
+    imports: [
+        CommonModule, ReactiveFormsModule, MatStepperModule,
+        MatFormFieldModule, MatInputModule, MatButtonModule,
+        MatRadioModule, MatCheckboxModule, MatIconModule, MatDialogModule, MatSelectModule
+    ],
+    templateUrl: './formulario-queja.component.html',
+    styleUrls: ['./formulario-queja.component.scss']
 })
 export class FormularioQuejaComponent {
 

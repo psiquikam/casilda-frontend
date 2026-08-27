@@ -11,20 +11,19 @@ import { SolicitudService } from '../../services/solicitud.service';
 import { MaestroDto } from '../../services/listas.service';
 
 @Component({
-  selector: 'app-modal-medidas-proteccion',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatIconModule,
-  ],
-  templateUrl: './modal-medidas-proteccion.component.html',
-  styleUrls: ['./modal-medidas-proteccion.component.scss']
+    selector: 'app-modal-medidas-proteccion',
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatButtonModule,
+        MatIconModule,
+    ],
+    templateUrl: './modal-medidas-proteccion.component.html',
+    styleUrls: ['./modal-medidas-proteccion.component.scss']
 })
 export class ModalMedidasProteccionComponent implements OnInit {
 

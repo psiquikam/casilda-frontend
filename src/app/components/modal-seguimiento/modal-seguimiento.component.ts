@@ -14,22 +14,21 @@ import { environment } from '../../../environments/environment';
 import { MaestroDto } from '../../services/listas.service';
 
 @Component({
-  selector: 'app-modal-remisiones',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatIconModule,
-    MatDatepickerModule,
-    MatNativeDateModule
-  ],
-  templateUrl: './modal-seguimiento.component.html',
-  styleUrls: ['./modal-seguimiento.component.scss']
+    selector: 'app-modal-remisiones',
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatButtonModule,
+        MatIconModule,
+        MatDatepickerModule,
+        MatNativeDateModule
+    ],
+    templateUrl: './modal-seguimiento.component.html',
+    styleUrls: ['./modal-seguimiento.component.scss']
 })
 export class ModalSeguimientosComponent implements OnInit {
 

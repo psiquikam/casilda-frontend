@@ -10,20 +10,19 @@ import { FormsModule } from '@angular/forms';
 import { MaestroDto } from '../../services/listas.service';
 
 @Component({
-  selector: 'app-modal-presunto-agresor',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatIconModule,
-  ],
-  templateUrl: './modal-presunto-agresor.component.html',
-  styleUrls: ['./modal-presunto-agresor.component.scss']
+    selector: 'app-modal-presunto-agresor',
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatButtonModule,
+        MatIconModule,
+    ],
+    templateUrl: './modal-presunto-agresor.component.html',
+    styleUrls: ['./modal-presunto-agresor.component.scss']
 })
 export class ModalPresuntoAgresorComponent {
 

@@ -16,20 +16,19 @@ export interface MaestroDto {
 }
 
 @Component({
-  selector: 'app-modal-telefono',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatIconModule
-  ],
-  templateUrl: './modal-activar-ruta.component.html',
-  styleUrls: ['./modal-activar-ruta.component.scss']
+    selector: 'app-modal-telefono',
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatButtonModule,
+        MatIconModule
+    ],
+    templateUrl: './modal-activar-ruta.component.html',
+    styleUrls: ['./modal-activar-ruta.component.scss']
 })
 export class ModalActivarRutaComponent implements OnInit {
   private readonly http = inject(HttpClient);
