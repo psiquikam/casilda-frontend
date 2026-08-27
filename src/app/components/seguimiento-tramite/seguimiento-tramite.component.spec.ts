@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { SeguimientoTramiteComponent } from './seguimiento-tramite.component';
 
@@ -8,7 +9,10 @@ describe('SeguimientoQuejaComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SeguimientoTramiteComponent]
+      imports: [SeguimientoTramiteComponent],
+      providers: [
+        provideNoopAnimations()
+      ]
     })
     .compileComponents();
     

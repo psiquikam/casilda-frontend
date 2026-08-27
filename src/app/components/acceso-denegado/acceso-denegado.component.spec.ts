@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { provideRouter } from '@angular/router';
 
 import { AccesoDenegadoComponent } from './acceso-denegado.component';
 
@@ -8,7 +10,11 @@ describe('AccesoDenegadoComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AccesoDenegadoComponent]
+      imports: [AccesoDenegadoComponent],
+      providers: [
+        provideNoopAnimations(),
+        provideRouter([])
+      ]
     })
     .compileComponents();
     

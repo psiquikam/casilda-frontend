@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CASILDACARDComponent } from './casilda-card.component';
+import { CasildaCardComponent } from './casilda-card.component';
 
-describe('CASILDACARDComponent', () => {
-  let component: CASILDACARDComponent;
-  let fixture: ComponentFixture<CASILDACARDComponent>;
+describe('CasildaCardComponent', () => {
+  let component: CasildaCardComponent;
+  let fixture: ComponentFixture<CasildaCardComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CASILDACARDComponent]
+      imports: [CasildaCardComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(CASILDACARDComponent);
+    fixture = TestBed.createComponent(CasildaCardComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

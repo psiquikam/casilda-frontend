@@ -1,18 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
-import { DialogExitoComponent } from './dialog-exito.component';
+import { DialogoExitoComponent } from './dialog-exito.component';
 
-describe('DialogExitoComponent', () => {
-  let component: DialogExitoComponent;
-  let fixture: ComponentFixture<DialogExitoComponent>;
+describe('DialogoExitoComponent', () => {
+  let component: DialogoExitoComponent;
+  let fixture: ComponentFixture<DialogoExitoComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DialogExitoComponent]
+      imports: [DialogoExitoComponent],
+      providers: [
+        provideNoopAnimations(),
+        { provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } },
+        { provide: MAT_DIALOG_DATA, useValue: {} }
+      ]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(DialogExitoComponent);
+    fixture = TestBed.createComponent(DialogoExitoComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
