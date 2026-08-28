@@ -7,66 +7,66 @@
   <mat-dialog-content class="modal-content">
     <mat-tab-group animationDuration="0ms">
 
-      <mat-tab label="Intento de Comunicación" *ngIf="!data.soloLectura">
-        <div class="tab-body-wrapper">
-          <form [formGroup]="contactoForm" (ngSubmit)="registrarIntento()" class="form-layout">
-
-            <div class="form-grid">
-              <mat-form-field appearance="outline">
-                <mat-label>Fecha</mat-label>
-                <input matInput type="date" formControlName="fecha" [readonly]="true">
+      @if (!data.soloLectura) {
+        <mat-tab label="Intento de Comunicación">
+          <div class="tab-body-wrapper">
+            <form [formGroup]="contactoForm" (ngSubmit)="registrarIntento()" class="form-layout">
+              <div class="form-grid">
+                <mat-form-field appearance="outline">
+                  <mat-label>Fecha</mat-label>
+                  <input matInput type="date" formControlName="fecha" [readonly]="true">
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Hora</mat-label>
+                  <input matInput type="time" formControlName="hora" [readonly]="true">
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Jornada</mat-label>
+                  <input matInput [value]="contactoForm.get('jornada')?.value" readonly>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Resultado</mat-label>
+                  <mat-select formControlName="resultado">
+                    @for (r of resultados; track r) {
+                      <mat-option [value]="r">{{ r }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <mat-form-field appearance="outline" class="full-width desc-field">
+                <mat-label>Observaciones Detalladas</mat-label>
+                <textarea matInput rows="4" formControlName="observacion"></textarea>
               </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Hora</mat-label>
-                <input matInput type="time" formControlName="hora" [readonly]="true">
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Jornada</mat-label>
-                <input matInput [value]="contactoForm.get('jornada')?.value" readonly>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Resultado</mat-label>
-                <mat-select formControlName="resultado">
-                  <mat-option *ngFor="let r of resultados" [value]="r">{{ r }}</mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-
-            <mat-form-field appearance="outline" class="full-width desc-field">
-              <mat-label>Observaciones Detalladas</mat-label>
-              <textarea matInput rows="4" formControlName="observacion"></textarea>
-            </mat-form-field>
-
-            <div class="form-grid" *ngIf="mostrarCamposCita">
-
-              <mat-form-field appearance="outline">
-                <mat-label>Fecha de Cita</mat-label>
-                <input matInput [matDatepicker]="pickerCita" formControlName="fechaCita" [min]="minCitaDate">
-                <mat-datepicker-toggle matIconSuffix [for]="pickerCita"></mat-datepicker-toggle>
-                <mat-datepicker #pickerCita></mat-datepicker>
-                <mat-error *ngIf="contactoForm.get('fechaCita')?.hasError('required')">La fecha es requerida</mat-error>
-                <mat-error *ngIf="contactoForm.get('fechaCita')?.hasError('dateNotGreaterThanToday')">La fecha debe ser posterior a hoy</mat-error>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Hora de Cita</mat-label>
-                <input matInput type="time" formControlName="horaCita">
-              </mat-form-field>
-            </div>
-
-            <div class="form-actions">
-              <button mat-flat-button class="btn-save" type="submit" [disabled]="contactoForm.invalid">
-                <mat-icon>save</mat-icon>
-                Guardar Registro
-              </button>
-            </div>
-
-          </form>
-        </div>
-      </mat-tab>
+              @if (mostrarCamposCita) {
+                <div class="form-grid">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Fecha de Cita</mat-label>
+                    <input matInput [matDatepicker]="pickerCita" formControlName="fechaCita" [min]="minCitaDate">
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerCita"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerCita></mat-datepicker>
+                    @if (contactoForm.get('fechaCita')?.hasError('required')) {
+                      <mat-error>La fecha es requerida</mat-error>
+                    }
+                    @if (contactoForm.get('fechaCita')?.hasError('dateNotGreaterThanToday')) {
+                      <mat-error>La fecha debe ser posterior a hoy</mat-error>
+                    }
+                  </mat-form-field>
+                  <mat-form-field appearance="outline">
+                    <mat-label>Hora de Cita</mat-label>
+                    <input matInput type="time" formControlName="horaCita">
+                  </mat-form-field>
+                </div>
+              }
+              <div class="form-actions">
+                <button mat-flat-button class="btn-save" type="submit" [disabled]="contactoForm.invalid">
+                  <mat-icon>save</mat-icon>
+                  Guardar Registro
+                </button>
+              </div>
+            </form>
+          </div>
+        </mat-tab>
+      }
 
       <mat-tab label="Historial">
         <div class="tab-body-wrapper">
@@ -102,10 +102,12 @@
 
             </table>
 
-            <div *ngIf="historialContactos.length === 0" class="empty-state">
-              <mat-icon>info</mat-icon>
-              <p>No se han registrado intentos previos.</p>
-            </div>
+            @if (historialContactos.length === 0) {
+              <div class="empty-state">
+                <mat-icon>info</mat-icon>
+                <p>No se han registrado intentos previos.</p>
+              </div>
+            }
 
           </div>
         </div>

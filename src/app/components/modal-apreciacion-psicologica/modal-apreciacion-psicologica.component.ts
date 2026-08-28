@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -16,10 +16,8 @@ export interface MaestroDto {
 }
 
 @Component({
-  selector: 'app-modal-apreciacion-psicologica',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-modal-apreciacion-psicologica',
+    imports: [
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
@@ -27,9 +25,9 @@ export interface MaestroDto {
     MatButtonModule,
     MatIconModule,
     FormsModule
-  ],
-  templateUrl: './modal-apreciacion-psicologica.component.html',
-  styleUrls: ['./modal-apreciacion-psicologica.component.scss']
+],
+    templateUrl: './modal-apreciacion-psicologica.component.html',
+    styleUrls: ['./modal-apreciacion-psicologica.component.scss']
 })
 export class ModalApreciacionPsicologicaComponent implements OnInit {
   private readonly http = inject(HttpClient);

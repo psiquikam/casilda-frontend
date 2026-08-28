@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, ViewChild, AfterViewInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, MatPaginatorIntl, PageEvent } from '@angular/material/paginator';
 import { MatIconModule } from '@angular/material/icon';
@@ -25,22 +25,20 @@ export function getSpanishPaginatorIntl() {
 }
 
 @Component({
-  selector: 'app-tabla-otros-casos',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-tabla-otros-casos',
+    imports: [
     MatTableModule,
     MatPaginatorModule,
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
-    MatCardModule,
-  ],
-  providers: [
-    { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
-  ],
-  templateUrl: './tabla-otros-casos.component.html',
-  styleUrls: ['./tabla-otros-casos.component.scss'],
+    MatCardModule
+],
+    providers: [
+        { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
+    ],
+    templateUrl: './tabla-otros-casos.component.html',
+    styleUrls: ['./tabla-otros-casos.component.scss']
 })
 export class TablaOtrosCasosComponent implements AfterViewInit {
 

@@ -33,7 +33,7 @@
 
 ::ng-deep {
 	.mat-mdc-tab-group {
-		--mdc-tab-indicator-active-indicator-color: #348f41;
+		--mat-tab-active-indicator-color: #348f41;
 	}
 
 	.mat-mdc-tab-header {
@@ -537,23 +537,23 @@
 }
 
 ::ng-deep .aph-tab .aph-result-option .mat-mdc-radio-button {
-	--mdc-radio-unselected-icon-color: #5f6368;
-	--mdc-radio-unselected-hover-icon-color: #5f6368;
+	--mat-radio-unselected-icon-color: #5f6368;
+	--mat-radio-unselected-hover-icon-color: #5f6368;
 }
 
 ::ng-deep .aph-tab .aph-result-alta .mdc-radio {
-	--mdc-radio-selected-icon-color: #d32f2f;
-	--mdc-radio-selected-hover-icon-color: #d32f2f;
+	--mat-radio-selected-icon-color: #d32f2f;
+	--mat-radio-selected-hover-icon-color: #d32f2f;
 }
 
 ::ng-deep .aph-tab .aph-result-media .mdc-radio {
-	--mdc-radio-selected-icon-color: #7b6b00;
-	--mdc-radio-selected-hover-icon-color: #7b6b00;
+	--mat-radio-selected-icon-color: #7b6b00;
+	--mat-radio-selected-hover-icon-color: #7b6b00;
 }
 
 ::ng-deep .aph-tab .aph-result-baja .mdc-radio {
-	--mdc-radio-selected-icon-color: #2e7d32;
-	--mdc-radio-selected-hover-icon-color: #2e7d32;
+	--mat-radio-selected-icon-color: #2e7d32;
+	--mat-radio-selected-hover-icon-color: #2e7d32;
 }
 
 .animate-fade-in {

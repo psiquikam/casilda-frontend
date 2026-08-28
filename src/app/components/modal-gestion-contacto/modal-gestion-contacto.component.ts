@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 
@@ -22,10 +22,8 @@ import { environment } from '../../../environments/environment';
 const RESULTADO_EXITOSO = 'Contesta y se concerta cita';
 
 @Component({
-  selector: 'app-modal-gestion',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-modal-gestion',
+    imports: [
     ReactiveFormsModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -39,9 +37,9 @@ const RESULTADO_EXITOSO = 'Contesta y se concerta cita';
     MatSnackBarModule,
     MatDatepickerModule,
     MatNativeDateModule
-  ],
-  templateUrl: './modal-gestion-contacto.component.html',
-  styleUrls: ['./modal-gestion-contacto.component.scss']
+],
+    templateUrl: './modal-gestion-contacto.component.html',
+    styleUrls: ['./modal-gestion-contacto.component.scss']
 })
 export class ModalGestionComponent implements OnInit {
 

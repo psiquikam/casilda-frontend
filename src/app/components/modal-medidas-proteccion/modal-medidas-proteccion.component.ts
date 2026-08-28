@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -11,20 +11,18 @@ import { SolicitudService } from '../../services/solicitud.service';
 import { MaestroDto } from '../../services/listas.service';
 
 @Component({
-  selector: 'app-modal-medidas-proteccion',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-modal-medidas-proteccion',
+    imports: [
     FormsModule,
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
-    MatIconModule,
-  ],
-  templateUrl: './modal-medidas-proteccion.component.html',
-  styleUrls: ['./modal-medidas-proteccion.component.scss']
+    MatIconModule
+],
+    templateUrl: './modal-medidas-proteccion.component.html',
+    styleUrls: ['./modal-medidas-proteccion.component.scss']
 })
 export class ModalMedidasProteccionComponent implements OnInit {
 

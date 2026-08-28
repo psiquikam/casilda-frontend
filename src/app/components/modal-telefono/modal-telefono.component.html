@@ -9,7 +9,9 @@
     <mat-form-field appearance="outline" class="field-tipo">
       <mat-label>Tipo</mat-label>
       <mat-select [(ngModel)]="data.tipoId" (selectionChange)="onTipoChange($event.value)">
-        <mat-option *ngFor="let tipo of tiposTelefono" [value]="tipo.id">{{ tipo.nombre }}</mat-option>
+        @for (tipo of tiposTelefono; track tipo) {
+          <mat-option [value]="tipo.id">{{ tipo.nombre }}</mat-option>
+        }
       </mat-select>
     </mat-form-field>
 
@@ -22,20 +24,22 @@
         pattern="\d*"
         (input)="soloDigitosTelefono($event)"
         placeholder="Ej: 3001234567">
-      <mat-error *ngIf="telefonoVal.invalid && (telefonoVal.dirty || telefonoVal.touched)">
-        El teléfono debe tener 10 dígitos
-      </mat-error>
-    </mat-form-field>
+        @if (telefonoVal.invalid && (telefonoVal.dirty || telefonoVal.touched)) {
+          <mat-error>
+            El teléfono debe tener 10 dígitos
+          </mat-error>
+        }
+      </mat-form-field>
 
 
-  </div>
-</mat-dialog-content>
+    </div>
+  </mat-dialog-content>
 
-<mat-dialog-actions align="end" class="modal-actions">
-  <button mat-button (click)="onNoClick()">Cancelar</button>
+  <mat-dialog-actions align="end" class="modal-actions">
+    <button mat-button (click)="onNoClick()">Cancelar</button>
 
-  <button mat-flat-button class="btn-confirm" (click)="guardar()" [disabled]="!canSubmit">
-    <mat-icon>check</mat-icon>
-    Agregar
-  </button>
-</mat-dialog-actions>
+    <button mat-flat-button class="btn-confirm" (click)="guardar()" [disabled]="!canSubmit">
+      <mat-icon>check</mat-icon>
+      Agregar
+    </button>
+  </mat-dialog-actions>

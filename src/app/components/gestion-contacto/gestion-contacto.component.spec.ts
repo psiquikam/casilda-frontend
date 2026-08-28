@@ -1,18 +1,28 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
 
-import { DetalleAconpanamientoComponent } from './gestion-contacto.component';
+import { DetalleAcompanamientoComponent } from './gestion-contacto.component';
 
-describe('DetalleAconpanamientoComponent', () => {
-  let component: DetalleAconpanamientoComponent;
-  let fixture: ComponentFixture<DetalleAconpanamientoComponent>;
+describe('DetalleAcompanamientoComponent', () => {
+  let component: DetalleAcompanamientoComponent;
+  let fixture: ComponentFixture<DetalleAcompanamientoComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DetalleAconpanamientoComponent]
+      imports: [DetalleAcompanamientoComponent],
+      providers: [
+        provideNoopAnimations(),
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting()
+      ]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(DetalleAconpanamientoComponent);
+    fixture = TestBed.createComponent(DetalleAcompanamientoComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

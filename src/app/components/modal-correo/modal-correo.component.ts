@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -16,10 +16,8 @@ interface TipoCorreoDto {
 }
 
 @Component({
-  selector: 'app-modal-correo',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-modal-correo',
+    imports: [
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
@@ -27,9 +25,9 @@ interface TipoCorreoDto {
     MatButtonModule,
     MatIconModule,
     FormsModule
-  ],
-  templateUrl: './modal-correo.component.html',
-  styleUrls: ['./modal-correo.component.scss']
+],
+    templateUrl: './modal-correo.component.html',
+    styleUrls: ['./modal-correo.component.scss']
 })
 export class ModalCorreoComponent implements OnInit {
 

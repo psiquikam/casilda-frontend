@@ -1,5 +1,5 @@
 import { Component, Injectable } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -47,10 +47,8 @@ export const HECHO_DATE_FORMATS = {
 };
 
 @Component({
-  selector: 'app-modal-hechos',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-modal-hechos',
+    imports: [
     FormsModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -59,13 +57,13 @@ export const HECHO_DATE_FORMATS = {
     MatIconModule,
     MatDatepickerModule,
     MatNativeDateModule
-  ],
-  providers: [
-    { provide: DateAdapter, useClass: HechoDateAdapter },
-    { provide: MAT_DATE_FORMATS, useValue: HECHO_DATE_FORMATS }
-  ],
-  templateUrl: './modal-hechos.component.html',
-  styleUrls: ['./modal-hechos.component.scss']
+],
+    providers: [
+        { provide: DateAdapter, useClass: HechoDateAdapter },
+        { provide: MAT_DATE_FORMATS, useValue: HECHO_DATE_FORMATS }
+    ],
+    templateUrl: './modal-hechos.component.html',
+    styleUrls: ['./modal-hechos.component.scss']
 })
 export class ModalHechosComponent {
 

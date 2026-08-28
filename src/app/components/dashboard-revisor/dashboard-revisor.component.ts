@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -8,19 +8,17 @@ import { MatTableModule } from '@angular/material/table';
 import { RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-dashboard-revisor',
-  standalone: true,
-  imports: [
-    CommonModule, 
-    MatCardModule, 
-    MatIconModule, 
-    MatProgressBarModule, 
-    MatButtonModule, 
+    selector: 'app-dashboard-revisor',
+    imports: [
+    MatCardModule,
+    MatIconModule,
+    MatProgressBarModule,
+    MatButtonModule,
     MatTableModule,
     RouterLink
-  ],
-  templateUrl: './dashboard-revisor.component.html',
-  styleUrls: ['./dashboard-revisor.component.scss']
+],
+    templateUrl: './dashboard-revisor.component.html',
+    styleUrls: ['./dashboard-revisor.component.scss']
 })
 export class DashboardRevisorComponent {
   stats = {

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,14 +9,18 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 
 @Component({
-  selector: 'app-detalle-revisor',
-  standalone: true,
-  imports: [
-    CommonModule, RouterLink, MatTabsModule, MatButtonModule, 
-    MatIconModule, MatChipsModule, MatCardModule, MatDividerModule
-  ],
-  templateUrl: './detalle-revisor.component.html',
-  styleUrls: ['./detalle-revisor.component.scss']
+    selector: 'app-detalle-revisor',
+    imports: [
+    RouterLink,
+    MatTabsModule,
+    MatButtonModule,
+    MatIconModule,
+    MatChipsModule,
+    MatCardModule,
+    MatDividerModule
+],
+    templateUrl: './detalle-revisor.component.html',
+    styleUrls: ['./detalle-revisor.component.scss']
 })
 export class DetalleRevisorComponent implements OnInit {
   idCaso: string | null = '';

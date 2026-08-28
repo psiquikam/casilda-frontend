@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { AuthService } from '../../../services/auth.service';
 import { RouterLink } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -9,19 +9,17 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 
 @Component({
-  selector: 'app-header',
-  standalone: true,
-  imports: [
-    CommonModule, 
-    MatToolbarModule, 
-    MatButtonModule, 
-    MatIconModule, 
-    MatMenuModule, 
+    selector: 'app-header',
+    imports: [
+    MatToolbarModule,
+    MatButtonModule,
+    MatIconModule,
+    MatMenuModule,
     MatDividerModule,
     RouterLink
-  ],
-  templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss']
+],
+    templateUrl: './header.component.html',
+    styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
   @Output() toggleSidenav = new EventEmitter<void>();

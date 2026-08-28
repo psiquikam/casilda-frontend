@@ -22,15 +22,14 @@ export interface Usuario {
 }
 
 @Component({
-  selector: 'app-gestion-usuarios',
-  standalone: true,
-  imports: [
-    CommonModule, MatTableModule, MatButtonModule, MatIconModule,
-    MatCardModule, MatChipsModule, MatDialogModule, MatTooltipModule,
-    MatPaginatorModule
-  ],
-  templateUrl: './gestion-usuarios.component.html',
-  styleUrls: ['./gestion-usuarios.component.scss']
+    selector: 'app-gestion-usuarios',
+    imports: [
+        CommonModule, MatTableModule, MatButtonModule, MatIconModule,
+        MatCardModule, MatChipsModule, MatDialogModule, MatTooltipModule,
+        MatPaginatorModule
+    ],
+    templateUrl: './gestion-usuarios.component.html',
+    styleUrls: ['./gestion-usuarios.component.scss']
 })
 export class GestionUsuariosComponent implements OnInit {
   displayedColumns: string[] = ['nombre', 'email', 'rol', 'estado', 'acciones'];

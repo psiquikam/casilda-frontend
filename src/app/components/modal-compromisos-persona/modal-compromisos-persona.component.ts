@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { HttpClient } from '@angular/common/http';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -14,10 +14,8 @@ import { environment } from '../../../environments/environment';
 import { MaestroDto } from '../../services/listas.service';
 
 @Component({
-  selector: 'app-modal-compromisos-persona',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-modal-compromisos-persona',
+    imports: [
     FormsModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -27,9 +25,9 @@ import { MaestroDto } from '../../services/listas.service';
     MatIconModule,
     MatDatepickerModule,
     MatNativeDateModule
-  ],
-  templateUrl: './modal-compromisos-persona.component.html',
-  styleUrls: ['./modal-compromisos-persona.component.scss']
+],
+    templateUrl: './modal-compromisos-persona.component.html',
+    styleUrls: ['./modal-compromisos-persona.component.scss']
 })
 export class ModalCompromisosPersonaComponent implements OnInit {
   private readonly http = inject(HttpClient);

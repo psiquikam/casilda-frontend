@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -12,10 +12,8 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { ListasService, MaestroDto } from '../../services/listas.service';
 
 @Component({
-  selector: 'app-modal-remision',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-modal-remision',
+    imports: [
     FormsModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -25,9 +23,9 @@ import { ListasService, MaestroDto } from '../../services/listas.service';
     MatIconModule,
     MatDatepickerModule,
     MatNativeDateModule
-  ],
-  templateUrl: './modal-remision.component.html',
-  styleUrls: ['./modal-remision.component.scss']
+],
+    templateUrl: './modal-remision.component.html',
+    styleUrls: ['./modal-remision.component.scss']
 })
 export class ModalRemisionComponent implements OnInit {
   private readonly listasService = inject(ListasService);

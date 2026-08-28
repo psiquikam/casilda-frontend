@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
@@ -11,14 +11,18 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [
-    CommonModule, ReactiveFormsModule, RouterLink,
-    MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule
-  ],
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+    selector: 'app-login',
+    imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule
+],
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
   loginForm: FormGroup;

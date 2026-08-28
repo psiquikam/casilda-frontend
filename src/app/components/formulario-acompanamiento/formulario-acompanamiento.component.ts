@@ -26,17 +26,16 @@ import { ModalCorreoComponent } from '../modal-correo/modal-correo.component';
 import { ModalTelefonoComponent } from '../modal-telefono/modal-telefono.component';
 
 @Component({
-  selector: 'app-formulario-acompanamiento',
-  standalone: true,
-  imports: [
-    CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule,
-    MatInputModule, MatSelectModule, MatDatepickerModule, MatNativeDateModule,
-    MatButtonModule, MatIconModule, MatSnackBarModule, MatRadioModule,
-    MatDialogModule, MatTabsModule, MatProgressSpinnerModule, MatTableModule,
-    MatTooltipModule
-  ],
-  templateUrl: './formulario-acompanamiento.component.html',
-  styleUrls: ['./formulario-acompanamiento.component.scss']
+    selector: 'app-formulario-acompanamiento',
+    imports: [
+        CommonModule, ReactiveFormsModule, MatCardModule, MatFormFieldModule,
+        MatInputModule, MatSelectModule, MatDatepickerModule, MatNativeDateModule,
+        MatButtonModule, MatIconModule, MatSnackBarModule, MatRadioModule,
+        MatDialogModule, MatTabsModule, MatProgressSpinnerModule, MatTableModule,
+        MatTooltipModule
+    ],
+    templateUrl: './formulario-acompanamiento.component.html',
+    styleUrls: ['./formulario-acompanamiento.component.scss']
 })
 export class FormularioAcompanamientoComponent implements OnInit {
   private fb = inject(FormBuilder);

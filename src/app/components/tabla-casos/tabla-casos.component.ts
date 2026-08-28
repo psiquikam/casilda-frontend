@@ -26,29 +26,28 @@ export function getSpanishPaginatorIntl() {
 }
 
 @Component({
-  selector: 'app-tabla-casos',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatIconModule,
-    MatButtonModule,
-    MatTooltipModule,
-    MatCardModule
-  ],
-  providers: [
-    { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
-  ],
-  templateUrl: './tabla-casos.component.html',
-  styleUrls: ['./tabla-casos.component.scss'],
-  animations: [
-    trigger('detailExpand', [
-      state('collapsed, void', style({ height: '0px', minHeight: '0' })),
-      state('expanded', style({ height: '*' })),
-      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
-    ]),
-  ],
+    selector: 'app-tabla-casos',
+    imports: [
+        CommonModule,
+        MatTableModule,
+        MatPaginatorModule,
+        MatIconModule,
+        MatButtonModule,
+        MatTooltipModule,
+        MatCardModule
+    ],
+    providers: [
+        { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
+    ],
+    templateUrl: './tabla-casos.component.html',
+    styleUrls: ['./tabla-casos.component.scss'],
+    animations: [
+        trigger('detailExpand', [
+            state('collapsed, void', style({ height: '0px', minHeight: '0' })),
+            state('expanded', style({ height: '*' })),
+            transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+        ]),
+    ]
 })
 export class TablaCasosComponent implements AfterViewInit {
 

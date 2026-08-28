@@ -1,14 +1,13 @@
 import { Component, Inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'app-exito-dialog',
-  standalone: true,
-  imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule],
-  template: `
+    selector: 'app-exito-dialog',
+    imports: [MatDialogModule, MatButtonModule, MatIconModule],
+    template: `
     <div class="dialog-container">
       <mat-icon class="success-icon">check_circle</mat-icon>
       <h2 mat-dialog-title>{{ data.titulo }}</h2>
@@ -22,7 +21,7 @@ import { MatIconModule } from '@angular/material/icon';
       </mat-dialog-actions>
     </div>
   `,
-  styleUrls: ['./dialog-exito.component.scss']
+    styleUrls: ['./dialog-exito.component.scss']
 })
 export class DialogoExitoComponent {
   constructor(

@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -40,10 +40,8 @@ type ContactoInfo = {
 };
 
 @Component({
-  selector: 'app-modal-detalle-solicitud',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-modal-detalle-solicitud',
+    imports: [
     ReactiveFormsModule,
     MatDialogModule,
     MatTabsModule,
@@ -57,10 +55,10 @@ type ContactoInfo = {
     MatTableModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule,
-  ],
-  templateUrl: './modal-detalle-solicitud.component.html',
-  styleUrls: ['./modal-detalle-solicitud.component.scss']
+    MatSnackBarModule
+],
+    templateUrl: './modal-detalle-solicitud.component.html',
+    styleUrls: ['./modal-detalle-solicitud.component.scss']
 })
 export class ModalDetalleSolicitudComponent implements OnInit {
   private fb = inject(FormBuilder);

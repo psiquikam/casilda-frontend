@@ -8,11 +8,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'app-seguimiento-tramite',
-  standalone: true,
-  imports: [CommonModule, FormsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule],
-  templateUrl: './seguimiento-tramite.component.html',
-  styleUrls: ['./seguimiento-tramite.component.scss']
+    selector: 'app-seguimiento-tramite',
+    imports: [CommonModule, FormsModule, MatCardModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule],
+    templateUrl: './seguimiento-tramite.component.html',
+    styleUrls: ['./seguimiento-tramite.component.scss']
 })
 export class SeguimientoTramiteComponent {
   codigoBusqueda: string = '';

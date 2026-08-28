@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -16,14 +16,17 @@ interface RolDto {
 }
 
 @Component({
-  selector: 'app-dialog-usuario',
-  standalone: true,
-  imports: [
-    CommonModule, ReactiveFormsModule, MatDialogModule,
-    MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule
-  ],
-  templateUrl: './dialog-usuario.component.html',
-  styleUrls: ['./dialog-usuario.component.scss']
+    selector: 'app-dialog-usuario',
+    imports: [
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule
+],
+    templateUrl: './dialog-usuario.component.html',
+    styleUrls: ['./dialog-usuario.component.scss']
 })
 export class DialogUsuarioComponent implements OnInit {
   userForm: FormGroup;

@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { HttpClient } from '@angular/common/http';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -14,10 +14,8 @@ import { environment } from '../../../environments/environment';
 import { MaestroDto } from '../../services/listas.service';
 
 @Component({
-  selector: 'app-modal-remisiones',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-modal-remisiones',
+    imports: [
     FormsModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -27,9 +25,9 @@ import { MaestroDto } from '../../services/listas.service';
     MatIconModule,
     MatDatepickerModule,
     MatNativeDateModule
-  ],
-  templateUrl: './modal-seguimiento.component.html',
-  styleUrls: ['./modal-seguimiento.component.scss']
+],
+    templateUrl: './modal-seguimiento.component.html',
+    styleUrls: ['./modal-seguimiento.component.scss']
 })
 export class ModalSeguimientosComponent implements OnInit {
 

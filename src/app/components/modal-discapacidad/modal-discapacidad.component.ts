@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -16,10 +16,8 @@ export interface MaestroDto {
 }
 
 @Component({
-  selector: 'app-modal-discapacidad',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-modal-discapacidad',
+    imports: [
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
@@ -27,9 +25,9 @@ export interface MaestroDto {
     MatButtonModule,
     FormsModule,
     MatIconModule
-  ],
-  templateUrl: './modal-discapacidad.component.html',
-  styleUrls: ['./modal-discapacidad.component.scss']
+],
+    templateUrl: './modal-discapacidad.component.html',
+    styleUrls: ['./modal-discapacidad.component.scss']
 })
 export class ModalDiscapacidadComponent implements OnInit {
 

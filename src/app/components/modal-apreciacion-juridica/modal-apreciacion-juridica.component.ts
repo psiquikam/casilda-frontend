@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -16,10 +16,8 @@ export interface MaestroDto {
 }
 
 @Component({
-  selector: 'app-modal-apreciacion-juridica',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-modal-apreciacion-juridica',
+    imports: [
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
@@ -27,9 +25,9 @@ export interface MaestroDto {
     MatButtonModule,
     MatIconModule,
     FormsModule
-  ],
-  templateUrl: './modal-apreciacion-juridica.component.html',
-  styleUrls: ['./modal-apreciacion-juridica.component.scss']
+],
+    templateUrl: './modal-apreciacion-juridica.component.html',
+    styleUrls: ['./modal-apreciacion-juridica.component.scss']
 })
 export class ModalApreciacionJuridicaComponent implements OnInit {
   private readonly http = inject(HttpClient);

@@ -59,16 +59,15 @@ export function futureDateTime(formGroup: AbstractControl): ValidationErrors | n
 }
 
 @Component({
-  selector: 'app-reprogramar-modal',
-  standalone: true,
-  templateUrl: './modal-reprogramar-cita.component.html',
-  styleUrls: ['./modal-reprogramar-cita.component.scss'],
-  imports: [
-    CommonModule, ReactiveFormsModule, MatDialogModule,
-    MatFormFieldModule, MatSelectModule, MatInputModule,
-    MatButtonModule, MatIconModule,
-    MatDatepickerModule, MatNativeDateModule
-  ]
+    selector: 'app-reprogramar-modal',
+    templateUrl: './modal-reprogramar-cita.component.html',
+    styleUrls: ['./modal-reprogramar-cita.component.scss'],
+    imports: [
+        CommonModule, ReactiveFormsModule, MatDialogModule,
+        MatFormFieldModule, MatSelectModule, MatInputModule,
+        MatButtonModule, MatIconModule,
+        MatDatepickerModule, MatNativeDateModule
+    ]
 })
 export class ReprogramarCitaModalComponent implements OnInit {
   gestionForm: FormGroup;

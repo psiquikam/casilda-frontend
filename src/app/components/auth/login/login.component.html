@@ -15,9 +15,11 @@
           <mat-label>Correo Electrónico</mat-label>
           <input matInput formControlName="email" placeholder="ejemplo@fnsp.gov">
           <mat-icon matSuffix>email</mat-icon>
-          <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
-            Ingrese un correo válido
-          </mat-error>
+          @if (loginForm.get('email')?.hasError('email')) {
+            <mat-error>
+              Ingrese un correo válido
+            </mat-error>
+          }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">

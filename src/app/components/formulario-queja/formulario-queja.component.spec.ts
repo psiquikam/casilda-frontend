@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 import { FormularioQuejaComponent } from './formulario-queja.component';
 
@@ -8,7 +9,10 @@ describe('FormularioQuejaComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FormularioQuejaComponent]
+      imports: [FormularioQuejaComponent],
+      providers: [
+        provideNoopAnimations()
+      ]
     })
     .compileComponents();
     

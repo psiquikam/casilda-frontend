@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, Validators, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,12 +15,10 @@ import { MaestroDto } from '../../services/listas.service';
 import { environment } from '../../../environments/environment';
 
 @Component({
-  selector: 'app-reparto-modal',
-  standalone: true,
-  templateUrl: './modal-reparto.component.html',
-  styleUrls: ['./modal-reparto.component.scss'],
-  imports: [
-    CommonModule,
+    selector: 'app-reparto-modal',
+    templateUrl: './modal-reparto.component.html',
+    styleUrls: ['./modal-reparto.component.scss'],
+    imports: [
     ReactiveFormsModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -29,7 +27,7 @@ import { environment } from '../../../environments/environment';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule
-  ]
+]
 })
 export class RepartoModalComponent implements OnInit {
   repartoForm: FormGroup;

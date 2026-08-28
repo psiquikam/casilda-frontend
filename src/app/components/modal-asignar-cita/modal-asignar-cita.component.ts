@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, Validators, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,12 +11,10 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
-  selector: 'app-reparto-modal',
-  standalone: true,
-  templateUrl: './modal-asignar-cita.component.html',
-  styleUrls: ['./modal-asignar-cita.component.scss'],
-  imports: [
-    CommonModule,
+    selector: 'app-reparto-modal',
+    templateUrl: './modal-asignar-cita.component.html',
+    styleUrls: ['./modal-asignar-cita.component.scss'],
+    imports: [
     ReactiveFormsModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -26,7 +24,7 @@ import { MatNativeDateModule } from '@angular/material/core';
     MatIconModule,
     MatDatepickerModule,
     MatNativeDateModule
-  ]
+]
 })
 export class AsignarCitaModalComponent {
 

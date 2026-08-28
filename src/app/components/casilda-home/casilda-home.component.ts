@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CasildaCardComponent } from '../casilda-card/casilda-card.component';
 
@@ -13,11 +13,10 @@ interface CasildaItem {
 }
 
 @Component({
-  selector: 'app-casilda-home',
-  standalone: true,
-  imports: [CommonModule, CasildaCardComponent, MatTooltipModule],
-  templateUrl: './casilda-home.component.html',
-  styleUrls: ['./casilda-home.component.scss']
+    selector: 'app-casilda-home',
+    imports: [CasildaCardComponent, MatTooltipModule],
+    templateUrl: './casilda-home.component.html',
+    styleUrls: ['./casilda-home.component.scss']
 })
 export class CasildaHomeComponent {
   acciones: CasildaItem[] = [

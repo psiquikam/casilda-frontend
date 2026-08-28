@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -14,14 +14,18 @@ import { MaestroDto } from '../../services/listas.service';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'app-modal-direccion',
-  standalone: true,
-  imports: [
-    CommonModule, ReactiveFormsModule, MatDialogModule,
-    MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatIconModule
-  ],
-  templateUrl: './modal-direccion.component.html',
-  styleUrls: ['./modal-direccion.component.scss']
+    selector: 'app-modal-direccion',
+    imports: [
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatIconModule
+],
+    templateUrl: './modal-direccion.component.html',
+    styleUrls: ['./modal-direccion.component.scss']
 })
 export class ModalDireccionComponent implements OnInit {
   private readonly fb = inject(FormBuilder);

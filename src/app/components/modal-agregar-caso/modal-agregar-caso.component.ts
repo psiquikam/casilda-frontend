@@ -36,7 +36,6 @@ export interface ModalAgregarCasoData {
 
 @Component({
   selector: 'app-modal-agregar-caso',
-  standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,

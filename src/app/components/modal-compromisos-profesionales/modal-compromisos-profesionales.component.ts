@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { HttpClient } from '@angular/common/http';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,10 +15,8 @@ import { MaestroDto } from '../../services/listas.service';
 import { GrupoProfesionalDto, SolicitudService } from '../../services/solicitud.service';
 
 @Component({
-  selector: 'app-modal-compromisos-profesionales',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-modal-compromisos-profesionales',
+    imports: [
     FormsModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -28,9 +26,9 @@ import { GrupoProfesionalDto, SolicitudService } from '../../services/solicitud.
     MatIconModule,
     MatDatepickerModule,
     MatNativeDateModule
-  ],
-  templateUrl: './modal-compromisos-profesionales.component.html',
-  styleUrls: ['./modal-compromisos-profesionales.component.scss']
+],
+    templateUrl: './modal-compromisos-profesionales.component.html',
+    styleUrls: ['./modal-compromisos-profesionales.component.scss']
 })
 export class ModalCompromisosProfesionalesComponent implements OnInit {
   private readonly http = inject(HttpClient);

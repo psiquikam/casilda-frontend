@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -16,10 +16,8 @@ export interface MaestroDto {
 }
 
 @Component({
-  selector: 'app-modal-telefono',
-  standalone: true,
-  imports: [
-    CommonModule,
+    selector: 'app-modal-telefono',
+    imports: [
     FormsModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -27,9 +25,9 @@ export interface MaestroDto {
     MatSelectModule,
     MatButtonModule,
     MatIconModule
-  ],
-  templateUrl: './modal-activar-ruta.component.html',
-  styleUrls: ['./modal-activar-ruta.component.scss']
+],
+    templateUrl: './modal-activar-ruta.component.html',
+    styleUrls: ['./modal-activar-ruta.component.scss']
 })
 export class ModalActivarRutaComponent implements OnInit {
   private readonly http = inject(HttpClient);

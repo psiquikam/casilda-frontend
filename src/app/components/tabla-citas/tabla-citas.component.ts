@@ -26,29 +26,28 @@ export function getSpanishPaginatorIntl() {
 }
 
 @Component({
-  selector: 'app-tabla-citas',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatIconModule,
-    MatButtonModule,
-    MatTooltipModule,
-    MatCardModule
-  ],
-  providers: [
-    { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
-  ],
-  templateUrl: './tabla-citas.component.html',
-  styleUrls: ['./tabla-citas.component.scss'],
-  animations: [
-    trigger('detailExpand', [
-      state('collapsed, void', style({ height: '0px', minHeight: '0' })),
-      state('expanded', style({ height: '*' })),
-      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
-    ]),
-  ],
+    selector: 'app-tabla-citas',
+    imports: [
+        CommonModule,
+        MatTableModule,
+        MatPaginatorModule,
+        MatIconModule,
+        MatButtonModule,
+        MatTooltipModule,
+        MatCardModule
+    ],
+    providers: [
+        { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
+    ],
+    templateUrl: './tabla-citas.component.html',
+    styleUrls: ['./tabla-citas.component.scss'],
+    animations: [
+        trigger('detailExpand', [
+            state('collapsed, void', style({ height: '0px', minHeight: '0' })),
+            state('expanded', style({ height: '*' })),
+            transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+        ]),
+    ]
 })
 export class TablaCitasComponent implements AfterViewInit {
 

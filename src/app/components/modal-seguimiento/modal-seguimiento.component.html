@@ -9,9 +9,11 @@
       <mat-label>Tipo de seguimiento</mat-label>
       <mat-select [(ngModel)]="data.idtiposeguimiento" (ngModelChange)="seleccionarTipoSeguimiento($event)"
         [disabled]="bloquearTipo || cargandoMaestros">
-        <mat-option *ngFor="let opcion of tiposSeguimiento" [value]="opcion.id">
-          {{opcion.nombre}}
-        </mat-option>
+        @for (opcion of tiposSeguimiento; track opcion) {
+          <mat-option [value]="opcion.id">
+            {{opcion.nombre}}
+          </mat-option>
+        }
       </mat-select>
     </mat-form-field>
 
@@ -27,14 +29,18 @@
     <mat-form-field appearance="outline" class="flex-field">
       <mat-label>Acción *</mat-label>
       <mat-select [(ngModel)]="data.idaccion" (ngModelChange)="seleccionarAccion($event)">
-        <mat-option *ngFor="let opcion of acciones" [value]="opcion.id">{{opcion.nombre}}</mat-option>
+        @for (opcion of acciones; track opcion) {
+          <mat-option [value]="opcion.id">{{opcion.nombre}}</mat-option>
+        }
       </mat-select>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="flex-field">
       <mat-label>Actividad *</mat-label>
       <mat-select [(ngModel)]="data.idactividad" (ngModelChange)="seleccionarActividad($event)" [disabled]="data.idaccion == null">
-        <mat-option *ngFor="let opcion of actividades" [value]="opcion.id">{{opcion.nombre}}</mat-option>
+        @for (opcion of actividades; track opcion) {
+          <mat-option [value]="opcion.id">{{opcion.nombre}}</mat-option>
+        }
       </mat-select>
     </mat-form-field>
   </div>
@@ -49,14 +55,18 @@
       <mat-form-field appearance="outline">
         <mat-label>Estado de seguimiento *</mat-label>
         <mat-select [(ngModel)]="data.idestadoseguimiento" (ngModelChange)="seleccionarEstadoSeguimiento($event)">
-          <mat-option *ngFor="let opcion of estadosSeguimiento" [value]="opcion.id">{{opcion.nombre}}</mat-option>
+          @for (opcion of estadosSeguimiento; track opcion) {
+            <mat-option [value]="opcion.id">{{opcion.nombre}}</mat-option>
+          }
         </mat-select>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Motivo del estado *</mat-label>
         <mat-select [(ngModel)]="data.idmotivoestado" (ngModelChange)="seleccionarMotivoEstado($event)">
-          <mat-option *ngFor="let opcion of motivosEstadoSeguimiento" [value]="opcion.id">{{opcion.nombre}}</mat-option>
+          @for (opcion of motivosEstadoSeguimiento; track opcion) {
+            <mat-option [value]="opcion.id">{{opcion.nombre}}</mat-option>
+          }
         </mat-select>
       </mat-form-field>
     </div>
