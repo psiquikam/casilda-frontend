@@ -1,11 +1,13 @@
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { AUTH_REQUIRED_MESSAGE, AuthService } from './auth.service';
 import Swal from 'sweetalert2';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
+  const router = inject(Router);
   const token = authService.getToken();
 
   const authReq = token
@@ -16,7 +18,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: HttpErrorResponse) => {
       const isAuthEndpoint = req.url.includes('/auth/login');
 
-      if ((error.status === 401 || error.status === 403) && !isAuthEndpoint) {
+      if (error.status === 401 && !isAuthEndpoint) {
         authService.logout();
         void Swal.fire({
           icon: 'warning',
@@ -25,6 +27,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
           confirmButtonText: 'Iniciar sesión',
           allowOutsideClick: false
         });
+      } else if (error.status === 403 && !isAuthEndpoint) {
+        void router.navigate(['/acceso-denegado']);
       }
       return throwError(() => error);
     })

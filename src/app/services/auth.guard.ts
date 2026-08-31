@@ -3,7 +3,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import { AUTH_REQUIRED_MESSAGE, AuthService } from './auth.service';
 import Swal from 'sweetalert2';
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
 

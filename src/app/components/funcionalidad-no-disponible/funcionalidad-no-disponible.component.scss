@@ -1,0 +1,17 @@
+:host {
+  display: grid;
+  min-height: 60vh;
+  place-items: center;
+}
+
+.feature-unavailable {
+  max-width: 32rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+mat-icon {
+  width: 3rem;
+  height: 3rem;
+  font-size: 3rem;
+}
