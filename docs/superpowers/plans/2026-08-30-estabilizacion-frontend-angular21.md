@@ -12,7 +12,7 @@
 
 ## Restricciones globales
 
-- Rama única: `docs/01/002/casilda/auditoria-angular21-plan`.
+- Rama única: `chore/01/002/casilda/auditoria-angular21-plan`.
 - PR único hacia `main`; se documenta que no existía una rama `release` al iniciar.
 - Conventional Commits con tipo estándar y descripción en español.
 - Sin cambios backend, endpoints nuevos ni contratos inventados.
@@ -684,8 +684,8 @@ git commit -m "docs: registra la verificación final del frontend"
 - [ ] **Paso 6: publicar y crear PR hacia main**
 
 ```powershell
-git push -u origin docs/01/002/casilda/auditoria-angular21-plan
-gh pr create --base main --head docs/01/002/casilda/auditoria-angular21-plan --title "docs: agrega auditoría y plan de estabilización de Angular 21" --body-file docs/evidencias/auditoria-angular21/descripcion-pr.md
+git push -u origin chore/01/002/casilda/auditoria-angular21-plan
+gh pr create --base main --head chore/01/002/casilda/auditoria-angular21-plan --title "docs: agrega auditoría y plan de estabilización de Angular 21" --body-file docs/evidencias/auditoria-angular21/descripcion-pr.md
 ```
 
 El PR debe declarar explícitamente: base excepcional `main`, ausencia de `release`, alcance sin backend, comandos ejecutados, métricas antes/después, riesgos, rollback y deuda pospuesta.

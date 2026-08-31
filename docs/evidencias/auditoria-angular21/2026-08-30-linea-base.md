@@ -3,7 +3,7 @@
 - **Fecha local:** 30 de agosto de 2026
 - **Zona horaria:** America/Bogota
 - **Commit:** `58b25e670b93289b14ba3ac958c83e4a62d0bb2d`
-- **Rama:** `docs/01/002/casilda/auditoria-angular21-plan`
+- **Rama:** `chore/01/002/casilda/auditoria-angular21-plan`
 - **Entorno:** Windows 10, Node 24.18.0, npm 11.16.0, Chrome Headless 151.0.0.0
 
 ## Archivos de entrada preservados

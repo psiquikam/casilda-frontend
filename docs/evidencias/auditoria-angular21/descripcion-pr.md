@@ -4,7 +4,7 @@ Agregar la segunda versión de la auditoría de migración React–Angular, actu
 
 ## Rama y base
 
-- Rama: `docs/01/002/casilda/auditoria-angular21-plan`.
+- Rama: `chore/01/002/casilda/auditoria-angular21-plan`.
 - Base: `main` en `58b25e670b93289b14ba3ac958c83e4a62d0bb2d`.
 - Excepción: la rama nace de `main` por instrucción expresa del responsable, debido a que no existe una rama `release` local ni remota.
 - Destino del PR: `main`.

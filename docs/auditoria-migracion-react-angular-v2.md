@@ -4,7 +4,7 @@
 - **Versión del documento:** 2.0
 - **Fecha de verificación:** 30 de agosto de 2026
 - **Commit base:** `58b25e670b93289b14ba3ac958c83e4a62d0bb2d`
-- **Rama documental:** `docs/01/002/casilda/auditoria-angular21-plan`
+- **Rama documental:** `chore/01/002/casilda/auditoria-angular21-plan`
 - **Stack comprobado:** Angular 21.2.22, Angular Material/CDK 21.2.14, TypeScript 5.9.3, RxJS 7.8.2
 - **Documento anterior preservado:** `docs/auditoria-migracion-react-angular.md`
 
@@ -295,7 +295,7 @@ Los componentes no generarán identificadores de negocio, no construirán URLs y
 Por decisión del responsable, todo el trabajo documental y la futura ejecución asociada se mantendrán en una única rama y un único PR hacia `main`:
 
 ```text
-docs/01/002/casilda/auditoria-angular21-plan
+chore/01/002/casilda/auditoria-angular21-plan
 ```
 
 Esta excepción parte directamente de `main` porque no existe una rama `release` en el remoto. El PR debe explicarlo de forma visible.
