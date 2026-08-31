@@ -8,7 +8,7 @@ export const roleGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
 
   // Obtenemos los roles permitidos para esta ruta desde la configuración de la ruta
-  const expectedRoles = route.data['roles'] as Array<string>;
+  const expectedRoles = route.data['roles'] as string[];
   const userRole = authService.currentUser?.rol;
 
   // 1. ¿Está logueado?

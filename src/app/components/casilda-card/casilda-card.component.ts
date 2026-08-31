@@ -9,9 +9,9 @@ import { MatIconModule } from '@angular/material/icon';
     styleUrls: ['./casilda-card.component.scss']
 })
 export class CasildaCardComponent {
-  @Input() icon: string = '';
-  @Input() title: string = '';
+  @Input() icon = '';
+  @Input() title = '';
   @Input() value: string | number = '';
   @Input() variant: 'light' | 'dark' = 'light';
-  @Input() isLogo: boolean = false;
+  @Input() isLogo = false;
 }

@@ -20,24 +20,24 @@ import { ModalTelefonoComponent } from '../modal-telefono/modal-telefono.compone
 import { ListasService, MaestroDto } from '../../services/listas.service';
 import { SolicitudService, UpdateSolicitudDto } from '../../services/solicitud.service';
 
-type CorreoRegistrado = {
+interface CorreoRegistrado {
   tipoId?: number | null;
   tipo?: string;
   correo: string;
-};
+}
 
-type TelefonoRegistrado = {
+interface TelefonoRegistrado {
   tipoId?: number | null;
   tipo?: string;
   telefono: string;
-};
+}
 
-type ContactoInfo = {
+interface ContactoInfo {
   tipoId?: number | null;
   tipo?: string | null;
   correo?: string | null;
   telefono?: string | null;
-};
+}
 
 @Component({
     selector: 'app-modal-detalle-solicitud',

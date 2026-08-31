@@ -697,7 +697,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       if (index >= 0) lista.splice(index, 1);
     }
 
-    const controlMap: { [key: string]: string } = {
+    const controlMap: Record<string, string> = {
       'psicologicaSel': 'detalleViolenciaPsicologica',
       'fisicaSel': 'detalleViolenciaFisica',
       'sexualSel': 'detalleViolenciaSexual',
@@ -717,7 +717,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     this.casoSeleccionado = null;
   }
 
-  private cargarCasos(page: number = 0, size: number = this.pageSizeCasos): void {
+  private cargarCasos(page = 0, size: number = this.pageSizeCasos): void {
     this.solicitudService.listarCasosPaginados(page, size).subscribe({
       next: (respuesta) => {
         const filas = respuesta.content.map((caso) => this.mapearCasoATabla(caso));

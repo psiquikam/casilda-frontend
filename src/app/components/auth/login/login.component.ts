@@ -27,7 +27,7 @@ import { MatIconModule } from '@angular/material/icon';
 export class LoginComponent {
   loginForm: FormGroup;
   hidePassword = true;
-  errorMessage: string = '';
+  errorMessage = '';
   loading = false;
 
   constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {

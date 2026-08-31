@@ -79,7 +79,7 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
   pageIndex = 0;
   pageSize = 10;
 
-  idCaso: string = 'Seleccione un caso';
+  idCaso = 'Seleccione un caso';
   contactoForm!: FormGroup;
   solicitudes: any[] = [];
   cargando = false;

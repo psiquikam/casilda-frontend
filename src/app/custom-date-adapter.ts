@@ -19,7 +19,7 @@ export class CustomDateAdapter extends NativeDateAdapter {
     return isNaN(timestamp) ? null : new Date(timestamp);
   }
 
-  override format(date: Date, displayFormat: Object): string {
+  override format(date: Date, displayFormat: unknown): string {
     if (displayFormat === 'input') {
       const day = date.getDate();
       const month = date.getMonth() + 1;

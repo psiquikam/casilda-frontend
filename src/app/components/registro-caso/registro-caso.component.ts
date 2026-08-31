@@ -73,8 +73,7 @@ import { environment } from '../../../environments/environment';
         MatAutocompleteModule,
         TablaCitasComponent,
         MatCheckboxModule,
-        FormsModule,
-        ModalPresuntoAgresorComponent
+        FormsModule
     ],
     templateUrl: './registro-caso.component.html',
     styleUrls: ['./registro-caso.component.scss', './registro-caso.consulta.scss'],
@@ -697,7 +696,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
       if (index >= 0) lista.splice(index, 1);
     }
 
-    const controlMap: { [key: string]: string } = {
+    const controlMap: Record<string, string> = {
       'psicologicaSel': 'detalleViolenciaPsicologica',
       'fisicaSel': 'detalleViolenciaFisica',
       'sexualSel': 'detalleViolenciaSexual',
@@ -717,7 +716,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
     this.casoSeleccionado = null;
   }
 
-  private cargarCitas(page: number = 0, size: number = this.pageSizeCitas): void {
+  private cargarCitas(page = 0, size: number = this.pageSizeCitas): void {
     this.solicitudService.listarCitasPaginadas(page, size, undefined, EstadoCitaEnum.CANCELADA).subscribe({
       next: (respuesta) => {
         const filas = respuesta.content.map((cita) => this.mapearCitaATabla(cita));

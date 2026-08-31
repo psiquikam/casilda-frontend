@@ -162,7 +162,7 @@ export class ListasService {
   }
 
   obtenerInstanciasRemision(tipoRemisionId?: number): Observable<MaestroDto[]> {
-    let params: { [param: string]: string } = {};
+    const params: Record<string, string> = {};
     if (tipoRemisionId) {
       params['tipoRemisionId'] = tipoRemisionId.toString();
     }
