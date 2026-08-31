@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CasildaHomeComponent } from './casilda-home.component';
+import { MatIconTestingModule } from '@angular/material/icon/testing';
 
 describe('CasildaHomeComponent', () => {
   let component: CasildaHomeComponent;
@@ -8,7 +9,7 @@ describe('CasildaHomeComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CasildaHomeComponent]
+      imports: [CasildaHomeComponent, MatIconTestingModule]
     })
     .compileComponents();
     

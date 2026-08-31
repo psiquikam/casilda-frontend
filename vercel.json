@@ -2,7 +2,7 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist/casilda-fnsp/browser",
   "devCommand": "npm start",
-  "installCommand": "npm install",
+  "installCommand": "npm ci",
   "framework": null,
   "rewrites": [
     {

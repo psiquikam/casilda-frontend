@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -25,14 +25,18 @@ import { MatIconModule } from '@angular/material/icon';
     styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
-  loginForm: FormGroup;
+  private readonly fb = inject(FormBuilder);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+
+  readonly loginForm: FormGroup;
   hidePassword = true;
-  errorMessage: string = '';
+  errorMessage = '';
   loading = false;
 
-  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
+  constructor() {
     if (this.auth.isAuthenticated()) {
-      this.router.navigate(['/dashboard-revisor']);
+      void this.router.navigate([this.auth.getDefaultRoute()]);
     }
 
     this.loginForm = this.fb.group({
@@ -41,20 +45,16 @@ export class LoginComponent {
     });
   }
 
-  onSubmit() {
+  onSubmit(): void {
     if (this.loginForm.valid) {
       this.loading = true;
       this.errorMessage = '';
       const { email, password } = this.loginForm.value;
 
       this.auth.loginWithCredentials(email, password).subscribe({
-        next: (resp) => {
+        next: () => {
           this.loading = false;
-          if (resp.rol === 'Admin') {
-            this.router.navigate(['/gestion-usuarios']);
-          } else {
-            this.router.navigate(['/dashboard-revisor']);
-          }
+          void this.router.navigate([this.auth.getDefaultRoute()]);
         },
         error: () => {
           this.loading = false;

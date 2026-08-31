@@ -40,7 +40,7 @@
     </a>
     }
 
-    @if (auth.isRevisor()) {
+    @if (auth.isRevisor() && (features.complaintIntakePrototype || features.publicTrackingPrototype)) {
     <mat-divider></mat-divider>
     <div class="menu-label">
       <mat-icon svgIcon="logo-alma" class="logo-icon"></mat-icon>
@@ -57,15 +57,19 @@
       <mat-icon svgIcon="uad-equipo" class="logo-icon"></mat-icon>
       <span>UAD EQUIPO 3 Y 4</span>
     </div>
-    <a mat-list-item routerLink="/nueva-queja" routerLinkActive="active-item">
-      <span matListItemTitle>Registrar Queja</span>
-    </a>
-    <a mat-list-item routerLink="/seguimiento" routerLinkActive="active-item">
-      <span matListItemTitle>Seguimiento</span>
-    </a>
+    @if (features.complaintIntakePrototype) {
+      <a mat-list-item routerLink="/nueva-queja" routerLinkActive="active-item">
+        <span matListItemTitle>Registrar Queja</span>
+      </a>
+    }
+    @if (features.publicTrackingPrototype) {
+      <a mat-list-item routerLink="/seguimiento" routerLinkActive="active-item">
+        <span matListItemTitle>Seguimiento</span>
+      </a>
+    }
     }
 
-    @if (auth.isAdmin()) {
+    @if (auth.isAdmin() && features.reviewerDashboardPrototype) {
     <mat-divider></mat-divider>
     <div class="menu-label">
       <mat-icon svgIcon="reportes-indicadores" class="logo-icon"></mat-icon>
@@ -76,14 +80,16 @@
     </a>
     }
 
-    <mat-divider></mat-divider>
-    <div class="menu-label">
-      <mat-icon class="large-icon">groups</mat-icon>
-      <span>RUTA VIOLETA</span>
-    </div>
-    <a mat-list-item routerLink="/seguimiento" routerLinkActive="active-item">
-      <span matListItemTitle>Seguimiento</span>
-    </a>
+    @if (features.publicTrackingPrototype) {
+      <mat-divider></mat-divider>
+      <div class="menu-label">
+        <mat-icon class="large-icon">groups</mat-icon>
+        <span>RUTA VIOLETA</span>
+      </div>
+      <a mat-list-item routerLink="/seguimiento" routerLinkActive="active-item">
+        <span matListItemTitle>Seguimiento</span>
+      </a>
+    }
 
   </mat-nav-list>
 </div>

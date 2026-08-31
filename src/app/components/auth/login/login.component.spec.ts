@@ -3,6 +3,7 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
+import { MatIconTestingModule } from '@angular/material/icon/testing';
 
 import { LoginComponent } from './login.component';
 
@@ -12,7 +13,7 @@ describe('LoginComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LoginComponent],
+      imports: [LoginComponent, MatIconTestingModule],
       providers: [
         provideNoopAnimations(),
         provideRouter([]),

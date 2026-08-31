@@ -48,8 +48,8 @@ export class GestionListasComponent implements OnInit {
   };
   readonly listKeys: ListaTabKey[] = ['tiposSolicitud', 'campus', 'unidadesAdministrativas', 'facultades', 'tiposDocumento'];
   tabIndex = 0;
-  nuevoNombre: string = '';
-  nuevoCodigo: string = '';
+  nuevoNombre = '';
+  nuevoCodigo = '';
   editandoItem: { lista: string; id: number; nombre: string; codigo: string } | null = null;
   paginacion: Record<ListaTabKey, PaginacionEstado> = {
     tiposSolicitud: { pageIndex: 0, pageSize: 10, totalElements: 0 },

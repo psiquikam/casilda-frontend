@@ -11,7 +11,7 @@ import { NativeDateAdapter, MAT_DATE_FORMATS, DateAdapter, MatNativeDateModule }
 
 @Injectable()
 export class HechoDateAdapter extends NativeDateAdapter {
-  override format(date: Date, displayFormat: Object): string {
+  override format(date: Date, displayFormat: object): string {
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
     const to2digit = (n: number) => ('00' + n).slice(-2);

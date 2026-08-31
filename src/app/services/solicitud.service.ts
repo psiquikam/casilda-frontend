@@ -164,16 +164,16 @@ export interface UpdateSolicitudDto {
   numeroDocumento?: string | null;
   fechaNacimiento?: string | null;
   identidadGeneroId?: number | null;
-  correos?: Array<{
+  correos?: {
     tipoId?: number | null;
     tipo?: string | null;
     correo: string;
-  }>;
-  telefonos?: Array<{
+  }[];
+  telefonos?: {
     tipoId?: number | null;
     tipo?: string | null;
     telefono: string;
-  }>;
+  }[];
   remitentePrimerNombre?: string | null;
   remitenteSegundoNombre?: string | null;
   remitentePrimerApellido?: string | null;

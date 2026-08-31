@@ -14,8 +14,8 @@ import { MatIconModule } from '@angular/material/icon';
     styleUrls: ['./seguimiento-tramite.component.scss']
 })
 export class SeguimientoTramiteComponent {
-  codigoBusqueda: string = '';
-  busquedaRealizada: boolean = false;
+  codigoBusqueda = '';
+  busquedaRealizada = false;
   casoEncontrado: any = null;
   etapas: any[] = [];
 

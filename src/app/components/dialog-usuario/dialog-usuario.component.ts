@@ -30,7 +30,7 @@ interface RolDto {
 })
 export class DialogUsuarioComponent implements OnInit {
   userForm: FormGroup;
-  isEdit: boolean = false;
+  isEdit = false;
   roles: RolDto[] = [];
 
   constructor(

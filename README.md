@@ -3,7 +3,7 @@
 ![Angular](https://img.shields.io/badge/Angular-21.2-DD0031?logo=angular&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)
 ![Angular Material](https://img.shields.io/badge/Angular%20Material-21.2-757575?logo=angularmaterial&logoColor=white)
-![Node](https://img.shields.io/badge/Node-%5E20.19%20%7C%20%5E22.12%20%7C%20%3E%3D24-339933?logo=node.js&logoColor=white)
+![Node](https://img.shields.io/badge/Node-24.18.0-339933?logo=node.js&logoColor=white)
 
 Frontend web de **CASILDA**, el sistema de vigilancia en salud pública para el abordaje de las violencias y discriminaciones basadas en género de la **Universidad de Antioquia**. Gestiona el flujo completo de atención: solicitud, contacto telefónico, cita, caso, atención y de seguimiento para quejas y solicitudes de acompañamiento psicosocial y jurídico, incluida la Línea ALMA de primer respondiente.
 
@@ -45,14 +45,14 @@ Los roles disponibles son `Admin`, `Revisor` y `Usuario`, aplicados mediante gua
 | Lenguaje | TypeScript (modo `strict`) | ~5.9.3 |
 | Build | `@angular-devkit/build-angular:application` (esbuild) | 21.2.x |
 | Tests | Karma + Jasmine | 6.4 / 5.1 |
-| Runtime | Node.js | `^20.19.0 \|\| ^22.12.0 \|\| >=24.0.0` |
+| Runtime | Node.js / npm | 24.18.0 / 11.16.0 |
 | Despliegue | Vercel (SPA con rewrites) | — |
 
 
 ## Requisitos previos
 
-- **Node.js** `^20.19.0`, `^22.12.0` o `>=24.0.0` (ver `engines` en `package.json`).
-- **npm** (incluido con Node).
+- **Node.js** 24.18.0 (ver `.nvmrc`).
+- **npm** 11.16.0 (ver `packageManager` en `package.json`).
 - Acceso a la API backend de CASILDA (ver [Configuración de entorno](#configuración-de-entorno)).
 
 ## Instalación y arranque rápido
@@ -60,7 +60,7 @@ Los roles disponibles son `Admin`, `Revisor` y `Usuario`, aplicados mediante gua
 ```powershell
 git clone <url-del-repositorio>
 cd casilda-frontend
-npm install
+npm ci
 npm start
 ```
 
@@ -96,6 +96,17 @@ export const environment = {
 | `npm run build` | Genera el build de producción en `dist/casilda-fnsp`. |
 | `npm run watch` | Build en modo `development` con recompilación continua. |
 | `npm test` | Ejecuta la suite de pruebas unitarias con Karma/Jasmine. |
+| `npm run lint` | Ejecuta ESLint y evita que aumente la línea base de deuda. |
+| `npm run test:ci` | Ejecuta pruebas headless con cobertura. |
+| `npm run check` | Ejecuta lint, pruebas y build de producción. |
+| `npm run audit:prod` | Audita exclusivamente dependencias productivas. |
+
+Antes de actualizar un pull request ejecuta:
+
+```powershell
+npm run check
+npm run audit:prod
+```
 
 ## Estructura del proyecto
 

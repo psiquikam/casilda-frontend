@@ -3,12 +3,12 @@ import { CanActivateFn, Router } from '@angular/router';
 import { AUTH_REQUIRED_MESSAGE, AuthService } from './auth.service';
 import Swal from 'sweetalert2';
 
-export const roleGuard: CanActivateFn = (route, state) => {
+export const roleGuard: CanActivateFn = (route) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
   // Obtenemos los roles permitidos para esta ruta desde la configuración de la ruta
-  const expectedRoles = route.data['roles'] as Array<string>;
+  const expectedRoles = route.data['roles'] as string[];
   const userRole = authService.currentUser?.rol;
 
   // 1. ¿Está logueado?

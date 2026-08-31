@@ -6,10 +6,17 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",
+    "audit:prod": "npm audit --omit=dev --audit-level=high",
+    "check": "npm run lint && npm run test:ci && npm run build",
+    "lint": "eslint . --max-warnings 303",
+    "lint:fix": "eslint . --fix"
   },
+  "packageManager": "npm@11.16.0",
   "engines": {
-    "node": "^20.19.0 || ^22.12.0 || >=24.0.0"
+    "node": "24.18.0",
+    "npm": "11.16.0"
   },
   "private": true,
   "dependencies": {
@@ -32,13 +39,17 @@
     "@angular-devkit/build-angular": "^21.2.22",
     "@angular/cli": "^21.2.22",
     "@angular/compiler-cli": "^21.2.22",
+    "@eslint/js": "^10.0.1",
     "@types/jasmine": "~5.1.0",
+    "angular-eslint": "21.4.0",
+    "eslint": "^10.3.0",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.9.3"
+    "typescript": "~5.9.3",
+    "typescript-eslint": "8.59.2"
   }
 }

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 
 import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-public-header',
@@ -9,4 +10,6 @@ import { RouterLink } from '@angular/router';
     templateUrl: './public-header.component.html',
     styleUrls: ['./public-header.component.scss']
 })
-export class PublicHeaderComponent {}
+export class PublicHeaderComponent {
+  readonly features = environment.features;
+}
