@@ -37,7 +37,7 @@
 
     <mat-form-field appearance="outline" class="flex-field">
       <mat-label>Actividad *</mat-label>
-      <mat-select [(ngModel)]="data.idactividad" (ngModelChange)="seleccionarActividad($event)" [disabled]="data.idaccion == null">
+                    <mat-select [(ngModel)]="data.idactividad" (ngModelChange)="seleccionarActividad($event)" [disabled]="data.idaccion === null">
         @for (opcion of actividades; track opcion) {
           <mat-option [value]="opcion.id">{{opcion.nombre}}</mat-option>
         }
@@ -84,7 +84,7 @@
 <mat-dialog-actions align="end" class="modal-actions">
   <button mat-button (click)="onNoClick()">Cancelar</button>
   <button mat-flat-button class="btn-confirm" (click)="guardar()"
-    [disabled]="data.idtiposeguimiento == null || data.idaccion == null || data.idactividad == null || data.idestadoseguimiento == null || data.idmotivoestado == null || !data.descripcion || !data.fecha">
+                [disabled]="data.idtiposeguimiento === null || data.idaccion === null || data.idactividad === null || data.idestadoseguimiento === null || data.idmotivoestado === null || !data.descripcion || !data.fecha">
     <mat-icon>check</mat-icon>
     Guardar Seguimiento
   </button>

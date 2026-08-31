@@ -42,7 +42,7 @@
   <button mat-button (click)="onNoClick()">Cancelar</button>
 
   <button mat-flat-button class="btn-confirm" (click)="guardar()"
-    [disabled]="data.idtipocompromiso == null || data.idgrupoprofesional == null || !data.fecha">
+                [disabled]="data.idtipocompromiso === null || data.idgrupoprofesional === null || !data.fecha">
     <mat-icon>check</mat-icon>
     Agregar compromiso
   </button>

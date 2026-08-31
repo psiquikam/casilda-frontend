@@ -542,9 +542,9 @@
                               </div>
                               <mat-radio-group formControlName="aphResultadoTriage" class="aph-result-group">
                                 @for (resultado of aphResultadosTriage; track resultado.id) {
-                                  <label class="aph-result-option">
+                                  <div class="aph-result-option">
                                     <mat-radio-button [value]="resultado.id">{{resultado.nombre}}</mat-radio-button>
-                                  </label>
+                                  </div>
                                 }
                               </mat-radio-group>
                             </div>

@@ -11,7 +11,7 @@
 
 ## Línea base de lint
 
-El primer análisis encontró 369 errores; la corrección mecánica segura de ESLint y la eliminación de importaciones inválidas resolvieron 27. Los 342 hallazgos restantes se mantienen como advertencias y el script usa `--max-warnings 342`, de modo que el pipeline falla si la deuda aumenta.
+El primer análisis encontró 369 errores. Las correcciones mecánicas y las mejoras implementadas redujeron la línea base a 303 advertencias; el script usa `--max-warnings 303`, de modo que el pipeline falla si la deuda aumenta.
 
 | Regla | Cantidad inicial |
 |---|---:|
@@ -22,13 +22,13 @@ El primer análisis encontró 369 errores; la corrección mecánica segura de ES
 | `@angular-eslint/template/label-has-associated-control` | 13 |
 | `no-case-declarations` | 12 |
 | reglas restantes | 9 |
-| **Total actual** | **342** |
+| **Total actual** | **303** |
 
 Las reglas no se desactivaron ni se excluyó código fuente. Solo se ignoran artefactos generados (`coverage`, `dist`, `.angular`) y dependencias. Las tareas posteriores deben reducir el techo cuando eliminen advertencias.
 
 ## Verificación automatizada
 
-- Lint: 0 errores, 342 advertencias controladas.
+- Lint: 0 errores, 303 advertencias controladas.
 - Pruebas: 47/47 exitosas, sin errores de iconos en consola.
 - Cobertura: 29,22 % sentencias; 7,08 % ramas; 19,04 % funciones; 29,89 % líneas.
 - Build de producción: exitoso; se conservan cuatro advertencias de presupuesto SCSS ya inventariadas.

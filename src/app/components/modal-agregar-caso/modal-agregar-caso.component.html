@@ -105,8 +105,8 @@
 
           <!-- Violencia de género -->
           <div class="pregunta-container">
-            <label class="pregunta-label">¿Violencia basada en género?</label>
-            <mat-radio-group formControlName="violenciaGenero" class="radio-group">
+            <span class="pregunta-label">¿Violencia basada en género?</span>
+            <mat-radio-group formControlName="violenciaGenero" class="radio-group" aria-label="Violencia basada en género">
               <mat-radio-button value="SI">Sí</mat-radio-button>
               <mat-radio-button value="NO">No</mat-radio-button>
             </mat-radio-group>
@@ -114,12 +114,12 @@
 
           <!-- Violencia misional -->
           <div class="pregunta-container">
-            <label class="pregunta-label">
+            <span class="pregunta-label">
               ¿El hecho de violencia ocurrió en el desarrollo de actividades misionales, o en representación de la
               Universidad? O ¿Dentro o fuera de los bienes inmuebles de la universidad con ocasión, en razón o como
               consecuencia de su vínculo o el vínculo del presunto(a) agresor(a) con la institución educativa?
-            </label>
-            <mat-radio-group formControlName="violenciaMisional" class="radio-group">
+            </span>
+            <mat-radio-group formControlName="violenciaMisional" class="radio-group" aria-label="Violencia en actividades misionales">
               <mat-radio-button value="SI">Sí</mat-radio-button>
               <mat-radio-button value="NO">No</mat-radio-button>
             </mat-radio-group>
