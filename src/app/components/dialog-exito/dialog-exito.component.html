@@ -1,14 +1,36 @@
 <div class="dialog-container">
   <mat-icon class="success-icon">check_circle</mat-icon>
-  <h2 mat-dialog-title>¡Queja Registrada!</h2>
-  
+  <h2 mat-dialog-title>{{ data.titulo || '¡Operación Exitosa!' }}</h2>
+
   <mat-dialog-content>
-    <p>Tu reporte ha sido procesado con éxito. Guarda este código para consultar el estado de tu caso:</p>
-    
-    <div class="code-box">
-      <span class="label">RADICADO</span>
-      <strong class="code">{{ data.codigo }}</strong>
-    </div>
+    @if (data.mensaje) {
+      <p class="dialog-intro">{{ data.mensaje }}</p>
+    }
+
+    @if (data.codigo) {
+      <div class="code-box">
+        <span class="label">{{ data.labelCodigo || 'IDENTIFICADOR DEL REPORTE' }}</span>
+        <div class="code-row">
+          <strong class="code">{{ data.codigo }}</strong>
+          <button type="button" mat-icon-button class="copy-btn" (click)="copiarCodigo()" [title]="copiado ? 'Copiado' : 'Copiar ID'">
+            <mat-icon>{{ copiado ? 'done' : 'content_copy' }}</mat-icon>
+          </button>
+        </div>
+        @if (copiado) {
+          <span class="copied-feedback">¡ID copiado al portapapeles!</span>
+        }
+      </div>
+    }
+
+    @if (data.instruccion) {
+      <div class="activation-card">
+        <mat-icon class="activation-icon">login</mat-icon>
+        <div class="activation-text">
+          <strong>Activación de ruta institucional</strong>
+          <p>{{ data.instruccion }}</p>
+        </div>
+      </div>
+    }
   </mat-dialog-content>
 
   <mat-dialog-actions align="center">

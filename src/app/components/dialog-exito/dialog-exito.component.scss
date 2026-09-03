@@ -1,50 +1,139 @@
 .dialog-container {
   text-align: center;
-  padding: 10px;
+  padding: 16px 12px;
 
   .success-icon {
-    font-size: 60px;
-    width: 60px;
-    height: 60px;
-    color: #4caf50;
-    margin-top: 10px;
+    font-size: 56px;
+    width: 56px;
+    height: 56px;
+    color: #348F41;
+    margin-top: 4px;
   }
 
   h2 {
-    color: #2d3748;
-    font-weight: bold;
+    color: #1e293b;
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin: 8px 0 12px 0;
+  }
+
+  .dialog-intro {
+    color: #475569;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0 0 14px 0;
   }
 
   .code-box {
-    background: #f1f5f9;
-    padding: 20px;
+    background: #f8fafc;
+    padding: 16px 20px;
     border-radius: 12px;
-    margin: 15px 0;
-    border: 2px dashed #cbd5e0;
+    margin: 14px 0;
+    border: 2px dashed #94a3b8;
 
     .label {
       display: block;
       font-size: 0.75rem;
       color: #64748b;
-      font-weight: bold;
-      margin-bottom: 5px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
     }
 
-    .code {
-      font-size: 2rem;
-      letter-spacing: 3px;
-      color: #1e293b;
+    .code-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+
+      .code {
+        font-size: 1.85rem;
+        letter-spacing: 2px;
+        color: #166534;
+        font-weight: 800;
+        font-family: monospace, sans-serif;
+      }
+
+      .copy-btn {
+        color: #64748b;
+        width: 36px;
+        height: 36px;
+        line-height: 36px;
+
+        &:hover {
+          color: #348F41;
+          background-color: #e2e8f0;
+        }
+
+        mat-icon {
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
+
+    .copied-feedback {
+      display: block;
+      font-size: 0.8rem;
+      color: #166534;
+      font-weight: 600;
+      margin-top: 4px;
+      animation: fadeIn 0.2s ease-in-out;
     }
   }
 
-  p {
-    color: #718096;
-    line-height: 1.5;
+  .activation-card {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-left: 4px solid #2563eb;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 16px 0 6px 0;
+    text-align: left;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+
+    .activation-icon {
+      color: #2563eb;
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .activation-text {
+      flex: 1;
+
+      strong {
+        display: block;
+        font-size: 0.85rem;
+        color: #1e40af;
+        margin-bottom: 2px;
+        font-weight: 700;
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.82rem;
+        color: #334155;
+        line-height: 1.45;
+      }
+    }
   }
 
   button {
     width: 100%;
-    height: 45px;
-    font-weight: bold;
+    height: 44px;
+    font-weight: 700;
+    border-radius: 8px;
   }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-2px); }
+  to { opacity: 1; transform: translateY(0); }
 }
