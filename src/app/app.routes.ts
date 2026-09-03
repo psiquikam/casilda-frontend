@@ -13,6 +13,15 @@ export const routes: Routes = [
     loadComponent: () => import('./components/auth/login/login.component').then((m) => m.LoginComponent)
   },
   {
+    path: 'formulario-anonimo',
+    loadComponent: () => import('./components/formulario-anonimo/formulario-anonimo.component').then((m) => m.FormularioAnonimoComponent)
+  },
+  {
+    path: 'reporte-anonimo',
+    redirectTo: 'formulario-anonimo',
+    pathMatch: 'full'
+  },
+  {
     path: 'seguimiento',
     canMatch: [featureCapabilityGuard],
     data: { feature: 'publicTrackingPrototype' },

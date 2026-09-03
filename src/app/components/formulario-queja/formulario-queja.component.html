@@ -7,12 +7,6 @@
         <div class="profile-selector">
           <h3>¿Cómo desea realizar su reporte?</h3>
           <mat-radio-group formControlName="perfil" class="profile-grid">
-            <div class="profile-card" [class.selected]="formPerfil.get('perfil')?.value === 'anonimo'">
-              <mat-radio-button value="anonimo">
-                <strong>Anónimo</strong>
-                <p>No requiere inicio de sesión. Su identidad estará protegida.</p>
-              </mat-radio-button>
-            </div>
             <div class="profile-card" [class.selected]="formPerfil.get('perfil')?.value === 'victima_logueada'">
               <mat-radio-button value="victima_logueada">
                 <strong>Soy la víctima</strong>
@@ -92,39 +86,37 @@
       </form>
     </mat-step>
 
-    @if (formPerfil.get('perfil')?.value !== 'anonimo') {
-      <mat-step [stepControl]="formVictima">
-        <form [formGroup]="formVictima" class="step-body">
-          <ng-template matStepLabel>Víctima</ng-template>
-          <div class="grid-form">
-            <mat-form-field appearance="outline"><mat-label>Identificación</mat-label><input matInput formControlName="identificacion"></mat-form-field>
-            <mat-form-field appearance="outline"><mat-label>Nombre</mat-label><input matInput formControlName="nombre"></mat-form-field>
-            <mat-form-field appearance="outline"><mat-label>Apellidos</mat-label><input matInput formControlName="apellidos"></mat-form-field>
-            <mat-form-field appearance="outline"><mat-label>Correo</mat-label><input matInput formControlName="correo"></mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Género</mat-label>
-              <mat-select formControlName="genero">
-                <mat-option value="Masculino">Masculino</mat-option>
-                <mat-option value="Femenino">Femenino</mat-option>
-                <mat-option value="Otro">Otro</mat-option>
-              </mat-select>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Vínculo</mat-label>
-              <mat-select formControlName="cargo">
-                <mat-option value="Estudiante">Estudiante</mat-option>
-                <mat-option value="Docente">Docente</mat-option>
-                <mat-option value="Administrativo">Administrativo</mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
-          <div class="actions">
-            <button mat-button matStepperPrevious>Atrás</button>
-            <button mat-raised-button color="primary" matStepperNext>Siguiente</button>
-          </div>
-        </form>
-      </mat-step>
-    }
+    <mat-step [stepControl]="formVictima">
+      <form [formGroup]="formVictima" class="step-body">
+        <ng-template matStepLabel>Víctima</ng-template>
+        <div class="grid-form">
+          <mat-form-field appearance="outline"><mat-label>Identificación</mat-label><input matInput formControlName="identificacion"></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>Nombre</mat-label><input matInput formControlName="nombre"></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>Apellidos</mat-label><input matInput formControlName="apellidos"></mat-form-field>
+          <mat-form-field appearance="outline"><mat-label>Correo</mat-label><input matInput formControlName="correo"></mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Género</mat-label>
+            <mat-select formControlName="genero">
+              <mat-option value="Masculino">Masculino</mat-option>
+              <mat-option value="Femenino">Femenino</mat-option>
+              <mat-option value="Otro">Otro</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Vínculo</mat-label>
+            <mat-select formControlName="cargo">
+              <mat-option value="Estudiante">Estudiante</mat-option>
+              <mat-option value="Docente">Docente</mat-option>
+              <mat-option value="Administrativo">Administrativo</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="actions">
+          <button mat-button matStepperPrevious>Atrás</button>
+          <button mat-raised-button color="primary" matStepperNext>Siguiente</button>
+        </div>
+      </form>
+    </mat-step>
 
     <mat-step [stepControl]="formVictimario">
       <form [formGroup]="formVictimario" class="step-body">

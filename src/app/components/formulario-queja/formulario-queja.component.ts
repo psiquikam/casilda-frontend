@@ -13,8 +13,9 @@ import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
 import { MatSelectModule } from '@angular/material/select';
 
 @Component({
-    selector: 'app-formulario-queja',
-    imports: [
+  selector: 'app-formulario-queja',
+  standalone: true,
+  imports: [
     ReactiveFormsModule,
     MatStepperModule,
     MatFormFieldModule,
@@ -25,13 +26,13 @@ import { MatSelectModule } from '@angular/material/select';
     MatIconModule,
     MatDialogModule,
     MatSelectModule
-],
-    templateUrl: './formulario-queja.component.html',
-    styleUrls: ['./formulario-queja.component.scss']
+  ],
+  templateUrl: './formulario-queja.component.html',
+  styleUrls: ['./formulario-queja.component.scss']
 })
 export class FormularioQuejaComponent {
 
-  tipoUsuario: 'anonimo' | 'victima_logueada' | 'tercero_logueado' = 'anonimo';
+  tipoUsuario: 'victima_logueada' | 'tercero_logueado' = 'victima_logueada';
   formPerfil: FormGroup;
   formConsentimiento: FormGroup;
   formRelato: FormGroup;
@@ -41,7 +42,7 @@ export class FormularioQuejaComponent {
 
   constructor(private fb: FormBuilder, private dialog: MatDialog) {
     this.formPerfil = this.fb.group({
-      perfil: ['anonimo', Validators.required]
+      perfil: ['victima_logueada', Validators.required]
     });
 
     this.formPerfil.get('perfil')?.valueChanges.subscribe(val => {
@@ -80,6 +81,8 @@ export class FormularioQuejaComponent {
     this.formEvidencias = this.fb.group({
       archivos: [null]
     });
+
+    this.ajustarValidaciones('victima_logueada');
   }
 
   enviarQueja() {
