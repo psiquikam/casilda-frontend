@@ -1,18 +1,28 @@
-<header class="public-header">
-  <a class="nav-item" routerLink="/login">
-    <mat-icon>account_circle</mat-icon>
-    <span class="nav-label">INICIAR SESIÓN</span>
-  </a>
-  
-  <a class="nav-item" routerLink="/formulario-anonimo">
-    <mat-icon>face</mat-icon>
-    <span class="nav-label">REPORTAR VBG ANÓNIMO</span>
-  </a>
-  
-  @if (features.publicTrackingPrototype) {
-    <a class="nav-item" routerLink="/seguimiento">
-      <mat-icon>assignment</mat-icon>
-      <span class="nav-label">CONSULTAR CASO</span>
-    </a>
-  }
-</header>
+<nav class="public-nav" aria-label="Accesos principales de Casilda">
+  <ul class="public-nav__lista">
+    <li>
+      <a class="public-nav__item" routerLink="/home" routerLinkActive="public-nav__item--activo"
+        #inicioActivo="routerLinkActive" [routerLinkActiveOptions]="{ exact: true }"
+        [attr.aria-current]="inicioActivo.isActive ? 'page' : null">
+        <mat-icon aria-hidden="true">home</mat-icon>
+        <span class="public-nav__label">Inicio</span>
+      </a>
+    </li>
+    <li>
+      <a class="public-nav__item" routerLink="/login" routerLinkActive="public-nav__item--activo"
+        #loginActivo="routerLinkActive"
+        [attr.aria-current]="loginActivo.isActive ? 'page' : null">
+        <mat-icon aria-hidden="true">account_circle</mat-icon>
+        <span class="public-nav__label">Iniciar sesión</span>
+      </a>
+    </li>
+    <li>
+      <a class="public-nav__item" routerLink="/formulario-anonimo" routerLinkActive="public-nav__item--activo"
+        #reporteActivo="routerLinkActive"
+        [attr.aria-current]="reporteActivo.isActive ? 'page' : null">
+        <mat-icon aria-hidden="true">shield</mat-icon>
+        <span class="public-nav__label">Reportar VBG de forma anónima</span>
+      </a>
+    </li>
+  </ul>
+</nav>

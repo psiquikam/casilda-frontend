@@ -2,85 +2,136 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 2vw;
-  height: 15vh;
-  min-height: 80px;
-  max-height: 100px;
-  background-color: #1a6332;
-  color: white;
-  position: relative;
+  gap: var(--space-6);
+  /* El borde superior derecho queda reservado para el botón flotante de
+     Salida Rápida, que debe permanecer visible y sin obstrucciones. */
+  padding: var(--space-3) 72px var(--space-3) var(--space-6);
+  height: auto;
+  min-height: 96px;
+  background-color: var(--color-primary);
+  color: var(--color-text-on-primary);
   flex-shrink: 0;
 }
 
-.logo-section {
-  display: flex;
-  align-items: center;
-  gap: 1vw;
-
-  .logo-icon {
-    width: clamp(40px, 5vh, 65px);
-    height: clamp(40px, 5vh, 65px);
-    color: white !important;
-    fill: white !important;
-  }
-
-  .app-title {
-    font-size: clamp(1.2rem, 2.5vw, 2.2rem);
-    font-weight: 900;
-    color: white;
-  }
-}
-
-.header-center-container {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+.marca {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  width: auto;
+  gap: var(--space-1);
+  min-width: 0;
 
-  .center-text-line {
-    font-size: clamp(0.8rem, 1.1vw, 1.3rem);
-    font-weight: 800;
-    line-height: 1.2;
-    white-space: nowrap;
-    color: white;
+  /* Volver al inicio desde cualquier ruta pública o autenticada. */
+  &__enlace {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: var(--touch-target-min);
+    color: inherit;
+    text-decoration: none;
+    border-radius: var(--radius-md);
+
+    &:hover .marca__nombre {
+      text-decoration: underline;
+    }
+
+    &:focus-visible {
+      outline: 3px solid var(--color-text-on-primary);
+      outline-offset: 4px;
+    }
+  }
+
+  &__distintivo {
+    width: clamp(38px, 5vw, 56px);
+    height: clamp(38px, 5vw, 56px);
+    color: var(--color-text-on-primary);
+    fill: currentColor;
+    flex-shrink: 0;
+  }
+
+  &__nombre {
+    font-family: var(--font-serif);
+    font-size: clamp(var(--font-size-xl), 3vw, var(--font-size-3xl));
+    font-weight: 700;
+    line-height: var(--line-height-tight);
+    letter-spacing: 0.02em;
+  }
+
+  &__descriptor {
+    max-width: 58ch;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    font-weight: 400;
+    line-height: var(--line-height-base);
+    white-space: normal;
   }
 }
 
-.udea-logo-section {
+.institucional {
   display: flex;
   align-items: center;
-  gap: 1.5vw;
+  gap: var(--space-6);
 
-  .udea-logo {
-    height: clamp(95px, 14vh, 150px);
-    width: auto;
+  /* Área de reserva del logosímbolo (ancho de la letra "U"). */
+  &__marca {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+  }
+
+  &__logo {
+    width: clamp(var(--udea-logo-min-width), 14vw, 190px);
+    min-width: var(--udea-logo-min-width);
+    height: auto;
     object-fit: contain;
   }
 
-  .user-profile-zone {
-    cursor: pointer;
-    padding: 8px 12px;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    transition: background 0.2s;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
-
-    .user-name {
-      font-weight: 700;
-      font-size: 0.9rem;
-    }
+  /* Nombre de la dependencia: Times New Roman Bold, según manual UdeA.
+     Sobre el fondo verde institucional se usa blanco para conservar
+     el contraste mínimo AA que el color 7740 C no alcanzaría. */
+  &__dependencia {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: var(--font-size-sm);
+    text-align: center;
+    line-height: var(--line-height-tight);
   }
 }
 
-@media (max-width: 1000px) {
-  .header-center-container { 
-    display: none; 
+.usuario {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--touch-target-min);
+  color: var(--color-text-on-primary);
+
+  &__nombre {
+    font-weight: 700;
+    font-size: var(--font-size-sm);
+  }
+}
+
+@media (min-width: 901px) {
+  .main-header {
+    padding-right: 280px;
+  }
+}
+
+@media (max-width: 900px) {
+  .main-header {
+    gap: var(--space-4);
+    padding-left: var(--space-4);
+  }
+
+  .marca__descriptor {
+    display: none;
+  }
+
+  .institucional__dependencia {
+    display: none;
+  }
+
+  .usuario__nombre {
+    display: none;
   }
 }
