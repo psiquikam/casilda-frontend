@@ -1,11 +1,15 @@
-<div class="card-wrapper" [ngClass]="variant">
-  <div class="icon-container">
-    <mat-icon [svgIcon]="icon"></mat-icon>
-  </div>
-  <div class="text-container">
-    @if (value) {
-      <span class="stat-value">{{ value }}</span>
-    }
-    <span class="card-title">{{ title }}</span>
-  </div>
-</div>
+@let item = contenido();
+
+@if (esNavegable()) {
+  <a class="tarjeta tarjeta--accion" [routerLink]="item.enlace">
+    <img class="tarjeta__imagen" [src]="item.imagen" alt="" aria-hidden="true">
+    <h3 class="tarjeta__titulo">{{ item.titulo }}</h3>
+    <p class="tarjeta__contenido">{{ item.contenido }}</p>
+  </a>
+} @else {
+  <article class="tarjeta">
+    <img class="tarjeta__imagen" [src]="item.imagen" alt="" aria-hidden="true">
+    <h3 class="tarjeta__titulo">{{ item.titulo }}</h3>
+    <p class="tarjeta__contenido">{{ item.contenido }}</p>
+  </article>
+}

@@ -1,4 +1,6 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, inject } from '@angular/core';
+
+import { RouterLink } from '@angular/router';
 
 import { AuthService } from '../../../services/auth.service';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -10,6 +12,7 @@ import { MatDividerModule } from '@angular/material/divider';
 @Component({
     selector: 'app-header',
     imports: [
+    RouterLink,
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
@@ -22,5 +25,5 @@ import { MatDividerModule } from '@angular/material/divider';
 export class HeaderComponent {
   @Output() toggleSidenav = new EventEmitter<void>();
 
-  constructor(public auth: AuthService) {}
+  readonly auth = inject(AuthService);
 }

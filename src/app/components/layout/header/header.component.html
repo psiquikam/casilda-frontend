@@ -1,29 +1,36 @@
 <mat-toolbar class="main-header">
-  <div class="logo-section">
-    <mat-icon svgIcon="logo-custom" class="logo-icon"></mat-icon>
-    <span class="app-title">CASILDA</span>
-  </div>
-
-  @if (!auth.isAuthenticated()) {
-  <div class="header-center-container">
-    <span class="center-text-line">Sistema de vigilancia en salud pública para el abordaje</span>
-    <span class="center-text-line">de las violencias y las discriminaciones basadas en género</span>
-  </div>
-  }
-
-  <div class="udea-logo-section">
+  <div class="marca">
+    <a class="marca__enlace" routerLink="/home">
+      <!-- Distintivo de Casilda: acompaña al texto, no se integra al escudo UdeA.
+           Pendiente de aval de Comunicaciones (ver CLAUDE.md §5). -->
+      <mat-icon svgIcon="logo-custom" class="marca__distintivo" aria-hidden="true"></mat-icon>
+      <span class="marca__nombre">Casilda</span>
+      <span class="visually-hidden">— ir a la página de inicio</span>
+    </a>
     @if (!auth.isAuthenticated()) {
-      <img src="assets/Logo-Udea-Blanco.png" alt="UdeA" class="udea-logo">
+      <span class="marca__descriptor">
+        Sistema de vigilancia en salud pública para el abordaje de las violencias
+        y las discriminaciones basadas en género
+      </span>
     }
-    
+  </div>
+
+  <div class="institucional">
+    <div class="institucional__marca">
+      <img src="assets/Logo-Udea-Blanco.png" alt="Universidad de Antioquia" class="institucional__logo">
+      <span class="institucional__dependencia">Facultad Nacional de Salud Pública</span>
+    </div>
+
     @if (auth.isAuthenticated()) {
-      <div class="user-profile-zone" [matMenuTriggerFor]="userMenu">
-        <span class="user-name">{{ auth.currentUser?.nombre }}</span>
-      </div>
+      <button mat-button type="button" class="usuario" [matMenuTriggerFor]="userMenu"
+        aria-label="Abrir el menú de la sesión">
+        <mat-icon aria-hidden="true">account_circle</mat-icon>
+        <span class="usuario__nombre">{{ auth.currentUser?.nombre }}</span>
+      </button>
       <mat-menu #userMenu="matMenu">
-        <button mat-menu-item (click)="auth.logout()">
-          <mat-icon color="warn">logout</mat-icon>
-          <span>Cerrar Sesión</span>
+        <button mat-menu-item type="button" (click)="auth.logout()">
+          <mat-icon aria-hidden="true">logout</mat-icon>
+          <span>Cerrar sesión</span>
         </button>
       </mat-menu>
     }

@@ -11,6 +11,7 @@ import { PublicFooterComponent } from './components/public-footer/public-footer.
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LoadingService } from './services/loading.service';
 import { CasildaIconRegistryService } from './core/icons/casilda-icon-registry.service';
+import { QuickExitComponent } from './components/quick-exit/quick-exit.component';
 
 @Component({
     selector: 'app-root',
@@ -23,6 +24,7 @@ import { CasildaIconRegistryService } from './core/icons/casilda-icon-registry.s
         SidebarComponent,
         PublicHeaderComponent,
         PublicFooterComponent,
+        QuickExitComponent,
         MatProgressSpinnerModule
     ],
     templateUrl: './app.component.html',

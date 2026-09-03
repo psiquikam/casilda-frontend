@@ -1,0 +1,131 @@
+/**
+ * CASILDA — SISTEMA DE INFORMACIÓN VBG (UdeA)
+ * Tokens de diseño globales — Manual de Identidad Institucional UdeA (v8)
+ * Conformidad WCAG 2.2 AA (contraste mínimo 4.5:1 texto normal / 3:1 texto grande)
+ *
+ * Fuente de verdad: casilda-diseno-v1.md (§3.A)
+ * No agregar colores fuera de esta paleta: cualquier color nuevo debe
+ * declararse aquí como token y consumirse con var(--token).
+ */
+
+:root {
+  /* ==========================================================================
+     1. PALETA OFICIAL UdeA (equivalentes Pantone Solid Coated)
+     ========================================================================== */
+  --udea-green-349: #026937;    /* Verde Principal Institucional */
+  --udea-green-7740: #35944b;   /* Verde Dependencias e Hitos */
+  --udea-green-361: #43b649;    /* Verde Vibrante */
+  --udea-green-375: #8dc63f;    /* Verde Claro */
+  --udea-blue-7465: #3ebdac;    /* Turquesa Claro */
+  --udea-blue-334: #069a7e;     /* Turquesa Medio */
+  --udea-blue-7718: #0e7774;    /* Turquesa Oscuro (ideal para textos/enlaces) */
+
+  /* Paleta complementaria oficial */
+  --udea-purple-7650: #70205b;
+  --udea-blue-633: #137598;
+  --udea-red-032: #ef434d;
+  --udea-orange-137: #f9a12c;
+  --udea-violet-1007: #532d87;
+
+  /* ==========================================================================
+     2. APLICACIÓN SEMÁNTICA (accesibilidad + enfoque sensible al trauma)
+     ========================================================================== */
+  --color-primary: var(--udea-green-349);
+  --color-primary-hover: #014f29;
+  --color-primary-active: #01361c;
+
+  --color-secondary: var(--udea-blue-7718);
+  --color-secondary-hover: #0a5a57;
+
+  --color-danger: var(--udea-red-032);   /* Rojo de marca: bordes y elementos gráficos (>=3:1) */
+  --color-danger-hover: #d32f2f;
+  --color-danger-text: #b3141f;          /* Rojo oscurecido para texto sobre fondo claro (6.3:1) */
+  /* Superficie roja apta para texto blanco: el #ef434d de marca solo alcanza
+     3.76:1 con blanco, insuficiente para texto normal (WCAG 1.4.3). */
+  --color-danger-surface: #c62828;       /* 5.6:1 con blanco */
+  --color-danger-surface-hover: #9b1c1c; /* 8.1:1 con blanco */
+  --color-warning: #d97706;
+  --color-success: var(--udea-green-7740);
+  --color-info: var(--udea-blue-633);
+
+  /* Fondos atenuados: guían la atención sin generar ansiedad */
+  --color-bg-danger-light: #fdf2f2;
+  --color-bg-warning-light: #fffbeb;
+  --color-bg-success-light: #f0fdf4;
+  --color-bg-info-light: #f0f9ff;
+
+  /* Neutros para lectura óptima */
+  --color-text-primary: #111827;
+  --color-text-secondary: #4b5563;
+  --color-text-muted: #6b7280;
+  --color-text-on-primary: #ffffff;
+  --color-text-on-danger: #ffffff;
+
+  /* Superficies */
+  --color-bg-main: #f9fafb;
+  --color-bg-surface: #ffffff;
+  --color-border: #e5e7eb;
+  --color-border-strong: #d1d5db;
+
+  /* ==========================================================================
+     3. TIPOGRAFÍA (normativa UdeA + Resolución MinTIC 1519 de 2020)
+     ========================================================================== */
+  /* Lora: serif contemporánea diseñada para pantalla. Conserva el carácter
+     institucional que pide el manual UdeA con mejor legibilidad digital que
+     Times New Roman, que permanece como respaldo inmediato. */
+  --font-serif: 'Lora', 'Times New Roman', Times, Georgia, serif;
+  --font-sans: 'Inter', 'Lato', 'Roboto', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px — mínimo de lectura en pantalla */
+  --font-size-base: 1rem;     /* 16px */
+  --font-size-md: 1.125rem;   /* 18px */
+  --font-size-lg: 1.25rem;    /* 20px */
+  --font-size-xl: 1.5rem;     /* 24px */
+  --font-size-2xl: 1.875rem;  /* 30px */
+  --font-size-3xl: 2.25rem;   /* 36px */
+
+  --line-height-tight: 1.25;
+  --line-height-base: 1.5;
+  --line-height-relaxed: 1.7;
+
+  /* ==========================================================================
+     4. ESPACIADOS (grilla de 4px)
+     ========================================================================== */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* ==========================================================================
+     5. BORDES, SOMBRAS Y ACCESIBILIDAD
+     ========================================================================== */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+
+  /* Anillo de enfoque para navegación por teclado */
+  --focus-ring-color: var(--udea-blue-7718);
+  --focus-ring: 3px solid var(--focus-ring-color);
+
+  /* Área táctil mínima accesible (WCAG 2.5.8 / 2.5.5) */
+  --touch-target-min: 44px;
+
+  /* Marca institucional: ancho mínimo del logosímbolo en digital */
+  --udea-logo-min-width: 130px;
+
+  /* Capas */
+  --z-quick-exit: 9999;
+  --z-overlay: 2500;
+}

@@ -30,6 +30,7 @@ html, body {
   width: 100vw;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .public-viewport-wrapper {
@@ -52,16 +53,16 @@ html, body {
     overflow-y: auto;
     overflow-x: hidden;
     min-height: 0;
-    background-color: #ffffff;
+    background-color: var(--color-bg-main);
   }
 }
 
 .global-loading-overlay {
   position: fixed;
   inset: 0;
+  z-index: var(--z-overlay);
   background: rgba(255, 255, 255, 0.65);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2500;
 }

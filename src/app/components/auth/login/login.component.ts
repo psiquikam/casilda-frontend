@@ -1,28 +1,33 @@
 import { Component, inject } from '@angular/core';
-
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../../services/auth.service';
 
-import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
+import { AuthService } from '../../../services/auth.service';
+
+/**
+ * Ingreso de personal institucional. La pantalla se mantiene en una sola
+ * columna de formulario, acompañada de un panel institucional informativo,
+ * para reducir la carga cognitiva en momentos de estrés.
+ */
 @Component({
-    selector: 'app-login',
-    imports: [
+  selector: 'app-login',
+  imports: [
     ReactiveFormsModule,
     RouterLink,
-    MatCardModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatIconModule
-],
-    templateUrl: './login.component.html',
-    styleUrls: ['./login.component.scss']
+    MatIconModule,
+    MatProgressSpinnerModule
+  ],
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
   private readonly fb = inject(FormBuilder);
@@ -30,6 +35,8 @@ export class LoginComponent {
   private readonly router = inject(Router);
 
   readonly loginForm: FormGroup;
+  readonly correoSoporte = 'proyectocasilda@udea.edu.co';
+
   hidePassword = true;
   errorMessage = '';
   loading = false;
@@ -45,22 +52,40 @@ export class LoginComponent {
     });
   }
 
-  onSubmit(): void {
-    if (this.loginForm.valid) {
-      this.loading = true;
-      this.errorMessage = '';
-      const { email, password } = this.loginForm.value;
+  get emailInvalido(): boolean {
+    const control = this.loginForm.get('email');
+    return !!control && control.invalid && (control.dirty || control.touched);
+  }
 
-      this.auth.loginWithCredentials(email, password).subscribe({
-        next: () => {
-          this.loading = false;
-          void this.router.navigate([this.auth.getDefaultRoute()]);
-        },
-        error: () => {
-          this.loading = false;
-          this.errorMessage = 'Credenciales inválidas. Verifique su usuario y contraseña.';
-        }
-      });
+  get passwordInvalido(): boolean {
+    const control = this.loginForm.get('password');
+    return !!control && control.invalid && (control.dirty || control.touched);
+  }
+
+  alternarPassword(): void {
+    this.hidePassword = !this.hidePassword;
+  }
+
+  onSubmit(): void {
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
     }
+
+    this.loading = true;
+    this.errorMessage = '';
+    const { email, password } = this.loginForm.value;
+
+    this.auth.loginWithCredentials(email, password).subscribe({
+      next: () => {
+        this.loading = false;
+        void this.router.navigate([this.auth.getDefaultRoute()]);
+      },
+      error: () => {
+        this.loading = false;
+        this.errorMessage =
+          'No pudimos validar esos datos. Revisa tu correo institucional y tu contraseña, e inténtalo de nuevo.';
+      }
+    });
   }
 }

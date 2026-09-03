@@ -1,28 +1,65 @@
 @use '@angular/material' as mat;
+@use 'styles/tokens';
+@use 'styles/base';
 
 @include mat.elevation-classes();
 @include mat.app-background();
 
-$casilda-purple-palette: (
-  50: #f1eaf4,
-  100: #dbcae4,
-  200: #c2a6d2,
-  300: #a982c0,
-  400: #9568b2,
-  500: #814ea5,
-  600: #73459c,
-  700: #348F41,
-  800: #5d258a,
-  900: #471978,
-  A100: #d5b0ff,
-  A200: #bc7dff,
-  A400: #a44aff,
-  A700: #9731ff,
+/* Paleta institucional UdeA (Pantone 349 C como primario, tono 700).
+   Ver src/styles/_tokens.scss para la definición semántica completa. */
+$casilda-green-palette: (
+  50: #e6f2ec,
+  100: #c1e0d0,
+  200: #98cbb1,
+  300: #6fb692,
+  400: #50a67b,
+  500: #319665,
+  600: #2a8759,
+  700: #026937,
+  800: #01552c,
+  900: #013a1d,
+  A100: #8dc63f,
+  A200: #43b649,
+  A400: #35944b,
+  A700: #026937,
   contrast: (
     50: rgba(black, 0.87),
     100: rgba(black, 0.87),
     200: rgba(black, 0.87),
-    300: white,
+    300: rgba(black, 0.87),
+    400: white,
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(black, 0.87),
+    A200: rgba(black, 0.87),
+    A400: white,
+    A700: white,
+  )
+);
+
+$casilda-turquoise-palette: (
+  50: #e4f2f2,
+  100: #bcdfde,
+  200: #90cac8,
+  300: #63b4b2,
+  400: #41a4a1,
+  500: #0e7774,
+  600: #0c6d6a,
+  700: #0a5a57,
+  800: #084745,
+  900: #053231,
+  A100: #3ebdac,
+  A200: #069a7e,
+  A400: #0e7774,
+  A700: #0a5a57,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: rgba(black, 0.87),
     400: white,
     500: white,
     600: white,
@@ -36,8 +73,8 @@ $casilda-purple-palette: (
   )
 );
 
-$my-primary-palette: mat.m2-define-palette($casilda-purple-palette, 700); 
-$my-accent-palette:  mat.m2-define-palette(mat.$m2-amber-palette, A200);
+$my-primary-palette: mat.m2-define-palette($casilda-green-palette, 700);
+$my-accent-palette:  mat.m2-define-palette($casilda-turquoise-palette, 500);
 $my-warn-palette:    mat.m2-define-palette(mat.$m2-red-palette);
 
 $Casilda-FNSP-theme: mat.m2-define-light-theme((
@@ -46,10 +83,11 @@ $Casilda-FNSP-theme: mat.m2-define-light-theme((
     accent: $my-accent-palette,
     warn: $my-warn-palette,
   ),
-  typography: mat.m2-define-typography-config(),
+  typography: mat.m2-define-typography-config(
+    $font-family: "'Inter', 'Lato', 'Roboto', Arial, sans-serif"
+  ),
   density: 0
 ));
-
 
 @include mat.all-component-themes($Casilda-FNSP-theme);
 
@@ -57,18 +95,21 @@ $Casilda-FNSP-theme: mat.m2-define-light-theme((
   box-sizing: border-box;
 }
 
-html, body { 
-  height: 100%; 
+html, body {
+  height: 100%;
   margin: 0;
   padding: 0;
   overflow: hidden;
 }
 
 body {
-  font-family: 'Inter', 'Roboto', sans-serif;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-main);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f8fafc;
 }
 
 .app-layout {
@@ -77,18 +118,17 @@ body {
   width: 100vw;
 }
 
-
-.full-width { 
-  width: 100%; 
+.full-width {
+  width: 100%;
 }
 
-.mat-mdc-form-field { 
-  margin-bottom: 12px; 
+.mat-mdc-form-field {
+  margin-bottom: var(--space-3);
 }
 
 .main-header {
-  background-color: #348F41 !important;
-  color: white !important;
+  background-color: var(--color-primary) !important;
+  color: var(--color-text-on-primary) !important;
 }
 
 ::-webkit-scrollbar {
@@ -103,20 +143,15 @@ body {
 ::-webkit-scrollbar-thumb {
   background: #cbd5e0;
   border-radius: 10px;
-  
+
   &:hover {
     background: #a0aec0;
   }
 }
 
-.login-container {
-  background: linear-gradient(135deg, #348F41 0%, #471978 100%);
-}
-
-/* Forzar ripple y state-layer a morado en todos los componentes */
+/* Ripple y state-layer alineados al verde institucional */
 :root {
-  --mat-ripple-color: #348F41;
-  --mat-ripple-color: rgba(52, 143, 65, 0.12);
+  --mat-ripple-color: rgba(2, 105, 55, 0.12);
 }
 
 .mat-mdc-button,
@@ -126,44 +161,44 @@ body {
 .mat-mdc-flat-button,
 .mat-mdc-fab,
 .mat-mdc-mini-fab {
-  --mat-ripple-color: #348F41;
-  --mat-mdc-button-ripple-color: rgba(52, 143, 65, 0.12);
-  --mat-mdc-button-persistent-ripple-color: #348F41;
+  --mat-ripple-color: rgba(2, 105, 55, 0.12);
+  --mat-mdc-button-ripple-color: rgba(2, 105, 55, 0.12);
+  --mat-mdc-button-persistent-ripple-color: var(--color-primary);
 }
 
 .mat-mdc-icon-button {
-  --mat-icon-button-state-layer-color: #348F41;
+  --mat-icon-button-state-layer-color: var(--color-primary);
 }
 
 .mat-mdc-radio-button {
-  --mat-radio-selected-focus-icon-color: #348F41;
-  --mat-radio-selected-hover-icon-color: #348F41;
-  --mat-radio-selected-icon-color: #348F41;
-  --mat-radio-selected-pressed-icon-color: #348F41;
-  --mat-radio-ripple-color: rgba(52, 143, 65, 0.12);
+  --mat-radio-selected-focus-icon-color: var(--color-primary);
+  --mat-radio-selected-hover-icon-color: var(--color-primary);
+  --mat-radio-selected-icon-color: var(--color-primary);
+  --mat-radio-selected-pressed-icon-color: var(--color-primary);
+  --mat-radio-ripple-color: rgba(2, 105, 55, 0.12);
 }
 
 .mat-mdc-checkbox {
-  --mat-checkbox-selected-focus-state-layer-color: #348F41;
-  --mat-checkbox-selected-hover-state-layer-color: #348F41;
-  --mat-checkbox-selected-pressed-state-layer-color: #348F41;
+  --mat-checkbox-selected-focus-state-layer-color: var(--color-primary);
+  --mat-checkbox-selected-hover-state-layer-color: var(--color-primary);
+  --mat-checkbox-selected-pressed-state-layer-color: var(--color-primary);
 }
 
 .mat-mdc-option:hover,
 .mat-mdc-option.mdc-list-item--selected {
-  --mat-option-selected-state-layer-color: rgba(52, 143, 65, 0.08);
+  --mat-option-selected-state-layer-color: rgba(2, 105, 55, 0.08);
 }
 
 .snack-error .mdc-snackbar__surface {
-  background-color: #dc2626 !important;
+  background-color: var(--color-danger-hover) !important;
 }
 .snack-error .mat-mdc-snack-bar-label,
 .snack-error .mat-mdc-button {
-  color: white !important;
+  color: var(--color-text-on-danger) !important;
 }
 
 .custom-modal-container .mat-mdc-dialog-container .mdc-dialog__surface {
   padding: 0 !important;
   overflow: hidden !important;
-  border-radius: 8px !important;
+  border-radius: var(--radius-md) !important;
 }

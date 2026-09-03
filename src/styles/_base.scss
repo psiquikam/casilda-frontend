@@ -1,0 +1,203 @@
+/**
+ * CASILDA — Base global de accesibilidad y tipografía institucional.
+ * Depende de src/styles/_tokens.scss (debe cargarse después de los tokens).
+ */
+
+/* --------------------------------------------------------------------------
+   Tipografía institucional
+   Serif (Times New Roman) reservada a encabezados; sans-serif para el resto.
+   -------------------------------------------------------------------------- */
+h1, h2, h3 {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: var(--line-height-tight);
+  margin-top: 0;
+}
+
+h4, h5, h6 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-top: 0;
+}
+
+p {
+  line-height: var(--line-height-base);
+}
+
+/* --------------------------------------------------------------------------
+   Foco visible: nunca eliminar el outline sin reemplazo equivalente.
+   -------------------------------------------------------------------------- */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* --------------------------------------------------------------------------
+   Utilidades de accesibilidad
+   -------------------------------------------------------------------------- */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Enlace de salto al contenido principal (WCAG 2.4.1) */
+.skip-link {
+  position: absolute;
+  left: var(--space-4);
+  top: -100px;
+  z-index: var(--z-quick-exit);
+  padding: var(--space-3) var(--space-5);
+  background-color: var(--color-bg-surface);
+  color: var(--color-primary);
+  font-family: var(--font-sans);
+  font-weight: 700;
+  text-decoration: none;
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  transition: top 0.15s ease-in-out;
+
+  &:focus {
+    top: var(--space-4);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Cajas de aviso de baja carga cognitiva (enfoque sensible al trauma)
+   El color nunca es el único portador de significado: se acompaña de ícono y texto.
+   -------------------------------------------------------------------------- */
+.casilda-alerta {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-md);
+  border-left: 6px solid var(--color-info);
+  background-color: var(--color-bg-info-light);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+
+  &--peligro {
+    border-left-color: var(--color-danger);
+    background-color: var(--color-bg-danger-light);
+  }
+
+  &--precaucion {
+    border-left-color: var(--color-warning);
+    background-color: var(--color-bg-warning-light);
+  }
+
+  &--exito {
+    border-left-color: var(--color-success);
+    background-color: var(--color-bg-success-light);
+  }
+
+  .mat-icon {
+    flex-shrink: 0;
+    color: var(--color-info);
+  }
+
+  &--peligro .mat-icon { color: var(--color-danger-text); }
+  &--precaucion .mat-icon { color: var(--color-warning); }
+  &--exito .mat-icon { color: var(--color-primary); }
+}
+
+/* --------------------------------------------------------------------------
+   Respeto por la preferencia de movimiento reducido (WCAG 2.3.3)
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Botones de acción clara (área táctil mínima 44px, tipografía sans-serif)
+   Se usan en las vistas públicas donde no se requiere un componente Material.
+   -------------------------------------------------------------------------- */
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--touch-target-min);
+  padding: var(--space-3) var(--space-6);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  line-height: var(--line-height-tight);
+  text-align: center;
+  text-decoration: none;
+  border: 2px solid transparent;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+
+  .mat-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+    line-height: 20px;
+    flex-shrink: 0;
+  }
+
+  &--primario {
+    background-color: var(--color-primary);
+    color: var(--color-text-on-primary);
+
+    &:hover { background-color: var(--color-primary-hover); }
+    &:active { background-color: var(--color-primary-active); }
+  }
+
+  &--secundario {
+    background-color: var(--color-bg-surface);
+    color: var(--color-secondary);
+    border-color: var(--color-secondary);
+
+    &:hover {
+      background-color: var(--color-secondary);
+      color: var(--color-text-on-primary);
+    }
+  }
+
+  &--emergencia {
+    background-color: var(--color-bg-danger-light);
+    color: var(--color-danger-text);
+    border-color: var(--color-danger);
+
+    &:hover {
+      background-color: var(--color-danger-surface);
+      color: var(--color-text-on-danger);
+      border-color: var(--color-danger-surface);
+    }
+  }
+
+  &[disabled],
+  &[aria-disabled='true'] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

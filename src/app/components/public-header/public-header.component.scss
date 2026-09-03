@@ -1,56 +1,64 @@
-.public-header {
-  background-color: #1a6332;
-  height: 50px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 40px;
+.public-nav {
   width: 100%;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: var(--color-primary-hover);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
 
-  .nav-item {
+  &__lista {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+    list-style: none;
+    margin: 0;
+    padding: var(--space-1) var(--space-4);
+  }
+
+  &__item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    color: white;
+    gap: var(--space-2);
+    min-height: var(--touch-target-min);
+    padding: var(--space-2) var(--space-3);
+    color: var(--color-text-on-primary);
     text-decoration: none;
-    cursor: pointer;
-    padding: 5px 12px;
-    border-radius: 6px;
-    transition: background-color 0.2s;
+    border-radius: var(--radius-md);
+    transition: background-color 0.2s ease;
 
     &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: rgba(255, 255, 255, 0.14);
+      text-decoration: underline;
     }
 
     &:focus-visible {
-      outline: 3px solid white;
+      outline: 3px solid var(--color-text-on-primary);
       outline-offset: 2px;
     }
 
-    mat-icon {
-      font-size: 22px;
+    .mat-icon {
       width: 22px;
       height: 22px;
+      font-size: 22px;
     }
+  }
 
-    .nav-label {
-      font-weight: 700;
-      font-size: 0.85rem;
-      letter-spacing: 0.3px;
-      white-space: nowrap;
-    }
+  &__item--activo {
+    background-color: rgba(255, 255, 255, 0.18);
+    box-shadow: inset 0 -3px 0 0 var(--color-text-on-primary);
+  }
+
+  &__label {
+    font-weight: 700;
+    font-size: var(--font-size-sm);
+    letter-spacing: 0.02em;
   }
 }
 
-@media (max-width: 768px) {
-  .public-header {
-    gap: 15px;
-    .nav-item {
-      padding: 5px;
-      .nav-label {
-        font-size: 0.75rem;
-      }
-    }
+@media (max-width: 600px) {
+  .public-nav__lista {
+    gap: var(--space-2);
+  }
+
+  .public-nav__label {
+    font-size: var(--font-size-xs);
   }
 }

@@ -1,3 +1,7 @@
+<a class="skip-link" href="#contenido-principal">Ir al contenido principal</a>
+
+<app-quick-exit></app-quick-exit>
+
 @if (auth.isAuthenticated()) {
   <div class="auth-layout">
     <app-header (toggleSidenav)="sidenav.toggle()"></app-header>
@@ -8,9 +12,9 @@
       </mat-sidenav>
 
       <mat-sidenav-content class="main-content">
-        <div class="page-wrapper">
+        <main class="page-wrapper" id="contenido-principal">
           <router-outlet></router-outlet>
-        </div>
+        </main>
       </mat-sidenav-content>
     </mat-sidenav-container>
   </div>
@@ -24,7 +28,7 @@
       <app-header></app-header>
       <app-public-header></app-public-header>
 
-      <main class="content-area">
+      <main class="content-area" id="contenido-principal">
         <router-outlet></router-outlet>
       </main>
 
@@ -34,7 +38,8 @@
 }
 
 @if (loadingService.loading$ | async) {
-  <div class="global-loading-overlay" aria-live="polite" aria-busy="true">
+  <div class="global-loading-overlay" role="status" aria-live="polite" aria-busy="true">
     <mat-spinner diameter="54"></mat-spinner>
+    <span class="visually-hidden">Cargando información…</span>
   </div>
 }

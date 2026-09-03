@@ -25,3 +25,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 /.vs
+
+# Tools
+skills/
+src/skills/
+.github/skills/
+tools/skills/

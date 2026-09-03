@@ -1,43 +1,55 @@
 .public-footer {
-  background-color: #348F41;
-  height: 10vh;
-  min-height: 70px;
-  max-height: 90px;
   width: 100%;
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
+  background-color: var(--color-primary);
+  color: var(--color-text-on-primary);
+  padding: var(--space-3) var(--space-4);
 
-  .footer-content {
+  &__lista {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 3vw;
-    width: 100%;
+    gap: var(--space-4) var(--space-8);
+    list-style: none;
+    margin: 0;
+    padding: 0;
   }
 
-  .footer-item {
+  &__item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    color: white;
+    gap: var(--space-2);
 
-    .icon-circle {
-      width: 30px;
-      height: 30px;
-      border: 1.5px solid white;
-      border-radius: 50%;
-      display: flex;
+    a {
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      mat-icon { font-size: 16px; width: 16px; height: 16px; }
+      min-height: var(--touch-target-min);
+      color: var(--color-text-on-primary);
+      font-weight: 600;
+      font-size: var(--font-size-sm);
+      text-decoration: underline;
+
+      &:focus-visible {
+        outline: 3px solid var(--color-text-on-primary);
+        outline-offset: 2px;
+      }
     }
-    span { font-weight: 600; font-size: clamp(0.7rem, 0.9vw, 1rem); }
   }
 
-  .vertical-divider {
-    width: 1px;
+  &__icono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
     height: 30px;
-    background-color: rgba(255, 255, 255, 0.3);
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+
+    .mat-icon {
+      width: 16px;
+      height: 16px;
+      font-size: 16px;
+    }
   }
 }

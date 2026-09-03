@@ -1,43 +1,73 @@
-<div class="casilda-home-container">
-  <header class="hero-section">
-    <p class="unified-hero-text">
-      ¿Necesitas reportar una situación de violencia o discriminación basada en género en la UdeA?
-      <strong>CASILDA te acompaña</strong>
+<div class="home">
+
+  <section class="hero" aria-labelledby="hero-titulo">
+    <h1 id="hero-titulo" class="hero__titulo">Casilda: un espacio seguro de escucha y orientación</h1>
+    <p class="hero__intro">
+      Si viviste o presenciaste una situación de violencia o discriminación basada en género en la
+      Universidad de Antioquia, aquí puedes contarlo a tu ritmo. Tú decides qué compartir y cuándo
+      hacerlo: te acompañamos en cada paso.
     </p>
-  </header>
 
-  <section class="cards-grid">
-    @for (item of acciones; track item) {
-      <app-casilda-card
-        [icon]="item.icon"
-        [title]="item.title"
-        [variant]="item.variant"
-        [matTooltip]="item.tooltip"
-        matTooltipPosition="above"
-        matTooltipClass="standard-tooltip">
-      </app-casilda-card>
-    }
+    <div class="hero__acciones">
+      <a class="boton boton--primario" routerLink="/formulario-anonimo">
+        <mat-icon aria-hidden="true">edit_note</mat-icon>
+        Iniciar reporte seguro
+      </a>
+      <a class="boton boton--emergencia" [href]="'tel:' + telefonoOrientacion">
+        <mat-icon aria-hidden="true">support_agent</mat-icon>
+        Orientación telefónica de emergencia
+      </a>
+    </div>
   </section>
 
-  <div class="info-divider">
-    <span class="divider-text">Información de interés general</span>
-  </div>
+  <aside class="casilda-alerta home__privacidad">
+    <mat-icon aria-hidden="true">lock</mat-icon>
+    <p>
+      <strong>Tu navegación es segura.</strong> Puedes reportar de forma anónima si lo prefieres, y
+      la información que compartas se maneja bajo estricto secreto profesional. Si necesitas salir
+      de inmediato, usa el botón <strong>Salida rápida</strong> o presiona <kbd>Alt</kbd> + <kbd>Q</kbd>.
+    </p>
+  </aside>
 
-  <section class="cards-grid stats">
-    @for (item of estadisticas; track item) {
-      <app-casilda-card
-        [icon]="item.icon"
-        [value]="item.value || ''"
-        [title]="item.title"
-        [isLogo]="item.isLogo || false"
-        [matTooltip]="item.tooltip"
-        matTooltipPosition="above"
-        [matTooltipClass]="item.title === '¿Quién es CASILDA?' ? 'large-tooltip' : 'standard-tooltip'">
-      </app-casilda-card>
+  @if (cargando()) {
+    <p class="home__estado" role="status" aria-live="polite">
+      <mat-spinner diameter="28"></mat-spinner>
+      <span>Cargando las opciones de atención…</span>
+    </p>
+  } @else if (errorCarga()) {
+    <div class="casilda-alerta casilda-alerta--precaucion home__estado-error" role="status" aria-live="polite">
+      <mat-icon aria-hidden="true">error_outline</mat-icon>
+      <div>
+        <p>No pudimos cargar las opciones de atención en este momento. Tu información sigue protegida.</p>
+        <button type="button" class="boton boton--secundario" (click)="cargarContenido()">Reintentar</button>
+      </div>
+    </div>
+  } @else {
+    @if (acciones().length) {
+      <section class="home__seccion" aria-labelledby="titulo-acciones">
+        <h2 id="titulo-acciones" class="home__seccion-titulo">¿Qué necesitas hacer hoy?</h2>
+        <ul class="home__grid">
+          @for (item of acciones(); track item.id) {
+            <li><app-casilda-card [contenido]="item"></app-casilda-card></li>
+          }
+        </ul>
+      </section>
     }
-  </section>
 
-  <footer class="legal-disclaimer">
-    <p>Las denuncias serán tratadas con confidencialidad y en cumplimiento de la ley de protección de datos personales.</p>
-  </footer>
+    @if (informacion().length) {
+      <section class="home__seccion" aria-labelledby="titulo-informacion">
+        <h2 id="titulo-informacion" class="home__seccion-titulo">Información de interés general</h2>
+        <ul class="home__grid">
+          @for (item of informacion(); track item.id) {
+            <li><app-casilda-card [contenido]="item"></app-casilda-card></li>
+          }
+        </ul>
+      </section>
+    }
+  }
+
+  <p class="home__legal">
+    Las denuncias se tratan con confidencialidad y en cumplimiento de la ley de protección de datos
+    personales.
+  </p>
 </div>
