@@ -1,71 +1,54 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { environment } from '../../../environments/environment';
 import { CasildaCardComponent } from '../casilda-card/casilda-card.component';
+import { ContenidoDestacadoDto, ContenidoHomeService } from '../../services/contenido-home.service';
 
-interface CasildaItem {
-  icon: string;
-  title: string;
-  variant: 'light' | 'dark';
-  tooltip: string;
-  value?: string | number;
-  isLogo?: boolean;
-}
-
+/**
+ * Landing pública de Casilda. La página no contiene textos de negocio
+ * quemados: las tarjetas de opción se alimentan del gestor de contenidos
+ * (`ContenidoHomeService`), de modo que puedan actualizarse sin desplegar.
+ */
 @Component({
-    selector: 'app-casilda-home',
-    imports: [CasildaCardComponent, MatTooltipModule],
-    templateUrl: './casilda-home.component.html',
-    styleUrls: ['./casilda-home.component.scss']
+  selector: 'app-casilda-home',
+  imports: [RouterLink, MatIconModule, MatProgressSpinnerModule, CasildaCardComponent],
+  templateUrl: './casilda-home.component.html',
+  styleUrls: ['./casilda-home.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CasildaHomeComponent {
-  acciones: CasildaItem[] = [
-    { 
-      icon: 'uad-equipo', 
-      title: 'Registrar Queja Disciplinaria (UAD 3 y 4)', 
-      variant: 'light',
-      tooltip: 'Portal para el registro formal de quejas ante la Unidad de Asuntos Disciplinarios.'
-    },
-    { 
-      icon: 'equipo-atencion', 
-      title: 'Solicitud Equipo de Atención VBG', 
-      variant: 'light',
-      tooltip: 'Contacta al equipo especializado para recibir orientación y acompañamiento.'
-    },
-    { 
-      icon: 'logo-alma', 
-      title: 'Atención por Línea Alma', 
-      variant: 'light',
-      tooltip: 'Línea de atención psicológica y apoyo inmediato de la Universidad.'
-    },
-    { 
-      icon: 'seguridad-bienes',
-      title: 'Atención por Seguridad a Personas y Bienes', 
-      variant: 'light',
-      tooltip: 'Reporte de incidentes de seguridad inmediata dentro del campus.'
-    }
-  ];
+export class CasildaHomeComponent implements OnInit {
+  private readonly contenidoHome = inject(ContenidoHomeService);
 
-  estadisticas: CasildaItem[] = [
-    { 
-      icon: 'reportes-indicadores', 
-      value: '3000', 
-      title: 'Indicadores Internos', 
-      variant: 'light',
-      tooltip: 'Visualización de datos y métricas del sistema Casilda.'
-    },
-    { 
-      icon: 'estadisticas-vbg',
-      title: 'Estadísticas en VBG', 
-      variant: 'light',
-      tooltip: 'Informes detallados sobre la situación de VBG en la institución.'
-    },
-    { 
-      icon: 'logo-custom', 
-      title: '¿Quién es CASILDA?', 
-      isLogo: true, 
-      variant: 'light',
-      tooltip: 'CASILDA es el Sistema de Vigilancia en Salud Pública de la UdeA para el abordaje de las violencias y las discriminaciones basadas en género. Su propósito es centralizar la información para generar acciones de prevención, atención y protección efectiva.'
-    }
-  ];
+  readonly telefonoOrientacion = environment.telefonoOrientacion;
+
+  readonly cargando = signal(true);
+  readonly errorCarga = signal(false);
+  private readonly contenidos = signal<ContenidoDestacadoDto[]>([]);
+
+  readonly acciones = computed(() => this.contenidos().filter((c) => c.seccion === 'acciones'));
+  readonly informacion = computed(() => this.contenidos().filter((c) => c.seccion === 'informacion'));
+
+  ngOnInit(): void {
+    this.cargarContenido();
+  }
+
+  cargarContenido(): void {
+    this.cargando.set(true);
+    this.errorCarga.set(false);
+
+    this.contenidoHome.listarContenidoVigente().subscribe({
+      next: (contenidos) => {
+        this.contenidos.set(contenidos);
+        this.cargando.set(false);
+      },
+      error: () => {
+        this.contenidos.set([]);
+        this.errorCarga.set(true);
+        this.cargando.set(false);
+      }
+    });
+  }
 }
