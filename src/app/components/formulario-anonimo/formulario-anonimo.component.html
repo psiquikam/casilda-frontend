@@ -66,19 +66,35 @@
             <div class="grid-form">
               <mat-form-field appearance="outline">
                 <mat-label>Identificación (Si la conoce)</mat-label>
-                <input matInput formControlName="identificacion">
+                <input matInput formControlName="identificacion" (input)="soloNumeros($event, 'identificacion', formVictima)" placeholder="Solo números (5-15 dígitos)">
+                @if (formVictima.get('identificacion')?.hasError('pattern')) {
+                  <mat-error>Solo números (entre 5 y 15 dígitos)</mat-error>
+                }
               </mat-form-field>
               <mat-form-field appearance="outline">
                 <mat-label>Nombre *</mat-label>
-                <input matInput formControlName="nombre">
+                <input matInput formControlName="nombre" (input)="soloLetras($event, 'nombre', formVictima)">
+                @if (formVictima.get('nombre')?.hasError('required')) {
+                  <mat-error>El nombre es obligatorio</mat-error>
+                } @else if (formVictima.get('nombre')?.hasError('minlength')) {
+                  <mat-error>Mínimo 2 caracteres</mat-error>
+                } @else if (formVictima.get('nombre')?.hasError('pattern')) {
+                  <mat-error>Solo debe contener letras</mat-error>
+                }
               </mat-form-field>
               <mat-form-field appearance="outline">
                 <mat-label>Apellidos</mat-label>
-                <input matInput formControlName="apellidos">
+                <input matInput formControlName="apellidos" (input)="soloLetras($event, 'apellidos', formVictima)">
+                @if (formVictima.get('apellidos')?.hasError('pattern')) {
+                  <mat-error>Solo debe contener letras</mat-error>
+                }
               </mat-form-field>
               <mat-form-field appearance="outline">
                 <mat-label>Correo Electrónico</mat-label>
-                <input matInput formControlName="correo" type="email">
+                <input matInput formControlName="correo" type="email" placeholder="usuario@correo.com">
+                @if (formVictima.get('correo')?.hasError('email') || formVictima.get('correo')?.hasError('pattern')) {
+                  <mat-error>Ingrese un correo válido (ej: nombre@correo.com)</mat-error>
+                }
               </mat-form-field>
               <mat-form-field appearance="outline">
                 <mat-label>Género</mat-label>
@@ -91,7 +107,7 @@
                 </mat-select>
               </mat-form-field>
               <mat-form-field appearance="outline">
-                <mat-label>Vínculo con la Universidad</mat-label>
+                <mat-label>Vínculo con la Universidad *</mat-label>
                 <mat-select formControlName="cargo">
                   <mat-option value="Estudiante">Estudiante</mat-option>
                   <mat-option value="Docente">Docente</mat-option>
@@ -100,14 +116,90 @@
                   <mat-option value="Contratista">Contratista</mat-option>
                   <mat-option value="Otro">Otro</mat-option>
                 </mat-select>
+                @if (formVictima.get('cargo')?.hasError('required')) {
+                  <mat-error>El vínculo con la universidad es obligatorio</mat-error>
+                }
               </mat-form-field>
             </div>
           </div>
         }
 
+        <!-- Preferencia de Contacto Opcional -->
+        <div class="contact-preference-section">
+          <h3>¿Deseas proporcionar medios para que te contactemos de forma opcional?</h3>
+          <p class="selector-subtitle">Si decides ser contactado(a), un profesional especializado podrá comunicarse contigo de manera confidencial.</p>
+
+          <mat-radio-group formControlName="deseaContacto" class="victim-radios">
+            <div class="profile-card mini" [class.selected]="formPerfil.get('deseaContacto')?.value === 'no'">
+              <mat-radio-button value="no">
+                <strong>No ingresar medios de contacto</strong>
+                <p>Mantener el reporte completamente sin datos de contacto.</p>
+              </mat-radio-button>
+            </div>
+            <div class="profile-card mini" [class.selected]="formPerfil.get('deseaContacto')?.value === 'si'">
+              <mat-radio-button value="si">
+                <strong>Sí, deseo ser contactado(a)</strong>
+                <p>Indicar al menos un medio (correo electrónico o WhatsApp / teléfono).</p>
+              </mat-radio-button>
+            </div>
+          </mat-radio-group>
+
+          @if (formPerfil.get('deseaContacto')?.value === 'si') {
+            <div class="contact-form-card">
+              @if (tieneCorreoVictimaAfectada) {
+                <div class="contact-already-provided">
+                  <mat-icon>mark_email_read</mat-icon>
+                  <div class="provided-info">
+                    <strong>Correo electrónico registrado para contacto:</strong>
+                    <span>{{ formVictima.get('correo')?.value }}</span>
+                    <small>Se utilizará el correo registrado en sus datos personales. Si lo desea, puede ingresar también su WhatsApp o teléfono:</small>
+                  </div>
+                </div>
+
+                <div class="grid-form single-field">
+                  <mat-form-field appearance="outline">
+                    <mat-label>WhatsApp / Teléfono (Opcional)</mat-label>
+                    <input matInput formControlName="whatsappContacto" type="tel" (input)="soloNumeros($event, 'whatsappContacto', formPerfil)" placeholder="Ej: 300 123 4567 (10 dígitos)">
+                    @if (formPerfil.get('whatsappContacto')?.hasError('pattern')) {
+                      <mat-error>El número debe contener entre 7 y 12 dígitos</mat-error>
+                    }
+                  </mat-form-field>
+                </div>
+              } @else {
+                <div class="contact-instruction">
+                  <mat-icon>info</mat-icon>
+                  <span>Para poder continuar debe ingresar al menos uno de los dos medios de contacto (correo electrónico o WhatsApp / teléfono).</span>
+                </div>
+                <div class="grid-form">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Correo Electrónico</mat-label>
+                    <input matInput formControlName="correoContacto" type="email" placeholder="ejemplo@correo.com">
+                    @if (formPerfil.get('correoContacto')?.hasError('email') || formPerfil.get('correoContacto')?.hasError('pattern')) {
+                      <mat-error>Ingrese un correo válido (ej: nombre@correo.com)</mat-error>
+                    }
+                  </mat-form-field>
+                  <mat-form-field appearance="outline">
+                    <mat-label>WhatsApp / Teléfono</mat-label>
+                    <input matInput formControlName="whatsappContacto" type="tel" (input)="soloNumeros($event, 'whatsappContacto', formPerfil)" placeholder="Ej: 300 123 4567 (10 dígitos)">
+                    @if (formPerfil.get('whatsappContacto')?.hasError('pattern')) {
+                      <mat-error>El número debe contener entre 7 y 12 dígitos</mat-error>
+                    }
+                  </mat-form-field>
+                </div>
+                @if (contactoRequeridoInvalido && (formPerfil.get('correoContacto')?.touched || formPerfil.get('whatsappContacto')?.touched || formPerfil.dirty)) {
+                  <div class="contact-error-badge">
+                    <mat-icon>warning</mat-icon>
+                    <span>Debe digitar el correo electrónico o el WhatsApp para continuar.</span>
+                  </div>
+                }
+              }
+            </div>
+          }
+        </div>
+
         <div class="actions">
           <button mat-button matStepperPrevious>Atrás</button>
-          <button mat-raised-button color="primary" matStepperNext>Siguiente</button>
+          <button mat-raised-button color="primary" matStepperNext [disabled]="contactoRequeridoInvalido">Siguiente</button>
         </div>
       </form>
     </mat-step>
@@ -148,35 +240,41 @@
             <div class="location-details-box">
               <div class="grid-form">
                 <mat-form-field appearance="outline">
-                  <mat-label>Sede o Campus</mat-label>
+                  <mat-label>Campus *</mat-label>
                   <mat-select formControlName="sedeCampus">
-                    <mat-option value="Ciudad Universitaria - Medellín">Ciudad Universitaria (Medellín)</mat-option>
-                    <mat-option value="Sede Robledo">Sede Robledo</mat-option>
-                    <mat-option value="Área de la Salud">Área de la Salud (Medicina, Enfermería, Odontología, Salud Pública)</mat-option>
-                    <mat-option value="Seccional Oriente">Seccional Oriente (El Carmen de Viboral)</mat-option>
-                    <mat-option value="Seccional Urabá">Seccional Urabá (Apartadó / Carepa / Turbo)</mat-option>
-                    <mat-option value="Seccional Bajo Cauca">Seccional Bajo Cauca (Caucasia)</mat-option>
-                    <mat-option value="Seccional Magdalena Medio">Seccional Magdalena Medio (Puerto Berrío)</mat-option>
-                    <mat-option value="Seccional Suroeste">Seccional Suroeste (Andes)</mat-option>
-                    <mat-option value="Sede Norte">Sede Norte (Yarumal)</mat-option>
-                    <mat-option value="Sede Occidente">Sede Occidente (Santa Fe de Antioquia)</mat-option>
-                    <mat-option value="Sede Sonsón">Sede Sonsón</mat-option>
-                    <mat-option value="Edificio San Ignacio">Edificio San Ignacio</mat-option>
-                    <mat-option value="Otra sede">Otra sede o dependencia</mat-option>
+                    @for (c of campusOptions; track c) {
+                      <mat-option [value]="c">{{ c }}</mat-option>
+                    }
                   </mat-select>
+                  @if (formRelato.get('sedeCampus')?.hasError('required')) {
+                    <mat-error>Debe seleccionar un campus</mat-error>
+                  }
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
-                  <mat-label>Facultad / Bloque / Espacio específico</mat-label>
-                  <input matInput formControlName="facultadBloqueLugar" placeholder="Ej: Bloque 12 piso 2, Coliseo, Cafetería central, etc.">
+                  <mat-label>Facultad (Opcional)</mat-label>
+                  <input matInput formControlName="facultad" placeholder="Ej: Facultad de Medicina, Ingeniería, etc.">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Bloque (Opcional)</mat-label>
+                  <input matInput formControlName="bloque" placeholder="Ej: Bloque 12, Bloque 22, etc.">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Espacio específico (Opcional)</mat-label>
+                  <input matInput formControlName="espacio" placeholder="Ej: Aula 201, Cafetería central, Coliseo, etc.">
                 </mat-form-field>
               </div>
             </div>
           } @else {
             <div class="location-details-box">
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Descripción del lugar externo</mat-label>
+                <mat-label>Descripción del lugar externo *</mat-label>
                 <input matInput formControlName="lugarDetalleExterno" placeholder="Ej: Vía pública cerca al campus, entorno virtual / redes sociales, residencia, etc.">
+                @if (formRelato.get('lugarDetalleExterno')?.hasError('required')) {
+                  <mat-error>Debe indicar la descripción del lugar externo</mat-error>
+                }
               </mat-form-field>
             </div>
           }
@@ -199,8 +297,11 @@
           <div class="grid-date-time">
             <div class="datetime-col">
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Fecha de los hechos</mat-label>
+                <mat-label>Fecha de los hechos *</mat-label>
                 <input matInput formControlName="fecha" placeholder="DD/MM/AAAA, aproximada o 'Se desconoce'">
+                @if (formRelato.get('fecha')?.hasError('required')) {
+                  <mat-error>La fecha es obligatoria</mat-error>
+                }
                 <mat-hint>Ej: 15/08/2026, 'Agosto 2026' o 'Se desconoce'</mat-hint>
               </mat-form-field>
               <div class="quick-helpers">
@@ -212,9 +313,9 @@
 
             <div class="datetime-col">
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Hora aproximada</mat-label>
+                <mat-label>Hora aproximada (Opcional)</mat-label>
                 <input matInput formControlName="hora" placeholder="HH:MM (Ej: 15:30), 'Tarde' o 'Se desconoce'">
-                <mat-hint>Ej: 03:00 PM, 'En la tarde' o 'Se desconoce'</mat-hint>
+                <mat-hint>Opcional: Ej: 03:00 PM, 'En la tarde' o 'Se desconoce'</mat-hint>
               </mat-form-field>
               <div class="quick-helpers">
                 <button type="button" mat-stroked-button class="quick-btn" (click)="setHoraRapida('En la mañana')">En la mañana</button>
@@ -228,46 +329,32 @@
         <!-- 3. Tipo de VBG -->
         <div class="vbg-section">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Tipo de VBG</mat-label>
-            <mat-select formControlName="tipoVbg">
+            <mat-label>Tipo(s) de violencia / VBG *</mat-label>
+            <mat-select formControlName="tipoVbg" multiple>
               @for (tipo of tiposVbg; track tipo.id) {
                 <mat-option [value]="tipo.nombre">{{ tipo.nombre }}</mat-option>
               }
             </mat-select>
-            <mat-hint>Modalidad de violencia o discriminación que mejor describe los hechos</mat-hint>
+            @if (formRelato.get('tipoVbg')?.hasError('required')) {
+              <mat-error>Debe seleccionar al menos un tipo de violencia</mat-error>
+            }
+            <mat-hint>Puede seleccionar una o varias modalidades de violencia o discriminación</mat-hint>
           </mat-form-field>
         </div>
 
         <!-- 4. Descripción del Caso -->
         <div class="description-section">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Describe el caso o situación</mat-label>
+            <mat-label>Describe el caso o situación *</mat-label>
             <textarea matInput formControlName="descripcion" rows="5" placeholder="Detalla lo sucedido, contexto de los hechos, personas involucradas..."></textarea>
+            @if (formRelato.get('descripcion')?.hasError('required')) {
+              <mat-error>La descripción es obligatoria</mat-error>
+            } @else if (formRelato.get('descripcion')?.hasError('minlength')) {
+              <mat-error>Mínimo 20 caracteres (actual: {{ formRelato.get('descripcion')?.value?.length || 0 }})</mat-error>
+            }
             <mat-hint>Mínimo 20 caracteres</mat-hint>
           </mat-form-field>
         </div>
-
-        <!-- 5. Preferencia de contacto opcional -->
-        <div class="contact-preference">
-          <p>¿Deseas proporcionar medios para que te contactemos de forma opcional?</p>
-          <mat-radio-group formControlName="deseaContacto">
-            <mat-radio-button value="si">Sí</mat-radio-button>
-            <mat-radio-button value="no">No</mat-radio-button>
-          </mat-radio-group>
-        </div>
-
-        @if (formRelato.get('deseaContacto')?.value === 'si') {
-          <div class="contact-fields">
-            <mat-form-field appearance="outline">
-              <mat-label>Correo Electrónico (Opcional)</mat-label>
-              <input matInput formControlName="correoContacto" type="email">
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>WhatsApp / Teléfono (Opcional)</mat-label>
-              <input matInput formControlName="whatsappContacto">
-            </mat-form-field>
-          </div>
-        }
 
         <div class="actions">
           <button mat-button matStepperPrevious>Atrás</button>
@@ -285,15 +372,24 @@
         <div class="grid-form">
           <mat-form-field appearance="outline">
             <mat-label>Identificación (Si la conoce)</mat-label>
-            <input matInput formControlName="identificacion">
+            <input matInput formControlName="identificacion" (input)="soloNumeros($event, 'identificacion', formVictimario)" placeholder="Solo números (5-15 dígitos)">
+            @if (formVictimario.get('identificacion')?.hasError('pattern')) {
+              <mat-error>Solo números (entre 5 y 15 dígitos)</mat-error>
+            }
           </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Nombre</mat-label>
-            <input matInput formControlName="nombre">
+            <input matInput formControlName="nombre" (input)="soloLetras($event, 'nombre', formVictimario)">
+            @if (formVictimario.get('nombre')?.hasError('pattern')) {
+              <mat-error>Solo debe contener letras</mat-error>
+            }
           </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Apellidos</mat-label>
-            <input matInput formControlName="apellidos">
+            <input matInput formControlName="apellidos" (input)="soloLetras($event, 'apellidos', formVictimario)">
+            @if (formVictimario.get('apellidos')?.hasError('pattern')) {
+              <mat-error>Solo debe contener letras</mat-error>
+            }
           </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Vínculo o enlace con la Universidad</mat-label>
@@ -313,6 +409,36 @@
             <input matInput formControlName="correo" placeholder="Correo electrónico, dependencia donde labora o datos adicionales...">
           </mat-form-field>
         </div>
+
+        @if (esVictimarioUdea) {
+          <div class="uad-section">
+            <div class="uad-header">
+              <mat-icon>gavel</mat-icon>
+              <h4>Atención disciplinaria por la Unidad de Asuntos Disciplinarios (UAD)</h4>
+            </div>
+            <p class="uad-text">
+              Dado que la persona señalada hace parte de la comunidad universitaria, este caso es susceptible de ser conocido y tramitado disciplinariamente por la <strong>Unidad de Asuntos Disciplinarios (UAD)</strong>.
+            </p>
+            <p class="uad-question">
+              ¿Desea que la UAD conozca este caso para iniciar las actuaciones institucionales correspondientes?
+            </p>
+            <mat-radio-group formControlName="remitirUad" class="victim-radios">
+              <div class="profile-card mini" [class.selected]="formVictimario.get('remitirUad')?.value === 'si'">
+                <mat-radio-button value="si">
+                  <strong>Sí</strong>
+                  <p>Autorizo remitir y poner el caso en conocimiento de la UAD.</p>
+                </mat-radio-button>
+              </div>
+              <div class="profile-card mini" [class.selected]="formVictimario.get('remitirUad')?.value === 'no'">
+                <mat-radio-button value="no">
+                  <strong>No</strong>
+                  <p>Por el momento prefiero que no sea remitido a la UAD (se mantendrá confidencial con fines de acompañamiento o registro).</p>
+                </mat-radio-button>
+              </div>
+            </mat-radio-group>
+          </div>
+        }
+
         <div class="actions">
           <button mat-button matStepperPrevious>Atrás</button>
           <button mat-raised-button color="primary" matStepperNext>Siguiente</button>
