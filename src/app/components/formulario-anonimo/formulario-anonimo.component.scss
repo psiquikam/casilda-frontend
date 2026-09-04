@@ -1,53 +1,48 @@
-$purple-sys: #348F41;
+// Verde institucional heredado (#348F41). Se consume desde los tokens para que
+// el formulario público no compita con el primario del resto del sistema.
+$purple-sys: var(--color-primary);
 
 .stepper-wrapper {
   max-width: 1000px;
-  margin: 20px auto 40px auto;
-  padding: 10px;
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.06);
+  margin: var(--space-4) auto var(--space-8);
+  padding: var(--space-2);
+  background-color: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
 
   .step-body {
-    padding: 24px 10px 10px 10px;
+    padding: var(--space-4) var(--space-3) var(--space-2);
   }
 
   ::ng-deep {
     .mat-horizontal-stepper-header-container {
-      margin-bottom: 10px;
-      border-bottom: 1px solid #f1f5f9;
+      margin-bottom: var(--space-2);
+      border-bottom: 1px solid var(--color-border);
     }
 
-    .mat-mdc-form-field-flex {
-      height: 36px !important;
-      min-height: 36px !important;
-      padding: 0 12px !important;
-      align-items: center !important;
+    /* Densidad compacta de Material en lugar de forzar alturas: los campos
+       conservan el área táctil mínima (48px) y la etiqueta flotante mantiene
+       su posición nativa, sin los recortes que producían los `top` fijos. */
+    .mat-mdc-form-field-infix {
+      min-height: 48px;
+      padding-top: var(--space-3);
+      padding-bottom: var(--space-3);
     }
 
-    .mat-mdc-form-field:has(textarea) {
-      .mat-mdc-form-field-flex {
-        height: auto !important;
-        min-height: 120px !important;
-        align-items: flex-start !important;
-        padding: 12px !important;
-      }
-      .mat-mdc-text-field-wrapper .mat-mdc-floating-label {
-        top: 24px !important;
-      }
+    .mat-mdc-form-field:has(textarea) .mat-mdc-form-field-infix {
+      min-height: 96px;
     }
 
-    .mat-mdc-text-field-wrapper .mat-mdc-floating-label {
-      top: 18px !important;
-      font-size: 14px;
-    }
-
-    .mat-mdc-text-field-wrapper.mat-mdc-form-field-can-float.mat-form-field-should-float .mat-mdc-floating-label {
-      transform: translateY(-22px) scale(0.75) !important;
+    /* El pseudo-elemento de MDC reserva 16px bajo cada campo aunque no haya
+       texto. Se colapsa cuando está vacío, pero las pistas y los mensajes de
+       error siguen siendo visibles (antes el bloque se ocultaba por completo). */
+    .mat-mdc-form-field-bottom-align::before {
+      display: none;
     }
 
     .mat-mdc-form-field-subscript-wrapper {
-      display: none !important;
+      padding-top: var(--space-1);
+      font-size: var(--font-size-xs);
     }
 
     .mat-step-icon-selected, .mat-step-icon-state-done {
@@ -56,7 +51,8 @@ $purple-sys: #348F41;
   }
 }
 
-.profile-selector h3, .policy-box h3, .victim-preference-section h3, .lugar-section h3, .datetime-section h3, .step-body h3 {
+/* Todas las secciones del formulario viven dentro de `.step-body`. */
+.step-body h3 {
   margin-top: 0;
   margin-bottom: 6px;
   color: #1e293b;
@@ -73,63 +69,62 @@ $purple-sys: #348F41;
 
 .policy-box {
   background-color: #f8fafc;
-  padding: 20px;
+  padding: var(--space-4);
   border-radius: 8px;
   border-left: 4px solid $purple-sys;
-  margin-bottom: 20px;
+  margin-bottom: var(--space-4);
 
   p {
     color: #475569;
     line-height: 1.5;
-    margin-bottom: 15px;
+    margin-bottom: var(--space-3);
     font-size: 0.95rem;
   }
 }
 
-.grid-form {
+/* Rejillas de dos columnas del formulario; colapsan a una sola en móvil
+   (ver el bloque responsive al final del archivo). */
+.grid-form, .grid-date-time, .contact-fields {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-bottom: 10px;
+  gap: var(--space-3);
+}
+
+.grid-form {
+  margin-bottom: var(--space-2);
 
   .full-width-cell {
     grid-column: 1 / -1;
   }
+}
 
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
+/* Rejillas de tarjetas de selección: se acomodan solas al ancho disponible. */
+.profile-grid, .victim-radios, .location-radios {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-3);
+  margin: var(--space-3) 0 var(--space-4);
 }
 
 .profile-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 16px;
-  margin: 16px 0 24px 0;
+  margin-bottom: var(--space-5);
 }
 
 .victim-preference-section {
-  margin-top: 24px;
-  padding-top: 20px;
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
   border-top: 1px solid #f1f5f9;
-}
-
-.victim-radios, .location-radios {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 14px;
-  margin: 14px 0 18px 0;
 }
 
 .profile-card {
   border: 2px solid #f1f5f9;
   border-radius: 12px;
-  padding: 20px;
+  padding: var(--space-4);
   transition: all 0.2s ease;
   cursor: pointer;
 
   &.mini {
-    padding: 14px 16px;
+    padding: var(--space-3);
   }
 
   &:hover {
@@ -137,9 +132,10 @@ $purple-sys: #348F41;
     background-color: #f8fafc;
   }
 
+  /* Selección en verde institucional (antes quedaba un lavanda del tema previo). */
   &.selected {
     border-color: $purple-sys;
-    background-color: #f5f3ff;
+    background-color: var(--color-bg-success-light);
   }
 
   strong {
@@ -162,13 +158,13 @@ $purple-sys: #348F41;
   border: 1px solid #e2e8f0;
   border-left: 4px solid $purple-sys;
   border-radius: 8px;
-  padding: 18px 20px 10px 20px;
-  margin-bottom: 20px;
+  padding: var(--space-4) var(--space-4) var(--space-2);
+  margin-bottom: var(--space-4);
   animation: fadeIn 0.25s ease-in-out;
 
   h4 {
     margin-top: 0;
-    margin-bottom: 14px;
+    margin-bottom: var(--space-3);
     font-size: 0.95rem;
     color: #1e293b;
     font-weight: 700;
@@ -176,14 +172,14 @@ $purple-sys: #348F41;
 }
 
 .lugar-section {
-  margin-bottom: 24px;
-  padding-bottom: 10px;
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-2);
   border-bottom: 1px solid #f1f5f9;
 }
 
 .datetime-section {
-  margin-bottom: 24px;
-  padding-bottom: 16px;
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-3);
   border-bottom: 1px solid #f1f5f9;
 }
 
@@ -240,16 +236,6 @@ $purple-sys: #348F41;
   }
 }
 
-.grid-date-time {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-}
-
 .datetime-col {
   display: flex;
   flex-direction: column;
@@ -278,12 +264,8 @@ $purple-sys: #348F41;
   }
 }
 
-.vbg-section {
-  margin-bottom: 16px;
-}
-
-.description-section {
-  margin-bottom: 16px;
+.vbg-section, .description-section {
+  margin-bottom: var(--space-4);
 }
 
 @keyframes fadeIn {
@@ -309,18 +291,18 @@ $purple-sys: #348F41;
 
 .upload-zone {
   border: 2px dashed #e2e8f0;
-  padding: 40px;
+  padding: var(--space-6) var(--space-4);
   text-align: center;
   border-radius: 12px;
   background-color: #f8fafc;
-  margin: 20px 0;
+  margin: var(--space-4) 0;
 
   mat-icon {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
     color: #cbd5e0;
-    margin-bottom: 12px;
+    margin-bottom: var(--space-2);
   }
 
   p { color: #64748b; font-size: 0.95rem; }
@@ -328,14 +310,15 @@ $purple-sys: #348F41;
 
 .actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 12px;
-  margin-top: 30px;
-  padding-top: 20px;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
   border-top: 1px solid #f1f5f9;
 }
 
-.full-width { width: 100%; }
+/* `.full-width` es una utilidad global (src/styles.scss); no se redefine aquí. */
 
 .contact-preference {
   margin: 20px 0 10px 0;
@@ -343,12 +326,46 @@ $purple-sys: #348F41;
 }
 
 .contact-fields {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-top: 10px;
+  margin-top: var(--space-2);
+}
 
-  @media (max-width: 768px) {
+/* --------------------------------------------------------------------------
+   Pantallas estrechas: la cabecera del stepper (5 pasos) no cabe en una fila y
+   Material la comprime hasta recortar las etiquetas. Se le permite desplazarse
+   en horizontal y se recupera el ancho útil que gastaban los márgenes.
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .grid-form, .grid-date-time, .contact-fields {
     grid-template-columns: 1fr;
+  }
+
+  .stepper-wrapper {
+    margin: var(--space-3) auto var(--space-6);
+    padding: 0;
+
+    .step-body {
+      padding: var(--space-3);
+    }
+
+    ::ng-deep {
+      .mat-horizontal-stepper-header-container {
+        overflow-x: auto;
+        scrollbar-width: thin;
+      }
+
+      .mat-horizontal-stepper-header {
+        flex-shrink: 0;
+        height: 56px;
+        padding: 0 var(--space-3);
+      }
+
+      .mat-horizontal-content-container {
+        padding: 0;
+      }
+    }
+  }
+
+  .actions button {
+    flex: 1 1 45%;
   }
 }
