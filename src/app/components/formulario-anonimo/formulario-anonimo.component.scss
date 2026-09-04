@@ -1,49 +1,39 @@
-$purple-sys: #348F41;
+// Verde institucional heredado (#348F41). Se consume desde los tokens para que
+// el formulario público no compita con el primario del resto del sistema.
+$purple-sys: var(--color-primary, #348F41);
 
 .stepper-wrapper {
   max-width: 1000px;
-  margin: 20px auto 40px auto;
-  padding: 10px;
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.06);
+  margin: var(--space-4, 20px) auto var(--space-8, 40px);
+  padding: var(--space-2, 10px);
+  background-color: var(--color-bg-surface, #ffffff);
+  border-radius: var(--radius-lg, 12px);
+  box-shadow: var(--shadow-md, 0 4px 25px rgba(0, 0, 0, 0.06));
 
   .step-body {
-    padding: 24px 10px 10px 10px;
+    padding: var(--space-4, 24px) var(--space-3, 10px) var(--space-2, 10px);
   }
 
   ::ng-deep {
     .mat-horizontal-stepper-header-container {
-      margin-bottom: 10px;
-      border-bottom: 1px solid #f1f5f9;
+      margin-bottom: var(--space-2, 10px);
+      border-bottom: 1px solid var(--color-border, #f1f5f9);
     }
 
-    .mat-mdc-form-field-flex {
-      height: 36px !important;
-      min-height: 36px !important;
-      padding: 0 12px !important;
-      align-items: center !important;
+    /* Densidad compacta de Material: conserva el área táctil mínima (48px) */
+    .mat-mdc-form-field-infix {
+      min-height: 48px;
+      padding-top: var(--space-3, 10px);
+      padding-bottom: var(--space-3, 10px);
     }
 
-    .mat-mdc-form-field:has(textarea) {
-      .mat-mdc-form-field-flex {
-        height: auto !important;
-        min-height: 120px !important;
-        align-items: flex-start !important;
-        padding: 12px !important;
-      }
-      .mat-mdc-text-field-wrapper .mat-mdc-floating-label {
-        top: 24px !important;
-      }
+    .mat-mdc-form-field:has(textarea) .mat-mdc-form-field-infix {
+      min-height: 96px;
     }
 
-    .mat-mdc-text-field-wrapper .mat-mdc-floating-label {
-      top: 18px !important;
-      font-size: 14px;
-    }
-
-    .mat-mdc-text-field-wrapper.mat-mdc-form-field-can-float.mat-form-field-should-float .mat-mdc-floating-label {
-      transform: translateY(-22px) scale(0.75) !important;
+    /* Colapsa el pseudo-elemento para que no agregue espacio innecesario si no hay texto */
+    .mat-mdc-form-field-bottom-align::before {
+      display: none;
     }
 
     .mat-mdc-form-field-subscript-wrapper {
@@ -81,7 +71,8 @@ $purple-sys: #348F41;
   }
 }
 
-.profile-selector h3, .policy-box h3, .victim-preference-section h3, .lugar-section h3, .datetime-section h3, .step-body h3 {
+/* Encabezados y títulos de secciones */
+.step-body h3 {
   margin-top: 0;
   margin-bottom: 6px;
   color: #1e293b;
@@ -98,20 +89,21 @@ $purple-sys: #348F41;
 
 .policy-box {
   background-color: #f8fafc;
-  padding: 20px;
+  padding: var(--space-4, 20px);
   border-radius: 8px;
   border-left: 4px solid $purple-sys;
-  margin-bottom: 20px;
+  margin-bottom: var(--space-4, 20px);
 
   p {
     color: #475569;
     line-height: 1.5;
-    margin-bottom: 15px;
+    margin-bottom: var(--space-3, 15px);
     font-size: 0.95rem;
   }
 }
 
-.grid-form {
+/* Grillas de dos columnas con alineación superior para evitar deformaciones por error */
+.grid-form, .grid-date-time, .contact-fields {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px 14px;
@@ -121,41 +113,35 @@ $purple-sys: #348F41;
   .full-width-cell {
     grid-column: 1 / -1;
   }
+}
 
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
+/* Grillas de tarjetas de selección */
+.profile-grid, .victim-radios, .location-radios {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-3, 14px);
+  margin: var(--space-3, 14px) 0 var(--space-4, 18px);
 }
 
 .profile-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 16px;
-  margin: 16px 0 24px 0;
+  margin-bottom: var(--space-5, 24px);
 }
 
 .victim-preference-section {
-  margin-top: 24px;
-  padding-top: 20px;
+  margin-top: var(--space-5, 24px);
+  padding-top: var(--space-4, 20px);
   border-top: 1px solid #f1f5f9;
-}
-
-.victim-radios, .location-radios {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 14px;
-  margin: 14px 0 18px 0;
 }
 
 .profile-card {
   border: 2px solid #f1f5f9;
   border-radius: 12px;
-  padding: 20px;
+  padding: var(--space-4, 20px);
   transition: all 0.2s ease;
   cursor: pointer;
 
   &.mini {
-    padding: 14px 16px;
+    padding: var(--space-3, 14px);
   }
 
   &:hover {
@@ -165,7 +151,7 @@ $purple-sys: #348F41;
 
   &.selected {
     border-color: $purple-sys;
-    background-color: #f5f3ff;
+    background-color: var(--color-bg-success-light, #f0fdf4);
   }
 
   strong {
@@ -188,13 +174,13 @@ $purple-sys: #348F41;
   border: 1px solid #e2e8f0;
   border-left: 4px solid $purple-sys;
   border-radius: 8px;
-  padding: 18px 20px 10px 20px;
-  margin-bottom: 20px;
+  padding: var(--space-4, 18px) var(--space-4, 20px) var(--space-2, 10px);
+  margin-bottom: var(--space-4, 20px);
   animation: fadeIn 0.25s ease-in-out;
 
   h4 {
     margin-top: 0;
-    margin-bottom: 14px;
+    margin-bottom: var(--space-3, 14px);
     font-size: 0.95rem;
     color: #1e293b;
     font-weight: 700;
@@ -202,14 +188,14 @@ $purple-sys: #348F41;
 }
 
 .lugar-section {
-  margin-bottom: 24px;
-  padding-bottom: 10px;
+  margin-bottom: var(--space-5, 24px);
+  padding-bottom: var(--space-2, 10px);
   border-bottom: 1px solid #f1f5f9;
 }
 
 .datetime-section {
-  margin-bottom: 24px;
-  padding-bottom: 16px;
+  margin-bottom: var(--space-5, 24px);
+  padding-bottom: var(--space-3, 16px);
   border-bottom: 1px solid #f1f5f9;
 }
 
@@ -266,16 +252,6 @@ $purple-sys: #348F41;
   }
 }
 
-.grid-date-time {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-}
-
 .datetime-col {
   display: flex;
   flex-direction: column;
@@ -304,12 +280,8 @@ $purple-sys: #348F41;
   }
 }
 
-.vbg-section {
-  margin-bottom: 16px;
-}
-
-.description-section {
-  margin-bottom: 16px;
+.vbg-section, .description-section {
+  margin-bottom: var(--space-4, 16px);
 }
 
 @keyframes fadeIn {
@@ -335,18 +307,18 @@ $purple-sys: #348F41;
 
 .upload-zone {
   border: 2px dashed #e2e8f0;
-  padding: 40px;
+  padding: var(--space-6, 40px) var(--space-4, 20px);
   text-align: center;
   border-radius: 12px;
   background-color: #f8fafc;
-  margin: 20px 0;
+  margin: var(--space-4, 20px) 0;
 
   mat-icon {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
     color: #cbd5e0;
-    margin-bottom: 12px;
+    margin-bottom: var(--space-2, 12px);
   }
 
   p { color: #64748b; font-size: 0.95rem; }
@@ -354,14 +326,17 @@ $purple-sys: #348F41;
 
 .actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 12px;
-  margin-top: 30px;
-  padding-top: 20px;
+  gap: var(--space-3, 12px);
+  margin-top: var(--space-5, 30px);
+  padding-top: var(--space-4, 20px);
   border-top: 1px solid #f1f5f9;
 }
 
-.full-width { width: 100%; }
+.full-width {
+  width: 100%;
+}
 
 .contact-preference-section {
   margin-top: 24px;
@@ -528,5 +503,44 @@ $purple-sys: #348F41;
     font-size: 0.92rem;
     font-weight: 600;
     margin: 12px 0 14px 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Pantallas estrechas (Mobile)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .grid-form, .grid-date-time, .contact-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .stepper-wrapper {
+    margin: var(--space-3, 12px) auto var(--space-6, 24px);
+    padding: 0;
+
+    .step-body {
+      padding: var(--space-3, 12px);
+    }
+
+    ::ng-deep {
+      .mat-horizontal-stepper-header-container {
+        overflow-x: auto;
+        scrollbar-width: thin;
+      }
+
+      .mat-horizontal-stepper-header {
+        flex-shrink: 0;
+        height: 56px;
+        padding: 0 var(--space-3, 12px);
+      }
+
+      .mat-horizontal-content-container {
+        padding: 0;
+      }
+    }
+  }
+
+  .actions button {
+    flex: 1 1 45%;
   }
 }

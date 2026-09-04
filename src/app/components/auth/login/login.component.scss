@@ -19,6 +19,7 @@
 .login__logo {
   width: clamp(var(--udea-logo-min-width), 60%, 260px);
   height: auto;
+  aspect-ratio: var(--udea-logo-aspect);
   object-fit: contain;
 }
 

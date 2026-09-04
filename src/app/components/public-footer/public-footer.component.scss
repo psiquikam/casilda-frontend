@@ -1,16 +1,18 @@
+/* El pie acompaña al final del contenido en lugar de ocupar alto fijo del
+   viewport (ver app.component.html): en móvil llegaba a robar tres filas. */
 .public-footer {
   width: 100%;
   flex-shrink: 0;
   background-color: var(--color-primary);
   color: var(--color-text-on-primary);
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-2) var(--space-4);
 
   &__lista {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: var(--space-4) var(--space-8);
+    gap: 0 var(--space-6);
     list-style: none;
     margin: 0;
     padding: 0;
@@ -41,15 +43,26 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 30px;
-    height: 30px;
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
     border: 1.5px solid currentColor;
     border-radius: 50%;
 
     .mat-icon {
-      width: 16px;
-      height: 16px;
-      font-size: 16px;
+      width: 15px;
+      height: 15px;
+      font-size: 15px;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .public-footer {
+    padding: var(--space-1) var(--space-3);
+
+    &__item a {
+      font-size: var(--font-size-xs);
     }
   }
 }

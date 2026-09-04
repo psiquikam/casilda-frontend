@@ -3,7 +3,7 @@
 > Archivo vivo. Se actualiza al cerrar cada fase de trabajo para que cualquier
 > sesión posterior (humana o asistida) retome sin repetir el análisis.
 >
-> **Última actualización:** 3 de septiembre de 2026
+> **Última actualización:** 3 de septiembre de 2026 (segunda revisión del día)
 
 ---
 
@@ -55,8 +55,9 @@ espaciados ni radios literales**: siempre `var(--token)`.
   `--secundario`, `--emergencia`), `.casilda-alerta` (+ `--peligro`, `--precaucion`,
   `--exito`), `.visually-hidden`, `.skip-link`, foco visible y `prefers-reduced-motion`.
 - **Marca UdeA:** la jerarquía institucional la sostiene el logosímbolo horizontal
-  de la UdeA (ancho mínimo 130 px, token `--udea-logo-min-width`) con el nombre de
-  la dependencia en serif bold. "Casilda" se presenta como texto estilizado
+  de la UdeA — `assets/Logo-Udea-Blanco-horizontal.png`, recortado a la caja real
+  de la marca (ancho mínimo 130 px, tokens `--udea-logo-min-width` y
+  `--udea-logo-aspect`) — con el nombre de la dependencia en serif bold. "Casilda" se presenta como texto estilizado
   acompañado del distintivo `logo-custom`, **nunca** integrado al escudo: el manual
   prohíbe crear un logosímbolo propio para iniciativas. El uso del distintivo está
   pendiente de aval de Comunicaciones; si se niega, se retira de
@@ -105,6 +106,43 @@ Detalle completo en `docs/evidencias/rediseno-udea/01-fases-1-3-sistema-diseno.m
   "Volver al inicio".
 - **Distintivo de Casilda:** se mantiene acompañando al texto en el header y en el
   panel del login, documentado como pendiente de aval de marca.
+
+### 2026-09-03 — Ajustes de la segunda revisión: proporción del cromo fijo
+Motivo: el encabezado, la navegación y el pie ocupaban ~250 px en escritorio y
+hasta ~280 px en móvil, dejando poco alto útil y obligando a desplazarse en
+exceso; el formulario multipaso se veía recortado.
+
+- **Logosímbolo UdeA recortado:** `assets/Logo-Udea-Blanco-horizontal.png` es el
+  PNG original recortado a la caja real de la marca (1470 × 378, relación 3.89:1).
+  El archivo original tenía un lienzo transparente de 2043 × 1222 que, al aplicar
+  el ancho mínimo de 130 px, aportaba 55 px de alto vacío al encabezado. **El
+  ancho mínimo del manual se conserva y ahora corresponde a la marca visible.**
+  El asset original queda en el repositorio sin uso, por si Comunicaciones exige
+  un recorte distinto.
+- **Encabezado en una sola fila:** el descriptor institucional y el nombre de la
+  dependencia pasan a acompañar horizontalmente a su marca (filete de separación)
+  en lugar de apilarse. Alto: 96 px → **64 px** (escritorio) y **56 px** (≤900 px).
+  El descriptor sólo se muestra desde 1200 px; por debajo, el mismo mensaje
+  encabeza la portada.
+- **Navegación pública:** en ≤600 px el texto visible se acorta ("Iniciar",
+  "Reportar VBG") y el complemento queda oculto visualmente pero disponible para
+  lectores de pantalla, de modo que el nombre accesible completo se conserva
+  (WCAG 2.5.3). Antes la fila se rompía en dos o tres líneas.
+- **Pie público dentro del área desplazable:** deja de ocupar alto fijo del
+  viewport y aparece al final del contenido (`app.component.html`). En móvil
+  llegaba a robar tres filas. Conserva los tres canales de contacto.
+- **`100dvh`** en los tres contenedores de página: con `100vh` la barra de
+  direcciones móvil dejaba el último tramo del contenido fuera de la pantalla.
+- **Formulario anónimo:** se eliminaron las alturas forzadas de 36 px y los
+  desplazamientos fijos de la etiqueta flotante (rompían el área táctil mínima y
+  recortaban los campos); ahora los campos miden 48 px y la etiqueta usa su
+  posición nativa. Se recuperó la visibilidad de `mat-hint` y de los mensajes de
+  error, que estaban ocultos con `display: none` sobre el subscript de MDC. En
+  ≤768 px la cabecera del stepper (5 pasos) se desplaza en horizontal en vez de
+  comprimirse. Espaciados y sombras migrados a tokens.
+
+**Pendiente asociado:** el resto del back-office sigue con `$purple-sys` (#348F41)
+y colores literales en 35 archivos `.scss`; sólo se migró el formulario anónimo.
 
 ### Pendiente (Fase 4 y siguientes)
 1. Auditoría automática con axe/Lighthouse y validación cruzada en navegadores y móviles reales.

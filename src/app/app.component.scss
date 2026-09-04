@@ -9,6 +9,9 @@ html, body {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  /* dvh descuenta la barra de direcciones móvil: con 100vh el último tramo del
+     contenido quedaba fuera de la pantalla en Android/iOS. */
+  height: 100dvh;
   overflow: hidden;
 
   app-header {
@@ -27,6 +30,7 @@ html, body {
 
 .full-screen-login {
   height: 100vh;
+  height: 100dvh;
   width: 100vw;
   display: flex;
   flex-direction: column;
@@ -37,12 +41,12 @@ html, body {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh;
   width: 100vw;
   overflow: hidden;
 
-  app-header, 
-  app-public-header, 
-  app-public-footer {
+  app-header,
+  app-public-header {
     flex-shrink: 0;
   }
 
@@ -54,6 +58,17 @@ html, body {
     overflow-x: hidden;
     min-height: 0;
     background-color: var(--color-bg-main);
+  }
+
+  /* Empuja el pie al fondo cuando la vista no llena la pantalla. */
+  .page-main {
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 auto;
+  }
+
+  app-public-footer {
+    flex-shrink: 0;
   }
 }
 
