@@ -122,8 +122,28 @@
   /* Área táctil mínima accesible (WCAG 2.5.8 / 2.5.5) */
   --touch-target-min: 44px;
 
-  /* Marca institucional: ancho mínimo del logosímbolo en digital */
+  /* Marca institucional: ancho mínimo del logosímbolo en digital.
+     Se aplica sobre `Logo-Udea-Blanco-horizontal.png`, recortado a la caja real
+     del logosímbolo (relación 3.89:1). El PNG original conserva un lienzo
+     transparente que triplicaba la altura ocupada sin aportar marca. */
   --udea-logo-min-width: 130px;
+  --udea-logo-aspect: 3.89;
+
+  /* ==========================================================================
+     6. ESTRUCTURA (alturas del cromo fijo)
+     El encabezado, la navegación y el pie compiten con el contenido por el alto
+     del viewport; en móvil ese margen es crítico. Estos topes mantienen el
+     cromo por debajo de ~1/5 de la pantalla sin sacrificar el área táctil.
+     ========================================================================== */
+  --header-min-height: 64px;
+  --header-min-height-sm: 56px;
+
+  /* Reserva horizontal del botón flotante de Salida rápida (ancho medido del
+     botón con la leyenda "Salida rápida (Alt + Q)" ≈ 218px + su separación del
+     borde). Nunca debe quedar por debajo del ancho real del botón: la Salida
+     rápida no se puede tapar. */
+  --quick-exit-reserve: 248px;
+  --quick-exit-reserve-sm: 72px;
 
   /* Capas */
   --z-quick-exit: 9999;

@@ -28,11 +28,15 @@
       <app-header></app-header>
       <app-public-header></app-public-header>
 
-      <main class="content-area" id="contenido-principal">
-        <router-outlet></router-outlet>
-      </main>
+      <!-- El pie viaja dentro del área desplazable: en pantallas pequeñas
+           ocupaba hasta tres filas fijas del viewport. -->
+      <div class="content-area">
+        <main class="page-main" id="contenido-principal">
+          <router-outlet></router-outlet>
+        </main>
 
-      <app-public-footer></app-public-footer>
+        <app-public-footer></app-public-footer>
+      </div>
     </div>
   }
 }
