@@ -11,7 +11,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../../services/auth.service';
 
 /**
- * Ingreso de personal institucional. La pantalla se mantiene en una sola
+ * Ingreso al sistema. La pantalla se mantiene en una sola
  * columna de formulario, acompañada de un panel institucional informativo,
  * para reducir la carga cognitiva en momentos de estrés.
  */
@@ -84,7 +84,7 @@ export class LoginComponent {
       error: () => {
         this.loading = false;
         this.errorMessage =
-          'No pudimos validar esos datos. Revisa tu correo institucional y tu contraseña, e inténtalo de nuevo.';
+          'No pudimos validar esos datos. Revisa tu correo electrónico y tu contraseña, e inténtalo de nuevo.';
       }
     });
   }
