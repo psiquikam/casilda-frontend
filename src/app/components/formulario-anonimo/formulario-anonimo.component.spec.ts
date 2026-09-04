@@ -42,17 +42,91 @@ describe('FormularioAnonimoComponent', () => {
     expect(component.formPerfil.valid).toBeTrue();
   });
 
-  it('should conditionally require victim name when deseaDatosVictima is si', () => {
+  it('should conditionally require both victim name and cargo (vinculo) when deseaDatosVictima is si', () => {
     component.formPerfil.get('deseaDatosVictima')?.setValue('si');
     expect(component.formPerfil.valid).toBeFalse();
     expect(component.formVictima.get('nombre')?.hasError('required')).toBeTrue();
+    expect(component.formVictima.get('cargo')?.hasError('required')).toBeTrue();
 
     component.formVictima.get('nombre')?.setValue('Persona Afectada');
+    expect(component.formPerfil.valid).toBeFalse();
+
+    component.formVictima.get('cargo')?.setValue('Estudiante');
     expect(component.formPerfil.valid).toBeTrue();
 
     component.formPerfil.get('deseaDatosVictima')?.setValue('no');
     expect(component.formVictima.get('nombre')?.hasError('required')).toBeFalse();
+    expect(component.formVictima.get('cargo')?.hasError('required')).toBeFalse();
     expect(component.formPerfil.valid).toBeTrue();
+  });
+
+  it('should require at least one contact method when deseaContacto is si', () => {
+    expect(component.formPerfil.get('deseaContacto')?.value).toBe('no');
+    expect(component.contactoRequeridoInvalido).toBeFalse();
+
+    component.formPerfil.get('deseaContacto')?.setValue('si');
+    expect(component.formPerfil.hasError('contactInfoRequired')).toBeTrue();
+    expect(component.contactoRequeridoInvalido).toBeTrue();
+    expect(component.formPerfil.valid).toBeFalse();
+
+    component.formPerfil.get('correoContacto')?.setValue('persona@udea.edu.co');
+    expect(component.formPerfil.hasError('contactInfoRequired')).toBeFalse();
+    expect(component.contactoRequeridoInvalido).toBeFalse();
+    expect(component.formPerfil.valid).toBeTrue();
+
+    component.formPerfil.get('correoContacto')?.setValue('');
+    component.formPerfil.get('whatsappContacto')?.setValue('3001234567');
+    expect(component.formPerfil.hasError('contactInfoRequired')).toBeFalse();
+    expect(component.formPerfil.valid).toBeTrue();
+  });
+
+  it('should not require re-entering email if affected person already provided email in victim data', () => {
+    component.formPerfil.get('perfil')?.setValue('anonimo');
+    component.formPerfil.get('deseaDatosVictima')?.setValue('si');
+    component.formVictima.patchValue({
+      nombre: 'Víctima Afectada',
+      cargo: 'Estudiante',
+      correo: 'victima@udea.edu.co'
+    });
+
+    component.formPerfil.get('deseaContacto')?.setValue('si');
+
+    expect(component.tieneCorreoVictimaAfectada).toBeTrue();
+    expect(component.formPerfil.hasError('contactInfoRequired')).toBeFalse();
+    expect(component.contactoRequeridoInvalido).toBeFalse();
+    expect(component.formPerfil.valid).toBeTrue();
+  });
+
+  it('should reject invalid email format and not consider it as valid contact info', () => {
+    component.formPerfil.get('perfil')?.setValue('anonimo');
+    component.formPerfil.get('deseaDatosVictima')?.setValue('si');
+    component.formVictima.patchValue({
+      nombre: 'Víctima Afectada',
+      cargo: 'Estudiante',
+      correo: 'sdssdsd'
+    });
+
+    component.formPerfil.get('deseaContacto')?.setValue('si');
+
+    expect(component.formVictima.get('correo')?.valid).toBeFalse();
+    expect(component.tieneCorreoVictimaAfectada).toBeFalse();
+    expect(component.formPerfil.hasError('contactInfoRequired')).toBeTrue();
+    expect(component.contactoRequeridoInvalido).toBeTrue();
+    expect(component.formPerfil.valid).toBeFalse();
+  });
+
+  it('should validate numeric identification and phone numbers', () => {
+    component.formVictima.get('identificacion')?.setValue('123abc456');
+    expect(component.formVictima.get('identificacion')?.valid).toBeFalse();
+
+    component.formVictima.get('identificacion')?.setValue('1234567890');
+    expect(component.formVictima.get('identificacion')?.valid).toBeTrue();
+
+    component.formPerfil.get('whatsappContacto')?.setValue('abcde');
+    expect(component.formPerfil.get('whatsappContacto')?.valid).toBeFalse();
+
+    component.formPerfil.get('whatsappContacto')?.setValue('3001234567');
+    expect(component.formPerfil.get('whatsappContacto')?.valid).toBeTrue();
   });
 
   it('should toggle location validation between interno and externo in formRelato (Paso 3: El Caso)', () => {
@@ -79,24 +153,35 @@ describe('FormularioAnonimoComponent', () => {
     expect(component.formRelato.get('hora')?.value).toBe('En la tarde');
   });
 
-  it('should validate complete case form including separate fecha, hora, tipoVbg and descripcion', () => {
+  it('should validate case form with optional hora and multi-select tipoVbg', () => {
     component.formRelato.patchValue({
       tipoLugar: 'interno',
-      sedeCampus: 'Ciudad Universitaria - Medellín',
-      facultadBloqueLugar: 'Bloque 12',
+      sedeCampus: 'Campus Apartadó (Seccional Urabá)',
+      facultad: 'Facultad de Medicina',
+      bloque: 'Bloque 1',
+      espacio: 'Aula 101',
       fecha: '15/08/2026',
-      hora: '14:30',
-      tipoVbg: 'Violencia Psicológica',
+      hora: '', // Opcional
+      tipoVbg: ['Violencia Psicológica', 'Violencia Digital / Informática'],
       descripcion: 'Esta es una descripción detallada que cumple con más de 20 caracteres.'
     });
 
     expect(component.formRelato.valid).toBeTrue();
   });
 
-  it('should include vinculoUniversidad in formVictimario', () => {
+  it('should handle UAD referral option when victimario belongs to UdeA', () => {
     expect(component.formVictimario.contains('vinculoUniversidad')).toBeTrue();
+    expect(component.formVictimario.contains('remitirUad')).toBeTrue();
+
     component.formVictimario.get('vinculoUniversidad')?.setValue('Estudiante');
-    expect(component.formVictimario.get('vinculoUniversidad')?.value).toBe('Estudiante');
+    expect(component.esVictimarioUdea).toBeTrue();
+
+    component.formVictimario.get('remitirUad')?.setValue('si');
+    expect(component.formVictimario.get('remitirUad')?.value).toBe('si');
+
+    component.formVictimario.get('vinculoUniversidad')?.setValue('Persona Externa');
+    expect(component.esVictimarioUdea).toBeFalse();
+    expect(component.formVictimario.get('remitirUad')?.value).toBe('no');
   });
 
   it('should open success dialog when submitting report', () => {

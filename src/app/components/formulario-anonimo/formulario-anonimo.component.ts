@@ -54,8 +54,84 @@ export class FormularioAnonimoComponent {
     { id: 8, nombre: 'Otro tipo de violencia' }
   ];
 
+  readonly rolesUdeaVictimario: string[] = [
+    'Estudiante',
+    'Docente',
+    'Personal Administrativo',
+    'Personal Directivo',
+    'Contratista / Proveedor'
+  ];
+
+  readonly campusOptions: string[] = [
+    'Campus Apartadó (Seccional Urabá)',
+    'Campus Carepa (Seccional Urabá)',
+    'Campus Turbo (Seccional Urabá)',
+    'Campus Ciudad Universitaria (Medellín)',
+    'Campus Robledo (Medellín)',
+    'Campus Edificio San Ignacio (Medellín)',
+    'Campus Facultad de Medicina (Área de la Salud)',
+    'Campus Facultad de Enfermería (Área de la Salud)',
+    'Campus Facultad de Odontología (Área de la Salud)',
+    'Campus Facultad Nacional de Salud Pública (Área de la Salud)',
+    'Campus El Carmen de Viboral (Seccional Oriente)',
+    'Campus Caucasia (Seccional Bajo Cauca)',
+    'Campus Puerto Berrío (Seccional Magdalena Medio)',
+    'Campus Andes (Seccional Suroeste)',
+    'Campus Yarumal (Sede Norte)',
+    'Campus Santa Fe de Antioquia (Sede Occidente)',
+    'Campus Sonsón (Sede Sonsón)',
+    'Campus Segovia (Sede Nordeste)',
+    'Campus Amalfi (Sede Nordeste)',
+    'Otro campus o sede universitaria'
+  ];
+
+  readonly REGEX_NUMEROS_IDENTIFICACION = /^[0-9]{5,15}$/;
+  readonly REGEX_LETRAS = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+  readonly REGEX_EMAIL = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  readonly REGEX_TELEFONO = /^[0-9]{7,12}$/;
+
   get formVictima(): FormGroup {
     return this.formPerfil.get('victima') as FormGroup;
+  }
+
+  get tieneCorreoVictimaAfectada(): boolean {
+    const perfil = this.formPerfil?.get('perfil')?.value;
+    const deseaDatosVictima = this.formPerfil?.get('deseaDatosVictima')?.value;
+    const correoCtrl = this.formVictima?.get('correo');
+    const valor = correoCtrl?.value?.trim();
+
+    return perfil === 'anonimo' &&
+           deseaDatosVictima === 'si' &&
+           !!valor &&
+           !!correoCtrl?.valid;
+  }
+
+  get esVictimarioUdea(): boolean {
+    const vinculo = this.formVictimario?.get('vinculoUniversidad')?.value;
+    return this.rolesUdeaVictimario.includes(vinculo);
+  }
+
+  get contactoRequeridoInvalido(): boolean {
+    return !!(this.formPerfil?.hasError('contactInfoRequired') && 
+      this.formPerfil.get('deseaContacto')?.value === 'si');
+  }
+
+  soloNumeros(event: Event, controlName: string, parentGroup: FormGroup): void {
+    const input = event.target as HTMLInputElement;
+    const limpio = input.value.replace(/\D/g, '');
+    if (input.value !== limpio) {
+      input.value = limpio;
+    }
+    parentGroup.get(controlName)?.setValue(limpio);
+  }
+
+  soloLetras(event: Event, controlName: string, parentGroup: FormGroup): void {
+    const input = event.target as HTMLInputElement;
+    const limpio = input.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+    if (input.value !== limpio) {
+      input.value = limpio;
+    }
+    parentGroup.get(controlName)?.setValue(limpio);
   }
 
   constructor() {
@@ -67,42 +143,87 @@ export class FormularioAnonimoComponent {
       perfil: ['anonimo', Validators.required],
       deseaDatosVictima: ['no', Validators.required],
       victima: this.fb.group({
-        identificacion: [''],
+        identificacion: ['', [Validators.pattern(this.REGEX_NUMEROS_IDENTIFICACION)]],
         nombre: [''],
-        apellidos: [''],
-        correo: ['', [Validators.email]],
+        apellidos: ['', [Validators.pattern(this.REGEX_LETRAS)]],
+        correo: ['', [Validators.email, Validators.pattern(this.REGEX_EMAIL)]],
         genero: [''],
         cargo: ['']
-      })
+      }),
+      deseaContacto: ['no', Validators.required],
+      correoContacto: ['', [Validators.email, Validators.pattern(this.REGEX_EMAIL)]],
+      whatsappContacto: ['', [Validators.pattern(this.REGEX_TELEFONO)]]
+    }, {
+      validators: (group) => this.validarMedioContacto(group as FormGroup)
     });
 
     this.formPerfil.get('perfil')?.valueChanges.subscribe(val => {
       this.tipoUsuario = val;
+      this.formPerfil.updateValueAndValidity();
     });
 
     this.formPerfil.get('deseaDatosVictima')?.valueChanges.subscribe(val => {
       const nombreCtrl = this.formVictima.get('nombre');
+      const cargoCtrl = this.formVictima.get('cargo');
       if (val === 'si') {
-        nombreCtrl?.setValidators([Validators.required]);
+        nombreCtrl?.setValidators([
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(60),
+          Validators.pattern(this.REGEX_LETRAS)
+        ]);
+        cargoCtrl?.setValidators([Validators.required]);
+        const correoVictima = this.formVictima.get('correo')?.value;
+        const correoVictimaValido = this.formVictima.get('correo')?.valid;
+        if (correoVictima && correoVictimaValido && this.formPerfil.get('perfil')?.value === 'anonimo') {
+          this.formPerfil.get('correoContacto')?.setValue(correoVictima, { emitEvent: false });
+        }
       } else {
         nombreCtrl?.clearValidators();
+        cargoCtrl?.clearValidators();
       }
       nombreCtrl?.updateValueAndValidity();
+      cargoCtrl?.updateValueAndValidity();
+      this.formPerfil.updateValueAndValidity();
+    });
+
+    this.formVictima.get('correo')?.valueChanges.subscribe(val => {
+      if (this.formPerfil.get('perfil')?.value === 'anonimo') {
+        const correoValido = this.formVictima.get('correo')?.valid;
+        if (val && correoValido) {
+          this.formPerfil.get('correoContacto')?.setValue(val, { emitEvent: false });
+        } else if (!val) {
+          this.formPerfil.get('correoContacto')?.setValue('', { emitEvent: false });
+        }
+        this.formPerfil.updateValueAndValidity({ emitEvent: false });
+      }
+    });
+
+    this.formPerfil.get('deseaContacto')?.valueChanges.subscribe(val => {
+      if (val === 'no') {
+        this.formPerfil.get('correoContacto')?.setValue('', { emitEvent: false });
+        this.formPerfil.get('whatsappContacto')?.setValue('', { emitEvent: false });
+      } else if (val === 'si') {
+        const correoVictima = this.formVictima.get('correo')?.value;
+        const correoVictimaValido = this.formVictima.get('correo')?.valid;
+        if (correoVictima && correoVictimaValido && this.formPerfil.get('perfil')?.value === 'anonimo') {
+          this.formPerfil.get('correoContacto')?.setValue(correoVictima, { emitEvent: false });
+        }
+      }
       this.formPerfil.updateValueAndValidity();
     });
 
     this.formRelato = this.fb.group({
       tipoLugar: ['interno', Validators.required],
       sedeCampus: ['', Validators.required],
-      facultadBloqueLugar: [''],
+      facultad: [''],
+      bloque: [''],
+      espacio: [''],
       lugarDetalleExterno: [''],
       fecha: ['', Validators.required],
-      hora: ['', Validators.required],
-      tipoVbg: ['', Validators.required],
-      descripcion: ['', [Validators.required, Validators.minLength(20)]],
-      deseaContacto: ['no'],
-      correoContacto: [''],
-      whatsappContacto: ['']
+      hora: [''],
+      tipoVbg: [[], Validators.required],
+      descripcion: ['', [Validators.required, Validators.minLength(20)]]
     });
 
     this.formRelato.get('tipoLugar')?.valueChanges.subscribe(tipo => {
@@ -121,16 +242,48 @@ export class FormularioAnonimoComponent {
     });
 
     this.formVictimario = this.fb.group({
-      identificacion: [''],
-      nombre: [''],
-      apellidos: [''],
+      identificacion: ['', [Validators.pattern(this.REGEX_NUMEROS_IDENTIFICACION)]],
+      nombre: ['', [Validators.pattern(this.REGEX_LETRAS)]],
+      apellidos: ['', [Validators.pattern(this.REGEX_LETRAS)]],
       vinculoUniversidad: [''],
+      remitirUad: ['no'],
       correo: ['']
+    });
+
+    this.formVictimario.get('vinculoUniversidad')?.valueChanges.subscribe(val => {
+      if (!this.rolesUdeaVictimario.includes(val)) {
+        this.formVictimario.get('remitirUad')?.setValue('no');
+      }
     });
 
     this.formEvidencias = this.fb.group({
       archivos: [null]
     });
+  }
+
+  private validarMedioContacto(group: FormGroup): { [key: string]: any } | null {
+    const deseaContacto = group.get('deseaContacto')?.value;
+    if (deseaContacto === 'si') {
+      const perfil = group.get('perfil')?.value;
+      const deseaDatosVictima = group.get('deseaDatosVictima')?.value;
+      const correoVictimaCtrl = group.get('victima.correo');
+      const correoVictimaValido = (perfil === 'anonimo' && deseaDatosVictima === 'si' && correoVictimaCtrl?.valid)
+        ? correoVictimaCtrl?.value?.trim()
+        : '';
+      
+      const correoContactoCtrl = group.get('correoContacto');
+      const correoContactoValido = (correoContactoCtrl?.valid && correoContactoCtrl?.value?.trim()) ? correoContactoCtrl.value.trim() : '';
+
+      const correo = correoContactoValido || correoVictimaValido;
+
+      const whatsappCtrl = group.get('whatsappContacto');
+      const whatsappValido = (whatsappCtrl?.valid && whatsappCtrl?.value?.trim()) ? whatsappCtrl.value.trim() : '';
+
+      if (!correo && !whatsappValido) {
+        return { contactInfoRequired: true };
+      }
+    }
+    return null;
   }
 
   setFechaRapida(valor: string): void {
