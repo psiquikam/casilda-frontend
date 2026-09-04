@@ -25,21 +25,21 @@
       Volver al inicio
     </a>
 
-    <h1 class="login__titulo">Ingreso institucional</h1>
-    <p class="login__subtitulo">Usa tu cuenta de la Universidad de Antioquia para continuar.</p>
+    <h1 class="login__titulo">Ingreso a Casilda</h1>
+    <p class="login__subtitulo">Usa el correo con el que fuiste registrado para continuar.</p>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
 
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Correo institucional UdeA</mat-label>
+        <mat-label>Correo electrónico</mat-label>
         <input matInput type="email" formControlName="email" autocomplete="username"
-          inputmode="email" placeholder="nombre.apellido&#64;udea.edu.co"
+          inputmode="email" placeholder="tucorreo@ejemplo.com"
           [attr.aria-invalid]="emailInvalido" aria-describedby="ayuda-email">
         @if (emailInvalido) {
-          <mat-error>Escribe un correo válido, por ejemplo nombre.apellido&#64;udea.edu.co</mat-error>
+          <mat-error>Escribe un correo electrónico válido, por ejemplo tucorreo@ejemplo.com</mat-error>
         }
       </mat-form-field>
-      <p id="ayuda-email" class="login__ayuda">Es el mismo correo con el que accedes a los servicios de la Universidad.</p>
+      <p id="ayuda-email" class="login__ayuda">Es el correo con el que te registraron en Casilda.</p>
 
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Contraseña</mat-label>
