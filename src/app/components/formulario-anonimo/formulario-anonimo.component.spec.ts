@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatStepper } from '@angular/material/stepper';
 
 import { FormularioAnonimoComponent } from './formulario-anonimo.component';
 
@@ -21,7 +22,7 @@ describe('FormularioAnonimoComponent', () => {
     fixture = TestBed.createComponent(FormularioAnonimoComponent);
     component = fixture.componentInstance;
     dialog = fixture.debugElement.injector.get(MatDialog);
-    spyOn(dialog, 'open').and.returnValue({} as any);
+    spyOn(dialog, 'open').and.returnValue({} as unknown as MatDialogRef<unknown>);
     fixture.detectChanges();
   });
 
@@ -283,7 +284,7 @@ describe('FormularioAnonimoComponent', () => {
   });
 
   it('should require at least one violence type to advance and show error when attempting to advance without selection', () => {
-    const mockStepper = { next: jasmine.createSpy('next') } as any;
+    const mockStepper = { next: jasmine.createSpy('next') } as unknown as MatStepper;
 
     expect(component.mostrarErrorTipoVbg).toBeFalse();
 

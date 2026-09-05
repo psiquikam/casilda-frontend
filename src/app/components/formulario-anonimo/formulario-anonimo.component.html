@@ -536,15 +536,7 @@
 
         <div class="actions">
           <button type="button" mat-button matStepperPrevious>Atrás</button>
-          <div class="actions-right">
-            <button type="button" mat-stroked-button class="btn-borrador" (click)="guardarBorrador()">
-              <mat-icon>bookmark_border</mat-icon>
-              <span>Guardar Borrador</span>
-            </button>
-            <button type="button" mat-raised-button color="primary" (click)="avanzarPasoRelato(stepper)">
-              <span>Siguiente</span>
-            </button>
-          </div>
+          <button type="button" mat-raised-button color="primary" (click)="avanzarPasoRelato(stepper)">Siguiente</button>
         </div>
       </form>
     </mat-step>

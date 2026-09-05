@@ -329,7 +329,7 @@ export class FormularioAnonimoComponent {
     });
   }
 
-  private validarMedioContacto(group: FormGroup): { [key: string]: any } | null {
+  private validarMedioContacto(group: FormGroup): ValidationErrors | null {
     const deseaContacto = group.get('deseaContacto')?.value;
     if (deseaContacto === 'si') {
       const perfil = group.get('perfil')?.value;
@@ -409,13 +409,26 @@ export class FormularioAnonimoComponent {
       : { minlength: { requiredLength: 20, actualLength: val.trim().length } };
   };
 
+  private getArrayByName(arrayName: string): number[] | null {
+    switch (arrayName) {
+      case 'psicologicaSel': return this.psicologicaSel;
+      case 'fisicaSel': return this.fisicaSel;
+      case 'sexualSel': return this.sexualSel;
+      case 'institucionalSel': return this.institucionalSel;
+      case 'economicaSel': return this.economicaSel;
+      case 'informaticaSel': return this.informaticaSel;
+      case 'prejuicioSel': return this.prejuicioSel;
+      default: return null;
+    }
+  }
+
   isModalidadSeleccionada(id: number, arrayName: string): boolean {
-    const lista = (this as any)[arrayName] as number[];
+    const lista = this.getArrayByName(arrayName);
     return Array.isArray(lista) && lista.includes(id);
   }
 
   toggleModalidad(id: number, arrayName: string): void {
-    const lista = (this as any)[arrayName] as number[];
+    const lista = this.getArrayByName(arrayName);
     if (!Array.isArray(lista)) return;
     const idx = lista.indexOf(id);
     if (idx >= 0) {
@@ -426,8 +439,8 @@ export class FormularioAnonimoComponent {
     this.actualizarEstadosViolenciaDesdeChips();
   }
 
-  onCheckboxChange(event: any, valor: number, arrayName: string): void {
-    const lista = (this as any)[arrayName] as number[];
+  onCheckboxChange(event: { checked?: boolean }, valor: number, arrayName: string): void {
+    const lista = this.getArrayByName(arrayName);
     if (!Array.isArray(lista)) return;
     if (event.checked) {
       if (!lista.includes(valor)) {
@@ -468,6 +481,18 @@ export class FormularioAnonimoComponent {
     }
   }
 
+  private clearArrayByName(sel: string): void {
+    switch (sel) {
+      case 'psicologicaSel': this.psicologicaSel = []; break;
+      case 'fisicaSel': this.fisicaSel = []; break;
+      case 'sexualSel': this.sexualSel = []; break;
+      case 'institucionalSel': this.institucionalSel = []; break;
+      case 'economicaSel': this.economicaSel = []; break;
+      case 'informaticaSel': this.informaticaSel = []; break;
+      case 'prejuicioSel': this.prejuicioSel = []; break;
+    }
+  }
+
   private configurarSincronizacionViolencia(): void {
     const mapeo = [
       { control: 'violenciaPsicologica', sel: 'psicologicaSel', label: 'Violencia Psicológica' },
@@ -482,7 +507,7 @@ export class FormularioAnonimoComponent {
     mapeo.forEach(m => {
       this.formRelato.get(m.control)?.valueChanges.subscribe(val => {
         if (val !== 'SI') {
-          (this as any)[m.sel] = [];
+          this.clearArrayByName(m.sel);
         }
         this.actualizarTipoVbgDesdeRadios();
       });
