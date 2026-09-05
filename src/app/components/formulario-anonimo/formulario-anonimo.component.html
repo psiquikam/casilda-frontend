@@ -302,7 +302,6 @@
                 @if (formRelato.get('fecha')?.hasError('required')) {
                   <mat-error>La fecha es obligatoria</mat-error>
                 }
-                <mat-hint>Ej: 15/08/2026, 'Agosto 2026' o 'Se desconoce'</mat-hint>
               </mat-form-field>
               <div class="quick-helpers">
                 <button type="button" mat-stroked-button class="quick-btn" (click)="setFechaRapida('Hoy')">Hoy</button>
@@ -315,7 +314,6 @@
               <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Hora aproximada (Opcional)</mat-label>
                 <input matInput formControlName="hora" placeholder="HH:MM (Ej: 15:30), 'Tarde' o 'Se desconoce'">
-                <mat-hint>Opcional: Ej: 03:00 PM, 'En la tarde' o 'Se desconoce'</mat-hint>
               </mat-form-field>
               <div class="quick-helpers">
                 <button type="button" mat-stroked-button class="quick-btn" (click)="setHoraRapida('En la mañana')">En la mañana</button>
@@ -326,39 +324,227 @@
           </div>
         </div>
 
-        <!-- 3. Tipo de VBG -->
-        <div class="vbg-section">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Tipo(s) de violencia / VBG *</mat-label>
-            <mat-select formControlName="tipoVbg" multiple>
-              @for (tipo of tiposVbg; track tipo.id) {
-                <mat-option [value]="tipo.nombre">{{ tipo.nombre }}</mat-option>
+        <!-- 3. Tipos y Modalidades de Violencia de Género -->
+        <div class="vbg-section" [class.vbg-section--has-error]="mostrarErrorTipoVbg">
+          <div class="vbg-section-header">
+            <div class="vbg-title-row">
+              <h4>Tipos y modalidades de violencia de género *</h4>
+              @if (mostrarErrorTipoVbg) {
+                <span class="vbg-required-badge">Selección obligatoria</span>
               }
-            </mat-select>
-            @if (formRelato.get('tipoVbg')?.hasError('required')) {
-              <mat-error>Debe seleccionar al menos un tipo de violencia</mat-error>
+            </div>
+            <p class="vbg-section-subtitle">
+              Selecciona directamente las etiquetas o situaciones que describan lo ocurrido. Puedes elegir varias opciones.
+            </p>
+
+            @if (mostrarErrorTipoVbg) {
+              <div class="vbg-error-alert" role="alert">
+                <mat-icon>error</mat-icon>
+                <span>Debe seleccionar al menos un tipo o modalidad de violencia de género para continuar.</span>
+              </div>
             }
-            <mat-hint>Puede seleccionar una o varias modalidades de violencia o discriminación</mat-hint>
-          </mat-form-field>
+          </div>
+
+          <div class="vbg-masonry">
+            <!-- 1. Violencia Psicológica -->
+            <div class="vbg-card" [class.vbg-card--has-selection]="psicologicaSel.length > 0">
+              <div class="vbg-card-header">
+                <span class="vbg-card-title">Tipo de violencia psicológica</span>
+                @if (psicologicaSel.length > 0) {
+                  <span class="vbg-card-badge">{{ psicologicaSel.length }}</span>
+                }
+              </div>
+              <div class="vbg-chips-wrap">
+                @for (c of listaPsicologica; track c.id) {
+                  <button type="button"
+                          class="vbg-chip"
+                          [class.selected]="isModalidadSeleccionada(c.id, 'psicologicaSel')"
+                          (click)="toggleModalidad(c.id, 'psicologicaSel')"
+                          [attr.aria-pressed]="isModalidadSeleccionada(c.id, 'psicologicaSel')">
+                    @if (isModalidadSeleccionada(c.id, 'psicologicaSel')) {
+                      <mat-icon class="chip-check-icon">check</mat-icon>
+                    }
+                    <span>{{ c.nombre }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- 2. Violencia Económica/Patrimonial -->
+            <div class="vbg-card" [class.vbg-card--has-selection]="economicaSel.length > 0">
+              <div class="vbg-card-header">
+                <span class="vbg-card-title">Tipo de violencia económica/Patrimonial</span>
+                @if (economicaSel.length > 0) {
+                  <span class="vbg-card-badge">{{ economicaSel.length }}</span>
+                }
+              </div>
+              <div class="vbg-chips-wrap">
+                @for (c of listaPatrimonial; track c.id) {
+                  <button type="button"
+                          class="vbg-chip"
+                          [class.selected]="isModalidadSeleccionada(c.id, 'economicaSel')"
+                          (click)="toggleModalidad(c.id, 'economicaSel')"
+                          [attr.aria-pressed]="isModalidadSeleccionada(c.id, 'economicaSel')">
+                    @if (isModalidadSeleccionada(c.id, 'economicaSel')) {
+                      <mat-icon class="chip-check-icon">check</mat-icon>
+                    }
+                    <span>{{ c.nombre }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- 3. Violencia Física -->
+            <div class="vbg-card" [class.vbg-card--has-selection]="fisicaSel.length > 0">
+              <div class="vbg-card-header">
+                <span class="vbg-card-title">Tipo de violencia física</span>
+                @if (fisicaSel.length > 0) {
+                  <span class="vbg-card-badge">{{ fisicaSel.length }}</span>
+                }
+              </div>
+              <div class="vbg-chips-wrap">
+                @for (c of listaFisica; track c.id) {
+                  <button type="button"
+                          class="vbg-chip"
+                          [class.selected]="isModalidadSeleccionada(c.id, 'fisicaSel')"
+                          (click)="toggleModalidad(c.id, 'fisicaSel')"
+                          [attr.aria-pressed]="isModalidadSeleccionada(c.id, 'fisicaSel')">
+                    @if (isModalidadSeleccionada(c.id, 'fisicaSel')) {
+                      <mat-icon class="chip-check-icon">check</mat-icon>
+                    }
+                    <span>{{ c.nombre }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- 4. Violencia Institucional -->
+            <div class="vbg-card" [class.vbg-card--has-selection]="institucionalSel.length > 0">
+              <div class="vbg-card-header">
+                <span class="vbg-card-title">Tipo de violencia Institucional</span>
+                @if (institucionalSel.length > 0) {
+                  <span class="vbg-card-badge">{{ institucionalSel.length }}</span>
+                }
+              </div>
+              <div class="vbg-chips-wrap">
+                @for (c of listaInstitucional; track c.id) {
+                  <button type="button"
+                          class="vbg-chip"
+                          [class.selected]="isModalidadSeleccionada(c.id, 'institucionalSel')"
+                          (click)="toggleModalidad(c.id, 'institucionalSel')"
+                          [attr.aria-pressed]="isModalidadSeleccionada(c.id, 'institucionalSel')">
+                    @if (isModalidadSeleccionada(c.id, 'institucionalSel')) {
+                      <mat-icon class="chip-check-icon">check</mat-icon>
+                    }
+                    <span>{{ c.nombre }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- 5. Violencia Sexual -->
+            <div class="vbg-card" [class.vbg-card--has-selection]="sexualSel.length > 0">
+              <div class="vbg-card-header">
+                <span class="vbg-card-title">Tipo de violencia sexual</span>
+                @if (sexualSel.length > 0) {
+                  <span class="vbg-card-badge">{{ sexualSel.length }}</span>
+                }
+              </div>
+              <div class="vbg-chips-wrap">
+                @for (c of listaSexual; track c.id) {
+                  <button type="button"
+                          class="vbg-chip"
+                          [class.selected]="isModalidadSeleccionada(c.id, 'sexualSel')"
+                          (click)="toggleModalidad(c.id, 'sexualSel')"
+                          [attr.aria-pressed]="isModalidadSeleccionada(c.id, 'sexualSel')">
+                    @if (isModalidadSeleccionada(c.id, 'sexualSel')) {
+                      <mat-icon class="chip-check-icon">check</mat-icon>
+                    }
+                    <span>{{ c.nombre }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- 6. Violencia Sexual Informática -->
+            <div class="vbg-card" [class.vbg-card--has-selection]="informaticaSel.length > 0">
+              <div class="vbg-card-header">
+                <span class="vbg-card-title">Tipo de violencia sexual informática</span>
+                @if (informaticaSel.length > 0) {
+                  <span class="vbg-card-badge">{{ informaticaSel.length }}</span>
+                }
+              </div>
+              <div class="vbg-chips-wrap">
+                @for (c of listaInformatica; track c.id) {
+                  <button type="button"
+                          class="vbg-chip"
+                          [class.selected]="isModalidadSeleccionada(c.id, 'informaticaSel')"
+                          (click)="toggleModalidad(c.id, 'informaticaSel')"
+                          [attr.aria-pressed]="isModalidadSeleccionada(c.id, 'informaticaSel')">
+                    @if (isModalidadSeleccionada(c.id, 'informaticaSel')) {
+                      <mat-icon class="chip-check-icon">check</mat-icon>
+                    }
+                    <span>{{ c.nombre }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- 7. Violencia por Prejuicio -->
+            <div class="vbg-card" [class.vbg-card--has-selection]="prejuicioSel.length > 0">
+              <div class="vbg-card-header">
+                <span class="vbg-card-title">Tipo de violencia por prejuicio</span>
+                @if (prejuicioSel.length > 0) {
+                  <span class="vbg-card-badge">{{ prejuicioSel.length }}</span>
+                }
+              </div>
+              <div class="vbg-chips-wrap">
+                @for (c of listaPrejuicio; track c.id) {
+                  <button type="button"
+                          class="vbg-chip"
+                          [class.selected]="isModalidadSeleccionada(c.id, 'prejuicioSel')"
+                          (click)="toggleModalidad(c.id, 'prejuicioSel')"
+                          [attr.aria-pressed]="isModalidadSeleccionada(c.id, 'prejuicioSel')">
+                    @if (isModalidadSeleccionada(c.id, 'prejuicioSel')) {
+                      <mat-icon class="chip-check-icon">check</mat-icon>
+                    }
+                    <span>{{ c.nombre }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+
+          @if (mostrarErrorTipoVbg) {
+            <div class="vbg-error-alert bottom-alert" role="alert">
+              <mat-icon>error</mat-icon>
+              <span>Debe seleccionar al menos una de las opciones de violencia de género arriba para poder continuar.</span>
+            </div>
+          }
         </div>
 
         <!-- 4. Descripción del Caso -->
         <div class="description-section">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Describe el caso o situación *</mat-label>
-            <textarea matInput formControlName="descripcion" rows="5" placeholder="Detalla lo sucedido, contexto de los hechos, personas involucradas..."></textarea>
-            @if (formRelato.get('descripcion')?.hasError('required')) {
-              <mat-error>La descripción es obligatoria</mat-error>
-            } @else if (formRelato.get('descripcion')?.hasError('minlength')) {
-              <mat-error>Mínimo 20 caracteres (actual: {{ formRelato.get('descripcion')?.value?.length || 0 }})</mat-error>
+          <mat-form-field appearance="outline" class="full-width compact-desc-field">
+            <mat-label>Descripción de los hechos (Opcional)</mat-label>
+            <textarea matInput formControlName="descripcion" rows="3" placeholder="Si lo deseas, puedes darnos más detalles aquí..."></textarea>
+            @if (formRelato.get('descripcion')?.hasError('minlength')) {
+              <mat-error>Mínimo 20 caracteres si decides detallar los hechos (actual: {{ formRelato.get('descripcion')?.value?.trim()?.length || 0 }})</mat-error>
             }
-            <mat-hint>Mínimo 20 caracteres</mat-hint>
           </mat-form-field>
         </div>
 
         <div class="actions">
-          <button mat-button matStepperPrevious>Atrás</button>
-          <button mat-raised-button color="primary" matStepperNext>Siguiente</button>
+          <button type="button" mat-button matStepperPrevious>Atrás</button>
+          <div class="actions-right">
+            <button type="button" mat-stroked-button class="btn-borrador" (click)="guardarBorrador()">
+              <mat-icon>bookmark_border</mat-icon>
+              <span>Guardar Borrador</span>
+            </button>
+            <button type="button" mat-raised-button color="primary" (click)="avanzarPasoRelato(stepper)">
+              <span>Siguiente</span>
+            </button>
+          </div>
         </div>
       </form>
     </mat-step>
