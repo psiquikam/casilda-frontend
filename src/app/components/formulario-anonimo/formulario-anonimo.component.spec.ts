@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatStepper } from '@angular/material/stepper';
 
 import { FormularioAnonimoComponent } from './formulario-anonimo.component';
 
@@ -21,7 +22,7 @@ describe('FormularioAnonimoComponent', () => {
     fixture = TestBed.createComponent(FormularioAnonimoComponent);
     component = fixture.componentInstance;
     dialog = fixture.debugElement.injector.get(MatDialog);
-    spyOn(dialog, 'open').and.returnValue({} as any);
+    spyOn(dialog, 'open').and.returnValue({} as unknown as MatDialogRef<unknown>);
     fixture.detectChanges();
   });
 
@@ -187,5 +188,145 @@ describe('FormularioAnonimoComponent', () => {
   it('should open success dialog when submitting report', () => {
     component.enviarReporte();
     expect(dialog.open).toHaveBeenCalled();
+  });
+
+  it('should initialize all 7 violence category radios to NO and selection arrays empty', () => {
+    expect(component.formRelato.get('violenciaPsicologica')?.value).toBe('NO');
+    expect(component.formRelato.get('violenciaFisica')?.value).toBe('NO');
+    expect(component.formRelato.get('violenciaSexual')?.value).toBe('NO');
+    expect(component.formRelato.get('violenciaInstitucional')?.value).toBe('NO');
+    expect(component.formRelato.get('violenciaEconomica')?.value).toBe('NO');
+    expect(component.formRelato.get('violenciaInformatica')?.value).toBe('NO');
+    expect(component.formRelato.get('violenciaPrejuicio')?.value).toBe('NO');
+
+    expect(component.psicologicaSel).toEqual([]);
+    expect(component.fisicaSel).toEqual([]);
+    expect(component.sexualSel).toEqual([]);
+    expect(component.institucionalSel).toEqual([]);
+    expect(component.economicaSel).toEqual([]);
+    expect(component.informaticaSel).toEqual([]);
+    expect(component.prejuicioSel).toEqual([]);
+    expect(component.tieneViolenciaSeleccionada).toBeFalse();
+  });
+
+  it('should toggle violence to SI, synchronize tipoVbg, and select modalities with onCheckboxChange', () => {
+    component.formRelato.get('violenciaPsicologica')?.setValue('SI');
+    expect(component.tieneViolenciaSeleccionada).toBeTrue();
+    expect(component.formRelato.get('tipoVbg')?.value).toContain('Violencia Psicológica');
+
+    // Add modality
+    component.onCheckboxChange({ checked: true }, 1, 'psicologicaSel');
+    component.onCheckboxChange({ checked: true }, 2, 'psicologicaSel');
+    expect(component.psicologicaSel).toEqual([1, 2]);
+
+    // Uncheck modality
+    component.onCheckboxChange({ checked: false }, 1, 'psicologicaSel');
+    expect(component.psicologicaSel).toEqual([2]);
+
+    // Switch radio back to NO - clears selections and removes from tipoVbg
+    component.formRelato.get('violenciaPsicologica')?.setValue('NO');
+    expect(component.psicologicaSel).toEqual([]);
+    expect(component.formRelato.get('tipoVbg')?.value).not.toContain('Violencia Psicológica');
+    expect(component.tieneViolenciaSeleccionada).toBeFalse();
+  });
+
+  it('should have all 7 modality lists populated with options matching the requirements', () => {
+    expect(component.listaPsicologica.length).toBe(7);
+    expect(component.listaPsicologica.map(m => m.nombre)).toContain('Abuso de poder y/o confianza');
+    expect(component.listaPsicologica.map(m => m.nombre)).toContain('Lenguaje misógino, sexista o discursos de odio');
+
+    expect(component.listaFisica.length).toBe(5);
+    expect(component.listaFisica.map(m => m.nombre)).toContain('Feminicidio (Tentativa o comisión)');
+
+    expect(component.listaSexual.length).toBe(4);
+    expect(component.listaSexual.map(m => m.nombre)).toContain('Acceso carnal');
+    expect(component.listaSexual.map(m => m.nombre)).toContain('Violencia sexual correctiva');
+
+    expect(component.listaInstitucional.length).toBe(3);
+    expect(component.listaInstitucional.map(m => m.nombre)).toContain('Omisión al deber de debida diligencia');
+
+    expect(component.listaPatrimonial.length).toBe(4);
+    expect(component.listaPatrimonial.map(m => m.nombre)).toContain('Control económico');
+
+    expect(component.listaInformatica.length).toBe(5);
+    expect(component.listaInformatica.map(m => m.nombre)).toContain('Grooming');
+    expect(component.listaInformatica.map(m => m.nombre)).toContain('Sexting');
+
+    expect(component.listaPrejuicio.length).toBe(1);
+    expect(component.listaPrejuicio[0].nombre).toBe('Discriminación por género u orientación sexual o identidad de género');
+  });
+
+  it('should toggle selectable chips with toggleModalidad and update category state', () => {
+    expect(component.isModalidadSeleccionada(1, 'psicologicaSel')).toBeFalse();
+
+    // Select chip
+    component.toggleModalidad(1, 'psicologicaSel');
+    expect(component.isModalidadSeleccionada(1, 'psicologicaSel')).toBeTrue();
+    expect(component.psicologicaSel).toContain(1);
+    expect(component.formRelato.get('violenciaPsicologica')?.value).toBe('SI');
+    expect(component.tieneViolenciaSeleccionada).toBeTrue();
+
+    // Deselect chip
+    component.toggleModalidad(1, 'psicologicaSel');
+    expect(component.isModalidadSeleccionada(1, 'psicologicaSel')).toBeFalse();
+    expect(component.psicologicaSel).not.toContain(1);
+    expect(component.formRelato.get('violenciaPsicologica')?.value).toBe('NO');
+  });
+
+  it('should save draft in localStorage with guardarBorrador', () => {
+    spyOn(localStorage, 'setItem');
+    component.toggleModalidad(2, 'fisicaSel');
+    component.guardarBorrador();
+    expect(localStorage.setItem).toHaveBeenCalledWith(
+      'casilda_borrador_anonimo',
+      jasmine.any(String)
+    );
+  });
+
+  it('should require at least one violence type to advance and show error when attempting to advance without selection', () => {
+    const mockStepper = { next: jasmine.createSpy('next') } as unknown as MatStepper;
+
+    expect(component.mostrarErrorTipoVbg).toBeFalse();
+
+    // Intentar avanzar sin haber seleccionado ninguna violencia
+    component.avanzarPasoRelato(mockStepper);
+
+    expect(component.mostrarErrorTipoVbg).toBeTrue();
+    expect(mockStepper.next).not.toHaveBeenCalled();
+
+    // Seleccionar un chip de violencia
+    component.toggleModalidad(1, 'psicologicaSel');
+    expect(component.mostrarErrorTipoVbg).toBeFalse();
+
+    // Completar el resto de campos obligatorios del relato
+    component.formRelato.patchValue({
+      tipoLugar: 'interno',
+      sedeCampus: 'Campus Apartadó (Seccional Urabá)',
+      fecha: '15/08/2026'
+    });
+
+    component.avanzarPasoRelato(mockStepper);
+    expect(mockStepper.next).toHaveBeenCalled();
+  });
+
+  it('should treat descripcion as optional, but require minlength 20 if text is provided', () => {
+    const descCtrl = component.formRelato.get('descripcion');
+
+    // Vacío es válido (opcional)
+    descCtrl?.setValue('');
+    expect(descCtrl?.valid).toBeTrue();
+
+    // Espacios en blanco es válido (se considera vacío)
+    descCtrl?.setValue('   ');
+    expect(descCtrl?.valid).toBeTrue();
+
+    // Texto con menos de 20 caracteres es inválido
+    descCtrl?.setValue('Texto muy corto');
+    expect(descCtrl?.hasError('minlength')).toBeTrue();
+    expect(descCtrl?.valid).toBeFalse();
+
+    // Texto con 20 o más caracteres es válido
+    descCtrl?.setValue('Este es un relato detallado de los hechos que cumple con la longitud mínima.');
+    expect(descCtrl?.valid).toBeTrue();
   });
 });
