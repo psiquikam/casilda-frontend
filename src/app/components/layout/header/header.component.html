@@ -1,16 +1,23 @@
 <mat-toolbar class="main-header">
   <div class="marca">
-    <a class="marca__enlace" routerLink="/home">
-      <!-- Distintivo de Casilda: acompaña al texto, no se integra al escudo UdeA.
-           Pendiente de aval de Comunicaciones (ver CLAUDE.md §5). -->
+    @if (auth.isAuthenticated() && navLayout.isSidebar()) {
+      <button mat-icon-button type="button" class="btn-toggle-menu"
+        (click)="toggleSidenav.emit()"
+        aria-label="Alternar menú lateral"
+        title="Alternar menú lateral">
+        <mat-icon aria-hidden="true">menu</mat-icon>
+      </button>
+    }
+    <a class="marca__enlace" [routerLink]="auth.isAuthenticated() ? '/inicio' : '/home'">
+      <!-- Distintivo de CASILDA: acompaña al texto, no se integra al escudo UdeA. -->
       <mat-icon svgIcon="logo-custom" class="marca__distintivo" aria-hidden="true"></mat-icon>
-      <span class="marca__nombre">Casilda</span>
-      <span class="visually-hidden">— ir a la página de inicio</span>
+      <span class="marca__nombre">CASILDA</span>
+      <span class="visually-hidden">— ir al inicio</span>
     </a>
     @if (!auth.isAuthenticated()) {
       <span class="marca__descriptor">
-        Sistema de vigilancia en salud pública para el abordaje de las violencias
-        y las discriminaciones basadas en género
+        Sistema de vigilancia en salud pública para el abordaje de las discriminaciones
+        y las violencias basadas en género
       </span>
     }
   </div>
@@ -19,18 +26,53 @@
     <div class="institucional__marca">
       <img src="assets/Logo-Udea-Blanco-horizontal.png" alt="Universidad de Antioquia"
         class="institucional__logo" width="1470" height="378">
-      <span class="institucional__dependencia">Facultad Nacional<br>de Salud Pública</span>
     </div>
 
     @if (auth.isAuthenticated()) {
       <button mat-button type="button" class="usuario" [matMenuTriggerFor]="userMenu"
-        aria-label="Abrir el menú de la sesión">
-        <mat-icon aria-hidden="true">account_circle</mat-icon>
+        aria-label="Abrir opciones de usuario y perfil">
+        <mat-icon class="usuario__icon" aria-hidden="true">account_circle</mat-icon>
         <span class="usuario__nombre">{{ auth.currentUser?.nombre }}</span>
+        <mat-icon class="usuario__chevron" aria-hidden="true">arrow_drop_down</mat-icon>
       </button>
-      <mat-menu #userMenu="matMenu">
-        <button mat-menu-item type="button" (click)="auth.logout()">
-          <mat-icon aria-hidden="true">logout</mat-icon>
+
+      <mat-menu #userMenu="matMenu" class="user-session-menu" xPosition="before">
+        <div class="user-menu-profile" (click)="$event.stopPropagation()">
+          <div class="user-menu-profile__avatar">
+            <mat-icon aria-hidden="true">account_circle</mat-icon>
+          </div>
+          <div class="user-menu-profile__meta">
+            <strong class="user-menu-profile__name">{{ auth.currentUser?.nombre }}</strong>
+            <span class="user-menu-profile__role">{{ auth.currentUser?.rol }}</span>
+            <span class="user-menu-profile__email">{{ auth.currentUser?.email }}</span>
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="user-menu-group-header" (click)="$event.stopPropagation()">
+          <mat-icon aria-hidden="true">view_quilt</mat-icon>
+          <span>Disposición del Menú</span>
+        </div>
+
+        <button mat-menu-item type="button" (click)="navLayout.setLayout('sidebar')">
+          <mat-icon aria-hidden="true" [class.icon-selected]="navLayout.isSidebar()">
+            {{ navLayout.isSidebar() ? 'radio_button_checked' : 'radio_button_unchecked' }}
+          </mat-icon>
+          <span [class.text-selected]="navLayout.isSidebar()">Menú Lateral (Vertical)</span>
+        </button>
+
+        <button mat-menu-item type="button" (click)="navLayout.setLayout('horizontal')">
+          <mat-icon aria-hidden="true" [class.icon-selected]="navLayout.isHorizontal()">
+            {{ navLayout.isHorizontal() ? 'radio_button_checked' : 'radio_button_unchecked' }}
+          </mat-icon>
+          <span [class.text-selected]="navLayout.isHorizontal()">Barra Horizontal (Superior)</span>
+        </button>
+
+        <mat-divider></mat-divider>
+
+        <button mat-menu-item type="button" (click)="auth.logout()" class="btn-logout">
+          <mat-icon aria-hidden="true" class="icon-danger">logout</mat-icon>
           <span>Cerrar sesión</span>
         </button>
       </mat-menu>

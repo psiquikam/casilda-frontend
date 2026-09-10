@@ -1,16 +1,22 @@
 :host {
   position: fixed;
-  top: var(--space-4);
+  top: 12px;
   right: var(--space-4);
   z-index: var(--z-quick-exit);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
 }
 
 .btn-escape {
-  display: flex;
+  pointer-events: auto;
+  display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  min-height: var(--touch-target-min);
-  padding: var(--space-3) var(--space-5);
+  height: 40px;
+  min-height: 40px;
+  max-height: 40px;
+  padding: 0 var(--space-4);
   background-color: var(--color-danger-surface);
   border: 2px solid var(--color-danger);
   color: var(--color-text-on-danger);
@@ -18,19 +24,22 @@
   font-size: var(--font-size-sm);
   font-weight: 700;
   border-radius: var(--radius-full);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-md);
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  box-sizing: border-box;
+  line-height: 1;
+  transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
 
   &:hover,
   &:focus {
     background-color: var(--color-danger-surface-hover);
-    transform: scale(1.05);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
   }
 
   &:focus-visible {
     outline: 3px solid var(--color-text-on-danger);
-    outline-offset: -4px;
+    outline-offset: 2px;
   }
 }
 
@@ -39,10 +48,16 @@
   height: 20px;
   font-size: 20px;
   line-height: 20px;
+  flex-shrink: 0;
 }
 
-/* En pantallas medianas y pequeñas se conserva solo el ícono, manteniendo el área táctil. */
+/* En pantallas medianas y pequeñas se conserva solo el ícono, manteniendo el área táctil centrada. */
 @media (max-width: 900px) {
+  :host {
+    top: 8px;
+    right: var(--space-3);
+  }
+
   .btn-escape-text {
     position: absolute;
     width: 1px;
@@ -57,9 +72,12 @@
 
   .btn-escape {
     justify-content: center;
-    width: var(--touch-target-min);
-    height: var(--touch-target-min);
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+    max-height: 40px;
     padding: 0;
     border-radius: 50%;
   }
 }
+

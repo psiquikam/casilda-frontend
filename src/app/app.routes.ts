@@ -9,6 +9,16 @@ export const routes: Routes = [
     loadComponent: () => import('./components/casilda-home/casilda-home.component').then((m) => m.CasildaHomeComponent)
   },
   {
+    path: 'inicio',
+    canActivate: [authGuard],
+    loadComponent: () => import('./components/dashboard-home/dashboard-home.component').then((m) => m.DashboardHomeComponent)
+  },
+  {
+    path: 'dashboard',
+    redirectTo: 'inicio',
+    pathMatch: 'full'
+  },
+  {
     path: 'login',
     loadComponent: () => import('./components/auth/login/login.component').then((m) => m.LoginComponent)
   },

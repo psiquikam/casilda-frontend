@@ -68,16 +68,16 @@ describe('AuthService', () => {
     expect(service.isUsuario()).toBeFalse();
   });
 
-  it('elige una ruta productiva de inicio según el rol', () => {
+  it('dirige al panel de inicio unificado según rol', () => {
     const service = createService();
 
     service.currentUser = { ...session(Math.floor(Date.now() / 1000) + 3600), rol: 'Revisor' };
-    expect(service.getDefaultRoute()).toBe('/consulta');
+    expect(service.getDefaultRoute()).toBe('/inicio');
 
     service.currentUser = { ...service.currentUser, rol: 'Admin' };
-    expect(service.getDefaultRoute()).toBe('/gestion-usuarios');
+    expect(service.getDefaultRoute()).toBe('/inicio');
 
     service.currentUser = { ...service.currentUser, rol: 'Usuario' };
-    expect(service.getDefaultRoute()).toBe('/solicitud-acompanamiento');
+    expect(service.getDefaultRoute()).toBe('/inicio');
   });
 });

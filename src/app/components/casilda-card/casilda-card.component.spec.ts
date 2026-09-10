@@ -9,7 +9,7 @@ describe('CasildaCardComponent', () => {
 
   const contenido: ContenidoDestacadoDto = {
     id: 1,
-    imagen: 'assets/distintivo_casilda.svg',
+    imagen: 'assets/distintivo_casilda_morado.svg',
     titulo: 'Registrar queja',
     contenido: 'Texto administrado por el gestor de contenidos.',
     vigenciaInicio: '2026-01-01T00:00:00Z',

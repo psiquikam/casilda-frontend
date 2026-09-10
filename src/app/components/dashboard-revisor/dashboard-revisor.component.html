@@ -1,157 +1,363 @@
 <div class="dashboard-wrapper">
-    <header class="db-header">
-        <div>
-            <h1>Panel de Revisión Profesional</h1>
-            <p>Resumen de métricas y caracterización de casos vigentes.</p>
-        </div>
-        <button mat-flat-button color="primary">Descargar Reporte (PDF)</button>
-    </header>
 
+  <!-- Encabezado del Panel -->
+  <header class="db-header">
+    <div class="db-header__text">
+      <div class="db-header__tags">
+        <span class="period-badge">{{ periodoSeleccionado }}</span>
+        <span class="institutional-badge">Vigilancia en Salud Pública VBG</span>
+      </div>
+      <h1 class="db-header__title">Panel de Indicadores y Caracterización de Casos</h1>
+      <p class="db-header__subtitle">
+        Métricas agregadas, enfoque diferencial de género y monitoreo de rutas de atención integral en la Universidad de Antioquia.
+      </p>
+    </div>
+    <div class="db-header__actions">
+      <button mat-flat-button color="primary" class="btn-download" aria-label="Descargar reporte en PDF">
+        <mat-icon aria-hidden="true">picture_as_pdf</mat-icon>
+        <span>Descargar Reporte (PDF)</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 1. Fila de Métricas de Identidad de Género e Inclusión -->
+  <section class="metrics-section" aria-label="Distribución por identidad de género">
     <div class="stats-row">
-        <mat-card class="stat-card main">
-            <div class="icon-box"><mat-icon>folder_special</mat-icon></div>
-            <div class="content">
-                <span class="label">Total Casos</span>
-                <span class="value">{{ stats.total }}</span>
-            </div>
-        </mat-card>
 
-        <mat-card class="stat-card female">
-            <div class="icon-box"><mat-icon>woman</mat-icon></div>
-            <div class="content">
-                <span class="label">Casos Mujeres</span>
-                <span class="value">{{ stats.mujeres }}</span>
-            </div>
-        </mat-card>
-
-        <mat-card class="stat-card male">
-            <div class="icon-box"><mat-icon>man</mat-icon></div>
-            <div class="content">
-                <span class="label">Casos Hombres</span>
-                <span class="value">{{ stats.hombres }}</span>
-            </div>
-        </mat-card>
-    </div>
-
-    <h3 class="sub-title">Distribución por Vínculo Institucional</h3>
-    <div class="roles-grid">
-        <mat-card class="role-item">
-            <div class="role-container">
-                <div class="icon-box student"><mat-icon>school</mat-icon></div>
-                <div class="role-content">
-                    <div class="role-header">
-                        <span>Estudiantes</span>
-                        <strong class="count">{{ stats.estudiantes }}</strong>
-                    </div>
-                    <mat-progress-bar mode="determinate"
-                        [value]="(stats.estudiantes/stats.total)*100"></mat-progress-bar>
-                </div>
-            </div>
-        </mat-card>
-
-        <mat-card class="role-item">
-            <div class="role-container">
-                <div class="icon-box teacher"><mat-icon>history_edu</mat-icon></div>
-                <div class="role-content">
-                    <div class="role-header">
-                        <span>Docentes</span>
-                        <strong class="count">{{ stats.docentes }}</strong>
-                    </div>
-                    <mat-progress-bar mode="determinate" color="accent"
-                        [value]="(stats.docentes/stats.total)*100"></mat-progress-bar>
-                </div>
-            </div>
-        </mat-card>
-
-        <mat-card class="role-item">
-            <div class="role-container">
-                <div class="icon-box admin"><mat-icon>badge</mat-icon></div>
-                <div class="role-content">
-                    <div class="role-header">
-                        <span>Administrativos</span>
-                        <strong class="count">{{ stats.administrativos }}</strong>
-                    </div>
-                    <mat-progress-bar mode="determinate" color="warn"
-                        [value]="(stats.administrativos/stats.total)*100"></mat-progress-bar>
-                </div>
-            </div>
-        </mat-card>
-    </div>
-
-    <mat-card class="table-card">
-        <h3>Casos Recientes por Revisar</h3>
-        <div class="table-responsive">
-            <table mat-table [dataSource]="dataSourceQuejas">
-                <ng-container matColumnDef="id">
-                    <th mat-header-cell *matHeaderCellDef>Radicado</th>
-                    <td mat-cell *matCellDef="let element"><strong>{{element.id}}</strong></td>
-                </ng-container>
-
-                <ng-container matColumnDef="fecha">
-                    <th mat-header-cell *matHeaderCellDef>Fecha</th>
-                    <td mat-cell *matCellDef="let element"> {{element.fecha}} </td>
-                </ng-container>
-
-                <ng-container matColumnDef="victima">
-                    <th mat-header-cell *matHeaderCellDef>Tipo Víctima</th>
-                    <td mat-cell *matCellDef="let element"> {{element.victima}} </td>
-                </ng-container>
-
-                <ng-container matColumnDef="estado">
-                    <th mat-header-cell *matHeaderCellDef>Estado</th>
-                    <td mat-cell *matCellDef="let element">
-                        <span class="status-pill">{{element.estado}}</span>
-                    </td>
-                </ng-container>
-
-                <ng-container matColumnDef="accion">
-                    <th mat-header-cell *matHeaderCellDef>Acción</th>
-                    <td mat-cell *matCellDef="let element">
-                        <button mat-icon-button color="primary" [routerLink]="['/detalle-revisor', element.id]">
-                            <mat-icon svgIcon="icono-ver"></mat-icon>
-                        </button>
-                    </td>
-                </ng-container>
-
-                <tr mat-header-row *matHeaderRowDef="displayedColumnsQuejas"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumnsQuejas;"></tr>
-            </table>
+      <!-- Total Casos -->
+      <mat-card class="stat-card stat-card--total">
+        <div class="icon-box"><mat-icon aria-hidden="true">folder_special</mat-icon></div>
+        <div class="content">
+          <span class="label">Total Casos Registrados</span>
+          <span class="value">{{ stats.total }}</span>
+          <span class="caption">100% de expedientes activos</span>
         </div>
+      </mat-card>
+
+      <!-- Mujeres (Cis/Trans) -->
+      <mat-card class="stat-card stat-card--female">
+        <div class="icon-box"><mat-icon aria-hidden="true">female</mat-icon></div>
+        <div class="content">
+          <span class="label">Mujeres (Cis / Trans)</span>
+          <div class="value-row">
+            <span class="value">{{ stats.genero[0].count }}</span>
+            <span class="pct-badge">{{ stats.genero[0].porcentaje }}%</span>
+          </div>
+          <span class="caption">Mayoría de reportes atendidos</span>
+        </div>
+      </mat-card>
+
+      <!-- Personas No Binarias -->
+      <mat-card class="stat-card stat-card--nonbinary">
+        <div class="icon-box"><mat-icon aria-hidden="true">diversity_1</mat-icon></div>
+        <div class="content">
+          <span class="label">Personas No Binarias</span>
+          <div class="value-row">
+            <span class="value">{{ stats.genero[1].count }}</span>
+            <span class="pct-badge">{{ stats.genero[1].porcentaje }}%</span>
+          </div>
+          <span class="caption">Enfoque de género no conforme</span>
+        </div>
+      </mat-card>
+
+      <!-- Hombres (Cis/Trans) -->
+      <mat-card class="stat-card stat-card--male">
+        <div class="icon-box"><mat-icon aria-hidden="true">male</mat-icon></div>
+        <div class="content">
+          <span class="label">Hombres (Cis / Trans)</span>
+          <div class="value-row">
+            <span class="value">{{ stats.genero[2].count }}</span>
+            <span class="pct-badge">{{ stats.genero[2].porcentaje }}%</span>
+          </div>
+          <span class="caption">Orientación y asesoría</span>
+        </div>
+      </mat-card>
+
+      <!-- Disidencias y Otras Identidades -->
+      <mat-card class="stat-card stat-card--diverse">
+        <div class="icon-box"><mat-icon aria-hidden="true">transgender</mat-icon></div>
+        <div class="content">
+          <span class="label">Otras Identidades</span>
+          <div class="value-row">
+            <span class="value">{{ stats.genero[3].count }}</span>
+            <span class="pct-badge">{{ stats.genero[3].porcentaje }}%</span>
+          </div>
+          <span class="caption">Identidades diversas</span>
+        </div>
+      </mat-card>
+
+    </div>
+  </section>
+
+  <!-- 2. KPIs Operativos Clave -->
+  <section class="kpis-bar" aria-label="Indicadores clave de rendimiento">
+    <div class="kpi-item">
+      <mat-icon aria-hidden="true">speed</mat-icon>
+      <div class="kpi-text">
+        <span class="kpi-value">{{ stats.kpis.tiempoRespuesta }}</span>
+        <span class="kpi-label">Tiempo promedio de 1er contacto</span>
+      </div>
+    </div>
+    <div class="kpi-divider"></div>
+
+    <div class="kpi-item">
+      <mat-icon aria-hidden="true">security</mat-icon>
+      <div class="kpi-text">
+        <span class="kpi-value">{{ stats.kpis.medidasProteccion }}</span>
+        <span class="kpi-label">Medidas de protección activadas</span>
+      </div>
+    </div>
+    <div class="kpi-divider"></div>
+
+    <div class="kpi-item">
+      <mat-icon aria-hidden="true">event_available</mat-icon>
+      <div class="kpi-text">
+        <span class="kpi-value">{{ stats.kpis.citasActivas }}</span>
+        <span class="kpi-label">Citas psicosociales y jurídicas</span>
+      </div>
+    </div>
+    <div class="kpi-divider"></div>
+
+    <div class="kpi-item">
+      <mat-icon aria-hidden="true">thumb_up</mat-icon>
+      <div class="kpi-text">
+        <span class="kpi-value">{{ stats.kpis.satisfaccionAcompanamiento }}</span>
+        <span class="kpi-label">Efectividad en articulación</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Distribuciones en Barritas (4 Cuadrantes Útiles) -->
+  <section class="distributions-grid" aria-label="Distribuciones y caracterización">
+
+    <!-- Cuadrante 1: Modalidades de Violencia VBG -->
+    <mat-card class="dist-card">
+      <div class="dist-card__header">
+        <div class="dist-card__title-box">
+          <mat-icon class="dist-icon--purple" aria-hidden="true">psychology</mat-icon>
+          <h3>Modalidades de Violencia (VBG)</h3>
+        </div>
+        <span class="dist-caption">Casos pueden reportar múltiples modalidades</span>
+      </div>
+      <div class="dist-card__body">
+        @for (m of stats.modalidades; track m.label) {
+          <div class="dist-row">
+            <div class="dist-row__header">
+              <span class="dist-row__label">
+                <mat-icon class="inline-icon" aria-hidden="true">{{ m.icon }}</mat-icon>
+                <span>{{ m.label }}</span>
+              </span>
+              <span class="dist-row__count"><strong>{{ m.count }}</strong> ({{ m.porcentaje }}%)</span>
+            </div>
+            <div class="custom-progress">
+              <div class="custom-progress__bar custom-progress__bar--vbg" [style.width.%]="m.porcentaje"></div>
+            </div>
+          </div>
+        }
+      </div>
     </mat-card>
 
-    <mat-card class="table-card">
-        <h3>Acompañamientos Recientes por Revisar</h3>
-        <div class="table-responsive">
-            <table mat-table [dataSource]="dataSourceAcompanamiento">
-                <ng-container matColumnDef="id">
-                    <th mat-header-cell *matHeaderCellDef>Radicado</th>
-                    <td mat-cell *matCellDef="let element"><strong>{{element.id}}</strong></td>
-                </ng-container>
-
-                <ng-container matColumnDef="fecha">
-                    <th mat-header-cell *matHeaderCellDef>Fecha</th>
-                    <td mat-cell *matCellDef="let element"> {{element.fecha}} </td>
-                </ng-container>
-
-                <ng-container matColumnDef="estado">
-                    <th mat-header-cell *matHeaderCellDef>Estado</th>
-                    <td mat-cell *matCellDef="let element">
-                        <span class="status-pill">{{element.estado}}</span>
-                    </td>
-                </ng-container>
-
-                <ng-container matColumnDef="accion">
-                    <th mat-header-cell *matHeaderCellDef>Acción</th>
-                    <td mat-cell *matCellDef="let element">
-                        <button mat-icon-button color="primary" [routerLink]="['/reparto', element.id]">
-                            <mat-icon svgIcon="icono-ver"></mat-icon>
-                        </button>
-                    </td>
-                </ng-container>
-
-                <tr mat-header-row *matHeaderRowDef="displayedColumnsAcompanamiento"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumnsAcompanamiento;"></tr>
-            </table>
+    <!-- Cuadrante 2: Vínculo Institucional -->
+    <mat-card class="dist-card">
+      <div class="dist-card__header">
+        <div class="dist-card__title-box">
+          <mat-icon class="dist-icon--blue" aria-hidden="true">groups</mat-icon>
+          <h3>Vínculo Institucional UdeA</h3>
         </div>
+        <span class="dist-caption">Distribución de la comunidad universitaria</span>
+      </div>
+      <div class="dist-card__body">
+        @for (v of stats.vinculo; track v.label) {
+          <div class="dist-row">
+            <div class="dist-row__header">
+              <span class="dist-row__label">
+                <mat-icon class="inline-icon" aria-hidden="true">{{ v.icon }}</mat-icon>
+                <span>{{ v.label }}</span>
+              </span>
+              <span class="dist-row__count"><strong>{{ v.count }}</strong> ({{ v.porcentaje }}%)</span>
+            </div>
+            <div class="custom-progress">
+              <div class="custom-progress__bar custom-progress__bar--vinculo" [style.width.%]="v.porcentaje"></div>
+            </div>
+          </div>
+        }
+      </div>
     </mat-card>
+
+    <!-- Cuadrante 3: Estado del Trámite -->
+    <mat-card class="dist-card">
+      <div class="dist-card__header">
+        <div class="dist-card__title-box">
+          <mat-icon class="dist-icon--green" aria-hidden="true">timeline</mat-icon>
+          <h3>Estado del Trámite / Caso</h3>
+        </div>
+        <span class="dist-caption">Avance del ciclo de acompañamiento</span>
+      </div>
+      <div class="dist-card__body">
+        @for (e of stats.estados; track e.label) {
+          <div class="dist-row">
+            <div class="dist-row__header">
+              <span class="dist-row__label">{{ e.label }}</span>
+              <span class="dist-row__count"><strong>{{ e.count }}</strong> ({{ e.porcentaje }}%)</span>
+            </div>
+            <div class="custom-progress">
+              <div class="custom-progress__bar custom-progress__bar--estado" [style.width.%]="e.porcentaje"></div>
+            </div>
+          </div>
+        }
+      </div>
+    </mat-card>
+
+    <!-- Cuadrante 4: Sedes y Campus Universitarios -->
+    <mat-card class="dist-card">
+      <div class="dist-card__header">
+        <div class="dist-card__title-box">
+          <mat-icon class="dist-icon--teal" aria-hidden="true">location_on</mat-icon>
+          <h3>Distribución por Sedes UdeA</h3>
+        </div>
+        <span class="dist-caption">Presencia en Medellín y regiones de Antioquia</span>
+      </div>
+      <div class="dist-card__body">
+        @for (s of stats.sedes; track s.label) {
+          <div class="dist-row">
+            <div class="dist-row__header">
+              <span class="dist-row__label">
+                <mat-icon class="inline-icon" aria-hidden="true">{{ s.icon }}</mat-icon>
+                <span>{{ s.label }}</span>
+              </span>
+              <span class="dist-row__count"><strong>{{ s.count }}</strong> ({{ s.porcentaje }}%)</span>
+            </div>
+            <div class="custom-progress">
+              <div class="custom-progress__bar custom-progress__bar--sede" [style.width.%]="s.porcentaje"></div>
+            </div>
+          </div>
+        }
+      </div>
+    </mat-card>
+
+  </section>
+
+  <!-- 4. Tablas Operativas Recientes -->
+  <section class="tables-section" aria-label="Casos y acompañamientos recientes">
+
+    <!-- Tabla: Casos Recientes por Revisar -->
+    <div class="table-container">
+      <div class="table-header">
+        <div>
+          <h3 class="table-title">Casos Recientes por Revisar</h3>
+          <p class="table-subtitle">Expedientes con caracterización e identidad de género documentada</p>
+        </div>
+        <a routerLink="/consulta" class="btn-table-action">Ver todas las solicitudes</a>
+      </div>
+
+      <div class="table-responsive">
+        <table mat-table [dataSource]="dataSourceQuejas" class="casilda-table" aria-label="Tabla de casos recientes">
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef>Radicado</th>
+            <td mat-cell *matCellDef="let element" class="mono-font font-bold">{{ element.id }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef>Fecha</th>
+            <td mat-cell *matCellDef="let element">{{ element.fecha }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="victima">
+            <th mat-header-cell *matHeaderCellDef>Vínculo</th>
+            <td mat-cell *matCellDef="let element">{{ element.victima }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="identidad">
+            <th mat-header-cell *matHeaderCellDef>Identidad de Género</th>
+            <td mat-cell *matCellDef="let element">
+              <span class="chip-identity">{{ element.identidad }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef>Estado</th>
+            <td mat-cell *matCellDef="let element">
+              <span class="badge-status" [class]="'badge-status--' + element.estado.toLowerCase().replace(' ', '-')">
+                {{ element.estado }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="accion">
+            <th mat-header-cell *matHeaderCellDef class="text-right">Acción</th>
+            <td mat-cell *matCellDef="let element" class="text-right">
+              <a [routerLink]="['/consulta']" class="icon-link" aria-label="Ver detalles del caso">
+                <mat-icon aria-hidden="true">visibility</mat-icon>
+              </a>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumnsQuejas"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumnsQuejas;"></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tabla: Acompañamientos Recientes por Revisar -->
+    <div class="table-container">
+      <div class="table-header">
+        <div>
+          <h3 class="table-title">Acompañamientos y Citas por Coordinar</h3>
+          <p class="table-subtitle">Solicitudes en etapa de agendamiento y orientación directa</p>
+        </div>
+        <a routerLink="/cita" class="btn-table-action">Ir al Calendario de Citas</a>
+      </div>
+
+      <div class="table-responsive">
+        <table mat-table [dataSource]="dataSourceAcompanamiento" class="casilda-table" aria-label="Tabla de acompañamientos">
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef>Radicado</th>
+            <td mat-cell *matCellDef="let element" class="mono-font font-bold">{{ element.id }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef>Fecha</th>
+            <td mat-cell *matCellDef="let element">{{ element.fecha }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="tipo">
+            <th mat-header-cell *matHeaderCellDef>Enfoque</th>
+            <td mat-cell *matCellDef="let element">
+              <span class="chip-enfoque">{{ element.tipo }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="identidad">
+            <th mat-header-cell *matHeaderCellDef>Identidad de Género</th>
+            <td mat-cell *matCellDef="let element">
+              <span class="chip-identity">{{ element.identidad }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef>Estado</th>
+            <td mat-cell *matCellDef="let element">
+              <span class="badge-status" [class]="'badge-status--' + element.estado.toLowerCase().replace(' ', '-')">
+                {{ element.estado }}
+              </span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="accion">
+            <th mat-header-cell *matHeaderCellDef class="text-right">Acción</th>
+            <td mat-cell *matCellDef="let element" class="text-right">
+              <a [routerLink]="['/cita']" class="icon-link" aria-label="Gestionar cita">
+                <mat-icon aria-hidden="true">event</mat-icon>
+              </a>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumnsAcompanamiento"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumnsAcompanamiento;"></tr>
+        </table>
+      </div>
+    </div>
+
+  </section>
+
 </div>

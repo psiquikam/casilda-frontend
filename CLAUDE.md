@@ -9,9 +9,9 @@
 
 ## 1. Qué es este repositorio
 
-`casilda-frontend` (proyecto Angular `Casilda-FNSP`) es la capa web de **Casilda**, el
+`casilda-frontend` (proyecto Angular `Casilda-FNSP`) es la capa web de **CASILDA**, el
 sistema de vigilancia en salud pública de la Universidad de Antioquia para el abordaje
-de las violencias y discriminaciones basadas en género (VBG).
+de las discriminaciones y violencias basadas en género (VBG).
 
 Documentos de referencia, en orden de precedencia para decisiones de diseño:
 
