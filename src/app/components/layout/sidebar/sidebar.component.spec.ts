@@ -31,4 +31,16 @@ describe('SidebarComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('debe alternar el estado de expansión de una sección', () => {
+    expect(component.isExpanded('atencion')).toBeTrue();
+    component.toggleSection('atencion');
+    expect(component.isExpanded('atencion')).toBeFalse();
+    component.toggleSection('atencion');
+    expect(component.isExpanded('atencion')).toBeTrue();
+  });
+
+  it('debe tener la sección de reportes cerrada por defecto', () => {
+    expect(component.isExpanded('reportes')).toBeFalse();
+  });
 });

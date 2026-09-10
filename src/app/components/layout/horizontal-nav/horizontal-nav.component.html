@@ -1,0 +1,114 @@
+<nav class="hnav-bar" aria-label="Navegación horizontal principal">
+  <div class="hnav-container">
+
+    <!-- 0. Panel de Inicio -->
+    <a routerLink="/inicio" routerLinkActive="hnav-item--active" class="hnav-link">
+      <mat-icon class="hnav-icon" aria-hidden="true">dashboard</mat-icon>
+      <span class="hnav-text">Inicio</span>
+    </a>
+
+    <!-- 1. Administración (Admin) -->
+    @if (auth.isAdmin()) {
+      <button type="button" class="hnav-dropdown-btn" [matMenuTriggerFor]="adminMenu"
+        aria-label="Abrir menú de Administración">
+        <mat-icon class="hnav-icon" aria-hidden="true">admin_panel_settings</mat-icon>
+        <span class="hnav-text">Administración</span>
+        <mat-icon class="hnav-chevron" aria-hidden="true">arrow_drop_down</mat-icon>
+      </button>
+
+      <mat-menu #adminMenu="matMenu" class="hnav-menu">
+        <a mat-menu-item routerLink="/gestion-usuarios" routerLinkActive="hnav-menu-item--active">
+          <mat-icon aria-hidden="true">manage_accounts</mat-icon>
+          <span>Gestión de Usuarios</span>
+        </a>
+        <a mat-menu-item routerLink="/gestion-sistema" routerLinkActive="hnav-menu-item--active">
+          <mat-icon aria-hidden="true">tune</mat-icon>
+          <span>Maestros del Sistema</span>
+        </a>
+      </mat-menu>
+    }
+
+    <!-- 2. Equipo de Atención (Admin & Revisor) -->
+    @if (auth.isRevisor()) {
+      <button type="button" class="hnav-dropdown-btn" [matMenuTriggerFor]="atencionMenu"
+        aria-label="Abrir menú del Equipo de Atención">
+        <mat-icon class="hnav-icon" aria-hidden="true">volunteer_activism</mat-icon>
+        <span class="hnav-text">Equipo de Atención</span>
+        <mat-icon class="hnav-chevron" aria-hidden="true">arrow_drop_down</mat-icon>
+      </button>
+
+      <mat-menu #atencionMenu="matMenu" class="hnav-menu">
+        <a mat-menu-item routerLink="/solicitud-acompanamiento" routerLinkActive="hnav-menu-item--active">
+          <mat-icon aria-hidden="true">add_circle_outline</mat-icon>
+          <span>Nueva Solicitud</span>
+        </a>
+        <a mat-menu-item routerLink="/consulta" routerLinkActive="hnav-menu-item--active">
+          <mat-icon aria-hidden="true">search</mat-icon>
+          <span>Consulta de Solicitudes</span>
+        </a>
+        <a mat-menu-item routerLink="/cita" routerLinkActive="hnav-menu-item--active">
+          <mat-icon aria-hidden="true">calendar_month</mat-icon>
+          <span>Citas y Agendamiento</span>
+        </a>
+        <a mat-menu-item routerLink="/registro-caso" routerLinkActive="hnav-menu-item--active">
+          <mat-icon aria-hidden="true">folder_shared</mat-icon>
+          <span>Registro de Caso</span>
+        </a>
+        <a mat-menu-item routerLink="/registro-atencion" routerLinkActive="hnav-menu-item--active">
+          <mat-icon aria-hidden="true">handshake</mat-icon>
+          <span>Registro de Atención</span>
+        </a>
+      </mat-menu>
+    }
+
+    <!-- 3. Línea Alma -->
+    @if (auth.isRevisor() && (features.complaintIntakePrototype || features.publicTrackingPrototype)) {
+      <a mat-button routerLink="/linea-alma/atencion-pr" routerLinkActive="hnav-item--active" class="hnav-link">
+        <mat-icon class="hnav-icon" aria-hidden="true">ring_volume</mat-icon>
+        <span class="hnav-text">Línea Alma</span>
+      </a>
+    }
+
+    <!-- 4. UAD (Equipos 3 y 4) -->
+    @if (auth.isRevisor()) {
+      <button type="button" class="hnav-dropdown-btn" [matMenuTriggerFor]="uadMenu"
+        aria-label="Abrir menú de UAD">
+        <mat-icon class="hnav-icon" aria-hidden="true">balance</mat-icon>
+        <span class="hnav-text">UAD</span>
+        <mat-icon class="hnav-chevron" aria-hidden="true">arrow_drop_down</mat-icon>
+      </button>
+
+      <mat-menu #uadMenu="matMenu" class="hnav-menu">
+        @if (features.complaintIntakePrototype) {
+          <a mat-menu-item routerLink="/nueva-queja" routerLinkActive="hnav-menu-item--active">
+            <mat-icon aria-hidden="true">post_add</mat-icon>
+            <span>Registrar Queja Disciplinaria</span>
+          </a>
+        }
+        @if (features.publicTrackingPrototype) {
+          <a mat-menu-item routerLink="/seguimiento" routerLinkActive="hnav-menu-item--active">
+            <mat-icon aria-hidden="true">track_changes</mat-icon>
+            <span>Seguimiento de Trámites</span>
+          </a>
+        }
+      </mat-menu>
+    }
+
+    <!-- 5. Reportes y Métricas (Admin) -->
+    @if (auth.isAdmin() && features.reviewerDashboardPrototype) {
+      <a routerLink="/dashboard-revisor" routerLinkActive="hnav-item--active" class="hnav-link">
+        <mat-icon class="hnav-icon" aria-hidden="true">bar_chart</mat-icon>
+        <span class="hnav-text">Panel de Indicadores</span>
+      </a>
+    }
+
+    <!-- 6. Ruta Violeta -->
+    @if (features.publicTrackingPrototype) {
+      <a routerLink="/seguimiento" routerLinkActive="hnav-item--active" class="hnav-link">
+        <mat-icon class="hnav-icon" aria-hidden="true">diversity_1</mat-icon>
+        <span class="hnav-text">Ruta Violeta</span>
+      </a>
+    }
+
+  </div>
+</nav>

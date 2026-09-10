@@ -5,7 +5,7 @@
 ![Angular Material](https://img.shields.io/badge/Angular%20Material-21.2-757575?logo=angularmaterial&logoColor=white)
 ![Node](https://img.shields.io/badge/Node-24.18.0-339933?logo=node.js&logoColor=white)
 
-Frontend web de **CASILDA**, el sistema de vigilancia en salud pública para el abordaje de las violencias y discriminaciones basadas en género de la **Universidad de Antioquia**. Gestiona el flujo completo de atención: solicitud, contacto telefónico, cita, caso, atención y de seguimiento para quejas y solicitudes de acompañamiento psicosocial y jurídico, incluida la Línea ALMA de primer respondiente.
+Frontend web de **CASILDA**, el sistema de vigilancia en salud pública para el abordaje de las discriminaciones y violencias basadas en género de la **Universidad de Antioquia**. Gestiona el flujo completo de atención: solicitud, contacto telefónico, cita, caso, atención y de seguimiento para quejas y solicitudes de acompañamiento psicosocial y jurídico, incluida la Línea ALMA de primer respondiente.
 
 ## Tabla de contenido
 

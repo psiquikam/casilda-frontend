@@ -1,0 +1,428 @@
+<div class="workspace">
+
+  <!-- Encabezado de Operaciones y Búsqueda -->
+  <header class="workspace-header">
+    <div class="workspace-header__top">
+      <div class="user-greeting">
+        <div class="user-greeting__meta">
+          <span class="user-greeting__role-badge">{{ rolUsuario }}</span>
+          <span class="user-greeting__date">{{ fechaFormateada }}</span>
+        </div>
+        <h1 class="user-greeting__title">Hola, {{ nombreUsuario }}</h1>
+        <p class="user-greeting__desc">
+          Centro de navegación y operaciones de CASILDA. Encuentra herramientas, comprende el flujo de casos y accede a tus módulos de trabajo.
+        </p>
+      </div>
+
+      <!-- Conmutador rápido de orientación del menú (demostración directa) -->
+      <div class="layout-toggle-widget" aria-label="Selector de orientación del menú">
+        <span class="layout-toggle-widget__label">
+          <mat-icon aria-hidden="true">view_quilt</mat-icon>
+          <span>Disposición:</span>
+        </span>
+        <div class="layout-toggle-pills" role="radiogroup" aria-label="Modo de menú">
+          <button
+            type="button"
+            class="layout-pill"
+            [class.is-active]="navLayout.isSidebar()"
+            (click)="navLayout.setLayout('sidebar')"
+            role="radio"
+            [attr.aria-checked]="navLayout.isSidebar()"
+            title="Activar menú lateral"
+          >
+            <mat-icon aria-hidden="true">dock_to_left</mat-icon>
+            <span>Lateral</span>
+          </button>
+          <button
+            type="button"
+            class="layout-pill"
+            [class.is-active]="navLayout.isHorizontal()"
+            (click)="navLayout.setLayout('horizontal')"
+            role="radio"
+            [attr.aria-checked]="navLayout.isHorizontal()"
+            title="Activar barra horizontal superior"
+          >
+            <mat-icon aria-hidden="true">dock_to_top</mat-icon>
+            <span>Horizontal</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra de Búsqueda Rápida de Tareas y Herramientas -->
+    <div class="search-box" role="search">
+      <mat-icon class="search-box__icon" aria-hidden="true">search</mat-icon>
+      <input
+        type="search"
+        [(ngModel)]="searchQuery"
+        placeholder="¿Qué necesitas hacer hoy? (ej. agendar cita, ver llamadas, registrar caso, crear usuario...)"
+        class="search-box__input"
+        aria-label="Buscar tareas o módulos en CASILDA"
+      />
+      @if (searchQuery) {
+        <button type="button" (click)="searchQuery = ''" class="search-box__clear" aria-label="Limpiar búsqueda">
+          <mat-icon aria-hidden="true">close</mat-icon>
+        </button>
+      }
+    </div>
+  </header>
+
+  <!-- Si hay una búsqueda activa, mostramos los resultados inmediatamente -->
+  @if (searchQuery.trim()) {
+    <section class="search-results-section" aria-label="Resultados de búsqueda">
+      <div class="section-title-row">
+        <h2 class="section-title">
+          <mat-icon class="section-title__icon" aria-hidden="true">manage_search</mat-icon>
+          <span>Resultados para "{{ searchQuery }}" ({{ filteredTools.length }})</span>
+        </h2>
+        <button type="button" (click)="searchQuery = ''" class="btn-clear-search">Ver todo el centro de operaciones</button>
+      </div>
+
+      @if (filteredTools.length > 0) {
+        <div class="tools-grid">
+          @for (tool of filteredTools; track tool.id) {
+            <article class="tool-card">
+              <div class="tool-card__header">
+                <div class="tool-card__icon-wrapper">
+                  <mat-icon class="tool-card__icon" aria-hidden="true">{{ tool.icon }}</mat-icon>
+                </div>
+                <span class="tool-card__category">{{ tool.category }}</span>
+              </div>
+              <h3 class="tool-card__title">{{ tool.title }}</h3>
+              <p class="tool-card__what"><strong>¿Qué es?</strong> {{ tool.whatItIs }}</p>
+              <p class="tool-card__when"><strong>¿Cuándo usarlo?</strong> {{ tool.whenToUse }}</p>
+              <div class="tool-card__footer">
+                <a [routerLink]="tool.route" class="btn-tool-action">
+                  <span>Abrir {{ tool.title }}</span>
+                  <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+                </a>
+              </div>
+            </article>
+          }
+        </div>
+      } @else {
+        <div class="no-results-box">
+          <mat-icon class="no-results-box__icon" aria-hidden="true">search_off</mat-icon>
+          <p class="no-results-box__title">No encontramos ninguna herramienta que coincida con "{{ searchQuery }}"</p>
+          <p class="no-results-box__help">Intenta buscar por palabras más simples como: <em>cita, solicitud, llamada, usuario, queja o caso</em>.</p>
+        </div>
+      }
+    </section>
+  } @else {
+
+    <!-- 1. Tarjetas KPI de Resumen Operativo (Digeribles a simple vista) -->
+    <section class="kpi-grid" aria-label="Resumen operativo en tiempo real">
+      @for (kpi of summaryStats.kpis; track kpi.id) {
+        <article [class]="'kpi-card kpi-card--' + kpi.colorClass">
+          <div class="kpi-card__header">
+            <span class="kpi-card__label">{{ kpi.label }}</span>
+            <div [class]="'kpi-card__icon-box icon-box--' + kpi.colorClass">
+              <mat-icon aria-hidden="true">{{ kpi.icon }}</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-card__main">
+            <span class="kpi-card__value">{{ kpi.count }}</span>
+            @if (kpi.badge) {
+              <span [class]="'kpi-card__badge badge--' + kpi.colorClass">{{ kpi.badge }}</span>
+            }
+          </div>
+          <p class="kpi-card__subtext">{{ kpi.subtext }}</p>
+        </article>
+      }
+    </section>
+
+    <!-- 2. Bloque de Enfoque Diferencial y Diversidad de Género -->
+    <section class="diversity-card" aria-label="Distribución por identidad de género y diversidad">
+      <div class="diversity-card__header">
+        <div class="diversity-card__title-box">
+          <div class="diversity-card__icon-box">
+            <mat-icon aria-hidden="true">diversity_1</mat-icon>
+          </div>
+          <div>
+            <h2 class="diversity-card__title">Distribución por Identidad de Género y Diversidad</h2>
+            <p class="diversity-card__subtitle">Vigilancia epidemiológica con enfoque diferencial (Total: {{ summaryStats.totalCasos }} casos activos)</p>
+          </div>
+        </div>
+        <a routerLink="/dashboard-revisor" class="link-full-metrics">
+          <span>Ver panel completo de indicadores</span>
+          <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+        </a>
+      </div>
+
+      <!-- Barra visual de proporción continua -->
+      <div class="diversity-bar-container">
+        <div class="segmented-bar" role="progressbar" aria-label="Distribución porcentual por identidad de género">
+          @for (d of summaryStats.diversidad; track d.label) {
+            <div [class]="'segmented-bar__slice slice--' + d.colorClass" [style.width.%]="d.porcentaje"
+                 [title]="d.label + ': ' + d.count + ' (' + d.porcentaje + '%)'"></div>
+          }
+        </div>
+      </div>
+
+      <!-- 4 Módulos independientes y digeribles por grupo -->
+      <div class="diversity-grid">
+        @for (d of summaryStats.diversidad; track d.label) {
+          <div [class]="'diversity-stat-card diversity-stat-card--' + d.colorClass">
+            <div class="diversity-stat-card__header">
+              <span [class]="'diversity-stat-card__dot dot--' + d.colorClass"></span>
+              <span class="diversity-stat-card__name">{{ d.label }}</span>
+            </div>
+            <div class="diversity-stat-card__body">
+              <strong class="diversity-stat-card__count">{{ d.count }}</strong>
+              <span [class]="'diversity-stat-card__percent pill--' + d.colorClass">{{ d.porcentaje }}%</span>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Pestañas de Navegación del Centro de Operaciones -->
+    <nav class="nav-tabs" aria-label="Secciones del centro de operaciones">
+      <button
+        type="button"
+        class="nav-tabs__tab"
+        [class.is-active]="activeTab === 'guia'"
+        (click)="activeTab = 'guia'"
+        [attr.aria-selected]="activeTab === 'guia'"
+      >
+        <mat-icon aria-hidden="true">timeline</mat-icon>
+        <span>Ruta del Caso (Flujo Guiado)</span>
+      </button>
+
+      <button
+        type="button"
+        class="nav-tabs__tab"
+        [class.is-active]="activeTab === 'herramientas'"
+        (click)="activeTab = 'herramientas'"
+        [attr.aria-selected]="activeTab === 'herramientas'"
+      >
+        <mat-icon aria-hidden="true">apps</mat-icon>
+        <span>Módulos de la Plataforma</span>
+      </button>
+
+      <button
+        type="button"
+        class="nav-tabs__tab"
+        [class.is-active]="activeTab === 'protocolos'"
+        (click)="activeTab = 'protocolos'"
+        [attr.aria-selected]="activeTab === 'protocolos'"
+      >
+        <mat-icon aria-hidden="true">menu_book</mat-icon>
+        <span>Protocolos y Herramientas Útiles</span>
+      </button>
+    </nav>
+
+    <!-- 1. PESTAÑA: RUTA DEL CASO (FLUJO GUIADO) -->
+    @if (activeTab === 'guia') {
+      <section class="guide-section" aria-labelledby="guide-title">
+        <div class="guide-intro">
+          <h2 id="guide-title" class="guide-intro__title">Flujo de Vida de una Solicitud en CASILDA</h2>
+          <p class="guide-intro__desc">
+            Comprende cómo viaja un caso desde su reporte inicial hasta la atención y cierre formal.
+            Haz clic en cada etapa para ver qué actividades se realizan y acceder a su pantalla correspondiente.
+          </p>
+        </div>
+
+        <!-- Stepper interactivo de etapas -->
+        <div class="stepper-nav" role="tablist" aria-label="Etapas del proceso">
+          @for (step of workflowSteps; track step.stepNumber; let i = $index) {
+            <button
+              type="button"
+              class="stepper-item"
+              [class.is-selected]="selectedStepIndex === i"
+              (click)="selectStep(i)"
+              role="tab"
+              [attr.aria-selected]="selectedStepIndex === i"
+              [attr.aria-controls]="'step-panel-' + step.stepNumber"
+            >
+              <div class="stepper-item__circle">
+                <span class="stepper-item__number">{{ step.stepNumber }}</span>
+              </div>
+              <div class="stepper-item__text">
+                <span class="stepper-item__name">{{ step.title }}</span>
+                <span class="stepper-item__tag">{{ step.tag }}</span>
+              </div>
+            </button>
+          }
+        </div>
+
+        <!-- Panel de detalle de la etapa seleccionada -->
+        @if (currentStep; as curStep) {
+          <article [id]="'step-panel-' + curStep.stepNumber" class="step-detail-card" role="tabpanel">
+            <div class="step-detail-card__header">
+              <div class="step-detail-card__icon-box">
+                <mat-icon aria-hidden="true">{{ curStep.icon }}</mat-icon>
+              </div>
+              <div class="step-detail-card__heading">
+                <span class="step-detail-card__badge">Paso {{ curStep.stepNumber }} de 5</span>
+                <h3 class="step-detail-card__title">{{ curStep.title }}</h3>
+                <span class="step-detail-card__subtitle">{{ curStep.subtitle }}</span>
+              </div>
+            </div>
+
+            <div class="step-detail-card__body">
+              <p class="step-detail-card__overview">{{ curStep.description }}</p>
+
+              <h4 class="step-detail-card__activities-title">
+                <mat-icon aria-hidden="true">checklist</mat-icon>
+                <span>¿Qué se realiza en esta etapa?</span>
+              </h4>
+              <ul class="step-detail-card__list">
+                @for (detail of curStep.details; track detail) {
+                  <li>{{ detail }}</li>
+                }
+              </ul>
+            </div>
+
+            <div class="step-detail-card__footer">
+              <a [routerLink]="curStep.route" class="btn-step-action">
+                <span>{{ curStep.actionText }}</span>
+                <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+              </a>
+
+              <div class="stepper-pagination">
+                <button
+                  type="button"
+                  class="btn-nav-step"
+                  [disabled]="selectedStepIndex === 0"
+                  (click)="selectStep(selectedStepIndex - 1)"
+                  aria-label="Paso anterior"
+                >
+                  <mat-icon aria-hidden="true">chevron_left</mat-icon>
+                  <span>Anterior</span>
+                </button>
+                <button
+                  type="button"
+                  class="btn-nav-step"
+                  [disabled]="selectedStepIndex === workflowSteps.length - 1"
+                  (click)="selectStep(selectedStepIndex + 1)"
+                  aria-label="Siguiente paso"
+                >
+                  <span>Siguiente</span>
+                  <mat-icon aria-hidden="true">chevron_right</mat-icon>
+                </button>
+              </div>
+            </div>
+          </article>
+        }
+      </section>
+    }
+
+    <!-- 2. PESTAÑA: MÓDULOS DE LA PLATAFORMA -->
+    @if (activeTab === 'herramientas') {
+      <section class="tools-directory-section" aria-label="Directorio completo de módulos">
+        <div class="section-title-row">
+          <div>
+            <h2 class="section-title">Directorio de Módulos</h2>
+            <p class="section-subtitle">Explicación práctica de cada sección del sistema y cuándo acudir a ella</p>
+          </div>
+        </div>
+
+        <div class="tools-grid">
+          @for (tool of filteredTools; track tool.id) {
+            <article class="tool-card">
+              <div class="tool-card__header">
+                <div class="tool-card__icon-wrapper">
+                  <mat-icon class="tool-card__icon" aria-hidden="true">{{ tool.icon }}</mat-icon>
+                </div>
+                <span class="tool-card__category">{{ tool.category }}</span>
+              </div>
+              <h3 class="tool-card__title">{{ tool.title }}</h3>
+              <p class="tool-card__what"><strong>¿Para qué sirve?</strong> {{ tool.whatItIs }}</p>
+              <p class="tool-card__when"><strong>¿Cuándo usarlo?</strong> {{ tool.whenToUse }}</p>
+              <div class="tool-card__footer">
+                <a [routerLink]="tool.route" class="btn-tool-action">
+                  <span>Ir a {{ tool.title }}</span>
+                  <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+                </a>
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- 3. PESTAÑA: PROTOCOLOS Y HERRAMIENTAS ÚTILES -->
+    @if (activeTab === 'protocolos') {
+      <section class="protocols-section" aria-label="Protocolos y herramientas útiles">
+        <div class="protocols-grid">
+
+          <!-- Tarjeta 1: Salida Rápida y Seguridad -->
+          <article class="protocol-card protocol-card--emergency">
+            <div class="protocol-card__header">
+              <div class="protocol-card__icon-badge">
+                <mat-icon aria-hidden="true">exit_to_app</mat-icon>
+              </div>
+              <h3 class="protocol-card__title">Protocolo de Salida Rápida</h3>
+            </div>
+            <p class="protocol-card__desc">
+              Diseñado para proteger la privacidad de la persona atendida o del profesional si alguien se acerca repentinamente:
+            </p>
+            <ul class="protocol-card__points">
+              <li>
+                <strong>Atajos de teclado:</strong> Presiona <kbd>Alt + Q</kbd> o presiona dos veces la tecla <kbd>Escape</kbd> rápidamente.
+              </li>
+              <li>
+                <strong>Efecto inmediato:</strong> Cierra la sesión, limpia los datos temporales de la pantalla y redirige inmediatamente a Google para no dejar rastro.
+              </li>
+              <li>
+                <strong>Botón siempre visible:</strong> Ubicado en la esquina superior derecha en todas las pantallas del sistema.
+              </li>
+            </ul>
+          </article>
+
+          <!-- Tarjeta 2: Principios Clave en CASILDA -->
+          <article class="protocol-card protocol-card--principles">
+            <div class="protocol-card__header">
+              <div class="protocol-card__icon-badge">
+                <mat-icon aria-hidden="true">verified_user</mat-icon>
+              </div>
+              <h3 class="protocol-card__title">Criterios Clave de Registro en CASILDA</h3>
+            </div>
+            <p class="protocol-card__desc">
+              Lineamientos obligatorios en el manejo de casos de discriminación y violencias:
+            </p>
+            <ul class="protocol-card__points">
+              <li>
+                <strong>No revictimización:</strong> Evita pedir el relato de los hechos una y otra vez. Consulta siempre la bandeja antes de contactar.
+              </li>
+              <li>
+                <strong>Reserva legal y confidencialidad:</strong> Los datos personales, teléfonos y testimonios no deben compartirse fuera del equipo técnico.
+              </li>
+              <li>
+                <strong>Consentimiento voluntario:</strong> La persona tiene derecho a decidir si desea iniciar o suspender el acompañamiento en cualquier momento.
+              </li>
+            </ul>
+          </article>
+
+          <!-- Tarjeta 3: Contactos de Apoyo y Soporte Técnico -->
+          <article class="protocol-card protocol-card--support">
+            <div class="protocol-card__header">
+              <div class="protocol-card__icon-badge">
+                <mat-icon aria-hidden="true">contact_support</mat-icon>
+              </div>
+              <h3 class="protocol-card__title">Canales de Orientación y Soporte</h3>
+            </div>
+            <p class="protocol-card__desc">
+              Líneas de escalamiento institucional y soporte técnico de la plataforma:
+            </p>
+            <ul class="protocol-card__points">
+              <li>
+                <strong>Línea de Orientación UdeA:</strong> <code>{{ telefonoOrientacion }}</code> (para personas que requieren atención inmediata).
+              </li>
+              <li>
+                <strong>Soporte Técnico CASILDA:</strong> <code>{{ correoSoporte }}</code> (para incidencias técnicas, errores o solicitud de permisos).
+              </li>
+              <li>
+                <strong>Facultad Nacional de Salud Pública:</strong> Dependencia líder de vigilancia en salud pública para el proyecto.
+              </li>
+            </ul>
+          </article>
+
+        </div>
+      </section>
+    }
+
+  }
+
+</div>

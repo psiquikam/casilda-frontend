@@ -21,7 +21,32 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  min-width: 0;
+  flex-shrink: 0;
+
+  .btn-toggle-menu {
+    color: var(--color-text-on-primary);
+    margin-right: var(--space-1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: var(--touch-target-min);
+    min-height: var(--touch-target-min);
+    border-radius: var(--radius-md);
+    transition: background-color 0.15s ease, transform 0.15s ease;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.18);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    &:focus-visible {
+      outline: 3px solid var(--color-text-on-primary);
+      outline-offset: 2px;
+    }
+  }
 
   /* Volver al inicio desde cualquier ruta pública o autenticada. */
   &__enlace {
@@ -96,30 +121,180 @@
     aspect-ratio: var(--udea-logo-aspect);
     object-fit: contain;
   }
+}
 
-  /* Nombre de la dependencia en serif bold, según manual UdeA.
-     Sobre el fondo verde institucional se usa blanco para conservar
-     el contraste mínimo AA que el color 7740 C no alcanzaría. */
-  &__dependencia {
-    font-family: var(--font-serif);
-    font-weight: 700;
-    font-size: var(--font-size-xs);
-    line-height: var(--line-height-tight);
-    padding-left: var(--space-3);
-    border-left: 1px solid rgba(255, 255, 255, 0.35);
+/* Botón de usuario en el encabezado con alto contraste blanco y píldora visual */
+.usuario {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: var(--space-2) !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+  padding: 0 var(--space-3) !important;
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
+  border-radius: var(--radius-full) !important;
+  color: #ffffff !important;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.25) !important;
+    border-color: rgba(255, 255, 255, 0.6) !important;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #ffffff !important;
+    outline-offset: 2px !important;
+  }
+
+  &__icon {
+    color: #ffffff !important;
+    font-size: 22px !important;
+    width: 22px !important;
+    height: 22px !important;
+    line-height: 22px !important;
+  }
+
+  &__nombre {
+    color: #ffffff !important;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__chevron {
+    color: rgba(255, 255, 255, 0.8) !important;
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    line-height: 18px !important;
   }
 }
 
-.usuario {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  min-height: var(--touch-target-min);
-  color: var(--color-text-on-primary);
+/* Menú desplegable de perfil y preferencias */
+::ng-deep .user-session-menu {
+  min-width: 280px !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-lg) !important;
+  overflow: hidden;
 
-  &__nombre {
+  .user-menu-profile {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background-color: var(--color-bg-main);
+
+    &__avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-full);
+      background-color: var(--color-primary);
+      color: #ffffff;
+      flex-shrink: 0;
+
+      mat-icon {
+        font-size: 28px !important;
+        width: 28px !important;
+        height: 28px !important;
+      }
+    }
+
+    &__meta {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    &__name {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      color: var(--color-text-primary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &__role {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      color: var(--color-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    &__email {
+      font-family: var(--font-sans);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .user-menu-group-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4) 4px;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-xs);
     font-weight: 700;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+
+    mat-icon {
+      font-size: 16px !important;
+      width: 16px !important;
+      height: 16px !important;
+    }
+  }
+
+  .mat-mdc-menu-item {
+    font-family: var(--font-sans);
     font-size: var(--font-size-sm);
+
+    mat-icon {
+      color: var(--color-text-secondary);
+      margin-right: var(--space-2);
+
+      &.icon-selected {
+        color: var(--color-primary);
+      }
+
+      &.icon-danger {
+        color: var(--color-danger);
+      }
+    }
+
+    .text-selected {
+      color: var(--color-primary);
+      font-weight: 700;
+    }
+
+    &:hover {
+      background-color: var(--color-bg-success-light);
+    }
+  }
+
+  .btn-logout {
+    color: var(--color-danger);
+
+    &:hover {
+      background-color: var(--color-bg-danger-light);
+    }
   }
 }
 
@@ -138,14 +313,52 @@
   }
 }
 
-@media (max-width: 900px) {
-  .main-header {
-    gap: var(--space-3);
-    padding-left: var(--space-3);
+@media (min-width: 901px) and (max-width: 1100px) {
+  .institucional__logo {
+    width: 115px !important;
+    min-width: 95px !important;
   }
 
-  .institucional__dependencia,
   .usuario__nombre {
-    display: none;
+    max-width: 110px;
+  }
+}
+
+@media (max-width: 900px) {
+  .main-header {
+    gap: var(--space-2);
+    padding-left: var(--space-2);
+    padding-right: 64px; /* Reserva para el botón de salida rápida de 40px en la esquina derecha */
+  }
+
+  .marca {
+    gap: var(--space-1);
+    flex-shrink: 0;
+  }
+
+  /* Ocultar el logo texto ancho de UdeA en móvil para que NUNCA colisione con CASILDA */
+  .institucional__marca {
+    display: none !important;
+  }
+
+  .institucional {
+    gap: var(--space-2);
+  }
+
+  .usuario {
+    width: 38px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    padding: 0 !important;
+    justify-content: center !important;
+    border-radius: var(--radius-full) !important;
+  }
+
+  .usuario__nombre,
+  .usuario__chevron {
+    display: none !important;
   }
 }

@@ -1,95 +1,194 @@
-<div class="sidebar">
-  <mat-nav-list>
+<nav class="sidebar" aria-label="Menú de navegación principal">
 
+  <!-- Enlace superior: Panel de Inicio / Dashboard -->
+  <div class="sidebar-top">
+    <a routerLink="/inicio" routerLinkActive="active-item" class="nav-item nav-item--home"
+      aria-label="Ir al panel de inicio principal">
+      <mat-icon class="nav-item__icon" aria-hidden="true">dashboard</mat-icon>
+      <span class="nav-item__text">Panel de Inicio</span>
+    </a>
+  </div>
+
+  <hr class="nav-divider">
+
+  <div class="sidebar-sections">
+
+    <!-- 1. ADMINISTRACIÓN Y PARAMETRIZACIÓN (Admin) -->
     @if (auth.isAdmin()) {
-    <div class="menu-label">
-      <mat-icon svgIcon="administracion" class="logo-icon"></mat-icon>
-      <span>ADMINISTRACIÓN Y PARAMETRIZACIÓN</span>
-    </div>
-    <a mat-list-item routerLink="/gestion-usuarios" routerLinkActive="active-item">
-      <span matListItemTitle>Usuarios</span>
-    </a>
-    <a mat-list-item routerLink="/gestion-sistema" routerLinkActive="active-item">
-      <span matListItemTitle>Maestros</span>
-    </a>
-    }
-
-    @if (auth.isRevisor()) {
-    <mat-divider></mat-divider>
-    <div class="menu-label">
-      <mat-icon svgIcon="equipo-atencion" class="logo-icon"></mat-icon>
-      <span>EQUIPO DE ATENCIÓN</span>
-    </div>
-    <a mat-list-item routerLink="/solicitud-acompanamiento" routerLinkActive="active-item">
-      <span matListItemTitle>Solicitud</span>
-    </a>
-    <a mat-list-item routerLink="/consulta" routerLinkActive="active-item">
-      <span matListItemTitle>Consulta solicitud</span>
-    </a>
-    <a mat-list-item [routerLink]="['detalle-acompanamiento', 00000]" routerLinkActive="active-item">
-      <span matListItemTitle>Contacto</span>
-    </a>
-    <a mat-list-item routerLink="/cita" routerLinkActive="active-item">
-      <span matListItemTitle>Cita</span>
-    </a>
-    <a mat-list-item routerLink="/registro-caso" routerLinkActive="active-item">
-      <span matListItemTitle>Caso</span>
-    </a>
-    <a mat-list-item routerLink="/registro-atencion" routerLinkActive="active-item">
-      <span matListItemTitle>Atención</span>
-    </a>
-    }
-
-    @if (auth.isRevisor() && (features.complaintIntakePrototype || features.publicTrackingPrototype)) {
-    <mat-divider></mat-divider>
-    <div class="menu-label">
-      <mat-icon svgIcon="logo-alma" class="logo-icon"></mat-icon>
-      <span>LÍNEA ALMA</span>
-    </div>
-    <a mat-list-item routerLink="/linea-alma/atencion-pr" routerLinkActive="active-item">
-      <span matListItemTitle>Atención Primer Respondiente</span>
-    </a>
-    }
-
-    @if (auth.isRevisor()) {
-    <mat-divider></mat-divider>
-    <div class="menu-label">
-      <mat-icon svgIcon="uad-equipo" class="logo-icon"></mat-icon>
-      <span>UAD EQUIPO 3 Y 4</span>
-    </div>
-    @if (features.complaintIntakePrototype) {
-      <a mat-list-item routerLink="/nueva-queja" routerLinkActive="active-item">
-        <span matListItemTitle>Registrar Queja</span>
-      </a>
-    }
-    @if (features.publicTrackingPrototype) {
-      <a mat-list-item routerLink="/seguimiento" routerLinkActive="active-item">
-        <span matListItemTitle>Seguimiento</span>
-      </a>
-    }
-    }
-
-    @if (auth.isAdmin() && features.reviewerDashboardPrototype) {
-    <mat-divider></mat-divider>
-    <div class="menu-label">
-      <mat-icon svgIcon="reportes-indicadores" class="logo-icon"></mat-icon>
-      <span>REPORTES E INDICADORES</span>
-    </div>
-    <a mat-list-item routerLink="/dashboard-revisor" routerLinkActive="active-item">
-      <span matListItemTitle>Panel de Indicadores</span>
-    </a>
-    }
-
-    @if (features.publicTrackingPrototype) {
-      <mat-divider></mat-divider>
-      <div class="menu-label">
-        <mat-icon class="large-icon">groups</mat-icon>
-        <span>RUTA VIOLETA</span>
+      <div class="nav-section">
+        <button type="button" class="section-toggle" (click)="toggleSection('admin')"
+          [attr.aria-expanded]="isExpanded('admin')" aria-controls="section-admin">
+          <span class="section-toggle__title">
+            <mat-icon class="section-toggle__icon" aria-hidden="true">admin_panel_settings</mat-icon>
+            <span>Administración</span>
+          </span>
+          <mat-icon class="section-toggle__chevron" [class.is-expanded]="isExpanded('admin')" aria-hidden="true">
+            expand_more
+          </mat-icon>
+        </button>
+        @if (isExpanded('admin')) {
+          <div id="section-admin" class="section-content" role="region">
+            <a routerLink="/gestion-usuarios" routerLinkActive="active-item" class="nav-item">
+              <mat-icon class="nav-item__icon" aria-hidden="true">manage_accounts</mat-icon>
+              <span class="nav-item__text">Usuarios</span>
+            </a>
+            <a routerLink="/gestion-sistema" routerLinkActive="active-item" class="nav-item">
+              <mat-icon class="nav-item__icon" aria-hidden="true">tune</mat-icon>
+              <span class="nav-item__text">Maestros del Sistema</span>
+            </a>
+          </div>
+        }
       </div>
-      <a mat-list-item routerLink="/seguimiento" routerLinkActive="active-item">
-        <span matListItemTitle>Seguimiento</span>
-      </a>
+      <hr class="nav-divider">
     }
 
-  </mat-nav-list>
-</div>
+    <!-- 2. EQUIPO DE ATENCIÓN (Admin & Revisor) -->
+    @if (auth.isRevisor()) {
+      <div class="nav-section">
+        <button type="button" class="section-toggle" (click)="toggleSection('atencion')"
+          [attr.aria-expanded]="isExpanded('atencion')" aria-controls="section-atencion">
+          <span class="section-toggle__title">
+            <mat-icon class="section-toggle__icon" aria-hidden="true">volunteer_activism</mat-icon>
+            <span>Equipo de Atención</span>
+          </span>
+          <mat-icon class="section-toggle__chevron" [class.is-expanded]="isExpanded('atencion')" aria-hidden="true">
+            expand_more
+          </mat-icon>
+        </button>
+        @if (isExpanded('atencion')) {
+          <div id="section-atencion" class="section-content" role="region">
+            <a routerLink="/solicitud-acompanamiento" routerLinkActive="active-item" class="nav-item">
+              <mat-icon class="nav-item__icon" aria-hidden="true">add_circle_outline</mat-icon>
+              <span class="nav-item__text">Nueva Solicitud</span>
+            </a>
+            <a routerLink="/consulta" routerLinkActive="active-item" class="nav-item">
+              <mat-icon class="nav-item__icon" aria-hidden="true">search</mat-icon>
+              <span class="nav-item__text">Consulta Solicitudes</span>
+            </a>
+            <a routerLink="/cita" routerLinkActive="active-item" class="nav-item">
+              <mat-icon class="nav-item__icon" aria-hidden="true">calendar_month</mat-icon>
+              <span class="nav-item__text">Citas y Agendamiento</span>
+            </a>
+            <a routerLink="/registro-caso" routerLinkActive="active-item" class="nav-item">
+              <mat-icon class="nav-item__icon" aria-hidden="true">folder_shared</mat-icon>
+              <span class="nav-item__text">Registro de Caso</span>
+            </a>
+            <a routerLink="/registro-atencion" routerLinkActive="active-item" class="nav-item">
+              <mat-icon class="nav-item__icon" aria-hidden="true">handshake</mat-icon>
+              <span class="nav-item__text">Registro de Atención</span>
+            </a>
+          </div>
+        }
+      </div>
+      <hr class="nav-divider">
+    }
+
+    <!-- 3. LÍNEA ALMA (Admin & Revisor) -->
+    @if (auth.isRevisor() && (features.complaintIntakePrototype || features.publicTrackingPrototype)) {
+      <div class="nav-section">
+        <button type="button" class="section-toggle" (click)="toggleSection('alma')"
+          [attr.aria-expanded]="isExpanded('alma')" aria-controls="section-alma">
+          <span class="section-toggle__title">
+            <mat-icon class="section-toggle__icon" aria-hidden="true">health_and_safety</mat-icon>
+            <span>Línea Alma</span>
+          </span>
+          <mat-icon class="section-toggle__chevron" [class.is-expanded]="isExpanded('alma')" aria-hidden="true">
+            expand_more
+          </mat-icon>
+        </button>
+        @if (isExpanded('alma')) {
+          <div id="section-alma" class="section-content" role="region">
+            <a routerLink="/linea-alma/atencion-pr" routerLinkActive="active-item" class="nav-item">
+              <mat-icon class="nav-item__icon" aria-hidden="true">ring_volume</mat-icon>
+              <span class="nav-item__text">Primer Respondiente</span>
+            </a>
+          </div>
+        }
+      </div>
+      <hr class="nav-divider">
+    }
+
+    <!-- 4. UAD EQUIPO 3 Y 4 -->
+    @if (auth.isRevisor()) {
+      <div class="nav-section">
+        <button type="button" class="section-toggle" (click)="toggleSection('uad')"
+          [attr.aria-expanded]="isExpanded('uad')" aria-controls="section-uad">
+          <span class="section-toggle__title">
+            <mat-icon class="section-toggle__icon" aria-hidden="true">balance</mat-icon>
+            <span>UAD Equipos 3 y 4</span>
+          </span>
+          <mat-icon class="section-toggle__chevron" [class.is-expanded]="isExpanded('uad')" aria-hidden="true">
+            expand_more
+          </mat-icon>
+        </button>
+        @if (isExpanded('uad')) {
+          <div id="section-uad" class="section-content" role="region">
+            @if (features.complaintIntakePrototype) {
+              <a routerLink="/nueva-queja" routerLinkActive="active-item" class="nav-item">
+                <mat-icon class="nav-item__icon" aria-hidden="true">post_add</mat-icon>
+                <span class="nav-item__text">Registrar Queja</span>
+              </a>
+            }
+            @if (features.publicTrackingPrototype) {
+              <a routerLink="/seguimiento" routerLinkActive="active-item" class="nav-item">
+                <mat-icon class="nav-item__icon" aria-hidden="true">track_changes</mat-icon>
+                <span class="nav-item__text">Seguimiento</span>
+              </a>
+            }
+          </div>
+        }
+      </div>
+      <hr class="nav-divider">
+    }
+
+    <!-- 5. REPORTES E INDICADORES (Admin) -->
+    @if (auth.isAdmin() && features.reviewerDashboardPrototype) {
+      <div class="nav-section">
+        <button type="button" class="section-toggle" (click)="toggleSection('reportes')"
+          [attr.aria-expanded]="isExpanded('reportes')" aria-controls="section-reportes">
+          <span class="section-toggle__title">
+            <mat-icon class="section-toggle__icon" aria-hidden="true">insights</mat-icon>
+            <span>Reportes y Métricas</span>
+          </span>
+          <mat-icon class="section-toggle__chevron" [class.is-expanded]="isExpanded('reportes')" aria-hidden="true">
+            expand_more
+          </mat-icon>
+        </button>
+        @if (isExpanded('reportes')) {
+          <div id="section-reportes" class="section-content" role="region">
+            <a routerLink="/dashboard-revisor" routerLinkActive="active-item" class="nav-item">
+              <mat-icon class="nav-item__icon" aria-hidden="true">bar_chart</mat-icon>
+              <span class="nav-item__text">Panel de Indicadores</span>
+            </a>
+          </div>
+        }
+      </div>
+      <hr class="nav-divider">
+    }
+
+    <!-- 6. RUTA VIOLETA -->
+    @if (features.publicTrackingPrototype) {
+      <div class="nav-section">
+        <button type="button" class="section-toggle" (click)="toggleSection('violeta')"
+          [attr.aria-expanded]="isExpanded('violeta')" aria-controls="section-violeta">
+          <span class="section-toggle__title">
+            <mat-icon class="section-toggle__icon" aria-hidden="true">diversity_1</mat-icon>
+            <span>Ruta Violeta</span>
+          </span>
+          <mat-icon class="section-toggle__chevron" [class.is-expanded]="isExpanded('violeta')" aria-hidden="true">
+            expand_more
+          </mat-icon>
+        </button>
+        @if (isExpanded('violeta')) {
+          <div id="section-violeta" class="section-content" role="region">
+            <a routerLink="/seguimiento" routerLinkActive="active-item" class="nav-item">
+              <mat-icon class="nav-item__icon" aria-hidden="true">track_changes</mat-icon>
+              <span class="nav-item__text">Seguimiento</span>
+            </a>
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+</nav>

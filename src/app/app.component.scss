@@ -14,18 +14,51 @@ html, body {
   height: 100dvh;
   overflow: hidden;
 
-  app-header {
+  app-header,
+  app-horizontal-nav {
     flex-shrink: 0;
+  }
+
+  .horizontal-content-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+    background-color: var(--color-bg-main);
+
+    .page-wrapper {
+      flex: 1 0 auto;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
   }
 
   .sidenav-container {
     flex: 1;
     overflow: hidden;
   }
+
+  .main-content {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: var(--color-bg-main);
+  }
+
+  .page-wrapper {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 ::ng-deep .aside-menu {
-  width: 220px !important;
+  width: 260px !important;
+  border-right: 1px solid var(--color-border) !important;
 }
 
 .full-screen-login {

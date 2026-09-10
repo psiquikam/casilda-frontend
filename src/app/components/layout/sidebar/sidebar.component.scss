@@ -3,114 +3,219 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: white;
+  background-color: var(--color-bg-surface);
   box-sizing: border-box;
   overflow-x: hidden;
   overflow-y: auto;
+  padding: var(--space-3) var(--space-2) var(--space-6);
 
-  .logo-container {
-    padding: 20px 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    
-    mat-icon {
-      color: #6B2D95;
-      transform: scale(1.1);
-    }
-
-    span {
-      font-weight: 800;
-      font-size: 1.1rem;
-      letter-spacing: -0.5px;
-      color: #1e293b;
-    }
+  /* Scrollbar estético y minimalista */
+  &::-webkit-scrollbar {
+    width: 6px;
   }
-
-  mat-nav-list {
-    padding: 0;
-
-    .menu-label {
-      padding: 16px 24px 6px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      
-      font-size: 0.7rem;
-      font-weight: 800;
-      color: #475569;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-
-      mat-icon.large-icon, mat-icon.logo-icon {
-        font-size: 24px !important;
-        width: 24px !important;
-        height: 24px !important;
-        color: #6B2D95;
-        display: flex !important;
-        align-items: center;
-        justify-content: center;
-        margin: 0 !important;
-        filter: drop-shadow(0 2px 4px rgba(107, 45, 149, 0.15));
-      }
-
-      mat-icon.logo-icon ::ng-deep svg path,
-      mat-icon.logo-icon ::ng-deep svg circle,
-      mat-icon.logo-icon ::ng-deep svg rect,
-      mat-icon.logo-icon ::ng-deep svg polygon {
-        fill: #6B2D95;
-      }
-    }
-
-    a[mat-list-item] {
-      margin: 1px 12px !important;
-      width: calc(100% - 24px) !important;
-      border-radius: 8px;
-      color: #64748b;
-      min-height: 36px !important;
-      height: auto !important;
-      transition: all 0.2s ease;
-
-      ::ng-deep .mdc-list-item__content {
-        padding-left: 38px !important;
-        padding-right: 8px !important;
-
-        @media (max-width: 768px) {
-          padding-left: 30px !important;
-        }
-      }
-
-      ::ng-deep .mdc-list-item__primary-text {
-        white-space: normal !important;
-        overflow: visible !important;
-        text-overflow: clip !important;
-        line-height: 1.2 !important;
-      }
-
-      &:hover {
-        background-color: #f1f5f9;
-        color: #1e293b;
-      }
-
-      &.active-item {
-        background-color: #f5f3ff !important;
-        color: #6B2D95 !important;
-
-        ::ng-deep .mdc-list-item__primary-text {
-          font-weight: 700 !important;
-        }
-      }
-    }
+  &::-webkit-scrollbar-track {
+    background: transparent;
   }
-
-  mat-divider {
-    margin: 6px 24px; // Reducido de 12px a 6px
-    border-top-color: #f1f5f9;
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-border-strong);
+    border-radius: var(--radius-full);
   }
 }
 
-::ng-deep {
-  .mdc-list-item__primary-text {
-    font-size: 0.82rem !important; // Un poco más pequeño para mantener proporción
+.sidebar-top {
+  padding: var(--space-1) var(--space-1);
+}
+
+.nav-divider {
+  border: 0;
+  height: 1px;
+  background-color: var(--color-border);
+  margin: var(--space-2) var(--space-2);
+}
+
+.sidebar-sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.nav-section {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Botón de alternancia de cada sección (Acordeón) */
+.section-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  min-height: 40px;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__icon {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__chevron {
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
+    color: var(--color-text-muted);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &.is-expanded {
+      transform: rotate(180deg);
+    }
+  }
+
+  &:hover {
+    background-color: var(--color-bg-main);
+
+    .section-toggle__title {
+      color: var(--color-text-primary);
+    }
+    .section-toggle__chevron {
+      color: var(--color-text-primary);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: 1px;
+  }
+}
+
+/* Contenido de cada sección */
+.section-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 2px 0 6px var(--space-2);
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enlaces de navegación */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 8px var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: var(--line-height-tight);
+  min-height: 38px;
+  transition: all 0.15s ease;
+  border-left: 3px solid transparent;
+
+  &__icon {
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
+    color: var(--color-text-muted);
+    transition: color 0.15s ease, transform 0.15s ease;
+    flex-shrink: 0;
+  }
+
+  &__text {
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &:hover {
+    background-color: var(--color-bg-main);
+    color: var(--color-text-primary);
+
+    .nav-item__icon {
+      color: var(--color-primary);
+      transform: translateX(1px);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: 1px;
+  }
+
+  /* Estado Activo: Verde institucional UdeA */
+  &.active-item {
+    background-color: var(--color-bg-success-light);
+    color: var(--color-primary);
+    font-weight: 700;
+    border-left-color: var(--color-primary);
+
+    .nav-item__icon {
+      color: var(--color-primary);
+    }
+  }
+
+  /* Estilo destacado para el botón superior "Panel de Inicio" */
+  &--home {
+    background-color: var(--color-bg-main);
+    font-weight: 600;
+    border-left: 3px solid var(--color-secondary);
+
+    .nav-item__icon {
+      color: var(--color-secondary);
+    }
+
+    &:hover {
+      background-color: #f1f5f9;
+      color: var(--color-secondary-hover);
+
+      .nav-item__icon {
+        color: var(--color-secondary-hover);
+      }
+    }
+
+    &.active-item {
+      background-color: var(--color-bg-success-light);
+      border-left-color: var(--color-primary);
+      color: var(--color-primary);
+
+      .nav-item__icon {
+        color: var(--color-primary);
+      }
+    }
   }
 }

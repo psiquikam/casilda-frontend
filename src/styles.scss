@@ -73,6 +73,18 @@ $casilda-turquoise-palette: (
   )
 );
 
+/* ==========================================================================
+   Paleta de Color Complementaria UdeA (Manual de Identidad Institucional pág. 20)
+   - Pantone 7650 C: #70205b (Morado / Magenta profundo)
+   - Pantone 633 C:  #137598 (Azul petróleo)
+   - Pantone 032 C:  #ef434d (Rojo carmesí brillante)
+   - Pantone 137 C:  #f9a12c (Ámbar dorado / Naranja)
+   ========================================================================== */
+$udea-pantone-7650: #70205b;
+$udea-pantone-633:  #137598;
+$udea-pantone-032:  #ef434d;
+$udea-pantone-137:  #f9a12c;
+
 $my-primary-palette: mat.m2-define-palette($casilda-green-palette, 700);
 $my-accent-palette:  mat.m2-define-palette($casilda-turquoise-palette, 500);
 $my-warn-palette:    mat.m2-define-palette(mat.$m2-red-palette);

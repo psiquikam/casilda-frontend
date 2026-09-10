@@ -9,6 +9,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 
+import { NavigationLayoutService } from '../../../services/navigation-layout.service';
+
 @Component({
     selector: 'app-header',
     imports: [
@@ -26,4 +28,5 @@ export class HeaderComponent {
   @Output() toggleSidenav = new EventEmitter<void>();
 
   readonly auth = inject(AuthService);
+  readonly navLayout = inject(NavigationLayoutService);
 }

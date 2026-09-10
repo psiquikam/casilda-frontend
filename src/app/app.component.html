@@ -3,20 +3,29 @@
 <app-quick-exit></app-quick-exit>
 
 @if (auth.isAuthenticated()) {
-  <div class="auth-layout">
-    <app-header (toggleSidenav)="sidenav.toggle()"></app-header>
+  <div class="auth-layout" [class.auth-layout--horizontal]="navLayout.isHorizontal()">
+    <app-header (toggleSidenav)="onToggleSidenav()"></app-header>
 
-    <mat-sidenav-container class="sidenav-container">
-      <mat-sidenav #sidenav mode="side" [opened]="!isHomeRoute()" [hidden]="isHomeRoute()" class="aside-menu">
-        <app-sidebar></app-sidebar>
-      </mat-sidenav>
-
-      <mat-sidenav-content class="main-content">
+    @if (navLayout.isHorizontal()) {
+      <app-horizontal-nav></app-horizontal-nav>
+      <div class="horizontal-content-area">
         <main class="page-wrapper" id="contenido-principal">
           <router-outlet></router-outlet>
         </main>
-      </mat-sidenav-content>
-    </mat-sidenav-container>
+      </div>
+    } @else {
+      <mat-sidenav-container class="sidenav-container">
+        <mat-sidenav #sidenav mode="side" [opened]="!isHomeRoute()" class="aside-menu">
+          <app-sidebar></app-sidebar>
+        </mat-sidenav>
+
+        <mat-sidenav-content class="main-content">
+          <main class="page-wrapper" id="contenido-principal">
+            <router-outlet></router-outlet>
+          </main>
+        </mat-sidenav-content>
+      </mat-sidenav-container>
+    }
   </div>
 } @else {
   @if (isLoginRoute()) {

@@ -20,12 +20,31 @@
   --udea-blue-334: #069a7e;     /* Turquesa Medio */
   --udea-blue-7718: #0e7774;    /* Turquesa Oscuro (ideal para textos/enlaces) */
 
-  /* Paleta complementaria oficial */
-  --udea-purple-7650: #70205b;
-  --udea-blue-633: #137598;
-  --udea-red-032: #ef434d;
-  --udea-orange-137: #f9a12c;
-  --udea-violet-1007: #532d87;
+  /* Paleta complementaria oficial UdeA (Manual de Identidad Institucional pág. 20) */
+  --udea-pantone-7650: #70205b;         /* 7650 C — Morado / Magenta Profundo (RGB: 112, 32, 91) */
+  --udea-pantone-7650-rgb: 112, 32, 91;
+  --udea-pantone-633:  #137598;         /* 633 C — Azul Petróleo (RGB: 19, 117, 152) */
+  --udea-pantone-633-rgb: 19, 117, 152;
+  --udea-pantone-032:  #ef434d;         /* 032 C — Rojo Carmesí Brillante (RGB: 239, 67, 77) */
+  --udea-pantone-032-rgb: 239, 67, 77;
+  --udea-pantone-137:  #f9a12c;         /* 137 C — Ámbar Dorado / Naranja (RGB: 249, 161, 44) */
+  --udea-pantone-137-rgb: 249, 161, 44;
+
+  /* Aliases semánticos para uso general en gráficos, métricas y badges */
+  --color-comp-purple: var(--udea-pantone-7650);
+  --color-comp-blue:   var(--udea-pantone-633);
+  --color-comp-red:    var(--udea-pantone-032);
+  --color-comp-orange: var(--udea-pantone-137);
+
+  /* Variantes atenuadas para tarjetas, fichas, pills y bordes */
+  --color-comp-purple-light: rgba(var(--udea-pantone-7650-rgb), 0.08);
+  --color-comp-purple-border: rgba(var(--udea-pantone-7650-rgb), 0.28);
+  --color-comp-blue-light:   rgba(var(--udea-pantone-633-rgb), 0.08);
+  --color-comp-blue-border:   rgba(var(--udea-pantone-633-rgb), 0.28);
+  --color-comp-red-light:    rgba(var(--udea-pantone-032-rgb), 0.08);
+  --color-comp-red-border:    rgba(var(--udea-pantone-032-rgb), 0.28);
+  --color-comp-orange-light: rgba(var(--udea-pantone-137-rgb), 0.08);
+  --color-comp-orange-border: rgba(var(--udea-pantone-137-rgb), 0.28);
 
   /* ==========================================================================
      2. APLICACIÓN SEMÁNTICA (accesibilidad + enfoque sensible al trauma)

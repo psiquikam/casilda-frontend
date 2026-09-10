@@ -56,9 +56,7 @@ export class AuthService {
   isUsuario(): boolean { return this.currentUser?.rol === 'Usuario'; }
 
   getDefaultRoute(): string {
-    if (this.isAdmin()) return '/gestion-usuarios';
-    if (this.currentUser?.rol === 'Revisor') return '/consulta';
-    return '/solicitud-acompanamiento';
+    return '/inicio';
   }
 
   loginWithCredentials(email: string, password: string): Observable<AuthLoginResponse> {
