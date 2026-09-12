@@ -1,4 +1,3 @@
-$purple-sys: #348F41;
 
 .modal-container {
   overflow: hidden;
@@ -6,7 +5,7 @@ $purple-sys: #348F41;
 }
 
 .modal-header {
-  background-color: $purple-sys;
+  background-color: var(--color-primary);
   color: white !important;
   margin: 0 !important;
   padding: 16px 24px !important;
@@ -43,14 +42,14 @@ $purple-sys: #348F41;
 .asignados-section {
   margin: 15px 0;
   padding: 12px;
-  background: #f8fafc;
+  background: var(--color-bg-main);
   border-radius: 8px;
-  border: 1px dashed #cbd5e1;
+  border: 1px dashed var(--color-border-strong);
 
   .section-label {
-    font-size: 11px;
+    font-size: var(--font-size-sm); /* piso 14px (WCAG 1.4.4) */
     font-weight: 700;
-    color: #64748b;
+    color: var(--color-text-muted);
     margin-bottom: 8px;
     text-transform: uppercase;
   }
@@ -67,11 +66,11 @@ $purple-sys: #348F41;
   align-items: center;
   gap: 6px;
   background-color: #f0e7f6;
-  border: 1px solid $purple-sys;
-  color: $purple-sys;
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
   padding: 4px 10px;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: var(--font-size-sm); /* piso 14px (WCAG 1.4.4) */
   font-weight: 600;
 
   .mini-icon {
@@ -84,7 +83,7 @@ $purple-sys: #348F41;
     border: none;
     background: transparent;
     cursor: pointer;
-    color: #ef4444;
+    color: var(--color-danger);
     display: flex;
 
     mat-icon {
@@ -109,12 +108,12 @@ $purple-sys: #348F41;
 
 .modal-footer {
   padding: 12px 24px !important;
-  border-top: 1px solid #f1f5f9;
-  background-color: #f8fafc;
+  border-top: 1px solid var(--color-bg-subtle);
+  background-color: var(--color-bg-main);
 }
 
 .btn-confirm {
-  background-color: $purple-sys !important;
+  background-color: var(--color-primary) !important;
   color: white !important;
   height: 38px;
   font-weight: 700;
@@ -174,8 +173,8 @@ $purple-sys: #348F41;
 
   .mat-mdc-optgroup-label {
     font-weight: 700 !important;
-    color: $purple-sys !important;
-    font-size: 11px !important;
+    color: var(--color-primary) !important;
+    font-size: var(--font-size-sm) !important; /* piso 14px (WCAG 1.4.4) */
   }
 
   .mat-mdc-dialog-content {

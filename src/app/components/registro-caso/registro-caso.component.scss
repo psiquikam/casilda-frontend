@@ -1,11 +1,10 @@
-$purple-sys: #348F41;
-$bg-soft: #f8fafc;
-$border-soft: #e2e8f0;
-$text-dark: #1e293b;
-$text-muted: #64748b;
+$bg-soft: var(--color-bg-main);
+$border-soft: var(--color-border);
+$text-dark: var(--color-text-primary);
+$text-muted: var(--color-text-muted);
 
 .tab-label-error {
-  color: #dc2626 !important;
+  color: var(--color-danger-text) !important;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -16,7 +15,7 @@ $text-muted: #64748b;
   font-size: 14px !important;
   width: 14px !important;
   height: 14px !important;
-  color: #dc2626;
+  color: var(--color-danger-text);
 }
 
 .cita-container {
@@ -34,7 +33,7 @@ $text-muted: #64748b;
     cursor: pointer;
     margin-bottom: 15px;
     font-weight: 600;
-    font-size: 13px;
+    font-size: var(--font-size-sm); /* piso 14px (WCAG 1.4.4) */
     transition: color 0.2s;
 
     &:hover {
@@ -106,7 +105,7 @@ $text-muted: #64748b;
     }
 
     mat-icon {
-      color: $purple-sys;
+      color: var(--color-primary);
       width: 24px;
       height: 24px;
       font-size: 24px;
@@ -146,7 +145,7 @@ $text-muted: #64748b;
 
     mat-card-title {
       font-weight: 900;
-      color: #0f172a;
+      color: var(--color-text-primary);
     }
   }
 }
@@ -165,7 +164,7 @@ $text-muted: #64748b;
   .mat-mdc-tab-group {
     height: auto !important;
     flex-grow: 0 !important;
-    --mat-tab-active-indicator-color: #{$purple-sys};
+    --mat-tab-active-indicator-color: #{var(--color-primary)};
   }
 
   .mat-mdc-tab-header {
@@ -177,11 +176,11 @@ $text-muted: #64748b;
     height: 48px !important;
     border-radius: 8px 8px 0 0;
     margin-right: 4px;
-    background-color: #fff !important;
+    background-color: var(--color-bg-surface) !important;
 
     .mdc-tab__text-label {
       font-weight: 700 !important;
-      font-size: 12px !important;
+      font-size: var(--font-size-sm) !important; /* piso 14px (WCAG 1.4.4) */
       color: $text-muted;
       z-index: 2;
     }
@@ -189,7 +188,7 @@ $text-muted: #64748b;
 
   .mat-mdc-tab.mdc-tab--active {
     .mdc-tab__text-label {
-      color: $purple-sys !important;
+      color: var(--color-primary) !important;
     }
 
     .mdc-tab-indicator__content {
@@ -243,7 +242,7 @@ $text-muted: #64748b;
 
   .mat-mdc-text-field-wrapper .mat-mdc-floating-label {
     top: 16px !important;
-    font-size: 13px;
+    font-size: var(--font-size-sm); /* piso 14px (WCAG 1.4.4) */
   }
 
   .mat-mdc-text-field-wrapper.mat-mdc-form-field-can-float.mat-form-field-should-float .mat-mdc-floating-label {
@@ -272,13 +271,13 @@ $text-muted: #64748b;
 
 .btn-label-top {
   font-weight: 700;
-  font-size: 13px;
+  font-size: var(--font-size-sm); /* piso 14px (WCAG 1.4.4) */
   color: $text-dark;
 }
 
 mat-card-actions {
   padding: 15px 25px !important;
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid var(--color-bg-subtle);
   background-color: #fafafa;
   gap: 12px;
 }
@@ -305,7 +304,7 @@ mat-card-actions {
   overflow-x: auto;
   border: 1px solid $border-soft;
   border-radius: 8px;
-  background: #fff;
+  background: var(--color-bg-surface);
   position: relative;
 
   &::-webkit-scrollbar {
@@ -313,7 +312,7 @@ mat-card-actions {
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: var(--color-border-strong);
     border-radius: 10px;
   }
 }
@@ -332,18 +331,18 @@ mat-card-actions {
     background-color: $bg-soft !important;
     color: $text-dark;
     font-weight: 700;
-    font-size: 12px;
+    font-size: var(--font-size-sm); /* piso 14px (WCAG 1.4.4) */
     text-transform: uppercase;
     padding: 0 10px !important;
     border-bottom: 2px solid $border-soft;
   }
 
   td.mat-cell {
-    font-size: 12px;
+    font-size: var(--font-size-sm); /* piso 14px (WCAG 1.4.4) */
     padding: 0 10px;
     height: 22px;
-    color: #475569;
-    border-bottom: 1px solid #f1f5f9;
+    color: var(--color-text-secondary);
+    border-bottom: 1px solid var(--color-bg-subtle);
   }
 
   tr:hover {
@@ -356,7 +355,7 @@ mat-card-actions {
   flex-direction: column;
   align-items: center;
   padding: 6px;
-  color: #94a3b8;
+  color: var(--color-text-muted);
 
   mat-icon {
     font-size: 16px;
@@ -367,7 +366,7 @@ mat-card-actions {
 
   p {
     margin: 0;
-    font-size: 11px;
+    font-size: var(--font-size-sm); /* piso 14px (WCAG 1.4.4) */
   }
 }
 
@@ -454,7 +453,7 @@ mat-card-actions {
   }
 
   ::ng-deep .mat-mdc-tab .mdc-tab__text-label {
-    font-size: 10px !important;
+    font-size: var(--font-size-sm) !important; /* piso 14px (WCAG 1.4.4) */
   }
 }
 
@@ -489,14 +488,14 @@ input[readonly] {
   height: 32px !important;
   line-height: 32px !important;
   padding: 0 16px !important;
-  font-size: 12px !important;
+  font-size: var(--font-size-sm) !important; /* piso 14px (WCAG 1.4.4) */
   display: flex;
   align-items: center;
   align-self: flex-start;
   margin-top: 0 !important;
   gap: 6px;
   white-space: nowrap;
-  background-color: $purple-sys !important;
+  background-color: var(--color-primary) !important;
   color: white !important;
   border-radius: 8px;
 

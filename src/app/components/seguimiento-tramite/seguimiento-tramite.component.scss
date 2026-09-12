@@ -16,14 +16,14 @@
     margin-bottom: 25px;
     
     .icon-circle {
-      background: #f1f5f9;
+      background: var(--color-bg-subtle);
       padding: 15px;
       border-radius: 50%;
       mat-icon { font-size: 32px; width: 32px; height: 32px; }
     }
     
-    h2 { margin: 0; font-size: 1.6rem; font-weight: 800; }
-    p { margin: 0; color: #64748b; }
+    h1 { margin: 0; font-size: 1.6rem; font-weight: 800; }
+    p { margin: 0; color: var(--color-text-muted); }
   }
 }
 
@@ -44,14 +44,14 @@
     padding: 6px 16px;
     border-radius: 30px;
     font-weight: 700;
-    &.aco { background: #f3e8ff; color: #6B2D95; }
-    &.cas { background: #fee2e2; color: #ef4444; }
+    &.aco { background: #f3e8ff; color: var(--color-comp-purple); }
+    &.cas { background: var(--color-bg-danger-light); color: var(--color-danger); }
   }
 
   .meta-info {
     display: flex;
     gap: 15px;
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 0.9rem;
     align-items: center;
     mat-icon { font-size: 18px; width: 18px; height: 18px; }
@@ -59,7 +59,7 @@
 }
 .timeline-vertical {
   padding-left: 20px;
-  border-left: 2px dashed #e2e8f0;
+  border-left: 2px dashed var(--color-border);
   margin-left: 15px;
 
   .timeline-item {
@@ -71,42 +71,42 @@
       position: absolute;
       left: -22px;
       background: white;
-      border: 2px solid #e2e8f0;
+      border: 2px solid var(--color-border);
       border-radius: 50%;
       width: 40px;
       height: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #94a3b8;
+      color: var(--color-text-muted);
       transition: all 0.3s ease;
     }
 
     .timeline-content {
-      h3 { margin: 0; font-size: 1.1rem; color: #475569; }
-      .status-label { font-size: 0.8rem; color: #94a3b8; }
+      h2 { margin: 0; font-size: 1.1rem; color: var(--color-text-secondary); }
+      .status-label { font-size: 0.8rem; color: var(--color-text-muted); }
     }
 
     &.completed {
-      .timeline-icon { background: #22c55e; border-color: #22c55e; color: white; }
-      h3 { color: #1e293b; }
+      .timeline-icon { background: var(--color-success); border-color: var(--color-success); color: white; }
+      h2 { color: var(--color-text-primary); }
     }
 
     &.active {
       .timeline-icon { 
-        background: #6B2D95; 
-        border-color: #6B2D95; 
+        background: var(--color-comp-purple); 
+        border-color: var(--color-comp-purple); 
         color: white;
         box-shadow: 0 0 10px rgba(107,45,149,0.3);
       }
-      h3 { color: #6B2D95; font-weight: 700; }
+      h2 { color: var(--color-comp-purple); font-weight: 700; }
       .active-detail {
         margin-top: 10px;
         padding: 15px;
-        background: #f8fafc;
+        background: var(--color-bg-main);
         border-radius: 8px;
-        border-left: 4px solid #6B2D95;
-        p { margin: 0; font-style: italic; color: #475569; }
+        border-left: 4px solid var(--color-comp-purple);
+        p { margin: 0; font-style: italic; color: var(--color-text-secondary); }
       }
     }
   }

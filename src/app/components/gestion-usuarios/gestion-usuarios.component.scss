@@ -1,6 +1,6 @@
 .gestion-container {
   padding: 30px;
-  background: #f1f5f9;
+  background: var(--color-bg-subtle);
   min-height: calc(100vh - 64px);
 
   .page-header {
@@ -8,8 +8,8 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
-    h1 { margin: 0; font-weight: 800; color: #1e293b; }
-    p { margin: 0; color: #64748b; }
+    h1 { margin: 0; font-weight: 800; color: var(--color-text-primary); }
+    p { margin: 0; color: var(--color-text-muted); }
   }
 }
 
@@ -25,9 +25,9 @@
   gap: 12px;
 
   .mini-avatar {
-    width: 32px; height: 32px; background: #e2e8f0;
+    width: 32px; height: 32px; background: var(--color-border);
     border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    font-size: 0.8rem; font-weight: bold; color: #475569;
+    font-size: 0.8rem; font-weight: bold; color: var(--color-text-secondary);
   }
 }
 
@@ -38,9 +38,9 @@
   font-weight: 700;
   text-transform: uppercase;
 
-  &.admin { background: #fee2e2; color: #ef4444; }
-  &.revisor { background: #dcfce7; color: #16a34a; }
-  &.coordinador { background: #dbeafe; color: #2563eb; }
+  &.admin { background: var(--color-bg-danger-light); color: var(--color-danger); }
+  &.revisor { background: var(--color-bg-success-light); color: #16a34a; }
+  &.coordinador { background: var(--color-bg-info-light); color: #2563eb; }
   &.profesional { background: #ede9fe; color: #7c3aed; }
   &.usuario { background: #ffedd5; color: #ea580c; }
   &.consulta { background: #fef9c3; color: #ca8a04; }
@@ -51,5 +51,5 @@
 }
 
 mat-paginator {
-  border-top: 1px solid #f1f5f9;
+  border-top: 1px solid var(--color-bg-subtle);
 }

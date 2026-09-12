@@ -558,11 +558,11 @@
     color: #0369a1;
   }
   &--investigación {
-    background-color: #fef3c7;
+    background-color: var(--color-bg-warning-light);
     color: #b45309;
   }
   &--recepción {
-    background-color: #f0fdf4;
+    background-color: var(--color-bg-success-light);
     color: var(--color-primary);
   }
   &--atención-activa,

@@ -1,5 +1,4 @@
-$purple-sys: #348F41;
-$purple-buttons: #348F41;
+$purple-buttons: var(--color-primary); // verde UdeA: token del sistema (antes verde heredado a 3.9:1; ahora 5.16:1)
 
 :host {
   display: block;
@@ -7,7 +6,7 @@ $purple-buttons: #348F41;
   .modal-title {
     margin: 0;
     padding: 12px 20px;
-    background-color: $purple-sys;
+    background-color: var(--color-primary);
     color: white;
     font-weight: 800;
     font-size: 16px;
@@ -59,15 +58,15 @@ $purple-buttons: #348F41;
   }
 
   .file-name {
-    font-size: 11px;
-    color: #64748b;
+    font-size: var(--font-size-sm); /* piso 14px (WCAG 1.4.4) */
+    color: var(--color-text-muted);
     margin-top: 4px;
   }
 }
 
 .modal-actions {
   padding: 12px 24px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--color-border);
   gap: 8px;
 
   .btn-confirm {
@@ -145,7 +144,7 @@ $purple-buttons: #348F41;
         }
 
         &::-webkit-scrollbar-thumb {
-          background: #cbd5e1;
+          background: var(--color-border-strong);
           border-radius: 10px;
         }
       }
