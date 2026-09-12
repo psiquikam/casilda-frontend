@@ -1,0 +1,22 @@
+{
+  "resumen": {
+    "fecha": "2026-09-11",
+    "H-01 botones de ícono sin nombre": "0 de 99",
+    "H-01 <mat-icon> sin aria-hidden": 0,
+    "H-02 filtros sin etiqueta": 0,
+    "H-02 SCSS con outline:none sin reemplazo": 0,
+    "H-03 rutas sin title": "0 de 21",
+    "H-12 console.error/warn": 0,
+    "H-13 font-size < 14px": 0,
+    "H-14 usos de paleta heredada": 0,
+    "H-14 SCSS con colores literales": "28 de 60"
+  },
+  "detalle": {
+    "botonesSinNombre": [],
+    "iconosExpuestos": [],
+    "filtrosSinEtiqueta": [],
+    "outlineSinReemplazo": [],
+    "rutasSinTitulo": [],
+    "fuentesPequenas": []
+  }
+}
