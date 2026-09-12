@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { SolicitudService } from '../../services/solicitud.service';
 import { MaestroDto } from '../../services/listas.service';
+import { NotificacionService } from '../../core/a11y/notificacion.service';
 
 @Component({
     selector: 'app-modal-medidas-proteccion',
@@ -25,6 +26,7 @@ import { MaestroDto } from '../../services/listas.service';
     styleUrls: ['./modal-medidas-proteccion.component.scss']
 })
 export class ModalMedidasProteccionComponent implements OnInit {
+  private readonly notificacion = inject(NotificacionService);
 
   private readonly solicitudService = inject(SolicitudService);
   public readonly dialogRef = inject(MatDialogRef<ModalMedidasProteccionComponent>);
@@ -47,12 +49,12 @@ export class ModalMedidasProteccionComponent implements OnInit {
   ngOnInit(): void {
     this.solicitudService.listarTiposMedida().subscribe({
       next: (tipos) => this.tiposMedidaList = tipos,
-      error: (err) => console.error('Error cargando tipos de medida:', err)
+      error: (err) => this.notificacion.error('No fue posible cargar los tipos de medida. Cierra el diálogo e intenta de nuevo.', err)
     });
 
     this.solicitudService.listarResponsablesMedida().subscribe({
       next: (resps) => this.responsablesList = resps,
-      error: (err) => console.error('Error cargando responsables de medida:', err)
+      error: (err) => this.notificacion.error('No fue posible cargar los responsables. Cierra el diálogo e intenta de nuevo.', err)
     });
   }
 
@@ -66,7 +68,7 @@ export class ModalMedidasProteccionComponent implements OnInit {
     if (tipoId) {
       this.solicitudService.listarSubTiposMedidaPorTipo(tipoId).subscribe({
         next: (subtipos) => this.subtiposMedidaList = subtipos,
-        error: (err) => console.error('Error cargando subtipos de medida:', err)
+        error: (err) => this.notificacion.error('No fue posible cargar los subtipos de medida. Intenta seleccionar de nuevo el tipo.', err)
       });
     }
   }

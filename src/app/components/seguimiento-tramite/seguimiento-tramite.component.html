@@ -2,10 +2,10 @@
   <mat-card class="search-card">
     <div class="header-content">
       <div class="icon-circle">
-        <mat-icon color="primary">track_changes</mat-icon>
+        <mat-icon aria-hidden="true" color="primary">track_changes</mat-icon>
       </div>
       <div>
-        <h2>Seguimiento de Trámites</h2>
+        <h1>Seguimiento de Trámites</h1>
         <p>Ingrese su código <strong>CAS-</strong> o <strong>ACO-</strong> para conocer el estado.</p>
       </div>
     </div>
@@ -16,10 +16,10 @@
         <input matInput [(ngModel)]="codigoBusqueda"
           placeholder="Ej: ACO-1234"
           (keyup.enter)="buscarCaso()">
-          <mat-icon matPrefix>qr_code</mat-icon>
+          <mat-icon aria-hidden="true" matPrefix>qr_code</mat-icon>
         </mat-form-field>
         <button mat-raised-button color="primary" class="search-btn" (click)="buscarCaso()">
-          <mat-icon>search</mat-icon> Consultar
+          <mat-icon aria-hidden="true">search</mat-icon> Consultar
         </button>
       </div>
     </mat-card>
@@ -31,7 +31,7 @@
             {{ casoEncontrado.tipo }}: {{ casoEncontrado.codigo }}
           </div>
           <div class="meta-info">
-            <span><mat-icon>calendar_today</mat-icon> {{ casoEncontrado.fechaActualizacion }}</span>
+            <span><mat-icon aria-hidden="true">calendar_today</mat-icon> {{ casoEncontrado.fechaActualizacion }}</span>
             <span class="days-badge">Días: {{ casoEncontrado.diasDesdeRecepcion }}</span>
           </div>
         </div>
@@ -42,10 +42,10 @@
               [class.completed]="etapa.id < casoEncontrado.estadoActual"
               [class.active]="etapa.id === casoEncontrado.estadoActual">
               <div class="timeline-icon">
-                <mat-icon>{{ etapa.id < casoEncontrado.estadoActual ? 'check' : etapa.icon }}</mat-icon>
+                <mat-icon aria-hidden="true">{{ etapa.id < casoEncontrado.estadoActual ? 'check' : etapa.icon }}</mat-icon>
               </div>
               <div class="timeline-content">
-                <h3>{{ etapa.nombre }}</h3>
+                <h2>{{ etapa.nombre }}<span class="visually-hidden">{{ etapa.id < casoEncontrado.estadoActual ? ' (completada)' : etapa.id === casoEncontrado.estadoActual ? ' (etapa actual)' : ' (pendiente)' }}</span></h2>
                 @if (etapa.id === casoEncontrado.estadoActual) {
                   <div class="active-detail">
                     <p>{{ casoEncontrado.detalle }}</p>
@@ -63,7 +63,7 @@
 
     @if (busquedaRealizada && !casoEncontrado) {
       <mat-card class="error-card">
-        <mat-icon color="warn">error_outline</mat-icon>
+        <mat-icon aria-hidden="true" color="warn">error_outline</mat-icon>
         <p>No se encontró el radicado <strong>{{codigoBusqueda}}</strong></p>
         <small>Verifique que el código incluya el guion y el prefijo correcto.</small>
       </mat-card>

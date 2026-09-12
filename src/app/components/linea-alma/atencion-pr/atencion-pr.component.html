@@ -1,22 +1,24 @@
 <div class="atencion-pr-container animate-fade-in">
   <div class="section-header">
-    <h2>Atención Primer Respondiente</h2>
+    <h1>Atención Primer Respondiente</h1>
   </div>
 
   <mat-card class="form-card">
     <mat-card-content>
       @if (cargandoCatalogos) {
         <div class="no-results-msg">
-          <mat-icon>hourglass_top</mat-icon>
+          <mat-icon aria-hidden="true">hourglass_top</mat-icon>
           <p>Cargando catálogos...</p>
         </div>
       }
-      <form [formGroup]="registroCasoForm">
+      <!-- Los campos describen a terceras personas (no a quien usa el sistema): sin autocompletado,
+           para que el navegador no sugiera los datos del profesional (WCAG 1.3.5 no aplica). -->
+      <form [formGroup]="registroCasoForm" autocomplete="off">
         <mat-tab-group animationDuration="200ms" color="primary" [(selectedIndex)]="tabSeleccionada">
           <mat-tab label="Registro de atención de caso">
             <div class="tab-padding">
               <div class="profile-selector">
-                <h3 class="section-title">Tipo de solicitud</h3>
+                <h2 class="section-title">Tipo de solicitud</h2>
                 <mat-radio-group formControlName="tipoReporte" class="profile-grid">
                   <div class="profile-card"
                     [class.selected]="registroCasoForm.get('tipoReporte')?.value === 'directa'">
@@ -129,10 +131,10 @@
                   <input matInput formControlName="documento" inputmode="numeric" pattern="\d*"
                     [maxlength]="maxLongitudDocumento" (input)="soloDigitos($event)"
                     (keyup.enter)="buscarPersona($event)">
-                    <button matSuffix mat-icon-button type="button" (click)="buscarPersona($event)"
+                    <button matSuffix mat-icon-button aria-label="Buscar persona por documento" type="button" (click)="buscarPersona($event)"
                       [disabled]="buscandoPersona" matTooltip="Buscar persona">
                       @if (!buscandoPersona) {
-                        <mat-icon>search</mat-icon>
+                        <mat-icon aria-hidden="true">search</mat-icon>
                       }
                       @if (buscandoPersona) {
                         <mat-spinner diameter="18"></mat-spinner>
@@ -260,7 +262,7 @@
                           <div class="direccion-row">
                             <button mat-raised-button type="button" class="btn-direccion"
                               (click)="abrirModalDireccion()">
-                              <mat-icon>location_on</mat-icon>
+                              <mat-icon aria-hidden="true">location_on</mat-icon>
                               <span>{{ registroCasoForm.get('direccionResidencia')?.value ? 'Cambiar dirección' :
                               'Capturar dirección' }}</span>
                             </button>
@@ -269,47 +271,47 @@
                               <mat-label>Dirección de Residencia Registrada</mat-label>
                               <input matInput formControlName="direccionResidencia" readonly
                                 placeholder="No se ha registrado dirección">
-                                <mat-icon matSuffix color="primary">location_on</mat-icon>
+                                <mat-icon aria-hidden="true" matSuffix color="primary">location_on</mat-icon>
                               </mat-form-field>
                             </div>
 
                             <div class="discapacidad-container">
                               <div class="section-header-inline">
                                 <div class="section-title">
-                                  <mat-icon color="primary">accessible</mat-icon>
+                                  <mat-icon aria-hidden="true" color="primary">accessible</mat-icon>
                                   <span>Discapacidades</span>
                                 </div>
 
-                                <button mat-icon-button class="btn-add-inline" type="button"
+                                <button mat-icon-button aria-label="Agregar discapacidad" class="btn-add-inline" type="button"
                                   (click)="abrirModalDiscapacidad()">
-                                  <mat-icon>add_circle</mat-icon>
+                                  <mat-icon aria-hidden="true">add_circle</mat-icon>
                                 </button>
                               </div>
 
                               <div class="table-responsive">
-                                <table mat-table [dataSource]="discapacidadesRegistradas" class="atencion-table">
+                                <table mat-table [dataSource]="discapacidadesRegistradas" class="atencion-table" aria-label="Discapacidades registradas">
                                   <ng-container matColumnDef="tipo">
-                                    <th mat-header-cell *matHeaderCellDef> Tipo </th>
+                                    <th mat-header-cell scope="col" *matHeaderCellDef> Tipo </th>
                                     <td mat-cell *matCellDef="let element"> {{element.tipo}} </td>
                                   </ng-container>
 
                                   <ng-container matColumnDef="subTipo">
-                                    <th mat-header-cell *matHeaderCellDef> Subtipo </th>
+                                    <th mat-header-cell scope="col" *matHeaderCellDef> Subtipo </th>
                                     <td mat-cell *matCellDef="let element"> {{element.subTipo}} </td>
                                   </ng-container>
 
                                   <ng-container matColumnDef="descripcion">
-                                    <th mat-header-cell *matHeaderCellDef> Descripción </th>
+                                    <th mat-header-cell scope="col" *matHeaderCellDef> Descripción </th>
                                     <td mat-cell *matCellDef="let element"> {{element.descripcion}} </td>
                                   </ng-container>
 
                                   <ng-container matColumnDef="acciones">
-                                    <th mat-header-cell *matHeaderCellDef style="text-align: center;"> Acciones
+                                    <th mat-header-cell scope="col" *matHeaderCellDef style="text-align: center;"> Acciones
                                     </th>
                                     <td mat-cell *matCellDef="let i = index" style="text-align: center;">
-                                      <button mat-icon-button color="warn" type="button"
+                                      <button mat-icon-button [attr.aria-label]="'Eliminar la discapacidad de la fila ' + (i + 1)" color="warn" type="button"
                                         (click)="eliminarDiscapacidad(i)">
-                                        <mat-icon svgIcon="icono-eliminar"></mat-icon>
+                                        <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
                                       </button>
                                     </td>
                                   </ng-container>
@@ -323,7 +325,7 @@
 
                                 @if (discapacidadesRegistradas.length === 0) {
                                   <div class="no-results-msg">
-                                    <mat-icon>accessible</mat-icon>
+                                    <mat-icon aria-hidden="true">accessible</mat-icon>
                                     <p>No hay Discapacidades registrados.</p>
                                   </div>
                                 }
@@ -385,35 +387,35 @@
                             <div class="discapacidad-container">
                               <div class="section-header-inline">
                                 <div class="section-title">
-                                  <mat-icon color="primary">email</mat-icon>
+                                  <mat-icon aria-hidden="true" color="primary">email</mat-icon>
                                   <span>Correos Electrónicos</span>
                                 </div>
 
-                                <button mat-icon-button class="btn-add-inline" type="button"
+                                <button mat-icon-button aria-label="Agregar correo electrónico" class="btn-add-inline" type="button"
                                   (click)="abrirModalCorreo()">
-                                  <mat-icon>add_circle</mat-icon>
+                                  <mat-icon aria-hidden="true">add_circle</mat-icon>
                                 </button>
                               </div>
 
                               <div class="table-responsive">
-                                <table mat-table [dataSource]="correoRegistrados" class="atencion-table">
+                                <table mat-table [dataSource]="correoRegistrados" class="atencion-table" aria-label="Correos electrónicos registrados">
                                   <ng-container matColumnDef="tipo">
-                                    <th mat-header-cell *matHeaderCellDef> Tipo </th>
+                                    <th mat-header-cell scope="col" *matHeaderCellDef> Tipo </th>
                                     <td mat-cell *matCellDef="let element"> {{element.tipo}} </td>
                                   </ng-container>
 
                                   <ng-container matColumnDef="correo">
-                                    <th mat-header-cell *matHeaderCellDef> Correo Electrónico </th>
+                                    <th mat-header-cell scope="col" *matHeaderCellDef> Correo Electrónico </th>
                                     <td mat-cell *matCellDef="let element"> {{element.correo}} </td>
                                   </ng-container>
 
                                   <ng-container matColumnDef="acciones">
-                                    <th mat-header-cell *matHeaderCellDef style="text-align: center;"> Acciones
+                                    <th mat-header-cell scope="col" *matHeaderCellDef style="text-align: center;"> Acciones
                                     </th>
                                     <td mat-cell *matCellDef="let i = index" style="text-align: center;">
-                                      <button mat-icon-button color="warn" type="button"
+                                      <button mat-icon-button [attr.aria-label]="'Eliminar el correo de la fila ' + (i + 1)" color="warn" type="button"
                                         (click)="eliminarCorreo(i)">
-                                        <mat-icon svgIcon="icono-eliminar"></mat-icon>
+                                        <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
                                       </button>
                                     </td>
                                   </ng-container>
@@ -425,7 +427,7 @@
 
                                 @if (correoRegistrados.length === 0) {
                                   <div class="no-results-msg">
-                                    <mat-icon>mail_outline</mat-icon>
+                                    <mat-icon aria-hidden="true">mail_outline</mat-icon>
                                     <p>No hay correos adicionales registrados.</p>
                                   </div>
                                 }
@@ -443,35 +445,35 @@
                             <div class="discapacidad-container">
                               <div class="section-header-inline">
                                 <div class="section-title">
-                                  <mat-icon color="primary">phone_enabled</mat-icon>
+                                  <mat-icon aria-hidden="true" color="primary">phone_enabled</mat-icon>
                                   <span>Telefonos</span>
                                 </div>
 
-                                <button mat-icon-button class="btn-add-inline" type="button"
+                                <button mat-icon-button aria-label="Agregar teléfono" class="btn-add-inline" type="button"
                                   (click)="abrirModalTelefono()">
-                                  <mat-icon>add_circle</mat-icon>
+                                  <mat-icon aria-hidden="true">add_circle</mat-icon>
                                 </button>
                               </div>
 
                               <div class="table-responsive">
-                                <table mat-table [dataSource]="telefonosRegistrados" class="atencion-table">
+                                <table mat-table [dataSource]="telefonosRegistrados" class="atencion-table" aria-label="Teléfonos registrados">
                                   <ng-container matColumnDef="tipo">
-                                    <th mat-header-cell *matHeaderCellDef> Tipo </th>
+                                    <th mat-header-cell scope="col" *matHeaderCellDef> Tipo </th>
                                     <td mat-cell *matCellDef="let element"> {{element.tipo}} </td>
                                   </ng-container>
 
                                   <ng-container matColumnDef="correo">
-                                    <th mat-header-cell *matHeaderCellDef> Telefono </th>
+                                    <th mat-header-cell scope="col" *matHeaderCellDef> Telefono </th>
                                     <td mat-cell *matCellDef="let element"> {{element.telefono}} </td>
                                   </ng-container>
 
                                   <ng-container matColumnDef="acciones">
-                                    <th mat-header-cell *matHeaderCellDef style="text-align: center;"> Acciones
+                                    <th mat-header-cell scope="col" *matHeaderCellDef style="text-align: center;"> Acciones
                                     </th>
                                     <td mat-cell *matCellDef="let i = index" style="text-align: center;">
-                                      <button mat-icon-button color="warn" type="button"
+                                      <button mat-icon-button [attr.aria-label]="'Eliminar el teléfono de la fila ' + (i + 1)" color="warn" type="button"
                                         (click)="eliminarTelefono(i)">
-                                        <mat-icon svgIcon="icono-eliminar"></mat-icon>
+                                        <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
                                       </button>
                                     </td>
                                   </ng-container>
@@ -483,7 +485,7 @@
 
                                 @if (telefonosRegistrados.length === 0) {
                                   <div class="no-results-msg">
-                                    <mat-icon>phone_enabled</mat-icon>
+                                    <mat-icon aria-hidden="true">phone_enabled</mat-icon>
                                     <p>No hay Telefonos adicionales registrados.</p>
                                   </div>
                                 }
@@ -591,7 +593,7 @@
                         <div class="tab-padding">
                           @if (!idRegistroCreado) {
                             <div class="no-results-msg">
-                              <mat-icon>info</mat-icon>
+                              <mat-icon aria-hidden="true">info</mat-icon>
                               <p>Guarda primero el registro Línea ALMA para poder agregar intentos de contacto.</p>
                             </div>
                           }
@@ -614,7 +616,7 @@
                                 <button mat-raised-button color="primary" type="button"
                                   (click)="registrarIntentoContacto()"
                                   [disabled]="guardandoContacto || contactoFechaCtrl.invalid || contactoResultadoCtrl.invalid">
-                                  <mat-icon>{{ guardandoContacto ? 'hourglass_top' : 'phone_callback'
+                                  <mat-icon aria-hidden="true">{{ guardandoContacto ? 'hourglass_top' : 'phone_callback'
                                   }}</mat-icon>
                                   <span>{{ guardandoContacto ? 'Registrando...' : 'Registrar intento'
                                   }}</span>
@@ -624,28 +626,28 @@
                             <div class="discapacidad-container">
                               <div class="section-header-inline">
                                 <div class="section-title">
-                                  <mat-icon color="primary">history</mat-icon>
+                                  <mat-icon aria-hidden="true" color="primary">history</mat-icon>
                                   <span>Intentos de contacto registrados</span>
                                 </div>
                               </div>
                               <div class="table-responsive">
-                                <table mat-table [dataSource]="contactosRegistrados" class="atencion-table">
+                                <table mat-table [dataSource]="contactosRegistrados" class="atencion-table" aria-label="Contactos registrados">
                                   <ng-container matColumnDef="fecha">
-                                    <th mat-header-cell *matHeaderCellDef> Fecha y hora </th>
+                                    <th mat-header-cell scope="col" *matHeaderCellDef> Fecha y hora </th>
                                     <td mat-cell *matCellDef="let c"> {{ c.fecha | date:'dd/MM/yyyy HH:mm'
                                     }} </td>
                                   </ng-container>
                                   <ng-container matColumnDef="resultado">
-                                    <th mat-header-cell *matHeaderCellDef> Resultado </th>
+                                    <th mat-header-cell scope="col" *matHeaderCellDef> Resultado </th>
                                     <td mat-cell *matCellDef="let c"> {{ c.resultado }} </td>
                                   </ng-container>
                                   <ng-container matColumnDef="acciones">
-                                    <th mat-header-cell *matHeaderCellDef style="text-align: center;">
+                                    <th mat-header-cell scope="col" *matHeaderCellDef style="text-align: center;">
                                     Acciones </th>
                                     <td mat-cell *matCellDef="let i = index" style="text-align: center;">
-                                      <button mat-icon-button color="warn" type="button"
+                                      <button mat-icon-button [attr.aria-label]="'Eliminar el contacto de la fila ' + (i + 1)" color="warn" type="button"
                                         (click)="eliminarContacto(i)">
-                                        <mat-icon svgIcon="icono-eliminar"></mat-icon>
+                                        <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
                                       </button>
                                     </td>
                                   </ng-container>
@@ -657,13 +659,13 @@
                                 @if (contactosRegistrados.length === 0 && !cargandoContactos) {
                                   <div
                                     class="no-results-msg">
-                                    <mat-icon>phone_disabled</mat-icon>
+                                    <mat-icon aria-hidden="true">phone_disabled</mat-icon>
                                     <p>No hay intentos de contacto registrados.</p>
                                   </div>
                                 }
                                 @if (cargandoContactos) {
                                   <div class="no-results-msg">
-                                    <mat-icon>hourglass_top</mat-icon>
+                                    <mat-icon aria-hidden="true">hourglass_top</mat-icon>
                                     <p>Cargando intentos...</p>
                                   </div>
                                 }
@@ -678,41 +680,41 @@
                           <div class="discapacidad-container">
                             <div class="section-header-inline">
                               <div class="section-title">
-                                <mat-icon color="primary">assignment</mat-icon>
+                                <mat-icon aria-hidden="true" color="primary">assignment</mat-icon>
                                 <span>Remisiones</span>
                               </div>
 
-                              <button mat-icon-button class="btn-add-inline" type="button"
+                              <button mat-icon-button aria-label="Agregar remisión" class="btn-add-inline" type="button"
                                 (click)="abrirModalRemision()" matTooltip="Agregar Remisión">
-                                <mat-icon>add_circle</mat-icon>
+                                <mat-icon aria-hidden="true">add_circle</mat-icon>
                               </button>
                             </div>
 
                             <div class="table-responsive">
-                              <table mat-table [dataSource]="remisionesRegistrados" class="atencion-table">
+                              <table mat-table [dataSource]="remisionesRegistrados" class="atencion-table" aria-label="Remisiones registradas">
                                 <ng-container matColumnDef="tipo">
-                                  <th mat-header-cell *matHeaderCellDef> Tipo </th>
+                                  <th mat-header-cell scope="col" *matHeaderCellDef> Tipo </th>
                                   <td mat-cell *matCellDef="let element"> {{element.tipo}} </td>
                                 </ng-container>
 
                                 <ng-container matColumnDef="fecha">
-                                  <th mat-header-cell *matHeaderCellDef> Fecha </th>
+                                  <th mat-header-cell scope="col" *matHeaderCellDef> Fecha </th>
                                   <td mat-cell *matCellDef="let element"> {{element.fecha |
                                   date:'dd/MM/yyyy'}} </td>
                                 </ng-container>
 
                                 <ng-container matColumnDef="cual">
-                                  <th mat-header-cell *matHeaderCellDef> Cual </th>
+                                  <th mat-header-cell scope="col" *matHeaderCellDef> Cual </th>
                                   <td mat-cell *matCellDef="let element"> {{element.cual}} </td>
                                 </ng-container>
 
                                 <ng-container matColumnDef="acciones">
-                                  <th mat-header-cell *matHeaderCellDef style="text-align: center;"> Acciones
+                                  <th mat-header-cell scope="col" *matHeaderCellDef style="text-align: center;"> Acciones
                                   </th>
                                   <td mat-cell *matCellDef="let i = index" style="text-align: center;">
-                                    <button mat-icon-button color="warn" type="button"
+                                    <button mat-icon-button [attr.aria-label]="'Eliminar la remisión de la fila ' + (i + 1)" color="warn" type="button"
                                       (click)="eliminarRemision(i)">
-                                      <mat-icon svgIcon="icono-eliminar"></mat-icon>
+                                      <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
                                     </button>
                                   </td>
                                 </ng-container>
@@ -725,7 +727,7 @@
 
                               @if (remisionesRegistrados.length === 0) {
                                 <div class="no-results-msg">
-                                  <mat-icon>assignment</mat-icon>
+                                  <mat-icon aria-hidden="true">assignment</mat-icon>
                                   <p>No hay activaciones de rutas registradas.</p>
                                 </div>
                               }
@@ -738,7 +740,7 @@
                     <div class="section-header-inline" style="justify-content: flex-end; margin-top: 16px;">
                       <button mat-raised-button color="primary" type="button" (click)="guardarRegistro()"
                         [disabled]="guardandoRegistro || cargandoCatalogos">
-                        <mat-icon>{{ guardandoRegistro ? 'hourglass_top' : 'save' }}</mat-icon>
+                        <mat-icon aria-hidden="true">{{ guardandoRegistro ? 'hourglass_top' : 'save' }}</mat-icon>
                         <span>{{ guardandoRegistro ? 'Guardando...' : 'Guardar' }}</span>
                       </button>
                     </div>

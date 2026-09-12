@@ -2,7 +2,7 @@
   <div class="hnav-container">
 
     <!-- 0. Panel de Inicio -->
-    <a routerLink="/inicio" routerLinkActive="hnav-item--active" class="hnav-link">
+    <a routerLink="/inicio" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
       <mat-icon class="hnav-icon" aria-hidden="true">dashboard</mat-icon>
       <span class="hnav-text">Inicio</span>
     </a>
@@ -17,11 +17,11 @@
       </button>
 
       <mat-menu #adminMenu="matMenu" class="hnav-menu">
-        <a mat-menu-item routerLink="/gestion-usuarios" routerLinkActive="hnav-menu-item--active">
+        <a mat-menu-item routerLink="/gestion-usuarios" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
           <mat-icon aria-hidden="true">manage_accounts</mat-icon>
           <span>Gestión de Usuarios</span>
         </a>
-        <a mat-menu-item routerLink="/gestion-sistema" routerLinkActive="hnav-menu-item--active">
+        <a mat-menu-item routerLink="/gestion-sistema" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
           <mat-icon aria-hidden="true">tune</mat-icon>
           <span>Maestros del Sistema</span>
         </a>
@@ -38,23 +38,23 @@
       </button>
 
       <mat-menu #atencionMenu="matMenu" class="hnav-menu">
-        <a mat-menu-item routerLink="/solicitud-acompanamiento" routerLinkActive="hnav-menu-item--active">
+        <a mat-menu-item routerLink="/solicitud-acompanamiento" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
           <mat-icon aria-hidden="true">add_circle_outline</mat-icon>
           <span>Nueva Solicitud</span>
         </a>
-        <a mat-menu-item routerLink="/consulta" routerLinkActive="hnav-menu-item--active">
+        <a mat-menu-item routerLink="/consulta" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
           <mat-icon aria-hidden="true">search</mat-icon>
           <span>Consulta de Solicitudes</span>
         </a>
-        <a mat-menu-item routerLink="/cita" routerLinkActive="hnav-menu-item--active">
+        <a mat-menu-item routerLink="/cita" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
           <mat-icon aria-hidden="true">calendar_month</mat-icon>
           <span>Citas y Agendamiento</span>
         </a>
-        <a mat-menu-item routerLink="/registro-caso" routerLinkActive="hnav-menu-item--active">
+        <a mat-menu-item routerLink="/registro-caso" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
           <mat-icon aria-hidden="true">folder_shared</mat-icon>
           <span>Registro de Caso</span>
         </a>
-        <a mat-menu-item routerLink="/registro-atencion" routerLinkActive="hnav-menu-item--active">
+        <a mat-menu-item routerLink="/registro-atencion" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
           <mat-icon aria-hidden="true">handshake</mat-icon>
           <span>Registro de Atención</span>
         </a>
@@ -63,7 +63,7 @@
 
     <!-- 3. Línea Alma -->
     @if (auth.isRevisor() && (features.complaintIntakePrototype || features.publicTrackingPrototype)) {
-      <a mat-button routerLink="/linea-alma/atencion-pr" routerLinkActive="hnav-item--active" class="hnav-link">
+      <a mat-button routerLink="/linea-alma/atencion-pr" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
         <mat-icon class="hnav-icon" aria-hidden="true">ring_volume</mat-icon>
         <span class="hnav-text">Línea Alma</span>
       </a>
@@ -80,13 +80,13 @@
 
       <mat-menu #uadMenu="matMenu" class="hnav-menu">
         @if (features.complaintIntakePrototype) {
-          <a mat-menu-item routerLink="/nueva-queja" routerLinkActive="hnav-menu-item--active">
+          <a mat-menu-item routerLink="/nueva-queja" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
             <mat-icon aria-hidden="true">post_add</mat-icon>
             <span>Registrar Queja Disciplinaria</span>
           </a>
         }
         @if (features.publicTrackingPrototype) {
-          <a mat-menu-item routerLink="/seguimiento" routerLinkActive="hnav-menu-item--active">
+          <a mat-menu-item routerLink="/seguimiento" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
             <mat-icon aria-hidden="true">track_changes</mat-icon>
             <span>Seguimiento de Trámites</span>
           </a>
@@ -96,7 +96,7 @@
 
     <!-- 5. Reportes y Métricas (Admin) -->
     @if (auth.isAdmin() && features.reviewerDashboardPrototype) {
-      <a routerLink="/dashboard-revisor" routerLinkActive="hnav-item--active" class="hnav-link">
+      <a routerLink="/dashboard-revisor" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
         <mat-icon class="hnav-icon" aria-hidden="true">bar_chart</mat-icon>
         <span class="hnav-text">Panel de Indicadores</span>
       </a>
@@ -104,7 +104,7 @@
 
     <!-- 6. Ruta Violeta -->
     @if (features.publicTrackingPrototype) {
-      <a routerLink="/seguimiento" routerLinkActive="hnav-item--active" class="hnav-link">
+      <a routerLink="/seguimiento" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
         <mat-icon class="hnav-icon" aria-hidden="true">diversity_1</mat-icon>
         <span class="hnav-text">Ruta Violeta</span>
       </a>

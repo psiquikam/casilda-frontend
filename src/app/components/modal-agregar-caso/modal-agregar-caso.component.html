@@ -1,12 +1,14 @@
 <div class="modal-header">
   <span class="modal-header-title">{{ tituloModal }}</span>
-  <button mat-icon-button class="btn-close" (click)="onCerrar()" type="button">
-    <mat-icon>close</mat-icon>
+  <button mat-icon-button aria-label="Cerrar el diálogo" class="btn-close" (click)="onCerrar()" type="button">
+    <mat-icon aria-hidden="true">close</mat-icon>
   </button>
 </div>
 
 <mat-dialog-content class="modal-content">
-  <form [formGroup]="casoForm">
+  <!-- Los campos describen a terceras personas (no a quien usa el sistema): sin autocompletado,
+       para que el navegador no sugiera los datos del profesional (WCAG 1.3.5 no aplica). -->
+  <form [formGroup]="casoForm" autocomplete="off">
     <mat-tab-group animationDuration="150ms">
 
       <!-- ===================== TAB 1: Documentación del caso ===================== -->
@@ -60,9 +62,9 @@
           <!-- Documentación de hechos -->
           <div class="hechos-acciones-row">
             <span class="hechos-doc-label">Documentación de hechos</span>
-            <button mat-icon-button class="btn-add-green" type="button" (click)="abrirModalHechos()"
+            <button mat-icon-button aria-label="Agregar hechos" class="btn-add-green" type="button" (click)="abrirModalHechos()"
               matTooltip="Agregar Hecho">
-              <mat-icon>add_circle</mat-icon>
+              <mat-icon aria-hidden="true">add_circle</mat-icon>
             </button>
           </div>
 
@@ -73,7 +75,7 @@
               <span class="hechos-opcion-label">Opción</span>
             </div>
 
-            <table mat-table [dataSource]="hechosRegistrados" class="hechos-table">
+            <table mat-table [dataSource]="hechosRegistrados" class="hechos-table" aria-label="Hechos registrados">
 
               <ng-container matColumnDef="fecha">
                 <td mat-cell *matCellDef="let element">{{element.fecha | date:'MM/yyyy'}}</td>
@@ -89,8 +91,8 @@
 
               <ng-container matColumnDef="opcion">
                 <td mat-cell *matCellDef="let element; let i = index" class="opcion-cell">
-                  <button mat-icon-button type="button" (click)="eliminarHecho(i)" matTooltip="Eliminar">
-                    <mat-icon svgIcon="icono-eliminar"></mat-icon>
+                  <button mat-icon-button [attr.aria-label]="'Eliminar el hecho de la fila ' + (i + 1)" type="button" (click)="eliminarHecho(i)" matTooltip="Eliminar">
+                    <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
                   </button>
                 </td>
               </ng-container>

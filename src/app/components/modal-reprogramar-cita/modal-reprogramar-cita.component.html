@@ -1,6 +1,6 @@
 <div class="modal-container">
   <h2 mat-dialog-title class="modal-header" [ngClass]="{'bg-cancel': data.accion === 'cancelar'}">
-    <mat-icon>{{ icono }}</mat-icon>
+    <mat-icon aria-hidden="true">{{ icono }}</mat-icon>
     <span>{{ titulo }}: {{ data.caso.id }}</span>
   </h2>
 
@@ -34,7 +34,7 @@
 
         @if (data.accion === 'reprogramar' && gestionForm.hasError('invalidDateTime')) {
           <div class="span-all error-message">
-            <mat-icon>error</mat-icon>
+            <mat-icon aria-hidden="true">error</mat-icon>
             <span>La fecha y hora debe ser mayor o igual a la fecha y hora actual</span>
           </div>
         }
@@ -66,7 +66,7 @@
       class="btn-confirm"
       (click)="guardar()"
       [disabled]="gestionForm.invalid">
-      <mat-icon>check_circle</mat-icon>
+      <mat-icon aria-hidden="true">check_circle</mat-icon>
       Confirmar {{ data.accion === 'cancelar' ? 'Cancelación' : 'Reprogramación' }}
     </button>
   </mat-dialog-actions>

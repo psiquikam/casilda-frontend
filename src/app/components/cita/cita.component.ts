@@ -7,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { MatPaginatorModule, MatPaginatorIntl, PageEvent } from '@angular/material/paginator';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
@@ -15,33 +15,15 @@ import { MatDialog } from '@angular/material/dialog';
 import { ReprogramarCitaModalComponent } from '../modal-reprogramar-cita/modal-reprogramar-cita.component';
 import { SolicitudService, CitaDto, EstadoCitaEnum } from '../../services/solicitud.service';
 import { formatOnlyDate } from '../../custom-date-adapter';
-
-export function getSpanishPaginatorIntl() {
-  const paginatorIntl = new MatPaginatorIntl();
-  paginatorIntl.itemsPerPageLabel = 'Elementos por página:';
-  paginatorIntl.nextPageLabel = 'Siguiente';
-  paginatorIntl.previousPageLabel = 'Anterior';
-  paginatorIntl.firstPageLabel = 'Primera página';
-  paginatorIntl.lastPageLabel = 'Última página';
-  paginatorIntl.getRangeLabel = (page: number, pageSize: number, length: number) => {
-    if (length === 0 || pageSize === 0) return `0 de ${length}`;
-    length = Math.max(length, 0);
-    const startIndex = page * pageSize;
-    const endIndex = startIndex < length ? Math.min(startIndex + pageSize, length) : startIndex + pageSize;
-    return `${startIndex + 1} – ${endIndex} de ${length}`;
-  };
-  return paginatorIntl;
-}
+import { FiltroColumnaDirective } from '../../core/a11y/filtro-columna.directive';
+import { NotificacionService } from '../../core/a11y/notificacion.service';
 
 @Component({
     selector: 'app-cita',
     imports: [
         CommonModule, MatCardModule, MatFormFieldModule,
         MatInputModule, MatButtonModule, MatIconModule,
-        MatDividerModule, MatTableModule, MatPaginatorModule, MatTooltipModule
-    ],
-    providers: [
-        { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
+        MatDividerModule, MatTableModule, MatPaginatorModule, MatTooltipModule, FiltroColumnaDirective
     ],
     templateUrl: './cita.component.html',
     styleUrls: ['./cita.component.scss'],
@@ -54,6 +36,7 @@ export function getSpanishPaginatorIntl() {
     ]
 })
 export class CitaComponent implements OnInit, AfterViewInit {
+  private readonly notificacion = inject(NotificacionService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private dialog = inject(MatDialog);
@@ -177,7 +160,7 @@ export class CitaComponent implements OnInit, AfterViewInit {
           observaciones: f.observaciones
         }).subscribe({
           next: () => this.cargarCitas(this.pageIndex, this.pageSize),
-          error: (err) => console.error('Error al cancelar cita:', err)
+          error: (err) => this.notificacion.error('No fue posible cancelar la cita. Intenta de nuevo.', err)
         });
       } else {
         const f = result.formulario;
@@ -188,7 +171,7 @@ export class CitaComponent implements OnInit, AfterViewInit {
           observaciones: f.observaciones
         }).subscribe({
           next: () => this.cargarCitas(this.pageIndex, this.pageSize),
-          error: (err) => console.error('Error al reprogramar cita:', err)
+          error: (err) => this.notificacion.error('No fue posible reprogramar la cita. Intenta de nuevo.', err)
         });
       }
     });

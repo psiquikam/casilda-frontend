@@ -19,6 +19,7 @@ import { ModalCorreoComponent } from '../modal-correo/modal-correo.component';
 import { ModalTelefonoComponent } from '../modal-telefono/modal-telefono.component';
 import { ListasService, MaestroDto } from '../../services/listas.service';
 import { SolicitudService, UpdateSolicitudDto } from '../../services/solicitud.service';
+import { NotificacionService } from '../../core/a11y/notificacion.service';
 
 interface CorreoRegistrado {
   tipoId?: number | null;
@@ -61,6 +62,7 @@ interface ContactoInfo {
     styleUrls: ['./modal-detalle-solicitud.component.scss']
 })
 export class ModalDetalleSolicitudComponent implements OnInit {
+  private readonly notificacion = inject(NotificacionService);
   private fb = inject(FormBuilder);
   private dialog = inject(MatDialog);
   private solicitudService = inject(SolicitudService);
@@ -209,7 +211,7 @@ export class ModalDetalleSolicitudComponent implements OnInit {
         this.dialogRef.close(solicitudActualizada);
       },
       error: (error) => {
-        console.error('Error al actualizar solicitud:', error);
+        this.notificacion.error('No fue posible guardar los cambios de la solicitud. Intenta de nuevo.', error);
         this.guardando = false;
         this.snackBar.open(this.obtenerMensajeError(error), 'Cerrar', {
           duration: 6000,

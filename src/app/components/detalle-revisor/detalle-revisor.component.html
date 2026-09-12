@@ -1,8 +1,8 @@
 <div class="detalle-container">
   <div class="header-acciones">
     <div class="titulo">
-      <button mat-icon-button routerLink="/dashboard-revisor">
-        <mat-icon>arrow_back</mat-icon>
+      <button mat-icon-button aria-label="Volver al panel de indicadores" routerLink="/dashboard-revisor">
+        <mat-icon aria-hidden="true">arrow_back</mat-icon>
       </button>
       <div>
         <h1>Expediente {{ caso.id }}</h1>
@@ -19,16 +19,16 @@
       <span class="label">GESTIONAR FASE:</span>
       @if (caso.estadoActual === 1) {
         <button mat-flat-button color="primary" (click)="cambiarEstado(2)">
-          <mat-icon>play_arrow</mat-icon> Iniciar Indagación
+          <mat-icon aria-hidden="true">play_arrow</mat-icon> Iniciar Indagación
         </button>
       }
       @if (caso.estadoActual === 2) {
         <button mat-flat-button color="accent" (click)="cambiarEstado(3)">
-          <mat-icon>gavel</mat-icon> Elevar a Investigación
+          <mat-icon aria-hidden="true">gavel</mat-icon> Elevar a Investigación
         </button>
       }
       <button mat-stroked-button color="warn">
-        <mat-icon>block</mat-icon> Desestimar
+        <mat-icon aria-hidden="true">block</mat-icon> Desestimar
       </button>
     </div>
   </div>
@@ -83,12 +83,12 @@
             <div class="file-grid">
               @for (file of caso.archivos; track file) {
                 <div class="file-card">
-                  <mat-icon>description</mat-icon>
+                  <mat-icon aria-hidden="true">description</mat-icon>
                   <div class="file-meta">
                     <span class="name">{{ file.nombre }}</span>
                     <span class="size">{{ file.tamano }}</span>
                   </div>
-                  <button mat-icon-button color="primary"><mat-icon>download</mat-icon></button>
+                  <button mat-icon-button [attr.aria-label]="'Descargar ' + file.nombre" color="primary"><mat-icon aria-hidden="true">download</mat-icon></button>
                 </div>
               }
             </div>
@@ -105,18 +105,18 @@
         <mat-card-content>
           <div class="mini-timeline">
             <div class="step" [class.done]="caso.estadoActual >= 1">
-              <mat-icon>{{ caso.estadoActual >= 1 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
-              <span>Recepción</span>
+              <mat-icon aria-hidden="true">{{ caso.estadoActual >= 1 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+              <span>Recepción<span class="visually-hidden">{{ caso.estadoActual >= 1 ? ' (completada)' : ' (pendiente)' }}</span></span>
             </div>
             <div class="line"></div>
             <div class="step" [class.done]="caso.estadoActual >= 2">
-              <mat-icon>{{ caso.estadoActual >= 2 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
-              <span>Indagación Previa</span>
+              <mat-icon aria-hidden="true">{{ caso.estadoActual >= 2 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+              <span>Indagación Previa<span class="visually-hidden">{{ caso.estadoActual >= 2 ? ' (completada)' : ' (pendiente)' }}</span></span>
             </div>
             <div class="line"></div>
             <div class="step" [class.done]="caso.estadoActual >= 3">
-              <mat-icon>{{ caso.estadoActual >= 3 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
-              <span>Investigación</span>
+              <mat-icon aria-hidden="true">{{ caso.estadoActual >= 3 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+              <span>Investigación<span class="visually-hidden">{{ caso.estadoActual >= 3 ? ' (completada)' : ' (pendiente)' }}</span></span>
             </div>
           </div>
         </mat-card-content>

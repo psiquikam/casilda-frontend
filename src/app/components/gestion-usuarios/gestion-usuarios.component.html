@@ -5,15 +5,15 @@
       <p>Administre los accesos y roles del personal institucional.</p>
     </div>
     <button mat-raised-button color="primary" (click)="abrirFormulario()">
-      <mat-icon>person_add</mat-icon> Nuevo Usuario
+      <mat-icon aria-hidden="true">person_add</mat-icon> Nuevo Usuario
     </button>
   </header>
 
   <mat-card class="table-card">
-    <table mat-table [dataSource]="dataSource" class="full-width">
+    <table mat-table [dataSource]="dataSource" class="full-width" aria-label="Usuarios del sistema">
       
       <ng-container matColumnDef="nombre">
-        <th mat-header-cell *matHeaderCellDef> Usuario </th>
+        <th mat-header-cell scope="col" *matHeaderCellDef> Usuario </th>
         <td mat-cell *matCellDef="let user"> 
           <div class="user-cell">
             <div class="mini-avatar">{{user.nombre[0]}}</div>
@@ -23,12 +23,12 @@
       </ng-container>
 
       <ng-container matColumnDef="email">
-        <th mat-header-cell *matHeaderCellDef> Correo Electrónico </th>
+        <th mat-header-cell scope="col" *matHeaderCellDef> Correo Electrónico </th>
         <td mat-cell *matCellDef="let user"> {{user.email}} </td>
       </ng-container>
 
       <ng-container matColumnDef="rol">
-        <th mat-header-cell *matHeaderCellDef> Rol </th>
+        <th mat-header-cell scope="col" *matHeaderCellDef> Rol </th>
         <td mat-cell *matCellDef="let user">
           <span class="role-badge" [ngClass]="user.rol.toLowerCase()">
             {{user.rol}}
@@ -37,24 +37,24 @@
       </ng-container>
 
       <ng-container matColumnDef="estado">
-        <th mat-header-cell *matHeaderCellDef> Estado </th>
+        <th mat-header-cell scope="col" *matHeaderCellDef> Estado </th>
         <td mat-cell *matCellDef="let user">
           <button mat-button (click)="toggleEstado(user)" 
                   [color]="user.estado === 'Activo' ? 'primary' : 'warn'">
-            <mat-icon>{{ user.estado === 'Activo' ? 'check_circle' : 'block' }}</mat-icon>
+            <mat-icon aria-hidden="true">{{ user.estado === 'Activo' ? 'check_circle' : 'block' }}</mat-icon>
             {{user.estado}}
           </button>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="acciones">
-        <th mat-header-cell *matHeaderCellDef> Acciones </th>
+        <th mat-header-cell scope="col" *matHeaderCellDef> Acciones </th>
         <td mat-cell *matCellDef="let user">
-          <button mat-icon-button matTooltip="Editar" (click)="abrirFormulario(user)">
-            <mat-icon svgIcon="icono-editar"></mat-icon>
+          <button mat-icon-button [attr.aria-label]="'Editar el usuario ' + user.nombre" matTooltip="Editar" (click)="abrirFormulario(user)">
+            <mat-icon aria-hidden="true" svgIcon="icono-editar"></mat-icon>
           </button>
-          <button mat-icon-button matTooltip="Eliminar" (click)="eliminarUsuario(user.id)">
-            <mat-icon svgIcon="icono-eliminar"></mat-icon>
+          <button mat-icon-button [attr.aria-label]="'Eliminar el usuario ' + user.nombre" matTooltip="Eliminar" (click)="eliminarUsuario(user.id)">
+            <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
           </button>
         </td>
       </ng-container>

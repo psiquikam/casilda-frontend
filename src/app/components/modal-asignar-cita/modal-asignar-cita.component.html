@@ -1,6 +1,6 @@
 <div class="modal-container">
   <h2 mat-dialog-title class="modal-header">
-    <mat-icon>event</mat-icon>
+    <mat-icon aria-hidden="true">event</mat-icon>
     <span>Asignar Cita: {{ data.id }}</span>
   </h2>
 
@@ -28,7 +28,7 @@
   <mat-dialog-actions align="end" class="modal-footer">
     <button mat-button (click)="cerrar()" color="warn">Cancelar</button>
     <button mat-flat-button class="btn-confirm" (click)="guardar()" [disabled]="citaForm.invalid">
-      <mat-icon>check_circle</mat-icon>
+      <mat-icon aria-hidden="true">check_circle</mat-icon>
       Guardar
     </button>
   </mat-dialog-actions>

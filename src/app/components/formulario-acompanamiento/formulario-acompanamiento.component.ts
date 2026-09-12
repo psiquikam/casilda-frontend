@@ -24,6 +24,9 @@ import { PersonaSearchDto, SolicitudService } from '../../services/solicitud.ser
 import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
 import { ModalCorreoComponent } from '../modal-correo/modal-correo.component';
 import { ModalTelefonoComponent } from '../modal-telefono/modal-telefono.component';
+import { ResumenErroresComponent } from '../../core/a11y/resumen-errores.component';
+import { DescripcionCampos, ErrorFormulario, recolectarErrores } from '../../core/a11y/errores-formulario';
+import { NotificacionService } from '../../core/a11y/notificacion.service';
 
 @Component({
     selector: 'app-formulario-acompanamiento',
@@ -32,12 +35,13 @@ import { ModalTelefonoComponent } from '../modal-telefono/modal-telefono.compone
         MatInputModule, MatSelectModule, MatDatepickerModule, MatNativeDateModule,
         MatButtonModule, MatIconModule, MatSnackBarModule, MatRadioModule,
         MatDialogModule, MatTabsModule, MatProgressSpinnerModule, MatTableModule,
-        MatTooltipModule
+        MatTooltipModule, ResumenErroresComponent
     ],
     templateUrl: './formulario-acompanamiento.component.html',
     styleUrls: ['./formulario-acompanamiento.component.scss']
 })
 export class FormularioAcompanamientoComponent implements OnInit {
+  private readonly notificacion = inject(NotificacionService);
   private fb = inject(FormBuilder);
   private listasService = inject(ListasService);
   private solicitudService = inject(SolicitudService);
@@ -239,12 +243,41 @@ export class FormularioAcompanamientoComponent implements OnInit {
     return `${day}/${month}/${year}`;
   }
 
+  /** Errores del envío para el resumen enfocable (WCAG 3.3.1); pestaña activa del formulario. */
+  erroresEnvio: ErrorFormulario[] = [];
+  tabSeleccionada = 0;
+
+  private readonly camposEnvio: DescripcionCampos = {
+    tipoReporte: { etiqueta: 'Tipo de solicitud', mensajes: { required: 'Indica si la solicitud es directa o indirecta.' } },
+    medioSolicitud: { etiqueta: 'Medio de la solicitud', mensajes: { required: 'Indica si llegó de forma presencial o virtual.' } },
+    remitentePrimerNombre: { etiqueta: 'Primer nombre del remitente' },
+    remitentePrimerApellido: { etiqueta: 'Primer apellido del remitente' },
+    remitenteCargo: { etiqueta: 'Cargo del remitente' },
+    remitenteCampus: { etiqueta: 'Campus del remitente' },
+    remitenteUnidadAdministrativa: { etiqueta: 'Unidad administrativa del remitente' },
+    remitenteUnidadAcademica: { etiqueta: 'Unidad académica del remitente' },
+    tipoDocumento: { etiqueta: 'Tipo de documento del solicitante' },
+    numeroDocumento: { etiqueta: 'Número de documento del solicitante', mensajes: { pattern: 'Escribe solo números, sin puntos ni espacios.' } },
+    fechaNacimiento: { etiqueta: 'Fecha de nacimiento del solicitante' },
+    primerNombre: { etiqueta: 'Primer nombre del solicitante' },
+    primerApellido: { etiqueta: 'Primer apellido del solicitante' },
+    identidadGenero: { etiqueta: 'Identidad de género del solicitante' }
+  };
+
+  /** Muestra la pestaña que contiene el campo antes de que el resumen lo enfoque. */
+  revelarCampo(id: string): void {
+    if (this.acompanamientoForm.get('tipoReporte')?.value !== 'indirecta') return;
+    this.tabSeleccionada = id.startsWith('acomp-remitente') ? 0 : 1;
+  }
+
   enviarSolicitud(): void {
     if (this.acompanamientoForm.invalid) {
       this.acompanamientoForm.markAllAsTouched();
-      this.snackBar.open('Por favor, revisa los campos marcados en rojo', 'Cerrar', { duration: 3000 });
+      // Nueva referencia en cada intento para que el resumen recupere el foco.
+      this.erroresEnvio = recolectarErrores(this.acompanamientoForm, this.camposEnvio, 'acomp');
       return;
     }
+    this.erroresEnvio = [];
 
     const fv = this.acompanamientoForm.value;
     const tipoReporte = fv.tipoReporte as 'directa' | 'indirecta';
@@ -318,7 +351,7 @@ export class FormularioAcompanamientoComponent implements OnInit {
       },
       error: (error) => {
         this.enviando = false;
-        console.error('Error creando solicitud:', error);
+        this.notificacion.error('No fue posible enviar la solicitud. Tus datos siguen en el formulario; intenta de nuevo.', error);
         const msg = error?.error?.message || 'Error al enviar la solicitud. Intente de nuevo.';
         this.snackBar.open(msg, 'Cerrar', { duration: 5000 });
       }

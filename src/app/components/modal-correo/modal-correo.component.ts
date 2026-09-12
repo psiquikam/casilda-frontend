@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { NotificacionService } from '../../core/a11y/notificacion.service';
 
 interface TipoCorreoDto {
   id: number;
@@ -30,6 +31,7 @@ interface TipoCorreoDto {
     styleUrls: ['./modal-correo.component.scss']
 })
 export class ModalCorreoComponent implements OnInit {
+  private readonly notificacion = inject(NotificacionService);
 
   private http = inject(HttpClient);
 
@@ -46,7 +48,7 @@ export class ModalCorreoComponent implements OnInit {
   ngOnInit(): void {
     this.http.get<TipoCorreoDto[]>(`${environment.apiBaseUrl}/maestros/tipos-correo`).subscribe({
       next: (tipos) => this.tiposCorreo = tipos,
-      error: (err) => console.error('Error al cargar tipos de correo:', err)
+      error: (err) => this.notificacion.error('No fue posible cargar los tipos de correo. Cierra el diálogo e intenta de nuevo.', err)
     });
   }
 

@@ -9,7 +9,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatPaginator, MatPaginatorIntl, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { ModalDetalleSolicitudComponent } from '../modal-detalle-solicitud/modal-detalle-solicitud.component';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
@@ -17,33 +17,15 @@ import { RepartoModalComponent } from '../modal-reparto/modal-reparto.component'
 import { Router } from '@angular/router';
 import { SolicitudService } from '../../services/solicitud.service';
 import { formatFechaCreacion } from '../../custom-date-adapter';
-
-export function getSpanishPaginatorIntl() {
-  const paginatorIntl = new MatPaginatorIntl();
-  paginatorIntl.itemsPerPageLabel = 'Elementos por página:';
-  paginatorIntl.nextPageLabel = 'Siguiente';
-  paginatorIntl.previousPageLabel = 'Anterior';
-  paginatorIntl.firstPageLabel = 'Primera página';
-  paginatorIntl.lastPageLabel = 'Última página';
-  paginatorIntl.getRangeLabel = (page: number, pageSize: number, length: number) => {
-    if (length === 0 || pageSize === 0) return `0 de ${length}`;
-    length = Math.max(length, 0);
-    const startIndex = page * pageSize;
-    const endIndex = startIndex < length ? Math.min(startIndex + pageSize, length) : startIndex + pageSize;
-    return `${startIndex + 1} – ${endIndex} de ${length}`;
-  };
-  return paginatorIntl;
-}
+import { FiltroColumnaDirective } from '../../core/a11y/filtro-columna.directive';
+import { NotificacionService } from '../../core/a11y/notificacion.service';
 
 @Component({
     selector: 'app-consulta',
     imports: [
         CommonModule, FormsModule, MatTabsModule, MatTableModule,
         MatButtonModule, MatIconModule, MatChipsModule, MatCardModule,
-        MatInputModule, MatDialogModule, MatPaginatorModule
-    ],
-    providers: [
-        { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
+        MatInputModule, MatDialogModule, MatPaginatorModule, FiltroColumnaDirective
     ],
     templateUrl: './consulta.component.html',
     styleUrls: ['./consulta.component.scss'],
@@ -56,6 +38,7 @@ export function getSpanishPaginatorIntl() {
     ]
 })
 export class ConsultaComponent implements OnInit, AfterViewInit {
+  private readonly notificacion = inject(NotificacionService);
 
   private solicitudService = inject(SolicitudService);
   private router = inject(Router);
@@ -109,7 +92,7 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
         this.cargando = false;
       },
       error: (err) => {
-        console.error('Error al cargar solicitudes:', err);
+        this.notificacion.error('No fue posible cargar las solicitudes. Recarga la página o intenta más tarde.', err);
         this.cargando = false;
       }
     });
@@ -267,7 +250,7 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
       if (confirmado) {
         this.solicitudService.eliminar(element.solicitudId).subscribe({
           next: () => this.cargarDatos(this.pageIndex, this.pageSize),
-          error: (err) => console.error('Error al eliminar solicitud:', err)
+          error: (err) => this.notificacion.error('No fue posible eliminar la solicitud. Intenta de nuevo.', err)
         });
       }
     });
@@ -290,7 +273,7 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
           fechaReparto: result.fechaReparto
         }).subscribe({
           next: () => this.cargarDatos(this.pageIndex, this.pageSize),
-          error: (err) => console.error('Error al asignar solicitud:', err)
+          error: (err) => this.notificacion.error('No fue posible asignar la solicitud. Intenta de nuevo.', err)
         });
       }
     });

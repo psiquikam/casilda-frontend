@@ -1,5 +1,5 @@
 <h2 mat-dialog-title class="modal-title">
-  <mat-icon>fact_check</mat-icon>
+  <mat-icon aria-hidden="true">fact_check</mat-icon>
   Agregar Hecho
 </h2>
 
@@ -40,7 +40,7 @@
   <button mat-button (click)="onNoClick()">Cancelar</button>
 
   <button mat-flat-button class="btn-confirm" [mat-dialog-close]="data" [disabled]="!data.fecha || !data.descripcion || !data.lugar">
-    <mat-icon>check</mat-icon>
+    <mat-icon aria-hidden="true">check</mat-icon>
     Agregar
   </button>
 </mat-dialog-actions>

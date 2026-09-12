@@ -17,14 +17,20 @@
 
 <ng-template #tablaCasos let-dataSource="dataSource" let-showReparto="showReparto" let-msgVacio="msgVacio">
   <div class="table-responsive">
-    <table mat-table [dataSource]="dataSource" multiTemplateDataRows>
+    <!-- Anuncia el resultado del filtrado por columna (WCAG 4.1.3). -->
+    <p class="visually-hidden" role="status" aria-live="polite">
+      {{ dataSource.filteredData.length }} resultados encontrados
+    </p>
+    <table mat-table [dataSource]="dataSource" multiTemplateDataRows aria-label="Solicitudes">
 
       <ng-container matColumnDef="expand">
-        <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
+        <th mat-header-cell scope="col" *matHeaderCellDef><span class="visually-hidden">Detalle</span></th>
         <td mat-cell *matCellDef="let element">
-          <button mat-icon-button
+          <button mat-icon-button [attr.aria-label]="'Ver el detalle de la solicitud ' + element.id"
+            [attr.aria-expanded]="expandedElement === element"
+            [attr.aria-controls]="'detalle-' + element.id"
             (click)="(expandedElement = expandedElement === element ? null : element); $event.stopPropagation()">
-            <mat-icon [ngClass]="expandedElement === element ? 'icon-remove' : 'icon-add'">
+            <mat-icon aria-hidden="true" [ngClass]="expandedElement === element ? 'icon-remove' : 'icon-add'">
               {{expandedElement === element ? 'remove_circle' : 'add_circle'}}
             </mat-icon>
           </button>
@@ -32,20 +38,20 @@
       </ng-container>
 
       <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell scope="col" *matHeaderCellDef>
           <div class="header-inline-container">
             <span class="column-title">ID</span>
-            <div class="search-box-slim"><input (keyup)="applyFilter('id', $event)" placeholder="Filtrar"></div>
+            <div class="search-box-slim"><input appFiltroColumna="ID de la solicitud" (keyup)="applyFilter('id', $event)" placeholder="Filtrar"></div>
           </div>
         </th>
         <td mat-cell *matCellDef="let element" class="id-cell">#{{element.id}}</td>
       </ng-container>
 
       <ng-container matColumnDef="nombre">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell scope="col" *matHeaderCellDef>
           <div class="header-inline-container">
             <span class="column-title">Usuario</span>
-            <div class="search-box-slim"><input (keyup)="applyFilter('nombre', $event)" placeholder="Buscar..."></div>
+            <div class="search-box-slim"><input appFiltroColumna="nombre de la persona usuaria" (keyup)="applyFilter('nombre', $event)" placeholder="Buscar..."></div>
           </div>
         </th>
         <td mat-cell *matCellDef="let element">
@@ -55,10 +61,10 @@
       </ng-container>
 
       <ng-container matColumnDef="documento">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell scope="col" *matHeaderCellDef>
           <div class="header-inline-container">
             <span class="column-title">Doc.</span>
-            <div class="search-box-slim"><input (keyup)="applyFilter('documento', $event)" placeholder="N°"></div>
+            <div class="search-box-slim"><input appFiltroColumna="número de documento" (keyup)="applyFilter('documento', $event)" placeholder="N°"></div>
           </div>
         </th>
         <td mat-cell *matCellDef="let element">
@@ -67,20 +73,20 @@
       </ng-container>
 
       <ng-container matColumnDef="fecha">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell scope="col" *matHeaderCellDef>
           <div class="header-inline-container">
             <span class="column-title">Fecha</span>
-            <div class="search-box-slim"><input (keyup)="applyFilter('fecha', $event)" placeholder="dd/MM/yyyy"></div>
+            <div class="search-box-slim"><input appFiltroColumna="fecha" (keyup)="applyFilter('fecha', $event)" placeholder="dd/MM/yyyy"></div>
           </div>
         </th>
         <td mat-cell *matCellDef="let element">{{element.fecha}}</td>
       </ng-container>
 
       <ng-container matColumnDef="tipoAsignacion">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell scope="col" *matHeaderCellDef>
           <div class="header-inline-container">
             <span class="column-title">Tipo de Asignación</span>
-            <div class="search-box-slim"><input (keyup)="applyFilter('tipoAsignacion', $event)" placeholder="Filtrar...">
+            <div class="search-box-slim"><input appFiltroColumna="tipo de asignación" (keyup)="applyFilter('tipoAsignacion', $event)" placeholder="Filtrar...">
             </div>
           </div>
         </th>
@@ -88,7 +94,7 @@
       </ng-container>
 
       <ng-container matColumnDef="estado">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell scope="col" *matHeaderCellDef>
           <div class="header-inline-container">
             <span class="column-title">Estado</span>
           </div>
@@ -104,38 +110,41 @@
       </ng-container>
 
       <ng-container matColumnDef="profesional">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell scope="col" *matHeaderCellDef>
           <div class="header-inline-container">
             <span class="column-title">Asignado</span>
-            <div class="search-box-slim"><input (keyup)="applyFilter('profesional', $event)" placeholder="Filtrar...">
+            <div class="search-box-slim"><input appFiltroColumna="profesional asignado" (keyup)="applyFilter('profesional', $event)" placeholder="Filtrar...">
             </div>
           </div>
         </th>
         <td mat-cell *matCellDef="let element">
-          <span [class.text-danger]="element.profesional === 'Sin asignar'">{{element.profesional}}</span>
+          <span class="estado-asignacion" [class.estado-asignacion--pendiente]="element.profesional === 'Sin asignar'">
+            @if (element.profesional === 'Sin asignar') {
+              <mat-icon aria-hidden="true">error_outline</mat-icon>
+            }
+            {{ element.profesional }}
+          </span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="acciones">
-        <th mat-header-cell *matHeaderCellDef><span class="column-title">Acciones</span></th>
+        <th mat-header-cell scope="col" *matHeaderCellDef><span class="column-title">Acciones</span></th>
         <td mat-cell *matCellDef="let element">
           <div class="action-buttons-container">
 
             @if (showReparto) {
-              <button mat-icon-button class="action-purple" (click)="irAReparto(element)"
-                title="Repartir / Asignar Caso">
-                <mat-icon>assignment_ind</mat-icon>
+              <button mat-icon-button [attr.aria-label]="'Repartir o asignar el caso ' + element.id" class="action-purple" (click)="irAReparto(element)">
+                <mat-icon aria-hidden="true">assignment_ind</mat-icon>
               </button>
             }
-            <button mat-icon-button class="action-visible" (click)="abrirModal(element, 'visualizar')"
-              title="Visualizar">
-              <mat-icon svgIcon="icono-ver"></mat-icon>
+            <button mat-icon-button [attr.aria-label]="'Visualizar el caso ' + element.id" class="action-visible" (click)="abrirModal(element, 'visualizar')">
+              <mat-icon aria-hidden="true" svgIcon="icono-ver"></mat-icon>
             </button>
-            <button mat-icon-button class="action-purple" (click)="abrirModal(element, 'editar')" title="Editar">
-              <mat-icon svgIcon="icono-editar"></mat-icon>
+            <button mat-icon-button [attr.aria-label]="'Editar el caso ' + element.id" class="action-purple" (click)="abrirModal(element, 'editar')">
+              <mat-icon aria-hidden="true" svgIcon="icono-editar"></mat-icon>
             </button>
-            <button mat-icon-button class="action-danger" (click)="eliminarCaso(element)" title="Eliminar">
-              <mat-icon svgIcon="icono-eliminar"></mat-icon>
+            <button mat-icon-button [attr.aria-label]="'Eliminar el caso ' + element.id" class="action-danger" (click)="eliminarCaso(element)">
+              <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
             </button>
           </div>
         </td>
@@ -143,7 +152,7 @@
 
       <ng-container matColumnDef="expandedDetail">
         <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
-          <div class="element-detail" [@detailExpand]="element === expandedElement ? 'expanded' : 'collapsed'">
+          <div class="element-detail" [id]="'detalle-' + element.id" [attr.inert]="element === expandedElement ? null : ''" [@detailExpand]="element === expandedElement ? 'expanded' : 'collapsed'">
             <div class="detail-grid">
 
               <div class="detail-item">
@@ -196,7 +205,7 @@
 
     @if (dataSource.filteredData.length === 0) {
       <div class="no-results-msg">
-        <mat-icon>info_outline</mat-icon>
+        <mat-icon aria-hidden="true">info_outline</mat-icon>
         <p>{{ msgVacio }}</p>
       </div>
     }

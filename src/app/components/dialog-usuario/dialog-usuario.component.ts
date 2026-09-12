@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, inject } from '@angular/core';
 
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { HttpClient } from '@angular/common/http';
 import { Usuario } from '../gestion-usuarios/gestion-usuarios.component';
 import { environment } from '../../../environments/environment';
+import { NotificacionService } from '../../core/a11y/notificacion.service';
 
 interface RolDto {
   id: number;
@@ -29,6 +30,7 @@ interface RolDto {
     styleUrls: ['./dialog-usuario.component.scss']
 })
 export class DialogUsuarioComponent implements OnInit {
+  private readonly notificacion = inject(NotificacionService);
   userForm: FormGroup;
   isEdit = false;
   roles: RolDto[] = [];
@@ -58,7 +60,7 @@ export class DialogUsuarioComponent implements OnInit {
           this.userForm.get('idRol')?.setValue(roles[0].id);
         }
       },
-      error: (err) => console.error('Error cargando roles', err)
+      error: (err) => this.notificacion.error('No fue posible cargar los roles. Cierra el diálogo e intenta de nuevo.', err)
     });
   }
 

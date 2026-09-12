@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { ListasService, MaestroDto } from '../../services/listas.service';
-import Swal from 'sweetalert2';
+import { DialogoService } from '../../core/a11y/dialogo.service';
 
 // Material
 import { MatTabsModule } from '@angular/material/tabs';
@@ -13,6 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCardModule } from '@angular/material/card';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { NotificacionService } from '../../core/a11y/notificacion.service';
 
 type ListaTabKey = 'tiposSolicitud' | 'campus' | 'unidadesAdministrativas' | 'facultades' | 'tiposDocumento';
 
@@ -39,6 +40,8 @@ interface PaginacionEstado {
     styleUrls: ['./gestion-listas.component.scss']
 })
 export class GestionListasComponent implements OnInit {
+  private readonly notificacion = inject(NotificacionService);
+  private readonly dialogo = inject(DialogoService);
   listas: Record<ListaTabKey, MaestroDto[]> = {
     tiposSolicitud: [],
     campus: [],
@@ -101,7 +104,7 @@ export class GestionListasComponent implements OnInit {
         this.paginacion[listKey].pageSize = resp.size;
       },
       error: (error) => {
-        console.error(`Error cargando lista paginada ${listKey}:`, error);
+        this.notificacion.error(`No fue posible cargar la lista «${listKey}». Recarga la página o intenta más tarde.`, error);
         this.listas[listKey] = [];
         this.paginacion[listKey].totalElements = 0;
       }
@@ -118,25 +121,20 @@ export class GestionListasComponent implements OnInit {
         this.paginacion[listKey].pageIndex = 0;
         this.cargarPagina(listKey);
       },
-      error: (error) => console.error(`Error agregando item en ${listKey}:`, error)
+      error: (error) => this.notificacion.error(`No fue posible agregar el elemento a «${listKey}». Intenta de nuevo.`, error)
     });
   }
 
   borrar(nombreLista: string, item: MaestroDto) {
-    Swal.fire({
-      title: '¿Está seguro?',
-      text: `¿Desea eliminar "${item.nombre}"?`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
-    }).then(result => {
-      if (result.isConfirmed) {
+    this.dialogo.confirmar({
+      titulo: 'Eliminar elemento',
+      mensaje: `¿Deseas eliminar «${item.nombre}» de la lista?`
+    }).subscribe((confirmado) => {
+      if (confirmado) {
         const listKey = nombreLista as ListaTabKey;
         this.listasService.eliminarItem$(nombreLista, item.id).subscribe({
           next: () => this.cargarPagina(listKey),
-          error: (error) => console.error(`Error eliminando item en ${listKey}:`, error)
+          error: (error) => this.notificacion.error(`No fue posible eliminar el elemento de «${listKey}». Intenta de nuevo.`, error)
         });
       }
     });
@@ -164,7 +162,7 @@ export class GestionListasComponent implements OnInit {
           this.editandoItem = null;
           this.cargarPagina(listKey);
         },
-        error: (error) => console.error(`Error editando item en ${listKey}:`, error)
+        error: (error) => this.notificacion.error(`No fue posible guardar la edición en «${listKey}». Intenta de nuevo.`, error)
       });
     }
   }

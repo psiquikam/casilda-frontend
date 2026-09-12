@@ -1,5 +1,5 @@
 <h2 mat-dialog-title class="modal-title">
-  <mat-icon>gavel</mat-icon>
+  <mat-icon aria-hidden="true">gavel</mat-icon>
   Agregar Apreciación Jurídica
 </h2>
 
@@ -24,7 +24,7 @@
 <mat-dialog-actions align="end" class="modal-actions">
   <button mat-button (click)="onNoClick()">Cancelar</button>
   <button mat-flat-button class="btn-confirm" [mat-dialog-close]="data" [disabled]="!data.tipo || !data.descripcion">
-    <mat-icon>check</mat-icon>
+    <mat-icon aria-hidden="true">check</mat-icon>
     Agregar a la lista
   </button>
 </mat-dialog-actions>

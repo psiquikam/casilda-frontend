@@ -1,11 +1,12 @@
 <div class="stepper-wrapper">
+  <h1 class="formulario-titulo">Registro de queja</h1>
   <mat-stepper linear #stepper>
 
     <mat-step [stepControl]="formPerfil">
-      <form [formGroup]="formPerfil" class="step-body">
+      <form [formGroup]="formPerfil" class="step-body" autocomplete="off">
         <ng-template matStepLabel>Identificación</ng-template>
         <div class="profile-selector">
-          <h3>¿Cómo desea realizar su reporte?</h3>
+          <h2>¿Cómo desea realizar su reporte?</h2>
           <mat-radio-group formControlName="perfil" class="profile-grid">
             <div class="profile-card" [class.selected]="formPerfil.get('perfil')?.value === 'victima_logueada'">
               <mat-radio-button value="victima_logueada">
@@ -31,7 +32,7 @@
       <form [formGroup]="formConsentimiento" class="step-body">
         <ng-template matStepLabel>Privacidad</ng-template>
         <div class="policy-box">
-          <h3>Tratamiento de Datos Personales</h3>
+          <h2>Tratamiento de Datos Personales</h2>
           <p>Para procesar esta queja, necesitamos tratar sus datos según la ley vigente...</p>
           <mat-checkbox formControlName="aceptaPolitica">He leído y acepto la política de privacidad</mat-checkbox>
         </div>
@@ -43,12 +44,12 @@
     </mat-step>
 
     <mat-step [stepControl]="formRelato">
-      <form [formGroup]="formRelato" class="step-body">
+      <form [formGroup]="formRelato" class="step-body" autocomplete="off">
         <ng-template matStepLabel>El Caso</ng-template>
 
         @if (tipoUsuario === 'tercero_logueado') {
           <div class="alert-info">
-            <mat-icon>info</mat-icon>
+            <mat-icon aria-hidden="true">info</mat-icon>
             <span>Usted reporta en representación. Sea detallado en su relación con la víctima.</span>
           </div>
         }
@@ -70,11 +71,11 @@
           <div class="contact-fields">
             <mat-form-field appearance="outline">
               <mat-label>Correo</mat-label>
-              <input matInput formControlName="correoContacto">
+              <input matInput formControlName="correoContacto" autocomplete="email">
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>WhatsApp</mat-label>
-              <input matInput formControlName="whatsappContacto">
+              <input matInput formControlName="whatsappContacto" autocomplete="tel">
             </mat-form-field>
           </div>
         }
@@ -87,7 +88,7 @@
     </mat-step>
 
     <mat-step [stepControl]="formVictima">
-      <form [formGroup]="formVictima" class="step-body">
+      <form [formGroup]="formVictima" class="step-body" autocomplete="off">
         <ng-template matStepLabel>Víctima</ng-template>
         <div class="grid-form">
           <mat-form-field appearance="outline"><mat-label>Identificación</mat-label><input matInput formControlName="identificacion"></mat-form-field>
@@ -119,7 +120,7 @@
     </mat-step>
 
     <mat-step [stepControl]="formVictimario">
-      <form [formGroup]="formVictimario" class="step-body">
+      <form [formGroup]="formVictimario" class="step-body" autocomplete="off">
         <ng-template matStepLabel>Victimario</ng-template>
         <div class="grid-form">
           <mat-form-field appearance="outline"><mat-label>Identificación (Si la conoce)</mat-label><input matInput formControlName="identificacion"></mat-form-field>
@@ -137,7 +138,7 @@
       <form [formGroup]="formEvidencias" class="step-body">
         <ng-template matStepLabel>Evidencias</ng-template>
         <div class="upload-zone">
-          <mat-icon>cloud_upload</mat-icon>
+          <mat-icon aria-hidden="true">cloud_upload</mat-icon>
           <p>Arrastre o seleccione archivos de evidencia</p>
           <input type="file" multiple>
         </div>

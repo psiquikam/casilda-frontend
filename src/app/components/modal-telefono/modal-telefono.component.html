@@ -1,5 +1,5 @@
 <h2 mat-dialog-title class="modal-title">
-  <mat-icon>phone</mat-icon>
+  <mat-icon aria-hidden="true">phone</mat-icon>
   Agregar Teléfono
 </h2>
 
@@ -39,7 +39,7 @@
     <button mat-button (click)="onNoClick()">Cancelar</button>
 
     <button mat-flat-button class="btn-confirm" (click)="guardar()" [disabled]="!canSubmit">
-      <mat-icon>check</mat-icon>
+      <mat-icon aria-hidden="true">check</mat-icon>
       Agregar
     </button>
   </mat-dialog-actions>
