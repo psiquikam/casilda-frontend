@@ -78,6 +78,13 @@ summary:focus-visible,
   }
 }
 
+/* Destino del enlace de salto y del foco programático tras navegar (WCAG 2.4.3).
+   Es un contenedor de región, no un control: recibe foco con tabindex="-1" para
+   reubicar el punto de lectura, sin dibujar el anillo alrededor de toda la vista. */
+#contenido-principal:focus {
+  outline: none;
+}
+
 /* --------------------------------------------------------------------------
    Cajas de aviso de baja carga cognitiva (enfoque sensible al trauma)
    El color nunca es el único portador de significado: se acompaña de ícono y texto.
@@ -118,6 +125,48 @@ summary:focus-visible,
   &--peligro .mat-icon { color: var(--color-danger-text); }
   &--precaucion .mat-icon { color: var(--color-warning); }
   &--exito .mat-icon { color: var(--color-primary); }
+}
+
+/* --------------------------------------------------------------------------
+   Estados en tablas del back-office (WCAG 1.4.1): color + ícono + texto.
+   `.estado-asignacion--pendiente` marca «Sin asignar»; el texto ya va en la celda.
+   -------------------------------------------------------------------------- */
+.estado-asignacion {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+
+  &--pendiente {
+    color: var(--color-danger-text);
+    font-weight: 700;
+
+    .mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+  }
+}
+
+/* Notificaciones de `NotificacionService` (MatSnackBar): color + texto + acción.
+   El contraste del texto blanco sobre estas superficies supera 4.5:1. */
+.casilda-snackbar--error {
+  --mdc-snackbar-container-color: var(--color-danger-surface);
+  --mdc-snackbar-supporting-text-color: var(--color-text-on-danger);
+  --mat-snack-bar-button-color: var(--color-text-on-danger);
+}
+
+.casilda-snackbar--exito {
+  --mdc-snackbar-container-color: var(--color-primary);
+  --mdc-snackbar-supporting-text-color: var(--color-text-on-primary);
+  --mat-snack-bar-button-color: var(--color-text-on-primary);
+}
+
+/* Campos de filtro de columna (directiva `appFiltroColumna`). */
+.filtro-columna {
+  font-family: var(--font-sans);
+  min-height: 28px;
 }
 
 /* --------------------------------------------------------------------------

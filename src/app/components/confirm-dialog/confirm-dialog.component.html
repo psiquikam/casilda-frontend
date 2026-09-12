@@ -2,10 +2,11 @@
 
   <div class="confirm-header">
     <div class="icon-wrapper">
-      <mat-icon>warning</mat-icon>
+      <mat-icon aria-hidden="true">warning</mat-icon>
     </div>
     <div class="title-group">
-      <h2>{{ data.titulo || 'Confirmar acción' }}</h2>
+      <!-- mat-dialog-title enlaza el título con el diálogo (aria-labelledby). -->
+      <h2 mat-dialog-title>{{ data.titulo || 'Confirmar acción' }}</h2>
       <p class="subtitle">Esta acción no se puede deshacer</p>
     </div>
   </div>
@@ -15,13 +16,14 @@
   </div>
 
   <div class="confirm-actions">
-    <button mat-stroked-button (click)="cancelar()">
+    <!-- El foco inicial va a «Cancelar»: la opción segura ante una acción destructiva. -->
+    <button mat-stroked-button type="button" cdkFocusInitial (click)="cancelar()">
       Cancelar
     </button>
 
-    <button mat-flat-button color="warn" (click)="confirmar()">
-      <mat-icon>delete</mat-icon>
-      Eliminar
+    <button mat-flat-button type="button" color="warn" (click)="confirmar()">
+      <mat-icon aria-hidden="true">{{ data.iconoConfirmar || 'delete' }}</mat-icon>
+      {{ data.textoConfirmar || 'Eliminar' }}
     </button>
   </div>
 

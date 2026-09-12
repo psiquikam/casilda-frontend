@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, forkJoin, of } from 'rxjs';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { NotificacionService } from '../core/a11y/notificacion.service';
 
 export interface MaestroDto {
   id: number;
@@ -25,6 +26,7 @@ type ListaKey = 'tiposSolicitud' | 'campus' | 'unidadesAdministrativas' | 'unida
   providedIn: 'root'
 })
 export class ListasService {
+  private readonly notificacion = inject(NotificacionService);
   private readonly apiBaseUrl = `${environment.apiBaseUrl}/maestros`;
   private readonly endpointByList: Record<ListaKey, string> = {
     tiposSolicitud: 'tipos-solicitud',
@@ -75,7 +77,7 @@ export class ListasService {
     const endpoint = this.endpointByList[lista];
     return this.http.get<MaestroDto[]>(`${this.apiBaseUrl}/${endpoint}`).pipe(
       catchError((error) => {
-        console.error(`Error consultando maestros para ${lista}:`, error);
+        this.notificacion.error(`No fue posible cargar la lista «${lista}». Recarga la página o intenta más tarde.`, error);
         return of([] as MaestroDto[]);
       })
     );
@@ -84,7 +86,7 @@ export class ListasService {
   obtenerMaestro(endpoint: string): Observable<MaestroDto[]> {
     return this.http.get<MaestroDto[]>(`${this.apiBaseUrl}/${endpoint}`).pipe(
       catchError((error) => {
-        console.error(`Error consultando maestros para endpoint ${endpoint}:`, error);
+        this.notificacion.error(`No fue posible cargar la lista «${endpoint}». Recarga la página o intenta más tarde.`, error);
         return of([] as MaestroDto[]);
       })
     );
@@ -133,7 +135,7 @@ export class ListasService {
     this.agregarItem$(lista, nombre, codigo)
       .subscribe({
         next: () => this.cargarListas(),
-        error: (error) => console.error(`Error agregando item en ${listaKey}:`, error)
+        error: (error) => this.notificacion.error(`No fue posible agregar el elemento a «${listaKey}». Intenta de nuevo.`, error)
       });
   }
 
@@ -145,7 +147,7 @@ export class ListasService {
     this.eliminarItem$(lista, id)
       .subscribe({
         next: () => this.cargarListas(),
-        error: (error) => console.error(`Error eliminando item en ${listaKey}:`, error)
+        error: (error) => this.notificacion.error(`No fue posible eliminar el elemento de «${listaKey}». Intenta de nuevo.`, error)
       });
   }
 
@@ -157,7 +159,7 @@ export class ListasService {
     this.editarItem$(lista, id, nombre, codigo)
       .subscribe({
         next: () => this.cargarListas(),
-        error: (error) => console.error(`Error editando item en ${listaKey}:`, error)
+        error: (error) => this.notificacion.error(`No fue posible guardar la edición en «${listaKey}». Intenta de nuevo.`, error)
       });
   }
 

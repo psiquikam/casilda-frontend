@@ -11,8 +11,8 @@
 }
 
 .icon-wrapper {
-  background: #fdecea;
-  color: #d32f2f;
+  background: var(--color-bg-danger-light);
+  color: var(--color-danger-text);
   border-radius: 50%;
   width: 42px;
   height: 42px;
@@ -30,12 +30,22 @@
     margin: 0;
     font-size: 18px;
     font-weight: 600;
+
+    /* Neutraliza el relleno y el espaciador de `mat-dialog-title` (MDC),
+       que aquí vive dentro de una cabecera propia. */
+    &.mat-mdc-dialog-title {
+      padding: 0;
+
+      &::before {
+        display: none;
+      }
+    }
   }
 
   .subtitle {
     margin: 2px 0 0;
-    font-size: 12px;
-    color: #777;
+    font-size: var(--font-size-sm); /* piso 14px (WCAG 1.4.4) */
+    color: var(--color-text-muted);
   }
 }
 
@@ -45,7 +55,7 @@
   p {
     margin: 0;
     font-size: 14px;
-    color: #444;
+    color: var(--color-text-secondary);
   }
 }
 

@@ -1,11 +1,12 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AUTH_REQUIRED_MESSAGE, AuthService } from './auth.service';
-import Swal from 'sweetalert2';
+import { DialogoService } from '../core/a11y/dialogo.service';
 
 export const roleGuard: CanActivateFn = (route) => {
   const authService = inject(AuthService);
   const router = inject(Router);
+  const dialogo = inject(DialogoService);
 
   // Obtenemos los roles permitidos para esta ruta desde la configuración de la ruta
   const expectedRoles = route.data['roles'] as string[];
@@ -13,11 +14,7 @@ export const roleGuard: CanActivateFn = (route) => {
 
   // 1. ¿Está logueado?
   if (!authService.isAuthenticated()) {
-    void Swal.fire({
-      icon: 'warning',
-      title: 'Acceso requerido',
-      text: AUTH_REQUIRED_MESSAGE
-    });
+    dialogo.aviso({ titulo: 'Acceso requerido', mensaje: AUTH_REQUIRED_MESSAGE, icono: 'lock' }).subscribe();
     return router.createUrlTree(['/login']);
   }
 

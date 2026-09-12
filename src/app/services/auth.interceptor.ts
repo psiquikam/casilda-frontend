@@ -3,11 +3,12 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { AUTH_REQUIRED_MESSAGE, AuthService } from './auth.service';
-import Swal from 'sweetalert2';
+import { DialogoService } from '../core/a11y/dialogo.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
+  const dialogo = inject(DialogoService);
   const token = authService.getToken();
 
   const authReq = token
@@ -20,13 +21,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
       if (error.status === 401 && !isAuthEndpoint) {
         authService.logout();
-        void Swal.fire({
-          icon: 'warning',
-          title: 'Sesión expirada',
-          text: AUTH_REQUIRED_MESSAGE,
-          confirmButtonText: 'Iniciar sesión',
-          allowOutsideClick: false
-        });
+        // Bloqueante: la sesión ya no existe y la única salida es volver a autenticarse.
+        dialogo
+          .aviso(
+            { titulo: 'Sesión expirada', mensaje: AUTH_REQUIRED_MESSAGE, textoBoton: 'Iniciar sesión', icono: 'lock_clock' },
+            { bloqueante: true }
+          )
+          .subscribe();
       } else if (error.status === 403 && !isAuthEndpoint) {
         void router.navigate(['/acceso-denegado']);
       }
