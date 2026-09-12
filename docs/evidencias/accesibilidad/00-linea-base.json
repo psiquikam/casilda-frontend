@@ -1,0 +1,2146 @@
+{
+  "resumen": {
+    "fecha": "2026-09-11",
+    "H-01 botones de ícono sin nombre": "98 de 99",
+    "H-01 <mat-icon> sin aria-hidden": 270,
+    "H-02 filtros sin etiqueta": 42,
+    "H-02 SCSS con outline:none sin reemplazo": 9,
+    "H-03 rutas sin title": "21 de 21",
+    "H-12 console.error/warn": 48,
+    "H-13 font-size < 14px": 112,
+    "H-14 usos de paleta heredada": 178,
+    "H-14 SCSS con colores literales": "47 de 60"
+  },
+  "detalle": {
+    "botonesSinNombre": [
+      {
+        "archivo": "src/app/components/auth/login/login.component.html",
+        "tag": "<button mat-icon-button matSuffix type=\"button\" (click)=\"alternarPassword()\" [attr.aria-pr"
+      },
+      {
+        "archivo": "src/app/components/caso/caso.component.html",
+        "tag": "<button mat-icon-button (click)=\"(expandedElement = expandedElement === element ? null : e"
+      },
+      {
+        "archivo": "src/app/components/caso/caso.component.html",
+        "tag": "<button mat-icon-button class=\"action-purple\" (click)=\"irAReparto(element)\" title=\"Reparti"
+      },
+      {
+        "archivo": "src/app/components/caso/caso.component.html",
+        "tag": "<button mat-icon-button class=\"action-visible\" (click)=\"abrirModal(element, 'visualizar')\""
+      },
+      {
+        "archivo": "src/app/components/caso/caso.component.html",
+        "tag": "<button mat-icon-button class=\"action-purple\" (click)=\"abrirModal(element, 'editar')\" titl"
+      },
+      {
+        "archivo": "src/app/components/caso/caso.component.html",
+        "tag": "<button mat-icon-button class=\"action-danger\" (click)=\"eliminarCaso(element)\" title=\"Elimi"
+      },
+      {
+        "archivo": "src/app/components/cita/cita.component.html",
+        "tag": "<button mat-icon-button (click)=\"(expandedElement = expandedElement === element ? null : e"
+      },
+      {
+        "archivo": "src/app/components/cita/cita.component.html",
+        "tag": "<button mat-icon-button class=\"action-warning\" [disabled]=\"estaCitaCaducada(element.fechaC"
+      },
+      {
+        "archivo": "src/app/components/cita/cita.component.html",
+        "tag": "<button mat-icon-button class=\"action-danger\" matTooltip=\"Cancelar\" (click)=\"cancelarCita("
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.html",
+        "tag": "<button mat-icon-button (click)=\"(expandedElement = expandedElement === element ? null : e"
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.html",
+        "tag": "<button mat-icon-button class=\"action-purple\" (click)=\"irAReparto(element)\" title=\"Reparti"
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.html",
+        "tag": "<button mat-icon-button class=\"action-visible\" (click)=\"abrirModal(element, 'visualizar')\""
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.html",
+        "tag": "<button mat-icon-button class=\"action-purple\" (click)=\"abrirModal(element, 'editar')\" titl"
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.html",
+        "tag": "<button mat-icon-button class=\"action-danger\" (click)=\"eliminarCaso(element)\" title=\"Elimi"
+      },
+      {
+        "archivo": "src/app/components/detalle-revisor/detalle-revisor.component.html",
+        "tag": "<button mat-icon-button routerLink=\"/dashboard-revisor\">"
+      },
+      {
+        "archivo": "src/app/components/detalle-revisor/detalle-revisor.component.html",
+        "tag": "<button mat-icon-button color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/dialog-exito/dialog-exito.component.html",
+        "tag": "<button type=\"button\" mat-icon-button class=\"copy-btn\" (click)=\"copiarCodigo()\" [title]=\"c"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.html",
+        "tag": "<button matSuffix mat-icon-button class=\"btn-search-doc\" type=\"button\" (click)=\"buscarRemi"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.html",
+        "tag": "<button matSuffix mat-icon-button class=\"btn-search-doc\" type=\"button\" (click)=\"buscarSoli"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalCorreo()\" matTooltip=\"Ag"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.html",
+        "tag": "<button mat-icon-button (click)=\"eliminarCorreo(i)\" matTooltip=\"Eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalTelefono()\" matTooltip=\""
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.html",
+        "tag": "<button mat-icon-button (click)=\"eliminarTelefono(i)\" matTooltip=\"Eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/gestion-contacto/gestion-contacto.component.html",
+        "tag": "<button mat-icon-button (click)=\"(expandedElement = expandedElement === element ? null : e"
+      },
+      {
+        "archivo": "src/app/components/gestion-contacto/gestion-contacto.component.html",
+        "tag": "<button mat-icon-button class=\"action-purple\" [matTooltip]=\"(!element.profesional || eleme"
+      },
+      {
+        "archivo": "src/app/components/gestion-contacto/gestion-contacto.component.html",
+        "tag": "<button mat-icon-button class=\"action-visible\" matTooltip=\"Ver historial\" [disabled]=\"!ele"
+      },
+      {
+        "archivo": "src/app/components/gestion-listas/gestion-listas.component.html",
+        "tag": "<button mat-icon-button class=\"edit-btn\" (click)=\"iniciarEdicion(listKey, item)\">"
+      },
+      {
+        "archivo": "src/app/components/gestion-listas/gestion-listas.component.html",
+        "tag": "<button mat-icon-button class=\"delete-btn\" (click)=\"borrar(listKey, item)\">"
+      },
+      {
+        "archivo": "src/app/components/gestion-listas/gestion-listas.component.html",
+        "tag": "<button mat-icon-button class=\"check-btn\" (click)=\"guardarEdicion()\">"
+      },
+      {
+        "archivo": "src/app/components/gestion-listas/gestion-listas.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"editandoItem = null\">"
+      },
+      {
+        "archivo": "src/app/components/gestion-usuarios/gestion-usuarios.component.html",
+        "tag": "<button mat-icon-button matTooltip=\"Editar\" (click)=\"abrirFormulario(user)\">"
+      },
+      {
+        "archivo": "src/app/components/gestion-usuarios/gestion-usuarios.component.html",
+        "tag": "<button mat-icon-button matTooltip=\"Eliminar\" (click)=\"eliminarUsuario(user.id)\">"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<button matSuffix mat-icon-button type=\"button\" (click)=\"buscarPersona($event)\" [disabled]"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" type=\"button\" (click)=\"abrirModalDiscapacid"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" type=\"button\" (click)=\"eliminarDiscapacidad(i)\">"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" type=\"button\" (click)=\"abrirModalCorreo()\">"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" type=\"button\" (click)=\"eliminarCorreo(i)\">"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" type=\"button\" (click)=\"abrirModalTelefono()"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" type=\"button\" (click)=\"eliminarTelefono(i)\">"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" type=\"button\" (click)=\"eliminarContacto(i)\">"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" type=\"button\" (click)=\"abrirModalRemision()"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" type=\"button\" (click)=\"eliminarRemision(i)\">"
+      },
+      {
+        "archivo": "src/app/components/modal-agregar-caso/modal-agregar-caso.component.html",
+        "tag": "<button mat-icon-button class=\"btn-close\" (click)=\"onCerrar()\" type=\"button\">"
+      },
+      {
+        "archivo": "src/app/components/modal-agregar-caso/modal-agregar-caso.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-green\" type=\"button\" (click)=\"abrirModalHechos()\" m"
+      },
+      {
+        "archivo": "src/app/components/modal-agregar-caso/modal-agregar-caso.component.html",
+        "tag": "<button mat-icon-button type=\"button\" (click)=\"eliminarHecho(i)\" matTooltip=\"Eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/modal-detalle-solicitud/modal-detalle-solicitud.component.html",
+        "tag": "<button mat-icon-button class=\"close-btn\" (click)=\"dialogRef.close()\">"
+      },
+      {
+        "archivo": "src/app/components/modal-detalle-solicitud/modal-detalle-solicitud.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalCorreo()\" matTooltip=\"Ag"
+      },
+      {
+        "archivo": "src/app/components/modal-detalle-solicitud/modal-detalle-solicitud.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarCorreo(i)\" matTooltip=\"Eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/modal-detalle-solicitud/modal-detalle-solicitud.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalTelefono()\" matTooltip=\""
+      },
+      {
+        "archivo": "src/app/components/modal-detalle-solicitud/modal-detalle-solicitud.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarTelefono(i)\" matTooltip=\"Eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalApreciacionJuridica()\" m"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarApreciacionJuridica(i)\" matTooltip=\""
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalApreciacionPsicologica()"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarApreciacionPsicologica(i)\" matToolti"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalRutaActivada()\" matToolt"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarRemision(i)\" matTooltip=\"Eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalRemision()\" matTooltip=\""
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarRutaActivada(i)\" matTooltip=\"Elimina"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalMedida()\" matTooltip=\"Ag"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarMedida(i)\" matTooltip=\"Eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalCompromisosPersona()\" ma"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarCompromisosPersona(i)\" matTooltip=\"E"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalCompromisosProfesional()"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarCompromisosProfesional(i)\" matToolti"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalSeguimientos(tipoSeguimi"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarSeguimientos(i)\" matTooltip=\"Elimina"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalDiscapacidad()\" matToolt"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarDiscapacidad(i)\" matTooltip=\"Elimina"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalCorreo()\" matTooltip=\"Ag"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarCorreo(i)\" matTooltip=\"Eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalTelefono()\" matTooltip=\""
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarTelefono(i)\" matTooltip=\"Eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalHechos()\" matTooltip=\"Ag"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarHechos(i)\" matTooltip=\"Eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalAgresor()\" matTooltip=\"A"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarAgresor(i)\" matTooltip=\"Eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalApreciacionJuridica()\" m"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarApreciacionJuridica(i)\" matTooltip=\""
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalApreciacionPsicologica()"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarApreciacionPsicologica(i)\" matToolti"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalRutaActivada()\" matToolt"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarRemision(i)\" matTooltip=\"Eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalRemision()\" matTooltip=\""
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarRutaActivada(i)\" matTooltip=\"Elimina"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalMedida()\" matTooltip=\"Ag"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarMedida(i)\" matTooltip=\"Eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalCompromisosPersona()\" ma"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarCompromisosPersona(i)\" matTooltip=\"E"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalCompromisosProfesional()"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarCompromisosProfesional(i)\" matToolti"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button class=\"btn-add-inline\" (click)=\"abrirModalSeguimientos(tipoSeguimi"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<button mat-icon-button color=\"warn\" (click)=\"eliminarSeguimientos(i)\" matTooltip=\"Elimina"
+      },
+      {
+        "archivo": "src/app/components/tabla-casos/tabla-casos.component.html",
+        "tag": "<button mat-icon-button (click)=\"(expandedElement = expandedElement === element ? null : e"
+      },
+      {
+        "archivo": "src/app/components/tabla-casos/tabla-casos.component.html",
+        "tag": "<button mat-icon-button class=\"action-success\" (click)=\"iniciarAtencion(element); $event.s"
+      },
+      {
+        "archivo": "src/app/components/tabla-citas/tabla-citas.component.html",
+        "tag": "<button mat-icon-button (click)=\"(expandedElement = expandedElement === element ? null : e"
+      },
+      {
+        "archivo": "src/app/components/tabla-citas/tabla-citas.component.html",
+        "tag": "<button mat-icon-button class=\"action-success\" (click)=\"iniciarAtencion(element); $event.s"
+      },
+      {
+        "archivo": "src/app/components/tabla-otros-casos/tabla-otros-casos.component.html",
+        "tag": "<button mat-icon-button class=\"action-success\" (click)=\"onEditar(element)\" matTooltip=\"Edi"
+      },
+      {
+        "archivo": "src/app/components/tabla-otros-casos/tabla-otros-casos.component.html",
+        "tag": "<button mat-icon-button class=\"action-danger\" (click)=\"onEliminar(element)\" matTooltip=\"El"
+      }
+    ],
+    "iconosExpuestos": [
+      {
+        "archivo": "src/app/components/acceso-denegado/acceso-denegado.component.html",
+        "tag": "<mat-icon color=\"warn\" style=\"font-size: 100px; width: 100px; height: 100px;\">"
+      },
+      {
+        "archivo": "src/app/components/caso/caso.component.html",
+        "tag": "<mat-icon [ngClass]=\"expandedElement === element ? 'icon-remove' : 'icon-add'\">"
+      },
+      {
+        "archivo": "src/app/components/caso/caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/caso/caso.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-ver\">"
+      },
+      {
+        "archivo": "src/app/components/caso/caso.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-editar\">"
+      },
+      {
+        "archivo": "src/app/components/caso/caso.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/caso/caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/cita/cita.component.html",
+        "tag": "<mat-icon [ngClass]=\"expandedElement === element ? 'icon-remove' : 'icon-add'\">"
+      },
+      {
+        "archivo": "src/app/components/cita/cita.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/cita/cita.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/cita/cita.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/confirm-dialog/confirm-dialog.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/confirm-dialog/confirm-dialog.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.html",
+        "tag": "<mat-icon [ngClass]=\"expandedElement === element ? 'icon-remove' : 'icon-add'\">"
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-ver\">"
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-editar\">"
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/detalle-revisor/detalle-revisor.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/detalle-revisor/detalle-revisor.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/detalle-revisor/detalle-revisor.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/detalle-revisor/detalle-revisor.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/detalle-revisor/detalle-revisor.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/detalle-revisor/detalle-revisor.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/detalle-revisor/detalle-revisor.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/detalle-revisor/detalle-revisor.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/detalle-revisor/detalle-revisor.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/dialog-exito/dialog-exito.component.html",
+        "tag": "<mat-icon class=\"success-icon\">"
+      },
+      {
+        "archivo": "src/app/components/dialog-exito/dialog-exito.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/dialog-exito/dialog-exito.component.html",
+        "tag": "<mat-icon class=\"activation-icon\">"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/formulario-anonimo/formulario-anonimo.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/formulario-anonimo/formulario-anonimo.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/formulario-anonimo/formulario-anonimo.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/formulario-anonimo/formulario-anonimo.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/formulario-anonimo/formulario-anonimo.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/formulario-anonimo/formulario-anonimo.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/formulario-anonimo/formulario-anonimo.component.html",
+        "tag": "<mat-icon class=\"chip-check-icon\">"
+      },
+      {
+        "archivo": "src/app/components/formulario-anonimo/formulario-anonimo.component.html",
+        "tag": "<mat-icon class=\"chip-check-icon\">"
+      },
+      {
+        "archivo": "src/app/components/formulario-anonimo/formulario-anonimo.component.html",
+        "tag": "<mat-icon class=\"chip-check-icon\">"
+      },
+      {
+        "archivo": "src/app/components/formulario-anonimo/formulario-anonimo.component.html",
+        "tag": "<mat-icon class=\"chip-check-icon\">"
+      },
+      {
+        "archivo": "src/app/components/formulario-anonimo/formulario-anonimo.component.html",
+        "tag": "<mat-icon class=\"chip-check-icon\">"
+      },
+      {
+        "archivo": "src/app/components/formulario-anonimo/formulario-anonimo.component.html",
+        "tag": "<mat-icon class=\"chip-check-icon\">"
+      },
+      {
+        "archivo": "src/app/components/formulario-anonimo/formulario-anonimo.component.html",
+        "tag": "<mat-icon class=\"chip-check-icon\">"
+      },
+      {
+        "archivo": "src/app/components/formulario-anonimo/formulario-anonimo.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/formulario-anonimo/formulario-anonimo.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/formulario-anonimo/formulario-anonimo.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/formulario-queja/formulario-queja.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/formulario-queja/formulario-queja.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/gestion-contacto/gestion-contacto.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/gestion-contacto/gestion-contacto.component.html",
+        "tag": "<mat-icon [ngClass]=\"expandedElement === element ? 'icon-remove' : 'icon-add'\">"
+      },
+      {
+        "archivo": "src/app/components/gestion-contacto/gestion-contacto.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/gestion-contacto/gestion-contacto.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-ver\">"
+      },
+      {
+        "archivo": "src/app/components/gestion-contacto/gestion-contacto.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/gestion-listas/gestion-listas.component.html",
+        "tag": "<mat-icon class=\"tab-icon\">"
+      },
+      {
+        "archivo": "src/app/components/gestion-listas/gestion-listas.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/gestion-listas/gestion-listas.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-editar\">"
+      },
+      {
+        "archivo": "src/app/components/gestion-listas/gestion-listas.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/gestion-listas/gestion-listas.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/gestion-listas/gestion-listas.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/gestion-usuarios/gestion-usuarios.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/gestion-usuarios/gestion-usuarios.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/gestion-usuarios/gestion-usuarios.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-editar\">"
+      },
+      {
+        "archivo": "src/app/components/gestion-usuarios/gestion-usuarios.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon matSuffix color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/mis-asignaciones/mis-asignaciones.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/mis-asignaciones/mis-asignaciones.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-activar-ruta/modal-activar-ruta.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-activar-ruta/modal-activar-ruta.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-agregar-caso/modal-agregar-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-agregar-caso/modal-agregar-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-agregar-caso/modal-agregar-caso.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/modal-apreciacion-juridica/modal-apreciacion-juridica.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-apreciacion-juridica/modal-apreciacion-juridica.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-apreciacion-psicologica/modal-apreciacion-psicologica.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-apreciacion-psicologica/modal-apreciacion-psicologica.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-asignar-cita/modal-asignar-cita.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-asignar-cita/modal-asignar-cita.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-compromisos-persona/modal-compromisos-persona.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-compromisos-persona/modal-compromisos-persona.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-compromisos-profesionales/modal-compromisos-profesionales.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-compromisos-profesionales/modal-compromisos-profesionales.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-correo/modal-correo.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-correo/modal-correo.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-detalle-solicitud/modal-detalle-solicitud.component.html",
+        "tag": "<mat-icon class=\"header-icon\">"
+      },
+      {
+        "archivo": "src/app/components/modal-detalle-solicitud/modal-detalle-solicitud.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-detalle-solicitud/modal-detalle-solicitud.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/modal-detalle-solicitud/modal-detalle-solicitud.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-detalle-solicitud/modal-detalle-solicitud.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/modal-detalle-solicitud/modal-detalle-solicitud.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-detalle-solicitud/modal-detalle-solicitud.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/modal-detalle-solicitud/modal-detalle-solicitud.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-detalle-solicitud/modal-detalle-solicitud.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/modal-detalle-solicitud/modal-detalle-solicitud.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-detalle-solicitud/modal-detalle-solicitud.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-direccion/modal-direccion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-discapacidad/modal-discapacidad.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-discapacidad/modal-discapacidad.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-gestion-contacto/modal-gestion-contacto.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-gestion-contacto/modal-gestion-contacto.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-gestion-contacto/modal-gestion-contacto.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-hechos/modal-hechos.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-hechos/modal-hechos.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-medidas-proteccion/modal-medidas-proteccion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-medidas-proteccion/modal-medidas-proteccion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-presunto-agresor/modal-presunto-agresor.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-presunto-agresor/modal-presunto-agresor.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-remision/modal-remision.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-remision/modal-remision.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-reparto/modal-reparto.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-reparto/modal-reparto.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-reprogramar-cita/modal-reprogramar-cita.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-reprogramar-cita/modal-reprogramar-cita.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-reprogramar-cita/modal-reprogramar-cita.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-seguimiento/modal-seguimiento.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-seguimiento/modal-seguimiento.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-telefono/modal-telefono.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/modal-telefono/modal-telefono.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/public-footer/public-footer.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/public-footer/public-footer.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/public-footer/public-footer.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon class=\"tab-error-icon\">"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon matSuffix color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon class=\"tab-error-icon\">"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon color=\"disabled\">"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.html",
+        "tag": "<mat-icon class=\"tab-error-icon\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon class=\"tab-error-icon\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon matSuffix color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon class=\"tab-error-icon\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon class=\"tab-error-icon\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon class=\"tab-error-icon\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon color=\"disabled\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.html",
+        "tag": "<mat-icon class=\"tab-error-icon\">"
+      },
+      {
+        "archivo": "src/app/components/seguimiento-tramite/seguimiento-tramite.component.html",
+        "tag": "<mat-icon color=\"primary\">"
+      },
+      {
+        "archivo": "src/app/components/seguimiento-tramite/seguimiento-tramite.component.html",
+        "tag": "<mat-icon matPrefix>"
+      },
+      {
+        "archivo": "src/app/components/seguimiento-tramite/seguimiento-tramite.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/seguimiento-tramite/seguimiento-tramite.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/seguimiento-tramite/seguimiento-tramite.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/seguimiento-tramite/seguimiento-tramite.component.html",
+        "tag": "<mat-icon color=\"warn\">"
+      },
+      {
+        "archivo": "src/app/components/tabla-casos/tabla-casos.component.html",
+        "tag": "<mat-icon [ngClass]=\"expandedElement === element ? 'icon-remove' : 'icon-add'\">"
+      },
+      {
+        "archivo": "src/app/components/tabla-casos/tabla-casos.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/tabla-casos/tabla-casos.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/tabla-citas/tabla-citas.component.html",
+        "tag": "<mat-icon [ngClass]=\"expandedElement === element ? 'icon-remove' : 'icon-add'\">"
+      },
+      {
+        "archivo": "src/app/components/tabla-citas/tabla-citas.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/tabla-citas/tabla-citas.component.html",
+        "tag": "<mat-icon>"
+      },
+      {
+        "archivo": "src/app/components/tabla-otros-casos/tabla-otros-casos.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-editar\">"
+      },
+      {
+        "archivo": "src/app/components/tabla-otros-casos/tabla-otros-casos.component.html",
+        "tag": "<mat-icon svgIcon=\"icono-eliminar\">"
+      },
+      {
+        "archivo": "src/app/components/tabla-otros-casos/tabla-otros-casos.component.html",
+        "tag": "<mat-icon>"
+      }
+    ],
+    "filtrosSinEtiqueta": [
+      {
+        "archivo": "src/app/components/caso/caso.component.html",
+        "tag": "<input (keyup)=\"applyFilter('id', $event)\" placeholder=\"Filtrar\">"
+      },
+      {
+        "archivo": "src/app/components/caso/caso.component.html",
+        "tag": "<input (keyup)=\"applyFilter('nombre', $event)\" placeholder=\"Buscar...\">"
+      },
+      {
+        "archivo": "src/app/components/caso/caso.component.html",
+        "tag": "<input (keyup)=\"applyFilter('documento', $event)\" placeholder=\"N°\">"
+      },
+      {
+        "archivo": "src/app/components/caso/caso.component.html",
+        "tag": "<input (keyup)=\"applyFilter('fecha', $event)\" placeholder=\"dd/MM/yyyy\">"
+      },
+      {
+        "archivo": "src/app/components/caso/caso.component.html",
+        "tag": "<input (keyup)=\"applyFilter('unidadAdministrativa', $event)\" placeholder=\"Filtrar...\">"
+      },
+      {
+        "archivo": "src/app/components/caso/caso.component.html",
+        "tag": "<input (keyup)=\"applyFilter('profesional', $event)\" placeholder=\"...\">"
+      },
+      {
+        "archivo": "src/app/components/cita/cita.component.html",
+        "tag": "<input (keyup)=\"applyFilter('id', $event)\" placeholder=\"Filtrar\">"
+      },
+      {
+        "archivo": "src/app/components/cita/cita.component.html",
+        "tag": "<input (keyup)=\"applyFilter('nombre', $event)\" placeholder=\"Buscar...\">"
+      },
+      {
+        "archivo": "src/app/components/cita/cita.component.html",
+        "tag": "<input (keyup)=\"applyFilter('documento', $event)\" placeholder=\"N°\">"
+      },
+      {
+        "archivo": "src/app/components/cita/cita.component.html",
+        "tag": "<input (keyup)=\"applyFilter('fecha', $event)\" placeholder=\"Filtrar...\">"
+      },
+      {
+        "archivo": "src/app/components/cita/cita.component.html",
+        "tag": "<input (keyup)=\"applyFilter('profesional', $event)\" placeholder=\"Filtrar...\">"
+      },
+      {
+        "archivo": "src/app/components/cita/cita.component.html",
+        "tag": "<input (keyup)=\"applyFilter('tipoSolicitud', $event)\" placeholder=\"...\">"
+      },
+      {
+        "archivo": "src/app/components/cita/cita.component.html",
+        "tag": "<input (keyup)=\"applyFilter('estadoCita', $event)\" placeholder=\"...\">"
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.html",
+        "tag": "<input (keyup)=\"applyFilter('id', $event)\" placeholder=\"Filtrar\">"
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.html",
+        "tag": "<input (keyup)=\"applyFilter('nombre', $event)\" placeholder=\"Buscar...\">"
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.html",
+        "tag": "<input (keyup)=\"applyFilter('documento', $event)\" placeholder=\"N°\">"
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.html",
+        "tag": "<input (keyup)=\"applyFilter('fecha', $event)\" placeholder=\"dd/MM/yyyy\">"
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.html",
+        "tag": "<input (keyup)=\"applyFilter('tipoAsignacion', $event)\" placeholder=\"Filtrar...\">"
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.html",
+        "tag": "<input (keyup)=\"applyFilter('profesional', $event)\" placeholder=\"Filtrar...\">"
+      },
+      {
+        "archivo": "src/app/components/gestion-contacto/gestion-contacto.component.html",
+        "tag": "<input (keyup)=\"applyFilter('id', $event)\" placeholder=\"Filtrar\">"
+      },
+      {
+        "archivo": "src/app/components/gestion-contacto/gestion-contacto.component.html",
+        "tag": "<input (keyup)=\"applyFilter('nombre', $event)\" placeholder=\"Buscar...\">"
+      },
+      {
+        "archivo": "src/app/components/gestion-contacto/gestion-contacto.component.html",
+        "tag": "<input (keyup)=\"applyFilter('documento', $event)\" placeholder=\"N°\">"
+      },
+      {
+        "archivo": "src/app/components/gestion-contacto/gestion-contacto.component.html",
+        "tag": "<input (keyup)=\"applyFilter('fecha', $event)\" placeholder=\"dd/MM/yyyy\">"
+      },
+      {
+        "archivo": "src/app/components/gestion-contacto/gestion-contacto.component.html",
+        "tag": "<input (keyup)=\"applyFilter('tipoAsignacion', $event)\" placeholder=\"...\">"
+      },
+      {
+        "archivo": "src/app/components/gestion-contacto/gestion-contacto.component.html",
+        "tag": "<input (keyup)=\"applyFilter('profesional', $event)\" placeholder=\"...\">"
+      },
+      {
+        "archivo": "src/app/components/tabla-casos/tabla-casos.component.html",
+        "tag": "<input (keyup)=\"applyFilter('id', $event)\" placeholder=\"Filtrar\">"
+      },
+      {
+        "archivo": "src/app/components/tabla-casos/tabla-casos.component.html",
+        "tag": "<input (keyup)=\"applyFilter('nombre', $event)\" placeholder=\"Buscar...\">"
+      },
+      {
+        "archivo": "src/app/components/tabla-casos/tabla-casos.component.html",
+        "tag": "<input (keyup)=\"applyFilter('documento', $event)\" placeholder=\"N°\">"
+      },
+      {
+        "archivo": "src/app/components/tabla-casos/tabla-casos.component.html",
+        "tag": "<input (keyup)=\"applyFilter('fecha', $event)\" placeholder=\"dd/MM/yyyy\">"
+      },
+      {
+        "archivo": "src/app/components/tabla-casos/tabla-casos.component.html",
+        "tag": "<input (keyup)=\"applyFilter('tipoAsignacion', $event)\" placeholder=\"...\">"
+      },
+      {
+        "archivo": "src/app/components/tabla-casos/tabla-casos.component.html",
+        "tag": "<input (keyup)=\"applyFilter('profesional', $event)\" placeholder=\"...\">"
+      },
+      {
+        "archivo": "src/app/components/tabla-citas/tabla-citas.component.html",
+        "tag": "<input (keyup)=\"applyFilter('id', $event)\" placeholder=\"Filtrar\">"
+      },
+      {
+        "archivo": "src/app/components/tabla-citas/tabla-citas.component.html",
+        "tag": "<input (keyup)=\"applyFilter('nombre', $event)\" placeholder=\"Buscar...\">"
+      },
+      {
+        "archivo": "src/app/components/tabla-citas/tabla-citas.component.html",
+        "tag": "<input (keyup)=\"applyFilter('documento', $event)\" placeholder=\"N°\">"
+      },
+      {
+        "archivo": "src/app/components/tabla-citas/tabla-citas.component.html",
+        "tag": "<input (keyup)=\"applyFilter('fecha', $event)\" placeholder=\"dd/MM/yyyy\">"
+      },
+      {
+        "archivo": "src/app/components/tabla-citas/tabla-citas.component.html",
+        "tag": "<input (keyup)=\"applyFilter('tipoAsignacion', $event)\" placeholder=\"...\">"
+      },
+      {
+        "archivo": "src/app/components/tabla-citas/tabla-citas.component.html",
+        "tag": "<input (keyup)=\"applyFilter('profesional', $event)\" placeholder=\"...\">"
+      },
+      {
+        "archivo": "src/app/components/tabla-otros-casos/tabla-otros-casos.component.html",
+        "tag": "<input (keyup)=\"applyFilter('id', $event)\" placeholder=\"Filtrar\">"
+      },
+      {
+        "archivo": "src/app/components/tabla-otros-casos/tabla-otros-casos.component.html",
+        "tag": "<input (keyup)=\"applyFilter('tiempoHechos', $event)\" placeholder=\"Buscar...\">"
+      },
+      {
+        "archivo": "src/app/components/tabla-otros-casos/tabla-otros-casos.component.html",
+        "tag": "<input (keyup)=\"applyFilter('tipoViolencia', $event)\" placeholder=\"Buscar...\">"
+      },
+      {
+        "archivo": "src/app/components/tabla-otros-casos/tabla-otros-casos.component.html",
+        "tag": "<input (keyup)=\"applyFilter('subcategoriaViolencia', $event)\" placeholder=\"Buscar...\">"
+      },
+      {
+        "archivo": "src/app/components/tabla-otros-casos/tabla-otros-casos.component.html",
+        "tag": "<input (keyup)=\"applyFilter('descripcion', $event)\" placeholder=\"Buscar...\">"
+      }
+    ],
+    "outlineSinReemplazo": [
+      "src/app/components/caso/caso.component.scss",
+      "src/app/components/cita/cita.component.scss",
+      "src/app/components/consulta/consulta.component.scss",
+      "src/app/components/gestion-contacto/gestion-contacto.component.scss",
+      "src/app/components/registro-atencion/registro-atencion.consulta.scss",
+      "src/app/components/registro-caso/registro-caso.consulta.scss",
+      "src/app/components/tabla-casos/tabla-casos.component.scss",
+      "src/app/components/tabla-citas/tabla-citas.component.scss",
+      "src/app/components/tabla-otros-casos/tabla-otros-casos.component.scss"
+    ],
+    "rutasSinTitulo": [
+      "home",
+      "inicio",
+      "login",
+      "formulario-anonimo",
+      "seguimiento",
+      "detalle-revisor/:id",
+      "gestion-usuarios",
+      "dashboard-revisor",
+      "nueva-queja",
+      "solicitud-acompanamiento",
+      "gestion-sistema",
+      "mis-asignaciones",
+      "detalle-acompanamiento/:id",
+      "consulta",
+      "registro-caso",
+      "caso",
+      "registro-atencion",
+      "cita",
+      "linea-alma/atencion-pr",
+      "acceso-denegado",
+      "funcionalidad-no-disponible"
+    ],
+    "fuentesPequenas": [
+      {
+        "archivo": "src/app/components/caso/caso.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/caso/caso.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/caso/caso.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/caso/caso.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/cita/cita.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/cita/cita.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/cita/cita.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/cita/cita.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/cita/cita.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/confirm-dialog/confirm-dialog.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.scss",
+        "valor": "10px"
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/consulta/consulta.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.scss",
+        "valor": "10px"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/formulario-acompanamiento/formulario-acompanamiento.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/formulario-anonimo/formulario-anonimo.component.scss",
+        "valor": "11.5px"
+      },
+      {
+        "archivo": "src/app/components/formulario-anonimo/formulario-anonimo.component.scss",
+        "valor": "11.5px"
+      },
+      {
+        "archivo": "src/app/components/formulario-anonimo/formulario-anonimo.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/formulario-anonimo/formulario-anonimo.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/gestion-contacto/gestion-contacto.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/gestion-contacto/gestion-contacto.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/gestion-contacto/gestion-contacto.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/gestion-contacto/gestion-contacto.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/gestion-contacto/gestion-contacto.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/gestion-listas/gestion-listas.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/linea-alma/atencion-pr/atencion-pr.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/modal-agregar-caso/modal-agregar-caso.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/modal-agregar-caso/modal-agregar-caso.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/modal-agregar-caso/modal-agregar-caso.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/modal-agregar-caso/modal-agregar-caso.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/modal-agregar-caso/modal-agregar-caso.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/modal-agregar-caso/modal-agregar-caso.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/modal-agregar-caso/modal-agregar-caso.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/modal-agregar-caso/modal-agregar-caso.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/modal-agregar-caso/modal-agregar-caso.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/modal-detalle-solicitud/modal-detalle-solicitud.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/modal-detalle-solicitud/modal-detalle-solicitud.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/modal-detalle-solicitud/modal-detalle-solicitud.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/modal-direccion/modal-direccion.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/modal-direccion/modal-direccion.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/modal-gestion-contacto/modal-gestion-contacto.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/modal-gestion-contacto/modal-gestion-contacto.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/modal-reparto/modal-reparto.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/modal-reparto/modal-reparto.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/modal-reparto/modal-reparto.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/modal-seguimiento/modal-seguimiento.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.scss",
+        "valor": "10px"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.consulta.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.consulta.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.consulta.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.consulta.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.consulta.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.consulta.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.consulta.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.consulta.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/registro-atencion/registro-atencion.consulta.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.scss",
+        "valor": "10px"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.component.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.consulta.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.consulta.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.consulta.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.consulta.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.consulta.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.consulta.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.consulta.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.consulta.scss",
+        "valor": "12px"
+      },
+      {
+        "archivo": "src/app/components/registro-caso/registro-caso.consulta.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/tabla-casos/tabla-casos.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/tabla-casos/tabla-casos.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/tabla-casos/tabla-casos.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/tabla-casos/tabla-casos.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/tabla-citas/tabla-citas.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/tabla-citas/tabla-citas.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/tabla-citas/tabla-citas.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/tabla-citas/tabla-citas.component.scss",
+        "valor": "13px"
+      },
+      {
+        "archivo": "src/app/components/tabla-otros-casos/tabla-otros-casos.component.scss",
+        "valor": "11px"
+      },
+      {
+        "archivo": "src/app/components/tabla-otros-casos/tabla-otros-casos.component.scss",
+        "valor": "11px"
+      }
+    ]
+  }
+}
