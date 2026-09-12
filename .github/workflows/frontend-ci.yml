@@ -35,6 +35,9 @@ jobs:
       - name: Verificar lint
         run: npm run lint
 
+      - name: Auditoría estática de accesibilidad
+        run: npm run a11y:rules && npm run a11y:audit
+
       - name: Ejecutar pruebas
         run: npm run test:ci
 
