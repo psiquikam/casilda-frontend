@@ -96,10 +96,15 @@ export const environment = {
 | `npm run build` | Genera el build de producción en `dist/casilda-fnsp`. |
 | `npm run watch` | Build en modo `development` con recompilación continua. |
 | `npm test` | Ejecuta la suite de pruebas unitarias con Karma/Jasmine. |
-| `npm run lint` | Ejecuta ESLint y evita que aumente la línea base de deuda. |
+| `npm run lint` | Ejecuta ESLint (las reglas de accesibilidad son errores) y evita que aumente la línea base de deuda. |
+| `npm run a11y:audit` | Auditoría estática de accesibilidad (`tools/auditar-accesibilidad.mjs`); falla si reaparece deuda P0. Añade `-- --detalle` para ver cada hallazgo. |
+| `npm run a11y:rules` | Pruebas de la regla ESLint propia `casilda/mat-icon-button-accessible-name`. |
 | `npm run test:ci` | Ejecuta pruebas headless con cobertura. |
-| `npm run check` | Ejecuta lint, pruebas y build de producción. |
+| `npm run check` | Ejecuta lint, auditoría de accesibilidad, pruebas y build de producción. |
 | `npm run audit:prod` | Audita exclusivamente dependencias productivas. |
+
+El diagnóstico de accesibilidad, el plan, su estado y la definición de terminado para
+cada PR viven en `docs/evidencias/accesibilidad/plan_accesibilidad.md`.
 
 Antes de actualizar un pull request ejecuta:
 

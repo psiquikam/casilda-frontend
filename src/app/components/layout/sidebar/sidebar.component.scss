@@ -200,7 +200,7 @@
     }
 
     &:hover {
-      background-color: #f1f5f9;
+      background-color: var(--color-bg-subtle);
       color: var(--color-secondary-hover);
 
       .nav-item__icon {

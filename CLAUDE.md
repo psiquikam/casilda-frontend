@@ -3,7 +3,7 @@
 > Archivo vivo. Se actualiza al cerrar cada fase de trabajo para que cualquier
 > sesión posterior (humana o asistida) retome sin repetir el análisis.
 >
-> **Última actualización:** 3 de septiembre de 2026 (segunda revisión del día)
+> **Última actualización:** 12 de septiembre de 2026 (documentación de accesibilidad reubicada en `docs/evidencias/accesibilidad/`)
 
 ---
 
@@ -22,6 +22,8 @@ Documentos de referencia, en orden de precedencia para decisiones de diseño:
 | `AGENTS.md` | Prompt/rol de la migración Angular 17 → 21 (ya completada). |
 | `.agents/skills/angular_frontend_guidelines/SKILL.md` | Convenciones obligatorias de código Angular del equipo. |
 | `.agents/skills/accessibility/SKILL.md` | Criterios WCAG 2.2 aplicados. |
+| `docs/evidencias/accesibilidad/plan_accesibilidad.md` | Diagnóstico, hallazgos H-01…H-18, plan por fases hacia WCAG 2.2 AA y **estado de cada tarea** (§4, §6). |
+| `docs/evidencias/accesibilidad/01-fases-1-5-correcciones.md` | Cómo se implementó cada corrección de las fases 1–5 (evidencia de la entrega del 2026-09-11). |
 
 ## 2. Stack y comandos
 
@@ -32,8 +34,10 @@ Documentos de referencia, en orden de precedencia para decisiones de diseño:
 npm start        # ng serve → http://localhost:4200
 npm run build    # build de producción → dist/casilda-fnsp
 npm run test:ci  # pruebas headless con cobertura
-npm run lint     # ESLint (tope actual: 303 warnings heredados)
-npm run check    # lint + tests + build
+npm run lint     # ESLint (tope actual: 299 warnings heredados; reglas de accesibilidad = error)
+npm run a11y:audit  # auditoría estática de accesibilidad (falla con deuda P0); `-- --detalle` lista cada caso
+npm run a11y:rules  # pruebas de la regla ESLint propia casilda/mat-icon-button-accessible-name
+npm run check    # lint + a11y:audit + tests + build
 ```
 
 ## 3. Sistema de diseño (obligatorio para toda UI nueva)
@@ -71,6 +75,13 @@ espaciados ni radios literales**: siempre `var(--token)`.
 | `QuickExitService` | `src/app/core/security/quick-exit.service.ts` | Limpia `sessionStorage` + llaves `casilda_*` y `userSession`, y redirige con `location.replace()` a `environment.quickExitUrl`. |
 | `ContenidoHomeService` | `src/app/services/contenido-home.service.ts` | Contenido editable del home (`imagen`, `titulo`, `contenido`, vigencia, sección). Hoy devuelve un **mock**; el endpoint previsto es `GET {apiBaseUrl}/contenidos/home`. |
 | `CasildaCardComponent` | `src/app/components/casilda-card/` | Tarjeta puramente presentacional alimentada por `ContenidoDestacadoDto`. |
+| `CasildaTitleStrategy` | `src/app/core/a11y/casilda-title.strategy.ts` | Título del documento por ruta (`title` en `app.routes.ts`) + sufijo «Casilda — UdeA». |
+| `EnfoqueRutaService` | `src/app/core/a11y/enfoque-ruta.service.ts` | Foco al `<main id="contenido-principal">` tras cada navegación. |
+| `FiltroColumnaDirective` | `src/app/core/a11y/filtro-columna.directive.ts` | `<input appFiltroColumna="ID del caso">`: nombre accesible, `type="search"`, foco visible. Obligatoria en filtros de cabecera de tabla. |
+| `ResumenErroresComponent` + `recolectarErrores()` | `src/app/core/a11y/resumen-errores.component.ts`, `errores-formulario.ts` | Resumen enfocable de errores al enviar (`role="alert"`) con salto al campo. Los inputs listados llevan `id="<prefijo>-<control>"`. |
+| `NotificacionService` | `src/app/core/a11y/notificacion.service.ts` | `error()` / `exito()` / `info()` sobre MatSnackBar con `role` adecuado. **Reemplaza a `console.error`** en los `subscribe`. |
+| `DialogoService` | `src/app/core/a11y/dialogo.service.ts` | `aviso()` y `confirmar()` sobre MatDialog (`AvisoDialogComponent`, `ConfirmDialogComponent`). **SweetAlert2 fue retirado.** |
+| `getPaginadorIntlEs()` | `src/app/core/i18n/paginador-es.ts` | Paginador en español provisto una sola vez en `app.config.ts`. |
 
 ## 5. Bitácora de avances
 
@@ -141,17 +152,39 @@ exceso; el formulario multipaso se veía recortado.
   ≤768 px la cabecera del stepper (5 pasos) se desplaza en horizontal en vez de
   comprimirse. Espaciados y sombras migrados a tokens.
 
-**Pendiente asociado:** el resto del back-office sigue con `$purple-sys` (#348F41)
-y colores literales en 35 archivos `.scss`; sólo se migró el formulario anónimo.
+### 2026-09-11 — Plan de accesibilidad, fases 0 a 5 (WCAG 2.2 AA)
+Detalle y métricas en `docs/evidencias/accesibilidad/01-fases-1-5-correcciones.md`
+(línea base en `00-linea-base.json`, resultado en `01-tras-fases-1-5.json`).
 
-### Pendiente (Fase 4 y siguientes)
-1. Auditoría automática con axe/Lighthouse y validación cruzada en navegadores y móviles reales.
+- **Instrumentación:** `tools/auditar-accesibilidad.mjs` (deuda H-01/02/03/12/13/14) y regla
+  ESLint propia `casilda/mat-icon-button-accessible-name` con prueba; ambos en CI.
+- **P0 a cero:** 98 botones de ícono con nombre contextual, 42 filtros con `appFiltroColumna`
+  y foco visible, 21 rutas con `title` + `CasildaTitleStrategy`.
+- **Orientación:** foco al `<main>` al navegar, `h1` en las 6 vistas que no lo tenían,
+  `aria-current` en menús, sidenav superpuesto bajo 900 px, tablas con `aria-label` y `scope`,
+  filas expandibles con `aria-expanded` + `inert`.
+- **Formularios:** `autocomplete` con política de privacidad documentada (reporte anónimo),
+  instrucciones en `<mat-hint>` (no `placeholder`), entrada sin mutación al teclear, resumen
+  de errores enfocable en reporte anónimo y solicitud de acompañamiento.
+- **Retroalimentación:** `NotificacionService` reemplaza 47 `console.error`; SweetAlert2
+  retirado en favor de `DialogoService`/MatDialog.
+- **Tokens:** paleta heredada `#348F41` eliminada (→ `--color-primary`), 524 literales
+  migrados a tokens, piso tipográfico de 14 px, `LOCALE_ID` es-CO.
+- **Colateral:** handlers «Eliminar» intercambiados entre Rutas activadas y Remisiones en
+  `registro-caso` y `registro-atencion`, corregidos.
+
+### Pendiente
+1. Accesibilidad — tareas abiertas priorizadas en
+   `docs/evidencias/accesibilidad/plan_accesibilidad.md` §6: fases 0.1/0.2/0.4 (axe,
+   Lighthouse, recorrido con teclado), 2.4 (conectar `ResumenErroresComponent` a
+   `registro-caso` y `registro-atencion`), 4.2 (136 colores literales sin token), 4.4/4.5
+   (reflujo 320 px y texto 200 %), 5.3 (`jasmine-axe`) y Fase 6 (NVDA/VoiceOver, personas
+   usuarias, declaración de accesibilidad).
 2. Sustituir el mock de `ContenidoHomeService` por el endpoint real del gestor de contenidos.
 3. Confirmar con Comunicaciones UdeA: dependencia exacta del logosímbolo y uso del
    distintivo de Casilda como favicon.
 4. Datos reales de contacto: `environment.telefonoOrientacion` y los del pie público.
-5. Deuda heredada: `aria-label` en los ~99 `mat-icon-button` del back-office,
-   `console.error` sin feedback visual, sidenav no responsive, spinner global.
+5. Validar con el equipo de atención el tono de los mensajes de error y notificaciones.
 
 ## 6. Reglas que no se deben romper
 
@@ -162,3 +195,10 @@ y colores literales en 35 archivos `.scss`; sólo se migró el formulario anóni
 4. Área táctil mínima 44 px, contraste mínimo 4.5:1 en texto y foco siempre visible.
 5. El color nunca es el único portador de significado: acompáñalo de ícono y texto.
 6. La Salida rápida es funcionalidad crítica de seguridad: no se degrada ni se oculta.
+7. Todo `<button mat-icon-button>` lleva `aria-label` (o `[attr.aria-label]` contextual) y su
+   `<mat-icon>` `aria-hidden="true"`; `matTooltip` no es nombre accesible. El lint lo exige.
+8. Toda ruta nueva declara `title`; toda vista tiene un único `h1`; los filtros de tabla usan
+   `appFiltroColumna`; los errores de red pasan por `NotificacionService`, los modales por
+   `MatDialog` (`DialogoService`), nunca por `alert`/`confirm`/SweetAlert2.
+9. `autocomplete`: semántico solo para datos de la persona usuaria; `off` en formularios sobre
+   terceras personas y en los datos de contacto del reporte anónimo (ver comentario en la plantilla).

@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, inject } from '@angular/core';
 
 import { FormBuilder, Validators, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
@@ -13,6 +13,7 @@ import { forkJoin } from 'rxjs';
 import { SolicitudService, GrupoProfesionalDto } from '../../services/solicitud.service';
 import { MaestroDto } from '../../services/listas.service';
 import { environment } from '../../../environments/environment';
+import { NotificacionService } from '../../core/a11y/notificacion.service';
 
 @Component({
     selector: 'app-reparto-modal',
@@ -30,6 +31,7 @@ import { environment } from '../../../environments/environment';
 ]
 })
 export class RepartoModalComponent implements OnInit {
+  private readonly notificacion = inject(NotificacionService);
   repartoForm: FormGroup;
   gruposProfesionales: GrupoProfesionalDto[] = [];
 
@@ -65,7 +67,7 @@ export class RepartoModalComponent implements OnInit {
         this.tiposServicio = tiposServicio;
         this.gruposProfesionales = grupos;
       },
-      error: (err) => console.error('Error al cargar datos del formulario:', err)
+      error: (err) => this.notificacion.error('No fue posible cargar los datos del formulario. Cierra el diálogo e intenta de nuevo.', err)
     });
   }
 

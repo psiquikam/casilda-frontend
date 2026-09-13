@@ -33,9 +33,7 @@
               "src/styles.scss"
             ],
             "scripts": [],
-            "allowedCommonJsDependencies": [
-              "sweetalert2"
-            ]
+            "allowedCommonJsDependencies": []
           },
           "configurations": {
             "production": {

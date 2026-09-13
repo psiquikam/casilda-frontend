@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, inject } from '@angular/core';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -17,6 +17,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { SolicitudService, ContactoTelefonicoDto } from '../../services/solicitud.service';
 import { environment } from '../../../environments/environment';
+import { NotificacionService } from '../../core/a11y/notificacion.service';
 
 /** Resultado que permite concertar cita en primera llamada */
 const RESULTADO_EXITOSO = 'Contesta y se concerta cita';
@@ -42,6 +43,7 @@ const RESULTADO_EXITOSO = 'Contesta y se concerta cita';
     styleUrls: ['./modal-gestion-contacto.component.scss']
 })
 export class ModalGestionComponent implements OnInit {
+  private readonly notificacion = inject(NotificacionService);
 
   contactoForm!: FormGroup;
   guardando = false;
@@ -203,7 +205,7 @@ export class ModalGestionComponent implements OnInit {
         this.dialogRef.close(true);
       },
       error: (err) => {
-        console.error('Error al registrar contacto:', err);
+        this.notificacion.error('No fue posible registrar el intento de contacto. Intenta de nuevo.', err);
         this.guardando = false;
       }
     });

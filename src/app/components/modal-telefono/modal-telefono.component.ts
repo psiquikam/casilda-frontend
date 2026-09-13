@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { NotificacionService } from '../../core/a11y/notificacion.service';
 
 interface TipoTelefonoDto {
   id: number;
@@ -30,6 +31,7 @@ interface TipoTelefonoDto {
     styleUrls: ['./modal-telefono.component.scss']
 })
 export class ModalTelefonoComponent implements OnInit {
+  private readonly notificacion = inject(NotificacionService);
 
   private http = inject(HttpClient);
 
@@ -46,7 +48,7 @@ export class ModalTelefonoComponent implements OnInit {
   ngOnInit(): void {
     this.http.get<TipoTelefonoDto[]>(`${environment.apiBaseUrl}/maestros/tipos-telefono`).subscribe({
       next: (tipos) => this.tiposTelefono = tipos,
-      error: (err) => console.error('Error al cargar tipos de teléfono:', err)
+      error: (err) => this.notificacion.error('No fue posible cargar los tipos de teléfono. Cierra el diálogo e intenta de nuevo.', err)
     });
   }
 

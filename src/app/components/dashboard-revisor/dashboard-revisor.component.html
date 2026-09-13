@@ -253,29 +253,29 @@
       <div class="table-responsive">
         <table mat-table [dataSource]="dataSourceQuejas" class="casilda-table" aria-label="Tabla de casos recientes">
           <ng-container matColumnDef="id">
-            <th mat-header-cell *matHeaderCellDef>Radicado</th>
+            <th mat-header-cell scope="col" *matHeaderCellDef>Radicado</th>
             <td mat-cell *matCellDef="let element" class="mono-font font-bold">{{ element.id }}</td>
           </ng-container>
 
           <ng-container matColumnDef="fecha">
-            <th mat-header-cell *matHeaderCellDef>Fecha</th>
+            <th mat-header-cell scope="col" *matHeaderCellDef>Fecha</th>
             <td mat-cell *matCellDef="let element">{{ element.fecha }}</td>
           </ng-container>
 
           <ng-container matColumnDef="victima">
-            <th mat-header-cell *matHeaderCellDef>Vínculo</th>
+            <th mat-header-cell scope="col" *matHeaderCellDef>Vínculo</th>
             <td mat-cell *matCellDef="let element">{{ element.victima }}</td>
           </ng-container>
 
           <ng-container matColumnDef="identidad">
-            <th mat-header-cell *matHeaderCellDef>Identidad de Género</th>
+            <th mat-header-cell scope="col" *matHeaderCellDef>Identidad de Género</th>
             <td mat-cell *matCellDef="let element">
               <span class="chip-identity">{{ element.identidad }}</span>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="estado">
-            <th mat-header-cell *matHeaderCellDef>Estado</th>
+            <th mat-header-cell scope="col" *matHeaderCellDef>Estado</th>
             <td mat-cell *matCellDef="let element">
               <span class="badge-status" [class]="'badge-status--' + element.estado.toLowerCase().replace(' ', '-')">
                 {{ element.estado }}
@@ -284,7 +284,7 @@
           </ng-container>
 
           <ng-container matColumnDef="accion">
-            <th mat-header-cell *matHeaderCellDef class="text-right">Acción</th>
+            <th mat-header-cell scope="col" *matHeaderCellDef class="text-right">Acción</th>
             <td mat-cell *matCellDef="let element" class="text-right">
               <a [routerLink]="['/consulta']" class="icon-link" aria-label="Ver detalles del caso">
                 <mat-icon aria-hidden="true">visibility</mat-icon>
@@ -311,31 +311,31 @@
       <div class="table-responsive">
         <table mat-table [dataSource]="dataSourceAcompanamiento" class="casilda-table" aria-label="Tabla de acompañamientos">
           <ng-container matColumnDef="id">
-            <th mat-header-cell *matHeaderCellDef>Radicado</th>
+            <th mat-header-cell scope="col" *matHeaderCellDef>Radicado</th>
             <td mat-cell *matCellDef="let element" class="mono-font font-bold">{{ element.id }}</td>
           </ng-container>
 
           <ng-container matColumnDef="fecha">
-            <th mat-header-cell *matHeaderCellDef>Fecha</th>
+            <th mat-header-cell scope="col" *matHeaderCellDef>Fecha</th>
             <td mat-cell *matCellDef="let element">{{ element.fecha }}</td>
           </ng-container>
 
           <ng-container matColumnDef="tipo">
-            <th mat-header-cell *matHeaderCellDef>Enfoque</th>
+            <th mat-header-cell scope="col" *matHeaderCellDef>Enfoque</th>
             <td mat-cell *matCellDef="let element">
               <span class="chip-enfoque">{{ element.tipo }}</span>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="identidad">
-            <th mat-header-cell *matHeaderCellDef>Identidad de Género</th>
+            <th mat-header-cell scope="col" *matHeaderCellDef>Identidad de Género</th>
             <td mat-cell *matCellDef="let element">
               <span class="chip-identity">{{ element.identidad }}</span>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="estado">
-            <th mat-header-cell *matHeaderCellDef>Estado</th>
+            <th mat-header-cell scope="col" *matHeaderCellDef>Estado</th>
             <td mat-cell *matCellDef="let element">
               <span class="badge-status" [class]="'badge-status--' + element.estado.toLowerCase().replace(' ', '-')">
                 {{ element.estado }}
@@ -344,7 +344,7 @@
           </ng-container>
 
           <ng-container matColumnDef="accion">
-            <th mat-header-cell *matHeaderCellDef class="text-right">Acción</th>
+            <th mat-header-cell scope="col" *matHeaderCellDef class="text-right">Acción</th>
             <td mat-cell *matCellDef="let element" class="text-right">
               <a [routerLink]="['/cita']" class="icon-link" aria-label="Gestionar cita">
                 <mat-icon aria-hidden="true">event</mat-icon>

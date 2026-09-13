@@ -58,6 +58,9 @@ html, body {
 
 ::ng-deep .aside-menu {
   width: 260px !important;
+  /* En modo superpuesto (≤ 900 px) nunca ocupa toda la pantalla: queda visible
+     el contenido detrás y el borde permite cerrar tocando fuera. */
+  max-width: 85vw;
   border-right: 1px solid var(--color-border) !important;
 }
 

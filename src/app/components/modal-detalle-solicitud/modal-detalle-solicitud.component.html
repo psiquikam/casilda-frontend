@@ -1,6 +1,6 @@
 <div class="modal-header-purple">
   <div class="header-title">
-    <mat-icon class="header-icon">
+    <mat-icon aria-hidden="true" class="header-icon">
       {{ data.modo === 'editar' ? 'edit' : 'visibility' }}
     </mat-icon>
     {{ data.modo === 'editar' ? 'Editar Solicitud' : 'Visualizar Solicitud' }} #{{ data.info.id }}
@@ -9,13 +9,15 @@
     }
   </div>
 
-  <button mat-icon-button class="close-btn" (click)="dialogRef.close()">
-    <mat-icon>close</mat-icon>
+  <button mat-icon-button aria-label="Cerrar el diálogo" class="close-btn" (click)="dialogRef.close()">
+    <mat-icon aria-hidden="true">close</mat-icon>
   </button>
 </div>
 
 <mat-dialog-content class="custom-content">
-  <form [formGroup]="detalleForm">
+  <!-- Los campos describen a terceras personas (no a quien usa el sistema): sin autocompletado,
+       para que el navegador no sugiera los datos del profesional (WCAG 1.3.5 no aplica). -->
+  <form [formGroup]="detalleForm" autocomplete="off">
 
     <div class="medio-solicitud-wrapper"
       style="margin-bottom: 20px; display: grid; grid-template-columns: 1fr; width: 100%;">
@@ -157,33 +159,33 @@
         <div class="discapacidad-container">
           <div class="section-header-inline">
             <div class="section-title">
-              <mat-icon color="primary">email</mat-icon>
+              <mat-icon aria-hidden="true" color="primary">email</mat-icon>
               <span>Correos Electrónicos</span>
             </div>
             @if (!esVisualizacion) {
-              <button mat-icon-button class="btn-add-inline" (click)="abrirModalCorreo()"
+              <button mat-icon-button aria-label="Agregar correo electrónico" class="btn-add-inline" (click)="abrirModalCorreo()"
                 matTooltip="Agregar Correo">
-                <mat-icon>add_circle</mat-icon>
+                <mat-icon aria-hidden="true">add_circle</mat-icon>
               </button>
             }
           </div>
           <div class="table-responsive">
-            <table mat-table [dataSource]="correoRegistrados" class="atencion-table">
+            <table mat-table [dataSource]="correoRegistrados" class="atencion-table" aria-label="Correos electrónicos registrados">
               <ng-container matColumnDef="tipo">
-                <th mat-header-cell *matHeaderCellDef> Tipo </th>
+                <th mat-header-cell scope="col" *matHeaderCellDef> Tipo </th>
                 <td mat-cell *matCellDef="let element"> {{element.tipo}} </td>
               </ng-container>
               <ng-container matColumnDef="correo">
-                <th mat-header-cell *matHeaderCellDef> Correo Electrónico </th>
+                <th mat-header-cell scope="col" *matHeaderCellDef> Correo Electrónico </th>
                 <td mat-cell *matCellDef="let element"> {{element.correo}} </td>
               </ng-container>
               <ng-container matColumnDef="acciones">
-                <th mat-header-cell *matHeaderCellDef style="text-align: center;"> Acciones </th>
+                <th mat-header-cell scope="col" *matHeaderCellDef style="text-align: center;"> Acciones </th>
                 <td mat-cell *matCellDef="let i = index" style="text-align: center;">
                   @if (!esVisualizacion) {
-                    <button mat-icon-button color="warn" (click)="eliminarCorreo(i)"
+                    <button mat-icon-button [attr.aria-label]="'Eliminar el correo de la fila ' + (i + 1)" color="warn" (click)="eliminarCorreo(i)"
                       matTooltip="Eliminar">
-                      <mat-icon svgIcon="icono-eliminar"></mat-icon>
+                      <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
                     </button>
                   }
                 </td>
@@ -193,7 +195,7 @@
             </table>
             @if (correoRegistrados.length === 0) {
               <div class="no-results-msg">
-                <mat-icon>mail_outline</mat-icon>
+                <mat-icon aria-hidden="true">mail_outline</mat-icon>
                 <p>No hay correos registrados.</p>
               </div>
             }
@@ -211,33 +213,33 @@
         <div class="discapacidad-container">
           <div class="section-header-inline">
             <div class="section-title">
-              <mat-icon color="primary">phone_enabled</mat-icon>
+              <mat-icon aria-hidden="true" color="primary">phone_enabled</mat-icon>
               <span>Teléfonos</span>
             </div>
             @if (!esVisualizacion) {
-              <button mat-icon-button class="btn-add-inline" (click)="abrirModalTelefono()"
+              <button mat-icon-button aria-label="Agregar teléfono" class="btn-add-inline" (click)="abrirModalTelefono()"
                 matTooltip="Agregar Teléfono">
-                <mat-icon>add_circle</mat-icon>
+                <mat-icon aria-hidden="true">add_circle</mat-icon>
               </button>
             }
           </div>
           <div class="table-responsive">
-            <table mat-table [dataSource]="telefonosRegistrados" class="atencion-table">
+            <table mat-table [dataSource]="telefonosRegistrados" class="atencion-table" aria-label="Teléfonos registrados">
               <ng-container matColumnDef="tipo">
-                <th mat-header-cell *matHeaderCellDef> Tipo </th>
+                <th mat-header-cell scope="col" *matHeaderCellDef> Tipo </th>
                 <td mat-cell *matCellDef="let element"> {{element.tipo}} </td>
               </ng-container>
               <ng-container matColumnDef="telefono">
-                <th mat-header-cell *matHeaderCellDef> Teléfono </th>
+                <th mat-header-cell scope="col" *matHeaderCellDef> Teléfono </th>
                 <td mat-cell *matCellDef="let element"> {{element.telefono}} </td>
               </ng-container>
               <ng-container matColumnDef="acciones">
-                <th mat-header-cell *matHeaderCellDef style="text-align: center;"> Acciones </th>
+                <th mat-header-cell scope="col" *matHeaderCellDef style="text-align: center;"> Acciones </th>
                 <td mat-cell *matCellDef="let i = index" style="text-align: center;">
                   @if (!esVisualizacion) {
-                    <button mat-icon-button color="warn" (click)="eliminarTelefono(i)"
+                    <button mat-icon-button [attr.aria-label]="'Eliminar el teléfono de la fila ' + (i + 1)" color="warn" (click)="eliminarTelefono(i)"
                       matTooltip="Eliminar">
-                      <mat-icon svgIcon="icono-eliminar"></mat-icon>
+                      <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
                     </button>
                   }
                 </td>
@@ -247,7 +249,7 @@
             </table>
             @if (telefonosRegistrados.length === 0) {
               <div class="no-results-msg">
-                <mat-icon>phone_enabled</mat-icon>
+                <mat-icon aria-hidden="true">phone_enabled</mat-icon>
                 <p>No hay teléfonos registrados.</p>
               </div>
             }
@@ -275,7 +277,7 @@
     <button mat-raised-button class="btn-guardar"
       [disabled]="detalleForm.invalid || guardando" (click)="guardar()">
       @if (!guardando) {
-        <mat-icon>save</mat-icon>
+        <mat-icon aria-hidden="true">save</mat-icon>
       }
       @if (guardando) {
         <mat-spinner diameter="18"></mat-spinner>

@@ -17,13 +17,15 @@ import { RepartoModalComponent } from '../modal-reparto/modal-reparto.component'
 import { Router } from '@angular/router';
 import { SolicitudService } from '../../services/solicitud.service';
 import { formatFechaCreacion } from '../../custom-date-adapter';
+import { FiltroColumnaDirective } from '../../core/a11y/filtro-columna.directive';
+import { NotificacionService } from '../../core/a11y/notificacion.service';
 
 @Component({
     selector: 'app-caso',
     imports: [
         CommonModule, FormsModule, MatTabsModule, MatTableModule,
         MatButtonModule, MatIconModule, MatChipsModule, MatCardModule,
-        MatInputModule, MatDialogModule, MatPaginatorModule
+        MatInputModule, MatDialogModule, MatPaginatorModule, FiltroColumnaDirective
     ],
     templateUrl: './caso.component.html',
     styleUrls: ['./caso.component.scss'],
@@ -36,6 +38,7 @@ import { formatFechaCreacion } from '../../custom-date-adapter';
     ]
 })
 export class CasoComponent implements OnInit {
+  private readonly notificacion = inject(NotificacionService);
 
   private solicitudService = inject(SolicitudService);
   private router = inject(Router);
@@ -82,7 +85,7 @@ export class CasoComponent implements OnInit {
         this.cargando = false;
       },
       error: (err) => {
-        console.error('Error al cargar solicitudes:', err);
+        this.notificacion.error('No fue posible cargar las solicitudes. Recarga la página o intenta más tarde.', err);
         this.cargando = false;
       }
     });
@@ -235,7 +238,7 @@ export class CasoComponent implements OnInit {
       if (confirmado) {
         this.solicitudService.eliminar(element.solicitudId).subscribe({
           next: () => this.cargarDatos(this.pageIndex, this.pageSize),
-          error: (err) => console.error('Error al eliminar caso:', err)
+          error: (err) => this.notificacion.error('No fue posible eliminar el caso. Intenta de nuevo.', err)
         });
       }
     });
@@ -258,7 +261,7 @@ export class CasoComponent implements OnInit {
           fechaReparto: result.fechaReparto
         }).subscribe({
           next: () => this.cargarDatos(this.pageIndex, this.pageSize),
-          error: (err) => console.error('Error al asignar caso:', err)
+          error: (err) => this.notificacion.error('No fue posible asignar el caso. Intenta de nuevo.', err)
         });
       }
     });

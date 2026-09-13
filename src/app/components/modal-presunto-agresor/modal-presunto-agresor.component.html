@@ -1,5 +1,5 @@
 <h2 mat-dialog-title class="modal-title">
-  <mat-icon>person</mat-icon>
+  <mat-icon aria-hidden="true">person</mat-icon>
   Datos de presunto agresor
 </h2>
 
@@ -52,7 +52,7 @@
   <button mat-flat-button class="btn-confirm"
     [mat-dialog-close]="data"
     [disabled]="!data.primerNombre && !data.primerApellido && !data.idVinculoUniversidad && !data.idVinculoVictima">
-    <mat-icon>check</mat-icon>
+    <mat-icon aria-hidden="true">check</mat-icon>
     Guardar
   </button>
 </mat-dialog-actions>

@@ -10,33 +10,20 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
-import { MatPaginatorModule, MatPaginatorIntl, PageEvent } from '@angular/material/paginator';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ModalGestionComponent } from '../modal-gestion-contacto/modal-gestion-contacto.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { SolicitudService, ContactoTelefonicoDto } from '../../services/solicitud.service';
 import { formatFechaCreacion } from '../../custom-date-adapter';
 import { forkJoin, Observable } from 'rxjs';
+import { FiltroColumnaDirective } from '../../core/a11y/filtro-columna.directive';
+import { NotificacionService } from '../../core/a11y/notificacion.service';
 
 enum EstadoSolicitudEnum {
   ASIGNADA = 2
 }
 
-
-export function getSpanishPaginatorIntl() {
-  const paginatorIntl = new MatPaginatorIntl();
-  paginatorIntl.itemsPerPageLabel = 'Items:';
-  paginatorIntl.nextPageLabel = 'Siguiente';
-  paginatorIntl.previousPageLabel = 'Anterior';
-  paginatorIntl.getRangeLabel = (page: number, pageSize: number, length: number) => {
-    if (length === 0 || pageSize === 0) return `0 de ${length}`;
-    length = Math.max(length, 0);
-    const startIndex = page * pageSize;
-    const endIndex = startIndex < length ? Math.min(startIndex + pageSize, length) : startIndex + pageSize;
-    return `${startIndex + 1} – ${endIndex} de ${length}`;
-  };
-  return paginatorIntl;
-}
 
 @Component({
     selector: 'app-detalle-acompanamiento',
@@ -52,10 +39,7 @@ export function getSpanishPaginatorIntl() {
         MatIconModule,
         MatPaginatorModule,
         MatDialogModule,
-        MatTooltipModule
-    ],
-    providers: [
-        { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
+        MatTooltipModule, FiltroColumnaDirective
     ],
     templateUrl: './gestion-contacto.component.html',
     styleUrls: ['./gestion-contacto.component.scss'],
@@ -68,6 +52,7 @@ export function getSpanishPaginatorIntl() {
     ]
 })
 export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
+  private readonly notificacion = inject(NotificacionService);
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -155,7 +140,7 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
         });
       },
       error: (err) => {
-        console.error('Error al cargar solicitudes:', err);
+        this.notificacion.error('No fue posible cargar las solicitudes. Recarga la página o intenta más tarde.', err);
         this.cargando = false;
       }
     });

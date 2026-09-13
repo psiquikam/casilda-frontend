@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { animate, state, style, transition, trigger } from '@angular/animations';
@@ -47,6 +47,7 @@ import { AuthService } from '../../services/auth.service';
 import { AtencionContextoRequestDto, AtencionRegistroRequestDto, CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, HechoRequestDto, SeguimientoAtencionRequestDto, SolicitudService, VinculoUdeAEnum } from '../../services/solicitud.service';
 import { MaestroDto } from '../../services/listas.service';
 import { environment } from '../../../environments/environment';
+import { NotificacionService } from '../../core/a11y/notificacion.service';
 
 @Component({
     selector: 'app-registro-caso',
@@ -86,6 +87,7 @@ import { environment } from '../../../environments/environment';
     ]
 })
 export class RegistroCasoComponent implements OnInit, AfterViewInit {
+  private readonly notificacion = inject(NotificacionService);
   casoForm!: FormGroup;
   atencionId: number | null = null;
   casoId: number | null = null;
@@ -375,7 +377,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
         controlPrograma?.enable({ emitEvent: false });
       },
       error: (err) => {
-        console.error('Error cargando programas filtrados:', err);
+        this.notificacion.error('No fue posible cargar los programas académicos. Intenta seleccionar de nuevo la unidad.', err);
         this.listaProgramas = [];
         controlPrograma?.disable({ emitEvent: false });
       }
@@ -495,7 +497,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
         this.lugaresEntrevista = data.lugaresEntrevista;
       },
       error: (error) => {
-        console.error('Error cargando listas maestras de registro de atención:', error);
+        this.notificacion.error('No fue posible cargar las listas del formulario. Recarga la página o intenta más tarde.', error);
       }
     });
   }
@@ -633,7 +635,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
   private obtenerMaestro(endpoint: string) {
     return this.http.get<MaestroDto[]>(`${this.maestrosUrl}/${endpoint}`).pipe(
       catchError((error) => {
-        console.error(`Error cargando maestro ${endpoint}:`, error);
+        this.notificacion.error(`No fue posible cargar la lista «${endpoint}». Algunos campos pueden aparecer vacíos.`, error);
         return of([] as MaestroDto[]);
       })
     );
@@ -727,7 +729,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
         this.pageSizeCitas = respuesta.size;
       },
       error: (error) => {
-        console.error('Error al cargar citas:', error);
+        this.notificacion.error('No fue posible cargar las citas. Recarga la página o intenta más tarde.', error);
         this.casoPorAtender = [];
         this.dataSource.data = [];
         this.totalElementosCitas = 0;
@@ -822,7 +824,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
           }));
         },
         error: (error) => {
-          console.error('Error al cargar detalle de solicitud para la cita:', error);
+          this.notificacion.error('No fue posible cargar el detalle de la solicitud. Intenta abrir la cita de nuevo.', error);
         }
       });
     }
@@ -1284,7 +1286,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
           },
           error: (error) => {
             this.guardandoCompromisos = false;
-            console.error('Error registrando atención:', error);
+            this.notificacion.error('No fue posible guardar el registro de atención. Tus datos siguen en el formulario; intenta de nuevo.', error);
             const msg = 'No fue posible guardar los datos de la pestaña';
             this.snackBar.open(msg, 'Cerrar', { duration: 3500 });
           }
@@ -1292,7 +1294,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
       })
       .catch((error) => {
         this.guardandoCompromisos = false;
-        console.error('Error preparando request de atención:', error);
+        this.notificacion.error('No fue posible preparar el registro de atención. Revisa los datos e intenta de nuevo.', error);
         this.snackBar.open('No fue posible preparar el archivo o los seguimientos', 'Cerrar', { duration: 3500 });
       });
   }

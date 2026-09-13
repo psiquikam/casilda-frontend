@@ -1,6 +1,6 @@
 <div class="modal-container">
   <h2 mat-dialog-title class="modal-header">
-    <mat-icon>assignment_ind</mat-icon>
+    <mat-icon aria-hidden="true">assignment_ind</mat-icon>
     <span>Asignar Caso: {{ data.id }}</span>
   </h2>
 
@@ -50,7 +50,7 @@
     <button mat-button (click)="cerrar()" color="warn">Cancelar</button>
     <button mat-flat-button class="btn-confirm" (click)="guardar()"
       [disabled]="repartoForm.invalid">
-      <mat-icon>check_circle</mat-icon>
+      <mat-icon aria-hidden="true">check_circle</mat-icon>
       Confirmar Asignación
     </button>
   </mat-dialog-actions>

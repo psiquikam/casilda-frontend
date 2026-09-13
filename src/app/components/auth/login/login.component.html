@@ -19,7 +19,9 @@
     </p>
   </aside>
 
-  <main class="login__formulario" id="contenido-login">
+  <!-- Mismo id que el destino del enlace de salto de app.component.html:
+       el login se renderiza a pantalla completa, sin el <main> global. -->
+  <main class="login__formulario" id="contenido-principal" tabindex="-1">
     <a class="login__volver" routerLink="/home">
       <mat-icon aria-hidden="true">arrow_back</mat-icon>
       Volver al inicio

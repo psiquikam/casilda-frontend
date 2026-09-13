@@ -1,5 +1,5 @@
 <h2 mat-dialog-title class="modal-title">
-  <mat-icon>email</mat-icon>
+  <mat-icon aria-hidden="true">email</mat-icon>
   Agregar Correo
 </h2>
 
@@ -36,7 +36,7 @@
     <button mat-button (click)="onNoClick()">Cancelar</button>
 
     <button mat-flat-button class="btn-confirm" (click)="guardar()" [disabled]="!canSubmit">
-      <mat-icon>check</mat-icon>
+      <mat-icon aria-hidden="true">check</mat-icon>
       Agregar a la lista
     </button>
   </mat-dialog-actions>

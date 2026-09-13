@@ -7,14 +7,20 @@
 
   <mat-card class="pendientes-card">
     <div class="table-responsive">
-      <table mat-table [dataSource]="dataSource" multiTemplateDataRows>
+      <!-- Anuncia el resultado del filtrado por columna (WCAG 4.1.3). -->
+      <p class="visually-hidden" role="status" aria-live="polite">
+        {{ dataSource.filteredData.length }} resultados encontrados
+      </p>
+      <table mat-table [dataSource]="dataSource" multiTemplateDataRows aria-label="Citas">
 
         <ng-container matColumnDef="expand">
-          <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
+          <th mat-header-cell scope="col" *matHeaderCellDef><span class="visually-hidden">Detalle</span></th>
           <td mat-cell *matCellDef="let element">
-            <button mat-icon-button
+            <button mat-icon-button [attr.aria-label]="'Ver el detalle de la cita ' + element.id"
+              [attr.aria-expanded]="expandedElement === element"
+              [attr.aria-controls]="'detalle-' + element.id"
               (click)="(expandedElement = expandedElement === element ? null : element); $event.stopPropagation()">
-              <mat-icon [ngClass]="expandedElement === element ? 'icon-remove' : 'icon-add'">
+              <mat-icon aria-hidden="true" [ngClass]="expandedElement === element ? 'icon-remove' : 'icon-add'">
                 {{expandedElement === element ? 'remove_circle' : 'add_circle'}}
               </mat-icon>
             </button>
@@ -22,20 +28,20 @@
         </ng-container>
 
         <ng-container matColumnDef="id">
-          <th mat-header-cell *matHeaderCellDef>
+          <th mat-header-cell scope="col" *matHeaderCellDef>
             <div class="header-inline-container">
               <span class="column-title">ID</span>
-              <div class="search-box-slim"><input (keyup)="applyFilter('id', $event)" placeholder="Filtrar"></div>
+              <div class="search-box-slim"><input appFiltroColumna="ID de la cita" (keyup)="applyFilter('id', $event)" placeholder="Filtrar"></div>
             </div>
           </th>
           <td mat-cell *matCellDef="let element" class="id-cell">#{{element.id}}</td>
         </ng-container>
 
         <ng-container matColumnDef="nombre">
-          <th mat-header-cell *matHeaderCellDef>
+          <th mat-header-cell scope="col" *matHeaderCellDef>
             <div class="header-inline-container">
               <span class="column-title">Usuario</span>
-              <div class="search-box-slim"><input (keyup)="applyFilter('nombre', $event)" placeholder="Buscar..."></div>
+              <div class="search-box-slim"><input appFiltroColumna="nombre de la persona usuaria" (keyup)="applyFilter('nombre', $event)" placeholder="Buscar..."></div>
             </div>
           </th>
           <td mat-cell *matCellDef="let element">
@@ -44,10 +50,10 @@
         </ng-container>
 
         <ng-container matColumnDef="documento">
-          <th mat-header-cell *matHeaderCellDef>
+          <th mat-header-cell scope="col" *matHeaderCellDef>
             <div class="header-inline-container">
               <span class="column-title">Doc.</span>
-              <div class="search-box-slim"><input (keyup)="applyFilter('documento', $event)" placeholder="N°"></div>
+              <div class="search-box-slim"><input appFiltroColumna="número de documento" (keyup)="applyFilter('documento', $event)" placeholder="N°"></div>
             </div>
           </th>
           <td mat-cell *matCellDef="let element">
@@ -56,10 +62,10 @@
         </ng-container>
 
         <ng-container matColumnDef="fechaCita">
-          <th mat-header-cell *matHeaderCellDef>
+          <th mat-header-cell scope="col" *matHeaderCellDef>
             <div class="header-inline-container">
               <span class="column-title">Fecha Cita</span>
-              <div class="search-box-slim"><input (keyup)="applyFilter('fecha', $event)" placeholder="Filtrar..."></div>
+              <div class="search-box-slim"><input appFiltroColumna="fecha" (keyup)="applyFilter('fecha', $event)" placeholder="Filtrar..."></div>
             </div>
           </th>
           <td mat-cell *matCellDef="let element">{{ formatOnlyDate(element.fechaCita) }}</td>
@@ -67,10 +73,10 @@
 
 
         <ng-container matColumnDef="profesional">
-          <th mat-header-cell *matHeaderCellDef>
+          <th mat-header-cell scope="col" *matHeaderCellDef>
             <div class="header-inline-container">
               <span class="column-title">Profesional asignado</span>
-              <div class="search-box-slim"><input (keyup)="applyFilter('profesional', $event)" placeholder="Filtrar...">
+              <div class="search-box-slim"><input appFiltroColumna="profesional asignado" (keyup)="applyFilter('profesional', $event)" placeholder="Filtrar...">
               </div>
             </div>
           </th>
@@ -78,41 +84,46 @@
         </ng-container>
 
         <ng-container matColumnDef="tipoSolicitud">
-          <th mat-header-cell *matHeaderCellDef>
+          <th mat-header-cell scope="col" *matHeaderCellDef>
             <div class="header-inline-container">
               <span class="column-title">Asignado</span>
-              <div class="search-box-slim"><input (keyup)="applyFilter('tipoSolicitud', $event)" placeholder="..."></div>
+              <div class="search-box-slim"><input appFiltroColumna="tipo de solicitud" (keyup)="applyFilter('tipoSolicitud', $event)" placeholder="..."></div>
             </div>
           </th>
           <td mat-cell *matCellDef="let element">
-            <span [class.text-danger]="element.tipoSolicitud === 'Sin asignar'">{{element.tipoSolicitud}}</span>
+            <span class="estado-asignacion" [class.estado-asignacion--pendiente]="element.tipoSolicitud === 'Sin asignar'">
+              @if (element.tipoSolicitud === 'Sin asignar') {
+                <mat-icon aria-hidden="true">error_outline</mat-icon>
+              }
+              {{ element.tipoSolicitud }}
+            </span>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="estadoCita">
-          <th mat-header-cell *matHeaderCellDef>
+          <th mat-header-cell scope="col" *matHeaderCellDef>
             <div class="header-inline-container">
               <span class="column-title">Estado Cita</span>
-              <div class="search-box-slim"><input (keyup)="applyFilter('estadoCita', $event)" placeholder="..."></div>
+              <div class="search-box-slim"><input appFiltroColumna="estado de la cita" (keyup)="applyFilter('estadoCita', $event)" placeholder="..."></div>
             </div>
           </th>
           <td mat-cell *matCellDef="let element">{{element.estadoCita}}</td>
         </ng-container>
 
         <ng-container matColumnDef="acciones">
-          <th mat-header-cell *matHeaderCellDef>
+          <th mat-header-cell scope="col" *matHeaderCellDef>
             <div class="column-title text-center">Acciones</div>
           </th>
           <td mat-cell *matCellDef="let element">
             <div class="action-buttons-container">
-              <button mat-icon-button class="action-warning"
+              <button mat-icon-button [attr.aria-label]="'Reprogramar la cita ' + element.id" class="action-warning"
                 [disabled]="estaCitaCaducada(element.fechaCita)"
                 [matTooltip]="estaCitaCaducada(element.fechaCita) ? 'La cita ha caducado y no se puede reprogramar' : 'Reprogramar'"
                 (click)="reprogramarCita(element); $event.stopPropagation()">
-                <mat-icon>event_repeat</mat-icon>
+                <mat-icon aria-hidden="true">event_repeat</mat-icon>
               </button>
-              <button mat-icon-button class="action-danger" matTooltip="Cancelar" (click)="cancelarCita(element); $event.stopPropagation()">
-                <mat-icon>cancel</mat-icon>
+              <button mat-icon-button [attr.aria-label]="'Cancelar la cita ' + element.id" class="action-danger" matTooltip="Cancelar" (click)="cancelarCita(element); $event.stopPropagation()">
+                <mat-icon aria-hidden="true">cancel</mat-icon>
               </button>
             </div>
           </td>
@@ -120,7 +131,7 @@
 
         <ng-container matColumnDef="expandedDetail">
           <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
-          <div class="element-detail" [@detailExpand]="element === expandedElement ? 'expanded' : 'collapsed'">
+          <div class="element-detail" [id]="'detalle-' + element.id" [attr.inert]="element === expandedElement ? null : ''" [@detailExpand]="element === expandedElement ? 'expanded' : 'collapsed'">
               <div class="detail-grid">
                 <div class="detail-item"><strong>Tipo Documento:</strong> {{element.tipoDocumento}}</div>
                 <div class="detail-item"><strong>Tipo Solicitud:</strong> {{element.tipoSolicitud}}</div>
@@ -144,7 +155,7 @@
 
       @if (!cargando && dataSource.data.length === 0) {
         <div class="no-results-msg">
-          <mat-icon>event_available</mat-icon>
+          <mat-icon aria-hidden="true">event_available</mat-icon>
           <p>No hay citas.</p>
         </div>
       }

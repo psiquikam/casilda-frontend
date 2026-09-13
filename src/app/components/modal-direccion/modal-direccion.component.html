@@ -1,7 +1,9 @@
 <h2 mat-dialog-title class="modal-header">Captura de Dirección</h2>
 
 <mat-dialog-content>
-  <form [formGroup]="direccionForm" class="grid-modal">
+  <!-- Los campos describen a terceras personas (no a quien usa el sistema): sin autocompletado,
+       para que el navegador no sugiera los datos del profesional (WCAG 1.3.5 no aplica). -->
+  <form [formGroup]="direccionForm" autocomplete="off" class="grid-modal">
 
 
 
@@ -47,7 +49,7 @@
 
     <div class="address-preview span-all">
       <span class="preview-label">
-        <mat-icon>location_on</mat-icon> Vista previa
+        <mat-icon aria-hidden="true">location_on</mat-icon> Vista previa
       </span>
       <span class="preview-text">{{ direccionPreview }}</span>
     </div>

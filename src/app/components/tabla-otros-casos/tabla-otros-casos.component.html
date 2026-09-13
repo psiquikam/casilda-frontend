@@ -1,14 +1,18 @@
 <div class="cita-container">
   <mat-card class="pendientes-card">
     <div class="table-responsive">
-      <table mat-table [dataSource]="dataSource">
+      <!-- Anuncia el resultado del filtrado por columna (WCAG 4.1.3). -->
+      <p class="visually-hidden" role="status" aria-live="polite">
+        {{ dataSource.filteredData.length }} resultados encontrados
+      </p>
+      <table mat-table [dataSource]="dataSource" aria-label="Otros casos">
 
         <ng-container matColumnDef="id">
-          <th mat-header-cell *matHeaderCellDef>
+          <th mat-header-cell scope="col" *matHeaderCellDef>
             <div class="header-inline-container">
               <span class="column-title">ID Caso</span>
               <div class="search-box-slim">
-                <input (keyup)="applyFilter('id', $event)" placeholder="Filtrar">
+                <input appFiltroColumna="ID del caso" (keyup)="applyFilter('id', $event)" placeholder="Filtrar">
               </div>
             </div>
           </th>
@@ -16,11 +20,11 @@
         </ng-container>
 
         <ng-container matColumnDef="tiempoHechos">
-          <th mat-header-cell *matHeaderCellDef>
+          <th mat-header-cell scope="col" *matHeaderCellDef>
             <div class="header-inline-container">
               <span class="column-title">Tiempo de los hechos</span>
               <div class="search-box-slim">
-                <input (keyup)="applyFilter('tiempoHechos', $event)" placeholder="Buscar...">
+                <input appFiltroColumna="tiempo de los hechos" (keyup)="applyFilter('tiempoHechos', $event)" placeholder="Buscar...">
               </div>
             </div>
           </th>
@@ -28,11 +32,11 @@
         </ng-container>
 
         <ng-container matColumnDef="tipoViolencia">
-          <th mat-header-cell *matHeaderCellDef>
+          <th mat-header-cell scope="col" *matHeaderCellDef>
             <div class="header-inline-container">
               <span class="column-title">Tipo de violencia</span>
               <div class="search-box-slim">
-                <input (keyup)="applyFilter('tipoViolencia', $event)" placeholder="Buscar...">
+                <input appFiltroColumna="tipo de violencia" (keyup)="applyFilter('tipoViolencia', $event)" placeholder="Buscar...">
               </div>
             </div>
           </th>
@@ -40,11 +44,11 @@
         </ng-container>
 
         <ng-container matColumnDef="subcategoriaViolencia">
-          <th mat-header-cell *matHeaderCellDef>
+          <th mat-header-cell scope="col" *matHeaderCellDef>
             <div class="header-inline-container">
               <span class="column-title">Subcategoría de violencia</span>
               <div class="search-box-slim">
-                <input (keyup)="applyFilter('subcategoriaViolencia', $event)" placeholder="Buscar...">
+                <input appFiltroColumna="subcategoría de violencia" (keyup)="applyFilter('subcategoriaViolencia', $event)" placeholder="Buscar...">
               </div>
             </div>
           </th>
@@ -52,11 +56,11 @@
         </ng-container>
 
         <ng-container matColumnDef="descripcion">
-          <th mat-header-cell *matHeaderCellDef>
+          <th mat-header-cell scope="col" *matHeaderCellDef>
             <div class="header-inline-container">
               <span class="column-title">Descripción</span>
               <div class="search-box-slim">
-                <input (keyup)="applyFilter('descripcion', $event)" placeholder="Buscar...">
+                <input appFiltroColumna="descripción" (keyup)="applyFilter('descripcion', $event)" placeholder="Buscar...">
               </div>
             </div>
           </th>
@@ -64,18 +68,18 @@
         </ng-container>
 
         <ng-container matColumnDef="opcion">
-          <th mat-header-cell *matHeaderCellDef>
+          <th mat-header-cell scope="col" *matHeaderCellDef>
             <div class="column-title text-center">Opción</div>
           </th>
           <td mat-cell *matCellDef="let element; let i = index">
             <div class="action-buttons-container">
-              <button mat-icon-button class="action-success" (click)="onEditar(element)"
+              <button mat-icon-button [attr.aria-label]="'Editar el caso ' + element.id" class="action-success" (click)="onEditar(element)"
                 matTooltip="Editar">
-                <mat-icon svgIcon="icono-editar"></mat-icon>
+                <mat-icon aria-hidden="true" svgIcon="icono-editar"></mat-icon>
               </button>
-              <button mat-icon-button class="action-danger" (click)="onEliminar(element)"
+              <button mat-icon-button [attr.aria-label]="'Eliminar el caso ' + element.id" class="action-danger" (click)="onEliminar(element)"
                 matTooltip="Eliminar">
-                <mat-icon svgIcon="icono-eliminar"></mat-icon>
+                <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
               </button>
             </div>
           </td>
@@ -88,7 +92,7 @@
 
       @if (dataSource.data.length === 0) {
         <div class="no-results-msg">
-          <mat-icon>inbox</mat-icon>
+          <mat-icon aria-hidden="true">inbox</mat-icon>
           <p>No hay casos registrados.</p>
         </div>
       }

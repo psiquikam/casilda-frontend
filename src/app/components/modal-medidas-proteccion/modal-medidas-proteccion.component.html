@@ -1,5 +1,5 @@
 <h2 mat-dialog-title class="modal-title">
-  <mat-icon>security</mat-icon>
+  <mat-icon aria-hidden="true">security</mat-icon>
   Medidas de protección
 </h2>
 
@@ -46,7 +46,7 @@
   <button mat-flat-button class="btn-confirm"
     [mat-dialog-close]="data"
     [disabled]="!data.tipoMedidaId || !data.subtipoMedidaId || !data.responsableId || !data.descripcion">
-    <mat-icon>check</mat-icon>
+    <mat-icon aria-hidden="true">check</mat-icon>
     Guardar
   </button>
 </mat-dialog-actions>

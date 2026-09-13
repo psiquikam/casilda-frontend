@@ -1,29 +1,13 @@
 import { Component, Input, Output, EventEmitter, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { MatPaginator, MatPaginatorModule, MatPaginatorIntl, PageEvent } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { MatCardModule } from '@angular/material/card';
-
-export function getSpanishPaginatorIntl() {
-  const paginatorIntl = new MatPaginatorIntl();
-  paginatorIntl.itemsPerPageLabel = 'Elementos por página:';
-  paginatorIntl.nextPageLabel = 'Siguiente';
-  paginatorIntl.previousPageLabel = 'Anterior';
-  paginatorIntl.firstPageLabel = 'Primera página';
-  paginatorIntl.lastPageLabel = 'Última página';
-  paginatorIntl.getRangeLabel = (page: number, pageSize: number, length: number) => {
-    if (length === 0 || pageSize === 0) return `0 de ${length}`;
-    length = Math.max(length, 0);
-    const startIndex = page * pageSize;
-    const endIndex = startIndex < length ? Math.min(startIndex + pageSize, length) : startIndex + pageSize;
-    return `${startIndex + 1} – ${endIndex} de ${length}`;
-  };
-  return paginatorIntl;
-}
+import { FiltroColumnaDirective } from '../../core/a11y/filtro-columna.directive';
 
 @Component({
     selector: 'app-tabla-casos',
@@ -34,10 +18,7 @@ export function getSpanishPaginatorIntl() {
         MatIconModule,
         MatButtonModule,
         MatTooltipModule,
-        MatCardModule
-    ],
-    providers: [
-        { provide: MatPaginatorIntl, useValue: getSpanishPaginatorIntl() }
+        MatCardModule, FiltroColumnaDirective
     ],
     templateUrl: './tabla-casos.component.html',
     styleUrls: ['./tabla-casos.component.scss'],

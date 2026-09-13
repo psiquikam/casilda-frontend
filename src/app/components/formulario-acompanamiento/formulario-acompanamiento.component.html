@@ -8,11 +8,14 @@
 
   <mat-card class="form-card">
     <mat-card-content class="content-padding">
-      <form [formGroup]="acompanamientoForm">
+      <form [formGroup]="acompanamientoForm" autocomplete="off">
+
+        <!-- Resumen enfocable de errores al enviar (WCAG 3.3.1 / 3.3.3). -->
+        <app-resumen-errores [errores]="erroresEnvio" (campoSolicitado)="revelarCampo($event)" />
 
         <div class="profile-selector">
-          <h3 class="section-title">¿Desea registrar una solicitud?</h3>
-          <mat-radio-group formControlName="tipoReporte" class="profile-grid">
+          <h2 class="section-title">¿Desea registrar una solicitud?</h2>
+          <mat-radio-group formControlName="tipoReporte" class="profile-grid" id="acomp-tipoReporte" tabindex="-1">
             <div class="profile-card" [class.selected]="acompanamientoForm.get('tipoReporte')?.value === 'directa'">
               <mat-radio-button value="directa">
                 <strong>Solicitud Directa</strong>
@@ -29,8 +32,8 @@
         </div>
 
         <div class="profile-selector">
-          <h3 class="section-title">¿Cuál es el medio por donde llegó la solicitud?</h3>
-          <mat-radio-group formControlName="medioSolicitud" class="profile-grid">
+          <h2 class="section-title">¿Cuál es el medio por donde llegó la solicitud?</h2>
+          <mat-radio-group formControlName="medioSolicitud" class="profile-grid" id="acomp-medioSolicitud" tabindex="-1">
             <div class="profile-card"
               [class.selected]="acompanamientoForm.get('medioSolicitud')?.value === 'presencial'">
               <mat-radio-button value="presencial">
@@ -48,7 +51,7 @@
         </div>
 
         @if (acompanamientoForm.get('tipoReporte')?.value === 'indirecta') {
-          <mat-tab-group animationDuration="200ms" class="form-tabs">
+          <mat-tab-group animationDuration="200ms" class="form-tabs" [(selectedIndex)]="tabSeleccionada">
             <mat-tab label="Información del Remitente">
               <div class="tab-body-padding">
                 <div class="row">
@@ -63,10 +66,10 @@
                   <mat-form-field appearance="outline">
                     <mat-label>Número Documento</mat-label>
                     <input matInput formControlName="remitenteNumeroDocumento" (keyup.enter)="buscarRemitente($event)">
-                    <button matSuffix mat-icon-button class="btn-search-doc" type="button"
+                    <button matSuffix mat-icon-button aria-label="Buscar funcionario por documento" class="btn-search-doc" type="button"
                       (click)="buscarRemitente($event)" [disabled]="buscandoRemitente" matTooltip="Buscar funcionario">
                       @if (!buscandoRemitente) {
-                        <mat-icon>search</mat-icon>
+                        <mat-icon aria-hidden="true">search</mat-icon>
                       }
                       @if (buscandoRemitente) {
                         <mat-spinner diameter="18"></mat-spinner>
@@ -75,17 +78,17 @@
                   </mat-form-field>
                   <mat-form-field appearance="outline">
                     <mat-label>Primer Nombre</mat-label>
-                    <input matInput formControlName="remitentePrimerNombre">
+                    <input matInput formControlName="remitentePrimerNombre" id="acomp-remitentePrimerNombre" autocomplete="given-name">
                   </mat-form-field>
                   <mat-form-field appearance="outline">
                     <mat-label>Segundo Nombre</mat-label>
-                    <input matInput formControlName="remitenteSegundoNombre">
+                    <input matInput formControlName="remitenteSegundoNombre" autocomplete="additional-name">
                   </mat-form-field>
                 </div>
                 <div class="row">
                   <mat-form-field appearance="outline">
                     <mat-label>Primer Apellido</mat-label>
-                    <input matInput formControlName="remitentePrimerApellido">
+                    <input matInput formControlName="remitentePrimerApellido" id="acomp-remitentePrimerApellido" autocomplete="family-name">
                   </mat-form-field>
                   <mat-form-field appearance="outline">
                     <mat-label>Segundo Apellido</mat-label>
@@ -93,7 +96,7 @@
                   </mat-form-field>
                   <mat-form-field appearance="outline">
                     <mat-label>Cargo</mat-label>
-                    <mat-select formControlName="remitenteCargo">
+                    <mat-select formControlName="remitenteCargo" id="acomp-remitenteCargo">
                       @for (c of cargos; track c.id) {
                         <mat-option [value]="c.id">{{c.nombre}}</mat-option>
                       }
@@ -101,7 +104,7 @@
                   </mat-form-field>
                   <mat-form-field appearance="outline">
                     <mat-label>Campus</mat-label>
-                    <mat-select formControlName="remitenteCampus">
+                    <mat-select formControlName="remitenteCampus" id="acomp-remitenteCampus">
                       @for (c of campusLista; track c.id) {
                         <mat-option [value]="c.id">{{c.nombre}}</mat-option>
                       }
@@ -111,7 +114,7 @@
                 <div class="row">
                   <mat-form-field appearance="outline">
                     <mat-label>Unidad Administrativa</mat-label>
-                    <mat-select formControlName="remitenteUnidadAdministrativa">
+                    <mat-select formControlName="remitenteUnidadAdministrativa" id="acomp-remitenteUnidadAdministrativa">
                       @for (d of unidadesAdministrativas; track d.id) {
                         <mat-option [value]="d.id">{{d.nombre}}</mat-option>
                       }
@@ -119,7 +122,7 @@
                   </mat-form-field>
                   <mat-form-field appearance="outline">
                     <mat-label>Unidad Académica</mat-label>
-                    <mat-select formControlName="remitenteUnidadAcademica">
+                    <mat-select formControlName="remitenteUnidadAcademica" id="acomp-remitenteUnidadAcademica">
                       @for (f of unidadesAcademicas; track f.id) {
                         <mat-option [value]="f.id">{{f.nombre}}</mat-option>
                       }
@@ -147,7 +150,7 @@
           <div class="row">
             <mat-form-field appearance="outline">
               <mat-label>Tipo Documento</mat-label>
-              <mat-select formControlName="tipoDocumento">
+              <mat-select formControlName="tipoDocumento" id="acomp-tipoDocumento">
                 @for (t of tiposDocumento; track t.id) {
                   <mat-option [value]="t.id">{{t.nombre}}</mat-option>
                 }
@@ -155,11 +158,11 @@
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Número Documento</mat-label>
-              <input matInput formControlName="numeroDocumento" (keyup.enter)="buscarSolicitante($event)">
-              <button matSuffix mat-icon-button class="btn-search-doc" type="button" (click)="buscarSolicitante($event)"
+              <input matInput formControlName="numeroDocumento" id="acomp-numeroDocumento" (keyup.enter)="buscarSolicitante($event)">
+              <button matSuffix mat-icon-button aria-label="Buscar solicitante por documento" class="btn-search-doc" type="button" (click)="buscarSolicitante($event)"
                 [disabled]="buscandoSolicitante" matTooltip="Buscar solicitante">
                 @if (!buscandoSolicitante) {
-                  <mat-icon>search</mat-icon>
+                  <mat-icon aria-hidden="true">search</mat-icon>
                 }
                 @if (buscandoSolicitante) {
                   <mat-spinner diameter="18"></mat-spinner>
@@ -168,13 +171,13 @@
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Fecha de Nacimiento</mat-label>
-              <input matInput [matDatepicker]="pickerNac" formControlName="fechaNacimiento">
+              <input matInput [matDatepicker]="pickerNac" formControlName="fechaNacimiento" id="acomp-fechaNacimiento">
               <mat-datepicker-toggle matIconSuffix [for]="pickerNac"></mat-datepicker-toggle>
               <mat-datepicker #pickerNac></mat-datepicker>
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Primer Nombre</mat-label>
-              <input matInput formControlName="primerNombre">
+              <input matInput formControlName="primerNombre" id="acomp-primerNombre">
             </mat-form-field>
           </div>
 
@@ -186,7 +189,7 @@
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Primer Apellido</mat-label>
-              <input matInput formControlName="primerApellido">
+              <input matInput formControlName="primerApellido" id="acomp-primerApellido">
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Segundo Apellido</mat-label>
@@ -194,7 +197,7 @@
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Identidad de Género</mat-label>
-              <mat-select formControlName="identidadGenero">
+              <mat-select formControlName="identidadGenero" id="acomp-identidadGenero">
                 @for (ig of identidadesGenero; track ig.id) {
                   <mat-option [value]="ig.id">{{ig.nombre}}</mat-option>
                 }
@@ -205,34 +208,34 @@
           <div class="discapacidad-container">
             <div class="section-header-inline">
               <div class="section-title">
-                <mat-icon color="primary">email</mat-icon>
+                <mat-icon aria-hidden="true" color="primary">email</mat-icon>
                 <span>Correos Electrónicos</span>
               </div>
 
-              <button mat-icon-button class="btn-add-inline" (click)="abrirModalCorreo()" matTooltip="Agregar Correo">
-                <mat-icon>add_circle</mat-icon>
+              <button mat-icon-button aria-label="Agregar correo electrónico" class="btn-add-inline" (click)="abrirModalCorreo()" matTooltip="Agregar Correo">
+                <mat-icon aria-hidden="true">add_circle</mat-icon>
               </button>
             </div>
 
             <div class="table-responsive">
-              <table mat-table [dataSource]="correoRegistrados" class="atencion-table">
+              <table mat-table [dataSource]="correoRegistrados" class="atencion-table" aria-label="Correos electrónicos registrados">
 
                 <ng-container matColumnDef="tipo">
-                  <th mat-header-cell *matHeaderCellDef> Tipo </th>
+                  <th mat-header-cell scope="col" *matHeaderCellDef> Tipo </th>
                   <td mat-cell *matCellDef="let element"> {{element.tipo}} </td>
                 </ng-container>
 
                 <ng-container matColumnDef="correo">
-                  <th mat-header-cell *matHeaderCellDef> Correo Electrónico </th>
+                  <th mat-header-cell scope="col" *matHeaderCellDef> Correo Electrónico </th>
                   <td mat-cell *matCellDef="let element"> {{element.correo}} </td>
                 </ng-container>
 
                 <ng-container matColumnDef="acciones">
-                  <th mat-header-cell *matHeaderCellDef style="text-align: center;">
+                  <th mat-header-cell scope="col" *matHeaderCellDef style="text-align: center;">
                   Acciones </th>
                   <td mat-cell *matCellDef="let i = index" style="text-align: center;">
-                    <button mat-icon-button (click)="eliminarCorreo(i)" matTooltip="Eliminar">
-                      <mat-icon svgIcon="icono-eliminar"></mat-icon>
+                    <button mat-icon-button [attr.aria-label]="'Eliminar el correo de la fila ' + (i + 1)" (click)="eliminarCorreo(i)" matTooltip="Eliminar">
+                      <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
                     </button>
                   </td>
                 </ng-container>
@@ -244,7 +247,7 @@
 
               @if (correoRegistrados.length === 0) {
                 <div class="no-results-msg">
-                  <mat-icon>mail_outline</mat-icon>
+                  <mat-icon aria-hidden="true">mail_outline</mat-icon>
                   <p>No hay correos adicionales registrados.</p>
                 </div>
               }
@@ -260,35 +263,35 @@
           <div class="discapacidad-container">
             <div class="section-header-inline">
               <div class="section-title">
-                <mat-icon color="primary">phone_enabled</mat-icon>
+                <mat-icon aria-hidden="true" color="primary">phone_enabled</mat-icon>
                 <span>Telefonos</span>
               </div>
 
-              <button mat-icon-button class="btn-add-inline" (click)="abrirModalTelefono()"
+              <button mat-icon-button aria-label="Agregar teléfono" class="btn-add-inline" (click)="abrirModalTelefono()"
                 matTooltip="Agregar Telefono">
-                <mat-icon>add_circle</mat-icon>
+                <mat-icon aria-hidden="true">add_circle</mat-icon>
               </button>
             </div>
 
             <div class="table-responsive">
-              <table mat-table [dataSource]="telefonosRegistrados" class="atencion-table">
+              <table mat-table [dataSource]="telefonosRegistrados" class="atencion-table" aria-label="Teléfonos registrados">
 
                 <ng-container matColumnDef="tipo">
-                  <th mat-header-cell *matHeaderCellDef> Tipo </th>
+                  <th mat-header-cell scope="col" *matHeaderCellDef> Tipo </th>
                   <td mat-cell *matCellDef="let element"> {{element.tipo}} </td>
                 </ng-container>
 
                 <ng-container matColumnDef="correo">
-                  <th mat-header-cell *matHeaderCellDef> Telefono </th>
+                  <th mat-header-cell scope="col" *matHeaderCellDef> Telefono </th>
                   <td mat-cell *matCellDef="let element"> {{element.telefono}} </td>
                 </ng-container>
 
                 <ng-container matColumnDef="acciones">
-                  <th mat-header-cell *matHeaderCellDef style="text-align: center;">
+                  <th mat-header-cell scope="col" *matHeaderCellDef style="text-align: center;">
                   Acciones </th>
                   <td mat-cell *matCellDef="let i = index" style="text-align: center;">
-                    <button mat-icon-button (click)="eliminarTelefono(i)" matTooltip="Eliminar">
-                      <mat-icon svgIcon="icono-eliminar"></mat-icon>
+                    <button mat-icon-button [attr.aria-label]="'Eliminar el teléfono de la fila ' + (i + 1)" (click)="eliminarTelefono(i)" matTooltip="Eliminar">
+                      <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
                     </button>
                   </td>
                 </ng-container>
@@ -300,7 +303,7 @@
 
               @if (telefonosRegistrados.length === 0) {
                 <div class="no-results-msg">
-                  <mat-icon>phone_enabled</mat-icon>
+                  <mat-icon aria-hidden="true">phone_enabled</mat-icon>
                   <p>No hay Telefonos adicionales registrados.</p>
                 </div>
               }
@@ -321,9 +324,9 @@
     @if (acompanamientoForm.get('tipoReporte')?.value) {
       <mat-card-actions align="end">
         <button mat-button color="warn" type="button" (click)="cancelar()">Limpiar</button>
-        <button mat-raised-button color="primary" [disabled]="acompanamientoForm.invalid || enviando"
+        <button mat-raised-button color="primary" [disabled]="enviando"
           (click)="enviarSolicitud()">
-          <mat-icon>send</mat-icon> Enviar Solicitud
+          <mat-icon aria-hidden="true">send</mat-icon> Enviar Solicitud
         </button>
       </mat-card-actions>
     }

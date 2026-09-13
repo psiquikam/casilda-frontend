@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,7 +10,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { DialogUsuarioComponent } from '../dialog-usuario/dialog-usuario.component';
 import { UsuarioService } from '../../services/usuario.service';
-import Swal from 'sweetalert2';
+import { DialogoService } from '../../core/a11y/dialogo.service';
+import { NotificacionService } from '../../core/a11y/notificacion.service';
 
 export interface Usuario {
   id: number;
@@ -32,6 +33,8 @@ export interface Usuario {
     styleUrls: ['./gestion-usuarios.component.scss']
 })
 export class GestionUsuariosComponent implements OnInit {
+  private readonly notificacion = inject(NotificacionService);
+  private readonly dialogo = inject(DialogoService);
   displayedColumns: string[] = ['nombre', 'email', 'rol', 'estado', 'acciones'];
   dataSource = new MatTableDataSource<Usuario>([]);
   totalElementos = 0;
@@ -62,7 +65,7 @@ export class GestionUsuariosComponent implements OnInit {
         this.pageIndex = respuesta.number;
         this.pageSize = respuesta.size;
       },
-      error: (err) => console.error('Error cargando usuarios', err)
+      error: (err) => this.notificacion.error('No fue posible cargar los usuarios. Recarga la página o intenta más tarde.', err)
     });
   }
 
@@ -91,31 +94,26 @@ export class GestionUsuariosComponent implements OnInit {
       if (usuario) {
         this.usuarioService.actualizar(usuario.id, request).subscribe({
           next: () => this.cargarUsuarios(this.pageIndex, this.pageSize),
-          error: (err) => console.error('Error actualizando usuario', err)
+          error: (err) => this.notificacion.error('No fue posible actualizar el usuario. Revisa los datos e intenta de nuevo.', err)
         });
       } else {
         this.usuarioService.crear(request).subscribe({
           next: () => this.cargarUsuarios(this.pageIndex, this.pageSize),
-          error: (err) => console.error('Error creando usuario', err)
+          error: (err) => this.notificacion.error('No fue posible crear el usuario. Revisa los datos e intenta de nuevo.', err)
         });
       }
     });
   }
 
   eliminarUsuario(id: number) {
-    Swal.fire({
-      title: '¿Está seguro?',
-      text: '¿Desea eliminar este usuario?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
-    }).then(result => {
-      if (result.isConfirmed) {
+    this.dialogo.confirmar({
+      titulo: 'Eliminar usuario',
+      mensaje: '¿Deseas eliminar este usuario? Perderá el acceso al sistema.'
+    }).subscribe((confirmado) => {
+      if (confirmado) {
         this.usuarioService.eliminar(id).subscribe({
           next: () => this.cargarUsuarios(this.pageIndex, this.pageSize),
-          error: (err) => console.error('Error eliminando usuario', err)
+          error: (err) => this.notificacion.error('No fue posible eliminar el usuario. Intenta de nuevo.', err)
         });
       }
     });
@@ -125,7 +123,7 @@ export class GestionUsuariosComponent implements OnInit {
     const nuevoActivo = usuario.estado !== 'Activo';
     this.usuarioService.cambiarEstado(usuario.id, nuevoActivo).subscribe({
       next: () => this.cargarUsuarios(this.pageIndex, this.pageSize),
-      error: (err) => console.error('Error cambiando estado', err)
+      error: (err) => this.notificacion.error('No fue posible cambiar el estado del usuario. Intenta de nuevo.', err)
     });
   }
 }

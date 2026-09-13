@@ -1,5 +1,5 @@
 <h2 mat-dialog-title class="modal-title">
-  <mat-icon>assignment</mat-icon>
+  <mat-icon aria-hidden="true">assignment</mat-icon>
   Compromiso de la Persona Atendida
 </h2>
 
@@ -31,7 +31,7 @@
 
   <button mat-flat-button class="btn-confirm" (click)="guardar()"
                 [disabled]="data.idtipocompromiso === null || !data.fecha">
-    <mat-icon>check</mat-icon>
+    <mat-icon aria-hidden="true">check</mat-icon>
     Agregar compromiso
   </button>
 </mat-dialog-actions>

@@ -12,7 +12,7 @@
             @for (listKey of listKeys; track listKey) {
             <mat-tab>
                 <ng-template mat-tab-label>
-                    <mat-icon class="tab-icon">settings_input_component</mat-icon>
+                    <mat-icon aria-hidden="true" class="tab-icon">settings_input_component</mat-icon>
                     <span>{{ etiquetas[listKey] }}</span>
                 </ng-template>
 
@@ -31,7 +31,7 @@
                         </mat-form-field>
                         <button mat-raised-button color="primary" class="add-btn" (click)="agregar(listKey)"
                             [disabled]="!nuevoNombre">
-                            <mat-icon>save</mat-icon> Guardar
+                            <mat-icon aria-hidden="true">save</mat-icon> Guardar
                         </button>
                     </div>
 
@@ -72,19 +72,19 @@
                                     <td class="column-actions">
                                         <div class="actions-container">
                                             @if (editandoItem?.id !== item.id || editandoItem?.lista !== listKey) {
-                                            <button mat-icon-button class="edit-btn"
+                                            <button mat-icon-button [attr.aria-label]="'Editar ' + item.nombre" class="edit-btn"
                                                 (click)="iniciarEdicion(listKey, item)">
-                                                <mat-icon svgIcon="icono-editar"></mat-icon>
+                                                <mat-icon aria-hidden="true" svgIcon="icono-editar"></mat-icon>
                                             </button>
-                                            <button mat-icon-button class="delete-btn" (click)="borrar(listKey, item)">
-                                                <mat-icon svgIcon="icono-eliminar"></mat-icon>
+                                            <button mat-icon-button [attr.aria-label]="'Eliminar ' + item.nombre" class="delete-btn" (click)="borrar(listKey, item)">
+                                                <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
                                             </button>
                                             } @else {
-                                            <button mat-icon-button class="check-btn" (click)="guardarEdicion()">
-                                                <mat-icon>check_circle</mat-icon>
+                                            <button mat-icon-button aria-label="Guardar la edición" class="check-btn" (click)="guardarEdicion()">
+                                                <mat-icon aria-hidden="true">check_circle</mat-icon>
                                             </button>
-                                            <button mat-icon-button color="warn" (click)="editandoItem = null">
-                                                <mat-icon>cancel</mat-icon>
+                                            <button mat-icon-button aria-label="Cancelar la edición" color="warn" (click)="editandoItem = null">
+                                                <mat-icon aria-hidden="true">cancel</mat-icon>
                                             </button>
                                             }
                                         </div>

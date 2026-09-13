@@ -1,6 +1,6 @@
 .gestion-container {
   padding: 24px;
-  background-color: #f8fafc;
+  background-color: var(--color-bg-main);
 }
 
 .page-header {
@@ -13,12 +13,12 @@
     margin: 0;
     font-size: 24px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--color-text-primary);
   }
 
   p {
     margin: 4px 0 0;
-    color: #64748b;
+    color: var(--color-text-muted);
   }
 }
 
@@ -31,7 +31,7 @@
 ::ng-deep .mat-mdc-tab-group {
   .mat-mdc-tab.mdc-tab--active {
     .mdc-tab__text-label {
-      color: #348F41 !important;
+      color: var(--color-primary) !important;
       font-weight: 700;
     }
   }
@@ -54,7 +54,7 @@
   align-items: center;
   margin-bottom: 24px;
   padding: 16px;
-  background-color: #f1f5f9;
+  background-color: var(--color-bg-subtle);
   border-radius: 8px;
 
   mat-form-field {
@@ -71,7 +71,7 @@
 }
 
 .table-wrapper {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -81,17 +81,17 @@
   border-collapse: collapse;
 
   th {
-    background-color: #f8fafc;
+    background-color: var(--color-bg-main);
     padding: 12px 20px;
-    font-size: 12px;
+    font-size: var(--font-size-sm); /* piso 14px (WCAG 1.4.4) */
     text-transform: uppercase;
-    color: #64748b;
-    border-bottom: 1px solid #e2e8f0;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid var(--color-border);
   }
 
   td {
     padding: 12px 20px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--color-bg-subtle);
     vertical-align: middle;
   }
 
@@ -117,7 +117,7 @@
   }
 
   tr:hover {
-    background-color: #f8fafc;
+    background-color: var(--color-bg-main);
   }
 }
 
@@ -130,9 +130,9 @@
   }
 }
 
-.edit-btn { color: #348F41; }
-.delete-btn { color: #ef4444; }
-.check-btn { color: #22c55e; }
+.edit-btn { color: var(--color-primary); }
+.delete-btn { color: var(--color-danger); }
+.check-btn { color: var(--color-success); }
 
 .editing-row {
   background-color: #f1eaf4 !important;

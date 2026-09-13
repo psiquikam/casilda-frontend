@@ -1,4 +1,4 @@
-$green: #348F41;
+$green: var(--color-primary); // verde UdeA: token del sistema (antes verde heredado a 3.9:1; ahora 5.16:1)
 
 :host {
   display: block;
@@ -39,8 +39,8 @@ $green: #348F41;
 
 .modal-actions {
   padding: 12px 24px;
-  border-top: 1px solid #e2e8f0;
-  background-color: #f8fafc;
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-bg-main);
 
   .btn-confirm {
     background-color: $green;
@@ -55,8 +55,8 @@ $green: #348F41;
     }
 
     &:disabled {
-      background-color: #e2e8f0;
-      color: #94a3b8;
+      background-color: var(--color-border);
+      color: var(--color-text-muted);
     }
   }
 }

@@ -1,5 +1,5 @@
 <h2 mat-dialog-title class="modal-title">
-  <mat-icon>assignment_turned_in</mat-icon>
+  <mat-icon aria-hidden="true">assignment_turned_in</mat-icon>
   Seguimiento
 </h2>
 
@@ -85,7 +85,7 @@
   <button mat-button (click)="onNoClick()">Cancelar</button>
   <button mat-flat-button class="btn-confirm" (click)="guardar()"
                 [disabled]="data.idtiposeguimiento === null || data.idaccion === null || data.idactividad === null || data.idestadoseguimiento === null || data.idmotivoestado === null || !data.descripcion || !data.fecha">
-    <mat-icon>check</mat-icon>
+    <mat-icon aria-hidden="true">check</mat-icon>
     Guardar Seguimiento
   </button>
 </mat-dialog-actions>

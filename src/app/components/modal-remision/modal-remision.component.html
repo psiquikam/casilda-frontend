@@ -1,5 +1,5 @@
 <h2 mat-dialog-title class="modal-title">
-  <mat-icon>assignment</mat-icon>
+  <mat-icon aria-hidden="true">assignment</mat-icon>
   Agregar Remisión
 </h2>
 
@@ -43,7 +43,7 @@
     [mat-dialog-close]="{ idTipoRemision: data.tipo?.id, tipo: data.tipo?.nombre, cual: data.cual, fecha: data.fecha }"
     [disabled]="!data.tipo || !data.fecha"
   >
-    <mat-icon>check</mat-icon>
+    <mat-icon aria-hidden="true">check</mat-icon>
     Agregar a la lista
   </button>
 </mat-dialog-actions>

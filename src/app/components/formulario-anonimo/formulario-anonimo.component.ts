@@ -12,7 +12,9 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
 import { MaestroDto } from '../../services/listas.service';
-import Swal from 'sweetalert2';
+import { NotificacionService } from '../../core/a11y/notificacion.service';
+import { ResumenErroresComponent } from '../../core/a11y/resumen-errores.component';
+import { DescripcionCampos, ErrorFormulario, recolectarErrores } from '../../core/a11y/errores-formulario';
 
 @Component({
   selector: 'app-formulario-anonimo',
@@ -28,7 +30,8 @@ import Swal from 'sweetalert2';
     MatCheckboxModule,
     MatIconModule,
     MatDialogModule,
-    MatSelectModule
+    MatSelectModule,
+    ResumenErroresComponent
   ],
   templateUrl: './formulario-anonimo.component.html',
   styleUrls: ['./formulario-anonimo.component.scss']
@@ -36,6 +39,7 @@ import Swal from 'sweetalert2';
 export class FormularioAnonimoComponent {
   private readonly fb = inject(FormBuilder);
   private readonly dialog = inject(MatDialog);
+  private readonly notificacion = inject(NotificacionService);
 
   tipoUsuario: 'anonimo' | 'anonimo_tercero' = 'anonimo';
   formConsentimiento: FormGroup;
@@ -43,6 +47,17 @@ export class FormularioAnonimoComponent {
   formRelato: FormGroup;
   formVictimario: FormGroup;
   formEvidencias: FormGroup;
+
+  /** Errores del paso «El Caso» para el resumen enfocable (WCAG 3.3.1). */
+  erroresRelato: ErrorFormulario[] = [];
+
+  private readonly camposRelato: DescripcionCampos = {
+    sedeCampus: { etiqueta: 'Campus', mensajes: { required: 'Indícanos en qué campus ocurrió.' } },
+    lugarDetalleExterno: { etiqueta: 'Lugar fuera de la Universidad', mensajes: { required: 'Cuéntanos, aunque sea de forma aproximada, dónde ocurrió.' } },
+    fecha: { etiqueta: 'Fecha de los hechos', mensajes: { required: 'Puedes escribir una fecha aproximada o elegir «Se desconoce».' } },
+    tipoVbg: { etiqueta: 'Tipos de violencia', mensajes: { required: 'Selecciona al menos un tipo o modalidad de violencia.' } },
+    descripcion: { etiqueta: 'Descripción', mensajes: { minlength: 'Si decides describir los hechos, escribe al menos 20 caracteres.' } }
+  };
 
   readonly tiposVbg: MaestroDto[] = [
     { id: 1, nombre: 'Violencia Psicológica' },
@@ -173,24 +188,6 @@ export class FormularioAnonimoComponent {
   get contactoRequeridoInvalido(): boolean {
     return !!(this.formPerfil?.hasError('contactInfoRequired') && 
       this.formPerfil.get('deseaContacto')?.value === 'si');
-  }
-
-  soloNumeros(event: Event, controlName: string, parentGroup: FormGroup): void {
-    const input = event.target as HTMLInputElement;
-    const limpio = input.value.replace(/\D/g, '');
-    if (input.value !== limpio) {
-      input.value = limpio;
-    }
-    parentGroup.get(controlName)?.setValue(limpio);
-  }
-
-  soloLetras(event: Event, controlName: string, parentGroup: FormGroup): void {
-    const input = event.target as HTMLInputElement;
-    const limpio = input.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
-    if (input.value !== limpio) {
-      input.value = limpio;
-    }
-    parentGroup.get(controlName)?.setValue(limpio);
   }
 
   constructor() {
@@ -393,9 +390,11 @@ export class FormularioAnonimoComponent {
     }
 
     if (this.formRelato.valid && tieneVbg) {
+      this.erroresRelato = [];
       stepper.next();
-    } else if (typeof window !== 'undefined' && window.scrollY !== 0) {
-      window.scrollTo(0, 0);
+    } else {
+      // Nueva referencia en cada intento para que el resumen recupere el foco.
+      this.erroresRelato = recolectarErrores(this.formRelato, this.camposRelato, 'relato');
     }
   }
 
@@ -469,13 +468,7 @@ export class FormularioAnonimoComponent {
         guardadoEl: new Date().toISOString()
       };
       localStorage.setItem('casilda_borrador_anonimo', JSON.stringify(borrador));
-      Swal.fire({
-        icon: 'success',
-        title: 'Borrador guardado',
-        text: 'Tu avance ha sido guardado de forma segura en este navegador.',
-        timer: 2000,
-        showConfirmButton: false
-      });
+      this.notificacion.exito('Borrador guardado. Tu avance queda solo en este navegador.');
     } catch {
       // Manejo preventivo si localStorage no estuviese accesible
     }

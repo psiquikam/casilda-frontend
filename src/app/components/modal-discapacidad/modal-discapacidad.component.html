@@ -1,5 +1,5 @@
 <h2 mat-dialog-title class="modal-title">
-  <mat-icon>accessibility</mat-icon>
+  <mat-icon aria-hidden="true">accessibility</mat-icon>
   Agregar Discapacidad
 </h2>
 
@@ -37,6 +37,6 @@
   <button mat-flat-button class="btn-confirm"
           [mat-dialog-close]="data"
           [disabled]="!data.tipo || !data.descripcion">
-    <mat-icon>check</mat-icon> Agregar
+    <mat-icon aria-hidden="true">check</mat-icon> Agregar
   </button>
 </mat-dialog-actions>
