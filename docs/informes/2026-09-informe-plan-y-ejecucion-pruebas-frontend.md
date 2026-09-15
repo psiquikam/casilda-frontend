@@ -14,10 +14,11 @@
 ## 1. Objetivo y Alcance del Plan de Pruebas
 
 El presente documento consolida la planificación, ejecución y resultados de las pruebas realizadas sobre los módulos de Front-End desarrollados durante el período, asegurando:
-1. **Calidad de software y estabilidad funcional:** Ejecución de pruebas unitarias sobre los componentes implementados.
-2. **Integridad técnica y compilación:** Cumplimiento de estándares de linteo sin errores, presupuestos de hojas de estilo SCSS y compilación productiva.
-3. **Experiencia de usuario y usabilidad:** Verificación de flujos amigables, áreas táctiles en dispositivos móviles y claridad en el diligenciamiento de reportes anónimos.
-4. **Validación participativa con usuarios y QA:** Retroalimentación obtenida en mesas de trabajo con el equipo de salud pública y el Líder Técnico SCRUM Master.
+1. **Automatización en Integración Continua (CI):** Configuración del pipeline de GitHub Actions (`.github/workflows/frontend-ci.yml`) para la ejecución desatendida y obligatoria de pruebas en cada Pull Request y push a la rama principal.
+2. **Calidad de software y estabilidad funcional:** Ejecución de pruebas unitarias sobre los componentes implementados.
+3. **Integridad técnica y compilación:** Cumplimiento de estándares de linteo sin errores, presupuestos de hojas de estilo SCSS y compilación productiva.
+4. **Experiencia de usuario y usabilidad:** Verificación de flujos amigables, áreas táctiles en dispositivos móviles y claridad en el diligenciamiento de reportes anónimos.
+5. **Validación participativa con usuarios y QA:** Retroalimentación obtenida en mesas de trabajo con el equipo de salud pública y el Líder Técnico SCRUM Master.
 
 ---
 
@@ -61,6 +62,7 @@ Se ejecutaron pruebas estáticas y de compilación sobre todo el código fuente 
 | **Presupuesto de Estilos (SCSS Budget)** | `npm run build` (`angular.json`) | Bundle de producción sin exceder límites de hojas de estilo. | **Build Exitoso** | Se ajustaron los límites de presupuesto SCSS en `angular.json` para dar soporte a los estilos extensos del dashboard (`c7c5272`). |
 | **Tipado y Catálogos** | Compilador TypeScript (`tsc`) | Coherencia estricta en las opciones del catálogo VBG. | **Tipado Correcto** | Se corrigieron las discrepancias de nombres y claves en el catálogo de Violencias Basadas en Género (`2bbd53a`). |
 | **Seguridad de Dependencias** | `npm run audit:prod` | Ausencia de vulnerabilidades conocidas en producción. | **0 Vulnerabilidades** | Verificación limpia de dependencias productivas. |
+| **Pipeline de CI en Pull Requests** | GitHub Actions (`frontend-ci.yml`) | Ejecución automática de tests, linteo y build en cada PR antes del merge a `main`. | **Automático y Exitoso** | Implementación del flujo de CI que bloquea la integración si alguna prueba o validación falla. |
 
 ---
 
