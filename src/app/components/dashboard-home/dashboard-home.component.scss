@@ -949,6 +949,41 @@
     outline: 3px solid var(--focus-ring-color);
     outline-offset: 2px;
   }
+
+  &--secondary {
+    background-color: var(--color-surface-container-high);
+    color: var(--color-primary);
+    border: 1px solid var(--color-outline-variant);
+
+    &:hover {
+      background-color: var(--color-surface-container-highest);
+    }
+  }
+}
+
+.step-card__restricted-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.step-card__restricted-msg {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--color-amber-600, #d97706);
+  }
 }
 
 .stepper-pagination {

@@ -149,8 +149,8 @@
       <hr class="nav-divider">
     }
 
-    <!-- 4. UAD EQUIPO 3 Y 4 (Admin, Coordinador y Revisor) -->
-    @if (auth.isAdmin() || auth.isCoordinador() || auth.isRevisor()) {
+    <!-- 4. UAD EQUIPO 3 Y 4 (Funcionarios) -->
+    @if (!auth.isUsuario()) {
       <div class="nav-section">
         <button type="button" id="toggle-uad" class="section-toggle" (click)="toggleSection('uad')"
           [attr.aria-expanded]="isExpanded('uad')" aria-controls="section-uad">

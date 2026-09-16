@@ -207,6 +207,16 @@ export class AuthService {
     return this.hasRole('USUARIO');
   }
 
+  isMockUser(): boolean {
+    if (!this.currentUser) return false;
+    const token = this.currentUser.token || '';
+    return (
+      token.includes('mockSignatureCasildaTokenValidation2026') ||
+      token.startsWith('mock-') ||
+      Object.values(MOCK_USERS).some((u) => u.email.toLowerCase() === this.currentUser?.email.toLowerCase())
+    );
+  }
+
   hasRole(role: string): boolean {
     if (!this.currentUser) return false;
     const target = role.toUpperCase().replace(/^ROLE_/, '');

@@ -758,10 +758,23 @@
               </div>
 
               <div class="step-card__footer">
-                <a [routerLink]="curStep.route" class="btn-step-action">
-                  <span>{{ curStep.actionText }}</span>
-                  <mat-icon aria-hidden="true">arrow_forward</mat-icon>
-                </a>
+                @if (canAccessRoute(curStep.route)) {
+                  <a [routerLink]="curStep.route" class="btn-step-action">
+                    <span>{{ curStep.actionText }}</span>
+                    <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+                  </a>
+                } @else {
+                  <div class="step-card__restricted-wrap">
+                    <span class="step-card__restricted-msg">
+                      <mat-icon aria-hidden="true">lock</mat-icon>
+                      Módulo asistencial reservado para Equipo de Atención y Coordinación.
+                    </span>
+                    <a routerLink="/consulta" class="btn-step-action btn-step-action--secondary">
+                      <span>Auditar solicitudes en Consulta</span>
+                      <mat-icon aria-hidden="true">search</mat-icon>
+                    </a>
+                  </div>
+                }
               </div>
             </div>
           }

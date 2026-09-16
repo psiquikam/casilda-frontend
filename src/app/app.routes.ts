@@ -133,7 +133,7 @@ export const routes: Routes = [
     path: 'cita',
     title: 'Agenda de citas',
     canActivate: [roleGuard],
-    data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL'] },
+    data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR'] },
     loadComponent: () => import('./components/cita/cita.component').then((m) => m.CitaComponent)
   },
   {

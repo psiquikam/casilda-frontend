@@ -95,8 +95,8 @@
       </a>
     }
 
-    <!-- 4. UAD (Equipos 3 y 4 - Admin, Coordinador y Revisor) -->
-    @if (auth.isAdmin() || auth.isCoordinador() || auth.isRevisor()) {
+    <!-- 4. UAD (Equipos 3 y 4 - Funcionarios) -->
+    @if (!auth.isUsuario()) {
       <button type="button" class="hnav-dropdown-btn" [matMenuTriggerFor]="uadMenu"
         aria-label="Abrir menú de UAD">
         <mat-icon class="hnav-icon" aria-hidden="true">balance</mat-icon>

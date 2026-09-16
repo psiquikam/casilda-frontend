@@ -29,7 +29,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
           )
           .subscribe();
       } else if (error.status === 403 && !isAuthEndpoint) {
-        void router.navigate(['/acceso-denegado']);
+        const isCatalogOrMaestro = req.url.includes('/maestros') || req.url.includes('/catalogos');
+        const isExempt = Boolean(
+          (typeof authService.isAdmin === 'function' && authService.isAdmin()) ||
+          (typeof authService.isMockUser === 'function' && authService.isMockUser())
+        );
+
+        if (!isCatalogOrMaestro && !isExempt) {
+          void router.navigate(['/acceso-denegado']);
+        }
       }
       return throwError(() => error);
     })

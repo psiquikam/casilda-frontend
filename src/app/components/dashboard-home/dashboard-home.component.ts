@@ -316,7 +316,7 @@ export class DashboardHomeComponent {
       whatItIs: 'Módulo de programación y calendario de sesiones psicosociales y jurídicas.',
       whenToUse: 'Para fijar una fecha y hora con la persona tras contactarla o para reprogramar citas.',
       keywords: ['cita', 'agendar', 'horario', 'calendario', 'sesion', 'psicologia', 'juridica', 'fecha'],
-      roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL']
+      roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR']
     },
     {
       id: 'caso',
@@ -443,5 +443,12 @@ export class DashboardHomeComponent {
 
   selectStep(index: number): void {
     this.selectedStepIndex = index;
+  }
+
+  canAccessRoute(route: string): boolean {
+    if (this.auth.isAdmin()) return true;
+    const tool = this.allTools.find(t => t.route === route);
+    if (!tool || !tool.roles) return true;
+    return tool.roles.some(r => this.auth.hasRole(r));
   }
 }
