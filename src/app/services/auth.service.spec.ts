@@ -12,7 +12,7 @@ describe('AuthService', () => {
     return `header.${payload}.signature`;
   };
 
-  const session = (expiresAt: number, rol: string = 'Usuario'): UserSession => ({
+  const session = (expiresAt: number, rol = 'Usuario'): UserSession => ({
     email: 'persona@udea.edu.co',
     nombre: 'Persona de prueba',
     rol: rol,
