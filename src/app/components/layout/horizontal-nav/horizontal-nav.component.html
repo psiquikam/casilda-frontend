@@ -1,4 +1,5 @@
-<nav class="hnav-bar" aria-label="Navegación horizontal principal">
+<!-- VISTA DE ESCRITORIO (> 992px): Barra horizontal fluida con submenús mat-menu -->
+<nav class="hnav-desktop hnav-bar" aria-label="Navegación horizontal principal">
   <div class="hnav-container">
 
     <!-- 0. Panel de Inicio (Todos los usuarios) -->
@@ -138,3 +139,220 @@
 
   </div>
 </nav>
+
+<!-- VISTA MÓVIL Y TABLET (<= 992px): Barra colapsable accesible que no se corta -->
+<div class="hnav-mobile">
+  <div class="hnav-mobile-bar">
+    <button type="button" class="hnav-mobile-toggle" (click)="toggleMobileMenu()"
+      [attr.aria-expanded]="mobileMenuOpen()" aria-controls="hnav-mobile-drawer"
+      aria-label="Alternar menú de navegación del sistema">
+      <div class="hnav-mobile-toggle__left">
+        <mat-icon class="hnav-mobile-toggle__icon" aria-hidden="true">
+          {{ mobileMenuOpen() ? 'close' : 'menu' }}
+        </mat-icon>
+        <span class="hnav-mobile-toggle__label">Menú de Navegación</span>
+      </div>
+      <div class="hnav-mobile-toggle__right">
+        <span class="hnav-mobile-toggle__status">{{ mobileMenuOpen() ? 'Cerrar' : 'Explorar' }}</span>
+        <mat-icon class="hnav-mobile-toggle__chevron" [class.is-expanded]="mobileMenuOpen()" aria-hidden="true">
+          expand_more
+        </mat-icon>
+      </div>
+    </button>
+  </div>
+
+  @if (mobileMenuOpen()) {
+    <nav id="hnav-mobile-drawer" class="hnav-mobile-drawer" aria-label="Menú móvil desplegable">
+
+      <!-- 0. Panel de Inicio -->
+      <a routerLink="/inicio" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+        class="hnav-mobile-item hnav-mobile-item--root" (click)="closeMobileMenu()">
+        <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">dashboard</mat-icon>
+        <span class="hnav-mobile-item__text">Panel de Inicio</span>
+      </a>
+
+      <!-- SECCIÓN USUARIO (No Funcionario) -->
+      @if (auth.isUsuario()) {
+        <div class="hnav-mobile-group">
+          <button type="button" class="hnav-mobile-group-header" (click)="toggleSection('usuario')"
+            [attr.aria-expanded]="isSectionExpanded('usuario')">
+            <span class="hnav-mobile-group-title">
+              <mat-icon class="hnav-mobile-group-icon" aria-hidden="true">volunteer_activism</mat-icon>
+              <span>Mis Trámites y Solicitudes</span>
+            </span>
+            <mat-icon class="hnav-mobile-group-chevron" [class.is-expanded]="isSectionExpanded('usuario')" aria-hidden="true">
+              expand_more
+            </mat-icon>
+          </button>
+
+          @if (isSectionExpanded('usuario')) {
+            <div class="hnav-mobile-group-content">
+              <a routerLink="/solicitud-acompanamiento" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+                class="hnav-mobile-item" (click)="closeMobileMenu()">
+                <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">add_circle_outline</mat-icon>
+                <span class="hnav-mobile-item__text">Reportar Caso</span>
+              </a>
+              <a routerLink="/seguimiento" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+                class="hnav-mobile-item" (click)="closeMobileMenu()">
+                <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">track_changes</mat-icon>
+                <span class="hnav-mobile-item__text">Seguimiento de Trámite</span>
+              </a>
+              @if (features.complaintIntakePrototype) {
+                <a routerLink="/nueva-queja" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+                  class="hnav-mobile-item" (click)="closeMobileMenu()">
+                  <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">post_add</mat-icon>
+                  <span class="hnav-mobile-item__text">Queja Disciplinaria (UAD)</span>
+                </a>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- 1. ADMINISTRACIÓN (Solo Admin) -->
+      @if (auth.isAdmin()) {
+        <div class="hnav-mobile-group">
+          <button type="button" class="hnav-mobile-group-header" (click)="toggleSection('admin')"
+            [attr.aria-expanded]="isSectionExpanded('admin')">
+            <span class="hnav-mobile-group-title">
+              <mat-icon class="hnav-mobile-group-icon" aria-hidden="true">admin_panel_settings</mat-icon>
+              <span>Administración</span>
+            </span>
+            <mat-icon class="hnav-mobile-group-chevron" [class.is-expanded]="isSectionExpanded('admin')" aria-hidden="true">
+              expand_more
+            </mat-icon>
+          </button>
+
+          @if (isSectionExpanded('admin')) {
+            <div class="hnav-mobile-group-content">
+              <a routerLink="/gestion-usuarios" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+                class="hnav-mobile-item" (click)="closeMobileMenu()">
+                <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">manage_accounts</mat-icon>
+                <span class="hnav-mobile-item__text">Gestión de Usuarios</span>
+              </a>
+              <a routerLink="/gestion-sistema" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+                class="hnav-mobile-item" (click)="closeMobileMenu()">
+                <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">tune</mat-icon>
+                <span class="hnav-mobile-item__text">Maestros del Sistema</span>
+              </a>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- 2. EQUIPO DE ATENCIÓN (Admin, Coordinador y Profesional) -->
+      @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional()) {
+        <div class="hnav-mobile-group">
+          <button type="button" class="hnav-mobile-group-header" (click)="toggleSection('atencion')"
+            [attr.aria-expanded]="isSectionExpanded('atencion')">
+            <span class="hnav-mobile-group-title">
+              <mat-icon class="hnav-mobile-group-icon" aria-hidden="true">volunteer_activism</mat-icon>
+              <span>Equipo de Atención</span>
+            </span>
+            <mat-icon class="hnav-mobile-group-chevron" [class.is-expanded]="isSectionExpanded('atencion')" aria-hidden="true">
+              expand_more
+            </mat-icon>
+          </button>
+
+          @if (isSectionExpanded('atencion')) {
+            <div class="hnav-mobile-group-content">
+              <a routerLink="/solicitud-acompanamiento" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+                class="hnav-mobile-item" (click)="closeMobileMenu()">
+                <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">add_circle_outline</mat-icon>
+                <span class="hnav-mobile-item__text">Nueva Solicitud</span>
+              </a>
+              <a routerLink="/consulta" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+                class="hnav-mobile-item" (click)="closeMobileMenu()">
+                <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">search</mat-icon>
+                <span class="hnav-mobile-item__text">Consulta de Solicitudes</span>
+              </a>
+              @if (features.assignmentsPrototype) {
+                <a routerLink="/mis-asignaciones" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+                  class="hnav-mobile-item" (click)="closeMobileMenu()">
+                  <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">assignment_ind</mat-icon>
+                  <span class="hnav-mobile-item__text">Mis Asignaciones</span>
+                </a>
+              }
+              <a routerLink="/cita" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+                class="hnav-mobile-item" (click)="closeMobileMenu()">
+                <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">calendar_month</mat-icon>
+                <span class="hnav-mobile-item__text">Citas y Agendamiento</span>
+              </a>
+              <a routerLink="/registro-caso" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+                class="hnav-mobile-item" (click)="closeMobileMenu()">
+                <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">folder_shared</mat-icon>
+                <span class="hnav-mobile-item__text">Registro de Caso</span>
+              </a>
+              <a routerLink="/registro-atencion" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+                class="hnav-mobile-item" (click)="closeMobileMenu()">
+                <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">handshake</mat-icon>
+                <span class="hnav-mobile-item__text">Registro de Atención</span>
+              </a>
+            </div>
+          }
+        </div>
+
+        <!-- Línea Alma -->
+        <a routerLink="/linea-alma/atencion-pr" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+          class="hnav-mobile-item" (click)="closeMobileMenu()">
+          <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">ring_volume</mat-icon>
+          <span class="hnav-mobile-item__text">Línea Alma</span>
+        </a>
+      }
+
+      <!-- 4. UAD (Funcionarios) -->
+      @if (!auth.isUsuario()) {
+        <div class="hnav-mobile-group">
+          <button type="button" class="hnav-mobile-group-header" (click)="toggleSection('uad')"
+            [attr.aria-expanded]="isSectionExpanded('uad')">
+            <span class="hnav-mobile-group-title">
+              <mat-icon class="hnav-mobile-group-icon" aria-hidden="true">balance</mat-icon>
+              <span>UAD</span>
+            </span>
+            <mat-icon class="hnav-mobile-group-chevron" [class.is-expanded]="isSectionExpanded('uad')" aria-hidden="true">
+              expand_more
+            </mat-icon>
+          </button>
+
+          @if (isSectionExpanded('uad')) {
+            <div class="hnav-mobile-group-content">
+              @if (features.complaintIntakePrototype) {
+                <a routerLink="/nueva-queja" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+                  class="hnav-mobile-item" (click)="closeMobileMenu()">
+                  <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">post_add</mat-icon>
+                  <span class="hnav-mobile-item__text">Registrar Queja Disciplinaria</span>
+                </a>
+              }
+              @if (features.publicTrackingPrototype) {
+                <a routerLink="/seguimiento" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+                  class="hnav-mobile-item" (click)="closeMobileMenu()">
+                  <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">track_changes</mat-icon>
+                  <span class="hnav-mobile-item__text">Seguimiento de Trámites</span>
+                </a>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- 5. Reportes y Métricas -->
+      @if ((auth.isAdmin() || auth.isCoordinador() || auth.isRevisor()) && features.reviewerDashboardPrototype) {
+        <a routerLink="/dashboard-revisor" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+          class="hnav-mobile-item" (click)="closeMobileMenu()">
+          <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">bar_chart</mat-icon>
+          <span class="hnav-mobile-item__text">Panel de Indicadores</span>
+        </a>
+      }
+
+      <!-- 6. Ruta Violeta -->
+      @if (features.publicTrackingPrototype && !auth.isUsuario()) {
+        <a routerLink="/seguimiento" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+          class="hnav-mobile-item" (click)="closeMobileMenu()">
+          <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">diversity_1</mat-icon>
+          <span class="hnav-mobile-item__text">Ruta Violeta</span>
+        </a>
+      }
+
+    </nav>
+  }
+</div>
