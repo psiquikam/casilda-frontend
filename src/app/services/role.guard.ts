@@ -8,21 +8,23 @@ export const roleGuard: CanActivateFn = (route) => {
   const router = inject(Router);
   const dialogo = inject(DialogoService);
 
-  // Obtenemos los roles permitidos para esta ruta desde la configuración de la ruta
-  const expectedRoles = route.data['roles'] as string[];
-  const userRole = authService.currentUser?.rol;
-
   // 1. ¿Está logueado?
   if (!authService.isAuthenticated()) {
     dialogo.aviso({ titulo: 'Acceso requerido', mensaje: AUTH_REQUIRED_MESSAGE, icono: 'lock' }).subscribe();
     return router.createUrlTree(['/login']);
   }
 
-  // 2. ¿Tiene el rol necesario?
-  if (userRole && expectedRoles.includes(userRole)) {
+  // 2. Regla de negocio: El administrador tiene acceso a todas las páginas
+  if (authService.isAdmin()) {
     return true;
   }
 
-  // 3. Si no tiene permiso, lo mandamos a una página de "Acceso Denegado"
+  // 3. ¿Tiene alguno de los roles permitidos para esta ruta?
+  const expectedRoles = (route.data['roles'] as string[]) || [];
+  if (expectedRoles.length > 0 && authService.hasAnyRole(expectedRoles)) {
+    return true;
+  }
+
+  // 4. Si no tiene permiso, redirigir a "Acceso Denegado"
   return router.createUrlTree(['/acceso-denegado']);
 };

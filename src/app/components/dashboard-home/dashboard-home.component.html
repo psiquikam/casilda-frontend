@@ -5,16 +5,16 @@
     <div class="workspace-header__top">
       <div class="user-greeting">
         <div class="user-greeting__meta">
-          <span class="user-greeting__role-badge">{{ rolUsuario }}</span>
+          <span class="user-greeting__role-badge user-greeting__role-badge--{{ auth.getRoleCode().toLowerCase() }}">{{ rolUsuario }}</span>
           <span class="user-greeting__date">{{ fechaFormateada }}</span>
         </div>
         <h1 class="user-greeting__title">Hola, {{ nombreUsuario }}</h1>
         <p class="user-greeting__desc">
-          Centro de navegación y operaciones de CASILDA. Encuentra herramientas, comprende el flujo de casos y accede a tus módulos de trabajo.
+          {{ subtituloRol }}
         </p>
       </div>
 
-      <!-- Conmutador rápido de orientación del menú (demostración directa) -->
+      <!-- Conmutador rápido de orientación del menú -->
       <div class="layout-toggle-widget" aria-label="Selector de orientación del menú">
         <span class="layout-toggle-widget__label">
           <mat-icon aria-hidden="true">view_quilt</mat-icon>
@@ -49,15 +49,15 @@
       </div>
     </div>
 
-    <!-- Barra de Búsqueda Rápida de Tareas y Herramientas -->
+    <!-- Barra de Búsqueda de Tareas y Herramientas (filtradas por rol) -->
     <div class="search-box" role="search">
       <mat-icon class="search-box__icon" aria-hidden="true">search</mat-icon>
       <input
         type="search"
         [(ngModel)]="searchQuery"
-        placeholder="¿Qué necesitas hacer hoy? (ej. agendar cita, ver llamadas, registrar caso, crear usuario...)"
+        placeholder="¿Qué necesitas gestionar hoy? (busca herramientas permitidas para tu rol...)"
         class="search-box__input"
-        aria-label="Buscar tareas o módulos en CASILDA"
+        aria-label="Buscar tareas o módulos autorizados en CASILDA"
       />
       @if (searchQuery) {
         <button type="button" (click)="searchQuery = ''" class="search-box__clear" aria-label="Limpiar búsqueda">
@@ -67,15 +67,15 @@
     </div>
   </header>
 
-  <!-- Si hay una búsqueda activa, mostramos los resultados inmediatamente -->
+  <!-- Si hay una búsqueda activa, mostramos los resultados autorizados -->
   @if (searchQuery.trim()) {
     <section class="search-results-section" aria-label="Resultados de búsqueda">
       <div class="section-title-row">
         <h2 class="section-title">
           <mat-icon class="section-title__icon" aria-hidden="true">manage_search</mat-icon>
-          <span>Resultados para "{{ searchQuery }}" ({{ filteredTools.length }})</span>
+          <span>Herramientas para tu perfil "{{ searchQuery }}" ({{ filteredTools.length }})</span>
         </h2>
-        <button type="button" (click)="searchQuery = ''" class="btn-clear-search">Ver todo el centro de operaciones</button>
+        <button type="button" (click)="searchQuery = ''" class="btn-clear-search">Volver al centro de inicio</button>
       </div>
 
       @if (filteredTools.length > 0) {
@@ -103,324 +103,753 @@
       } @else {
         <div class="no-results-box">
           <mat-icon class="no-results-box__icon" aria-hidden="true">search_off</mat-icon>
-          <p class="no-results-box__title">No encontramos ninguna herramienta que coincida con "{{ searchQuery }}"</p>
-          <p class="no-results-box__help">Intenta buscar por palabras más simples como: <em>cita, solicitud, llamada, usuario, queja o caso</em>.</p>
+          <p class="no-results-box__title">No encontramos herramientas autorizadas que coincidan con "{{ searchQuery }}"</p>
+          <p class="no-results-box__help">Recuerda que solo se muestran los módulos autorizados para tu rol de {{ rolUsuario }}.</p>
         </div>
       }
     </section>
   } @else {
 
-    <!-- 1. Tarjetas KPI de Resumen Operativo (Digeribles a simple vista) -->
-    <section class="kpi-grid" aria-label="Resumen operativo en tiempo real">
-      @for (kpi of summaryStats.kpis; track kpi.id) {
-        <article [class]="'kpi-card kpi-card--' + kpi.colorClass">
-          <div class="kpi-card__header">
-            <span class="kpi-card__label">{{ kpi.label }}</span>
-            <div [class]="'kpi-card__icon-box icon-box--' + kpi.colorClass">
-              <mat-icon aria-hidden="true">{{ kpi.icon }}</mat-icon>
+    <!-- ====================================================================
+         VISTA PERSONALIZADA 1: ROL USUARIO (CIUDADANO / ESTUDIANTE)
+         ==================================================================== -->
+    @if (auth.isUsuario()) {
+      <div class="portal-usuario">
+
+        <!-- Banner Empático de Orientación -->
+        <section class="banner-ciudadano">
+          <div class="banner-ciudadano__content">
+            <div class="banner-ciudadano__badge">
+              <mat-icon aria-hidden="true">verified_user</mat-icon>
+              <span>Espacio Confidencial y Seguro</span>
+            </div>
+            <h2 class="banner-ciudadano__title">Atención y Acompañamiento ante Violencias Basadas en Género</h2>
+            <p class="banner-ciudadano__desc">
+              La Universidad de Antioquia te acompaña con profesionales en psicología, trabajo social y derecho.
+              Todas las solicitudes son tratadas con estricta reserva, respeto a tu voluntad y sin revictimización.
+            </p>
+          </div>
+          <div class="banner-ciudadano__help-box">
+            <div class="help-box-icon">
+              <mat-icon aria-hidden="true">phone_in_talk</mat-icon>
+            </div>
+            <div class="help-box-info">
+              <span class="help-box-label">Línea de Orientación en Crisis:</span>
+              <strong class="help-box-phone">{{ telefonoOrientacion }}</strong>
+              <span class="help-box-note">Gratuita nacional y desde celular</span>
             </div>
           </div>
-          <div class="kpi-card__main">
-            <span class="kpi-card__value">{{ kpi.count }}</span>
-            @if (kpi.badge) {
-              <span [class]="'kpi-card__badge badge--' + kpi.colorClass">{{ kpi.badge }}</span>
-            }
-          </div>
-          <p class="kpi-card__subtext">{{ kpi.subtext }}</p>
-        </article>
-      }
-    </section>
+        </section>
 
-    <!-- 2. Bloque de Enfoque Diferencial y Diversidad de Género -->
-    <section class="diversity-card" aria-label="Distribución por identidad de género y diversidad">
-      <div class="diversity-card__header">
-        <div class="diversity-card__title-box">
-          <div class="diversity-card__icon-box">
-            <mat-icon aria-hidden="true">diversity_1</mat-icon>
-          </div>
-          <div>
-            <h2 class="diversity-card__title">Distribución por Identidad de Género y Diversidad</h2>
-            <p class="diversity-card__subtitle">Vigilancia epidemiológica con enfoque diferencial (Total: {{ summaryStats.totalCasos }} casos activos)</p>
-          </div>
-        </div>
-        <a routerLink="/dashboard-revisor" class="link-full-metrics">
-          <span>Ver panel completo de indicadores</span>
-          <mat-icon aria-hidden="true">arrow_forward</mat-icon>
-        </a>
-      </div>
-
-      <!-- Barra visual de proporción continua -->
-      <div class="diversity-bar-container">
-        <div class="segmented-bar" role="progressbar" aria-label="Distribución porcentual por identidad de género">
-          @for (d of summaryStats.diversidad; track d.label) {
-            <div [class]="'segmented-bar__slice slice--' + d.colorClass" [style.width.%]="d.porcentaje"
-                 [title]="d.label + ': ' + d.count + ' (' + d.porcentaje + '%)'"></div>
-          }
-        </div>
-      </div>
-
-      <!-- 4 Módulos independientes y digeribles por grupo -->
-      <div class="diversity-grid">
-        @for (d of summaryStats.diversidad; track d.label) {
-          <div [class]="'diversity-stat-card diversity-stat-card--' + d.colorClass">
-            <div class="diversity-stat-card__header">
-              <span [class]="'diversity-stat-card__dot dot--' + d.colorClass"></span>
-              <span class="diversity-stat-card__name">{{ d.label }}</span>
+        <!-- 3 Tarjetas de Acción Prioritarias para el Usuario -->
+        <section class="user-actions-grid" aria-label="Acciones prioritarias de usuario">
+          <article class="user-action-card user-action-card--primary">
+            <div class="user-action-card__icon-wrap">
+              <mat-icon aria-hidden="true">add_circle</mat-icon>
             </div>
-            <div class="diversity-stat-card__body">
-              <strong class="diversity-stat-card__count">{{ d.count }}</strong>
-              <span [class]="'diversity-stat-card__percent pill--' + d.colorClass">{{ d.porcentaje }}%</span>
+            <div class="user-action-card__body">
+              <h3 class="user-action-card__title">Reportar Caso / Solicitud</h3>
+              <p class="user-action-card__text">
+                Radica una solicitud de acompañamiento psicosocial o asesoría jurídica. Puedes hacerlo de manera directa o informando una situación.
+              </p>
             </div>
-          </div>
-        }
-      </div>
-    </section>
-
-    <!-- Pestañas de Navegación del Centro de Operaciones -->
-    <nav class="nav-tabs" aria-label="Secciones del centro de operaciones">
-      <button
-        type="button"
-        class="nav-tabs__tab"
-        [class.is-active]="activeTab === 'guia'"
-        (click)="activeTab = 'guia'"
-        [attr.aria-selected]="activeTab === 'guia'"
-      >
-        <mat-icon aria-hidden="true">timeline</mat-icon>
-        <span>Ruta del Caso (Flujo Guiado)</span>
-      </button>
-
-      <button
-        type="button"
-        class="nav-tabs__tab"
-        [class.is-active]="activeTab === 'herramientas'"
-        (click)="activeTab = 'herramientas'"
-        [attr.aria-selected]="activeTab === 'herramientas'"
-      >
-        <mat-icon aria-hidden="true">apps</mat-icon>
-        <span>Módulos de la Plataforma</span>
-      </button>
-
-      <button
-        type="button"
-        class="nav-tabs__tab"
-        [class.is-active]="activeTab === 'protocolos'"
-        (click)="activeTab = 'protocolos'"
-        [attr.aria-selected]="activeTab === 'protocolos'"
-      >
-        <mat-icon aria-hidden="true">menu_book</mat-icon>
-        <span>Protocolos y Herramientas Útiles</span>
-      </button>
-    </nav>
-
-    <!-- 1. PESTAÑA: RUTA DEL CASO (FLUJO GUIADO) -->
-    @if (activeTab === 'guia') {
-      <section class="guide-section" aria-labelledby="guide-title">
-        <div class="guide-intro">
-          <h2 id="guide-title" class="guide-intro__title">Flujo de Vida de una Solicitud en CASILDA</h2>
-          <p class="guide-intro__desc">
-            Comprende cómo viaja un caso desde su reporte inicial hasta la atención y cierre formal.
-            Haz clic en cada etapa para ver qué actividades se realizan y acceder a su pantalla correspondiente.
-          </p>
-        </div>
-
-        <!-- Stepper interactivo de etapas -->
-        <div class="stepper-nav" role="tablist" aria-label="Etapas del proceso">
-          @for (step of workflowSteps; track step.stepNumber; let i = $index) {
-            <button
-              type="button"
-              class="stepper-item"
-              [class.is-selected]="selectedStepIndex === i"
-              (click)="selectStep(i)"
-              role="tab"
-              [attr.aria-selected]="selectedStepIndex === i"
-              [attr.aria-controls]="'step-panel-' + step.stepNumber"
-            >
-              <div class="stepper-item__circle">
-                <span class="stepper-item__number">{{ step.stepNumber }}</span>
-              </div>
-              <div class="stepper-item__text">
-                <span class="stepper-item__name">{{ step.title }}</span>
-                <span class="stepper-item__tag">{{ step.tag }}</span>
-              </div>
-            </button>
-          }
-        </div>
-
-        <!-- Panel de detalle de la etapa seleccionada -->
-        @if (currentStep; as curStep) {
-          <article [id]="'step-panel-' + curStep.stepNumber" class="step-detail-card" role="tabpanel">
-            <div class="step-detail-card__header">
-              <div class="step-detail-card__icon-box">
-                <mat-icon aria-hidden="true">{{ curStep.icon }}</mat-icon>
-              </div>
-              <div class="step-detail-card__heading">
-                <span class="step-detail-card__badge">Paso {{ curStep.stepNumber }} de 5</span>
-                <h3 class="step-detail-card__title">{{ curStep.title }}</h3>
-                <span class="step-detail-card__subtitle">{{ curStep.subtitle }}</span>
-              </div>
-            </div>
-
-            <div class="step-detail-card__body">
-              <p class="step-detail-card__overview">{{ curStep.description }}</p>
-
-              <h4 class="step-detail-card__activities-title">
-                <mat-icon aria-hidden="true">checklist</mat-icon>
-                <span>¿Qué se realiza en esta etapa?</span>
-              </h4>
-              <ul class="step-detail-card__list">
-                @for (detail of curStep.details; track detail) {
-                  <li>{{ detail }}</li>
-                }
-              </ul>
-            </div>
-
-            <div class="step-detail-card__footer">
-              <a [routerLink]="curStep.route" class="btn-step-action">
-                <span>{{ curStep.actionText }}</span>
+            <div class="user-action-card__action">
+              <a routerLink="/solicitud-acompanamiento" class="boton-action boton-action--primary">
+                <span>Nueva Solicitud</span>
                 <mat-icon aria-hidden="true">arrow_forward</mat-icon>
               </a>
-
-              <div class="stepper-pagination">
-                <button
-                  type="button"
-                  class="btn-nav-step"
-                  [disabled]="selectedStepIndex === 0"
-                  (click)="selectStep(selectedStepIndex - 1)"
-                  aria-label="Paso anterior"
-                >
-                  <mat-icon aria-hidden="true">chevron_left</mat-icon>
-                  <span>Anterior</span>
-                </button>
-                <button
-                  type="button"
-                  class="btn-nav-step"
-                  [disabled]="selectedStepIndex === workflowSteps.length - 1"
-                  (click)="selectStep(selectedStepIndex + 1)"
-                  aria-label="Siguiente paso"
-                >
-                  <span>Siguiente</span>
-                  <mat-icon aria-hidden="true">chevron_right</mat-icon>
-                </button>
-              </div>
             </div>
           </article>
-        }
-      </section>
-    }
 
-    <!-- 2. PESTAÑA: MÓDULOS DE LA PLATAFORMA -->
-    @if (activeTab === 'herramientas') {
-      <section class="tools-directory-section" aria-label="Directorio completo de módulos">
-        <div class="section-title-row">
-          <div>
-            <h2 class="section-title">Directorio de Módulos</h2>
-            <p class="section-subtitle">Explicación práctica de cada sección del sistema y cuándo acudir a ella</p>
-          </div>
-        </div>
+          <article class="user-action-card user-action-card--secondary">
+            <div class="user-action-card__icon-wrap">
+              <mat-icon aria-hidden="true">track_changes</mat-icon>
+            </div>
+            <div class="user-action-card__body">
+              <h3 class="user-action-card__title">Seguimiento a mi Trámite</h3>
+              <p class="user-action-card__text">
+                Consulta el avance y estado de tu solicitud de acompañamiento en la Ruta Violeta con tu código de radicado.
+              </p>
+            </div>
+            <div class="user-action-card__action">
+              <a routerLink="/seguimiento" class="boton-action boton-action--secondary">
+                <span>Consultar Trámite</span>
+                <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+              </a>
+            </div>
+          </article>
 
-        <div class="tools-grid">
-          @for (tool of filteredTools; track tool.id) {
-            <article class="tool-card">
-              <div class="tool-card__header">
-                <div class="tool-card__icon-wrapper">
-                  <mat-icon class="tool-card__icon" aria-hidden="true">{{ tool.icon }}</mat-icon>
-                </div>
-                <span class="tool-card__category">{{ tool.category }}</span>
+          @if (features.complaintIntakePrototype) {
+            <article class="user-action-card user-action-card--accent">
+              <div class="user-action-card__icon-wrap">
+                <mat-icon aria-hidden="true">post_add</mat-icon>
               </div>
-              <h3 class="tool-card__title">{{ tool.title }}</h3>
-              <p class="tool-card__what"><strong>¿Para qué sirve?</strong> {{ tool.whatItIs }}</p>
-              <p class="tool-card__when"><strong>¿Cuándo usarlo?</strong> {{ tool.whenToUse }}</p>
-              <div class="tool-card__footer">
-                <a [routerLink]="tool.route" class="btn-tool-action">
-                  <span>Ir a {{ tool.title }}</span>
+              <div class="user-action-card__body">
+                <h3 class="user-action-card__title">Queja Disciplinaria (UAD)</h3>
+                <p class="user-action-card__text">
+                  Si deseas iniciar un trámite formal ante la Unidad de Asuntos Disciplinarios contra un miembro de la comunidad universitaria.
+                </p>
+              </div>
+              <div class="user-action-card__action">
+                <a routerLink="/nueva-queja" class="boton-action boton-action--accent">
+                  <span>Radicar Queja UAD</span>
                   <mat-icon aria-hidden="true">arrow_forward</mat-icon>
                 </a>
               </div>
             </article>
           }
-        </div>
-      </section>
+        </section>
+
+        <!-- Mis Solicitudes Radicadas -->
+        <section class="user-requests-section" aria-label="Historial de mis solicitudes">
+          <div class="section-title-row">
+            <h2 class="section-title">
+              <mat-icon class="section-title__icon" aria-hidden="true">history_edu</mat-icon>
+              <span>Mis Solicitudes en Seguimiento ({{ misSolicitudesUsuario.length }})</span>
+            </h2>
+            <a routerLink="/seguimiento" class="link-view-all">Ver trazabilidad completa</a>
+          </div>
+
+          <div class="user-requests-grid">
+            @for (item of misSolicitudesUsuario; track item.radicado) {
+              <article class="request-summary-card">
+                <div class="request-summary-card__top">
+                  <span class="request-summary-card__code">{{ item.radicado }}</span>
+                  <span class="request-summary-card__badge request-summary-card__badge--{{ item.estadoClass }}">
+                    {{ item.estado }}
+                  </span>
+                </div>
+                <h4 class="request-summary-card__type">{{ item.tipo }}</h4>
+                <div class="request-summary-card__details">
+                  <p><mat-icon aria-hidden="true">event</mat-icon> <span>Radicado el: {{ item.fecha }}</span></p>
+                  <p><mat-icon aria-hidden="true">person</mat-icon> <span>Profesional asignado: {{ item.profesional }}</span></p>
+                  @if (item.proximaCita) {
+                    <p class="highlight-cita"><mat-icon aria-hidden="true">calendar_month</mat-icon> <strong>Próxima sesión: {{ item.proximaCita }}</strong></p>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+        </section>
+
+        <!-- Guía de Principios y Proceso de Acompañamiento -->
+        <section class="guia-usuario-card">
+          <h3 class="guia-usuario-card__title">
+            <mat-icon aria-hidden="true">info</mat-icon>
+            ¿Cómo te acompaña CASILDA paso a paso?
+          </h3>
+          <div class="pasos-usuario-grid">
+            <div class="paso-usuario">
+              <div class="paso-usuario__num">1</div>
+              <strong class="paso-usuario__title">Reporte Seguro</strong>
+              <p class="paso-usuario__text">Ingresas tu solicitud con tus datos de contacto protegidos.</p>
+            </div>
+            <div class="paso-usuario__num-arrow">→</div>
+            <div class="paso-usuario">
+              <div class="paso-usuario__num">2</div>
+              <strong class="paso-usuario__title">Contacto Confidencial</strong>
+              <p class="paso-usuario__text">Un profesional del equipo se comunica para validar tu voluntad.</p>
+            </div>
+            <div class="paso-usuario__num-arrow">→</div>
+            <div class="paso-usuario">
+              <div class="paso-usuario__num">3</div>
+              <strong class="paso-usuario__title">Sesiones de Orientación</strong>
+              <p class="paso-usuario__text">Agendamiento de citas psicosociales o jurídicas según tu necesidad.</p>
+            </div>
+            <div class="paso-usuario__num-arrow">→</div>
+            <div class="paso-usuario">
+              <div class="paso-usuario__num">4</div>
+              <strong class="paso-usuario__title">Acuerdos y Cierre</strong>
+              <p class="paso-usuario__text">Definición de compromisos, remisiones a bienestar y seguimiento.</p>
+            </div>
+          </div>
+        </section>
+
+      </div>
     }
 
-    <!-- 3. PESTAÑA: PROTOCOLOS Y HERRAMIENTAS ÚTILES -->
-    @if (activeTab === 'protocolos') {
-      <section class="protocols-section" aria-label="Protocolos y herramientas útiles">
-        <div class="protocols-grid">
+    <!-- ====================================================================
+         VISTA PERSONALIZADA 2: ROL PROFESIONAL (ATENCIÓN ASISTENCIAL DIRECTA)
+         ==================================================================== -->
+    @if (auth.isProfesional()) {
+      <div class="portal-profesional">
 
-          <!-- Tarjeta 1: Salida Rápida y Seguridad -->
-          <article class="protocol-card protocol-card--emergency">
-            <div class="protocol-card__header">
-              <div class="protocol-card__icon-badge">
-                <mat-icon aria-hidden="true">exit_to_app</mat-icon>
+        <!-- KPIs de Jornada Asistencial -->
+        <section class="kpi-grid" aria-label="Resumen de mi jornada">
+          @for (kpi of kpisProfesional; track kpi.label) {
+            <article [class]="'kpi-card kpi-card--' + kpi.colorClass">
+              <div class="kpi-card__header">
+                <span class="kpi-card__label">{{ kpi.label }}</span>
+                <div [class]="'kpi-card__icon-box icon-box--' + kpi.colorClass">
+                  <mat-icon aria-hidden="true">{{ kpi.icon }}</mat-icon>
+                </div>
               </div>
-              <h3 class="protocol-card__title">Protocolo de Salida Rápida</h3>
-            </div>
-            <p class="protocol-card__desc">
-              Diseñado para proteger la privacidad de la persona atendida o del profesional si alguien se acerca repentinamente:
-            </p>
-            <ul class="protocol-card__points">
-              <li>
-                <strong>Atajos de teclado:</strong> Presiona <kbd>Alt + Q</kbd> o presiona dos veces la tecla <kbd>Escape</kbd> rápidamente.
-              </li>
-              <li>
-                <strong>Efecto inmediato:</strong> Cierra la sesión, limpia los datos temporales de la pantalla y redirige inmediatamente a Google para no dejar rastro.
-              </li>
-              <li>
-                <strong>Botón siempre visible:</strong> Ubicado en la esquina superior derecha en todas las pantallas del sistema.
-              </li>
-            </ul>
-          </article>
-
-          <!-- Tarjeta 2: Principios Clave en CASILDA -->
-          <article class="protocol-card protocol-card--principles">
-            <div class="protocol-card__header">
-              <div class="protocol-card__icon-badge">
-                <mat-icon aria-hidden="true">verified_user</mat-icon>
+              <div class="kpi-card__main">
+                <span class="kpi-card__value">{{ kpi.count }}</span>
               </div>
-              <h3 class="protocol-card__title">Criterios Clave de Registro en CASILDA</h3>
-            </div>
-            <p class="protocol-card__desc">
-              Lineamientos obligatorios en el manejo de casos de discriminación y violencias:
-            </p>
-            <ul class="protocol-card__points">
-              <li>
-                <strong>No revictimización:</strong> Evita pedir el relato de los hechos una y otra vez. Consulta siempre la bandeja antes de contactar.
-              </li>
-              <li>
-                <strong>Reserva legal y confidencialidad:</strong> Los datos personales, teléfonos y testimonios no deben compartirse fuera del equipo técnico.
-              </li>
-              <li>
-                <strong>Consentimiento voluntario:</strong> La persona tiene derecho a decidir si desea iniciar o suspender el acompañamiento en cualquier momento.
-              </li>
-            </ul>
-          </article>
+              <p class="kpi-card__subtext">{{ kpi.subtext }}</p>
+            </article>
+          }
+        </section>
 
-          <!-- Tarjeta 3: Contactos de Apoyo y Soporte Técnico -->
-          <article class="protocol-card protocol-card--support">
-            <div class="protocol-card__header">
-              <div class="protocol-card__icon-badge">
-                <mat-icon aria-hidden="true">contact_support</mat-icon>
+        <!-- Accesos Rápidos para Profesional -->
+        <section class="quick-actions-bar" aria-label="Accesos rápidos del profesional">
+          <h2 class="section-title">
+            <mat-icon class="section-title__icon" aria-hidden="true">bolt</mat-icon>
+            <span>Acciones Rápidas de Atención</span>
+          </h2>
+          <div class="quick-buttons-row">
+            <a routerLink="/registro-atencion" class="btn-quick-action btn-quick-action--emerald">
+              <mat-icon aria-hidden="true">handshake</mat-icon>
+              <span>Registrar Atención / Acta</span>
+            </a>
+            <a routerLink="/cita" class="btn-quick-action btn-quick-action--amber">
+              <mat-icon aria-hidden="true">calendar_month</mat-icon>
+              <span>Agendar o Reprogramar Cita</span>
+            </a>
+            <a routerLink="/registro-caso" class="btn-quick-action btn-quick-action--cyan">
+              <mat-icon aria-hidden="true">folder_shared</mat-icon>
+              <span>Registrar Caso / Expediente</span>
+            </a>
+            <a routerLink="/linea-alma/atencion-pr" class="btn-quick-action btn-quick-action--rose">
+              <mat-icon aria-hidden="true">ring_volume</mat-icon>
+              <span>Línea ALMA (Primer Respondiente)</span>
+            </a>
+            <a routerLink="/mis-asignaciones" class="btn-quick-action btn-quick-action--indigo">
+              <mat-icon aria-hidden="true">assignment_ind</mat-icon>
+              <span>Mis Asignaciones</span>
+            </a>
+          </div>
+        </section>
+
+        <!-- Mis Citas Programadas para Hoy -->
+        <section class="agenda-jornada-card" aria-label="Agenda de citas de hoy">
+          <div class="agenda-jornada-card__header">
+            <div class="title-with-icon">
+              <mat-icon aria-hidden="true">event_available</mat-icon>
+              <div>
+                <h3 class="agenda-title">Citas Programadas para Hoy</h3>
+                <p class="agenda-sub">Atenciones psicosociales y jurídicas asignadas a tu agenda para hoy</p>
               </div>
-              <h3 class="protocol-card__title">Canales de Orientación y Soporte</h3>
             </div>
-            <p class="protocol-card__desc">
-              Líneas de escalamiento institucional y soporte técnico de la plataforma:
-            </p>
-            <ul class="protocol-card__points">
-              <li>
-                <strong>Línea de Orientación UdeA:</strong> <code>{{ telefonoOrientacion }}</code> (para personas que requieren atención inmediata).
-              </li>
-              <li>
-                <strong>Soporte Técnico CASILDA:</strong> <code>{{ correoSoporte }}</code> (para incidencias técnicas, errores o solicitud de permisos).
-              </li>
-              <li>
-                <strong>Facultad Nacional de Salud Pública:</strong> Dependencia líder de vigilancia en salud pública para el proyecto.
-              </li>
-            </ul>
-          </article>
+            <a routerLink="/cita" class="btn-manage-citas">Gestionar agenda completa</a>
+          </div>
 
-        </div>
-      </section>
+          <div class="citas-table-wrapper">
+            <table class="citas-table" aria-label="Tabla de citas de hoy">
+              <thead>
+                <tr>
+                  <th>Hora</th>
+                  <th>Persona Acompañada</th>
+                  <th>Tipo de Atención</th>
+                  <th>Modalidad</th>
+                  <th>Estado</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (cita of citasDeHoy; track cita.hora) {
+                  <tr>
+                    <td><strong>{{ cita.hora }}</strong></td>
+                    <td>{{ cita.persona }}</td>
+                    <td><span class="badge-tipo">{{ cita.tipo }}</span></td>
+                    <td>{{ cita.modalidad }}</td>
+                    <td><span class="badge-estado-cita">{{ cita.estado }}</span></td>
+                    <td>
+                      <a routerLink="/registro-atencion" class="btn-table-action" title="Abrir registro de atención">
+                        <mat-icon aria-hidden="true">edit_note</mat-icon>
+                        <span>Atender</span>
+                      </a>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+    }
+
+    <!-- ====================================================================
+         VISTA PERSONALIZADA 3: ROL COORDINADOR (SUPERVISIÓN Y TRIAGE DE EQUIPO)
+         ==================================================================== -->
+    @if (auth.isCoordinador()) {
+      <div class="portal-coordinador">
+
+        <!-- KPIs de Coordinación de Equipo -->
+        <section class="kpi-grid" aria-label="Resumen de coordinación de equipo">
+          @for (kpi of kpisCoordinador; track kpi.label) {
+            <article [class]="'kpi-card kpi-card--' + kpi.colorClass">
+              <div class="kpi-card__header">
+                <span class="kpi-card__label">{{ kpi.label }}</span>
+                <div [class]="'kpi-card__icon-box icon-box--' + kpi.colorClass">
+                  <mat-icon aria-hidden="true">{{ kpi.icon }}</mat-icon>
+                </div>
+              </div>
+              <div class="kpi-card__main">
+                <span class="kpi-card__value">{{ kpi.count }}</span>
+              </div>
+              <p class="kpi-card__subtext">{{ kpi.subtext }}</p>
+            </article>
+          }
+        </section>
+
+        <!-- Accesos Rápidos de Coordinación -->
+        <section class="quick-actions-bar" aria-label="Acciones prioritarias de coordinación">
+          <h2 class="section-title">
+            <mat-icon class="section-title__icon" aria-hidden="true">tune</mat-icon>
+            <span>Herramientas de Coordinación y Triage</span>
+          </h2>
+          <div class="quick-buttons-row">
+            <a routerLink="/consulta" class="btn-quick-action btn-quick-action--amber">
+              <mat-icon aria-hidden="true">manage_search</mat-icon>
+              <span>Bandeja y Reparto de Casos</span>
+            </a>
+            <a routerLink="/mis-asignaciones" class="btn-quick-action btn-quick-action--indigo">
+              <mat-icon aria-hidden="true">assignment_ind</mat-icon>
+              <span>Supervisión de Asignaciones</span>
+            </a>
+            <a routerLink="/cita" class="btn-quick-action btn-quick-action--cyan">
+              <mat-icon aria-hidden="true">calendar_month</mat-icon>
+              <span>Agenda Global del Equipo</span>
+            </a>
+            <a routerLink="/solicitud-acompanamiento" class="btn-quick-action btn-quick-action--emerald">
+              <mat-icon aria-hidden="true">add_circle_outline</mat-icon>
+              <span>Radicar Nueva Solicitud</span>
+            </a>
+            <a routerLink="/dashboard-revisor" class="btn-quick-action btn-quick-action--rose">
+              <mat-icon aria-hidden="true">insights</mat-icon>
+              <span>Métricas e Indicadores</span>
+            </a>
+          </div>
+        </section>
+
+        <!-- Distribución y Balance de Carga del Equipo -->
+        <section class="carga-equipo-card" aria-label="Distribución de carga de trabajo">
+          <div class="carga-equipo-card__header">
+            <div class="title-with-icon">
+              <mat-icon aria-hidden="true">balance</mat-icon>
+              <div>
+                <h3 class="agenda-title">Carga de Trabajo del Equipo de Atención</h3>
+                <p class="agenda-sub">Seguimiento al volumen de casos activos y sesiones asignadas por profesional</p>
+              </div>
+            </div>
+            <a routerLink="/consulta" class="btn-manage-citas">Ir al módulo de reparto</a>
+          </div>
+
+          <div class="profesionales-grid">
+            @for (p of cargaEquipo; track p.profesional) {
+              <div class="profesional-card">
+                <div class="profesional-card__header">
+                  <mat-icon aria-hidden="true">badge</mat-icon>
+                  <strong>{{ p.profesional }}</strong>
+                </div>
+                <div class="profesional-card__stats">
+                  <span><strong>{{ p.casos }}</strong> casos activos</span>
+                  <span><strong>{{ p.citasHoy }}</strong> citas hoy</span>
+                </div>
+                <div class="profesional-card__bar-wrap">
+                  <div class="profesional-card__bar" [style.width.%]="p.porcentaje"
+                       [class]="'bar--' + p.badgeClass"></div>
+                </div>
+                <span class="profesional-card__cap-label">Capacidad operativa: {{ p.porcentaje }}%</span>
+              </div>
+            }
+          </div>
+        </section>
+
+      </div>
+    }
+
+    <!-- ====================================================================
+         VISTA PERSONALIZADA 4: ROL REVISOR (CALIDAD Y AUDITORÍA)
+         ==================================================================== -->
+    @if (auth.isRevisor()) {
+      <div class="portal-revisor">
+
+        <!-- KPIs de Auditoría y Calidad -->
+        <section class="kpi-grid" aria-label="Métricas de calidad y auditoría">
+          @for (kpi of kpisRevisor; track kpi.label) {
+            <article [class]="'kpi-card kpi-card--' + kpi.colorClass">
+              <div class="kpi-card__header">
+                <span class="kpi-card__label">{{ kpi.label }}</span>
+                <div [class]="'kpi-card__icon-box icon-box--' + kpi.colorClass">
+                  <mat-icon aria-hidden="true">{{ kpi.icon }}</mat-icon>
+                </div>
+              </div>
+              <div class="kpi-card__main">
+                <span class="kpi-card__value">{{ kpi.count }}</span>
+              </div>
+              <p class="kpi-card__subtext">{{ kpi.subtext }}</p>
+            </article>
+          }
+        </section>
+
+        <!-- Accesos Rápidos para Revisor -->
+        <section class="quick-actions-bar" aria-label="Accesos prioritarios de auditoría">
+          <h2 class="section-title">
+            <mat-icon class="section-title__icon" aria-hidden="true">fact_check</mat-icon>
+            <span>Módulos de Auditoría y Control</span>
+          </h2>
+          <div class="quick-buttons-row">
+            <a routerLink="/dashboard-revisor" class="btn-quick-action btn-quick-action--rose">
+              <mat-icon aria-hidden="true">bar_chart</mat-icon>
+              <span>Panel de Indicadores y Epidemiología</span>
+            </a>
+            <a routerLink="/consulta" class="btn-quick-action btn-quick-action--indigo">
+              <mat-icon aria-hidden="true">search</mat-icon>
+              <span>Consulta y Auditoría de Casos</span>
+            </a>
+            <a routerLink="/seguimiento" class="btn-quick-action btn-quick-action--cyan">
+              <mat-icon aria-hidden="true">track_changes</mat-icon>
+              <span>Trazabilidad / Ruta Violeta</span>
+            </a>
+            <a routerLink="/mis-asignaciones" class="btn-quick-action btn-quick-action--amber">
+              <mat-icon aria-hidden="true">assignment_ind</mat-icon>
+              <span>Mis Asignaciones de Revisión</span>
+            </a>
+          </div>
+        </section>
+
+        <!-- Vigilancia y Enfoque Diferencial -->
+        <section class="diversity-card" aria-label="Vigilancia epidemiológica y género">
+          <div class="diversity-card__header">
+            <div class="diversity-card__title-box">
+              <div class="diversity-card__icon-box">
+                <mat-icon aria-hidden="true">diversity_1</mat-icon>
+              </div>
+              <div>
+                <h2 class="diversity-card__title">Vigilancia con Enfoque Diferencial</h2>
+                <p class="diversity-card__subtitle">Distribución porcentual por identidad de género en seguimiento</p>
+              </div>
+            </div>
+            <a routerLink="/dashboard-revisor" class="link-full-metrics">
+              <span>Abrir panel analítico completo</span>
+              <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+            </a>
+          </div>
+
+          <div class="diversity-grid">
+            @for (d of summaryStats.diversidad; track d.label) {
+              <div [class]="'diversity-stat-card diversity-stat-card--' + d.colorClass">
+                <div class="diversity-stat-card__header">
+                  <span [class]="'diversity-stat-card__dot dot--' + d.colorClass"></span>
+                  <span class="diversity-stat-card__name">{{ d.label }}</span>
+                </div>
+                <div class="diversity-stat-card__body">
+                  <strong class="diversity-stat-card__count">{{ d.count }}</strong>
+                  <span [class]="'diversity-stat-card__percent pill--' + d.colorClass">{{ d.porcentaje }}%</span>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+
+      </div>
+    }
+
+    <!-- ====================================================================
+         VISTA PERSONALIZADA 5: ROL ADMIN (CENTRO GLOBAL 360°)
+         ==================================================================== -->
+    @if (auth.isAdmin()) {
+      <div class="portal-admin">
+
+        <!-- KPIs Globales de Administración -->
+        <section class="kpi-grid" aria-label="Resumen operativo 360 en tiempo real">
+          @for (kpi of summaryStats.kpis; track kpi.id) {
+            <article [class]="'kpi-card kpi-card--' + kpi.colorClass">
+              <div class="kpi-card__header">
+                <span class="kpi-card__label">{{ kpi.label }}</span>
+                <div [class]="'kpi-card__icon-box icon-box--' + kpi.colorClass">
+                  <mat-icon aria-hidden="true">{{ kpi.icon }}</mat-icon>
+                </div>
+              </div>
+              <div class="kpi-card__main">
+                <span class="kpi-card__value">{{ kpi.count }}</span>
+                @if (kpi.badge) {
+                  <span [class]="'kpi-card__badge badge--' + kpi.colorClass">{{ kpi.badge }}</span>
+                }
+              </div>
+              <p class="kpi-card__subtext">{{ kpi.subtext }}</p>
+            </article>
+          }
+        </section>
+
+        <!-- Accesos de Alta Prioridad de Administración -->
+        <section class="admin-priority-bar" aria-label="Herramientas exclusivas de administración">
+          <h2 class="section-title">
+            <mat-icon class="section-title__icon" aria-hidden="true">admin_panel_settings</mat-icon>
+            <span>Gestión del Sistema y Configuración</span>
+          </h2>
+          <div class="admin-buttons-grid">
+            <a routerLink="/gestion-usuarios" class="btn-admin-card">
+              <mat-icon aria-hidden="true">manage_accounts</mat-icon>
+              <div>
+                <strong>Gestión de Usuarios</strong>
+                <small>Crear, activar/desactivar y asignar roles institucionales</small>
+              </div>
+            </a>
+            <a routerLink="/gestion-sistema" class="btn-admin-card">
+              <mat-icon aria-hidden="true">tune</mat-icon>
+              <div>
+                <strong>Maestros del Sistema</strong>
+                <small>Catálogos: dependencias, facultades, tipologías y campus</small>
+              </div>
+            </a>
+            <a routerLink="/dashboard-revisor" class="btn-admin-card">
+              <mat-icon aria-hidden="true">bar_chart</mat-icon>
+              <div>
+                <strong>Panel de Indicadores</strong>
+                <small>Métricas analíticas consolidadas e informes institucionales</small>
+              </div>
+            </a>
+          </div>
+        </section>
+
+        <!-- Bloque de Enfoque Diferencial y Diversidad de Género -->
+        <section class="diversity-card" aria-label="Distribución por identidad de género y diversidad">
+          <div class="diversity-card__header">
+            <div class="diversity-card__title-box">
+              <div class="diversity-card__icon-box">
+                <mat-icon aria-hidden="true">diversity_1</mat-icon>
+              </div>
+              <div>
+                <h2 class="diversity-card__title">Distribución por Identidad de Género y Diversidad</h2>
+                <p class="diversity-card__subtitle">Vigilancia epidemiológica con enfoque diferencial (Total: {{ summaryStats.totalCasos }} casos activos)</p>
+              </div>
+            </div>
+            <a routerLink="/dashboard-revisor" class="link-full-metrics">
+              <span>Ver panel completo de indicadores</span>
+              <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+            </a>
+          </div>
+
+          <div class="diversity-bar-container">
+            <div class="segmented-bar" role="progressbar" aria-label="Distribución porcentual por identidad de género">
+              @for (d of summaryStats.diversidad; track d.label) {
+                <div [class]="'segmented-bar__slice slice--' + d.colorClass" [style.width.%]="d.porcentaje"
+                     [title]="d.label + ': ' + d.count + ' (' + d.porcentaje + '%)'"></div>
+              }
+            </div>
+          </div>
+
+          <div class="diversity-grid">
+            @for (d of summaryStats.diversidad; track d.label) {
+              <div [class]="'diversity-stat-card diversity-stat-card--' + d.colorClass">
+                <div class="diversity-stat-card__header">
+                  <span [class]="'diversity-stat-card__dot dot--' + d.colorClass"></span>
+                  <span class="diversity-stat-card__name">{{ d.label }}</span>
+                </div>
+                <div class="diversity-stat-card__body">
+                  <strong class="diversity-stat-card__count">{{ d.count }}</strong>
+                  <span [class]="'diversity-stat-card__percent pill--' + d.colorClass">{{ d.porcentaje }}%</span>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+
+      </div>
+    }
+
+    <!-- ====================================================================
+         SECCIONES TRANSVERSALES PARA FUNCIONARIOS (ADMIN, COORD, PROF, REVISOR)
+         ==================================================================== -->
+    @if (!auth.isUsuario()) {
+
+      <!-- Pestañas de Navegación del Centro de Operaciones -->
+      <nav class="nav-tabs" aria-label="Secciones del centro de operaciones">
+        <button
+          type="button"
+          class="nav-tabs__tab"
+          [class.is-active]="activeTab === 'guia'"
+          (click)="activeTab = 'guia'"
+          [attr.aria-selected]="activeTab === 'guia'"
+        >
+          <mat-icon aria-hidden="true">timeline</mat-icon>
+          <span>Ruta del Caso (Flujo Guiado)</span>
+        </button>
+
+        <button
+          type="button"
+          class="nav-tabs__tab"
+          [class.is-active]="activeTab === 'herramientas'"
+          (click)="activeTab = 'herramientas'"
+          [attr.aria-selected]="activeTab === 'herramientas'"
+        >
+          <mat-icon aria-hidden="true">apps</mat-icon>
+          <span>Módulos de la Plataforma ({{ filteredTools.length }})</span>
+        </button>
+
+        <button
+          type="button"
+          class="nav-tabs__tab"
+          [class.is-active]="activeTab === 'protocolos'"
+          (click)="activeTab = 'protocolos'"
+          [attr.aria-selected]="activeTab === 'protocolos'"
+        >
+          <mat-icon aria-hidden="true">menu_book</mat-icon>
+          <span>Protocolos y Herramientas Útiles</span>
+        </button>
+      </nav>
+
+      <!-- 1. PESTAÑA: RUTA DEL CASO (FLUJO GUIADO) -->
+      @if (activeTab === 'guia') {
+        <section class="guide-section" aria-labelledby="guide-title">
+          <div class="guide-intro">
+            <h2 id="guide-title" class="guide-intro__title">Flujo de Vida de una Solicitud en CASILDA</h2>
+            <p class="guide-intro__desc">
+              Comprende cómo viaja un caso desde su reporte inicial hasta la atención y cierre formal.
+              Haz clic en cada etapa para ver qué actividades se realizan y acceder a su pantalla correspondiente.
+            </p>
+          </div>
+
+          <div class="stepper-nav" role="tablist" aria-label="Etapas del proceso">
+            @for (step of workflowSteps; track step.stepNumber; let i = $index) {
+              <button
+                type="button"
+                class="stepper-item"
+                [class.is-selected]="selectedStepIndex === i"
+                (click)="selectStep(i)"
+                role="tab"
+                [attr.aria-selected]="selectedStepIndex === i"
+                [attr.aria-controls]="'step-panel-' + step.stepNumber"
+              >
+                <div class="stepper-item__circle">
+                  <span class="stepper-item__number">{{ step.stepNumber }}</span>
+                </div>
+                <div class="stepper-item__text">
+                  <span class="stepper-item__name">{{ step.title }}</span>
+                  <span class="stepper-item__tag">{{ step.tag }}</span>
+                </div>
+              </button>
+            }
+          </div>
+
+          @if (currentStep; as curStep) {
+            <div class="step-card" [id]="'step-panel-' + curStep.stepNumber" role="tabpanel" aria-live="polite">
+              <div class="step-card__header">
+                <div class="step-card__badge-pill">
+                  <mat-icon aria-hidden="true">{{ curStep.icon }}</mat-icon>
+                  <span>Paso {{ curStep.stepNumber }}: {{ curStep.tag }}</span>
+                </div>
+                <h3 class="step-card__title">{{ curStep.title }}</h3>
+                <span class="step-card__subtitle">{{ curStep.subtitle }}</span>
+              </div>
+
+              <div class="step-card__body">
+                <p class="step-card__desc">{{ curStep.description }}</p>
+
+                <div class="step-card__details-box">
+                  <h4 class="details-heading">
+                    <mat-icon aria-hidden="true">checklist</mat-icon>
+                    Actividades clave que se realizan en esta etapa:
+                  </h4>
+                  <ul class="details-list">
+                    @for (detail of curStep.details; track detail) {
+                      <li>
+                        <mat-icon class="check-icon" aria-hidden="true">check_circle</mat-icon>
+                        <span>{{ detail }}</span>
+                      </li>
+                    }
+                  </ul>
+                </div>
+              </div>
+
+              <div class="step-card__footer">
+                <a [routerLink]="curStep.route" class="btn-step-action">
+                  <span>{{ curStep.actionText }}</span>
+                  <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+                </a>
+              </div>
+            </div>
+          }
+        </section>
+      }
+
+      <!-- 2. PESTAÑA: MÓDULOS DE LA PLATAFORMA (FILTRADO POR ROL) -->
+      @if (activeTab === 'herramientas') {
+        <section class="tools-catalog" aria-labelledby="tools-catalog-title">
+          <div class="tools-intro">
+            <h2 id="tools-catalog-title" class="tools-intro__title">Módulos Disponibles para {{ rolUsuario }}</h2>
+            <p class="tools-intro__desc">
+              Acceso a las herramientas autorizadas de acuerdo con tu perfil de acceso.
+            </p>
+          </div>
+
+          <div class="tools-grid">
+            @for (tool of filteredTools; track tool.id) {
+              <article class="tool-card">
+                <div class="tool-card__header">
+                  <div class="tool-card__icon-wrapper">
+                    <mat-icon class="tool-card__icon" aria-hidden="true">{{ tool.icon }}</mat-icon>
+                  </div>
+                  <span class="tool-card__category">{{ tool.category }}</span>
+                </div>
+                <h3 class="tool-card__title">{{ tool.title }}</h3>
+                <p class="tool-card__what"><strong>¿Qué es?</strong> {{ tool.whatItIs }}</p>
+                <p class="tool-card__when"><strong>¿Cuándo usarlo?</strong> {{ tool.whenToUse }}</p>
+                <div class="tool-card__footer">
+                  <a [routerLink]="tool.route" class="btn-tool-action">
+                    <span>Abrir {{ tool.title }}</span>
+                    <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+                  </a>
+                </div>
+              </article>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- 3. PESTAÑA: PROTOCOLOS Y HERRAMIENTAS ÚTILES -->
+      @if (activeTab === 'protocolos') {
+        <section class="protocols-section" aria-labelledby="protocols-title">
+          <div class="protocols-intro">
+            <h2 id="protocols-title" class="protocols-intro__title">Protocolos y Canales Institucionales UdeA</h2>
+            <p class="protocols-intro__desc">
+              Información de consulta rápida, normatividad universitaria y canales de articulación para el abordaje de VBG.
+            </p>
+          </div>
+
+          <div class="protocols-grid">
+            <article class="protocol-card protocol-card--crisis">
+              <div class="protocol-card__header">
+                <div class="protocol-card__icon-box">
+                  <mat-icon aria-hidden="true">ring_volume</mat-icon>
+                </div>
+                <h3 class="protocol-card__title">Atención en Crisis y Emergencias</h3>
+              </div>
+              <p class="protocol-card__desc">
+                Si la persona se encuentra en una situación de riesgo inminente para su vida o integridad física, activa de inmediato la ruta de emergencia.
+              </p>
+              <ul class="protocol-card__list">
+                <li><strong>Línea de Orientación Telefónica:</strong> {{ telefonoOrientacion }}</li>
+                <li><strong>Línea Nacional 155:</strong> Orientación a mujeres víctimas de violencia</li>
+                <li><strong>Línea 123:</strong> Emergencias de Medellín / Policía Nacional</li>
+              </ul>
+            </article>
+
+            <article class="protocol-card protocol-card--normativa">
+              <div class="protocol-card__header">
+                <div class="protocol-card__icon-box">
+                  <mat-icon aria-hidden="true">gavel</mat-icon>
+                </div>
+                <h3 class="protocol-card__title">Normatividad y Principios</h3>
+              </div>
+              <p class="protocol-card__desc">
+                Fundamentos jurídicos y lineamientos institucionales que rigen la atención y el secreto profesional en CASILDA.
+              </p>
+              <ul class="protocol-card__list">
+                <li><strong>Resolución Rectoral 41986:</strong> Ruta Universitaria de Atención en VBG</li>
+                <li><strong>Ley 1257 de 2008:</strong> No violencia contra las mujeres</li>
+                <li><strong>Confidencialidad:</strong> Reserva legal de datos sensibles (Ley 1581)</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+      }
+
     }
 
   }

@@ -30,6 +30,24 @@
     <h1 class="login__titulo">Ingreso a CASILDA</h1>
     <p class="login__subtitulo">Usa el correo con el que fuiste registrado para continuar.</p>
 
+    <!-- ACCESO RÁPIDO PARA VALIDACIÓN DE ROLES (FASE 2) -->
+    <div class="login__mock-section" aria-label="Cuentas de prueba para verificación de roles">
+      <div class="mock-header">
+        <mat-icon aria-hidden="true" class="mock-header__icon">science</mat-icon>
+        <span class="mock-header__title">Cuentas de prueba (Roles Fase 2)</span>
+      </div>
+      <p class="mock-desc">Haz clic en cualquier rol para iniciar sesión instantáneamente y verificar sus accesos y vistas:</p>
+      <div class="mock-grid">
+        @for (mock of mockUsersList; track mock.id) {
+          <button type="button" class="btn-mock-pill" [class]="'btn-mock-pill--' + mock.badgeClass"
+            (click)="loginRapidoMock(mock)" [title]="mock.descripcion">
+            <span class="btn-mock-pill__role">{{ mock.rol }}</span>
+            <span class="btn-mock-pill__name">{{ mock.nombre.split(' ')[0] }}</span>
+          </button>
+        }
+      </div>
+    </div>
+
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
 
       <mat-form-field appearance="outline" class="full-width">

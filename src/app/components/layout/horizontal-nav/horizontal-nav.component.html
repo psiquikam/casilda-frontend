@@ -1,13 +1,33 @@
 <nav class="hnav-bar" aria-label="Navegación horizontal principal">
   <div class="hnav-container">
 
-    <!-- 0. Panel de Inicio -->
+    <!-- 0. Panel de Inicio (Todos los usuarios) -->
     <a routerLink="/inicio" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
       <mat-icon class="hnav-icon" aria-hidden="true">dashboard</mat-icon>
       <span class="hnav-text">Inicio</span>
     </a>
 
-    <!-- 1. Administración (Admin) -->
+    <!-- SECCIÓN USUARIO (Usuario No Funcionario / Ciudadano) -->
+    @if (auth.isUsuario()) {
+      <a routerLink="/solicitud-acompanamiento" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
+        <mat-icon class="hnav-icon" aria-hidden="true">add_circle_outline</mat-icon>
+        <span class="hnav-text">Reportar Caso</span>
+      </a>
+
+      <a routerLink="/seguimiento" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
+        <mat-icon class="hnav-icon" aria-hidden="true">track_changes</mat-icon>
+        <span class="hnav-text">Seguimiento de Trámite</span>
+      </a>
+
+      @if (features.complaintIntakePrototype) {
+        <a routerLink="/nueva-queja" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
+          <mat-icon class="hnav-icon" aria-hidden="true">post_add</mat-icon>
+          <span class="hnav-text">Queja UAD</span>
+        </a>
+      }
+    }
+
+    <!-- 1. Administración (Solo Admin) -->
     @if (auth.isAdmin()) {
       <button type="button" class="hnav-dropdown-btn" [matMenuTriggerFor]="adminMenu"
         aria-label="Abrir menú de Administración">
@@ -28,8 +48,8 @@
       </mat-menu>
     }
 
-    <!-- 2. Equipo de Atención (Admin & Revisor) -->
-    @if (auth.isRevisor()) {
+    <!-- 2. Equipo de Atención (Admin, Coordinador y Profesional) -->
+    @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional()) {
       <button type="button" class="hnav-dropdown-btn" [matMenuTriggerFor]="atencionMenu"
         aria-label="Abrir menú del Equipo de Atención">
         <mat-icon class="hnav-icon" aria-hidden="true">volunteer_activism</mat-icon>
@@ -46,6 +66,12 @@
           <mat-icon aria-hidden="true">search</mat-icon>
           <span>Consulta de Solicitudes</span>
         </a>
+        @if (features.assignmentsPrototype) {
+          <a mat-menu-item routerLink="/mis-asignaciones" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
+            <mat-icon aria-hidden="true">assignment_ind</mat-icon>
+            <span>Mis Asignaciones</span>
+          </a>
+        }
         <a mat-menu-item routerLink="/cita" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
           <mat-icon aria-hidden="true">calendar_month</mat-icon>
           <span>Citas y Agendamiento</span>
@@ -61,16 +87,16 @@
       </mat-menu>
     }
 
-    <!-- 3. Línea Alma -->
-    @if (auth.isRevisor() && (features.complaintIntakePrototype || features.publicTrackingPrototype)) {
+    <!-- 3. Línea Alma (Admin, Coordinador y Profesional) -->
+    @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional()) {
       <a mat-button routerLink="/linea-alma/atencion-pr" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
         <mat-icon class="hnav-icon" aria-hidden="true">ring_volume</mat-icon>
         <span class="hnav-text">Línea Alma</span>
       </a>
     }
 
-    <!-- 4. UAD (Equipos 3 y 4) -->
-    @if (auth.isRevisor()) {
+    <!-- 4. UAD (Equipos 3 y 4 - Admin, Coordinador y Revisor) -->
+    @if (auth.isAdmin() || auth.isCoordinador() || auth.isRevisor()) {
       <button type="button" class="hnav-dropdown-btn" [matMenuTriggerFor]="uadMenu"
         aria-label="Abrir menú de UAD">
         <mat-icon class="hnav-icon" aria-hidden="true">balance</mat-icon>
@@ -94,16 +120,16 @@
       </mat-menu>
     }
 
-    <!-- 5. Reportes y Métricas (Admin) -->
-    @if (auth.isAdmin() && features.reviewerDashboardPrototype) {
+    <!-- 5. Reportes y Métricas (Admin, Coordinador y Revisor) -->
+    @if ((auth.isAdmin() || auth.isCoordinador() || auth.isRevisor()) && features.reviewerDashboardPrototype) {
       <a routerLink="/dashboard-revisor" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
         <mat-icon class="hnav-icon" aria-hidden="true">bar_chart</mat-icon>
         <span class="hnav-text">Panel de Indicadores</span>
       </a>
     }
 
-    <!-- 6. Ruta Violeta -->
-    @if (features.publicTrackingPrototype) {
+    <!-- 6. Ruta Violeta (Transversal para funcionarios) -->
+    @if (features.publicTrackingPrototype && !auth.isUsuario()) {
       <a routerLink="/seguimiento" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
         <mat-icon class="hnav-icon" aria-hidden="true">diversity_1</mat-icon>
         <span class="hnav-text">Ruta Violeta</span>

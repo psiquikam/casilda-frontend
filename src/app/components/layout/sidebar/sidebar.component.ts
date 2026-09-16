@@ -5,7 +5,7 @@ import { filter } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
 import { environment } from '../../../../environments/environment';
 
-export type MenuSectionKey = 'admin' | 'atencion' | 'alma' | 'uad' | 'reportes' | 'violeta';
+export type MenuSectionKey = 'admin' | 'atencion' | 'alma' | 'uad' | 'reportes' | 'violeta' | 'usuario';
 
 @Component({
   selector: 'app-sidebar',
@@ -25,7 +25,8 @@ export class SidebarComponent implements OnInit {
     alma: false,
     uad: false,
     reportes: false,
-    violeta: false
+    violeta: false,
+    usuario: true
   };
 
   ngOnInit(): void {
@@ -54,17 +55,30 @@ export class SidebarComponent implements OnInit {
       url.includes('/detalle-acompanamiento') ||
       url.includes('/cita') ||
       url.includes('/registro-caso') ||
-      url.includes('/registro-atencion')
+      url.includes('/registro-atencion') ||
+      url.includes('/mis-asignaciones')
     ) {
-      this.expandedSections.atencion = true;
+      if (this.auth.isUsuario()) {
+        this.expandedSections.usuario = true;
+      } else {
+        this.expandedSections.atencion = true;
+      }
     } else if (url.includes('/linea-alma')) {
       this.expandedSections.alma = true;
     } else if (url.includes('/nueva-queja')) {
-      this.expandedSections.uad = true;
-    } else if (url.includes('/dashboard-revisor')) {
+      if (this.auth.isUsuario()) {
+        this.expandedSections.usuario = true;
+      } else {
+        this.expandedSections.uad = true;
+      }
+    } else if (url.includes('/dashboard-revisor') || url.includes('/detalle-revisor')) {
       this.expandedSections.reportes = true;
     } else if (url.includes('/seguimiento')) {
-      this.expandedSections.violeta = true;
+      if (this.auth.isUsuario()) {
+        this.expandedSections.usuario = true;
+      } else {
+        this.expandedSections.violeta = true;
+      }
     }
   }
 }

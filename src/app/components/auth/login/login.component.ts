@@ -8,7 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
-import { AuthService } from '../../../services/auth.service';
+import { AuthService, MOCK_USERS, MockUserProfile } from '../../../services/auth.service';
 
 /**
  * Ingreso al sistema. La pantalla se mantiene en una sola
@@ -36,6 +36,7 @@ export class LoginComponent {
 
   readonly loginForm: FormGroup;
   readonly correoSoporte = 'proyectocasilda@udea.edu.co';
+  readonly mockUsersList: MockUserProfile[] = Object.values(MOCK_USERS);
 
   hidePassword = true;
   errorMessage = '';
@@ -64,6 +65,25 @@ export class LoginComponent {
 
   alternarPassword(): void {
     this.hidePassword = !this.hidePassword;
+  }
+
+  loginRapidoMock(mockUser: MockUserProfile): void {
+    this.loginForm.patchValue({
+      email: mockUser.email,
+      password: mockUser.password
+    });
+    this.loading = true;
+    this.errorMessage = '';
+    this.auth.loginAsMock(mockUser.roles[0]).subscribe({
+      next: () => {
+        this.loading = false;
+        void this.router.navigate([this.auth.getDefaultRoute()]);
+      },
+      error: () => {
+        this.loading = false;
+        this.errorMessage = 'Error al ingresar con la cuenta de prueba.';
+      }
+    });
   }
 
   onSubmit(): void {

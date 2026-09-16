@@ -176,6 +176,43 @@
   }
 }
 
+.header-role-pill {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  &.role-badge--admin {
+    background-color: #70205b;
+    color: #ffffff;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+  }
+  &.role-badge--coordinador {
+    background-color: #137598;
+    color: #ffffff;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+  }
+  &.role-badge--profesional {
+    background-color: #059669;
+    color: #ffffff;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+  }
+  &.role-badge--revisor {
+    background-color: #d97706;
+    color: #ffffff;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+  }
+  &.role-badge--usuario {
+    background-color: #0284c7;
+    color: #ffffff;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+  }
+}
+
 /* Menú desplegable de perfil y preferencias */
 ::ng-deep .user-session-menu {
   min-width: 280px !important;
@@ -358,7 +395,8 @@
   }
 
   .usuario__nombre,
-  .usuario__chevron {
+  .usuario__chevron,
+  .header-role-pill {
     display: none !important;
   }
 }

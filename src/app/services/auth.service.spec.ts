@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
-import { AuthService, UserSession } from './auth.service';
+import { AuthService, UserSession, MOCK_USERS } from './auth.service';
 
 describe('AuthService', () => {
   const router = jasmine.createSpyObj<Router>('Router', ['navigate']);
@@ -12,10 +12,12 @@ describe('AuthService', () => {
     return `header.${payload}.signature`;
   };
 
-  const session = (expiresAt: number): UserSession => ({
+  const session = (expiresAt: number, rol: string = 'Usuario'): UserSession => ({
     email: 'persona@udea.edu.co',
     nombre: 'Persona de prueba',
-    rol: 'Usuario',
+    rol: rol,
+    roles: [rol.toUpperCase()],
+    authorities: [`ROLE_${rol.toUpperCase()}`],
     token: jwt(expiresAt)
   });
 
@@ -36,12 +38,48 @@ describe('AuthService', () => {
   });
 
   it('recupera una sesión vigente y reconoce el rol Usuario', () => {
-    localStorage.setItem('userSession', JSON.stringify(session(Math.floor(Date.now() / 1000) + 3600)));
+    localStorage.setItem('userSession', JSON.stringify(session(Math.floor(Date.now() / 1000) + 3600, 'Usuario')));
 
     const service = createService();
 
     expect(service.isAuthenticated()).toBeTrue();
     expect(service.isUsuario()).toBeTrue();
+    expect(service.isAdmin()).toBeFalse();
+    expect(service.getRoleCode()).toBe('USUARIO');
+    expect(service.getRoleName()).toBe('Usuario');
+  });
+
+  it('reconoce adecuadamente los 5 roles del sistema', () => {
+    const service = createService();
+
+    // 1. Admin
+    service.currentUser = session(Math.floor(Date.now() / 1000) + 3600, 'Admin');
+    expect(service.isAdmin()).toBeTrue();
+    expect(service.hasAnyRole(['Usuario', 'Revisor'])).toBeTrue(); // Admin tiene acceso a todo
+
+    // 2. Coordinador
+    service.currentUser = session(Math.floor(Date.now() / 1000) + 3600, 'Coordinador');
+    expect(service.isCoordinador()).toBeTrue();
+    expect(service.hasRole('COORDINADOR')).toBeTrue();
+    expect(service.hasRole('ROLE_COORDINADOR')).toBeTrue();
+    expect(service.isAdmin()).toBeFalse();
+
+    // 3. Profesional
+    service.currentUser = session(Math.floor(Date.now() / 1000) + 3600, 'Profesional');
+    expect(service.isProfesional()).toBeTrue();
+    expect(service.hasRole('PROFESIONAL')).toBeTrue();
+    expect(service.hasAnyRole(['Profesional', 'Coordinador'])).toBeTrue();
+    expect(service.hasAnyRole(['Admin'])).toBeFalse();
+
+    // 4. Revisor
+    service.currentUser = session(Math.floor(Date.now() / 1000) + 3600, 'Revisor');
+    expect(service.isRevisor()).toBeTrue();
+    expect(service.hasRole('REVISOR')).toBeTrue();
+
+    // 5. Usuario
+    service.currentUser = session(Math.floor(Date.now() / 1000) + 3600, 'Usuario');
+    expect(service.isUsuario()).toBeTrue();
+    expect(service.hasRole('USUARIO')).toBeTrue();
   });
 
   it('elimina una sesión corrupta sin interrumpir la aplicación', () => {
@@ -71,13 +109,32 @@ describe('AuthService', () => {
   it('dirige al panel de inicio unificado según rol', () => {
     const service = createService();
 
-    service.currentUser = { ...session(Math.floor(Date.now() / 1000) + 3600), rol: 'Revisor' };
+    service.currentUser = session(Math.floor(Date.now() / 1000) + 3600, 'Revisor');
     expect(service.getDefaultRoute()).toBe('/inicio');
 
-    service.currentUser = { ...service.currentUser, rol: 'Admin' };
+    service.currentUser = session(Math.floor(Date.now() / 1000) + 3600, 'Admin');
     expect(service.getDefaultRoute()).toBe('/inicio');
 
-    service.currentUser = { ...service.currentUser, rol: 'Usuario' };
+    service.currentUser = session(Math.floor(Date.now() / 1000) + 3600, 'Usuario');
     expect(service.getDefaultRoute()).toBe('/inicio');
+
+    service.currentUser = session(Math.floor(Date.now() / 1000) + 3600, 'Coordinador');
+    expect(service.getDefaultRoute()).toBe('/inicio');
+
+    service.currentUser = session(Math.floor(Date.now() / 1000) + 3600, 'Profesional');
+    expect(service.getDefaultRoute()).toBe('/inicio');
+  });
+
+  it('permite iniciar sesión con usuario mockeado', (done) => {
+    const service = createService();
+
+    service.loginAsMock('coordinador').subscribe((res) => {
+      expect(res.email).toBe(MOCK_USERS['coordinador'].email);
+      expect(res.rol).toBe('Coordinador');
+      expect(service.isAuthenticated()).toBeTrue();
+      expect(service.isCoordinador()).toBeTrue();
+      expect(localStorage.getItem('userSession')).toBeTruthy();
+      done();
+    });
   });
 });

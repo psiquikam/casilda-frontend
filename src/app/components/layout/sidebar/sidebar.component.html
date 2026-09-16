@@ -13,7 +13,42 @@
 
   <div class="sidebar-sections">
 
-    <!-- 1. ADMINISTRACIÓN Y PARAMETRIZACIÓN (Admin) -->
+    <!-- SECCIÓN USUARIO / CIUDADANO (Usuario No Funcionario) -->
+    @if (auth.isUsuario()) {
+      <div class="nav-section">
+        <button type="button" id="toggle-usuario" class="section-toggle" (click)="toggleSection('usuario')"
+          [attr.aria-expanded]="isExpanded('usuario')" aria-controls="section-usuario">
+          <span class="section-toggle__title">
+            <mat-icon class="section-toggle__icon" aria-hidden="true">volunteer_activism</mat-icon>
+            <span>Mis Solicitudes</span>
+          </span>
+          <mat-icon class="section-toggle__chevron" [class.is-expanded]="isExpanded('usuario')" aria-hidden="true">
+            expand_more
+          </mat-icon>
+        </button>
+        @if (isExpanded('usuario')) {
+          <div id="section-usuario" class="section-content" role="region" aria-labelledby="toggle-usuario">
+            <a routerLink="/solicitud-acompanamiento" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
+              <mat-icon class="nav-item__icon" aria-hidden="true">add_circle_outline</mat-icon>
+              <span class="nav-item__text">Reportar Caso</span>
+            </a>
+            <a routerLink="/seguimiento" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
+              <mat-icon class="nav-item__icon" aria-hidden="true">track_changes</mat-icon>
+              <span class="nav-item__text">Seguimiento de Trámite</span>
+            </a>
+            @if (features.complaintIntakePrototype) {
+              <a routerLink="/nueva-queja" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
+                <mat-icon class="nav-item__icon" aria-hidden="true">post_add</mat-icon>
+                <span class="nav-item__text">Queja Disciplinaria (UAD)</span>
+              </a>
+            }
+          </div>
+        }
+      </div>
+      <hr class="nav-divider">
+    }
+
+    <!-- 1. ADMINISTRACIÓN Y PARAMETRIZACIÓN (Solo Admin) -->
     @if (auth.isAdmin()) {
       <div class="nav-section">
         <button type="button" id="toggle-admin" class="section-toggle" (click)="toggleSection('admin')"
@@ -42,8 +77,8 @@
       <hr class="nav-divider">
     }
 
-    <!-- 2. EQUIPO DE ATENCIÓN (Admin & Revisor) -->
-    @if (auth.isRevisor()) {
+    <!-- 2. EQUIPO DE ATENCIÓN (Admin, Coordinador y Profesional) -->
+    @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional()) {
       <div class="nav-section">
         <button type="button" id="toggle-atencion" class="section-toggle" (click)="toggleSection('atencion')"
           [attr.aria-expanded]="isExpanded('atencion')" aria-controls="section-atencion">
@@ -65,6 +100,12 @@
               <mat-icon class="nav-item__icon" aria-hidden="true">search</mat-icon>
               <span class="nav-item__text">Consulta Solicitudes</span>
             </a>
+            @if (features.assignmentsPrototype) {
+              <a routerLink="/mis-asignaciones" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
+                <mat-icon class="nav-item__icon" aria-hidden="true">assignment_ind</mat-icon>
+                <span class="nav-item__text">Mis Asignaciones</span>
+              </a>
+            }
             <a routerLink="/cita" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
               <mat-icon class="nav-item__icon" aria-hidden="true">calendar_month</mat-icon>
               <span class="nav-item__text">Citas y Agendamiento</span>
@@ -83,8 +124,8 @@
       <hr class="nav-divider">
     }
 
-    <!-- 3. LÍNEA ALMA (Admin & Revisor) -->
-    @if (auth.isRevisor() && (features.complaintIntakePrototype || features.publicTrackingPrototype)) {
+    <!-- 3. LÍNEA ALMA (Admin, Coordinador y Profesional) -->
+    @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional()) {
       <div class="nav-section">
         <button type="button" id="toggle-alma" class="section-toggle" (click)="toggleSection('alma')"
           [attr.aria-expanded]="isExpanded('alma')" aria-controls="section-alma">
@@ -108,8 +149,8 @@
       <hr class="nav-divider">
     }
 
-    <!-- 4. UAD EQUIPO 3 Y 4 -->
-    @if (auth.isRevisor()) {
+    <!-- 4. UAD EQUIPO 3 Y 4 (Admin, Coordinador y Revisor) -->
+    @if (auth.isAdmin() || auth.isCoordinador() || auth.isRevisor()) {
       <div class="nav-section">
         <button type="button" id="toggle-uad" class="section-toggle" (click)="toggleSection('uad')"
           [attr.aria-expanded]="isExpanded('uad')" aria-controls="section-uad">
@@ -141,8 +182,8 @@
       <hr class="nav-divider">
     }
 
-    <!-- 5. REPORTES E INDICADORES (Admin) -->
-    @if (auth.isAdmin() && features.reviewerDashboardPrototype) {
+    <!-- 5. REPORTES E INDICADORES (Admin, Coordinador y Revisor) -->
+    @if ((auth.isAdmin() || auth.isCoordinador() || auth.isRevisor()) && features.reviewerDashboardPrototype) {
       <div class="nav-section">
         <button type="button" id="toggle-reportes" class="section-toggle" (click)="toggleSection('reportes')"
           [attr.aria-expanded]="isExpanded('reportes')" aria-controls="section-reportes">
@@ -160,14 +201,18 @@
               <mat-icon class="nav-item__icon" aria-hidden="true">bar_chart</mat-icon>
               <span class="nav-item__text">Panel de Indicadores</span>
             </a>
+            <a routerLink="/consulta" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
+              <mat-icon class="nav-item__icon" aria-hidden="true">search</mat-icon>
+              <span class="nav-item__text">Auditoría de Casos</span>
+            </a>
           </div>
         }
       </div>
       <hr class="nav-divider">
     }
 
-    <!-- 6. RUTA VIOLETA -->
-    @if (features.publicTrackingPrototype) {
+    <!-- 6. RUTA VIOLETA (Funcionalidad transversal institucional) -->
+    @if (features.publicTrackingPrototype && !auth.isUsuario()) {
       <div class="nav-section">
         <button type="button" id="toggle-violeta" class="section-toggle" (click)="toggleSection('violeta')"
           [attr.aria-expanded]="isExpanded('violeta')" aria-controls="section-violeta">
