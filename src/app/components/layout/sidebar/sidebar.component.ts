@@ -63,6 +63,8 @@ export class SidebarComponent implements OnInit {
       } else {
         this.expandedSections.atencion = true;
       }
+    } else if (url.includes('/reportar-caso')) {
+      this.expandedSections.usuario = true;
     } else if (url.includes('/linea-alma')) {
       this.expandedSections.alma = true;
     } else if (url.includes('/nueva-queja')) {

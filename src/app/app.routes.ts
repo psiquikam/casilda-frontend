@@ -36,6 +36,15 @@ export const routes: Routes = [
     pathMatch: 'full'
   },
   {
+    // «Reportar Caso» de Mis Solicitudes (rol USUARIO): mismo formulario multipaso del
+    // canal público, en modo autenticado (ver ModoReporte en formulario-anonimo.component.ts).
+    path: 'reportar-caso',
+    title: 'Reportar caso',
+    canActivate: [roleGuard],
+    data: { roles: ['USUARIO'], modoReporte: 'autenticado' },
+    loadComponent: () => import('./components/formulario-anonimo/formulario-anonimo.component').then((m) => m.FormularioAnonimoComponent)
+  },
+  {
     path: 'seguimiento',
     title: 'Seguimiento de trámite',
     canMatch: [featureCapabilityGuard],

@@ -1,5 +1,5 @@
 <div class="stepper-wrapper">
-  <h1 class="formulario-titulo">Reporte anónimo de violencia basada en género</h1>
+  <h1 class="formulario-titulo">{{ textos.titulo }}</h1>
   <mat-stepper linear #stepper>
 
     <!-- Paso 1: Privacidad -->
@@ -23,19 +23,19 @@
         <ng-template matStepLabel>Identificación</ng-template>
 
         <div class="profile-selector">
-          <h2>¿Cómo desea realizar su reporte anónimo?</h2>
+          <h2>{{ textos.preguntaPerfil }}</h2>
           <p class="selector-subtitle">Su identidad y confidencialidad estarán totalmente protegidas durante todo el proceso.</p>
           <mat-radio-group formControlName="perfil" class="profile-grid">
             <div class="profile-card" [class.selected]="formPerfil.get('perfil')?.value === 'anonimo'">
               <mat-radio-button value="anonimo">
                 <strong>Soy la persona afectada</strong>
-                <p>Reporte anónimo sobre una situación que le ocurrió directamente a usted.</p>
+                <p>{{ textos.perfilAfectada }}</p>
               </mat-radio-button>
             </div>
             <div class="profile-card" [class.selected]="formPerfil.get('perfil')?.value === 'anonimo_tercero'">
               <mat-radio-button value="anonimo_tercero">
                 <strong>A nombre de otro / Testigo</strong>
-                <p>Reporte anónimo en representación de un tercero o como testigo presencial.</p>
+                <p>{{ textos.perfilTercero }}</p>
               </mat-radio-button>
             </div>
           </mat-radio-group>
@@ -652,7 +652,7 @@
         </div>
         <div class="actions">
           <button mat-button matStepperPrevious>Atrás</button>
-          <button mat-raised-button color="warn" (click)="enviarReporte()">Finalizar y Enviar Reporte Anónimo</button>
+          <button mat-raised-button color="warn" (click)="enviarReporte()">{{ textos.botonEnviar }}</button>
         </div>
       </form>
     </mat-step>
