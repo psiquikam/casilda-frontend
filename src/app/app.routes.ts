@@ -45,14 +45,15 @@ export const routes: Routes = [
   {
     path: 'detalle-revisor/:id',
     title: 'Detalle de la solicitud',
-    canActivate: [authGuard],
+    canActivate: [roleGuard],
+    data: { roles: ['ADMIN', 'COORDINADOR', 'REVISOR'] },
     loadComponent: () => import('./components/detalle-revisor/detalle-revisor.component').then((m) => m.DetalleRevisorComponent)
   },
   {
     path: 'gestion-usuarios',
     title: 'Gestión de usuarios',
     canActivate: [roleGuard],
-    data: { roles: ['Admin'] },
+    data: { roles: ['ADMIN'] },
     loadComponent: () => import('./components/gestion-usuarios/gestion-usuarios.component').then((m) => m.GestionUsuariosComponent)
   },
   {
@@ -60,7 +61,7 @@ export const routes: Routes = [
     title: 'Panel de indicadores',
     canMatch: [featureCapabilityGuard],
     canActivate: [roleGuard],
-    data: { roles: ['Admin', 'Revisor'], feature: 'reviewerDashboardPrototype' },
+    data: { roles: ['ADMIN', 'COORDINADOR', 'REVISOR'], feature: 'reviewerDashboardPrototype' },
     loadComponent: () => import('./components/dashboard-revisor/dashboard-revisor.component').then((m) => m.DashboardRevisorComponent)
   },
   {
@@ -68,21 +69,21 @@ export const routes: Routes = [
     title: 'Registro de queja',
     canMatch: [featureCapabilityGuard],
     canActivate: [roleGuard],
-    data: { roles: ['Admin', 'Revisor', 'Usuario'], feature: 'complaintIntakePrototype' },
+    data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR', 'USUARIO'], feature: 'complaintIntakePrototype' },
     loadComponent: () => import('./components/formulario-queja/formulario-queja.component').then((m) => m.FormularioQuejaComponent)
   },
   {
     path: 'solicitud-acompanamiento',
     title: 'Solicitud de acompañamiento',
     canActivate: [roleGuard],
-    data: { roles: ['Admin', 'Revisor', 'Usuario'] },
+    data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR', 'USUARIO'] },
     loadComponent: () => import('./components/formulario-acompanamiento/formulario-acompanamiento.component').then((m) => m.FormularioAcompanamientoComponent)
   },
   {
     path: 'gestion-sistema',
     title: 'Gestión de listas maestras',
     canActivate: [roleGuard],
-    data: { roles: ['Admin'] },
+    data: { roles: ['ADMIN'] },
     loadComponent: () => import('./components/gestion-listas/gestion-listas.component').then((m) => m.GestionListasComponent)
   },
   {
@@ -90,56 +91,56 @@ export const routes: Routes = [
     title: 'Mis asignaciones',
     canMatch: [featureCapabilityGuard],
     canActivate: [roleGuard],
-    data: { roles: ['Admin', 'Revisor'], feature: 'assignmentsPrototype' },
+    data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR'], feature: 'assignmentsPrototype' },
     loadComponent: () => import('./components/mis-asignaciones/mis-asignaciones.component').then((m) => m.MisAsignacionesComponent)
   },
   {
     path: 'detalle-acompanamiento/:id',
     title: 'Gestión de contacto',
     canActivate: [roleGuard],
-    data: { roles: ['Admin', 'Revisor'] },
+    data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR'] },
     loadComponent: () => import('./components/gestion-contacto/gestion-contacto.component').then((m) => m.DetalleAcompanamientoComponent)
   },
   {
     path: 'consulta',
     title: 'Consulta de solicitudes',
     canActivate: [roleGuard],
-    data: { roles: ['Admin', 'Revisor'] },
+    data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR'] },
     loadComponent: () => import('./components/consulta/consulta.component').then((m) => m.ConsultaComponent)
   },
   {
     path: 'registro-caso',
     title: 'Registro de caso',
     canActivate: [roleGuard],
-    data: { roles: ['Admin', 'Revisor'] },
+    data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL'] },
     loadComponent: () => import('./components/registro-caso/registro-caso.component').then((m) => m.RegistroCasoComponent)
   },
   {
     path: 'caso',
     title: 'Casos',
     canActivate: [roleGuard],
-    data: { roles: ['Admin', 'Revisor'] },
+    data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL'] },
     loadComponent: () => import('./components/caso/caso.component').then((m) => m.CasoComponent)
   },
   {
     path: 'registro-atencion',
     title: 'Registro de atención',
     canActivate: [roleGuard],
-    data: { roles: ['Admin', 'Revisor'] },
+    data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL'] },
     loadComponent: () => import('./components/registro-atencion/registro-atencion.component').then((m) => m.RegistroAtencionComponent)
   },
   {
     path: 'cita',
     title: 'Agenda de citas',
     canActivate: [roleGuard],
-    data: { roles: ['Admin', 'Revisor'] },
+    data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR'] },
     loadComponent: () => import('./components/cita/cita.component').then((m) => m.CitaComponent)
   },
   {
     path: 'linea-alma/atencion-pr',
     title: 'Atención de primer respondiente — Línea ALMA',
     canActivate: [roleGuard],
-    data: { roles: ['Admin', 'Revisor'] },
+    data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL'] },
     loadComponent: () => import('./components/linea-alma/atencion-pr/atencion-pr.component').then((m) => m.AtencionPrComponent)
   },
   {

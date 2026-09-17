@@ -33,6 +33,7 @@
         aria-label="Abrir opciones de usuario y perfil">
         <mat-icon class="usuario__icon" aria-hidden="true">account_circle</mat-icon>
         <span class="usuario__nombre">{{ auth.currentUser?.nombre }}</span>
+        <span class="header-role-pill" [class]="roleBadgeClass">{{ auth.getRoleName() }}</span>
         <mat-icon class="usuario__chevron" aria-hidden="true">arrow_drop_down</mat-icon>
       </button>
 
@@ -43,10 +44,30 @@
           </div>
           <div class="user-menu-profile__meta">
             <strong class="user-menu-profile__name">{{ auth.currentUser?.nombre }}</strong>
-            <span class="user-menu-profile__role">{{ auth.currentUser?.rol }}</span>
+            <span class="user-menu-profile__role-badge" [class]="roleBadgeClass">{{ auth.getRoleName() }}</span>
             <span class="user-menu-profile__email">{{ auth.currentUser?.email }}</span>
           </div>
         </div>
+
+        <mat-divider></mat-divider>
+
+        <!-- SECCIÓN DE PRUEBAS: CAMBIO RÁPIDO DE USUARIO / ROL -->
+        <div class="user-menu-group-header">
+          <mat-icon aria-hidden="true">swap_horiz</mat-icon>
+          <span>Cambiar Rol (Modo Prueba)</span>
+        </div>
+
+        @for (mock of mockUsers; track mock.id) {
+          <button mat-menu-item type="button" (click)="cambiarRolMock(mock.roles[0])"
+            [class.role-item--active]="auth.hasRole(mock.roles[0])">
+            <mat-icon aria-hidden="true" [class.icon-selected]="auth.hasRole(mock.roles[0])">
+              {{ auth.hasRole(mock.roles[0]) ? 'radio_button_checked' : 'radio_button_unchecked' }}
+            </mat-icon>
+            <span [class.text-selected]="auth.hasRole(mock.roles[0])">
+              {{ mock.rol }} — <small>{{ mock.nombre.split(' ')[0] }}</small>
+            </span>
+          </button>
+        }
 
         <mat-divider></mat-divider>
 

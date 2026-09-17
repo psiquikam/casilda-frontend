@@ -136,7 +136,28 @@
   border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
   border-radius: var(--radius-full) !important;
   color: var(--color-text-on-primary) !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
   transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+
+  /* Reseteo de interferencias internas de Angular Material MDC */
+  ::ng-deep .mat-mdc-button-touch-target {
+    display: none !important;
+  }
+
+  ::ng-deep .mdc-button__label {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: var(--space-2) !important;
+  }
+
+  ::ng-deep .mat-icon {
+    margin: 0 !important;
+  }
 
   &:hover {
     background-color: rgba(255, 255, 255, 0.25) !important;
@@ -153,7 +174,13 @@
     font-size: 22px !important;
     width: 22px !important;
     height: 22px !important;
-    line-height: 22px !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    flex-shrink: 0 !important;
   }
 
   &__nombre {
@@ -173,6 +200,43 @@
     width: 18px !important;
     height: 18px !important;
     line-height: 18px !important;
+  }
+}
+
+.header-role-pill {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  &.role-badge--admin {
+    background-color: #70205b;
+    color: #ffffff;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+  }
+  &.role-badge--coordinador {
+    background-color: #137598;
+    color: #ffffff;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+  }
+  &.role-badge--profesional {
+    background-color: #059669;
+    color: #ffffff;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+  }
+  &.role-badge--revisor {
+    background-color: #d97706;
+    color: #ffffff;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+  }
+  &.role-badge--usuario {
+    background-color: #0284c7;
+    color: #ffffff;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
   }
 }
 
@@ -346,19 +410,45 @@
   }
 
   .usuario {
-    width: 38px !important;
-    min-width: 38px !important;
-    max-width: 38px !important;
-    height: 38px !important;
-    min-height: 38px !important;
-    max-height: 38px !important;
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
     padding: 0 !important;
+    margin: 0 !important;
+    display: inline-flex !important;
     justify-content: center !important;
-    border-radius: var(--radius-full) !important;
+    align-items: center !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+
+    ::ng-deep .mdc-button__label {
+      width: 100% !important;
+      height: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 0 !important;
+    }
+
+    .usuario__icon {
+      font-size: 24px !important;
+      width: 24px !important;
+      height: 24px !important;
+      line-height: 1 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
   }
 
   .usuario__nombre,
-  .usuario__chevron {
+  .usuario__chevron,
+  .header-role-pill {
     display: none !important;
   }
 }

@@ -127,10 +127,31 @@
     font-size: 0.8125rem;
     font-weight: 700;
     border-radius: var(--radius-full);
-    border: 1px solid rgba(2, 105, 55, 0.2);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    line-height: 1;
+    &--admin {
+      background-color: #70205b;
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+    &--coordinador {
+      background-color: #137598;
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+    &--profesional {
+      background-color: #059669;
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+    &--revisor {
+      background-color: #d97706;
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+    &--usuario {
+      background-color: #0284c7;
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.4);
+    }
   }
 
   &__date {
@@ -928,6 +949,41 @@
     outline: 3px solid var(--focus-ring-color);
     outline-offset: 2px;
   }
+
+  &--secondary {
+    background-color: var(--color-surface-container-high);
+    color: var(--color-primary);
+    border: 1px solid var(--color-outline-variant);
+
+    &:hover {
+      background-color: var(--color-surface-container-highest);
+    }
+  }
+}
+
+.step-card__restricted-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.step-card__restricted-msg {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--color-amber-600, #d97706);
+  }
 }
 
 .stepper-pagination {
@@ -1434,5 +1490,607 @@ code {
 
   .diversity-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   Vistas de Portal Específicas por Rol (Fase 2)
+   ========================================================================== */
+
+/* 1. Portal Usuario */
+.portal-usuario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+
+  .banner-ciudadano {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-6);
+    background: linear-gradient(135deg, rgba(2, 132, 199, 0.08) 0%, rgba(2, 105, 55, 0.06) 100%);
+    border: 1.5px solid rgba(2, 132, 199, 0.25);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+
+    @media (max-width: 800px) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    &__content {
+      max-width: 65ch;
+    }
+
+    &__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      background-color: #e0f2fe;
+      color: #0369a1;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-3);
+
+      mat-icon { font-size: 16px; width: 16px; height: 16px; }
+    }
+
+    &__title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin: 0 0 var(--space-2);
+      line-height: 1.3;
+    }
+
+    &__desc {
+      font-size: 0.9375rem;
+      color: var(--color-text-secondary);
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    &__help-box {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      background-color: #ffffff;
+      border: 1px solid #bae6fd;
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.08);
+      flex-shrink: 0;
+
+      .help-box-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: var(--radius-full);
+        background-color: #0284c7;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        mat-icon { font-size: 24px; width: 24px; height: 24px; }
+      }
+
+      .help-box-info {
+        display: flex;
+        flex-direction: column;
+
+        .help-box-label {
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #64748b;
+        }
+
+        .help-box-phone {
+          font-size: 1.15rem;
+          font-weight: 800;
+          color: #0284c7;
+        }
+
+        .help-box-note {
+          font-size: 0.7rem;
+          color: #94a3b8;
+        }
+      }
+    }
+  }
+
+  .user-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-4);
+  }
+
+  .user-action-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: var(--color-bg-surface);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    &__icon-wrap {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-4);
+
+      mat-icon { font-size: 26px; width: 26px; height: 26px; }
+    }
+
+    &__title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin: 0 0 var(--space-2);
+    }
+
+    &__text {
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+      margin: 0 0 var(--space-4);
+    }
+
+    &--primary {
+      border-color: rgba(2, 105, 55, 0.3);
+      .user-action-card__icon-wrap { background-color: var(--color-bg-success-light); color: var(--color-primary); }
+    }
+
+    &--secondary {
+      border-color: rgba(2, 132, 199, 0.3);
+      .user-action-card__icon-wrap { background-color: #e0f2fe; color: #0284c7; }
+    }
+
+    &--accent {
+      border-color: rgba(112, 32, 91, 0.3);
+      .user-action-card__icon-wrap { background-color: #fdf2f8; color: #70205b; }
+    }
+
+    .boton-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 0.875rem;
+      text-decoration: none;
+      transition: opacity 0.15s ease;
+
+      &:hover { opacity: 0.9; }
+
+      &--primary { background-color: var(--color-primary); color: #ffffff; }
+      &--secondary { background-color: #0284c7; color: #ffffff; }
+      &--accent { background-color: #70205b; color: #ffffff; }
+    }
+  }
+
+  .user-requests-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+
+    .user-requests-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: var(--space-4);
+    }
+
+    .request-summary-card {
+      background-color: var(--color-bg-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-4) var(--space-5);
+      box-shadow: var(--shadow-xs);
+
+      &__top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-2);
+      }
+
+      &__code {
+        font-family: var(--font-mono, monospace);
+        font-weight: 700;
+        font-size: 0.875rem;
+        color: var(--color-primary);
+      }
+
+      &__badge {
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: var(--radius-full);
+
+        &--activo { background-color: #e0f2fe; color: #0369a1; }
+        &--finalizado { background-color: #f1f5f9; color: #475569; }
+      }
+
+      &__type {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--color-text-primary);
+        margin: 0 0 var(--space-3);
+      }
+
+      &__details {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 0.8125rem;
+        color: var(--color-text-secondary);
+
+        p {
+          margin: 0;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+
+          mat-icon { font-size: 16px; width: 16px; height: 16px; color: var(--color-text-muted); }
+        }
+
+        .highlight-cita {
+          color: var(--color-primary);
+          font-weight: 600;
+          margin-top: 4px;
+          mat-icon { color: var(--color-primary); }
+        }
+      }
+    }
+  }
+
+  .guia-usuario-card {
+    background-color: #ffffff;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+
+    &__title {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin: 0 0 var(--space-4);
+
+      mat-icon { color: var(--color-primary); }
+    }
+
+    .pasos-usuario-grid {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+
+      @media (max-width: 800px) {
+        flex-direction: column;
+        align-items: stretch;
+
+        .paso-usuario__num-arrow { display: none; }
+      }
+
+      .paso-usuario {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        &__num {
+          width: 32px;
+          height: 32px;
+          border-radius: var(--radius-full);
+          background-color: var(--color-bg-success-light);
+          color: var(--color-primary);
+          font-weight: 800;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 4px;
+        }
+
+        &__title {
+          font-size: 0.9375rem;
+          color: var(--color-text-primary);
+        }
+
+        &__text {
+          font-size: 0.8125rem;
+          color: var(--color-text-secondary);
+          margin: 0;
+          line-height: 1.4;
+        }
+      }
+
+      .paso-usuario__num-arrow {
+        font-size: 1.25rem;
+        color: #cbd5e1;
+        font-weight: 700;
+      }
+    }
+  }
+}
+
+/* 2. Quick Actions Bar (Profesional, Coordinador, Revisor) */
+.quick-actions-bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.quick-buttons-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+
+  .btn-quick-action {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 10px 18px;
+    border-radius: var(--radius-md);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    mat-icon { font-size: 20px; width: 20px; height: 20px; }
+
+    &--emerald { background-color: #059669; color: #ffffff; }
+    &--amber { background-color: #d97706; color: #ffffff; }
+    &--cyan { background-color: #0891b2; color: #ffffff; }
+    &--rose { background-color: #e11d48; color: #ffffff; }
+    &--indigo { background-color: #4f46e5; color: #ffffff; }
+  }
+}
+
+/* 3. Citas de la Jornada (Profesional) */
+.agenda-jornada-card,
+.carga-equipo-card {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+    flex-wrap: wrap;
+
+    .title-with-icon {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+
+      mat-icon { font-size: 28px; width: 28px; height: 28px; color: var(--color-primary); }
+    }
+
+    .agenda-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin: 0;
+    }
+
+    .agenda-sub {
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+      margin: 2px 0 0;
+    }
+
+    .btn-manage-citas {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      text-decoration: none;
+      &:hover { text-decoration: underline; }
+    }
+  }
+}
+
+.citas-table-wrapper {
+  overflow-x: auto;
+}
+
+.citas-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+
+  th {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 2px solid var(--color-border);
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--color-border-subtle, #f1f5f9);
+    color: var(--color-text-primary);
+  }
+
+  .badge-tipo {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: var(--radius-full);
+    background-color: #f1f5f9;
+    color: #334155;
+    font-weight: 600;
+  }
+
+  .badge-estado-cita {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: var(--radius-full);
+    background-color: #ecfdf5;
+    color: #059669;
+    font-weight: 700;
+  }
+
+  .btn-table-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-bg-success-light);
+    color: var(--color-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-decoration: none;
+
+    mat-icon { font-size: 16px; width: 16px; height: 16px; }
+    &:hover { background-color: var(--color-primary); color: #ffffff; }
+  }
+}
+
+/* 4. Carga de Equipo (Coordinador) */
+.profesionales-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-4);
+}
+
+.profesional-card {
+  background-color: var(--color-bg-surface-elevated, #f8fafc);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.875rem;
+    color: var(--color-text-primary);
+
+    mat-icon { font-size: 20px; width: 20px; height: 20px; color: var(--color-primary); }
+  }
+
+  &__stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary);
+  }
+
+  &__bar-wrap {
+    height: 8px;
+    background-color: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  &__bar {
+    height: 100%;
+    border-radius: 4px;
+
+    &.bar--normal { background-color: #059669; }
+    &.bar--alto { background-color: #e11d48; }
+    &.bar--bajo { background-color: #0284c7; }
+  }
+
+  &__cap-label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-align: right;
+  }
+}
+
+/* 5. Admin Priority Bar */
+.admin-priority-bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.admin-buttons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-4);
+
+  .btn-admin-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    background-color: #ffffff;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    text-decoration: none;
+    box-shadow: var(--shadow-xs);
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      border-color: #70205b;
+      box-shadow: var(--shadow-sm);
+    }
+
+    mat-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+      color: #70205b;
+      flex-shrink: 0;
+    }
+
+    strong {
+      display: block;
+      font-size: 0.9375rem;
+      color: var(--color-text-primary);
+    }
+
+    small {
+      display: block;
+      font-size: 0.8125rem;
+      color: var(--color-text-secondary);
+      line-height: 1.35;
+      margin-top: 2px;
+    }
   }
 }

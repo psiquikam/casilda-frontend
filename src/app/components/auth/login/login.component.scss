@@ -149,6 +149,108 @@
   margin-bottom: var(--space-4);
 }
 
+.login__mock-section {
+  background-color: var(--color-bg-surface-elevated, #f8fafc);
+  border: 1.5px solid var(--color-border-subtle, #e2e8f0);
+  border-radius: var(--radius-lg, 12px);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-6);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.mock-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--space-1);
+
+  &__icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.mock-desc {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-3) 0;
+  line-height: var(--line-height-base);
+}
+
+.mock-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.btn-mock-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full, 999px);
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  &__role {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  &__name {
+    color: #64748b;
+    font-size: 10px;
+  }
+
+  &--admin {
+    border-color: #70205b;
+    color: #70205b;
+    &:hover { background-color: #70205b; color: #ffffff; .btn-mock-pill__name { color: #ffffff; } }
+  }
+
+  &--coordinador {
+    border-color: #137598;
+    color: #137598;
+    &:hover { background-color: #137598; color: #ffffff; .btn-mock-pill__name { color: #ffffff; } }
+  }
+
+  &--profesional {
+    border-color: #059669;
+    color: #059669;
+    &:hover { background-color: #059669; color: #ffffff; .btn-mock-pill__name { color: #ffffff; } }
+  }
+
+  &--revisor {
+    border-color: #d97706;
+    color: #d97706;
+    &:hover { background-color: #d97706; color: #ffffff; .btn-mock-pill__name { color: #ffffff; } }
+  }
+
+  &--usuario {
+    border-color: #0284c7;
+    color: #0284c7;
+    &:hover { background-color: #0284c7; color: #ffffff; .btn-mock-pill__name { color: #ffffff; } }
+  }
+}
+
 @media (max-width: 900px) {
   .login {
     grid-template-columns: 1fr;
