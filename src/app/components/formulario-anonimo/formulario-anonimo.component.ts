@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MatStepper, MatStepperModule } from '@angular/material/stepper';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,6 +16,56 @@ import { MaestroDto } from '../../services/listas.service';
 import { NotificacionService } from '../../core/a11y/notificacion.service';
 import { ResumenErroresComponent } from '../../core/a11y/resumen-errores.component';
 import { DescripcionCampos, ErrorFormulario, recolectarErrores } from '../../core/a11y/errores-formulario';
+
+/**
+ * Modo en que se presenta el formulario multipaso de reporte:
+ * - `anonimo`: canal público del home («Reportar VBG de forma anónima»).
+ * - `autenticado`: opción «Reportar Caso» de Mis Solicitudes (rol USUARIO). Reutiliza el
+ *   mismo flujo y validaciones; solo cambian los textos que hablan de anonimato y la clave
+ *   del borrador local. Se declara en `data.modoReporte` de la ruta.
+ */
+export type ModoReporte = 'anonimo' | 'autenticado';
+
+/** Textos que dependen del modo del formulario (ver `ModoReporte`). */
+export interface TextosReporte {
+  titulo: string;
+  preguntaPerfil: string;
+  perfilAfectada: string;
+  perfilTercero: string;
+  botonEnviar: string;
+  claveBorrador: string;
+  exitoTitulo: string;
+  exitoMensaje: string;
+  exitoLabelCodigo: string;
+  exitoInstruccion: string;
+}
+
+export const TEXTOS_REPORTE: Record<ModoReporte, TextosReporte> = {
+  anonimo: {
+    titulo: 'Reporte anónimo de violencia basada en género',
+    preguntaPerfil: '¿Cómo desea realizar su reporte anónimo?',
+    perfilAfectada: 'Reporte anónimo sobre una situación que le ocurrió directamente a usted.',
+    perfilTercero: 'Reporte anónimo en representación de un tercero o como testigo presencial.',
+    botonEnviar: 'Finalizar y Enviar Reporte Anónimo',
+    claveBorrador: 'casilda_borrador_anonimo',
+    exitoTitulo: '¡Reporte Anónimo Registrado!',
+    exitoMensaje: 'Tu reporte anónimo ha sido recibido con éxito. Un profesional especializado revisará la información de forma confidencial.',
+    exitoLabelCodigo: 'ID ÚNICO DE REPORTE ANÓNIMO',
+    exitoInstruccion: 'Guarda este ID. Si en algún momento deseas activar una ruta de atención o acompañamiento institucional, inicia sesión en la plataforma e ingresa este ID para vincular tu caso.'
+  },
+  autenticado: {
+    titulo: 'Reportar caso de violencia basada en género',
+    preguntaPerfil: '¿Cómo desea realizar su reporte?',
+    perfilAfectada: 'Reporte sobre una situación que le ocurrió directamente a usted.',
+    perfilTercero: 'Reporte en representación de un tercero o como testigo presencial.',
+    botonEnviar: 'Finalizar y Enviar Reporte',
+    claveBorrador: 'casilda_borrador_reporte',
+    exitoTitulo: '¡Reporte Registrado!',
+    exitoMensaje: 'Tu reporte ha sido recibido con éxito. Un profesional especializado revisará la información de forma confidencial.',
+    exitoLabelCodigo: 'ID ÚNICO DE REPORTE',
+    exitoInstruccion: 'Guarda este ID. Podrás consultar el avance de tu caso desde «Seguimiento de Trámite» en Mis Solicitudes.'
+  }
+};
 
 @Component({
   selector: 'app-formulario-anonimo',
@@ -40,6 +91,12 @@ export class FormularioAnonimoComponent {
   private readonly fb = inject(FormBuilder);
   private readonly dialog = inject(MatDialog);
   private readonly notificacion = inject(NotificacionService);
+  // Opcional: el componente también se instancia sin router (pruebas unitarias).
+  private readonly route = inject(ActivatedRoute, { optional: true });
+
+  /** Modo declarado en `data.modoReporte` de la ruta; por defecto, reporte anónimo. */
+  readonly modo: ModoReporte = this.route?.snapshot?.data?.['modoReporte'] === 'autenticado' ? 'autenticado' : 'anonimo';
+  readonly textos: TextosReporte = TEXTOS_REPORTE[this.modo];
 
   tipoUsuario: 'anonimo' | 'anonimo_tercero' = 'anonimo';
   formConsentimiento: FormGroup;
@@ -467,7 +524,7 @@ export class FormularioAnonimoComponent {
         prejuicioSel: this.prejuicioSel,
         guardadoEl: new Date().toISOString()
       };
-      localStorage.setItem('casilda_borrador_anonimo', JSON.stringify(borrador));
+      localStorage.setItem(this.textos.claveBorrador, JSON.stringify(borrador));
       this.notificacion.exito('Borrador guardado. Tu avance queda solo en este navegador.');
     } catch {
       // Manejo preventivo si localStorage no estuviese accesible
@@ -612,11 +669,11 @@ export class FormularioAnonimoComponent {
 
     this.dialog.open(DialogoExitoComponent, {
       data: {
-        titulo: '¡Reporte Anónimo Registrado!',
-        mensaje: 'Tu reporte anónimo ha sido recibido con éxito. Un profesional especializado revisará la información de forma confidencial.',
+        titulo: this.textos.exitoTitulo,
+        mensaje: this.textos.exitoMensaje,
         codigo: codigoGenerado,
-        labelCodigo: 'ID ÚNICO DE REPORTE ANÓNIMO',
-        instruccion: 'Guarda este ID. Si en algún momento deseas activar una ruta de atención o acompañamiento institucional, inicia sesión en la plataforma e ingresa este ID para vincular tu caso.'
+        labelCodigo: this.textos.exitoLabelCodigo,
+        instruccion: this.textos.exitoInstruccion
       },
       width: '480px',
       disableClose: true

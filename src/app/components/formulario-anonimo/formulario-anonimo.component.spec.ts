@@ -2,8 +2,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatStepper } from '@angular/material/stepper';
+import { ActivatedRoute } from '@angular/router';
 
-import { FormularioAnonimoComponent } from './formulario-anonimo.component';
+import { FormularioAnonimoComponent, TEXTOS_REPORTE } from './formulario-anonimo.component';
 
 describe('FormularioAnonimoComponent', () => {
   let component: FormularioAnonimoComponent;
@@ -28,6 +29,13 @@ describe('FormularioAnonimoComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should default to anonymous mode when the route declares no modoReporte', () => {
+    expect(component.modo).toBe('anonimo');
+    expect(component.textos).toBe(TEXTOS_REPORTE.anonimo);
+    const h1: HTMLElement = fixture.nativeElement.querySelector('h1');
+    expect(h1.textContent).toContain('Reporte anónimo');
   });
 
   it('should require consent in formConsentimiento (Paso 1: Privacidad)', () => {
@@ -328,5 +336,60 @@ describe('FormularioAnonimoComponent', () => {
     // Texto con 20 o más caracteres es válido
     descCtrl?.setValue('Este es un relato detallado de los hechos que cumple con la longitud mínima.');
     expect(descCtrl?.valid).toBeTrue();
+  });
+});
+
+/** Modo «Reportar Caso» (Mis Solicitudes, rol USUARIO): mismo flujo, textos sin anonimato. */
+describe('FormularioAnonimoComponent en modo autenticado', () => {
+  let component: FormularioAnonimoComponent;
+  let fixture: ComponentFixture<FormularioAnonimoComponent>;
+  let dialog: MatDialog;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [FormularioAnonimoComponent],
+      providers: [
+        provideNoopAnimations(),
+        { provide: ActivatedRoute, useValue: { snapshot: { data: { modoReporte: 'autenticado' } } } }
+      ]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(FormularioAnonimoComponent);
+    component = fixture.componentInstance;
+    dialog = fixture.debugElement.injector.get(MatDialog);
+    spyOn(dialog, 'open').and.returnValue({} as unknown as MatDialogRef<unknown>);
+    fixture.detectChanges();
+  });
+
+  it('should read modoReporte from route data and render the authenticated texts', () => {
+    expect(component.modo).toBe('autenticado');
+    expect(component.textos).toBe(TEXTOS_REPORTE.autenticado);
+    const h1: HTMLElement = fixture.nativeElement.querySelector('h1');
+    expect(h1.textContent).toContain('Reportar caso');
+    expect(h1.textContent).not.toContain('anónimo');
+  });
+
+  it('should keep the same five-step flow and validations as the anonymous channel', () => {
+    expect(fixture.nativeElement.querySelectorAll('.mat-step-header').length).toBe(5);
+    expect(component.formConsentimiento.valid).toBeFalse();
+    component.formPerfil.get('deseaContacto')?.setValue('si');
+    expect(component.contactoRequeridoInvalido).toBeTrue();
+  });
+
+  it('should open the success dialog with the authenticated wording', () => {
+    component.enviarReporte();
+    expect(dialog.open).toHaveBeenCalledWith(jasmine.any(Function), jasmine.objectContaining({
+      data: jasmine.objectContaining({
+        titulo: TEXTOS_REPORTE.autenticado.exitoTitulo,
+        labelCodigo: 'ID ÚNICO DE REPORTE'
+      })
+    }));
+  });
+
+  it('should save the draft under a key separate from the anonymous channel', () => {
+    spyOn(localStorage, 'setItem');
+    component.guardarBorrador();
+    expect(localStorage.setItem).toHaveBeenCalledWith('casilda_borrador_reporte', jasmine.any(String));
   });
 });

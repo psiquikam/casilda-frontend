@@ -294,7 +294,18 @@ export class DashboardHomeComponent {
       whatItIs: 'Formulario de registro inicial para radicar una solicitud de acompañamiento en VBG.',
       whenToUse: 'Cuando una persona se acerca solicitando orientación o cuando un tercero reporta un caso.',
       keywords: ['solicitud', 'radicar', 'nueva', 'ingreso', 'acompañamiento', 'crear', 'caso'],
-      roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR', 'USUARIO']
+      roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR']
+    },
+    {
+      id: 'reportar-caso',
+      title: 'Reportar Caso',
+      category: 'Mis Solicitudes',
+      icon: 'add_circle_outline',
+      route: '/reportar-caso',
+      whatItIs: 'Formulario multipaso para reportar una situación de violencia basada en género, como persona afectada o en representación de un tercero.',
+      whenToUse: 'Cuando deseas poner en conocimiento de Casilda una situación de VBG y recibir un ID de seguimiento.',
+      keywords: ['reportar', 'reporte', 'caso', 'vbg', 'violencia', 'situación', 'nuevo'],
+      roles: ['USUARIO']
     },
     {
       id: 'consulta',

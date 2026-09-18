@@ -10,7 +10,7 @@
 
     <!-- SECCIÓN USUARIO (Usuario No Funcionario / Ciudadano) -->
     @if (auth.isUsuario()) {
-      <a routerLink="/solicitud-acompanamiento" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
+      <a routerLink="/reportar-caso" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
         <mat-icon class="hnav-icon" aria-hidden="true">add_circle_outline</mat-icon>
         <span class="hnav-text">Reportar Caso</span>
       </a>
@@ -187,7 +187,7 @@
 
           @if (isSectionExpanded('usuario')) {
             <div class="hnav-mobile-group-content">
-              <a routerLink="/solicitud-acompanamiento" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+              <a routerLink="/reportar-caso" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
                 class="hnav-mobile-item" (click)="closeMobileMenu()">
                 <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">add_circle_outline</mat-icon>
                 <span class="hnav-mobile-item__text">Reportar Caso</span>
