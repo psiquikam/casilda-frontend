@@ -5,7 +5,10 @@
 
 <mat-dialog-content class="modal-content">
   <div class="form-row"> <mat-form-field appearance="outline" class="flex-field">
-    <mat-label>Fecha de Cumplimiento</mat-label>
+    <mat-label>
+      Fecha de Cumplimiento
+      <button type="button" class="help-tooltip-trigger" matTooltip="Día acordado en que la profesional o dupla ejecutará el compromiso pactado." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+    </mat-label>
     <input matInput [matDatepicker]="picker" [(ngModel)]="data.fecha" placeholder="Seleccione fecha">
     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
     <mat-datepicker #picker></mat-datepicker>

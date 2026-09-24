@@ -6,6 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { MaestroDto } from '../../services/listas.service';
 
@@ -18,7 +19,8 @@ import { MaestroDto } from '../../services/listas.service';
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatTooltipModule
 ],
     templateUrl: './modal-presunto-agresor.component.html',
     styleUrls: ['./modal-presunto-agresor.component.scss']
