@@ -11,6 +11,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
 import { MaestroDto } from '../../services/listas.service';
 import { NotificacionService } from '../../core/a11y/notificacion.service';
@@ -82,6 +83,7 @@ export const TEXTOS_REPORTE: Record<ModoReporte, TextosReporte> = {
     MatIconModule,
     MatDialogModule,
     MatSelectModule,
+    MatTooltipModule,
     ResumenErroresComponent
   ],
   templateUrl: './formulario-anonimo.component.html',
@@ -146,10 +148,12 @@ export class FormularioAnonimoComponent {
   ];
 
   readonly listaSexual: MaestroDto[] = [
-    { id: 1, nombre: 'Acceso carnal' },
-    { id: 2, nombre: 'Acoso sexual' },
-    { id: 3, nombre: 'Actos sexuales' },
-    { id: 4, nombre: 'Violencia sexual correctiva' }
+    { id: 1, nombre: 'Acceso carnal violento' },
+    { id: 2, nombre: 'Acto sexual violento' },
+    { id: 3, nombre: 'Acoso sexual' },
+    { id: 4, nombre: 'Explotación sexual (inducción a la prostitución, proxenetismo con menor de edad, constreñimiento a la prostitución, trata de personas)' },
+    { id: 5, nombre: 'Violencia facilitada por nuevas tecnologías' },
+    { id: 6, nombre: 'Violencia sexual correctiva' }
   ];
 
   readonly listaInstitucional: MaestroDto[] = [
@@ -166,15 +170,62 @@ export class FormularioAnonimoComponent {
   ];
 
   readonly listaInformatica: MaestroDto[] = [
-    { id: 1, nombre: 'Chantaje sexual o extorsión sexual' },
+    { id: 1, nombre: 'Uso, explotación y trata mediante amenazas / extorsión' },
     { id: 2, nombre: 'Grooming' },
-    { id: 3, nombre: 'Pornografía' },
-    { id: 4, nombre: 'Sexting' },
+    { id: 3, nombre: 'Creación de contenido sin consentimiento' },
+    { id: 4, nombre: 'Sexting sin consentimiento' },
     { id: 5, nombre: 'Violación de datos personales' }
   ];
 
   readonly listaPrejuicio: MaestroDto[] = [
     { id: 1, nombre: 'Discriminación por género u orientación sexual o identidad de género' }
+  ];
+
+  readonly listaAmbitosOcurrencia: string[] = [
+    'Pareja / expareja',
+    'Laboral',
+    'Académico',
+    'Sindical',
+    'Político',
+    'Público',
+    'Privado',
+    'Familiar',
+    'Otro'
+  ];
+
+  readonly listaFormasOcurrencia: string[] = [
+    'Presencial',
+    'Virtual',
+    'Mixta'
+  ];
+
+  readonly listaDetalleMisional: string[] = [
+    'Misional Docencia',
+    'Misional Investigación',
+    'Misional Extensión',
+    'Actividades Institucionales',
+    'En representación de la U',
+    'En bienes inmuebles'
+  ];
+
+  readonly listaVinculosUniversidad: string[] = [
+    'Estudiante (Pregrado, Posgrado, Tecnología, Técnica)',
+    'Docente (Vinculado, Ocasional, Cátedra, Cátedra 50)',
+    'Personal no docente',
+    'Personal Directivo',
+    'Egresado(a)',
+    'Contratista / Proveedor',
+    'Persona Externa (Sin vínculo UdeA)',
+    'Se desconoce / No sabe',
+    'Otro'
+  ];
+
+  readonly listaVinculosVictima: string[] = [
+    'Pareja / Expareja',
+    'Familiar',
+    'Compañeros de estudio',
+    'Docente',
+    'Otro'
   ];
 
   psicologicaSel: number[] = [];
@@ -189,6 +240,7 @@ export class FormularioAnonimoComponent {
     'Estudiante',
     'Docente',
     'Personal Administrativo',
+    'Personal no docente',
     'Personal Directivo',
     'Contratista / Proveedor'
   ];
@@ -239,7 +291,16 @@ export class FormularioAnonimoComponent {
 
   get esVictimarioUdea(): boolean {
     const vinculo = this.formVictimario?.get('vinculoUniversidad')?.value;
-    return this.rolesUdeaVictimario.includes(vinculo);
+    if (!vinculo) {
+      return false;
+    }
+    return this.rolesUdeaVictimario.some(r => vinculo.toLowerCase().includes(r.toLowerCase())) ||
+           vinculo.includes('Estudiante') ||
+           vinculo.includes('Docente') ||
+           vinculo.includes('Personal no docente') ||
+           vinculo.includes('Personal Administrativo') ||
+           vinculo.includes('Personal Directivo') ||
+           vinculo.includes('Contratista');
   }
 
   get contactoRequeridoInvalido(): boolean {
@@ -333,6 +394,11 @@ export class FormularioAnonimoComponent {
       bloque: [''],
       espacio: [''],
       lugarDetalleExterno: [''],
+      ambitoOcurrencia: [''],
+      otroAmbitoOcurrencia: [''],
+      formaOcurrencia: [''],
+      relacionMisional: ['NO'],
+      detalleMisional: [''],
       fecha: ['', Validators.required],
       hora: [''],
       violenciaPsicologica: ['NO'],
@@ -368,12 +434,15 @@ export class FormularioAnonimoComponent {
       nombre: ['', [Validators.pattern(this.REGEX_LETRAS)]],
       apellidos: ['', [Validators.pattern(this.REGEX_LETRAS)]],
       vinculoUniversidad: [''],
+      otroVinculoUniversidad: [''],
+      vinculoVictima: [''],
+      otroVinculoVictima: [''],
       remitirUad: ['no'],
       correo: ['']
     });
 
-    this.formVictimario.get('vinculoUniversidad')?.valueChanges.subscribe(val => {
-      if (!this.rolesUdeaVictimario.includes(val)) {
+    this.formVictimario.get('vinculoUniversidad')?.valueChanges.subscribe(() => {
+      if (!this.esVictimarioUdea) {
         this.formVictimario.get('remitirUad')?.setValue('no');
       }
     });
@@ -430,13 +499,17 @@ export class FormularioAnonimoComponent {
            ((this.formRelato?.get('tipoVbg')?.value?.length ?? 0) > 0);
   }
 
+  intentoAvanzarRelato = false;
+
   get mostrarErrorTipoVbg(): boolean {
-    const ctrl = this.formRelato?.get('tipoVbg');
-    const fueTocado = !!(ctrl?.touched || ctrl?.dirty || this.formRelato?.touched);
-    return !this.tieneViolenciaSeleccionada && fueTocado;
+    if (this.tieneViolenciaSeleccionada) {
+      return false;
+    }
+    return this.intentoAvanzarRelato;
   }
 
   avanzarPasoRelato(stepper: MatStepper): void {
+    this.intentoAvanzarRelato = true;
     this.formRelato.markAllAsTouched();
     const tieneVbg = this.tieneViolenciaSeleccionada;
     const tipoVbgCtrl = this.formRelato.get('tipoVbg');
@@ -448,6 +521,7 @@ export class FormularioAnonimoComponent {
 
     if (this.formRelato.valid && tieneVbg) {
       this.erroresRelato = [];
+      this.intentoAvanzarRelato = false;
       stepper.next();
     } else {
       // Nueva referencia en cada intento para que el resumen recupere el foco.

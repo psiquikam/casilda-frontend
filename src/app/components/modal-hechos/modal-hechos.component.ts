@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { NativeDateAdapter, MAT_DATE_FORMATS, DateAdapter, MatNativeDateModule } from '@angular/material/core';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Injectable()
 export class HechoDateAdapter extends NativeDateAdapter {
@@ -56,7 +57,8 @@ export const HECHO_DATE_FORMATS = {
     MatButtonModule,
     MatIconModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    MatTooltipModule
 ],
     providers: [
         { provide: DateAdapter, useClass: HechoDateAdapter },

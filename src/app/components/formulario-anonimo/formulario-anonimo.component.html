@@ -72,63 +72,83 @@
           <div class="victim-form-card" formGroupName="victima">
             <h3>Información de la Víctima</h3>
             <div class="grid-form">
-              <mat-form-field appearance="outline">
-                <mat-label>Identificación (Si la conoce)</mat-label>
-                <input matInput formControlName="identificacion" inputmode="numeric" autocomplete="off">
-                <mat-hint>Solo números, entre 5 y 15 dígitos</mat-hint>
-                @if (formVictima.get('identificacion')?.hasError('pattern')) {
-                  <mat-error>Solo números (entre 5 y 15 dígitos)</mat-error>
-                }
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>Nombre *</mat-label>
-                <input matInput formControlName="nombre" autocomplete="given-name">
-                @if (formVictima.get('nombre')?.hasError('required')) {
-                  <mat-error>El nombre es obligatorio</mat-error>
-                } @else if (formVictima.get('nombre')?.hasError('minlength')) {
-                  <mat-error>Mínimo 2 caracteres</mat-error>
-                } @else if (formVictima.get('nombre')?.hasError('pattern')) {
-                  <mat-error>Solo debe contener letras</mat-error>
-                }
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>Apellidos</mat-label>
-                <input matInput formControlName="apellidos" autocomplete="family-name">
-                @if (formVictima.get('apellidos')?.hasError('pattern')) {
-                  <mat-error>Solo debe contener letras</mat-error>
-                }
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>Correo Electrónico</mat-label>
-                <input matInput formControlName="correo" type="email" placeholder="usuario@correo.com" autocomplete="email">
-                @if (formVictima.get('correo')?.hasError('email') || formVictima.get('correo')?.hasError('pattern')) {
-                  <mat-error>Ingrese un correo válido (ej: nombre@correo.com)</mat-error>
-                }
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>Género</mat-label>
-                <mat-select formControlName="genero">
-                  <mat-option value="Femenino">Femenino</mat-option>
-                  <mat-option value="Masculino">Masculino</mat-option>
-                  <mat-option value="No binario">No binario</mat-option>
-                  <mat-option value="Otro">Otro</mat-option>
-                  <mat-option value="Prefiero no decir">Prefiero no decir</mat-option>
-                </mat-select>
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>Vínculo con la Universidad *</mat-label>
-                <mat-select formControlName="cargo">
-                  <mat-option value="Estudiante">Estudiante</mat-option>
-                  <mat-option value="Docente">Docente</mat-option>
-                  <mat-option value="Administrativo">Administrativo</mat-option>
-                  <mat-option value="Egresado">Egresado(a)</mat-option>
-                  <mat-option value="Contratista">Contratista</mat-option>
-                  <mat-option value="Otro">Otro</mat-option>
-                </mat-select>
-                @if (formVictima.get('cargo')?.hasError('required')) {
-                  <mat-error>El vínculo con la universidad es obligatorio</mat-error>
-                }
-              </mat-form-field>
+              <div class="form-field-group">
+                <label class="form-field-label" for="victima-identificacion">Identificación</label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <input matInput formControlName="identificacion" id="victima-identificacion" inputmode="numeric" autocomplete="off" placeholder="Ej: 1020304050">
+                  @if (formVictima.get('identificacion')?.hasError('pattern')) {
+                    <mat-error>Solo números (entre 5 y 15 dígitos)</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              <div class="form-field-group">
+                <label class="form-field-label" for="victima-nombre">
+                  Nombre <span class="required-star">*</span>
+                </label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <input matInput formControlName="nombre" id="victima-nombre" autocomplete="given-name" placeholder="Ej: Juan">
+                  @if (formVictima.get('nombre')?.hasError('required')) {
+                    <mat-error>El nombre es obligatorio</mat-error>
+                  } @else if (formVictima.get('nombre')?.hasError('minlength')) {
+                    <mat-error>Mínimo 2 caracteres</mat-error>
+                  } @else if (formVictima.get('nombre')?.hasError('pattern')) {
+                    <mat-error>Solo debe contener letras</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              <div class="form-field-group">
+                <label class="form-field-label" for="victima-apellidos">Apellidos</label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <input matInput formControlName="apellidos" id="victima-apellidos" autocomplete="family-name" placeholder="Ej: Pérez">
+                  @if (formVictima.get('apellidos')?.hasError('pattern')) {
+                    <mat-error>Solo debe contener letras</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              <div class="form-field-group">
+                <label class="form-field-label" for="victima-correo">Correo Electrónico</label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <input matInput formControlName="correo" id="victima-correo" type="email" placeholder="usuario@correo.com" autocomplete="email">
+                  @if (formVictima.get('correo')?.hasError('email') || formVictima.get('correo')?.hasError('pattern')) {
+                    <mat-error>Ingrese un correo válido (ej: nombre@correo.com)</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              <div class="form-field-group">
+                <label class="form-field-label" for="victima-genero">Género</label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-select formControlName="genero" id="victima-genero" placeholder="Seleccione el género">
+                    <mat-option value="Femenino">Femenino</mat-option>
+                    <mat-option value="Masculino">Masculino</mat-option>
+                    <mat-option value="No binario">No binario</mat-option>
+                    <mat-option value="Otro">Otro</mat-option>
+                    <mat-option value="Prefiero no decir">Prefiero no decir</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div class="form-field-group">
+                <label class="form-field-label" for="victima-cargo">
+                  Vínculo con la Universidad <span class="required-star">*</span>
+                </label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-select formControlName="cargo" id="victima-cargo" placeholder="Seleccione el vínculo">
+                    <mat-option value="Estudiante">Estudiante</mat-option>
+                    <mat-option value="Docente">Docente</mat-option>
+                    <mat-option value="Administrativo">Administrativo</mat-option>
+                    <mat-option value="Egresado">Egresado(a)</mat-option>
+                    <mat-option value="Contratista">Contratista</mat-option>
+                    <mat-option value="Otro">Otro</mat-option>
+                  </mat-select>
+                  @if (formVictima.get('cargo')?.hasError('required')) {
+                    <mat-error>El vínculo con la universidad es obligatorio</mat-error>
+                  }
+                </mat-form-field>
+              </div>
             </div>
           </div>
         }
@@ -166,14 +186,16 @@
                 </div>
 
                 <div class="grid-form single-field">
-                  <mat-form-field appearance="outline">
-                    <mat-label>WhatsApp / Teléfono (Opcional)</mat-label>
-                    <input matInput formControlName="whatsappContacto" type="tel" inputmode="numeric" autocomplete="off">
-                    <mat-hint>Solo números, sin espacios (entre 7 y 12 dígitos)</mat-hint>
-                    @if (formPerfil.get('whatsappContacto')?.hasError('pattern')) {
-                      <mat-error>El número debe contener entre 7 y 12 dígitos</mat-error>
-                    }
-                  </mat-form-field>
+                  <div class="form-field-group">
+                    <label class="form-field-label" for="perfil-whatsapp-solo">WhatsApp / Teléfono</label>
+                    <mat-form-field appearance="outline" class="full-width">
+                      <input matInput formControlName="whatsappContacto" id="perfil-whatsapp-solo" type="tel" inputmode="numeric" autocomplete="off" placeholder="Ej: 3001234567">
+                      <mat-hint>Solo números, sin espacios (entre 7 y 12 dígitos)</mat-hint>
+                      @if (formPerfil.get('whatsappContacto')?.hasError('pattern')) {
+                        <mat-error>El número debe contener entre 7 y 12 dígitos</mat-error>
+                      }
+                    </mat-form-field>
+                  </div>
                 </div>
               } @else {
                 <div class="contact-instruction">
@@ -181,21 +203,25 @@
                   <span>Para poder continuar debe ingresar al menos uno de los dos medios de contacto (correo electrónico o WhatsApp / teléfono).</span>
                 </div>
                 <div class="grid-form">
-                  <mat-form-field appearance="outline">
-                    <mat-label>Correo Electrónico</mat-label>
-                    <input matInput formControlName="correoContacto" type="email" placeholder="ejemplo@correo.com" autocomplete="off">
-                    @if (formPerfil.get('correoContacto')?.hasError('email') || formPerfil.get('correoContacto')?.hasError('pattern')) {
-                      <mat-error>Ingrese un correo válido (ej: nombre@correo.com)</mat-error>
-                    }
-                  </mat-form-field>
-                  <mat-form-field appearance="outline">
-                    <mat-label>WhatsApp / Teléfono</mat-label>
-                    <input matInput formControlName="whatsappContacto" type="tel" inputmode="numeric" autocomplete="off">
-                    <mat-hint>Solo números, sin espacios (entre 7 y 12 dígitos)</mat-hint>
-                    @if (formPerfil.get('whatsappContacto')?.hasError('pattern')) {
-                      <mat-error>El número debe contener entre 7 y 12 dígitos</mat-error>
-                    }
-                  </mat-form-field>
+                  <div class="form-field-group">
+                    <label class="form-field-label" for="perfil-correoContacto">Correo Electrónico</label>
+                    <mat-form-field appearance="outline" class="full-width">
+                      <input matInput formControlName="correoContacto" id="perfil-correoContacto" type="email" placeholder="ejemplo@correo.com" autocomplete="off">
+                      @if (formPerfil.get('correoContacto')?.hasError('email') || formPerfil.get('correoContacto')?.hasError('pattern')) {
+                        <mat-error>Ingrese un correo válido (ej: nombre@correo.com)</mat-error>
+                      }
+                    </mat-form-field>
+                  </div>
+                  <div class="form-field-group">
+                    <label class="form-field-label" for="perfil-whatsappContacto">WhatsApp / Teléfono</label>
+                    <mat-form-field appearance="outline" class="full-width">
+                      <input matInput formControlName="whatsappContacto" id="perfil-whatsappContacto" type="tel" inputmode="numeric" autocomplete="off" placeholder="Ej: 3001234567">
+                      <mat-hint>Solo números, sin espacios (entre 7 y 12 dígitos)</mat-hint>
+                      @if (formPerfil.get('whatsappContacto')?.hasError('pattern')) {
+                        <mat-error>El número debe contener entre 7 y 12 dígitos</mat-error>
+                      }
+                    </mat-form-field>
+                  </div>
                 </div>
                 @if (contactoRequeridoInvalido && (formPerfil.get('correoContacto')?.touched || formPerfil.get('whatsappContacto')?.touched || formPerfil.dirty)) {
                   <div class="contact-error-badge">
@@ -231,7 +257,7 @@
 
         <!-- 1. Lugar de Ocurrencia (Interno / Externo) -->
         <div class="lugar-section">
-          <h2>Lugar de ocurrencia</h2>
+          <h3 class="form-section-title">Lugar de ocurrencia</h3>
           <p class="selector-subtitle">Indique si la situación ocurrió dentro de las instalaciones universitarias o en un espacio externo:</p>
 
           <mat-radio-group formControlName="tipoLugar" class="location-radios">
@@ -252,71 +278,226 @@
           @if (formRelato.get('tipoLugar')?.value === 'interno') {
             <div class="location-details-box">
               <div class="grid-form">
-                <mat-form-field appearance="outline">
-                  <mat-label>Campus *</mat-label>
-                  <mat-select formControlName="sedeCampus" id="relato-sedeCampus">
-                    @for (c of campusOptions; track c) {
-                      <mat-option [value]="c">{{ c }}</mat-option>
+                <div class="form-field-group">
+                  <label class="form-field-label" for="relato-sedeCampus">
+                    Campus <span class="required-star">*</span>
+                  </label>
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-select formControlName="sedeCampus" id="relato-sedeCampus" placeholder="Seleccione un campus">
+                      @for (c of campusOptions; track c) {
+                        <mat-option [value]="c">{{ c }}</mat-option>
+                      }
+                    </mat-select>
+                    @if (formRelato.get('sedeCampus')?.hasError('required')) {
+                      <mat-error>Debe seleccionar un campus</mat-error>
                     }
-                  </mat-select>
-                  @if (formRelato.get('sedeCampus')?.hasError('required')) {
-                    <mat-error>Debe seleccionar un campus</mat-error>
-                  }
-                </mat-form-field>
+                  </mat-form-field>
+                </div>
 
-                <mat-form-field appearance="outline">
-                  <mat-label>Facultad (Opcional)</mat-label>
-                  <input matInput formControlName="facultad" placeholder="Ej: Facultad de Medicina, Ingeniería, etc.">
-                </mat-form-field>
+                <div class="form-field-group">
+                  <label class="form-field-label" for="relato-facultad">Facultad</label>
+                  <mat-form-field appearance="outline" class="full-width">
+                    <input matInput formControlName="facultad" id="relato-facultad" placeholder="Ej: Facultad de Medicina, Ingeniería, etc.">
+                  </mat-form-field>
+                </div>
 
-                <mat-form-field appearance="outline">
-                  <mat-label>Bloque (Opcional)</mat-label>
-                  <input matInput formControlName="bloque" placeholder="Ej: Bloque 12, Bloque 22, etc.">
-                </mat-form-field>
+                <div class="form-field-group">
+                  <label class="form-field-label" for="relato-bloque">Bloque</label>
+                  <mat-form-field appearance="outline" class="full-width">
+                    <input matInput formControlName="bloque" id="relato-bloque" placeholder="Ej: Bloque 12, Bloque 22, etc.">
+                  </mat-form-field>
+                </div>
 
-                <mat-form-field appearance="outline">
-                  <mat-label>Espacio específico (Opcional)</mat-label>
-                  <input matInput formControlName="espacio" placeholder="Ej: Aula 201, Cafetería central, Coliseo, etc.">
-                </mat-form-field>
+                <div class="form-field-group">
+                  <label class="form-field-label" for="relato-espacio">Espacio específico</label>
+                  <mat-form-field appearance="outline" class="full-width">
+                    <input matInput formControlName="espacio" id="relato-espacio" placeholder="Ej: Aula 201, Cafetería central, Coliseo, etc.">
+                  </mat-form-field>
+                </div>
+
+                <div class="form-field-group">
+                  <label class="form-field-label" for="relato-ambitoOcurrencia">
+                    Ámbito de Ocurrencia
+                    <button type="button"
+                            class="help-tooltip-trigger"
+                            matTooltip="Contexto o espacio de relación social, laboral, académica o comunitaria en el cual se presentaron los hechos."
+                            matTooltipClass="casilda-help-tooltip"
+                            (click)="$event.stopPropagation()"
+                            aria-label="Ayuda sobre ámbito de ocurrencia">?</button>
+                  </label>
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-select formControlName="ambitoOcurrencia" id="relato-ambitoOcurrencia" placeholder="Seleccione el ámbito">
+                      @for (amb of listaAmbitosOcurrencia; track amb) {
+                        <mat-option [value]="amb">{{ amb }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-field-group">
+                  <label class="form-field-label" for="relato-formaOcurrencia">
+                    Forma de Ocurrencia
+                    <button type="button"
+                            class="help-tooltip-trigger"
+                            matTooltip="Modalidad en la que se manifestaron los hechos: Presencial, Virtual o Mixta."
+                            matTooltipClass="casilda-help-tooltip"
+                            (click)="$event.stopPropagation()"
+                            aria-label="Ayuda sobre forma de ocurrencia">?</button>
+                  </label>
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-select formControlName="formaOcurrencia" id="relato-formaOcurrencia" placeholder="Seleccione la forma">
+                      @for (fo of listaFormasOcurrencia; track fo) {
+                        <mat-option [value]="fo">{{ fo }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                @if (formRelato.get('ambitoOcurrencia')?.value === 'Otro') {
+                  <div class="form-field-group full-width-cell">
+                    <label class="form-field-label" for="relato-otroAmbito">¿Cuál ámbito?</label>
+                    <mat-form-field appearance="outline" class="full-width">
+                      <input matInput formControlName="otroAmbitoOcurrencia" id="relato-otroAmbito" placeholder="Especifique el ámbito de ocurrencia">
+                    </mat-form-field>
+                  </div>
+                }
               </div>
             </div>
           } @else {
             <div class="location-details-box">
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Descripción del lugar externo *</mat-label>
-                <input matInput formControlName="lugarDetalleExterno" id="relato-lugarDetalleExterno" placeholder="Ej: Vía pública cerca al campus, entorno virtual / redes sociales, residencia, etc.">
-                @if (formRelato.get('lugarDetalleExterno')?.hasError('required')) {
-                  <mat-error>Debe indicar la descripción del lugar externo</mat-error>
+              <div class="grid-form">
+                <div class="form-field-group full-width-cell">
+                  <label class="form-field-label" for="relato-lugarDetalleExterno">
+                    Descripción del lugar externo <span class="required-star">*</span>
+                    <button type="button"
+                            class="help-tooltip-trigger"
+                            matTooltip="Indique detalles o referencias que faciliten individualizar el sitio o plataforma externa."
+                            matTooltipClass="casilda-help-tooltip"
+                            (click)="$event.stopPropagation()"
+                            aria-label="Ayuda sobre lugar externo">?</button>
+                  </label>
+                  <mat-form-field appearance="outline" class="full-width">
+                    <input matInput formControlName="lugarDetalleExterno" id="relato-lugarDetalleExterno" placeholder="Ej: Vía pública cerca al campus, entorno virtual / redes sociales, residencia, etc.">
+                    @if (formRelato.get('lugarDetalleExterno')?.hasError('required')) {
+                      <mat-error>Debe indicar la descripción del lugar externo</mat-error>
+                    }
+                  </mat-form-field>
+                </div>
+
+                <div class="form-field-group">
+                  <label class="form-field-label" for="relato-ambitoOcurrenciaExt">
+                    Ámbito de Ocurrencia
+                    <button type="button"
+                            class="help-tooltip-trigger"
+                            matTooltip="Contexto o espacio de relación social, laboral, académica o comunitaria en el cual se presentaron los hechos."
+                            matTooltipClass="casilda-help-tooltip"
+                            (click)="$event.stopPropagation()"
+                            aria-label="Ayuda sobre ámbito de ocurrencia">?</button>
+                  </label>
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-select formControlName="ambitoOcurrencia" id="relato-ambitoOcurrenciaExt" placeholder="Seleccione el ámbito">
+                      @for (amb of listaAmbitosOcurrencia; track amb) {
+                        <mat-option [value]="amb">{{ amb }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-field-group">
+                  <label class="form-field-label" for="relato-formaOcurrenciaExt">
+                    Forma de Ocurrencia
+                    <button type="button"
+                            class="help-tooltip-trigger"
+                            matTooltip="Modalidad en la que se manifestaron los hechos: Presencial, Virtual o Mixta."
+                            matTooltipClass="casilda-help-tooltip"
+                            (click)="$event.stopPropagation()"
+                            aria-label="Ayuda sobre forma de ocurrencia">?</button>
+                  </label>
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-select formControlName="formaOcurrencia" id="relato-formaOcurrenciaExt" placeholder="Seleccione la forma">
+                      @for (fo of listaFormasOcurrencia; track fo) {
+                        <mat-option [value]="fo">{{ fo }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                @if (formRelato.get('ambitoOcurrencia')?.value === 'Otro') {
+                  <div class="form-field-group full-width-cell">
+                    <label class="form-field-label" for="relato-otroAmbitoExt">¿Cuál ámbito?</label>
+                    <mat-form-field appearance="outline" class="full-width">
+                      <input matInput formControlName="otroAmbitoOcurrencia" id="relato-otroAmbitoExt" placeholder="Especifique el ámbito de ocurrencia">
+                    </mat-form-field>
+                  </div>
                 }
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- 2. Relación Misional / Institucional -->
+        <div class="misional-section">
+          <h3 class="form-section-title">Relación Misional / Institucional</h3>
+          <p class="selector-subtitle">¿La situación ocurrió en el marco de actividades misionales o institucionales de la Universidad?</p>
+
+          <mat-radio-group formControlName="relacionMisional" class="misional-compact-radios">
+            <mat-radio-button value="SI">
+              <strong>Sí</strong> (Docencia, investigación, extensión, eventos o predios UdeA)
+            </mat-radio-button>
+            <mat-radio-button value="NO">
+              <strong>No</strong> (Ámbito privado o sin relación universitaria)
+            </mat-radio-button>
+          </mat-radio-group>
+
+          @if (formRelato.get('relacionMisional')?.value === 'SI') {
+            <div class="form-field-group misional-detail-field">
+              <label class="form-field-label" for="relato-detalleMisional">
+                Detalle de Actividad Misional / Institucional
+                <button type="button"
+                        class="help-tooltip-trigger"
+                        matTooltip="Seleccione la categoría estatutaria aplicable a la actividad misional o institucional."
+                        matTooltipClass="casilda-help-tooltip"
+                        (click)="$event.stopPropagation()"
+                        aria-label="Ayuda sobre actividad misional">?</button>
+              </label>
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-select formControlName="detalleMisional" id="relato-detalleMisional" placeholder="Seleccione actividad misional o institucional">
+                  @for (item of listaDetalleMisional; track item) {
+                    <mat-option [value]="item">{{ item }}</mat-option>
+                  }
+                </mat-select>
               </mat-form-field>
             </div>
           }
         </div>
 
-        <!-- 2. Fecha y Hora separadas con aclaración -->
+        <!-- 3. Fecha y Hora separadas con aclaración -->
         <div class="datetime-section">
-          <h2>Fecha y hora</h2>
-
-          <div class="alert-clarification">
-            <mat-icon aria-hidden="true">info</mat-icon>
-            <div class="clarification-content">
-              <span class="clarification-title">Aclaración sobre la fecha y hora:</span>
-              <p class="clarification-text">
-                En caso de haber ocurrido en múltiples ocasiones, indique la fecha y hora de la <strong>última situación o de la más grave</strong>. Si no las conoce con exactitud, puede ingresar un dato aproximado o indicar <em>"Se desconoce"</em> o <em>"N/A"</em>.
-              </p>
-            </div>
+          <div class="section-title-with-tooltip">
+            <h3 class="form-section-title">
+              Fecha y hora
+              <button type="button"
+                      class="help-tooltip-trigger"
+                      matTooltip="Si ocurrió en varias ocasiones, indique la fecha y hora de la última o de la más grave. Si no las conoce con exactitud, ingrese datos aproximados o 'Se desconoce / N/A'."
+                      matTooltipClass="casilda-help-tooltip"
+                      (click)="$event.stopPropagation()"
+                      aria-label="Ayuda sobre fecha y hora">?</button>
+            </h3>
           </div>
 
           <div class="grid-date-time">
             <div class="datetime-col">
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Fecha de los hechos *</mat-label>
-                <input matInput formControlName="fecha" id="relato-fecha" autocomplete="off">
-                <mat-hint>Formato DD/MM/AAAA; puede ser aproximada o «Se desconoce»</mat-hint>
-                @if (formRelato.get('fecha')?.hasError('required')) {
-                  <mat-error>La fecha es obligatoria</mat-error>
-                }
-              </mat-form-field>
+              <div class="form-field-group">
+                <label class="form-field-label" for="relato-fecha">
+                  Fecha de los hechos <span class="required-star">*</span>
+                </label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <input matInput formControlName="fecha" id="relato-fecha" placeholder="DD/MM/AAAA" autocomplete="off">
+                  @if (formRelato.get('fecha')?.hasError('required')) {
+                    <mat-error>La fecha es obligatoria</mat-error>
+                  }
+                </mat-form-field>
+              </div>
               <div class="quick-helpers">
                 <button type="button" mat-stroked-button class="quick-btn" (click)="setFechaRapida('Hoy')">Hoy</button>
                 <button type="button" mat-stroked-button class="quick-btn" (click)="setFechaRapida('Esta semana')">Esta semana</button>
@@ -325,11 +506,14 @@
             </div>
 
             <div class="datetime-col">
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Hora aproximada (Opcional)</mat-label>
-                <input matInput formControlName="hora" autocomplete="off">
-              <mat-hint>Formato HH:MM (ej. 15:30), «Tarde» o «Se desconoce»</mat-hint>
-              </mat-form-field>
+              <div class="form-field-group">
+                <label class="form-field-label" for="relato-hora">
+                  Hora aproximada
+                </label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <input matInput formControlName="hora" id="relato-hora" placeholder="HH:MM (ej. 15:30) o franja horaria" autocomplete="off">
+                </mat-form-field>
+              </div>
               <div class="quick-helpers">
                 <button type="button" mat-stroked-button class="quick-btn" (click)="setHoraRapida('En la mañana')">En la mañana</button>
                 <button type="button" mat-stroked-button class="quick-btn" (click)="setHoraRapida('En la tarde')">En la tarde</button>
@@ -339,14 +523,11 @@
           </div>
         </div>
 
-        <!-- 3. Tipos y Modalidades de Violencia de Género -->
+        <!-- 3. Tipos y Modalidades de Violencia -->
         <div class="vbg-section" id="relato-tipoVbg" tabindex="-1" [class.vbg-section--has-error]="mostrarErrorTipoVbg">
           <div class="vbg-section-header">
             <div class="vbg-title-row">
-              <h3>Tipos y modalidades de violencia de género *</h3>
-              @if (mostrarErrorTipoVbg) {
-                <span class="vbg-required-badge">Selección obligatoria</span>
-              }
+              <h3 class="form-section-title">Tipos y modalidades de violencia <span class="required-star">*</span></h3>
             </div>
             <p class="vbg-section-subtitle">
               Selecciona directamente las etiquetas o situaciones que describan lo ocurrido. Puedes elegir varias opciones.
@@ -355,16 +536,24 @@
             @if (mostrarErrorTipoVbg) {
               <div class="vbg-error-alert" role="alert">
                 <mat-icon aria-hidden="true">error</mat-icon>
-                <span>Debe seleccionar al menos un tipo o modalidad de violencia de género para continuar.</span>
+                <span>Debe seleccionar al menos un tipo o modalidad de violencia para continuar.</span>
               </div>
             }
           </div>
 
-          <div class="vbg-masonry">
+          <div class="vbg-grid">
             <!-- 1. Violencia Psicológica -->
             <div class="vbg-card" [class.vbg-card--has-selection]="psicologicaSel.length > 0">
               <div class="vbg-card-header">
-                <span class="vbg-card-title">Tipo de violencia psicológica</span>
+                <div class="vbg-card-title-wrap">
+                  <span class="vbg-card-title">Violencia Psicológica</span>
+                  <button type="button"
+                          class="help-tooltip-trigger"
+                          matTooltip="Conductas directas o indirectas destinadas a degradar, controlar, intimidar o humillar."
+                          matTooltipClass="casilda-help-tooltip"
+                          (click)="$event.stopPropagation()"
+                          aria-label="Ayuda sobre violencia psicológica">?</button>
+                </div>
                 @if (psicologicaSel.length > 0) {
                   <span class="vbg-card-badge">{{ psicologicaSel.length }}</span>
                 }
@@ -385,34 +574,18 @@
               </div>
             </div>
 
-            <!-- 2. Violencia Económica/Patrimonial -->
-            <div class="vbg-card" [class.vbg-card--has-selection]="economicaSel.length > 0">
-              <div class="vbg-card-header">
-                <span class="vbg-card-title">Tipo de violencia económica/Patrimonial</span>
-                @if (economicaSel.length > 0) {
-                  <span class="vbg-card-badge">{{ economicaSel.length }}</span>
-                }
-              </div>
-              <div class="vbg-chips-wrap">
-                @for (c of listaPatrimonial; track c.id) {
-                  <button type="button"
-                          class="vbg-chip"
-                          [class.selected]="isModalidadSeleccionada(c.id, 'economicaSel')"
-                          (click)="toggleModalidad(c.id, 'economicaSel')"
-                          [attr.aria-pressed]="isModalidadSeleccionada(c.id, 'economicaSel')">
-                    @if (isModalidadSeleccionada(c.id, 'economicaSel')) {
-                      <mat-icon aria-hidden="true" class="chip-check-icon">check</mat-icon>
-                    }
-                    <span>{{ c.nombre }}</span>
-                  </button>
-                }
-              </div>
-            </div>
-
-            <!-- 3. Violencia Física -->
+            <!-- 2. Violencia Física -->
             <div class="vbg-card" [class.vbg-card--has-selection]="fisicaSel.length > 0">
               <div class="vbg-card-header">
-                <span class="vbg-card-title">Tipo de violencia física</span>
+                <div class="vbg-card-title-wrap">
+                  <span class="vbg-card-title">Violencia Física</span>
+                  <button type="button"
+                          class="help-tooltip-trigger"
+                          matTooltip="Acciones o conductas que causan daño o sufrimiento físico, agresión o lesiones corporales."
+                          matTooltipClass="casilda-help-tooltip"
+                          (click)="$event.stopPropagation()"
+                          aria-label="Ayuda sobre violencia física">?</button>
+                </div>
                 @if (fisicaSel.length > 0) {
                   <span class="vbg-card-badge">{{ fisicaSel.length }}</span>
                 }
@@ -433,34 +606,18 @@
               </div>
             </div>
 
-            <!-- 4. Violencia Institucional -->
-            <div class="vbg-card" [class.vbg-card--has-selection]="institucionalSel.length > 0">
-              <div class="vbg-card-header">
-                <span class="vbg-card-title">Tipo de violencia Institucional</span>
-                @if (institucionalSel.length > 0) {
-                  <span class="vbg-card-badge">{{ institucionalSel.length }}</span>
-                }
-              </div>
-              <div class="vbg-chips-wrap">
-                @for (c of listaInstitucional; track c.id) {
-                  <button type="button"
-                          class="vbg-chip"
-                          [class.selected]="isModalidadSeleccionada(c.id, 'institucionalSel')"
-                          (click)="toggleModalidad(c.id, 'institucionalSel')"
-                          [attr.aria-pressed]="isModalidadSeleccionada(c.id, 'institucionalSel')">
-                    @if (isModalidadSeleccionada(c.id, 'institucionalSel')) {
-                      <mat-icon aria-hidden="true" class="chip-check-icon">check</mat-icon>
-                    }
-                    <span>{{ c.nombre }}</span>
-                  </button>
-                }
-              </div>
-            </div>
-
-            <!-- 5. Violencia Sexual -->
+            <!-- 3. Violencia Sexual -->
             <div class="vbg-card" [class.vbg-card--has-selection]="sexualSel.length > 0">
               <div class="vbg-card-header">
-                <span class="vbg-card-title">Tipo de violencia sexual</span>
+                <div class="vbg-card-title-wrap">
+                  <span class="vbg-card-title">Violencia Sexual</span>
+                  <button type="button"
+                          class="help-tooltip-trigger"
+                          matTooltip="Cualquier acto sexual, tentativa de consumarlo u otros actos dirigidos contra la sexualidad de una persona sin su consentimiento libre y explícito."
+                          matTooltipClass="casilda-help-tooltip"
+                          (click)="$event.stopPropagation()"
+                          aria-label="Ayuda sobre violencia sexual">?</button>
+                </div>
                 @if (sexualSel.length > 0) {
                   <span class="vbg-card-badge">{{ sexualSel.length }}</span>
                 }
@@ -481,10 +638,82 @@
               </div>
             </div>
 
-            <!-- 6. Violencia Sexual Informática -->
+            <!-- 4. Violencia Patrimonial -->
+            <div class="vbg-card" [class.vbg-card--has-selection]="economicaSel.length > 0">
+              <div class="vbg-card-header">
+                <div class="vbg-card-title-wrap">
+                  <span class="vbg-card-title">Violencia Patrimonial</span>
+                  <button type="button"
+                          class="help-tooltip-trigger"
+                          matTooltip="Acciones u omisiones que afectan la supervivencia económica o los recursos, bienes o derechos patrimoniales."
+                          matTooltipClass="casilda-help-tooltip"
+                          (click)="$event.stopPropagation()"
+                          aria-label="Ayuda sobre violencia patrimonial">?</button>
+                </div>
+                @if (economicaSel.length > 0) {
+                  <span class="vbg-card-badge">{{ economicaSel.length }}</span>
+                }
+              </div>
+              <div class="vbg-chips-wrap">
+                @for (c of listaPatrimonial; track c.id) {
+                  <button type="button"
+                          class="vbg-chip"
+                          [class.selected]="isModalidadSeleccionada(c.id, 'economicaSel')"
+                          (click)="toggleModalidad(c.id, 'economicaSel')"
+                          [attr.aria-pressed]="isModalidadSeleccionada(c.id, 'economicaSel')">
+                    @if (isModalidadSeleccionada(c.id, 'economicaSel')) {
+                      <mat-icon aria-hidden="true" class="chip-check-icon">check</mat-icon>
+                    }
+                    <span>{{ c.nombre }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- 5. Violencia Institucional -->
+            <div class="vbg-card" [class.vbg-card--has-selection]="institucionalSel.length > 0">
+              <div class="vbg-card-header">
+                <div class="vbg-card-title-wrap">
+                  <span class="vbg-card-title">Violencia Institucional</span>
+                  <button type="button"
+                          class="help-tooltip-trigger"
+                          matTooltip="Acciones u omisiones de instancias o servidores universitarios que dilatan, revictimizan o vulneran los derechos."
+                          matTooltipClass="casilda-help-tooltip"
+                          (click)="$event.stopPropagation()"
+                          aria-label="Ayuda sobre violencia institucional">?</button>
+                </div>
+                @if (institucionalSel.length > 0) {
+                  <span class="vbg-card-badge">{{ institucionalSel.length }}</span>
+                }
+              </div>
+              <div class="vbg-chips-wrap">
+                @for (c of listaInstitucional; track c.id) {
+                  <button type="button"
+                          class="vbg-chip"
+                          [class.selected]="isModalidadSeleccionada(c.id, 'institucionalSel')"
+                          (click)="toggleModalidad(c.id, 'institucionalSel')"
+                          [attr.aria-pressed]="isModalidadSeleccionada(c.id, 'institucionalSel')">
+                    @if (isModalidadSeleccionada(c.id, 'institucionalSel')) {
+                      <mat-icon aria-hidden="true" class="chip-check-icon">check</mat-icon>
+                    }
+                    <span>{{ c.nombre }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- 6. Violencia Digital / Informática -->
             <div class="vbg-card" [class.vbg-card--has-selection]="informaticaSel.length > 0">
               <div class="vbg-card-header">
-                <span class="vbg-card-title">Tipo de violencia sexual informática</span>
+                <div class="vbg-card-title-wrap">
+                  <span class="vbg-card-title">Violencia Digital / Informática</span>
+                  <button type="button"
+                          class="help-tooltip-trigger"
+                          matTooltip="Actos cometidos o facilitados por medios digitales, tecnologías de información y redes sociales (grooming, sexting sin consentimiento, violación de datos personales, etc.)."
+                          matTooltipClass="casilda-help-tooltip"
+                          (click)="$event.stopPropagation()"
+                          aria-label="Ayuda sobre violencia digital e informática">?</button>
+                </div>
                 @if (informaticaSel.length > 0) {
                   <span class="vbg-card-badge">{{ informaticaSel.length }}</span>
                 }
@@ -505,10 +734,18 @@
               </div>
             </div>
 
-            <!-- 7. Violencia por Prejuicio -->
-            <div class="vbg-card" [class.vbg-card--has-selection]="prejuicioSel.length > 0">
+            <!-- 7. Violencia por Prejuicio (Fila inferior completa) -->
+            <div class="vbg-card vbg-card--full" [class.vbg-card--has-selection]="prejuicioSel.length > 0">
               <div class="vbg-card-header">
-                <span class="vbg-card-title">Tipo de violencia por prejuicio</span>
+                <div class="vbg-card-title-wrap">
+                  <span class="vbg-card-title">Violencia por Prejuicio</span>
+                  <button type="button"
+                          class="help-tooltip-trigger"
+                          matTooltip="Violencia o discriminación motivada por prejuicio hacia la orientación sexual, identidad o expresión de género."
+                          matTooltipClass="casilda-help-tooltip"
+                          (click)="$event.stopPropagation()"
+                          aria-label="Ayuda sobre violencia por prejuicio">?</button>
+                </div>
                 @if (prejuicioSel.length > 0) {
                   <span class="vbg-card-badge">{{ prejuicioSel.length }}</span>
                 }
@@ -529,24 +766,33 @@
               </div>
             </div>
           </div>
-
-          @if (mostrarErrorTipoVbg) {
-            <div class="vbg-error-alert bottom-alert" role="alert">
-              <mat-icon aria-hidden="true">error</mat-icon>
-              <span>Debe seleccionar al menos una de las opciones de violencia de género arriba para poder continuar.</span>
-            </div>
-          }
         </div>
 
-        <!-- 4. Descripción del Caso -->
+        <!-- 4. Descripción de los hechos -->
         <div class="description-section">
-          <mat-form-field appearance="outline" class="full-width compact-desc-field">
-            <mat-label>Descripción de los hechos (Opcional)</mat-label>
-            <textarea matInput formControlName="descripcion" id="relato-descripcion" rows="3" placeholder="Si lo deseas, puedes darnos más detalles aquí..."></textarea>
-            @if (formRelato.get('descripcion')?.hasError('minlength')) {
-              <mat-error>Mínimo 20 caracteres si decides detallar los hechos (actual: {{ formRelato.get('descripcion')?.value?.trim()?.length || 0 }})</mat-error>
-            }
-          </mat-form-field>
+          <div class="section-title-with-tooltip">
+            <h3 class="form-section-title">
+              Descripción de los hechos
+              <button type="button"
+                      class="help-tooltip-trigger"
+                      matTooltip="Campo de redacción libre y confidencial para detallar los hechos en orden cronológico o según los recuerde."
+                      matTooltipClass="casilda-help-tooltip"
+                      (click)="$event.stopPropagation()"
+                      aria-label="Ayuda sobre descripción de los hechos">?</button>
+            </h3>
+          </div>
+          <p class="selector-subtitle">Describa libremente la situación, indicando circunstancias de tiempo, modo y lugar si las recuerda:</p>
+
+          <div class="form-field-group">
+            <label class="visually-hidden" for="relato-descripcion">Descripción de los hechos</label>
+
+            <mat-form-field appearance="outline" class="full-width compact-desc-field">
+              <textarea matInput formControlName="descripcion" id="relato-descripcion" rows="3" placeholder="Si lo deseas, puedes darnos más detalles aquí..."></textarea>
+              @if (formRelato.get('descripcion')?.hasError('minlength')) {
+                <mat-error>Mínimo 20 caracteres si decides detallar los hechos (actual: {{ formRelato.get('descripcion')?.value?.trim()?.length || 0 }})</mat-error>
+              }
+            </mat-form-field>
+          </div>
         </div>
 
         <div class="actions">
@@ -561,48 +807,116 @@
       <form [formGroup]="formVictimario" class="step-body">
         <ng-template matStepLabel>Victimario</ng-template>
         <h2>Datos del presunto agresor / victimario</h2>
-        <p class="selector-subtitle">Si conoce información del presunto agresor o persona señalada, regístrela a continuación (opcional):</p>
+        <p class="selector-subtitle">Si conoce información del presunto agresor o persona señalada, regístrela a continuación:</p>
         <div class="grid-form">
-          <mat-form-field appearance="outline">
-            <mat-label>Identificación (Si la conoce)</mat-label>
-            <input matInput formControlName="identificacion" inputmode="numeric" autocomplete="off">
-            <mat-hint>Solo números, entre 5 y 15 dígitos</mat-hint>
-            @if (formVictimario.get('identificacion')?.hasError('pattern')) {
-              <mat-error>Solo números (entre 5 y 15 dígitos)</mat-error>
-            }
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Nombre</mat-label>
-            <input matInput formControlName="nombre" autocomplete="off">
-            @if (formVictimario.get('nombre')?.hasError('pattern')) {
-              <mat-error>Solo debe contener letras</mat-error>
-            }
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Apellidos</mat-label>
-            <input matInput formControlName="apellidos" autocomplete="off">
-            @if (formVictimario.get('apellidos')?.hasError('pattern')) {
-              <mat-error>Solo debe contener letras</mat-error>
-            }
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Vínculo o enlace con la Universidad</mat-label>
-            <mat-select formControlName="vinculoUniversidad">
-              <mat-option value="Estudiante">Estudiante</mat-option>
-              <mat-option value="Docente">Docente</mat-option>
-              <mat-option value="Personal Administrativo">Personal Administrativo</mat-option>
-              <mat-option value="Personal Directivo">Personal Directivo</mat-option>
-              <mat-option value="Egresado(a)">Egresado(a)</mat-option>
-              <mat-option value="Contratista / Proveedor">Contratista / Proveedor</mat-option>
-              <mat-option value="Persona Externa">Persona Externa (Sin vínculo UdeA)</mat-option>
-              <mat-option value="Se desconoce / No sabe">Se desconoce / No sabe</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <mat-form-field appearance="outline" class="full-width-cell">
-            <mat-label>Correo o Información Adicional</mat-label>
-            <input matInput formControlName="correo" autocomplete="off">
-          <mat-hint>Correo electrónico, dependencia donde labora u otros datos que ayuden a identificarle</mat-hint>
-          </mat-form-field>
+          <div class="form-field-group">
+            <label class="form-field-label" for="victimario-identificacion">
+              Identificación
+              <button type="button"
+                      class="help-tooltip-trigger"
+                      matTooltip="Documento de identidad si lo conoce (cédula, TI, etc.). Solo números entre 5 y 15 dígitos."
+                      matTooltipClass="casilda-help-tooltip"
+                      (click)="$event.stopPropagation()"
+                      aria-label="Ayuda sobre identificación del agresor">?</button>
+            </label>
+            <mat-form-field appearance="outline" class="full-width">
+              <input matInput formControlName="identificacion" id="victimario-identificacion" inputmode="numeric" autocomplete="off" placeholder="Ej: 1020304050">
+              @if (formVictimario.get('identificacion')?.hasError('pattern')) {
+                <mat-error>Solo números (entre 5 y 15 dígitos)</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-field-group">
+            <label class="form-field-label" for="victimario-nombre">Nombre</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <input matInput formControlName="nombre" id="victimario-nombre" placeholder="Ej: Juan" autocomplete="off">
+              @if (formVictimario.get('nombre')?.hasError('pattern')) {
+                <mat-error>Solo debe contener letras</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-field-group">
+            <label class="form-field-label" for="victimario-apellidos">Apellidos</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <input matInput formControlName="apellidos" id="victimario-apellidos" placeholder="Ej: Pérez" autocomplete="off">
+              @if (formVictimario.get('apellidos')?.hasError('pattern')) {
+                <mat-error>Solo debe contener letras</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-field-group">
+            <label class="form-field-label" for="victimario-vinculoUniversidad">
+              Vínculo con la Universidad
+              <button type="button"
+                      class="help-tooltip-trigger"
+                      matTooltip="Relación contractual, formativa o institucional de la persona señalada con la UdeA."
+                      matTooltipClass="casilda-help-tooltip"
+                      (click)="$event.stopPropagation()"
+                      aria-label="Ayuda sobre vínculo con la universidad">?</button>
+            </label>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-select formControlName="vinculoUniversidad" id="victimario-vinculoUniversidad" placeholder="Seleccione el vínculo">
+                @for (rol of listaVinculosUniversidad; track rol) {
+                  <mat-option [value]="rol">{{ rol }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          @if (formVictimario.get('vinculoUniversidad')?.value === 'Otro') {
+            <div class="form-field-group full-width-cell">
+              <label class="form-field-label" for="victimario-otroVinculoUniversidad">¿Cuál vínculo con la universidad?</label>
+              <mat-form-field appearance="outline" class="full-width">
+                <input matInput formControlName="otroVinculoUniversidad" id="victimario-otroVinculoUniversidad" placeholder="Especifique el vínculo con la Universidad">
+              </mat-form-field>
+            </div>
+          }
+
+          <div class="form-field-group">
+            <label class="form-field-label" for="victimario-vinculoVictima">
+              Vínculo con la víctima
+              <button type="button"
+                      class="help-tooltip-trigger"
+                      matTooltip="Relación interpersonal, familiar o académica entre la persona agresora y la persona afectada."
+                      matTooltipClass="casilda-help-tooltip"
+                      (click)="$event.stopPropagation()"
+                      aria-label="Ayuda sobre vínculo con la víctima">?</button>
+            </label>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-select formControlName="vinculoVictima" id="victimario-vinculoVictima" placeholder="Seleccione el vínculo">
+                @for (vinc of listaVinculosVictima; track vinc) {
+                  <mat-option [value]="vinc">{{ vinc }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          @if (formVictimario.get('vinculoVictima')?.value === 'Otro') {
+            <div class="form-field-group full-width-cell">
+              <label class="form-field-label" for="victimario-otroVinculoVictima">¿Cuál vínculo con la víctima?</label>
+              <mat-form-field appearance="outline" class="full-width">
+                <input matInput formControlName="otroVinculoVictima" id="victimario-otroVinculoVictima" placeholder="Especifique la relación con la víctima">
+              </mat-form-field>
+            </div>
+          }
+
+          <div class="form-field-group full-width-cell">
+            <label class="form-field-label" for="victimario-correo">
+              Correo o Información Adicional
+              <button type="button"
+                      class="help-tooltip-trigger"
+                      matTooltip="Correo electrónico, dependencia donde labora, apodo u otros datos que faciliten su individualización."
+                      matTooltipClass="casilda-help-tooltip"
+                      (click)="$event.stopPropagation()"
+                      aria-label="Ayuda sobre información adicional del presunto agresor">?</button>
+            </label>
+            <mat-form-field appearance="outline" class="full-width">
+              <input matInput formControlName="correo" id="victimario-correo" placeholder="Ej: correo, dependencia o apodo" autocomplete="off">
+            </mat-form-field>
+          </div>
         </div>
 
         @if (esVictimarioUdea) {
