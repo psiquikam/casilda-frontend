@@ -1,118 +1,151 @@
-<div class="register">
+<div class="stepper-wrapper" id="contenido-principal" tabindex="-1">
+  <a class="register__volver" routerLink="/login">
+    <mat-icon aria-hidden="true">arrow_back</mat-icon>
+    Volver al inicio de sesión
+  </a>
 
-  <aside class="register__panel" aria-labelledby="register-panel-titulo">
-    <img class="register__logo" src="assets/Logo-Udea-Blanco-horizontal.png"
-      alt="Universidad de Antioquia" width="1470" height="378">
-    <p class="register__dependencia">Facultad Nacional de Salud Pública</p>
-
-    <div class="register__marca">
-      <mat-icon svgIcon="logo-custom" class="register__distintivo" aria-hidden="true"></mat-icon>
-      <h2 id="register-panel-titulo" class="register__panel-titulo">CASILDA</h2>
-    </div>
-    <p class="register__panel-texto">
-      Sistema de vigilancia en salud pública para el abordaje de las discriminaciones y las
-      violencias basadas en género.
-    </p>
-    <p class="register__panel-nota">
-      Sabemos que dar este paso requiere valor. Queremos ofrecerte un espacio seguro, donde tu información
-      será tratada con empatía, respeto y absoluta confidencialidad.
-    </p>
-  </aside>
-
-  <main class="register__formulario" id="contenido-principal" tabindex="-1">
-    <a class="register__volver" routerLink="/login">
-      <mat-icon aria-hidden="true">arrow_back</mat-icon>
-      Volver al inicio de sesión
-    </a>
-
-    <h1 class="register__titulo">Crear una cuenta</h1>
-    <p class="register__subtitulo">Te acompañaremos paso a paso en tu registro.</p>
-
-    <div class="register__stepper-container">
-      <mat-stepper linear #stepper>
+  <h1 class="formulario-titulo">Crear una cuenta en CASILDA</h1>
+  
+  <mat-stepper linear #stepper>
+    
+    <!-- Paso 1: Información Personal -->
+    <mat-step [stepControl]="step1Form">
+      <form [formGroup]="step1Form" class="step-body">
+        <ng-template matStepLabel>Identidad</ng-template>
         
-        <!-- Paso 1: Información básica -->
-        <mat-step [stepControl]="step1Form">
-          <form [formGroup]="step1Form">
-            <ng-template matStepLabel>Identidad</ng-template>
-            
-            <p class="register__ayuda">Queremos saber cómo dirigirnos a ti de forma respetuosa.</p>
-            
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Nombre</mat-label>
+        <div class="section-title-with-tooltip">
+          <h2>Información Personal</h2>
+        </div>
+        <p class="vbg-section-subtitle">Queremos saber cómo dirigirnos a ti de forma respetuosa.</p>
+
+        <div class="victim-form-card">
+          <div class="grid-form">
+            <mat-form-field appearance="outline">
+              <mat-label>Nombre *</mat-label>
               <input matInput formControlName="nombre" autocomplete="given-name">
               @if (controlInvalido(step1Form, 'nombre')) {
                 <mat-error>Por favor indícanos tu nombre</mat-error>
               }
             </mat-form-field>
             
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Apellidos</mat-label>
+            <mat-form-field appearance="outline">
+              <mat-label>Apellidos *</mat-label>
               <input matInput formControlName="apellidos" autocomplete="family-name">
               @if (controlInvalido(step1Form, 'apellidos')) {
                 <mat-error>Por favor indícanos tus apellidos</mat-error>
               }
             </mat-form-field>
 
-            <div class="step-actions">
-              <button type="button" mat-raised-button color="primary" matStepperNext>Continuar</button>
-            </div>
-          </form>
-        </mat-step>
-
-        <!-- Paso 2: Contacto -->
-        <mat-step [stepControl]="step2Form">
-          <form [formGroup]="step2Form">
-            <ng-template matStepLabel>Contacto</ng-template>
-            
-            <p class="register__ayuda">Estos datos nos permitirán comunicarnos contigo de manera segura y privada.</p>
-
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Correo electrónico (Seguro)</mat-label>
-              <input matInput type="email" formControlName="email" autocomplete="email" inputmode="email">
-              <mat-hint>Usa un correo al que solo tú tengas acceso.</mat-hint>
-              @if (controlInvalido(step2Form, 'email')) {
-                <mat-error>Por favor escribe un correo válido</mat-error>
+            <mat-form-field appearance="outline">
+              <mat-label>Tipo documento identidad *</mat-label>
+              <mat-select formControlName="tipoDocumento" placeholder="Seleccione el tipo">
+                <mat-option value="CC">Cédula de Ciudadanía</mat-option>
+                <mat-option value="TI">Tarjeta de Identidad</mat-option>
+                <mat-option value="CE">Cédula de Extranjería</mat-option>
+                <mat-option value="PA">Pasaporte</mat-option>
+                <mat-option value="OT">Otro</mat-option>
+              </mat-select>
+              @if (controlInvalido(step1Form, 'tipoDocumento')) {
+                <mat-error>Seleccione un tipo de documento</mat-error>
               }
             </mat-form-field>
 
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Teléfono (Opcional)</mat-label>
+            <mat-form-field appearance="outline">
+              <mat-label>Documento identidad *</mat-label>
+              <input matInput formControlName="documento" autocomplete="off" inputmode="text">
+              @if (controlInvalido(step1Form, 'documento')) {
+                <mat-error>Ingrese un documento válido</mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="button" mat-raised-button color="primary" matStepperNext>Continuar</button>
+        </div>
+      </form>
+    </mat-step>
+
+    <!-- Paso 2: Contacto e Institución -->
+    <mat-step [stepControl]="step2Form">
+      <form [formGroup]="step2Form" class="step-body">
+        <ng-template matStepLabel>Contacto e Institución</ng-template>
+        
+        <div class="section-title-with-tooltip">
+          <h2>Datos de Contacto e Institución</h2>
+        </div>
+        <p class="vbg-section-subtitle">Estos datos nos permitirán comunicarnos contigo de manera segura y conocer tu vínculo con la Universidad.</p>
+
+        <div class="victim-form-card">
+          <div class="grid-form">
+            <mat-form-field appearance="outline" class="full-width-cell">
+              <mat-label>Relación con la universidad *</mat-label>
+              <mat-select formControlName="relacionUniversidad" placeholder="Seleccione su vínculo">
+                <mat-option value="Estudiante">Estudiante</mat-option>
+                <mat-option value="Docente">Docente</mat-option>
+                <mat-option value="Administrativo">Administrativo</mat-option>
+                <mat-option value="Egresado">Egresado(a)</mat-option>
+                <mat-option value="Contratista">Contratista</mat-option>
+                <mat-option value="Otro">Otro</mat-option>
+              </mat-select>
+              @if (controlInvalido(step2Form, 'relacionUniversidad')) {
+                <mat-error>La relación con la universidad es obligatoria</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Correo electrónico seguro *</mat-label>
+              <input matInput type="email" formControlName="email" autocomplete="email" inputmode="email">
+              <mat-hint>Usa un correo al que solo tú tengas acceso.</mat-hint>
+              @if (controlInvalido(step2Form, 'email')) {
+                <mat-error>Escribe un correo válido</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Número de teléfono (Opcional)</mat-label>
               <input matInput type="tel" formControlName="telefono" autocomplete="tel" inputmode="tel">
               <mat-hint>Si deseas que te contactemos por llamada.</mat-hint>
               @if (controlInvalido(step2Form, 'telefono')) {
                 <mat-error>El teléfono debe contener solo números</mat-error>
               }
             </mat-form-field>
+          </div>
+        </div>
 
-            <div class="step-actions">
-              <button type="button" mat-button matStepperPrevious>Atrás</button>
-              <button type="button" mat-raised-button color="primary" matStepperNext>Continuar</button>
-            </div>
-          </form>
-        </mat-step>
+        <div class="actions">
+          <button type="button" mat-button matStepperPrevious>Atrás</button>
+          <button type="button" mat-raised-button color="primary" matStepperNext>Continuar</button>
+        </div>
+      </form>
+    </mat-step>
 
-        <!-- Paso 3: Seguridad y Confidencialidad -->
-        <mat-step [stepControl]="step3Form">
-          <form [formGroup]="step3Form" (ngSubmit)="onSubmit()">
-            <ng-template matStepLabel>Seguridad</ng-template>
-            
-            <p class="register__ayuda">Crea una contraseña segura para proteger el acceso a tu información.</p>
+    <!-- Paso 3: Seguridad y Privacidad -->
+    <mat-step [stepControl]="step3Form">
+      <form [formGroup]="step3Form" (ngSubmit)="onSubmit()" class="step-body">
+        <ng-template matStepLabel>Seguridad</ng-template>
+        
+        <div class="section-title-with-tooltip">
+          <h2>Seguridad y Confidencialidad</h2>
+        </div>
+        <p class="vbg-section-subtitle">Protege el acceso a tu información y autoriza el manejo de tus datos.</p>
 
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Contraseña</mat-label>
+        <div class="victim-form-card">
+          <div class="grid-form">
+            <mat-form-field appearance="outline">
+              <mat-label>Contraseña *</mat-label>
               <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" autocomplete="new-password">
               <button mat-icon-button matSuffix type="button" (click)="alternarPassword()">
                 <mat-icon aria-hidden="true">{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
               </button>
-              <mat-hint>Debe tener al menos 8 caracteres.</mat-hint>
+              <mat-hint>Mínimo 8 caracteres.</mat-hint>
               @if (controlInvalido(step3Form, 'password')) {
                 <mat-error>La contraseña es muy corta</mat-error>
               }
             </mat-form-field>
 
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Confirmar contraseña</mat-label>
+            <mat-form-field appearance="outline">
+              <mat-label>Confirmar contraseña *</mat-label>
               <input matInput [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirmPassword" autocomplete="new-password">
               <button mat-icon-button matSuffix type="button" (click)="alternarConfirmPassword()">
                 <mat-icon aria-hidden="true">{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
@@ -121,41 +154,37 @@
                 <mat-error>Las contraseñas no coinciden</mat-error>
               }
             </mat-form-field>
+          </div>
+        </div>
 
-            <div class="policy-box">
-              <h3>Privacidad garantizada</h3>
-              <p>
-                Tu información no será compartida con terceros no autorizados. Al crear la cuenta, nos permites 
-                contactarte y procesar tu solicitud con estricto profesionalismo.
-              </p>
-              <mat-checkbox formControlName="aceptaPolitica">Entiendo y acepto las políticas de confidencialidad</mat-checkbox>
-            </div>
+        <div class="policy-box">
+          <h2>Tratamiento de Información (Habeas Data)</h2>
+          <p>La información recopilada a través de este canal se gestiona bajo estrictos protocolos de confidencialidad institucional. No se almacenará ningún dato que comprometa su identidad sin su consentimiento expreso, de acuerdo a la ley de Habeas Data.</p>
+          <mat-checkbox formControlName="habeasData">He leído y acepto el manejo y política de tratamiento de datos</mat-checkbox>
+          @if (controlInvalido(step3Form, 'habeasData')) {
+            <mat-error style="font-size: 14px; color: var(--color-danger-text); display: block; margin-top: 8px;">Debes aceptar la política para continuar.</mat-error>
+          }
+        </div>
 
-            @if (errorMessage) {
-              <div class="casilda-alerta casilda-alerta--peligro" role="alert" style="margin-top: 1rem;">
-                <mat-icon aria-hidden="true">error_outline</mat-icon>
-                <span>{{ errorMessage }}</span>
-              </div>
+        @if (errorMessage) {
+          <div class="casilda-alerta casilda-alerta--peligro" role="alert" style="margin-top: 1rem;">
+            <mat-icon aria-hidden="true">error_outline</mat-icon>
+            <span>{{ errorMessage }}</span>
+          </div>
+        }
+
+        <div class="actions">
+          <button type="button" mat-button matStepperPrevious [disabled]="loading">Atrás</button>
+          <button type="submit" mat-raised-button color="primary" [disabled]="loading || step1Form.invalid || step2Form.invalid || step3Form.invalid">
+            @if (loading) {
+              <mat-spinner diameter="20" aria-hidden="true"></mat-spinner>
             }
+            {{ loading ? 'Creando cuenta…' : 'Crear mi cuenta segura' }}
+          </button>
+        </div>
+        
+      </form>
+    </mat-step>
 
-            <div class="step-actions">
-              <button type="button" mat-button matStepperPrevious [disabled]="loading">Atrás</button>
-              <button type="submit" mat-raised-button color="primary" [disabled]="loading || step1Form.invalid || step2Form.invalid || step3Form.invalid">
-                @if (loading) {
-                  <mat-spinner diameter="20" aria-hidden="true"></mat-spinner>
-                }
-                {{ loading ? 'Creando cuenta…' : 'Crear mi cuenta segura' }}
-              </button>
-            </div>
-            
-            <p class="register__estado" role="status" aria-live="polite">
-              {{ loading ? 'Creando tu cuenta, espera un momento.' : '' }}
-            </p>
-
-          </form>
-        </mat-step>
-
-      </mat-stepper>
-    </div>
-  </main>
+  </mat-stepper>
 </div>

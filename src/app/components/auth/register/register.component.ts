@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-register',
@@ -21,7 +22,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     MatIconModule,
     MatProgressSpinnerModule,
     MatStepperModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatSelectModule
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
@@ -42,10 +44,13 @@ export class RegisterComponent {
   constructor() {
     this.step1Form = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
-      apellidos: ['', [Validators.required, Validators.minLength(2)]]
+      apellidos: ['', [Validators.required, Validators.minLength(2)]],
+      tipoDocumento: ['', [Validators.required]],
+      documento: ['', [Validators.required, Validators.pattern('^[0-9A-Za-z]+$')]]
     });
 
     this.step2Form = this.fb.group({
+      relacionUniversidad: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       telefono: ['', [Validators.pattern('^[0-9]*$')]]
     });
@@ -53,7 +58,7 @@ export class RegisterComponent {
     this.step3Form = this.fb.group({
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required]],
-      aceptaPolitica: [false, [Validators.requiredTrue]]
+      habeasData: [false, [Validators.requiredTrue]]
     }, { validators: this.passwordsMatchValidator });
   }
 
@@ -86,7 +91,7 @@ export class RegisterComponent {
     this.loading = true;
     this.errorMessage = '';
     
-    // Aquí iría la lógica de registro con un servicio de autenticación
+    // Simular registro y redirección
     setTimeout(() => {
       this.loading = false;
       void this.router.navigate(['/login']);
