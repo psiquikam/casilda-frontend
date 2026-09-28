@@ -246,8 +246,8 @@ describe('FormularioAnonimoComponent', () => {
     expect(component.listaFisica.length).toBe(5);
     expect(component.listaFisica.map(m => m.nombre)).toContain('Feminicidio (Tentativa o comisión)');
 
-    expect(component.listaSexual.length).toBe(4);
-    expect(component.listaSexual.map(m => m.nombre)).toContain('Acceso carnal');
+    expect(component.listaSexual.length).toBe(6);
+    expect(component.listaSexual.map(m => m.nombre)).toContain('Acceso carnal violento');
     expect(component.listaSexual.map(m => m.nombre)).toContain('Violencia sexual correctiva');
 
     expect(component.listaInstitucional.length).toBe(3);
@@ -258,10 +258,27 @@ describe('FormularioAnonimoComponent', () => {
 
     expect(component.listaInformatica.length).toBe(5);
     expect(component.listaInformatica.map(m => m.nombre)).toContain('Grooming');
-    expect(component.listaInformatica.map(m => m.nombre)).toContain('Sexting');
+    expect(component.listaInformatica.map(m => m.nombre)).toContain('Sexting sin consentimiento');
 
     expect(component.listaPrejuicio.length).toBe(1);
     expect(component.listaPrejuicio[0].nombre).toBe('Discriminación por género u orientación sexual o identidad de género');
+
+    expect(component.listaAmbitosOcurrencia).toContain('Pareja / expareja');
+    expect(component.listaFormasOcurrencia).toContain('Presencial');
+    expect(component.listaDetalleMisional).toContain('Misional Docencia');
+    expect(component.listaVinculosVictima).toContain('Pareja / Expareja');
+  });
+
+  it('should contain new controls for ambito, forma, misionalidad and victimario vinculos', () => {
+    expect(component.formRelato.contains('ambitoOcurrencia')).toBeTrue();
+    expect(component.formRelato.contains('otroAmbitoOcurrencia')).toBeTrue();
+    expect(component.formRelato.contains('formaOcurrencia')).toBeTrue();
+    expect(component.formRelato.contains('relacionMisional')).toBeTrue();
+    expect(component.formRelato.contains('detalleMisional')).toBeTrue();
+
+    expect(component.formVictimario.contains('vinculoVictima')).toBeTrue();
+    expect(component.formVictimario.contains('otroVinculoUniversidad')).toBeTrue();
+    expect(component.formVictimario.contains('otroVinculoVictima')).toBeTrue();
   });
 
   it('should toggle selectable chips with toggleModalidad and update category state', () => {

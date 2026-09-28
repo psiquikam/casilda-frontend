@@ -43,6 +43,7 @@ import { ModalCompromisosPersonaComponent } from '../modal-compromisos-persona/m
 import { ModalCompromisosProfesionalesComponent } from '../modal-compromisos-profesionales/modal-compromisos-profesionales.component';
 import { ModalSeguimientosComponent } from '../modal-seguimiento/modal-seguimiento.component';
 import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
+import { ModalCodigosPaisComponent } from '../modal-codigos-pais/modal-codigos-pais.component';
 import { AuthService } from '../../services/auth.service';
 import { AtencionContextoRequestDto, AtencionRegistroRequestDto, CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, HechoRequestDto, SeguimientoAtencionRequestDto, SolicitudService, VinculoUdeAEnum } from '../../services/solicitud.service';
 import { MaestroDto } from '../../services/listas.service';
@@ -109,20 +110,33 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
 
 
   private readonly longitudesPorTipoDocumento: Record<string, number> = {
-    CC: 10, TI: 11, CE: 7, RC: 11, NUIP: 11, NIP: 11, PA: 12
+    CC: 10, TI: 11, CE: 15, RC: 11, NUIP: 11, NIP: 11, PA: 20
   };
 
   get maxLongitudDocumento(): number {
     const tipo = String(this.casoForm?.get('tipoDocumento')?.value ?? '').toUpperCase().trim();
+    const docActual = String(this.casoForm?.get('documento')?.value ?? '').trim();
+    if (/[A-Z]/i.test(docActual) || tipo.includes('PA') || tipo.includes('CE') || tipo.includes('PASAPORTE') || tipo.includes('EXTRANJER')) {
+      return 20;
+    }
     if (!tipo) {
-      return 12;
+      return 20;
     }
     for (const key of Object.keys(this.longitudesPorTipoDocumento)) {
       if (tipo.includes(key)) {
         return this.longitudesPorTipoDocumento[key];
       }
     }
-    return 12;
+    return 20;
+  }
+
+  formatoDocumento(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const limpio = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, this.maxLongitudDocumento);
+    if (input.value !== limpio) {
+      input.value = limpio;
+      this.casoForm.get('documento')?.setValue(limpio, { emitEvent: false });
+    }
   }
 
   soloDigitos(event: Event): void {
@@ -168,7 +182,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
     { tab: 'Registro de atención', label: 'Tipo de servicio', control: 'tipoServicio' },
     { tab: 'Registro de atención', label: 'Lugar de la entrevista', control: 'lugarEntrevista' },
     { tab: 'Datos de la persona', label: 'Tipo de documento', control: 'tipoDocumento' },
-    { tab: 'Datos de la persona', label: 'Número de documento', control: 'documento' },
+    { tab: 'Datos de la persona', label: 'Documento de Identificación', control: 'documento' },
     { tab: 'Datos de la persona', label: 'Fecha de nacimiento', control: 'fechaNacimiento' },
     { tab: 'Datos de la persona', label: 'Primer nombre', control: 'primerNombre' },
     { tab: 'Datos de la persona', label: 'Primer apellido', control: 'primerApellido' },
@@ -849,6 +863,24 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
   esOtroVinculo(): boolean {
     const valor = this.casoForm.get('vinculo')?.value;
     return this.resolverIdMaestro(valor, this.catalogoVinculosUdea) === VinculoUdeAEnum.OTRO_TIPO_DE_VINCULO;
+  }
+
+  abrirCatalogoPaises(): void {
+    const dialogRef = this.dialog.open(ModalCodigosPaisComponent, {
+      width: '560px',
+      maxWidth: '95vw'
+    });
+
+    dialogRef.afterClosed().subscribe((codigo?: string) => {
+      if (codigo) {
+        const ctrl = this.casoForm.get('documento');
+        const valorActual = String(ctrl?.value ?? '').trim();
+        const sinPrefijo = valorActual.replace(/^[A-Z]{2,4}/i, '');
+        const nuevoValor = `${codigo}${sinPrefijo}`.toUpperCase();
+        ctrl?.setValue(nuevoValor);
+        ctrl?.markAsDirty();
+      }
+    });
   }
 
   abrirModalDireccion(): void {

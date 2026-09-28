@@ -20,14 +20,17 @@
 
     <div class="form-row-full">
       <mat-form-field appearance="outline">
-        <mat-label>Lugar de ocurrencia del hecho *</mat-label>
+        <mat-label>Lugar de Ocurrencia *</mat-label>
         <input matInput [(ngModel)]="data.lugar" placeholder="Ej: Aula 204, Oficina, Virtual...">
       </mat-form-field>
     </div>
 
     <div class="form-row-full">
       <mat-form-field appearance="outline" class="field-descripcion">
-        <mat-label>Descripción del hecho *</mat-label>
+        <mat-label>
+          Descripción de los Hechos *
+          <button type="button" class="help-tooltip-trigger" matTooltip="Describa los hechos en circunstancias de tiempo, modo y lugar." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+        </mat-label>
         <textarea matInput [(ngModel)]="data.descripcion" rows="4"
           placeholder="Describa en detalle lo ocurrido..."></textarea>
       </mat-form-field>

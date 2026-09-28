@@ -1,6 +1,6 @@
 <h2 mat-dialog-title class="modal-title">
   <mat-icon aria-hidden="true">person</mat-icon>
-  Datos de presunto agresor
+  Datos del presunto agresor
 </h2>
 
 <mat-dialog-content class="modal-content">
@@ -8,26 +8,29 @@
 
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Primer Nombre</mat-label>
-      <input matInput [(ngModel)]="data.primerNombre" placeholder="Primer Nombre">
+      <input matInput [(ngModel)]="data.primerNombre" placeholder="Ej: Juan">
     </mat-form-field>
 
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Segundo Nombre</mat-label>
-      <input matInput [(ngModel)]="data.segundoNombre" placeholder="Segundo Nombre">
+      <input matInput [(ngModel)]="data.segundoNombre" placeholder="Ej: Carlos">
     </mat-form-field>
 
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Primer Apellido</mat-label>
-      <input matInput [(ngModel)]="data.primerApellido" placeholder="Primer Apellido">
+      <input matInput [(ngModel)]="data.primerApellido" placeholder="Ej: Pérez">
     </mat-form-field>
 
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Segundo Apellido</mat-label>
-      <input matInput [(ngModel)]="data.segundoApellido" placeholder="Segundo Apellido">
+      <input matInput [(ngModel)]="data.segundoApellido" placeholder="Ej: Gómez">
     </mat-form-field>
 
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Vínculo con la universidad</mat-label>
+      <mat-label>
+        Vínculo con la universidad
+        <button type="button" class="help-tooltip-trigger" matTooltip="Relación de la persona con la UdeA: Estudiante, Docente, Personal no docente, u Otro." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+      </mat-label>
       <mat-select [(ngModel)]="data.idVinculoUniversidad" (ngModelChange)="onVinculoUdeaChange($event)">
         @for (v of catalogoVinculosUdea; track v.id) {
           <mat-option [value]="v.id">{{ v.nombre }}</mat-option>
@@ -36,7 +39,10 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Vínculo con la víctima</mat-label>
+      <mat-label>
+        Vínculo con la víctima
+        <button type="button" class="help-tooltip-trigger" matTooltip="Relación o cercanía con la persona afectada: Pareja/expareja, Familiar, Compañeros de estudio, Docente, Otro." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+      </mat-label>
       <mat-select [(ngModel)]="data.idVinculoVictima" (ngModelChange)="onVinculoVictimaChange($event)">
         @for (v of catalogoVinculosAgresorVictima; track v.id) {
           <mat-option [value]="v.id">{{ v.nombre }}</mat-option>

@@ -36,7 +36,7 @@
                 <div class="tab-padding">
                   <div class="grid-3">
                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                      <mat-label>Número de Documento</mat-label>
+                      <mat-label>Documento de Identificación</mat-label>
                       <input matInput formControlName="documento" readonly inputmode="numeric"
                         pattern="\d*" [maxlength]="maxLongitudDocumento"
                         (input)="soloDigitos($event)">
@@ -170,10 +170,13 @@
                     </mat-select>
                   </mat-form-field>
                   <div class="button-container">
-                    <span class="btn-label-top">Archivo que contiene el Consentimiento*</span>
+                    <span class="btn-label-top">
+                      Consentimiento de Atención*
+                      <button type="button" class="help-tooltip-trigger" matTooltip="Carga del archivo PDF firmado/escaneado entregado por la persona al iniciar la atención." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+                    </span>
                     <button mat-raised-button color="accent" type="button" class="action-btn"
                       (click)="subirArchivo()">
-                      <mat-icon aria-hidden="true">cloud_upload</mat-icon> Consentimiento Informado
+                      <mat-icon aria-hidden="true">cloud_upload</mat-icon> Consentimiento de Atención
                     </button>
                   </div>
                 </div>
@@ -632,7 +635,10 @@
                 </ng-template>
                 <div class="tab-padding grid-2">
                   <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                    <mat-label>Estado del caso</mat-label>
+                    <mat-label>
+                      Estado del caso
+                      <button type="button" class="help-tooltip-trigger" matTooltip="Clasificación automática calculada por el sistema según los vínculos institucional/agresor y misionalidad (Grupos 1 al 6)." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+                    </mat-label>
                     <mat-select formControlName="estadosCaso">
                       @for (s of estadosCaso; track s) { <mat-option [value]="s">{{s}}</mat-option>
                     }

@@ -214,3 +214,56 @@ body {
   overflow: hidden !important;
   border-radius: var(--radius-md) !important;
 }
+
+/* ==========================================================================
+   Insignia circular de ayuda y Tooltip oscuro estilo Casilda
+   ========================================================================== */
+.help-tooltip-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  min-height: 18px;
+  max-width: 18px;
+  max-height: 18px;
+  background-color: #f37943; /* Naranja institucional de apoyo */
+  color: #ffffff;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+  cursor: help;
+  margin-left: 6px;
+  vertical-align: middle;
+  border: none;
+  padding: 0;
+  outline: none;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  overflow: visible;
+  transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+  user-select: none;
+
+  &:hover,
+  &:focus-visible {
+    background-color: #e26732;
+    transform: scale(1.15);
+    box-shadow: 0 0 0 2px rgba(243, 121, 67, 0.35);
+  }
+}
+
+.casilda-help-tooltip {
+  background-color: #212129 !important;
+  color: #ffffff !important;
+  font-size: 12px !important;
+  line-height: 1.45 !important;
+  padding: 8px 12px !important;
+  border-radius: 6px !important;
+  max-width: 300px !important;
+  white-space: normal !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3) !important;
+}
+

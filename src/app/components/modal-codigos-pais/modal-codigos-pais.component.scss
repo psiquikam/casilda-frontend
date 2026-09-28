@@ -1,0 +1,116 @@
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px 8px;
+  border-bottom: 1px solid var(--color-border, #e0e0e0);
+
+  .modal-title {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--color-text-primary, #1c2833);
+  }
+
+  .btn-close {
+    color: var(--color-text-secondary, #616161);
+  }
+}
+
+.modal-content {
+  padding: 16px 24px;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-description {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary, #546e7a);
+  line-height: 1.45;
+
+  strong {
+    color: var(--color-primary, #026937);
+  }
+}
+
+.search-container {
+  width: 100%;
+
+  .search-field {
+    width: 100%;
+  }
+}
+
+.table-container {
+  max-height: 320px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border, #e0e0e0);
+  border-radius: var(--radius-sm, 6px);
+
+  .paises-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th {
+      font-weight: 600;
+      color: var(--color-text-secondary, #455a64);
+      background-color: #f8faf9;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .country-row {
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+
+      &:hover {
+        background-color: rgba(2, 105, 55, 0.05);
+      }
+    }
+
+    .country-badge {
+      display: inline-block;
+      font-family: monospace;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #026937;
+      background-color: #e6f2ec;
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .country-name-cell {
+      font-weight: 500;
+      color: var(--color-text-primary, #263238);
+    }
+
+    .country-region-cell {
+      font-size: 0.825rem;
+      color: var(--color-text-secondary, #78909c);
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    .no-data-cell {
+      padding: 32px 16px;
+      text-align: center;
+      color: var(--color-text-secondary, #757575);
+      font-style: italic;
+    }
+  }
+}
+
+.modal-actions {
+  padding: 12px 24px;
+  border-top: 1px solid var(--color-border, #e0e0e0);
+}

@@ -7,7 +7,10 @@
   <div class="form-row">
 
     <mat-form-field appearance="outline" class="field-tipo">
-      <mat-label>Tipo de Ruta</mat-label>
+      <mat-label>
+        Tipo de Ruta
+        <button type="button" class="help-tooltip-trigger" matTooltip="Rutas Internas: instancias y medidas de la Universidad (asuntos disciplinarios, protocolo de amenazas). Rutas Externas: entidades del Estado (Fiscalía, Comisaría de Familia, Salud)." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+      </mat-label>
       <mat-select [(ngModel)]="data.tipo" (ngModelChange)="onTipoChange()">
         @for (tipo of tiposRutaActivacion; track tipo.id) {
           <mat-option [value]="tipo">{{ tipo.nombre }}</mat-option>

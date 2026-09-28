@@ -36,9 +36,16 @@
                 <div class="tab-padding">
                   <div class="grid-3">
                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                      <mat-label>Número de Documento</mat-label>
-                      <input matInput formControlName="documento" inputmode="numeric" pattern="\d*"
-                        [maxlength]="maxLongitudDocumento" (input)="soloDigitos($event)">
+                      <mat-label>
+                        Documento de Identificación
+                        <button type="button" class="help-tooltip-trigger" matTooltip="En caso de documento extranjero, consignar la abreviatura del país antes del número (ej. VNZ123456)." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+                      </mat-label>
+                      <input matInput formControlName="documento"
+                        [maxlength]="maxLongitudDocumento" (input)="formatoDocumento($event)">
+                      <button mat-icon-button matSuffix type="button" (click)="abrirCatalogoPaises()"
+                        matTooltip="Ver catálogo de códigos de país" aria-label="Ver catálogo de códigos de país">
+                        <mat-icon aria-hidden="true">public</mat-icon>
+                      </button>
                       </mat-form-field>
                       <mat-form-field appearance="outline" subscriptSizing="dynamic">
                         <mat-label>Tipo Documento</mat-label>
@@ -47,7 +54,7 @@
                         </mat-select>
                       </mat-form-field>
                       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                        <mat-label>Fecha Nacimiento</mat-label>
+                        <mat-label>Fecha de Nacimiento</mat-label>
                         <input matInput [matDatepicker]="picker2" formControlName="fechaNacimiento">
                         <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
                         <mat-datepicker #picker2></mat-datepicker>
@@ -434,7 +441,10 @@
                               </mat-autocomplete>
                             </mat-form-field>
                             <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                              <mat-label>Lugar de ocurriencia de hechos de violencia</mat-label>
+                              <mat-label>
+                                Lugar de Ocurrencia
+                                <button type="button" class="help-tooltip-trigger" matTooltip="Lugar vinculado a bienes inmuebles o predios universitarios (Dentro, Fuera, Mixto)." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+                              </mat-label>
                               <mat-select formControlName="lugarHechos">
                                 @for (c of lugarHechos; track c) { <mat-option [value]="c">{{c}}</mat-option> }
                               </mat-select>
@@ -490,17 +500,19 @@
                               </div>
                             </div>
                             <div class="pregunta-container span-all">
-                              <span class="pregunta-label">¿Violencia basada en género?</span>
+                              <span class="pregunta-label">
+                                Violencia Basada en Género
+                                <button type="button" class="help-tooltip-trigger" matTooltip="Filtro inicial: define si el hecho constituye VBG para desplegar las modalidades y temporalidad." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+                              </span>
                               <mat-radio-group formControlName="violenciaGenero" class="radio-group" aria-label="Violencia basada en género">
                                 <mat-radio-button value="SI">Sí</mat-radio-button>
                                 <mat-radio-button value="NO">No</mat-radio-button>
                               </mat-radio-group>
-                              <span class="pregunta-label">“¿El hecho de violencia ocurrió en el desarrollo de
-                                actividades misionales, o en representación de la Universidad? O ¿Dentro o fuera
-                                de los bienes inmuebles de la universidad con ocasión, en razón o como
-                                consecuencia de su vínculo o el vínculo del presunto(a) agresor(a) con la
-                              institución educativa?</span>
-                              <mat-radio-group formControlName="violenciaMisional" class="radio-group" aria-label="Violencia en actividades misionales">
+                              <span class="pregunta-label">
+                                Relación Misional / Institucional
+                                <button type="button" class="help-tooltip-trigger" matTooltip="Ocurrió en el desarrollo de actividades misionales (Docencia, Investigación, Extensión), institucionales, en representación de la Universidad o en bienes inmuebles." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+                              </span>
+                              <mat-radio-group formControlName="violenciaMisional" class="radio-group" aria-label="Relación Misional / Institucional">
                                 <mat-radio-button value="SI">Sí</mat-radio-button>
                                 <mat-radio-button value="NO">No</mat-radio-button>
                               </mat-radio-group>
@@ -592,7 +604,7 @@
                               </div>
                               <div class="vbg-card">
                                 <div class="vbg-header">
-                                  <span>Tipo de violencia económica/Patrimonial *</span>
+                                  <span>Violencia Patrimonial *</span>
                                   <mat-radio-group formControlName="violenciaEconomica">
                                     <mat-radio-button value="SI">Sí</mat-radio-button>
                                     <mat-radio-button value="NO">No</mat-radio-button>
@@ -609,7 +621,10 @@
                               </div>
                               <div class="vbg-card">
                                 <div class="vbg-header">
-                                  <span>Tipo de violencia sexual informática *</span>
+                                  <span>
+                                    Tipo de violencia sexual informática *
+                                    <button type="button" class="help-tooltip-trigger" matTooltip="Abarca grooming, amenazas, creación de contenido y sexting sin consentimiento." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+                                  </span>
                                   <mat-radio-group formControlName="violenciaInformatica">
                                     <mat-radio-button value="SI">Sí</mat-radio-button>
                                     <mat-radio-button value="NO">No</mat-radio-button>
@@ -652,7 +667,7 @@
                             <div class="section-header-inline">
                               <div class="section-title">
                                 <mat-icon aria-hidden="true" color="primary">person</mat-icon>
-                                <span>Presunto agresor</span>
+                                <span>Datos del presunto agresor</span>
                               </div>
                               <button mat-icon-button aria-label="Agregar presunto agresor" class="btn-add-inline" (click)="abrirModalAgresor()"
                                 matTooltip="Agregar Agresor">
@@ -756,10 +771,13 @@
                           </mat-select>
                         </mat-form-field>
                         <div class="button-container">
-                          <span class="btn-label-top">Archivo que contiene el Consentimiento*</span>
+                          <span class="btn-label-top">
+                            Consentimiento de Atención*
+                            <button type="button" class="help-tooltip-trigger" matTooltip="Carga del archivo PDF firmado/escaneado entregado por la persona al iniciar la atención." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+                          </span>
                           <button mat-raised-button color="accent" type="button" class="action-btn"
                             (click)="subirArchivo()">
-                            <mat-icon aria-hidden="true">cloud_upload</mat-icon> Consentimiento Informado
+                            <mat-icon aria-hidden="true">cloud_upload</mat-icon> Consentimiento de Atención
                           </button>
                         </div>
                       </div>
@@ -1218,7 +1236,10 @@
                       </ng-template>
                       <div class="tab-padding grid-2">
                         <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                          <mat-label>Estado del caso</mat-label>
+                          <mat-label>
+                            Estado del caso
+                            <button type="button" class="help-tooltip-trigger" matTooltip="Clasificación automática calculada por el sistema según los vínculos institucional/agresor y misionalidad (Grupos 1 al 6)." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+                          </mat-label>
                           <mat-select formControlName="estadosCaso">
                             @for (s of estadosCaso; track s) { <mat-option [value]="s">{{s}}</mat-option>
                           }

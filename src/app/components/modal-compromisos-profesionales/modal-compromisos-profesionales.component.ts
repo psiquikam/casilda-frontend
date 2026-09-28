@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { environment } from '../../../environments/environment';
 import { MaestroDto } from '../../services/listas.service';
 import { GrupoProfesionalDto, SolicitudService } from '../../services/solicitud.service';
@@ -25,7 +26,8 @@ import { GrupoProfesionalDto, SolicitudService } from '../../services/solicitud.
     MatButtonModule,
     MatIconModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    MatTooltipModule
 ],
     templateUrl: './modal-compromisos-profesionales.component.html',
     styleUrls: ['./modal-compromisos-profesionales.component.scss']

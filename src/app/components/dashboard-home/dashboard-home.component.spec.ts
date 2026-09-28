@@ -27,6 +27,12 @@ describe('DashboardHomeComponent', () => {
     fixture = TestBed.createComponent(DashboardHomeComponent);
     component = fixture.componentInstance;
     authService = TestBed.inject(AuthService);
+    authService.currentUser = {
+      nombre: 'Admin UdeA',
+      email: 'admin@udea.edu.co',
+      rol: 'Admin',
+      token: 'fake-token'
+    };
     fixture.detectChanges();
   });
 

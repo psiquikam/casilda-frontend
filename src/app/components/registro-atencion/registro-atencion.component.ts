@@ -169,7 +169,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     { tab: 'Registro de atención', label: 'Tipo de servicio', control: 'tipoServicio' },
     { tab: 'Registro de atención', label: 'Lugar de la entrevista', control: 'lugarEntrevista' },
     { tab: 'Datos de la persona', label: 'Tipo de documento', control: 'tipoDocumento' },
-    { tab: 'Datos de la persona', label: 'Número de documento', control: 'documento' },
+    { tab: 'Datos de la persona', label: 'Documento de Identificación', control: 'documento' },
     { tab: 'Datos de la persona', label: 'Fecha de nacimiento', control: 'fechaNacimiento' },
     { tab: 'Datos de la persona', label: 'Primer nombre', control: 'primerNombre' },
     { tab: 'Datos de la persona', label: 'Primer apellido', control: 'primerApellido' },

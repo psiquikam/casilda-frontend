@@ -50,7 +50,10 @@
             </mat-form-field>
 
             <mat-form-field appearance="outline" subscriptSizing="dynamic">
-              <mat-label>Lugar de ocurrencia de hechos de violencia *</mat-label>
+              <mat-label>
+                Lugar de Ocurrencia *
+                <button type="button" class="help-tooltip-trigger" matTooltip="Lugar vinculado a bienes inmuebles o predios universitarios (Dentro, Fuera, Mixto)." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+              </mat-label>
               <mat-select formControlName="lugarHechos">
                 @for (l of data.lugarHechos; track l) {
                 <mat-option [value]="l">{{l}}</mat-option>
@@ -107,7 +110,10 @@
 
           <!-- Violencia de género -->
           <div class="pregunta-container">
-            <span class="pregunta-label">¿Violencia basada en género?</span>
+            <span class="pregunta-label">
+              Violencia Basada en Género
+              <button type="button" class="help-tooltip-trigger" matTooltip="Filtro inicial: define si el hecho constituye VBG para desplegar las modalidades y temporalidad." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+            </span>
             <mat-radio-group formControlName="violenciaGenero" class="radio-group" aria-label="Violencia basada en género">
               <mat-radio-button value="SI">Sí</mat-radio-button>
               <mat-radio-button value="NO">No</mat-radio-button>
@@ -117,11 +123,10 @@
           <!-- Violencia misional -->
           <div class="pregunta-container">
             <span class="pregunta-label">
-              ¿El hecho de violencia ocurrió en el desarrollo de actividades misionales, o en representación de la
-              Universidad? O ¿Dentro o fuera de los bienes inmuebles de la universidad con ocasión, en razón o como
-              consecuencia de su vínculo o el vínculo del presunto(a) agresor(a) con la institución educativa?
+              Relación Misional / Institucional
+              <button type="button" class="help-tooltip-trigger" matTooltip="Ocurrió en el desarrollo de actividades misionales (Docencia, Investigación, Extensión), institucionales, en representación de la Universidad o en bienes inmuebles." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
             </span>
-            <mat-radio-group formControlName="violenciaMisional" class="radio-group" aria-label="Violencia en actividades misionales">
+            <mat-radio-group formControlName="violenciaMisional" class="radio-group" aria-label="Relación Misional / Institucional">
               <mat-radio-button value="SI">Sí</mat-radio-button>
               <mat-radio-button value="NO">No</mat-radio-button>
             </mat-radio-group>
@@ -220,7 +225,7 @@
 
             <div class="vbg-card">
               <div class="vbg-header">
-                <span>Tipo de violencia económica/Patrimonial *</span>
+                <span>Violencia Patrimonial *</span>
                 <mat-radio-group formControlName="violenciaEconomica">
                   <mat-radio-button value="SI">Sí</mat-radio-button>
                   <mat-radio-button value="NO">No</mat-radio-button>
@@ -238,7 +243,10 @@
 
             <div class="vbg-card">
               <div class="vbg-header">
-                <span>Tipo de violencia sexual informática *</span>
+                <span>
+                  Tipo de violencia sexual informática *
+                  <button type="button" class="help-tooltip-trigger" matTooltip="Abarca grooming, amenazas, creación de contenido y sexting sin consentimiento." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+                </span>
                 <mat-radio-group formControlName="violenciaInformatica">
                   <mat-radio-button value="SI">Sí</mat-radio-button>
                   <mat-radio-button value="NO">No</mat-radio-button>
@@ -307,7 +315,10 @@
             </mat-form-field>
 
             <mat-form-field appearance="outline" subscriptSizing="dynamic">
-              <mat-label>Vínculo con la universidad *</mat-label>
+              <mat-label>
+                Vínculo con la universidad *
+                <button type="button" class="help-tooltip-trigger" matTooltip="Relación de la persona con la UdeA: Estudiante, Docente, Personal no docente, u Otro." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+              </mat-label>
               <mat-select formControlName="presuntoVinculoUniversidad">
                 @for (v of data.listaVinculos; track v) {
                 <mat-option [value]="v">{{v}}</mat-option>
@@ -316,7 +327,10 @@
             </mat-form-field>
 
             <mat-form-field appearance="outline" subscriptSizing="dynamic">
-              <mat-label>Vínculo con la víctima *</mat-label>
+              <mat-label>
+                Vínculo con la víctima *
+                <button type="button" class="help-tooltip-trigger" matTooltip="Relación o cercanía con la persona afectada: Pareja/expareja, Familiar, Compañeros de estudio, Docente, Otro." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+              </mat-label>
               <mat-select formControlName="presuntoVinculoVictima">
                 @for (v of data.listaVinculosAgresorVictima; track v) {
                 <mat-option [value]="v">{{v}}</mat-option>
