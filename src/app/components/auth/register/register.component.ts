@@ -59,13 +59,19 @@ export class RegisterComponent {
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required]],
       habeasData: [false, [Validators.requiredTrue]]
-    }, { validators: this.passwordsMatchValidator });
-  }
+    });
 
-  private passwordsMatchValidator(group: FormGroup) {
-    const pass = group.get('password')?.value;
-    const confirm = group.get('confirmPassword')?.value;
-    return pass === confirm ? null : { passwordMismatch: true };
+    // Añadir el validador cruzado al control confirmPassword
+    this.step3Form.get('confirmPassword')?.addValidators(() => {
+      const pass = this.step3Form?.get('password')?.value;
+      const confirm = this.step3Form?.get('confirmPassword')?.value;
+      return pass === confirm ? null : { passwordMismatch: true };
+    });
+
+    // Reevaluar confirmPassword cuando password cambie
+    this.step3Form.get('password')?.valueChanges.subscribe(() => {
+      this.step3Form.get('confirmPassword')?.updateValueAndValidity({ emitEvent: false });
+    });
   }
 
   get controlInvalido() {
@@ -91,6 +97,17 @@ export class RegisterComponent {
     this.loading = true;
     this.errorMessage = '';
     
+    // Recopilar información de todos los pasos
+    const formData = {
+      ...this.step1Form.value,
+      ...this.step2Form.value,
+      ...this.step3Form.value
+    };
+
+    // Remover la confirmación de contraseña para no imprimirla si no es necesario, aunque aquí solo mostramos todo
+    console.log('--- DATOS DEL REGISTRO ---');
+    console.log(JSON.stringify(formData, null, 2));
+
     // Simular registro y redirección
     setTimeout(() => {
       this.loading = false;

@@ -135,7 +135,9 @@
             <mat-form-field appearance="outline">
               <mat-label>Contraseña *</mat-label>
               <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" autocomplete="new-password">
-              <button mat-icon-button matSuffix type="button" (click)="alternarPassword()">
+              <button mat-icon-button matSuffix type="button" (click)="alternarPassword()"
+                [attr.aria-label]="hidePassword ? 'Mostrar contraseña' : 'Ocultar contraseña'"
+                [attr.aria-pressed]="!hidePassword">
                 <mat-icon aria-hidden="true">{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
               </button>
               <mat-hint>Mínimo 8 caracteres.</mat-hint>
@@ -147,10 +149,12 @@
             <mat-form-field appearance="outline">
               <mat-label>Confirmar contraseña *</mat-label>
               <input matInput [type]="hideConfirmPassword ? 'password' : 'text'" formControlName="confirmPassword" autocomplete="new-password">
-              <button mat-icon-button matSuffix type="button" (click)="alternarConfirmPassword()">
+              <button mat-icon-button matSuffix type="button" (click)="alternarConfirmPassword()"
+                [attr.aria-label]="hideConfirmPassword ? 'Mostrar confirmación de contraseña' : 'Ocultar confirmación de contraseña'"
+                [attr.aria-pressed]="!hideConfirmPassword">
                 <mat-icon aria-hidden="true">{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
               </button>
-              @if (step3Form.hasError('passwordMismatch')) {
+              @if (step3Form.get('confirmPassword')?.hasError('passwordMismatch')) {
                 <mat-error>Las contraseñas no coinciden</mat-error>
               }
             </mat-form-field>
