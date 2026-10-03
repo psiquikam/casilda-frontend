@@ -26,6 +26,11 @@ export const routes: Routes = [
     loadComponent: () => import('./components/auth/login/login.component').then((m) => m.LoginComponent)
   },
   {
+    path: 'registro',
+    title: 'Registro',
+    loadComponent: () => import('./components/auth/register/register.component').then((m) => m.RegisterComponent)
+  },
+  {
     path: 'formulario-anonimo',
     title: 'Reporte anónimo de VBG',
     loadComponent: () => import('./components/formulario-anonimo/formulario-anonimo.component').then((m) => m.FormularioAnonimoComponent)
