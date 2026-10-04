@@ -133,7 +133,7 @@ Dos consecuencias prácticas:
 **Cómo se cambia de rol en desarrollo** (tres caminos, todos sin backend):
 
 1. **Login → «Cuentas de prueba (Roles Fase 2)»** (`login.component.html:34-50`): un clic
-   por rol. Es el camino usado para las capturas de este documento.
+   por rol. Es el camino usado para la verificación visual de este documento.
 2. **Encabezado → menú de usuario → «Cambiar Rol (Modo Prueba)»**
    (`header.component.html:54-70`): cambia de rol sin cerrar sesión y navega a `/inicio`.
 3. **Formulario de login** con las credenciales de `MOCK_USERS` (`auth.service.ts:75-136`):
@@ -180,10 +180,10 @@ Las rutas se abrevian: `dh.ts` = `dashboard-home.component.ts`,
 
 | ID | Estado | Evidencia | Causa |
 |---|---|---|---|
-| **DSH-01-01** | **CONFIRMADO** | Píldora del encabezado `header.component.html:36`; insignia del menú de usuario `header.component.html:47`; insignia del saludo `dh.html:8`; título `«Módulos Disponibles para {{ rolUsuario }}»` `dh.html:788`. Captura `admin-1440.png`. | Cuatro consumidores independientes de `auth.getRoleName()`. Además `getRoleName()` devuelve `'Admin'` (`auth.service.ts:178`) mientras `MOCK_USERS.admin.nombre` dice «Super Administrador CASILDA»: dos denominaciones para el mismo rol. |
+| **DSH-01-01** | **CONFIRMADO** | Píldora del encabezado `header.component.html:36`; insignia del menú de usuario `header.component.html:47`; insignia del saludo `dh.html:8`; título `«Módulos Disponibles para {{ rolUsuario }}»` `dh.html:788`. Verificado en navegador (ADMIN, 1440 px). | Cuatro consumidores independientes de `auth.getRoleName()`. Además `getRoleName()` devuelve `'Admin'` (`auth.service.ts:178`) mientras `MOCK_USERS.admin.nombre` dice «Super Administrador CASILDA»: dos denominaciones para el mismo rol. |
 | **DSH-01-02** | **DISTINTO** (síntoma real, causa distinta) | DOM: `"domingo, 4 de octubre de 2026"` (correcto). Render: `"Domingo, 4 De Octubre De 2026"`. `getComputedStyle(.user-greeting__date).textTransform === "capitalize"` → **`dh.scss:153`**. | **No hay `titlecase`.** `fechaFormateada` (`dh.ts:193-201`) usa `toLocaleDateString('es-CO')` y devuelve el texto correcto; lo rompe una regla CSS. Corrección: eliminar `text-transform: capitalize` en `dh.scss:153`. Independientemente, el getter debe migrar a `DatePipe` + `LOCALE_ID` (DSH-11-08) para no duplicar la configuración regional. |
 | **DSH-01-03** | **CONFIRMADO** | `dh.html:18-49`, en `.workspace-header__top`, junto al `h1`. Íconos `dock_to_left` / `dock_to_top`. | Preferencia de interfaz en la zona de mayor jerarquía. **Ya existe el destino correcto**: el menú de usuario tiene el mismo control (`header.component.html:76-92`), así que el bloque del panel es un duplicado puro y puede retirarse sin pérdida funcional. Nota: los íconos **no** son de teléfono móvil (el contrato lo supuso); son correctos. |
-| **DSH-01-04** | **CONFIRMADO** | `header.component.html:35` → «Super Administrador CASI…»; el `h1` del panel sí muestra el nombre completo (`dh.html:11`). Capturas `admin-1440.png`, `revisor-1440.png`. | `nombreUsuario` (`dh.ts:169-171`) devuelve `currentUser.nombre` completo; el truncado ocurre en el encabezado por ancho. No hay campo de nombre corto en `UserSession` (`auth.service.ts:9-17`). → Pregunta P-21. |
+| **DSH-01-04** | **CONFIRMADO** | `header.component.html:35` → «Super Administrador CASI…»; el `h1` del panel sí muestra el nombre completo (`dh.html:11`). Verificado en navegador (ADMIN y REVISOR, 1440 px). | `nombreUsuario` (`dh.ts:169-171`) devuelve `currentUser.nombre` completo; el truncado ocurre en el encabezado por ancho. No hay campo de nombre corto en `UserSession` (`auth.service.ts:9-17`). → Pregunta P-21. |
 | **DSH-01-05** | **CONFIRMADO** | `dh.html:53-67`; ancho completo bajo el saludo. `filteredTools` (`dh.ts:433-453`) busca sobre los mismos 13 módulos del menú. | El buscador duplica la navegación y, al escribir, **reemplaza todo el panel** por la grilla de resultados (`dh.html:71-110`): pierde KPIs y pendientes. |
 
 ### 3.2 Indicadores (KPIs)
@@ -201,7 +201,7 @@ Las rutas se abrevian: `dh.ts` = `dashboard-home.component.ts`,
 
 | ID | Estado | Evidencia | Causa |
 |---|---|---|---|
-| **DSH-03-01** | **CONFIRMADO** | `dh.scss:481-491`: `slice--female` = degradado `#70205b → #96357d` (morado/magenta); `slice--male` = `#137598 → #2a94bc` (azul). Píldoras en `:586-600`; puntos en `:547-550`. Captura `admin-1440.png`. | Asignación estereotipada morado→mujeres / azul→hombres. **No existe ninguna paleta `--color-data-*`** en `_tokens.scss`; lo más cercano son los alias `--color-comp-*` (`_tokens.scss:33-47`), descritos como «para gráficos, métricas y badges» pero sin criterio de serie ni contrastes verificados. Propuesta en el §5. |
+| **DSH-03-01** | **CONFIRMADO** | `dh.scss:481-491`: `slice--female` = degradado `#70205b → #96357d` (morado/magenta); `slice--male` = `#137598 → #2a94bc` (azul). Píldoras en `:586-600`; puntos en `:547-550`. Verificado en navegador (ADMIN, 1440 px). | Asignación estereotipada morado→mujeres / azul→hombres. **No existe ninguna paleta `--color-data-*`** en `_tokens.scss`; lo más cercano son los alias `--color-comp-*` (`_tokens.scss:33-47`), descritos como «para gráficos, métricas y badges» pero sin criterio de serie ni contrastes verificados. Propuesta en el §5. |
 | **DSH-03-02** | **CONFIRMADO** | `dh.ts:161-166`: `'Mujeres (Cis/Trans)'`, `'Hombres (Cis/Trans)'`, `'Personas No Binarias'`, `'Disidencias / Otras'`. | Categorías quemadas en el componente, no servidas por catálogo. **[PENDIENTE]** del contrato: sigue abierto (P-05). |
 | **DSH-03-03** | **CONFIRMADO**, y peor de lo descrito | `dh.html:629-634`: la barra lleva `role="progressbar"` **sin** `aria-valuenow`/`valuemin`/`valuemax`/`aria-valuetext`, y cada segmento es un `<div>` vacío cuyo único contenido es el atributo `[title]` (`:632`) — no accesible por teclado ni anunciado de forma fiable. No existe tabla alternativa. | Además del color como portador único, hay **uso incorrecto de ARIA**: `progressbar` no describe una distribución categórica. Las tarjetas de debajo sí llevan texto, pero la barra por sí sola no es interpretable. |
 | **DSH-03-04** | **CONFIRMADO** | `dh.ts:165` → `{ label: 'Disidencias / Otras', count: 8 }`. | No hay supresión de celdas pequeñas ni filtros hoy; el riesgo se materializa al añadir filtros (facultad, sede), que es justo lo que pide §4.5. **[PENDIENTE]** umbral (P-06). |
@@ -213,17 +213,17 @@ Las rutas se abrevian: `dh.ts` = `dashboard-home.component.ts`,
 | **DSH-04-01** | **CONFIRMADO** | Vía 1: menú lateral (`sidebar.component.html`). Vía 2: tarjetas «Gestión del Sistema y Configuración» (`dh.html:580-608`). Vía 3: grilla de 13 módulos (`dh.html:794-814`). Vía 4 no listada en el contrato: los botones «Acciones Rápidas» de cada rol (`dh.html:301-322`, `:404-425`, `:495-512`). Vía 5: el buscador (`dh.html:53-67`). | **Cinco** caminos a los mismos destinos, no tres. |
 | **DSH-04-02** | **CONFIRMADO** | `dh.html:92-93` → `<strong>¿Qué es?</strong>` / `<strong>¿Cuándo usarlo?</strong>` con los textos de `dh.ts:294-295` y equivalentes para los 13 módulos. CTA: `«Abrir {{ tool.title }}»` (`dh.html:96`). | Las MAYÚSCULAS sostenidas **no vienen del texto** sino del CSS: `.tool-card__category` y las etiquetas de KPI usan `text-transform: uppercase` (p. ej. `dh.scss:1119-1126`). El CTA no está en mayúsculas en el DOM. Las clases `.tool-card__what` y `.tools-intro*` **no tienen estilos** (ver DSH-04-07), por eso los párrafos se ven sin jerarquía. |
 | **DSH-04-03** | **CONFIRMADO** | «Nueva Solicitud» (`sidebar:97`) / «Solicitud de Acompañamiento» (`dh.ts:290`) / «Ir a Nueva Solicitud» (`dh.ts:221`) / `title: 'Solicitud de acompañamiento'` (`app.routes.ts:88`). · «Consulta Solicitudes» (`sidebar:101`) / «Consulta y Bandeja de Solicitudes» (`dh.ts:312`) / `'Consulta de solicitudes'` (`app.routes.ts:116`). · «Registro de Caso» (`sidebar:115`) / «Registro de Caso (Expediente)» (`dh.ts:334`). · «Primer Respondiente» (`sidebar:144`) / «Línea Alma (Primer Respondiente)» (`dh.ts:367`). · «Queja Disciplinaria (UAD)» (`sidebar:42`) / «Registrar Queja» (`sidebar:170`) / «UAD — Registrar Queja Disciplinaria» (`dh.ts:378`). | **Seis** módulos con nombre divergente, no tres. No existe catálogo central de navegación: cada superficie escribe su propio literal. **[PENDIENTE]** nombres oficiales (P-07). |
-| **DSH-04-04** | **CONFIRMADO** | `dh.ts:300-309`: `id: 'reportar-caso'`, `category: 'Mis Solicitudes'`, `roles: ['USUARIO']`, `icon: 'add_circle_outline'` — **el mismo ícono** que `id: 'solicitud'` (`dh.ts:293`). Aparece para el ADMIN porque `filteredTools` omite el filtro por rol cuando `isAdmin()` (`dh.ts:435,439`). Captura `admin-1440.png`, pestaña «Módulos de la Plataforma (13)». | El filtro de rol tiene una excepción para ADMIN heredada de `roleGuard`, pero en una vista de catálogo «ver todo» no equivale a «es mi tarea». |
-| **DSH-04-05** | **CONFIRMADO** | `dh.scss:751-759` → `.stepper-item__name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis }` dentro de una grilla `repeat(auto-fit, minmax(180px, 1fr))` (`dh.scss:705-707`) con 5 columnas. Captura `admin-1440-ruta-del-caso.png`: «Recepción y Radic…», «Bandeja y Contact…», «Agendamiento de …», «Apertura de Caso …». | 5 columnas de ≈180 px para títulos de hasta 25 caracteres. En ≤768 px el stepper pasa a scroll horizontal (`dh.scss:1429-1446`) y **ahí no se trunca**: el defecto es exclusivo de escritorio. |
-| **DSH-04-06** | **CONFIRMADO**, causa precisa | **Ninguna** de estas clases tiene regla en `dh.scss`: `.step-card`, `.step-card__header`, `.step-card__badge-pill`, `.step-card__title`, `.step-card__subtitle`, `.step-card__body`, `.step-card__desc`, `.step-card__details-box`, `.step-card__footer`, `.details-heading`, `.details-list`, `.check-icon`. Solo existen `.step-card__restricted-wrap` y `.step-card__restricted-msg` (`dh.scss:964,973`). Captura `admin-1440-ruta-del-caso.png`. | El SCSS define `.step-detail-card` (`dh.scss:853`), nombre que la plantilla **no usa**. El `<ul class="details-list">` conserva su `list-style` nativo y además cada `<li>` incluye un `<mat-icon>check_circle</mat-icon>` (`dh.html:752`) → viñeta + ícono. El `<mat-icon>` del `badge-pill` (`dh.html:734`) no tiene `display:flex` que lo alinee con el texto. |
+| **DSH-04-04** | **CONFIRMADO** | `dh.ts:300-309`: `id: 'reportar-caso'`, `category: 'Mis Solicitudes'`, `roles: ['USUARIO']`, `icon: 'add_circle_outline'` — **el mismo ícono** que `id: 'solicitud'` (`dh.ts:293`). Aparece para el ADMIN porque `filteredTools` omite el filtro por rol cuando `isAdmin()` (`dh.ts:435,439`). Verificado en navegador (ADMIN, pestaña «Módulos de la Plataforma (13)»). | El filtro de rol tiene una excepción para ADMIN heredada de `roleGuard`, pero en una vista de catálogo «ver todo» no equivale a «es mi tarea». |
+| **DSH-04-05** | **CONFIRMADO** | `dh.scss:751-759` → `.stepper-item__name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis }` dentro de una grilla `repeat(auto-fit, minmax(180px, 1fr))` (`dh.scss:705-707`) con 5 columnas. Verificado en navegador (ADMIN, 1440 px, pestaña «Ruta del Caso»): se lee «Recepción y Radic…», «Bandeja y Contact…», «Agendamiento de …», «Apertura de Caso …». | 5 columnas de ≈180 px para títulos de hasta 25 caracteres. En ≤768 px el stepper pasa a scroll horizontal (`dh.scss:1429-1446`) y **ahí no se trunca**: el defecto es exclusivo de escritorio. |
+| **DSH-04-06** | **CONFIRMADO**, causa precisa | **Ninguna** de estas clases tiene regla en `dh.scss`: `.step-card`, `.step-card__header`, `.step-card__badge-pill`, `.step-card__title`, `.step-card__subtitle`, `.step-card__body`, `.step-card__desc`, `.step-card__details-box`, `.step-card__footer`, `.details-heading`, `.details-list`, `.check-icon`. Solo existen `.step-card__restricted-wrap` y `.step-card__restricted-msg` (`dh.scss:964,973`). Verificado en navegador (ADMIN, pestaña «Ruta del Caso»). | El SCSS define `.step-detail-card` (`dh.scss:853`), nombre que la plantilla **no usa**. El `<ul class="details-list">` conserva su `list-style` nativo y además cada `<li>` incluye un `<mat-icon>check_circle</mat-icon>` (`dh.html:752`) → viñeta + ícono. El `<mat-icon>` del `badge-pill` (`dh.html:734`) no tiene `display:flex` que lo alinee con el texto. |
 | **DSH-04-07** | **CONFIRMADO**, y la inversión es exacta | Medido en el navegador con `getComputedStyle`. **ADMIN:** `h1 «Hola, Super Administrador CASILDA»` → **Inter**; `h2 «Gestión del Sistema y Configuración»` → **Inter**; `h2 «Distribución por Identidad de Género…»` → **Inter**; `h2 «Flujo de Vida de una Solicitud en CASILDA»` → **Inter**; `h3 «Recepción y Radicación»` → **Lora**. **USUARIO:** `h1` → **Inter**; `h2` del banner → **Lora**; `h3` de las tarjetas → **Lora**; `h2 «Mis Solicitudes en Seguimiento»` → **Inter**. | `_base.scss:10-16` fija `h1,h2,h3 { font-family: var(--font-serif) }`. El panel **sobrescribe con `--font-sans` en 15 selectores de encabezado** (`dh.scss:165, 417, 686, 1040, 1128, 1221, 1282`…) y **deja sin sobrescribir** los que no tienen estilo (`.step-card__title`, `.banner-ciudadano__title`, `.user-action-card__title`, `.guia-usuario-card__title`, `.agenda-title`). Resultado: los niveles correctos (`h1`–`h3`) salen en sans y los no estilizados salen en serif — **exactamente al revés de la regla**. El SCSS del panel **no usa `--font-serif` ni una sola vez**. Sobre `h1` único: el panel cumple (un solo `h1`, `dh.html:11`). |
-| **DSH-04-08** | **DISTINTO** (no hay doble scroll vertical en el panel) | Medido: `document.documentElement.scrollHeight > window.innerHeight` → **`false`**; el que desplaza es `.main-content` (`scrollHeight 1433 / clientHeight 836`). Causa: `app.component.scss:1-6` (`body { overflow: hidden }`) y `:44-50`. Dentro del panel: `.nav-tabs { overflow-x: auto }` (`dh.scss:613`), `.citas-table-wrapper` (`:1927`), `.stepper-nav` en ≤768 px (`:1431`). | No hay dos barras verticales anidadas; hay **una sola vertical, pero del contenedor interno, no del documento**: la barra aparece pegada al contenido (visible en las capturas) y no en el borde del navegador, que es lo que se percibe como scroll anidado. Los `overflow-x` del tab-strip y de la tabla sí son barras adicionales, horizontales. **Decisión de arquitectura del shell, no del panel**: cambiarla afecta a las 23 rutas → se trata aparte (Subfase 2, riesgo alto). |
+| **DSH-04-08** | **DISTINTO** (no hay doble scroll vertical en el panel) | Medido: `document.documentElement.scrollHeight > window.innerHeight` → **`false`**; el que desplaza es `.main-content` (`scrollHeight 1433 / clientHeight 836`). Causa: `app.component.scss:1-6` (`body { overflow: hidden }`) y `:44-50`. Dentro del panel: `.nav-tabs { overflow-x: auto }` (`dh.scss:613`), `.citas-table-wrapper` (`:1927`), `.stepper-nav` en ≤768 px (`:1431`). | No hay dos barras verticales anidadas; hay **una sola vertical, pero del contenedor interno, no del documento**: la barra aparece pegada al contenido y no en el borde del navegador, que es lo que se percibe como scroll anidado. Los `overflow-x` del tab-strip y de la tabla sí son barras adicionales, horizontales. **Decisión de arquitectura del shell, no del panel**: cambiarla afecta a las 23 rutas → se trata aparte (Subfase 2, riesgo alto). |
 
 ### 3.5 Protocolos y canales
 
 | ID | Estado | Evidencia | Causa |
 |---|---|---|---|
-| **DSH-05-01 [CRÍTICO]** | **CONFIRMADO** | Origen: `environment.ts:9` **y `environment.prod.ts:9`** → `telefonoOrientacion: '1234567890'`, ambos con el comentario `TODO(negocio)`. Consumo: `dh.ts:45` → `dh.html:138` (banner del rol USUARIO, «Línea de Orientación en Crisis») y `dh.html:840` (pestaña Protocolos, personal). Capturas `usuario-1440.png` y `usuario-375.png`. | **Está también en `environment.prod.ts`**: no es un valor solo de desarrollo. Se renderiza sin ninguna condición. **Cómo ocultar la línea mientras no haya dato real:** poner `telefonoOrientacion: ''` en ambos entornos y envolver el bloque en `@if (telefonoOrientacion)`. Conviene además un predicado en el componente (`get hayLineaOrientacion()`) que rechace cadena vacía **y** marcadores evidentes (secuencias como `1234567890`, repeticiones de un mismo dígito), para que un valor de prueba reintroducido no vuelva a pasar; y una prueba unitaria que lo fije. Las líneas **155** y **123** (`dh.html:841-842`) son reales y pueden conservarse. |
+| **DSH-05-01 [CRÍTICO]** | **CONFIRMADO** | Origen: `environment.ts:9` **y `environment.prod.ts:9`** → `telefonoOrientacion: '1234567890'`, ambos con el comentario `TODO(negocio)`. Consumo: `dh.ts:45` → `dh.html:138` (banner del rol USUARIO, «Línea de Orientación en Crisis») y `dh.html:840` (pestaña Protocolos, personal). Verificado en navegador (USUARIO, 1440 y 375 px). | **Está también en `environment.prod.ts`**: no es un valor solo de desarrollo. Se renderiza sin ninguna condición. **Cómo ocultar la línea mientras no haya dato real:** poner `telefonoOrientacion: ''` en ambos entornos y envolver el bloque en `@if (telefonoOrientacion)`. Conviene además un predicado en el componente (`get hayLineaOrientacion()`) que rechace cadena vacía **y** marcadores evidentes (secuencias como `1234567890`, repeticiones de un mismo dígito), para que un valor de prueba reintroducido no vuelva a pasar; y una prueba unitaria que lo fije. Las líneas **155** y **123** (`dh.html:841-842`) son reales y pueden conservarse. |
 | **DSH-05-02** | **CONFIRMADO** | `dh.html:840-842`: `<li><strong>…</strong> {{ telefonoOrientacion }}</li>`, texto plano. `dh.html:138`: `<strong class="help-box-phone">{{ telefonoOrientacion }}</strong>`. Ningún `href="tel:"` en todo el panel. | Falta `tel:`. Aplica a las tres líneas. |
 | **DSH-05-03** | **CONFIRMADO** | `dh.html:839-843`: solo nombre y número. | **[PENDIENTE]** horarios y cobertura (P-04). |
 | **DSH-05-04** | **CONFIRMADO** | `dh.html:857` «Resolución Rectoral 41986» (sin año); `:858` «Ley 1257 de 2008»; `:859` «Ley 1581» (sin año). | Literales en plantilla, sin catálogo normativo. **[PENDIENTE]** validación jurídica (P-08). |
@@ -233,7 +233,7 @@ Las rutas se abrevian: `dh.ts` = `dashboard-home.component.ts`,
 
 | ID | Estado | Evidencia | Conclusión |
 |---|---|---|---|
-| **DSH-06-01** | **CONFIRMADO** (sin interferencia hoy) | En 1440 px el botón ocupa la esquina superior derecha del encabezado; en 375 px colapsa a botón circular (capturas `*-375.png`) y nada del panel lo tapa. Reserva en `_tokens.scss:165-166`. **Riesgo futuro:** la paleta de comandos propuesta en DSH-01-05 escucharía `Escape`, y **el doble `Escape` es un disparador de la salida rápida** (`quick-exit.component.ts:39-48`). Un `MatDialog` abierto consume el primer `Escape` al cerrarse. | No se modifica nada. Requisito para la Subfase 2: si se implementa paleta de comandos, **no** debe registrar `Escape` propio, o debe reemitir. |
+| **DSH-06-01** | **CONFIRMADO** (sin interferencia hoy) | En 1440 px el botón ocupa la esquina superior derecha del encabezado; en 375 px colapsa a botón circular (verificado en navegador a 375 px en los cinco roles) y nada del panel lo tapa. Reserva en `_tokens.scss:165-166`. **Riesgo futuro:** la paleta de comandos propuesta en DSH-01-05 escucharía `Escape`, y **el doble `Escape` es un disparador de la salida rápida** (`quick-exit.component.ts:39-48`). Un `MatDialog` abierto consume el primer `Escape` al cerrarse. | No se modifica nada. Requisito para la Subfase 2: si se implementa paleta de comandos, **no** debe registrar `Escape` propio, o debe reemitir. |
 | **DSH-06-02** | **VERIFICADO — no se corrige, se reporta** | `quick-exit.component.ts:33` → `if (evento.altKey && evento.key.toLowerCase() === 'q')`. | **(a) Falsos positivos: no ocurren.** El manejador compara `event.key`, no `event.code`. En teclado latinoamericano `AltGr + Q` produce `@`, de modo que `event.key === '@'` y la condición **no se cumple**, aunque en Windows AltGr fije `altKey` y `ctrlKey`. Escribir un correo es seguro. La recomendación del contrato de «comprobar `event.key` y excluir `event.ctrlKey`» **ya está satisfecha en su parte esencial**; añadir `&& !evento.ctrlKey` sería defensa en profundidad sin efecto observable. **(b) Falsos negativos: sí existen.** En macOS, `Option + Q` produce `œ`, por lo que `event.key.toLowerCase() !== 'q'` y **el atajo documentado no dispara**. El mismo efecto puede darse en distribuciones Linux con tecla de composición. El botón y el doble `Escape` siguen funcionando. **Pendiente de confirmación manual** sobre teclado físico latinoamericano en Windows y sobre macOS; una comprobación sintética con Playwright no sirve, porque inyecta `key:'q'` y no la traducción del sistema. → Pregunta P-18. |
 | **DSH-06-03** | **CONFIRMADO** (cumple) | `QuickExitService` limpia `sessionStorage` completo + llaves con prefijo `casilda_` + `userSession` (`quick-exit.service.ts:5,11,38-56`). Llaves existentes: `casilda_menu_layout` (`navigation-layout.service.ts:13`) ✅, `casilda_borrador_anonimo` / `casilda_borrador_reporte` (`formulario-anonimo.component.ts:51,63`) ✅, `userSession` ✅. | Requisito claro para la fase: **toda llave nueva del panel debe empezar por `casilda_`**. Nota relacionada con DSH-10-14: la sesión del rol USUARIO se guarda hoy en `localStorage` (`auth.service.ts:262,279,294,325`); la salida rápida la borra, pero el cierre normal de pestaña no. |
 | **DSH-06-04** | **NO APLICA todavía** | No existe ningún texto sobre el historial del navegador en el panel ni en `quick-exit.component.html`. | Es contenido nuevo del rol USUARIO (Subfase 4), no un defecto a corregir. |
@@ -246,7 +246,7 @@ Las rutas se abrevian: `dh.ts` = `dashboard-home.component.ts`,
 | **ADD-02** | Alto | `_tokens.scss:59` → `--color-danger: var(--udea-red-032)` y `:68` → `--color-info: var(--udea-blue-633)`. **Ninguna de esas dos variables existe** (los tokens son `--udea-pantone-032` y `--udea-pantone-633`). | Sustitución `var()` fallida ⇒ la declaración queda inválida en tiempo de cálculo y se comporta como `unset`. Afecta a `.casilda-alerta--peligro` (`_base.scss:106`), `.boton--emergencia` (`_base.scss:238`) y 20 componentes que usan `var(--color-danger)`, incluido `dh.scss:1321,1325`. Los bordes de peligro no se pintan del color previsto. |
 | **ADD-03** | Medio | `dh.scss:598-599`: `.pill--diverse { color: var(--color-comp-red) }` = `#ef434d` como **texto** sobre un fondo `rgba(239,67,77,.12)` ≈ `#fdecee`. Contraste medido: **3,3:1** (requisito 4,5:1). | Doble incumplimiento: contraste AA y la regla de `CLAUDE.md` §3 («rojo de marca nunca en texto»). |
 | **ADD-04** | Medio | `dh.scss:985` `var(--color-amber-600, #d97706)`, `:1948` `var(--color-border-subtle, #f1f5f9)`, `:1995` `var(--color-bg-surface-elevated, #f8fafc)`. | Tres tokens inexistentes con *fallback* literal: aparentan usar el sistema de diseño pero siempre resuelven al literal. |
-| **ADD-05** | Medio | Botones de acción rápida en rojo/rosa: `dh.scss:1873` `.btn-quick-action--rose { background:#e11d48 }`, usado en «Línea ALMA» (`dh.html:314`) y «Métricas e Indicadores» (`dh.html:421`). Capturas `profesional-1440.png`, `coordinador-1440.png`. | Superficie roja saturada para acciones ordinarias: compite con la salida rápida y contradice DSH-P5. |
+| **ADD-05** | Medio | Botones de acción rápida en rojo/rosa: `dh.scss:1873` `.btn-quick-action--rose { background:#e11d48 }`, usado en «Línea ALMA» (`dh.html:314`) y «Métricas e Indicadores» (`dh.html:421`). Verificado en navegador (PROFESIONAL y COORDINADOR, 1440 px). | Superficie roja saturada para acciones ordinarias: compite con la salida rápida y contradice DSH-P5. |
 | **ADD-06** | Bajo | Consola del navegador: `NG0100 ExpressionChangedAfterItHasBeenCheckedError` en `AppComponent` (sidenav) en cada carga de `/inicio`; `NG0913` por `Logo-Udea-Blanco-horizontal.png` (1470×378 renderizado a ~130 px). | Ruido de consola preexistente; conviene no arrastrarlo a la fase. |
 | **ADD-07** | Bajo (documentación) | `.agents/skills/angular_frontend_guidelines/SKILL.md` declara Angular 17, Material 17 y **SweetAlert2** como estándar. `CLAUDE.md` §2 y §4 dicen Angular 21 y «SweetAlert2 fue retirado». | La guía de código que el skill `casilda-ux` cita como fuente nº 4 está desactualizada y contradice las reglas vigentes. |
 
@@ -425,7 +425,9 @@ funcionalidad crítica de seguridad. Ninguno depende de decisiones de diseño pe
 
 ---
 
-### Subfase 1 — Correcciones transversales sin cambiar la estructura
+### Subfase 1 — Correcciones transversales sin cambiar la estructura ✅ **EJECUTADA (2026-10-04)**
+
+> Resultado en `docs/evidencias/dashboards/02-subfase-1-correcciones-transversales.md`.
 
 **Objetivo:** dejar el panel correcto en formato, color y tipografía **sin tocar la
 arquitectura**, para que la Subfase 2 reorganice contenido ya saneado.
@@ -435,7 +437,7 @@ arquitectura**, para que la Subfase 2 reorganice contenido ya saneado.
 | **Archivos** | `dashboard-home.component.{ts,html,scss}` (el grueso), `src/styles/_tokens.scss` (solo ADD-02 y, si se aprueban, los tres tokens de ADD-04), `layout/header/header.component.html` (DSH-01-01). |
 | **Alcance** | Quitar `text-transform: capitalize` (`dh.scss:153`) y migrar `fechaFormateada` a `DatePipe` + `LOCALE_ID`. Mocks que entreguen **números** y vista que formatee con `DecimalPipe`/`PercentPipe` (elimina `badge: '30.8%'`, `'< 24h'`, `'96%'`). Migrar las 80 declaraciones literales a tokens. Corregir `--color-danger` y `--color-info`. Sustituir `#ef434d` como texto por `--color-data-3-text` o `--color-danger-text`. Retirar las superficies rojas de acciones ordinarias (ADD-05). Reescribir los encabezados: `h1`–`h3` sin sobrescribir `--font-serif`; lo que solo *parece* título pasa a `<p>`/`<span>` con `--font-sans`. **Escribir el SCSS ausente** de `.step-card*`, `.tools-*`, `.protocols-intro*`, `.details-*` (resuelve DSH-04-06 y parte de DSH-04-07): `display:flex` para alinear íconos, `list-style:none` para quitar el doble marcador. Stepper sin truncar (etiquetas cortas completas o stepper vertical en escritorio). Enlaces `tel:` en las tres líneas. «Ley 1581 **de 2012**». Dejar el rol **una sola vez**: retirar la insignia del saludo (`dh.html:8`) y conservar la del menú de usuario. |
 | **Dependencias** | DSH-02-04 y ADD-03 necesitan la paleta del §5 aprobada (**P-03**) para las series; el resto de literales (botones, insignias) se migra con tokens existentes. DSH-05-04 necesita **P-08** solo para la Resolución Rectoral; «Ley 1581 de 2012» es inmediato. |
-| **Riesgos** | El SCSS tiene 2096 líneas con clases huérfanas: hay riesgo de tocar reglas muertas y creer que se corrigió algo. Mitigación: antes de editar, listar las clases de la plantilla sin regla (script ya usado en este diagnóstico) y trabajar sobre esa lista. Cambiar la tipografía de los encabezados altera la densidad visual: revisar las seis capturas de línea base. |
+| **Riesgos** | El SCSS tiene 2096 líneas con clases huérfanas: hay riesgo de tocar reglas muertas y creer que se corrigió algo. Mitigación: antes de editar, listar las clases de la plantilla sin regla (script ya usado en este diagnóstico) y trabajar sobre esa lista. Cambiar la tipografía de los encabezados altera la densidad visual: revisar las cinco vistas de rol en navegador antes de cerrar. |
 | **Terminado cuando** | `a11y:audit` reporta `dashboard-home.component.scss` **fuera** de la lista de SCSS con literales. Ningún `getComputedStyle` de `h1`–`h3` del panel devuelve Inter, ni de un no-encabezado devuelve Lora. Ningún porcentaje o fecha se construye como cadena en el TS. Las etiquetas del stepper se leen completas en 1440, 768 y 375 px. Las tres líneas telefónicas son enlaces `tel:` operables. El rol aparece exactamente una vez por pantalla. |
 
 ---
@@ -447,7 +449,7 @@ arquitectura**, para que la Subfase 2 reorganice contenido ya saneado.
 | **Archivos** | **Nuevos:** `src/app/components/dashboard/` (contenedor de zonas + un componente standalone por widget), `src/app/components/casilda-kpi-card/`, `src/app/services/dashboard-metricas.service.ts`, `…/dashboard-pendientes.service.ts`, `…/catalogo-navegacion.service.ts`, `src/app/core/dashboard/dashboard-por-rol.ts` (registro). **Modificados:** `dashboard-home.component.*` (se vacía y pasa a orquestar), `app.routes.ts` (si cambia el `loadComponent`), `environment*.ts` (`features.demoData`), `layout/sidebar` y `horizontal-nav` (nombres desde el catálogo), `app.component.scss` (solo si se aborda DSH-04-08). **Nuevo contrato:** `docs/contratos/` con los DTO del panel. |
 | **Alcance** | Esqueleto Z1–Z6 con Z2 antes de Z3. Registro `DASHBOARD_POR_ROL: Record<RolCasilda, readonly WidgetId[]>` indexado por los **cinco roles reales** (§2.2), con el orden del registro como orden visual. Un servicio por fuente de datos con DTO tipado, endpoint documentado y latencia/error simulables (DSH-12-09), siguiendo `ContenidoHomeService`. Estados de carga/vacío/error por zona. Franja «Datos de demostración» tras `features.demoData`. Retirar del panel la grilla de 13 módulos, las tarjetas «Gestión del Sistema» y el conmutador de disposición (ya está en el menú de usuario). Mover «Ruta del Caso» y «Protocolos» a Z6 colapsable con `aria-expanded` + `inert`, estado recordado bajo llave `casilda_*`. Catálogo central de nombres consumido por menú, panel y `title` de ruta. Buscador: o paleta de comandos que **no capture `Escape`**, o campo compacto en la cabecera. |
 | **Dependencias** | **P-01** (`casilda-diseno-v1.md`: ¿define ya tarjeta de KPI o zonas?) es bloqueante para no construir dos veces. **P-07** (nombres oficiales) bloquea el catálogo. **P-02** condiciona si el registro lleva cuatro o cinco entradas de personal. |
-| **Riesgos** | **Alto.** Es la subfase que puede romper las cuatro vistas de personal a la vez. Mitigaciones: construir el contenedor nuevo **en paralelo** al actual y conmutar por rol conforme cada dashboard de la Subfase 3 esté listo; cada widget con su propia prueba; capturas comparadas contra la línea base de este documento. **DSH-04-08 se evalúa aparte**: pasar el scroll del shell al documento toca las 23 rutas y la salida rápida fija; si el análisis no es concluyente, se deja fuera y se documenta, y en esta subfase solo se eliminan los `overflow` innecesarios **dentro** del panel. |
+| **Riesgos** | **Alto.** Es la subfase que puede romper las cuatro vistas de personal a la vez. Mitigaciones: construir el contenedor nuevo **en paralelo** al actual y conmutar por rol conforme cada dashboard de la Subfase 3 esté listo; cada widget con su propia prueba; comparación visual en navegador contra la línea base descrita en el §8. **DSH-04-08 se evalúa aparte**: pasar el scroll del shell al documento toca las 23 rutas y la salida rápida fija; si el análisis no es concluyente, se deja fuera y se documenta, y en esta subfase solo se eliminan los `overflow` innecesarios **dentro** del panel. |
 | **Terminado cuando** | Ningún `@if` por rol en las plantillas de widget: el rol solo se consulta en el registro. Cada widget obtiene sus datos de un servicio (DSH-12-03), con `next` **y** `error`, y los errores pasan por `NotificacionService`. Las tres zonas de cada rol muestran skeleton, vacío y error forzables desde el mock. Un mismo módulo se llama igual en menú, panel y título de pestaña. La franja de demostración aparece con `demoData: true` y desaparece con `false`. La salida rápida sigue operando con clic, `Alt + Q` y doble `Escape` **con la paleta de comandos abierta**. |
 
 ---
@@ -545,29 +547,35 @@ con su justificación y su medición de peso de bundle.
 
 ---
 
-## 8. Capturas de línea base
+## 8. Línea base observada
 
-Tomadas el 4 de octubre de 2026 sobre `http://127.0.0.1:4300/inicio`, Chromium vía
-Playwright MCP, en `docs/evidencias/dashboards/capturas/linea-base/`.
+Verificación visual del 4 de octubre de 2026 sobre `http://127.0.0.1:4300/inicio`,
+Chromium vía Playwright MCP, en **375 y 1440 px** para **los cinco roles**. No quedó
+ningún rol sin revisar.
 
-| Archivo | Rol | Ancho | Contenido |
-|---|---|---|---|
-| `admin-1440.png` | ADMIN | 1440 | Cabecera, 4 KPIs, Gestión del Sistema, distribución por identidad de género, pestañas. |
-| `admin-1440-ruta-del-caso.png` | ADMIN | 1440 | Pestaña «Ruta del Caso»: stepper truncado, doble marcador, encabezado en serif. |
-| `admin-375.png` | ADMIN | 375 | Apilado móvil; salida rápida colapsada y sin obstrucción. |
-| `coordinador-1440.png` / `coordinador-375.png` | COORDINADOR | 1440 / 375 | KPIs de equipo, 5 botones de colores saturados, carga de trabajo con nombres completos. |
-| `profesional-1440.png` / `profesional-375.png` | PROFESIONAL | 1440 / 375 | KPIs de jornada, acciones rápidas, tabla de citas de hoy. |
-| `revisor-1440.png` / `revisor-375.png` | REVISOR | 1440 / 375 | KPIs con cadenas (`< 24h`, `96%`), módulos de auditoría, distribución sin barra. |
-| `usuario-1440.png` / `usuario-375.png` | USUARIO | 1440 / 375 | **Banner con el teléfono `1234567890`**, 3 tarjetas de acción, jerga visible. |
-| `usuario-1440-mis-solicitudes.png` | USUARIO | 1440 | «Mis Solicitudes en Seguimiento» con radicado, profesional y próxima cita; guía de 4 pasos. |
+> **Las imágenes no se versionan.** Lo que importa a futuro es la observación, no el
+> archivo: los PNG saturan el repositorio y envejecen mal. Lo observado queda descrito
+> aquí y en la columna «Evidencia» del §3, que es lo que permite reproducir la
+> verificación. Para repetirla, ver «cómo se cambia de rol en desarrollo» en el §2.1.
 
-**Roles cubiertos: los cinco.** No quedó ningún rol sin capturar. Las capturas son del
-viewport y no de página completa: el documento no desplaza (`body { overflow: hidden }`,
-`app.component.scss:1-6`), así que `fullPage` devuelve solo la parte visible — hecho que
-sirve de evidencia para DSH-04-08.
+| Rol | Ancho | Qué se observó |
+|---|---|---|
+| ADMIN | 1440 | Cabecera con el rol repetido, 4 KPIs con píldoras de porcentaje, «Gestión del Sistema», barra segmentada de identidad de género y las tres pestañas. |
+| ADMIN | 1440 | Pestaña «Ruta del Caso»: stepper con las cinco etapas truncadas, lista con doble marcador (viñeta + ícono) y «Recepción y Radicación» en serif frente a los `h2` en sans. |
+| ADMIN | 375 | Apilado móvil correcto; salida rápida colapsada a botón circular y sin obstrucción. |
+| COORDINADOR | 1440 / 375 | KPIs de equipo, cinco botones de acción en colores saturados (uno rojo) y «Carga de Trabajo» con nombres completos de profesionales. |
+| PROFESIONAL | 1440 / 375 | KPIs de jornada, cinco acciones rápidas de colores y tabla «Citas Programadas para Hoy». |
+| REVISOR | 1440 / 375 | KPIs con valores de texto (`< 24h`, `96%`), módulos de auditoría y distribución de identidad de género sin barra. |
+| USUARIO | 1440 / 375 | Banner con el teléfono `1234567890`, tres tarjetas de acción y jerga visible («radicado», «trámite»). |
+| USUARIO | 1440 | «Mis Solicitudes en Seguimiento» con radicado, nombre del profesional y próxima cita; guía de cuatro pasos. |
 
-**Consola durante la captura:** `NG0100` en `AppComponent` en cada carga de `/inicio` y
-`NG0913` por el tamaño intrínseco del logo (ADD-06). Sin errores atribuibles al panel.
+**Dato técnico recogido durante la verificación:** el documento no desplaza
+(`document.documentElement.scrollHeight > window.innerHeight` → `false`); desplaza
+`.main-content` (`app.component.scss:1-6` y `:44-50`). Por eso una captura `fullPage`
+devuelve solo la parte visible. Es la evidencia de DSH-04-08.
+
+**Consola:** `NG0100` en `AppComponent` en cada carga de `/inicio` y `NG0913` por el
+tamaño intrínseco del logo (ADD-06). Sin errores atribuibles al panel.
 
 ---
 
@@ -575,17 +583,17 @@ sirve de evidencia para DSH-04-08.
 
 | ID | Estado | Evidencia |
 |----|--------|-----------|
-| DSH-01-01 | CONFIRMADO | `header.component.html:36,47` · `dashboard-home.component.html:8,788` |
-| DSH-01-02 | DISTINTO | `dashboard-home.component.scss:153` (CSS, no pipe) |
+| DSH-01-01 | CONFIRMADO → **CORREGIDO** (Subfase 1) | `header.component.html:36,47` · `dashboard-home.component.html:8,788` |
+| DSH-01-02 | DISTINTO → **CORREGIDO** (Subfase 1) | `dashboard-home.component.scss:153` (CSS, no pipe) |
 | DSH-01-03 | CONFIRMADO | `dashboard-home.component.html:18-49` |
 | DSH-01-04 | CONFIRMADO | `header.component.html:35` |
 | DSH-01-05 | CONFIRMADO | `dashboard-home.component.html:53-67,71-110` |
 | DSH-02-01 | CONFIRMADO | `dashboard-home.component.ts:118-160` |
 | DSH-02-02 | CONFIRMADO | `dashboard-home.component.ts:141-149` |
 | DSH-02-03 | CONFIRMADO | `dashboard-home.component.ts:128` |
-| DSH-02-04 | DISTINTO | `dashboard-home.component.scss:131-153,1870-1874`; `#814ea5` = 0 usos |
+| DSH-02-04 | DISTINTO → **CORREGIDO** (Subfase 1) | `dashboard-home.component.scss:131-153,1870-1874`; `#814ea5` = 0 usos |
 | DSH-02-05 | CONFIRMADO | `dashboard-home.component.ts:118-167` |
-| DSH-02-06 | CONFIRMADO | `dashboard-home.component.ts:111,114,138,148,158` · `…html:542,646` |
+| DSH-02-06 | CONFIRMADO → **CORREGIDO** (Subfase 1) | `dashboard-home.component.ts:111,114,138,148,158` · `…html:542,646` |
 | DSH-03-01 | CONFIRMADO | `dashboard-home.component.scss:481-491,547-550,586-600` |
 | DSH-03-02 | CONFIRMADO | `dashboard-home.component.ts:161-166` |
 | DSH-03-03 | CONFIRMADO | `dashboard-home.component.html:629-634` |
@@ -594,24 +602,24 @@ sirve de evidencia para DSH-04-08.
 | DSH-04-02 | CONFIRMADO | `dashboard-home.component.html:92-93` · `…scss:1119-1126` |
 | DSH-04-03 | CONFIRMADO | `sidebar.component.html:97,101,115,144,42,170` · `…ts:290,312,334,367,378` |
 | DSH-04-04 | CONFIRMADO | `dashboard-home.component.ts:300-309,435,439` |
-| DSH-04-05 | CONFIRMADO | `dashboard-home.component.scss:705-707,751-759` |
-| DSH-04-06 | CONFIRMADO | `.step-card*`, `.details-*`, `.check-icon` sin regla en `…scss` |
-| DSH-04-07 | CONFIRMADO | `_base.scss:10-16` vs. 15 sobrescrituras en `…scss`; medición en navegador |
+| DSH-04-05 | CONFIRMADO → **CORREGIDO** (Subfase 1) | `dashboard-home.component.scss:705-707,751-759` |
+| DSH-04-06 | CONFIRMADO → **CORREGIDO** (Subfase 1) | `.step-card*`, `.details-*`, `.check-icon` sin regla en `…scss` |
+| DSH-04-07 | CONFIRMADO → **CORREGIDO** (Subfase 1) | `_base.scss:10-16` vs. 15 sobrescrituras en `…scss`; medición en navegador |
 | DSH-04-08 | DISTINTO | `app.component.scss:1-6,44-50`; `document` no desplaza |
 | DSH-05-01 | CONFIRMADO → **CORREGIDO** (Subfase 0) | `environment.ts:9` · `environment.prod.ts:9` · `…html:138,840` |
-| DSH-05-02 | CONFIRMADO | `dashboard-home.component.html:138,840-842` |
+| DSH-05-02 | CONFIRMADO → **CORREGIDO** (Subfase 1) | `dashboard-home.component.html:138,840-842` |
 | DSH-05-03 | CONFIRMADO | `dashboard-home.component.html:839-843` |
-| DSH-05-04 | CONFIRMADO | `dashboard-home.component.html:857-859` |
+| DSH-05-04 | CONFIRMADO → **PARCIAL** (falta P-08) | `dashboard-home.component.html:857-859` |
 | DSH-05-05 | CONFIRMADO | `dashboard-home.component.html:837` |
-| DSH-06-01 | CONFIRMADO (sin interferencia) | Capturas `*-375.png` · `_tokens.scss:165-166` |
+| DSH-06-01 | CONFIRMADO (sin interferencia) | Verificado a 375 px · `_tokens.scss:165-166` |
 | DSH-06-02 | VERIFICADO → **CORREGIDO** (Subfase 0) | `quick-exit.component.ts:33` |
 | DSH-06-03 | CONFIRMADO (cumple) | `quick-exit.service.ts:5,11,38-56` |
 | DSH-06-04 | NO APLICA (contenido nuevo) | — |
 | ADD-01 | **ACEPTADO — deuda conocida** | `header.component.html:54-70` · `login.component.html:34-50` · `auth.service.ts:54-73,302-327` |
-| ADD-02 | NUEVO — alto | `_tokens.scss:59,68` |
-| ADD-03 | NUEVO — medio | `dashboard-home.component.scss:598-599` (3,3:1) |
-| ADD-04 | NUEVO — medio | `dashboard-home.component.scss:985,1948,1995` |
-| ADD-05 | NUEVO — medio | `dashboard-home.component.scss:1873` · `…html:314,421` |
+| ADD-02 | **CORREGIDO** (Subfase 1) | `_tokens.scss:59,68` |
+| ADD-03 | **CORREGIDO** (Subfase 1) | `dashboard-home.component.scss:598-599` (3,3:1) |
+| ADD-04 | **CORREGIDO** (Subfase 1) | `dashboard-home.component.scss:985,1948,1995` |
+| ADD-05 | **CORREGIDO** (Subfase 1) | `dashboard-home.component.scss:1873` · `…html:314,421` |
 | ADD-06 | NUEVO — bajo | Consola del navegador (NG0100, NG0913) |
 | ADD-07 | NUEVO — bajo | `.agents/skills/angular_frontend_guidelines/SKILL.md` vs. `CLAUDE.md` §2 |
 

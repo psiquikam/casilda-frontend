@@ -20,6 +20,11 @@
   --udea-blue-334: #069a7e;     /* Turquesa Medio */
   --udea-blue-7718: #0e7774;    /* Turquesa Oscuro (ideal para textos/enlaces) */
 
+  /* Componentes RGB para construir transparencias con rgba() sin repetir el
+     hexadecimal en los componentes (mismo patrón que la paleta complementaria). */
+  --udea-green-349-rgb: 2, 105, 55;
+  --udea-blue-7718-rgb: 14, 119, 116;
+
   /* Paleta complementaria oficial UdeA (Manual de Identidad Institucional pág. 20) */
   --udea-pantone-7650: #70205b;         /* 7650 C — Morado / Magenta Profundo (RGB: 112, 32, 91) */
   --udea-pantone-7650-rgb: 112, 32, 91;
@@ -50,13 +55,20 @@
      2. APLICACIÓN SEMÁNTICA (accesibilidad + enfoque sensible al trauma)
      ========================================================================== */
   --color-primary: var(--udea-green-349);
+  --color-primary-rgb: var(--udea-green-349-rgb);
   --color-primary-hover: #014f29;
   --color-primary-active: #01361c;
+  /* Realces del verde institucional: foco, selección y acentos suaves. */
+  --color-primary-tint: rgba(var(--color-primary-rgb), 0.08);
+  --color-primary-border: rgba(var(--color-primary-rgb), 0.25);
+  --color-primary-ring: rgba(var(--color-primary-rgb), 0.15);
 
   --color-secondary: var(--udea-blue-7718);
+  --color-secondary-rgb: var(--udea-blue-7718-rgb);
   --color-secondary-hover: #0a5a57;
+  --color-secondary-tint: rgba(var(--color-secondary-rgb), 0.08);
 
-  --color-danger: var(--udea-red-032);   /* Rojo de marca: bordes y elementos gráficos (>=3:1) */
+  --color-danger: var(--udea-pantone-032);  /* Rojo de marca: bordes y elementos gráficos (>=3:1) */
   --color-danger-hover: #d32f2f;
   --color-danger-text: #b3141f;          /* Rojo oscurecido para texto sobre fondo claro (6.3:1) */
   /* Superficie roja apta para texto blanco: el #ef434d de marca solo alcanza
@@ -65,7 +77,7 @@
   --color-danger-surface-hover: #9b1c1c; /* 8.1:1 con blanco */
   --color-warning: #d97706;
   --color-success: var(--udea-green-7740);
-  --color-info: var(--udea-blue-633);
+  --color-info: var(--udea-pantone-633);
 
   /* Fondos atenuados: guían la atención sin generar ansiedad */
   --color-bg-danger-light: #fdf2f2;
@@ -95,6 +107,9 @@
      Times New Roman, que permanece como respaldo inmediato. */
   --font-serif: 'Lora', 'Times New Roman', Times, Georgia, serif;
   --font-sans: 'Inter', 'Lato', 'Roboto', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  /* Monoespaciada para códigos de radicado y otros identificadores: alinea
+     dígitos en columna y evita confundir 0/O y 1/l. */
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
 
   --font-size-xs: 0.75rem;    /* 12px */
   --font-size-sm: 0.875rem;   /* 14px — mínimo de lectura en pantalla */

@@ -4,9 +4,10 @@
   <header class="workspace-header">
     <div class="workspace-header__top">
       <div class="user-greeting">
+        <!-- El rol se muestra una sola vez, en el menú de usuario del
+             encabezado (DSH-01-01). Aquí solo la fecha. -->
         <div class="user-greeting__meta">
-          <span class="user-greeting__role-badge user-greeting__role-badge--{{ auth.getRoleCode().toLowerCase() }}">{{ rolUsuario }}</span>
-          <span class="user-greeting__date">{{ fechaFormateada }}</span>
+          <span class="user-greeting__date">{{ hoy | date:'fullDate' }}</span>
         </div>
         <h1 class="user-greeting__title">Hola, {{ nombreUsuario }}</h1>
         <p class="user-greeting__desc">
@@ -281,15 +282,23 @@
         <!-- KPIs de Jornada Asistencial -->
         <section class="kpi-grid" aria-label="Resumen de mi jornada">
           @for (kpi of kpisProfesional; track kpi.label) {
-            <article [class]="'kpi-card kpi-card--' + kpi.colorClass">
+            <article class="kpi-card">
               <div class="kpi-card__header">
                 <span class="kpi-card__label">{{ kpi.label }}</span>
-                <div [class]="'kpi-card__icon-box icon-box--' + kpi.colorClass">
+                <div class="kpi-card__icon-box">
                   <mat-icon aria-hidden="true">{{ kpi.icon }}</mat-icon>
                 </div>
               </div>
               <div class="kpi-card__main">
-                <span class="kpi-card__value">{{ kpi.count }}</span>
+                <span class="kpi-card__value">
+                  @if (kpi.comparador) { <span class="kpi-card__comparador">{{ kpi.comparador }}</span> }
+                  @if (kpi.proporcion) {
+                    {{ kpi.valor | percent:'1.0-1' }}
+                  } @else {
+                    {{ kpi.valor | number }}
+                  }
+                  @if (kpi.unidad) { <span class="kpi-card__unidad">{{ kpi.unidad }}</span> }
+                </span>
               </div>
               <p class="kpi-card__subtext">{{ kpi.subtext }}</p>
             </article>
@@ -303,23 +312,23 @@
             <span>Acciones Rápidas de Atención</span>
           </h2>
           <div class="quick-buttons-row">
-            <a routerLink="/registro-atencion" class="btn-quick-action btn-quick-action--emerald">
+            <a routerLink="/registro-atencion" class="btn-quick-action">
               <mat-icon aria-hidden="true">handshake</mat-icon>
               <span>Registrar Atención / Acta</span>
             </a>
-            <a routerLink="/cita" class="btn-quick-action btn-quick-action--amber">
+            <a routerLink="/cita" class="btn-quick-action">
               <mat-icon aria-hidden="true">calendar_month</mat-icon>
               <span>Agendar o Reprogramar Cita</span>
             </a>
-            <a routerLink="/registro-caso" class="btn-quick-action btn-quick-action--cyan">
+            <a routerLink="/registro-caso" class="btn-quick-action">
               <mat-icon aria-hidden="true">folder_shared</mat-icon>
               <span>Registrar Caso / Expediente</span>
             </a>
-            <a routerLink="/linea-alma/atencion-pr" class="btn-quick-action btn-quick-action--rose">
+            <a routerLink="/linea-alma/atencion-pr" class="btn-quick-action">
               <mat-icon aria-hidden="true">ring_volume</mat-icon>
               <span>Línea ALMA (Primer Respondiente)</span>
             </a>
-            <a routerLink="/mis-asignaciones" class="btn-quick-action btn-quick-action--indigo">
+            <a routerLink="/mis-asignaciones" class="btn-quick-action">
               <mat-icon aria-hidden="true">assignment_ind</mat-icon>
               <span>Mis Asignaciones</span>
             </a>
@@ -384,15 +393,23 @@
         <!-- KPIs de Coordinación de Equipo -->
         <section class="kpi-grid" aria-label="Resumen de coordinación de equipo">
           @for (kpi of kpisCoordinador; track kpi.label) {
-            <article [class]="'kpi-card kpi-card--' + kpi.colorClass">
+            <article class="kpi-card">
               <div class="kpi-card__header">
                 <span class="kpi-card__label">{{ kpi.label }}</span>
-                <div [class]="'kpi-card__icon-box icon-box--' + kpi.colorClass">
+                <div class="kpi-card__icon-box">
                   <mat-icon aria-hidden="true">{{ kpi.icon }}</mat-icon>
                 </div>
               </div>
               <div class="kpi-card__main">
-                <span class="kpi-card__value">{{ kpi.count }}</span>
+                <span class="kpi-card__value">
+                  @if (kpi.comparador) { <span class="kpi-card__comparador">{{ kpi.comparador }}</span> }
+                  @if (kpi.proporcion) {
+                    {{ kpi.valor | percent:'1.0-1' }}
+                  } @else {
+                    {{ kpi.valor | number }}
+                  }
+                  @if (kpi.unidad) { <span class="kpi-card__unidad">{{ kpi.unidad }}</span> }
+                </span>
               </div>
               <p class="kpi-card__subtext">{{ kpi.subtext }}</p>
             </article>
@@ -406,23 +423,23 @@
             <span>Herramientas de Coordinación y Triage</span>
           </h2>
           <div class="quick-buttons-row">
-            <a routerLink="/consulta" class="btn-quick-action btn-quick-action--amber">
+            <a routerLink="/consulta" class="btn-quick-action">
               <mat-icon aria-hidden="true">manage_search</mat-icon>
               <span>Bandeja y Reparto de Casos</span>
             </a>
-            <a routerLink="/mis-asignaciones" class="btn-quick-action btn-quick-action--indigo">
+            <a routerLink="/mis-asignaciones" class="btn-quick-action">
               <mat-icon aria-hidden="true">assignment_ind</mat-icon>
               <span>Supervisión de Asignaciones</span>
             </a>
-            <a routerLink="/cita" class="btn-quick-action btn-quick-action--cyan">
+            <a routerLink="/cita" class="btn-quick-action">
               <mat-icon aria-hidden="true">calendar_month</mat-icon>
               <span>Agenda Global del Equipo</span>
             </a>
-            <a routerLink="/solicitud-acompanamiento" class="btn-quick-action btn-quick-action--emerald">
+            <a routerLink="/solicitud-acompanamiento" class="btn-quick-action">
               <mat-icon aria-hidden="true">add_circle_outline</mat-icon>
               <span>Radicar Nueva Solicitud</span>
             </a>
-            <a routerLink="/dashboard-revisor" class="btn-quick-action btn-quick-action--rose">
+            <a routerLink="/dashboard-revisor" class="btn-quick-action">
               <mat-icon aria-hidden="true">insights</mat-icon>
               <span>Métricas e Indicadores</span>
             </a>
@@ -454,10 +471,10 @@
                   <span><strong>{{ p.citasHoy }}</strong> citas hoy</span>
                 </div>
                 <div class="profesional-card__bar-wrap">
-                  <div class="profesional-card__bar" [style.width.%]="p.porcentaje"
-                       [class]="'bar--' + p.badgeClass"></div>
+                  <div class="profesional-card__bar" [style.width.%]="p.porcentaje * 100"
+                       [class]="'bar--' + p.nivel" aria-hidden="true"></div>
                 </div>
-                <span class="profesional-card__cap-label">Capacidad operativa: {{ p.porcentaje }}%</span>
+                <span class="profesional-card__cap-label">Capacidad operativa: {{ p.porcentaje | percent }}</span>
               </div>
             }
           </div>
@@ -475,15 +492,23 @@
         <!-- KPIs de Auditoría y Calidad -->
         <section class="kpi-grid" aria-label="Métricas de calidad y auditoría">
           @for (kpi of kpisRevisor; track kpi.label) {
-            <article [class]="'kpi-card kpi-card--' + kpi.colorClass">
+            <article class="kpi-card">
               <div class="kpi-card__header">
                 <span class="kpi-card__label">{{ kpi.label }}</span>
-                <div [class]="'kpi-card__icon-box icon-box--' + kpi.colorClass">
+                <div class="kpi-card__icon-box">
                   <mat-icon aria-hidden="true">{{ kpi.icon }}</mat-icon>
                 </div>
               </div>
               <div class="kpi-card__main">
-                <span class="kpi-card__value">{{ kpi.count }}</span>
+                <span class="kpi-card__value">
+                  @if (kpi.comparador) { <span class="kpi-card__comparador">{{ kpi.comparador }}</span> }
+                  @if (kpi.proporcion) {
+                    {{ kpi.valor | percent:'1.0-1' }}
+                  } @else {
+                    {{ kpi.valor | number }}
+                  }
+                  @if (kpi.unidad) { <span class="kpi-card__unidad">{{ kpi.unidad }}</span> }
+                </span>
               </div>
               <p class="kpi-card__subtext">{{ kpi.subtext }}</p>
             </article>
@@ -497,19 +522,19 @@
             <span>Módulos de Auditoría y Control</span>
           </h2>
           <div class="quick-buttons-row">
-            <a routerLink="/dashboard-revisor" class="btn-quick-action btn-quick-action--rose">
+            <a routerLink="/dashboard-revisor" class="btn-quick-action">
               <mat-icon aria-hidden="true">bar_chart</mat-icon>
               <span>Panel de Indicadores y Epidemiología</span>
             </a>
-            <a routerLink="/consulta" class="btn-quick-action btn-quick-action--indigo">
+            <a routerLink="/consulta" class="btn-quick-action">
               <mat-icon aria-hidden="true">search</mat-icon>
               <span>Consulta y Auditoría de Casos</span>
             </a>
-            <a routerLink="/seguimiento" class="btn-quick-action btn-quick-action--cyan">
+            <a routerLink="/seguimiento" class="btn-quick-action">
               <mat-icon aria-hidden="true">track_changes</mat-icon>
               <span>Trazabilidad / Ruta Violeta</span>
             </a>
-            <a routerLink="/mis-asignaciones" class="btn-quick-action btn-quick-action--amber">
+            <a routerLink="/mis-asignaciones" class="btn-quick-action">
               <mat-icon aria-hidden="true">assignment_ind</mat-icon>
               <span>Mis Asignaciones de Revisión</span>
             </a>
@@ -536,14 +561,14 @@
 
           <div class="diversity-grid">
             @for (d of summaryStats.diversidad; track d.label) {
-              <div [class]="'diversity-stat-card diversity-stat-card--' + d.colorClass">
+              <div class="diversity-stat-card">
                 <div class="diversity-stat-card__header">
-                  <span [class]="'diversity-stat-card__dot dot--' + d.colorClass"></span>
+                  <span [class]="'diversity-stat-card__dot dot--' + d.serie" aria-hidden="true"></span>
                   <span class="diversity-stat-card__name">{{ d.label }}</span>
                 </div>
                 <div class="diversity-stat-card__body">
-                  <strong class="diversity-stat-card__count">{{ d.count }}</strong>
-                  <span [class]="'diversity-stat-card__percent pill--' + d.colorClass">{{ d.porcentaje }}%</span>
+                  <strong class="diversity-stat-card__count">{{ d.count | number }}</strong>
+                  <span class="diversity-stat-card__percent">{{ d.porcentaje | percent:'1.0-1' }}</span>
                 </div>
               </div>
             }
@@ -562,17 +587,20 @@
         <!-- KPIs Globales de Administración -->
         <section class="kpi-grid" aria-label="Resumen operativo 360 en tiempo real">
           @for (kpi of summaryStats.kpis; track kpi.id) {
-            <article [class]="'kpi-card kpi-card--' + kpi.colorClass">
+            <article class="kpi-card">
               <div class="kpi-card__header">
                 <span class="kpi-card__label">{{ kpi.label }}</span>
-                <div [class]="'kpi-card__icon-box icon-box--' + kpi.colorClass">
+                <div class="kpi-card__icon-box">
                   <mat-icon aria-hidden="true">{{ kpi.icon }}</mat-icon>
                 </div>
               </div>
               <div class="kpi-card__main">
-                <span class="kpi-card__value">{{ kpi.count }}</span>
+                <span class="kpi-card__value">{{ kpi.valor | number }}</span>
                 @if (kpi.badge) {
-                  <span [class]="'kpi-card__badge badge--' + kpi.colorClass">{{ kpi.badge }}</span>
+                  <span class="kpi-card__badge">{{ kpi.badge }}</span>
+                }
+                @if (kpi.porcentaje) {
+                  <span class="kpi-card__badge">{{ kpi.porcentaje | percent:'1.0-1' }}</span>
                 }
               </div>
               <p class="kpi-card__subtext">{{ kpi.subtext }}</p>
@@ -629,25 +657,28 @@
             </a>
           </div>
 
+          <!-- La barra es decorativa: el dato lo porta la cuadrícula de abajo,
+               que lleva etiqueta y cifra en texto (DSH-03-03). La alternativa
+               tabular completa llega en la Subfase 3. -->
           <div class="diversity-bar-container">
-            <div class="segmented-bar" role="progressbar" aria-label="Distribución porcentual por identidad de género">
+            <div class="segmented-bar" aria-hidden="true">
               @for (d of summaryStats.diversidad; track d.label) {
-                <div [class]="'segmented-bar__slice slice--' + d.colorClass" [style.width.%]="d.porcentaje"
-                     [title]="d.label + ': ' + d.count + ' (' + d.porcentaje + '%)'"></div>
+                <div [class]="'segmented-bar__slice slice--' + d.serie"
+                     [style.width.%]="d.porcentaje * 100"></div>
               }
             </div>
           </div>
 
           <div class="diversity-grid">
             @for (d of summaryStats.diversidad; track d.label) {
-              <div [class]="'diversity-stat-card diversity-stat-card--' + d.colorClass">
+              <div class="diversity-stat-card">
                 <div class="diversity-stat-card__header">
-                  <span [class]="'diversity-stat-card__dot dot--' + d.colorClass"></span>
+                  <span [class]="'diversity-stat-card__dot dot--' + d.serie" aria-hidden="true"></span>
                   <span class="diversity-stat-card__name">{{ d.label }}</span>
                 </div>
                 <div class="diversity-stat-card__body">
-                  <strong class="diversity-stat-card__count">{{ d.count }}</strong>
-                  <span [class]="'diversity-stat-card__percent pill--' + d.colorClass">{{ d.porcentaje }}%</span>
+                  <strong class="diversity-stat-card__count">{{ d.count | number }}</strong>
+                  <span class="diversity-stat-card__percent">{{ d.porcentaje | percent:'1.0-1' }}</span>
                 </div>
               </div>
             }
@@ -789,7 +820,7 @@
       @if (activeTab === 'herramientas') {
         <section class="tools-catalog" aria-labelledby="tools-catalog-title">
           <div class="tools-intro">
-            <h2 id="tools-catalog-title" class="tools-intro__title">Módulos Disponibles para {{ rolUsuario }}</h2>
+            <h2 id="tools-catalog-title" class="tools-intro__title">Módulos disponibles para tu perfil</h2>
             <p class="tools-intro__desc">
               Acceso a las herramientas autorizadas de acuerdo con tu perfil de acceso.
             </p>
@@ -838,15 +869,26 @@
                 <h3 class="protocol-card__title">Atención en Crisis y Emergencias</h3>
               </div>
               <p class="protocol-card__desc">
-                Si la persona se encuentra en una situación de riesgo inminente para su vida o integridad física, activa de inmediato la ruta de emergencia.
+                Para el equipo de atención: si la persona se encuentra en una situación de riesgo inminente para su vida o integridad física, activa de inmediato la ruta de emergencia.
               </p>
               <ul class="protocol-card__list">
                 <!-- Ver nota de DSH-05-01 en el banner del rol Usuario. -->
                 @if (hayLineaOrientacion) {
-                  <li><strong>Línea de Orientación Telefónica:</strong> {{ telefonoOrientacion }}</li>
+                  <li>
+                    <strong>Línea de orientación telefónica:</strong>
+                    <a class="protocol-card__tel" [href]="'tel:' + telefonoOrientacion">{{ telefonoOrientacion }}</a>
+                  </li>
                 }
-                <li><strong>Línea Nacional 155:</strong> Orientación a mujeres víctimas de violencia</li>
-                <li><strong>Línea 123:</strong> Emergencias de Medellín / Policía Nacional</li>
+                <li>
+                  <strong>Línea nacional:</strong>
+                  <a class="protocol-card__tel" href="tel:155">155</a>
+                  — orientación a mujeres víctimas de violencia
+                </li>
+                <li>
+                  <strong>Emergencias:</strong>
+                  <a class="protocol-card__tel" href="tel:123">123</a>
+                  — Medellín / Policía Nacional
+                </li>
               </ul>
             </article>
 
@@ -863,7 +905,7 @@
               <ul class="protocol-card__list">
                 <li><strong>Resolución Rectoral 41986:</strong> Ruta Universitaria de Atención en VBG</li>
                 <li><strong>Ley 1257 de 2008:</strong> No violencia contra las mujeres</li>
-                <li><strong>Confidencialidad:</strong> Reserva legal de datos sensibles (Ley 1581)</li>
+                <li><strong>Confidencialidad:</strong> Reserva legal de datos sensibles (Ley 1581 de 2012)</li>
               </ul>
             </article>
           </div>

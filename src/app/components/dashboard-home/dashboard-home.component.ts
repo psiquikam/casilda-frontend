@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { DatePipe, DecimalPipe, PercentPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,6 +21,28 @@ export interface WorkflowStep {
   icon: string;
 }
 
+/**
+ * Tarjeta de indicador. El mock entrega **números**, nunca cadenas con formato:
+ * el formato regional lo aplican `DecimalPipe` y `PercentPipe` sobre el
+ * `LOCALE_ID` es-CO ya provisto (DSH-02-06, DSH-11-08).
+ *
+ * El color no distingue indicadores: todos comparten superficie neutra, porque
+ * un color por tarjeta sugiere un estado que no existe (DSH-02-04).
+ */
+export interface KpiDashboard {
+  label: string;
+  /** Valor numérico. Si `proporcion` es `true`, va en el rango 0–1. */
+  valor: number;
+  /** Formatea el valor con `PercentPipe` en lugar de `DecimalPipe`. */
+  proporcion?: boolean;
+  /** Unidad que acompaña al valor ("horas", "días"). */
+  unidad?: string;
+  /** Matiz del valor ("menos de"), para no convertirlo en cadena. */
+  comparador?: string;
+  subtext: string;
+  icon: string;
+}
+
 export interface PlatformTool {
   id: string;
   title: string;
@@ -35,7 +58,7 @@ export interface PlatformTool {
 @Component({
   selector: 'app-dashboard-home',
   standalone: true,
-  imports: [RouterLink, FormsModule, MatIconModule, MatButtonModule],
+  imports: [RouterLink, FormsModule, MatIconModule, MatButtonModule, DatePipe, DecimalPipe, PercentPipe],
   templateUrl: './dashboard-home.component.html',
   styleUrl: './dashboard-home.component.scss'
 })
@@ -88,11 +111,11 @@ export class DashboardHomeComponent {
   ];
 
   // 2. Datos para Rol PROFESIONAL (Atención asistencial directa)
-  readonly kpisProfesional = [
-    { label: 'Mis Casos Asignados', count: 12, subtext: 'En seguimiento activo', icon: 'folder_shared', colorClass: 'total' },
-    { label: 'Citas de Hoy', count: 4, subtext: '2 presenciales, 2 virtuales', icon: 'event_available', colorClass: 'citas' },
-    { label: 'Atenciones Pendientes', count: 3, subtext: 'Notas por documentar', icon: 'pending_actions', colorClass: 'recepcion' },
-    { label: 'Contactos por Realizar', count: 5, subtext: 'Llamadas programadas', icon: 'phone_forwarded', colorClass: 'activo' }
+  readonly kpisProfesional: KpiDashboard[] = [
+    { label: 'Mis casos asignados', valor: 12, subtext: 'En seguimiento activo', icon: 'folder_shared' },
+    { label: 'Citas de hoy', valor: 4, subtext: '2 presenciales, 2 virtuales', icon: 'event_available' },
+    { label: 'Atenciones pendientes', valor: 3, subtext: 'Notas por documentar', icon: 'pending_actions' },
+    { label: 'Contactos por realizar', valor: 5, subtext: 'Llamadas programadas', icon: 'phone_forwarded' }
   ];
 
   readonly citasDeHoy = [
@@ -103,77 +126,82 @@ export class DashboardHomeComponent {
   ];
 
   // 3. Datos para Rol COORDINADOR (Supervisión y triaje de equipo)
-  readonly kpisCoordinador = [
-    { label: 'Pendientes de Asignación', count: 14, subtext: 'Solicitudes sin repartir', icon: 'inbox', colorClass: 'recepcion' },
-    { label: 'Triage Prioritario (Alto)', count: 8, subtext: 'Riesgo urgente detectado', icon: 'warning_amber', colorClass: 'total' },
-    { label: 'Total Casos en Equipo', count: 156, subtext: 'En vigilancia institucional', icon: 'groups', colorClass: 'activo' },
-    { label: 'Citas Globales Semana', count: 52, subtext: 'Programadas en el equipo', icon: 'calendar_month', colorClass: 'citas' }
+  readonly kpisCoordinador: KpiDashboard[] = [
+    { label: 'Pendientes de asignación', valor: 14, subtext: 'Solicitudes sin repartir', icon: 'inbox' },
+    { label: 'Triaje prioritario (alto)', valor: 8, subtext: 'Riesgo urgente detectado', icon: 'warning_amber' },
+    { label: 'Total de casos en el equipo', valor: 156, subtext: 'En vigilancia institucional', icon: 'groups' },
+    { label: 'Citas globales de la semana', valor: 52, subtext: 'Programadas en el equipo', icon: 'calendar_month' }
   ];
 
+  // Aquí el color sí porta un estado (nivel de ocupación), así que se conserva,
+  // pero siempre acompañado del texto «Capacidad operativa: N %» (regla 5 de
+  // `CLAUDE.md`). El nivel alto usa ámbar, no rojo: el rojo queda reservado a la
+  // salida rápida y a las alertas realmente críticas (DSH-P5).
   readonly cargaEquipo = [
-    { profesional: 'Lic. Carlos Restrepo (Psicología)', casos: 12, citasHoy: 4, porcentaje: 80, badgeClass: 'normal' },
-    { profesional: 'Dra. María Carmona (Derecho)', casos: 15, citasHoy: 5, porcentaje: 95, badgeClass: 'alto' },
-    { profesional: 'Psic. Laura Valencia (Línea ALMA)', casos: 11, citasHoy: 3, porcentaje: 70, badgeClass: 'normal' },
-    { profesional: 'Dupla Psicosocial 1 (Territorial)', casos: 8, citasHoy: 2, porcentaje: 55, badgeClass: 'bajo' }
+    { profesional: 'Lic. Carlos Restrepo (Psicología)', casos: 12, citasHoy: 4, porcentaje: 0.8, nivel: 'normal' },
+    { profesional: 'Dra. María Carmona (Derecho)', casos: 15, citasHoy: 5, porcentaje: 0.95, nivel: 'alto' },
+    { profesional: 'Psic. Laura Valencia (Línea ALMA)', casos: 11, citasHoy: 3, porcentaje: 0.7, nivel: 'normal' },
+    { profesional: 'Dupla Psicosocial 1 (Territorial)', casos: 8, citasHoy: 2, porcentaje: 0.55, nivel: 'bajo' }
   ];
 
   // 4. Datos para Rol REVISOR (Calidad y auditoría)
-  readonly kpisRevisor = [
-    { label: 'Tiempo de Respuesta', count: '< 24h', subtext: '98.2% de cumplimiento', icon: 'speed', colorClass: 'activo' },
-    { label: 'Expedientes en Auditoría', count: 28, subtext: 'Control de calidad activo', icon: 'fact_check', colorClass: 'citas' },
-    { label: 'Medidas de Protección', count: 19, subtext: 'Activadas y verificadas', icon: 'verified_user', colorClass: 'total' },
-    { label: 'Tasa de Cumplimiento', count: '96%', subtext: 'Acuerdos protocolizados', icon: 'thumb_up', colorClass: 'recepcion' }
+  // Los mocks entregan números; el formato regional lo aplican los pipes sobre
+  // el LOCALE_ID es-CO (DSH-02-06). `unidad` y `proporcion` permiten expresar
+  // horas o porcentajes sin convertir el valor en una cadena.
+  readonly kpisRevisor: KpiDashboard[] = [
+    { label: 'Tiempo de respuesta', valor: 24, unidad: 'horas', comparador: 'menos de', subtext: 'Cumplimiento del 98,2 %', icon: 'speed' },
+    { label: 'Expedientes en auditoría', valor: 28, subtext: 'Control de calidad activo', icon: 'fact_check' },
+    { label: 'Medidas de protección', valor: 19, subtext: 'Activadas y verificadas', icon: 'verified_user' },
+    { label: 'Tasa de cumplimiento', valor: 0.96, proporcion: true, subtext: 'Acuerdos protocolizados', icon: 'thumb_up' }
   ];
 
   // 5. Métricas globales para Rol ADMIN
+  // Las proporciones van en el rango 0–1 y las formatea `PercentPipe`: así el
+  // separador decimal lo decide el `LOCALE_ID` es-CO y no el mock (DSH-02-06).
   readonly summaryStats = {
     totalCasos: 156,
     kpis: [
       {
         id: 'total',
-        label: 'Casos Activos',
-        count: 156,
+        label: 'Casos activos',
+        valor: 156,
         subtext: 'En vigilancia institucional',
         icon: 'folder_shared',
-        colorClass: 'total',
         badge: 'Activos'
       },
       {
         id: 'recepcion',
-        label: 'En Recepción',
-        count: 48,
-        porcentaje: 30.8,
+        label: 'En recepción',
+        valor: 48,
+        porcentaje: 0.308,
         subtext: 'Pendientes de valoración',
-        icon: 'inbox',
-        colorClass: 'recepcion',
-        badge: '30.8%'
+        icon: 'inbox'
       },
       {
         id: 'citas',
-        label: 'Citas Activas',
-        count: 52,
-        porcentaje: 33.3,
+        label: 'Citas activas',
+        valor: 52,
+        porcentaje: 0.333,
         subtext: 'Atenciones agendadas',
-        icon: 'event_available',
-        colorClass: 'citas',
-        badge: '33.3%'
+        icon: 'event_available'
       },
       {
         id: 'activo',
         label: 'Acompañamiento',
-        count: 41,
-        porcentaje: 26.3,
+        valor: 41,
+        porcentaje: 0.263,
         subtext: 'En seguimiento psicosocial',
-        icon: 'support_agent',
-        colorClass: 'activo',
-        badge: '26.3%'
+        icon: 'support_agent'
       }
     ],
+    // El orden de la serie define el color (`serie-1`…`serie-4`); el color no se
+    // asigna por categoría. La paleta definitiva y la revisión de las etiquetas
+    // son materia de la Subfase 3 (DSH-03-01, DSH-03-02, pendientes P-03 y P-05).
     diversidad: [
-      { label: 'Mujeres (Cis/Trans)', count: 88, porcentaje: 56.4, colorClass: 'female' },
-      { label: 'Hombres (Cis/Trans)', count: 36, porcentaje: 23.1, colorClass: 'male' },
-      { label: 'Personas No Binarias', count: 24, porcentaje: 15.4, colorClass: 'nonbinary' },
-      { label: 'Disidencias / Otras', count: 8, porcentaje: 5.1, colorClass: 'diverse' }
+      { label: 'Mujeres (Cis/Trans)', count: 88, porcentaje: 0.564, serie: 1 },
+      { label: 'Hombres (Cis/Trans)', count: 36, porcentaje: 0.231, serie: 2 },
+      { label: 'Personas No Binarias', count: 24, porcentaje: 0.154, serie: 3 },
+      { label: 'Disidencias / Otras', count: 8, porcentaje: 0.051, serie: 4 }
     ]
   };
 
@@ -201,15 +229,12 @@ export class DashboardHomeComponent {
     }
   }
 
-  get fechaFormateada(): string {
-    const opciones: Intl.DateTimeFormatOptions = {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    };
-    return new Date().toLocaleDateString('es-CO', opciones);
-  }
+  /**
+   * Fecha de hoy como `Date`. El formato lo aplica `DatePipe` en la plantilla
+   * sobre el `LOCALE_ID` es-CO ya provisto, en lugar de duplicar aquí la
+   * configuración regional (DSH-11-08).
+   */
+  readonly hoy = new Date();
 
   get currentStep(): WorkflowStep {
     return this.workflowSteps[this.selectedStepIndex] || this.workflowSteps[0];

@@ -1,4 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { LOCALE_ID } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeEsCo from '@angular/common/locales/es-CO';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
@@ -8,6 +11,11 @@ import { MatIconTestingModule } from '@angular/material/icon/testing';
 import { DashboardHomeComponent } from './dashboard-home.component';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
+
+// El `LOCALE_ID` es-CO se provee en `app.config.ts`, que no interviene en las
+// pruebas unitarias: sin registrarlo aquí, los pipes caerían a en-US y las
+// aserciones de formato regional no comprobarían nada (DSH-02-06, DSH-11-08).
+registerLocaleData(localeEsCo);
 
 describe('DashboardHomeComponent', () => {
   let component: DashboardHomeComponent;
@@ -21,7 +29,8 @@ describe('DashboardHomeComponent', () => {
         provideNoopAnimations(),
         provideRouter([]),
         provideHttpClient(),
-        provideHttpClientTesting()
+        provideHttpClientTesting(),
+        { provide: LOCALE_ID, useValue: 'es-CO' }
       ]
     }).compileComponents();
 
@@ -127,7 +136,7 @@ describe('DashboardHomeComponent', () => {
       configurarTelefono('');
 
       const panel = fixture.nativeElement as HTMLElement;
-      expect(panel.textContent).not.toContain('Línea de Orientación Telefónica');
+      expect(panel.textContent).not.toContain('Línea de orientación telefónica');
     });
 
     it('rechaza un número de relleno aunque esté configurado', () => {
@@ -155,7 +164,7 @@ describe('DashboardHomeComponent', () => {
       configurarTelefono('6042196000');
 
       const panel = fixture.nativeElement as HTMLElement;
-      expect(panel.textContent).toContain('Línea de Orientación Telefónica');
+      expect(panel.textContent).toContain('Línea de orientación telefónica');
       expect(panel.textContent).toContain('6042196000');
     });
 
@@ -164,8 +173,79 @@ describe('DashboardHomeComponent', () => {
       configurarTelefono('');
 
       const panel = fixture.nativeElement as HTMLElement;
-      expect(panel.textContent).toContain('Línea Nacional 155');
-      expect(panel.textContent).toContain('Línea 123');
+      expect(panel.textContent).toContain('Línea nacional');
+      expect(panel.querySelector('a[href="tel:155"]')).not.toBeNull();
+      expect(panel.querySelector('a[href="tel:123"]')).not.toBeNull();
+    });
+  });
+
+  // ==========================================================================
+  // Subfase 1 — correcciones transversales
+  // ==========================================================================
+  describe('formato regional (DSH-01-02, DSH-02-06)', () => {
+    it('escribe la fecha en español y en minúscula, sin «capitalize»', () => {
+      const fecha = (fixture.nativeElement as HTMLElement).querySelector('.user-greeting__date');
+
+      expect(fecha?.textContent?.trim()).toMatch(/^[a-záéíóúñ]+, \d{1,2} de [a-záéíóúñ]+ de \d{4}$/);
+      expect(getComputedStyle(fecha as Element).textTransform).toBe('none');
+    });
+
+    it('formatea los porcentajes con coma decimal, no con punto', () => {
+      const insignias = [...(fixture.nativeElement as HTMLElement).querySelectorAll('.kpi-card__badge')]
+        .map((e) => e.textContent?.trim() ?? '');
+
+      // Lo que importa es el separador decimal que impone es-CO: coma, no punto.
+      // El espacio antes del «%» lo decide CLDR, no el componente.
+      expect(insignias).toContain('30,8%');
+      expect(insignias.join(' ')).not.toContain('30.8');
+    });
+
+    it('entrega los porcentajes como número, nunca como cadena con formato', () => {
+      for (const kpi of component.summaryStats.kpis) {
+        if ('porcentaje' in kpi) expect(typeof kpi.porcentaje).toBe('number');
+      }
+      for (const grupo of component.summaryStats.diversidad) {
+        expect(typeof grupo.porcentaje).toBe('number');
+        expect(grupo.porcentaje).toBeLessThanOrEqual(1);
+      }
+      for (const kpi of component.kpisRevisor) {
+        expect(typeof kpi.valor).toBe('number');
+      }
+    });
+  });
+
+  describe('jerarquía tipográfica (DSH-04-07)', () => {
+    it('tiene un único h1 y lo escribe en la serif institucional', () => {
+      const encabezados = (fixture.nativeElement as HTMLElement).querySelectorAll('h1');
+
+      expect(encabezados.length).toBe(1);
+      expect(getComputedStyle(encabezados[0]).fontFamily).toContain('Lora');
+    });
+
+    it('no fuerza la sans en ningún encabezado h2 o h3', () => {
+      const encabezados = (fixture.nativeElement as HTMLElement).querySelectorAll('h2, h3');
+
+      expect(encabezados.length).toBeGreaterThan(0);
+      for (const encabezado of Array.from(encabezados)) {
+        expect(getComputedStyle(encabezado).fontFamily).toContain('Lora');
+      }
+    });
+  });
+
+  describe('el rol aparece una sola vez (DSH-01-01)', () => {
+    it('el saludo ya no repite el nombre del rol', () => {
+      const panel = fixture.nativeElement as HTMLElement;
+
+      expect(panel.querySelector('.user-greeting__role-badge')).toBeNull();
+      expect(panel.querySelector('.user-greeting__meta')?.textContent).not.toContain('Admin');
+    });
+
+    it('el catálogo de módulos no lleva el rol en su título', () => {
+      component.activeTab = 'herramientas';
+      fixture.detectChanges();
+
+      const titulo = (fixture.nativeElement as HTMLElement).querySelector('.tools-intro__title');
+      expect(titulo?.textContent?.trim()).toBe('Módulos disponibles para tu perfil');
     });
   });
 });
