@@ -8,6 +8,7 @@ import { widgetsDelRol, type WidgetId } from '../../core/dashboard/dashboard-por
 import { PendientesWidget } from './widgets/pendientes.widget';
 import { KpisWidget } from './widgets/kpis.widget';
 import { DistribucionIdentidadWidget } from './widgets/distribucion-identidad.widget';
+import { VigilanciaWidget } from './widgets/vigilancia.widget';
 import { AgendaHoyWidget } from './widgets/agenda-hoy.widget';
 import { CargaEquipoWidget } from './widgets/carga-equipo.widget';
 import { AccesosFrecuentesWidget } from './widgets/accesos-frecuentes.widget';
@@ -37,6 +38,7 @@ import { AyudaProtocolosWidget } from './widgets/ayuda-protocolos.widget';
     PendientesWidget,
     KpisWidget,
     DistribucionIdentidadWidget,
+    VigilanciaWidget,
     AgendaHoyWidget,
     CargaEquipoWidget,
     AccesosFrecuentesWidget,

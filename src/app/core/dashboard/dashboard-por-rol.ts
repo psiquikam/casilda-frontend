@@ -18,6 +18,7 @@ export type WidgetId =
   | 'pendientes'
   | 'kpis'
   | 'distribucion-identidad'
+  | 'vigilancia'
   | 'agenda-hoy'
   | 'carga-equipo'
   | 'accesos-frecuentes'
@@ -36,7 +37,9 @@ export const DASHBOARD_POR_ROL: Record<RolCasilda, readonly WidgetId[]> = {
   PROFESIONAL: ['pendientes', 'kpis', 'agenda-hoy', 'accesos-frecuentes', 'ayuda-protocolos'],
 
   // ¿Qué patrones muestra la vigilancia? (§4.5)
-  REVISOR: ['pendientes', 'kpis', 'distribucion-identidad', 'accesos-frecuentes', 'ayuda-protocolos'],
+  // A diferencia del Admin, el perfil analítico necesita filtrar por periodo,
+  // sede y dependencia; por eso usa `vigilancia` y no la distribución fija.
+  REVISOR: ['pendientes', 'kpis', 'vigilancia', 'accesos-frecuentes', 'ayuda-protocolos'],
 
   // El dashboard del rol Usuario se rediseña completo en la Subfase 4 con
   // enfoque informado en trauma (§5). Hasta entonces conserva su vista actual:

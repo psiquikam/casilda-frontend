@@ -22,6 +22,15 @@ export interface PendienteDto {
   /** Fecha de cumplimiento o de vencimiento, en ISO 8601. */
   readonly vence: string;
   readonly ruta: string;
+  /**
+   * `true` si quien consulta es la última profesional activa en el caso.
+   *
+   * Anticipa la alerta de cierre general de la matriz (VBG-08-13): si esta
+   * persona cierra su seguimiento, el caso queda sin acompañamiento. Se señala
+   * **de forma sutil** (DSH-08-03): es un aviso, no una urgencia, y no se pinta
+   * en rojo.
+   */
+  readonly ultimaProfesionalActiva?: boolean;
 }
 
 export interface CitaAgendaDto {
@@ -95,7 +104,8 @@ const PENDIENTES_POR_ROL: Record<string, readonly PendienteDto[]> = {
       iniciales: 'A. T.',
       descripcion: 'Seguimiento sin registro en los últimos 15 días',
       vence: diasDesdeHoy(1).toISOString(),
-      ruta: '/registro-atencion'
+      ruta: '/registro-atencion',
+      ultimaProfesionalActiva: true
     },
     {
       id: 'p-pro-3',

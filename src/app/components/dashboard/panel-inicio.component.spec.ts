@@ -180,6 +180,16 @@ describe('PanelInicioComponent', () => {
     expect(zona?.textContent).toContain('No tienes pendientes para hoy');
   }));
 
+  it('avisa de forma sutil cuando se es la última profesional activa (DSH-08-03)', fakeAsync(() => {
+    comoRol('Profesional');
+    resolverCarga();
+
+    const aviso = (fixture.nativeElement as HTMLElement).querySelector('.lista__aviso');
+    expect(aviso?.textContent).toContain('última profesional activa');
+    // Es un aviso, no una urgencia: sin rojo ni signos de admiración (DSH-P5).
+    expect(aviso?.textContent).not.toContain('!');
+  }));
+
   it('identifica a las personas por radicado e iniciales, nunca por nombre (DSH-P6)', fakeAsync(() => {
     comoRol('Profesional');
     resolverCarga();

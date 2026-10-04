@@ -18,11 +18,16 @@ describe('registro de widgets por rol', () => {
   });
 
   it('da a cada rol de personal una sola vista principal (DSH-P5)', () => {
-    const vistasPrincipales = ['distribucion-identidad', 'agenda-hoy', 'carga-equipo'];
+    const vistasPrincipales = ['distribucion-identidad', 'vigilancia', 'agenda-hoy', 'carga-equipo'];
     for (const rol of rolesPersonal) {
       const cuantas = DASHBOARD_POR_ROL[rol].filter((w) => vistasPrincipales.includes(w)).length;
       expect(cuantas).withContext(rol).toBe(1);
     }
+  });
+
+  it('el perfil analítico usa la vista con filtros, no la distribución fija (§4.5)', () => {
+    expect(DASHBOARD_POR_ROL.REVISOR).toContain('vigilancia');
+    expect(DASHBOARD_POR_ROL.REVISOR).not.toContain('distribucion-identidad');
   });
 
   it('no asigna widgets al rol Usuario: su panel es la Subfase 4', () => {

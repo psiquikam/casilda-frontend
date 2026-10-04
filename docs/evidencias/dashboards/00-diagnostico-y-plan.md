@@ -457,7 +457,11 @@ arquitectura**, para que la Subfase 2 reorganice contenido ya saneado.
 
 ---
 
-### Subfase 3 — Dashboards del personal
+### Subfase 3 — Dashboards del personal ✅ **EJECUTADA (2026-10-04)**
+
+> Resultado en `docs/evidencias/dashboards/04-subfase-3-dashboards-personal.md`.
+> Quedan bloqueados DSH-03-01 (P-03), DSH-03-02 (P-05), DSH-08-01 (P-12, no
+> implementable sin modelo de especialidades) y §4.3 (P-02).
 
 | IDs | §4.1 (Admin) · §4.2 (Profesional) · §4.3 (Recepción, si existe) · §4.5 (Reportes) · DSH-02-01 · DSH-02-02 · DSH-02-03 · DSH-02-05 · DSH-03-01…04 · DSH-08-01…03 · DSH-09-01, 09-02 · DSH-11-02, 11-03, 11-10 |
 |---|---|
@@ -591,16 +595,16 @@ tamaño intrínseco del logo (ADD-06). Sin errores atribuibles al panel.
 | DSH-01-03 | CONFIRMADO → **CORREGIDO** (Subfase 2) | `dashboard-home.component.html:18-49` |
 | DSH-01-04 | CONFIRMADO → **CORREGIDO** (Subfase 2) | `header.component.html:35` |
 | DSH-01-05 | CONFIRMADO → **CORREGIDO** (Subfase 2) | `dashboard-home.component.html:53-67,71-110` |
-| DSH-02-01 | CONFIRMADO | `dashboard-home.component.ts:118-160` |
-| DSH-02-02 | CONFIRMADO | `dashboard-home.component.ts:141-149` |
-| DSH-02-03 | CONFIRMADO | `dashboard-home.component.ts:128` |
+| DSH-02-01 | CONFIRMADO → **CORREGIDO** (Subfase 2) | `dashboard-home.component.ts:118-160` |
+| DSH-02-02 | CONFIRMADO → **CORREGIDO** (Subfase 2) | `dashboard-home.component.ts:141-149` |
+| DSH-02-03 | CONFIRMADO → **CORREGIDO** (Subfase 2) | `dashboard-home.component.ts:128` |
 | DSH-02-04 | DISTINTO → **CORREGIDO** (Subfase 1) | `dashboard-home.component.scss:131-153,1870-1874`; `#814ea5` = 0 usos |
-| DSH-02-05 | CONFIRMADO | `dashboard-home.component.ts:118-167` |
+| DSH-02-05 | CONFIRMADO → **CORREGIDO** (Subfase 2) | `dashboard-home.component.ts:118-167` |
 | DSH-02-06 | CONFIRMADO → **CORREGIDO** (Subfase 1) | `dashboard-home.component.ts:111,114,138,148,158` · `…html:542,646` |
-| DSH-03-01 | CONFIRMADO | `dashboard-home.component.scss:481-491,547-550,586-600` |
-| DSH-03-02 | CONFIRMADO | `dashboard-home.component.ts:161-166` |
+| DSH-03-01 | CONFIRMADO → **PARCIAL** (estereotipo eliminado; paleta bloqueada por P-03) | `dashboard-home.component.scss:481-491,547-550,586-600` |
+| DSH-03-02 | CONFIRMADO → **BLOQUEADO** (P-05) | `dashboard-home.component.ts:161-166` |
 | DSH-03-03 | CONFIRMADO → **CORREGIDO** (Subfase 2: tabla con `scope`) | `dashboard-home.component.html:629-634` |
-| DSH-03-04 | CONFIRMADO | `dashboard-home.component.ts:165` |
+| DSH-03-04 | CONFIRMADO → **CORREGIDO** (Subfase 3; umbral 5 pendiente de P-06) | `dashboard-home.component.ts:165` |
 | DSH-04-01 | CONFIRMADO → **CORREGIDO** (Subfase 2) | `sidebar.component.html` · `…html:580-608,794-814,301-322,53-67` |
 | DSH-04-02 | CONFIRMADO → **CORREGIDO** (Subfase 2) | `dashboard-home.component.html:92-93` · `…scss:1119-1126` |
 | DSH-04-03 | CONFIRMADO → **CORREGIDO** (Subfase 2, nombres pendientes de P-07) | `sidebar.component.html:97,101,115,144,42,170` · `…ts:290,312,334,367,378` |

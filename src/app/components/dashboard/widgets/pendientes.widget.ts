@@ -35,6 +35,15 @@ import { DashboardTrabajoService, PendienteDto } from '../../../services/dashboa
           <li class="lista__item">
             <div class="lista__texto">
               <span class="lista__descripcion">{{ pendiente.descripcion }}</span>
+              @if (pendiente.ultimaProfesionalActiva) {
+                <!-- Aviso sutil, no urgencia: si esta persona cierra su
+                     seguimiento, el caso queda sin acompañamiento
+                     (DSH-08-03, matriz VBG-08-13). -->
+                <span class="lista__aviso">
+                  <mat-icon aria-hidden="true">info_outline</mat-icon>
+                  <span>Eres la última profesional activa en este caso</span>
+                </span>
+              }
               <span class="lista__meta">
                 @if (pendiente.radicado !== '—') {
                   <span class="lista__radicado">{{ pendiente.radicado }}</span>
