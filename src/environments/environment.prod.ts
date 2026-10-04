@@ -17,6 +17,12 @@ export const environment = {
    * TODO(negocio): reemplazar por el contacto oficial del pie público.
    */
   telefonoContactoPublico: '',
+  /**
+   * Los indicadores del panel se sirven hoy de datos simulados. Con este flag
+   * activo, la interfaz lo declara con una franja visible, para que nadie
+   * interprete los mocks como cifras reales en una demostración (DSH-12-08).
+   */
+  datosDemostracion: false,
   features: {
     complaintIntakePrototype: false,
     publicTrackingPrototype: false,

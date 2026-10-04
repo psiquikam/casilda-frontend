@@ -1,94 +1,52 @@
 import { Component, inject } from '@angular/core';
-import { DatePipe, DecimalPipe, PercentPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
+
 import { AuthService } from '../../services/auth.service';
-import { NavigationLayoutService } from '../../services/navigation-layout.service';
+import { PanelInicioComponent } from '../dashboard/panel-inicio.component';
 import { esTelefonoPublicable } from '../../core/security/telefono-crisis';
 import { environment } from '../../../environments/environment';
 
-export interface WorkflowStep {
-  stepNumber: number;
-  title: string;
-  tag: string;
-  subtitle: string;
-  description: string;
-  details: string[];
-  route: string;
-  actionText: string;
-  icon: string;
-}
-
 /**
- * Tarjeta de indicador. El mock entrega **números**, nunca cadenas con formato:
- * el formato regional lo aplican `DecimalPipe` y `PercentPipe` sobre el
- * `LOCALE_ID` es-CO ya provisto (DSH-02-06, DSH-11-08).
+ * Punto de entrada de `/inicio`.
  *
- * El color no distingue indicadores: todos comparten superficie neutra, porque
- * un color por tarjeta sugiere un estado que no existe (DSH-02-04).
+ * Reparte entre dos vistas y **no contiene lógica de panel**: el personal usa
+ * `PanelInicioComponent`, que se arma por zonas desde `DASHBOARD_POR_ROL`
+ * (Subfase 2); el rol Usuario conserva su vista actual hasta la Subfase 4, que
+ * la rediseña con enfoque informado en trauma.
+ *
+ * Hasta la Subfase 2 este componente concentraba las cinco vistas de rol, los
+ * mocks de todos los indicadores y un catálogo de 13 módulos que duplicaba el
+ * menú lateral (DSH-04-01). Todo eso salió de aquí.
  */
-export interface KpiDashboard {
-  label: string;
-  /** Valor numérico. Si `proporcion` es `true`, va en el rango 0–1. */
-  valor: number;
-  /** Formatea el valor con `PercentPipe` en lugar de `DecimalPipe`. */
-  proporcion?: boolean;
-  /** Unidad que acompaña al valor ("horas", "días"). */
-  unidad?: string;
-  /** Matiz del valor ("menos de"), para no convertirlo en cadena. */
-  comparador?: string;
-  subtext: string;
-  icon: string;
-}
-
-export interface PlatformTool {
-  id: string;
-  title: string;
-  category: string;
-  icon: string;
-  route: string;
-  whatItIs: string;
-  whenToUse: string;
-  keywords: string[];
-  roles?: string[];
-}
-
 @Component({
   selector: 'app-dashboard-home',
   standalone: true,
-  imports: [RouterLink, FormsModule, MatIconModule, MatButtonModule, DatePipe, DecimalPipe, PercentPipe],
+  imports: [RouterLink, MatIconModule, PanelInicioComponent],
   templateUrl: './dashboard-home.component.html',
   styleUrl: './dashboard-home.component.scss'
 })
 export class DashboardHomeComponent {
   readonly auth = inject(AuthService);
-  readonly navLayout = inject(NavigationLayoutService);
   readonly features = environment.features;
   readonly telefonoOrientacion = environment.telefonoOrientacion;
-  readonly correoSoporte = 'proyectocasilda@udea.edu.co';
 
   /**
    * La línea de orientación solo se muestra si hay un número real configurado.
    * Un número de relleno en contenido de crisis puede impedir que una persona
-   * en riesgo reciba ayuda, así que ante la duda no se muestra nada
-   * (DSH-05-01 de `DASHBOARDS_POR_ROL.md`).
+   * en riesgo reciba ayuda (DSH-05-01).
    */
   get hayLineaOrientacion(): boolean {
     return esTelefonoPublicable(this.telefonoOrientacion);
   }
 
-  // Búsqueda interactiva de herramientas y procesos permitidos
-  searchQuery = '';
-
-  // Pestaña activa: 'guia' (Flujo de vida del caso), 'herramientas' (Catálogo), 'protocolos' (Cosas útiles y reglas)
-  activeTab: 'guia' | 'herramientas' | 'protocolos' = 'guia';
-
-  // Paso seleccionado en la guía
-  selectedStepIndex = 0;
-
-  // 1. Datos para Rol USUARIO (Ciudadano / Estudiante)
+  /**
+   * Solicitudes de la persona autenticada.
+   *
+   * TODO(Subfase 4): sustituir por un servicio con DTO y endpoint previsto,
+   * como el resto del panel. Se deja el mock aquí porque esta vista se reescribe
+   * completa y moverlo ahora sería trabajo desechable.
+   */
   readonly misSolicitudesUsuario = [
     {
       radicado: 'CAS-2026-081',
@@ -109,393 +67,4 @@ export class DashboardHomeComponent {
       profesional: 'Dra. María Carmona'
     }
   ];
-
-  // 2. Datos para Rol PROFESIONAL (Atención asistencial directa)
-  readonly kpisProfesional: KpiDashboard[] = [
-    { label: 'Mis casos asignados', valor: 12, subtext: 'En seguimiento activo', icon: 'folder_shared' },
-    { label: 'Citas de hoy', valor: 4, subtext: '2 presenciales, 2 virtuales', icon: 'event_available' },
-    { label: 'Atenciones pendientes', valor: 3, subtext: 'Notas por documentar', icon: 'pending_actions' },
-    { label: 'Contactos por realizar', valor: 5, subtext: 'Llamadas programadas', icon: 'phone_forwarded' }
-  ];
-
-  readonly citasDeHoy = [
-    { hora: '08:30 AM', persona: 'Estudiante (Fac. Medicina)', tipo: 'Psicológica', modalidad: 'Virtual (Teams)', estado: 'Confirmada' },
-    { hora: '10:00 AM', persona: 'Docente (Fac. Ingeniería)', tipo: 'Psicosocial', modalidad: 'Presencial (Bloque 22)', estado: 'Confirmada' },
-    { hora: '02:00 PM', persona: 'Personal Administrativo', tipo: 'Seguimiento', modalidad: 'Virtual', estado: 'Pendiente' },
-    { hora: '04:00 PM', persona: 'Estudiante (Fac. Educación)', tipo: 'Primera vez', modalidad: 'Presencial', estado: 'Confirmada' }
-  ];
-
-  // 3. Datos para Rol COORDINADOR (Supervisión y triaje de equipo)
-  readonly kpisCoordinador: KpiDashboard[] = [
-    { label: 'Pendientes de asignación', valor: 14, subtext: 'Solicitudes sin repartir', icon: 'inbox' },
-    { label: 'Triaje prioritario (alto)', valor: 8, subtext: 'Riesgo urgente detectado', icon: 'warning_amber' },
-    { label: 'Total de casos en el equipo', valor: 156, subtext: 'En vigilancia institucional', icon: 'groups' },
-    { label: 'Citas globales de la semana', valor: 52, subtext: 'Programadas en el equipo', icon: 'calendar_month' }
-  ];
-
-  // Aquí el color sí porta un estado (nivel de ocupación), así que se conserva,
-  // pero siempre acompañado del texto «Capacidad operativa: N %» (regla 5 de
-  // `CLAUDE.md`). El nivel alto usa ámbar, no rojo: el rojo queda reservado a la
-  // salida rápida y a las alertas realmente críticas (DSH-P5).
-  readonly cargaEquipo = [
-    { profesional: 'Lic. Carlos Restrepo (Psicología)', casos: 12, citasHoy: 4, porcentaje: 0.8, nivel: 'normal' },
-    { profesional: 'Dra. María Carmona (Derecho)', casos: 15, citasHoy: 5, porcentaje: 0.95, nivel: 'alto' },
-    { profesional: 'Psic. Laura Valencia (Línea ALMA)', casos: 11, citasHoy: 3, porcentaje: 0.7, nivel: 'normal' },
-    { profesional: 'Dupla Psicosocial 1 (Territorial)', casos: 8, citasHoy: 2, porcentaje: 0.55, nivel: 'bajo' }
-  ];
-
-  // 4. Datos para Rol REVISOR (Calidad y auditoría)
-  // Los mocks entregan números; el formato regional lo aplican los pipes sobre
-  // el LOCALE_ID es-CO (DSH-02-06). `unidad` y `proporcion` permiten expresar
-  // horas o porcentajes sin convertir el valor en una cadena.
-  readonly kpisRevisor: KpiDashboard[] = [
-    { label: 'Tiempo de respuesta', valor: 24, unidad: 'horas', comparador: 'menos de', subtext: 'Cumplimiento del 98,2 %', icon: 'speed' },
-    { label: 'Expedientes en auditoría', valor: 28, subtext: 'Control de calidad activo', icon: 'fact_check' },
-    { label: 'Medidas de protección', valor: 19, subtext: 'Activadas y verificadas', icon: 'verified_user' },
-    { label: 'Tasa de cumplimiento', valor: 0.96, proporcion: true, subtext: 'Acuerdos protocolizados', icon: 'thumb_up' }
-  ];
-
-  // 5. Métricas globales para Rol ADMIN
-  // Las proporciones van en el rango 0–1 y las formatea `PercentPipe`: así el
-  // separador decimal lo decide el `LOCALE_ID` es-CO y no el mock (DSH-02-06).
-  readonly summaryStats = {
-    totalCasos: 156,
-    kpis: [
-      {
-        id: 'total',
-        label: 'Casos activos',
-        valor: 156,
-        subtext: 'En vigilancia institucional',
-        icon: 'folder_shared',
-        badge: 'Activos'
-      },
-      {
-        id: 'recepcion',
-        label: 'En recepción',
-        valor: 48,
-        porcentaje: 0.308,
-        subtext: 'Pendientes de valoración',
-        icon: 'inbox'
-      },
-      {
-        id: 'citas',
-        label: 'Citas activas',
-        valor: 52,
-        porcentaje: 0.333,
-        subtext: 'Atenciones agendadas',
-        icon: 'event_available'
-      },
-      {
-        id: 'activo',
-        label: 'Acompañamiento',
-        valor: 41,
-        porcentaje: 0.263,
-        subtext: 'En seguimiento psicosocial',
-        icon: 'support_agent'
-      }
-    ],
-    // El orden de la serie define el color (`serie-1`…`serie-4`); el color no se
-    // asigna por categoría. La paleta definitiva y la revisión de las etiquetas
-    // son materia de la Subfase 3 (DSH-03-01, DSH-03-02, pendientes P-03 y P-05).
-    diversidad: [
-      { label: 'Mujeres (Cis/Trans)', count: 88, porcentaje: 0.564, serie: 1 },
-      { label: 'Hombres (Cis/Trans)', count: 36, porcentaje: 0.231, serie: 2 },
-      { label: 'Personas No Binarias', count: 24, porcentaje: 0.154, serie: 3 },
-      { label: 'Disidencias / Otras', count: 8, porcentaje: 0.051, serie: 4 }
-    ]
-  };
-
-  get nombreUsuario(): string {
-    return this.auth.currentUser?.nombre || 'Personal Institucional';
-  }
-
-  get rolUsuario(): string {
-    return this.auth.getRoleName();
-  }
-
-  get subtituloRol(): string {
-    const code = this.auth.getRoleCode();
-    switch (code) {
-      case 'ADMIN':
-        return 'Centro integral de administración, parametrización y vigilancia del sistema CASILDA.';
-      case 'COORDINADOR':
-        return 'Coordinación del equipo de atención, triaje de solicitudes y supervisión de casos.';
-      case 'PROFESIONAL':
-        return 'Jornada de atención técnica psicosocial y jurídica.';
-      case 'REVISOR':
-        return 'Monitoreo analítico, vigilancia epidemiológica y auditoría de calidad de expedientes.';
-      default:
-        return 'Portal de orientación, radicación de solicitudes y seguimiento a casos de VBG.';
-    }
-  }
-
-  /**
-   * Fecha de hoy como `Date`. El formato lo aplica `DatePipe` en la plantilla
-   * sobre el `LOCALE_ID` es-CO ya provisto, en lugar de duplicar aquí la
-   * configuración regional (DSH-11-08).
-   */
-  readonly hoy = new Date();
-
-  get currentStep(): WorkflowStep {
-    return this.workflowSteps[this.selectedStepIndex] || this.workflowSteps[0];
-  }
-
-  // Flujo operativo de Casilda
-  readonly workflowSteps: WorkflowStep[] = [
-    {
-      stepNumber: 1,
-      title: 'Recepción y Radicación',
-      tag: 'Solicitud',
-      subtitle: 'Módulo: Solicitud de Acompañamiento',
-      description: 'Ingreso inicial del reporte. Se reciben solicitudes de la propia persona afectada o de terceros.',
-      details: [
-        'Registro de datos de contacto (teléfono, correo, confidencialidad).',
-        'Identificación del medio de ingreso (presencial o virtual).',
-        'Generación del radicado preliminar de seguimiento.'
-      ],
-      route: '/solicitud-acompanamiento',
-      actionText: 'Ir a Nueva Solicitud',
-      icon: 'add_circle_outline'
-    },
-    {
-      stepNumber: 2,
-      title: 'Bandeja y Contacto Inicial',
-      tag: 'Consulta',
-      subtitle: 'Módulo: Consulta de Solicitudes',
-      description: 'Revisión y triaje de solicitudes pendientes. Se gestiona el contacto telefónico para validar la voluntad.',
-      details: [
-        'Filtrado por fecha, estado y código de radicado.',
-        'Registro de intentos de contacto telefónico (exitoso, no contesta, mensaje).',
-        'Verificación de consentimiento informado de la persona.'
-      ],
-      route: '/consulta',
-      actionText: 'Ir a Bandeja de Consultas',
-      icon: 'manage_search'
-    },
-    {
-      stepNumber: 3,
-      title: 'Agendamiento de Citas',
-      tag: 'Citas',
-      subtitle: 'Módulo: Gestión de Citas',
-      description: 'Coordinación formal de sesiones de orientación psicosocial o asesoría jurídica con los profesionales.',
-      details: [
-        'Asignación de fecha, hora y modalidad (presencial en campus o virtual).',
-        'Selección del área de atención (psicológica, jurídica o social).',
-        'Control de reprogramaciones debidamente justificadas.'
-      ],
-      route: '/cita',
-      actionText: 'Ir a Citas y Agendamiento',
-      icon: 'calendar_month'
-    },
-    {
-      stepNumber: 4,
-      title: 'Apertura de Caso Formal',
-      tag: 'Expediente',
-      subtitle: 'Módulo: Registro de Caso',
-      description: 'Consolidación del expediente formal del caso cuando se requiere intervención técnica continuada.',
-      details: [
-        'Caracterización de la persona, hechos y presunto agresor.',
-        'Tipologías de violencia y modalidades detectadas.',
-        'Apreciación psicológica/jurídica y activación de medidas de protección.'
-      ],
-      route: '/registro-caso',
-      actionText: 'Ir a Registro de Caso',
-      icon: 'folder_shared'
-    },
-    {
-      stepNumber: 5,
-      title: 'Intervención y Cierre',
-      tag: 'Atención',
-      subtitle: 'Módulo: Registro de Atención',
-      description: 'Documentación de sesiones de acompañamiento, acuerdos y remisiones interinstitucionales.',
-      details: [
-        'Actas de compromisos mutuos.',
-        'Remisiones a instancias externas o internas (salud, fiscalía, bienestar).',
-        'Cierre formal del caso y archivo bajo reserva legal.'
-      ],
-      route: '/registro-atencion',
-      actionText: 'Ir a Registro de Atención',
-      icon: 'handshake'
-    }
-  ];
-
-  // Catálogo completo de herramientas filtrado según rol
-  readonly allTools: PlatformTool[] = [
-    {
-      id: 'solicitud',
-      title: 'Solicitud de Acompañamiento',
-      category: 'Equipo de Atención',
-      icon: 'add_circle_outline',
-      route: '/solicitud-acompanamiento',
-      whatItIs: 'Formulario de registro inicial para radicar una solicitud de acompañamiento en VBG.',
-      whenToUse: 'Cuando una persona se acerca solicitando orientación o cuando un tercero reporta un caso.',
-      keywords: ['solicitud', 'radicar', 'nueva', 'ingreso', 'acompañamiento', 'crear', 'caso'],
-      roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR']
-    },
-    {
-      id: 'reportar-caso',
-      title: 'Reportar Caso',
-      category: 'Mis Solicitudes',
-      icon: 'add_circle_outline',
-      route: '/reportar-caso',
-      whatItIs: 'Formulario multipaso para reportar una situación de violencia basada en género, como persona afectada o en representación de un tercero.',
-      whenToUse: 'Cuando deseas poner en conocimiento de Casilda una situación de VBG y recibir un ID de seguimiento.',
-      keywords: ['reportar', 'reporte', 'caso', 'vbg', 'violencia', 'situación', 'nuevo'],
-      roles: ['USUARIO']
-    },
-    {
-      id: 'consulta',
-      title: 'Consulta y Bandeja de Solicitudes',
-      category: 'Equipo de Atención',
-      icon: 'manage_search',
-      route: '/consulta',
-      whatItIs: 'Bandeja general donde se listan todas las solicitudes radicadas con sus estados y datos de contacto.',
-      whenToUse: 'Para revisar solicitudes pendientes, consultar teléfonos, registrar llamadas o acceder al expediente.',
-      keywords: ['consulta', 'bandeja', 'buscar', 'filtro', 'llamadas', 'telefono', 'contacto', 'solicitudes'],
-      roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR']
-    },
-    {
-      id: 'cita',
-      title: 'Citas y Agendamiento',
-      category: 'Equipo de Atención',
-      icon: 'calendar_month',
-      route: '/cita',
-      whatItIs: 'Módulo de programación y calendario de sesiones psicosociales y jurídicas.',
-      whenToUse: 'Para fijar una fecha y hora con la persona tras contactarla o para reprogramar citas.',
-      keywords: ['cita', 'agendar', 'horario', 'calendario', 'sesion', 'psicologia', 'juridica', 'fecha'],
-      roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR']
-    },
-    {
-      id: 'caso',
-      title: 'Registro de Caso (Expediente)',
-      category: 'Equipo de Atención',
-      icon: 'folder_shared',
-      route: '/registro-caso',
-      whatItIs: 'Instrumento técnico para documentar en detalle la caracterización del caso y las apreciaciones profesionales.',
-      whenToUse: 'Cuando la solicitud se convierte en caso formal y se requiere registrar hechos, agresores y medidas.',
-      keywords: ['caso', 'expediente', 'hechos', 'agresor', 'medidas', 'proteccion', 'apreciacion'],
-      roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL']
-    },
-    {
-      id: 'atencion',
-      title: 'Registro de Atención',
-      category: 'Equipo de Atención',
-      icon: 'handshake',
-      route: '/registro-atencion',
-      whatItIs: 'Espacio para documentar las sesiones de atención brindadas, actas de acuerdos y remisiones.',
-      whenToUse: 'Al terminar cada intervención con la persona para dejar constancia de compromisos y avances.',
-      keywords: ['atencion', 'acta', 'compromisos', 'remision', 'intervencion', 'sesion'],
-      roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL']
-    },
-    {
-      id: 'mis-asignaciones',
-      title: 'Mis Asignaciones',
-      category: 'Equipo de Atención',
-      icon: 'assignment_ind',
-      route: '/mis-asignaciones',
-      whatItIs: 'Bandeja personalizada con los casos y solicitudes asignados a tu cuenta.',
-      whenToUse: 'Para revisar tu lista personal de expedientes asignados para seguimiento o auditoría.',
-      keywords: ['asignaciones', 'mis casos', 'reparto', 'responsable', 'tareas'],
-      roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR']
-    },
-    {
-      id: 'alma',
-      title: 'Línea Alma (Primer Respondiente)',
-      category: 'Líneas Especiales',
-      icon: 'ring_volume',
-      route: '/linea-alma/atencion-pr',
-      whatItIs: 'Canal de atención telefónica de emergencia y triaje de contención en crisis emocional.',
-      whenToUse: 'Cuando entra una llamada urgente a la línea institucional requiriendo apoyo psicológico inmediato.',
-      keywords: ['alma', 'emergencia', 'telefono', 'llamada', 'primer respondiente', 'crisis', 'urgente'],
-      roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL']
-    },
-    {
-      id: 'uad',
-      title: 'UAD — Registrar Queja Disciplinaria',
-      category: 'Asuntos Disciplinarios',
-      icon: 'post_add',
-      route: '/nueva-queja',
-      whatItIs: 'Módulo de radicación de quejas disciplinarias formales ante la Unidad de Asuntos Disciplinarios.',
-      whenToUse: 'Cuando la persona decide iniciar una queja sancionatoria formal contra un miembro de la UdeA.',
-      keywords: ['uad', 'queja', 'disciplinario', 'sancion', 'denuncia', 'regimen'],
-      roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR', 'USUARIO']
-    },
-    {
-      id: 'seguimiento',
-      title: 'Seguimiento de Trámites / Ruta Violeta',
-      category: 'Rutas Institucionales',
-      icon: 'track_changes',
-      route: '/seguimiento',
-      whatItIs: 'Monitoreo del estado y avance del trámite con trazabilidad y articulación universitaria.',
-      whenToUse: 'Para verificar el estado actual de un radicado y revisar el historial de articulación.',
-      keywords: ['seguimiento', 'ruta violeta', 'tramite', 'codigo', 'estado', 'avance'],
-      roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR', 'USUARIO']
-    },
-    {
-      id: 'usuarios',
-      title: 'Gestión de Usuarios',
-      category: 'Administración',
-      icon: 'manage_accounts',
-      route: '/gestion-usuarios',
-      whatItIs: 'Control de cuentas de acceso, roles y asignación de personal institucional.',
-      whenToUse: 'Para registrar nuevo personal profesional, modificar contraseñas o cambiar permisos.',
-      keywords: ['usuarios', 'roles', 'permisos', 'personal', 'cuentas', 'admin'],
-      roles: ['ADMIN']
-    },
-    {
-      id: 'maestros',
-      title: 'Listas Maestras del Sistema',
-      category: 'Administración',
-      icon: 'tune',
-      route: '/gestion-sistema',
-      whatItIs: 'Parametrizador central de catálogos: facultades, dependencias, modalidades VBG y tipologías.',
-      whenToUse: 'Para agregar o modificar las opciones que aparecen en los desplegables de los formularios.',
-      keywords: ['maestros', 'listas', 'parametros', 'catalogos', 'facultades', 'dependencias', 'opciones'],
-      roles: ['ADMIN']
-    },
-    {
-      id: 'reportes',
-      title: 'Panel de Indicadores',
-      category: 'Auditoría y Métricas',
-      icon: 'insights',
-      route: '/dashboard-revisor',
-      whatItIs: 'Visualización analítica de métricas, estadísticas de solicitudes y datos epidemiológicos.',
-      whenToUse: 'Para consultar informes periódicos, evaluar impacto y realizar reportes institucionales.',
-      keywords: ['reportes', 'metricas', 'indicadores', 'graficos', 'estadisticas', 'dashboard'],
-      roles: ['ADMIN', 'COORDINADOR', 'REVISOR']
-    }
-  ];
-
-  get filteredTools(): PlatformTool[] {
-    const query = this.searchQuery.trim().toLowerCase();
-    const isAdmin = this.auth.isAdmin();
-
-    return this.allTools.filter(tool => {
-      // Filtrar por permisos de rol si el usuario está autenticado y no es Admin
-      if (this.auth.currentUser && !isAdmin && tool.roles && !tool.roles.some(r => this.auth.hasRole(r))) {
-        return false;
-      }
-
-      if (!query) return true;
-
-      return (
-        tool.title.toLowerCase().includes(query) ||
-        tool.category.toLowerCase().includes(query) ||
-        tool.whatItIs.toLowerCase().includes(query) ||
-        tool.whenToUse.toLowerCase().includes(query) ||
-        tool.keywords.some(k => k.toLowerCase().includes(query))
-      );
-    });
-  }
-
-  selectStep(index: number): void {
-    this.selectedStepIndex = index;
-  }
-
-  canAccessRoute(route: string): boolean {
-    if (this.auth.isAdmin()) return true;
-    const tool = this.allTools.find(t => t.route === route);
-    if (!tool || !tool.roles) return true;
-    return tool.roles.some(r => this.auth.hasRole(r));
-  }
 }

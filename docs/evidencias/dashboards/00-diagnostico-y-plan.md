@@ -442,7 +442,10 @@ arquitectura**, para que la Subfase 2 reorganice contenido ya saneado.
 
 ---
 
-### Subfase 2 — Arquitectura común (Z1–Z6)
+### Subfase 2 — Arquitectura común (Z1–Z6) ✅ **EJECUTADA (2026-10-04)**
+
+> Resultado en `docs/evidencias/dashboards/03-subfase-2-arquitectura-comun.md`.
+> DSH-04-08 queda fuera y documentado: tocar el scroll del shell afecta a las 23 rutas.
 
 | IDs | DSH-01-03 · DSH-01-05 · DSH-04-01 · DSH-04-02 · DSH-04-03 · DSH-04-04 · DSH-04-08 · DSH-07-01…05 · DSH-11-01…05 · DSH-12-01…10 · D-3, D-4, D-5, D-7 |
 |---|---|
@@ -585,9 +588,9 @@ tamaño intrínseco del logo (ADD-06). Sin errores atribuibles al panel.
 |----|--------|-----------|
 | DSH-01-01 | CONFIRMADO → **CORREGIDO** (Subfase 1) | `header.component.html:36,47` · `dashboard-home.component.html:8,788` |
 | DSH-01-02 | DISTINTO → **CORREGIDO** (Subfase 1) | `dashboard-home.component.scss:153` (CSS, no pipe) |
-| DSH-01-03 | CONFIRMADO | `dashboard-home.component.html:18-49` |
-| DSH-01-04 | CONFIRMADO | `header.component.html:35` |
-| DSH-01-05 | CONFIRMADO | `dashboard-home.component.html:53-67,71-110` |
+| DSH-01-03 | CONFIRMADO → **CORREGIDO** (Subfase 2) | `dashboard-home.component.html:18-49` |
+| DSH-01-04 | CONFIRMADO → **CORREGIDO** (Subfase 2) | `header.component.html:35` |
+| DSH-01-05 | CONFIRMADO → **CORREGIDO** (Subfase 2) | `dashboard-home.component.html:53-67,71-110` |
 | DSH-02-01 | CONFIRMADO | `dashboard-home.component.ts:118-160` |
 | DSH-02-02 | CONFIRMADO | `dashboard-home.component.ts:141-149` |
 | DSH-02-03 | CONFIRMADO | `dashboard-home.component.ts:128` |
@@ -596,12 +599,12 @@ tamaño intrínseco del logo (ADD-06). Sin errores atribuibles al panel.
 | DSH-02-06 | CONFIRMADO → **CORREGIDO** (Subfase 1) | `dashboard-home.component.ts:111,114,138,148,158` · `…html:542,646` |
 | DSH-03-01 | CONFIRMADO | `dashboard-home.component.scss:481-491,547-550,586-600` |
 | DSH-03-02 | CONFIRMADO | `dashboard-home.component.ts:161-166` |
-| DSH-03-03 | CONFIRMADO | `dashboard-home.component.html:629-634` |
+| DSH-03-03 | CONFIRMADO → **CORREGIDO** (Subfase 2: tabla con `scope`) | `dashboard-home.component.html:629-634` |
 | DSH-03-04 | CONFIRMADO | `dashboard-home.component.ts:165` |
-| DSH-04-01 | CONFIRMADO | `sidebar.component.html` · `…html:580-608,794-814,301-322,53-67` |
-| DSH-04-02 | CONFIRMADO | `dashboard-home.component.html:92-93` · `…scss:1119-1126` |
-| DSH-04-03 | CONFIRMADO | `sidebar.component.html:97,101,115,144,42,170` · `…ts:290,312,334,367,378` |
-| DSH-04-04 | CONFIRMADO | `dashboard-home.component.ts:300-309,435,439` |
+| DSH-04-01 | CONFIRMADO → **CORREGIDO** (Subfase 2) | `sidebar.component.html` · `…html:580-608,794-814,301-322,53-67` |
+| DSH-04-02 | CONFIRMADO → **CORREGIDO** (Subfase 2) | `dashboard-home.component.html:92-93` · `…scss:1119-1126` |
+| DSH-04-03 | CONFIRMADO → **CORREGIDO** (Subfase 2, nombres pendientes de P-07) | `sidebar.component.html:97,101,115,144,42,170` · `…ts:290,312,334,367,378` |
+| DSH-04-04 | CONFIRMADO → **CORREGIDO** (Subfase 2) | `dashboard-home.component.ts:300-309,435,439` |
 | DSH-04-05 | CONFIRMADO → **CORREGIDO** (Subfase 1) | `dashboard-home.component.scss:705-707,751-759` |
 | DSH-04-06 | CONFIRMADO → **CORREGIDO** (Subfase 1) | `.step-card*`, `.details-*`, `.check-icon` sin regla en `…scss` |
 | DSH-04-07 | CONFIRMADO → **CORREGIDO** (Subfase 1) | `_base.scss:10-16` vs. 15 sobrescrituras en `…scss`; medición en navegador |
