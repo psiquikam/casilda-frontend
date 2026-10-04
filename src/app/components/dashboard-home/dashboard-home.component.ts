@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../services/auth.service';
 import { NavigationLayoutService } from '../../services/navigation-layout.service';
+import { esTelefonoPublicable } from '../../core/security/telefono-crisis';
 import { environment } from '../../../environments/environment';
 
 export interface WorkflowStep {
@@ -44,6 +45,16 @@ export class DashboardHomeComponent {
   readonly features = environment.features;
   readonly telefonoOrientacion = environment.telefonoOrientacion;
   readonly correoSoporte = 'proyectocasilda@udea.edu.co';
+
+  /**
+   * La línea de orientación solo se muestra si hay un número real configurado.
+   * Un número de relleno en contenido de crisis puede impedir que una persona
+   * en riesgo reciba ayuda, así que ante la duda no se muestra nada
+   * (DSH-05-01 de `DASHBOARDS_POR_ROL.md`).
+   */
+  get hayLineaOrientacion(): boolean {
+    return esTelefonoPublicable(this.telefonoOrientacion);
+  }
 
   // Búsqueda interactiva de herramientas y procesos permitidos
   searchQuery = '';

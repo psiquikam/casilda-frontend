@@ -129,16 +129,20 @@
               Todas las solicitudes son tratadas con estricta reserva, respeto a tu voluntad y sin revictimización.
             </p>
           </div>
-          <div class="banner-ciudadano__help-box">
-            <div class="help-box-icon">
-              <mat-icon aria-hidden="true">phone_in_talk</mat-icon>
+          <!-- Contenido de crisis: la línea solo aparece con un número real
+               configurado. Nunca un número de relleno (DSH-05-01). -->
+          @if (hayLineaOrientacion) {
+            <div class="banner-ciudadano__help-box">
+              <div class="help-box-icon">
+                <mat-icon aria-hidden="true">phone_in_talk</mat-icon>
+              </div>
+              <div class="help-box-info">
+                <span class="help-box-label">Línea de Orientación en Crisis:</span>
+                <strong class="help-box-phone">{{ telefonoOrientacion }}</strong>
+                <span class="help-box-note">Gratuita nacional y desde celular</span>
+              </div>
             </div>
-            <div class="help-box-info">
-              <span class="help-box-label">Línea de Orientación en Crisis:</span>
-              <strong class="help-box-phone">{{ telefonoOrientacion }}</strong>
-              <span class="help-box-note">Gratuita nacional y desde celular</span>
-            </div>
-          </div>
+          }
         </section>
 
         <!-- 3 Tarjetas de Acción Prioritarias para el Usuario -->
@@ -837,7 +841,10 @@
                 Si la persona se encuentra en una situación de riesgo inminente para su vida o integridad física, activa de inmediato la ruta de emergencia.
               </p>
               <ul class="protocol-card__list">
-                <li><strong>Línea de Orientación Telefónica:</strong> {{ telefonoOrientacion }}</li>
+                <!-- Ver nota de DSH-05-01 en el banner del rol Usuario. -->
+                @if (hayLineaOrientacion) {
+                  <li><strong>Línea de Orientación Telefónica:</strong> {{ telefonoOrientacion }}</li>
+                }
                 <li><strong>Línea Nacional 155:</strong> Orientación a mujeres víctimas de violencia</li>
                 <li><strong>Línea 123:</strong> Emergencias de Medellín / Policía Nacional</li>
               </ul>
