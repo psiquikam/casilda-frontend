@@ -24,6 +24,9 @@ Documentos de referencia, en orden de precedencia para decisiones de diseño:
 | `.agents/skills/accessibility/SKILL.md` | Criterios WCAG 2.2 aplicados. |
 | `docs/evidencias/accesibilidad/plan_accesibilidad.md` | Diagnóstico, hallazgos H-01…H-18, plan por fases hacia WCAG 2.2 AA y **estado de cada tarea** (§4, §6). |
 | `docs/evidencias/accesibilidad/01-fases-1-5-correcciones.md` | Cómo se implementó cada corrección de las fases 1–5 (evidencia de la entrega del 2026-09-11). |
+| `.claude/skills/casilda-ux/SKILL.md` | Orquesta las fuentes anteriores para toda tarea de UI/UX; incluye flujo de verificación y formato de reporte. |
+| `docs/contratos/MATRIZ_MODULO_ATENCION_VBG.md` | Campos, etiquetas y validaciones del módulo Equipo de Atención. Prevalece en contenido de formularios; en lo visual prevalecen §3 y `casilda-diseno-v1.md`. |
+| `docs/contratos/DASHBOARDS_POR_ROL.md` | Contenido del panel de inicio autenticado por rol y enfoque informado en trauma (no cubre la portada pública). |
 
 ## 2. Stack y comandos
 
@@ -183,8 +186,17 @@ Detalle y métricas en `docs/evidencias/accesibilidad/01-fases-1-5-correcciones.
 2. Sustituir el mock de `ContenidoHomeService` por el endpoint real del gestor de contenidos.
 3. Confirmar con Comunicaciones UdeA: dependencia exacta del logosímbolo y uso del
    distintivo de Casilda como favicon.
-4. Datos reales de contacto: `environment.telefonoOrientacion` y los del pie público.
+4. Datos reales de contacto: `environment.telefonoOrientacion` y `environment.telefonoContactoPublico`.
+   Ambos quedan **vacíos a propósito**: mientras no haya dato confirmado, la línea no se
+   muestra (`esTelefonoPublicable()` en `src/app/core/security/telefono-crisis.ts`). Nunca
+   reponer un número de relleno: hay pruebas que fallan si vuelve a aparecer.
 5. Validar con el equipo de atención el tono de los mensajes de error y notificaciones.
+6. **Antes de conectar el backend o de cualquier despliegue fuera de desarrollo:** retirar o
+   condicionar a un flag las cuentas de prueba, `loginAsMock()`, `createMockToken`, las
+   contraseñas genéricas y el selector de roles del encabezado y del login (hallazgo ADD-01
+   de `docs/evidencias/dashboards/00-diagnostico-y-plan.md`). Hoy permiten obtener una sesión
+   `ADMIN` con un clic. Se aceptan como deuda conocida mientras el proyecto esté
+   exclusivamente en etapa de desarrollo y sin backend.
 
 ## 6. Reglas que no se deben romper
 
