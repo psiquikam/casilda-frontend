@@ -13,10 +13,14 @@
         <mat-icon aria-hidden="true">edit_note</mat-icon>
         Iniciar reporte seguro
       </a>
-      <a class="boton boton--emergencia" [href]="'tel:' + telefonoOrientacion">
-        <mat-icon aria-hidden="true">support_agent</mat-icon>
-        Orientación telefónica de emergencia
-      </a>
+      <!-- Sin número real configurado no se ofrece el canal: un enlace `tel:`
+           vacío en un botón de emergencia deja a la persona sin salida. -->
+      @if (hayLineaOrientacion) {
+        <a class="boton boton--emergencia" [href]="'tel:' + telefonoOrientacion">
+          <mat-icon aria-hidden="true">support_agent</mat-icon>
+          Orientación telefónica de emergencia
+        </a>
+      }
     </div>
   </section>
 
