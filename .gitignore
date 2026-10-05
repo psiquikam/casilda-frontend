@@ -31,3 +31,9 @@ skills/
 src/skills/
 .github/skills/
 tools/skills/
+
+# Artefactos de automatización de navegador y capturas de verificación.
+# Las evidencias visuales se describen en los reportes de docs/evidencias/;
+# los archivos de imagen no se versionan para no saturar el repositorio.
+.playwright-mcp/
+docs/evidencias/**/capturas/

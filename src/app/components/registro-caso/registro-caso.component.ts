@@ -23,8 +23,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
 
 import { ModalDireccionComponent } from '../modal-direccion/modal-direccion.component';
 import { ModalDiscapacidadComponent } from '../modal-discapacidad/modal-discapacidad.component';
@@ -47,6 +46,9 @@ import { ModalCodigosPaisComponent } from '../modal-codigos-pais/modal-codigos-p
 import { AuthService } from '../../services/auth.service';
 import { AtencionContextoRequestDto, AtencionRegistroRequestDto, CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, HechoRequestDto, SeguimientoAtencionRequestDto, SolicitudService, VinculoUdeAEnum } from '../../services/solicitud.service';
 import { MaestroDto } from '../../services/listas.service';
+import { MaestrosVbgService } from '../../services/maestros-vbg.service';
+import { RegistroVbgDatosService } from '../../services/registro-vbg-datos.service';
+import { TEXTO_PROTOCOLO_RELACION_MISIONAL } from '../../core/catalogos/catalogo-vbg';
 import { environment } from '../../../environments/environment';
 import { NotificacionService } from '../../core/a11y/notificacion.service';
 
@@ -89,6 +91,12 @@ import { NotificacionService } from '../../core/a11y/notificacion.service';
 })
 export class RegistroCasoComponent implements OnInit, AfterViewInit {
   private readonly notificacion = inject(NotificacionService);
+  private readonly maestrosVbg = inject(MaestrosVbgService);
+
+  /** DSH-12-08: franja visible mientras los datos del módulo sean simulados. */
+  readonly datosDemostracion = environment.datosDemostracion;
+  readonly textoProtocoloRelacionMisional = TEXTO_PROTOCOLO_RELACION_MISIONAL;
+  private readonly registroVbgDatos = inject(RegistroVbgDatosService);
   casoForm!: FormGroup;
   atencionId: number | null = null;
   casoId: number | null = null;
@@ -201,13 +209,9 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
     { tab: 'Documentación', label: 'Tiempo ocurrido (valor)', control: 'tiempoOcurridoValor' },
     { tab: 'Documentación', label: 'Tiempo ocurrido (unidad)', control: 'tiempoOcurridoUnidad' },
     { tab: 'Documentación', label: '¿De qué forma?', control: 'queForma' },
+    { tab: 'Documentación', label: 'Ámbito de Ocurrencia', control: 'ambitoOcurrencia' },
     { tab: 'Documentación', label: 'Lugar de los hechos', control: 'lugarHechos' },
     { tab: 'Documentación', label: 'Violencia de género', control: 'violenciaGenero' },
-    { tab: 'Documentación', label: 'Violencia misional', control: 'violenciaMisional' },
-    {
-      tab: 'Documentación', label: 'Actividad misional', control: 'actividadMisional',
-      condition: () => this.casoForm?.get('violenciaMisional')?.value === 'SI'
-    },
     { tab: 'Presunto agresor', label: 'Primer nombre (agresor)', control: 'presuntoPrimerNombre' },
     { tab: 'Presunto agresor', label: 'Primer apellido (agresor)', control: 'presuntoPrimerApellido' },
     { tab: 'Presunto agresor', label: 'Vínculo con la universidad', control: 'presuntoVinculoUniversidad' },
@@ -253,7 +257,11 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
   unidadesAcademicasM: string[] = [];
   queForma: string[] = [];
   lugarHechos: string[] = [];
-  actividadesMisionales: string[] = [];
+  ambitoOcurrencia: string[] = [];
+  relacionMisionalNivel1: MaestroDto[] = [];
+  relacionMisionalNivel2: MaestroDto[] = [];
+  relacionMisionalNivel1Sel: number[] = [];
+  relacionMisionalNivel2Sel: number[] = [];
   estadosCaso: string[] = [];
   catalogoEstadosCaso: MaestroDto[] = [];
   grupoAtencion: string[] = [];
@@ -275,7 +283,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
   catalogoUnidadesAcademicas: MaestroDto[] = [];
   catalogoFormasOcurrencia: MaestroDto[] = [];
   catalogoLugaresOcurrencia: MaestroDto[] = [];
-  catalogoActividadesMisionales: MaestroDto[] = [];
+  catalogoAmbitoOcurrencia: MaestroDto[] = [];
 
   listaPsicologica: MaestroDto[] = [];
   listaFisica: MaestroDto[] = [];
@@ -296,7 +304,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.initForm();
-    this.configurarValidacionActividadMisional();
+    this.configurarValidacionDocumentacionVbg();
     this.configurarUnidadAdministrativaMunicipios();
     this.cargarListasMaestras();
     this.cargarCitas();
@@ -400,26 +408,43 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
 
 
 
-  private configurarValidacionActividadMisional(): void {
-    const controlViolenciaMisional = this.casoForm.get('violenciaMisional');
-    const controlActividadMisional = this.casoForm.get('actividadMisional');
+  /**
+   * VBG-01-06/01-07: Ámbito y Forma de Ocurrencia pasan a obligatorios
+   * cuando Violencia Basada en Género = `Sí` (§3 de la matriz); con `No`
+   * siguen visibles pero opcionales, no se ocultan.
+   */
+  private configurarValidacionDocumentacionVbg(): void {
+    const controlViolenciaGenero = this.casoForm.get('violenciaGenero');
+    const controlAmbito = this.casoForm.get('ambitoOcurrencia');
+    const controlForma = this.casoForm.get('queForma');
 
-    if (!controlViolenciaMisional || !controlActividadMisional) {
+    if (!controlViolenciaGenero || !controlAmbito || !controlForma) {
       return;
     }
 
     const aplicarRegla = (valor: unknown) => {
-      if (valor === 'SI') {
-        controlActividadMisional.setValidators([Validators.required]);
-      } else {
-        controlActividadMisional.clearValidators();
-        controlActividadMisional.setValue('');
+      const obligatorio = valor === 'SI';
+      for (const control of [controlAmbito, controlForma]) {
+        control.setValidators(obligatorio ? [Validators.required] : null);
+        control.updateValueAndValidity({ emitEvent: false });
       }
-      controlActividadMisional.updateValueAndValidity({ emitEvent: false });
     };
 
-    aplicarRegla(controlViolenciaMisional.value);
-    controlViolenciaMisional.valueChanges.subscribe(aplicarRegla);
+    aplicarRegla(controlViolenciaGenero.value);
+    controlViolenciaGenero.valueChanges.subscribe(aplicarRegla);
+  }
+
+  /** VBG-02-02: nivel 2 (Docencia/Investigación/Extensión) obligatorio si se marcó "Misional". */
+  esRelacionMisionalSeleccionada(): boolean {
+    const misional = this.relacionMisionalNivel1.find((c) => c.codigo === 'misional');
+    return misional ? this.relacionMisionalNivel1Sel.includes(misional.id) : false;
+  }
+
+  /** Pendiente 4, decisión provisional: "¿Cuál?" es opcional, no condiciona el guardado. */
+  esAmbitoOtro(): boolean {
+    const otro = this.catalogoAmbitoOcurrencia.find((c) => c.codigo === 'otro-ambito');
+    const valor = this.casoForm.get('ambitoOcurrencia')?.value;
+    return otro ? valor === otro.nombre : false;
   }
 
   private cargarListasMaestras(): void {
@@ -443,7 +468,9 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
       unidadesAcademicas: this.obtenerMaestro('unidades-academicas'),
       formasOcurrencia: this.obtenerMaestro('formas-ocurrencia'),
       lugaresOcurrencia: this.obtenerMaestro('lugares-ocurrencia'),
-      actividadesMisionales: this.obtenerMaestro('actividades-misionales'),
+      ambitoOcurrencia: this.obtenerMaestro('ambito-ocurrencia'),
+      relacionMisionalNivel1: this.obtenerMaestro('relacion-misional/nivel-1'),
+      relacionMisionalNivel2: this.obtenerMaestro('relacion-misional/nivel-2'),
       estadosCaso: this.obtenerMaestro('estados-caso'),
       gruposAtencion: this.obtenerMaestro('grupos-atencion'),
       modalidadesPsicologicas: this.obtenerMaestro('modalidades-violencia/tipo/1'),
@@ -472,7 +499,9 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
         this.catalogoUnidadesAcademicas = data.unidadesAcademicas;
         this.catalogoFormasOcurrencia = data.formasOcurrencia;
         this.catalogoLugaresOcurrencia = data.lugaresOcurrencia;
-        this.catalogoActividadesMisionales = data.actividadesMisionales;
+        this.catalogoAmbitoOcurrencia = data.ambitoOcurrencia;
+        this.relacionMisionalNivel1 = data.relacionMisionalNivel1;
+        this.relacionMisionalNivel2 = data.relacionMisionalNivel2;
 
         this.listaSexo = this.mapNombres(data.sexos);
         this.listaEtnias = this.mapNombres(data.etnias);
@@ -495,7 +524,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
         this.unidadesAcademicasM = this.mapNombres(data.unidadesAcademicas);
         this.queForma = this.mapNombres(data.formasOcurrencia);
         this.lugarHechos = this.mapNombres(data.lugaresOcurrencia);
-        this.actividadesMisionales = this.mapNombres(data.actividadesMisionales);
+        this.ambitoOcurrencia = this.mapNombres(data.ambitoOcurrencia);
         this.catalogoEstadosCaso = data.estadosCaso;
         this.estadosCaso = this.mapNombres(data.estadosCaso);
         this.grupoAtencion = this.mapNombres(data.gruposAtencion);
@@ -646,13 +675,12 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
     return mun ? mun.nombre : '';
   }
 
+  /**
+   * Catálogos del módulo. En modo de demostración no llama al backend (ver
+   * `MaestrosVbgService`); el formulario es el mismo en ambos modos.
+   */
   private obtenerMaestro(endpoint: string) {
-    return this.http.get<MaestroDto[]>(`${this.maestrosUrl}/${endpoint}`).pipe(
-      catchError((error) => {
-        this.notificacion.error(`No fue posible cargar la lista «${endpoint}». Algunos campos pueden aparecer vacíos.`, error);
-        return of([] as MaestroDto[]);
-      })
-    );
+    return this.maestrosVbg.obtenerCatalogo(endpoint);
   }
 
   private mapNombres(lista: MaestroDto[]): string[] {
@@ -733,7 +761,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
   }
 
   private cargarCitas(page = 0, size: number = this.pageSizeCitas): void {
-    this.solicitudService.listarCitasPaginadas(page, size, undefined, EstadoCitaEnum.CANCELADA).subscribe({
+    this.registroVbgDatos.listarCitasPaginadas(page, size, undefined, EstadoCitaEnum.CANCELADA).subscribe({
       next: (respuesta) => {
         const filas = respuesta.content.map((cita) => this.mapearCitaATabla(cita));
         this.casoPorAtender = filas;
@@ -807,7 +835,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
     });
 
     if (caso?.solicitudId) {
-      this.solicitudService.obtenerPorId(caso.solicitudId).subscribe({
+      this.registroVbgDatos.obtenerPorId(caso.solicitudId).subscribe({
         next: (solicitud) => {
           this.casoForm.patchValue({
             tipoDocumento: solicitud.tipoDocumento || this.casoForm.get('tipoDocumento')?.value,
@@ -1148,7 +1176,6 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
     this.dataSource.data = [...this.casoPorAtender];
   }
 
-  editarAcuerdo(element: any) { console.log('Editar', element); }
 
   initForm(): void {
     this.casoForm = this.fb.group({
@@ -1189,12 +1216,12 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
       tiempoOcurridoValor: [''],
       tiempoOcurridoUnidad: ['meses'],
       queForma: [''],
+      ambitoOcurrencia: [''],
+      ambitoOcurrenciaOtro: [''],
       departamentoHechos: [''],
       ciudadHechos: [''],
       lugarHechos: [''],
       violenciaGenero: [''],
-      violenciaMisional: [''],
-      actividadMisional: [''],
       presuntoPrimerNombre: [''],
       presuntoSegundoNombre: [''],
       presuntoPrimerApellido: [''],
@@ -1223,17 +1250,35 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
     });
   }
 
+  /** VBG-00-03 (solo PDF) y decisión provisional del pendiente 18 (máx. 10 MB, no obligatorio). */
+  private static readonly TAMANO_MAXIMO_CONSENTIMIENTO_BYTES = 10 * 1024 * 1024;
+
   subirArchivo(): void {
     const input = document.createElement('input');
     input.type = 'file';
+    input.accept = 'application/pdf';
     input.onchange = (e: any) => {
       const file = e.target.files[0];
-      if (file) {
-        this.casoForm.patchValue({ consentimientoArchivo: file });
-        this.snackBar.open(`Archivo ${file.name} cargado`, 'Cerrar', { duration: 2000 });
+      if (!file) {
+        return;
       }
+      if (file.type !== 'application/pdf') {
+        this.notificacion.error('El consentimiento de atención solo admite archivos en formato PDF.');
+        return;
+      }
+      if (file.size > RegistroCasoComponent.TAMANO_MAXIMO_CONSENTIMIENTO_BYTES) {
+        this.notificacion.error('El consentimiento de atención no puede superar los 10 MB.');
+        return;
+      }
+      this.casoForm.patchValue({ consentimientoArchivo: file });
+      this.snackBar.open(`Archivo ${file.name} cargado`, 'Cerrar', { duration: 2000 });
     };
     input.click();
+  }
+
+  /** VBG-00-03: estado visible del consentimiento, sin inventar un tercer valor. */
+  estadoConsentimiento(): 'Consentimiento pendiente' | 'Consentimiento cargado' {
+    return this.casoForm.get('consentimientoArchivo')?.value ? 'Consentimiento cargado' : 'Consentimiento pendiente';
   }
 
   private validarFormulario(): boolean {
@@ -1249,6 +1294,12 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
         if (!errorsByTab[field.tab]) errorsByTab[field.tab] = [];
         errorsByTab[field.tab].push(field.label);
       }
+    }
+
+    if (this.esRelacionMisionalSeleccionada() && this.relacionMisionalNivel2Sel.length === 0) {
+      this.tabErrors.add('Documentación');
+      if (!errorsByTab['Documentación']) errorsByTab['Documentación'] = [];
+      errorsByTab['Documentación'].push('Relación misional: Docencia, Investigación o Extensión');
     }
 
     if (this.tabErrors.size > 0) {
@@ -1283,7 +1334,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
     this.guardandoCompromisos = true;
     this.construirRegistroAtencionRequest(targetTabIndex)
       .then((dataFinal) => {
-        this.solicitudService.registrarPestana(targetTabIndex, dataFinal).subscribe({
+        this.registroVbgDatos.registrarPestana(targetTabIndex, dataFinal, this.casoId).subscribe({
           next: (atencion) => {
             this.guardandoCompromisos = false;
             this.tabErrors = new Set<string>();
@@ -1355,11 +1406,10 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
       tiempoOcurridoValor,
       tiempoOcurridoUnidad,
       queForma,
+      ambitoOcurrencia,
       ciudadHechos,
       lugarHechos,
       violenciaGenero,
-      violenciaMisional,
-      actividadMisional,
       direccionLugar,
       presuntoPrimerNombre,
       presuntoSegundoNombre,
@@ -1443,11 +1493,15 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
           hacecuantooccurrio: tiempoOcurridoValor ? Number(tiempoOcurridoValor) : 0,
           idtiempoocurridounidad: this.resolverIdMaestro(tiempoOcurridoUnidad, this.catalogoTiemposOcurridoUnidad),
           idformaocurrencia: this.resolverIdMaestro(queForma, this.catalogoFormasOcurrencia),
+          idambitoocurrencia: ambitoOcurrencia ? this.resolverIdMaestro(ambitoOcurrencia, this.catalogoAmbitoOcurrencia) : null,
           idciudadhechos: ciudadHechos ? Number(ciudadHechos) : null,
           idlugarocurrencia: this.resolverIdMaestro(lugarHechos, this.catalogoLugaresOcurrencia),
           violenciabasadagenero: violenciaGenero === true || violenciaGenero === 'SI',
-          hechoviolenciaocurrioactividadesmisionales: violenciaMisional === true || violenciaMisional === 'SI',
-          idactivadmisional: actividadMisional ? this.resolverIdMaestro(actividadMisional, this.catalogoActividadesMisionales) : null
+          // VBG-02: forma provisional (decisión del pendiente 7), pendiente de
+          // confirmación del backend — ver DECISIONES_PROVISIONALES_VBG.md.
+          hechoviolenciaocurrioactividadesmisionales: this.relacionMisionalNivel1Sel.length > 0,
+          idsRelacionMisionalNivel1: this.relacionMisionalNivel1Sel,
+          idsRelacionMisionalNivel2: this.relacionMisionalNivel2Sel
         };
       case 3:
         return {

@@ -1,4 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { LOCALE_ID } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeEsCo from '@angular/common/locales/es-CO';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
@@ -8,10 +11,23 @@ import { MatIconTestingModule } from '@angular/material/icon/testing';
 import { DashboardHomeComponent } from './dashboard-home.component';
 import { AuthService } from '../../services/auth.service';
 
+registerLocaleData(localeEsCo);
+
+/**
+ * Este componente solo reparte entre las dos vistas. El contenido se prueba en
+ * `panel-inicio.component.spec.ts` (personal) y en
+ * `panel-usuario.component.spec.ts` (persona que solicita acompañamiento).
+ */
 describe('DashboardHomeComponent', () => {
-  let component: DashboardHomeComponent;
   let fixture: ComponentFixture<DashboardHomeComponent>;
-  let authService: AuthService;
+  let auth: AuthService;
+
+  function conRol(rol: string): HTMLElement {
+    auth.currentUser = { nombre: `Persona ${rol}`, email: 'x@udea.edu.co', rol, token: 't' };
+    fixture = TestBed.createComponent(DashboardHomeComponent);
+    fixture.detectChanges();
+    return fixture.nativeElement as HTMLElement;
+  }
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -20,69 +36,30 @@ describe('DashboardHomeComponent', () => {
         provideNoopAnimations(),
         provideRouter([]),
         provideHttpClient(),
-        provideHttpClientTesting()
+        provideHttpClientTesting(),
+        { provide: LOCALE_ID, useValue: 'es-CO' }
       ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(DashboardHomeComponent);
-    component = fixture.componentInstance;
-    authService = TestBed.inject(AuthService);
-    authService.currentUser = {
-      nombre: 'Admin UdeA',
-      email: 'admin@udea.edu.co',
-      rol: 'Admin',
-      token: 'fake-token'
-    };
-    fixture.detectChanges();
+    auth = TestBed.inject(AuthService);
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(conRol('Admin')).toBeTruthy();
   });
 
-  it('debe inicializar con 5 etapas en el flujo de caso', () => {
-    expect(component.workflowSteps.length).toBe(5);
-    expect(component.workflowSteps[0].title).toBe('Recepción y Radicación');
+  it('el personal ve el panel por zonas', () => {
+    for (const rol of ['Admin', 'Coordinador', 'Profesional', 'Revisor']) {
+      const vista = conRol(rol);
+      expect(vista.querySelector('app-panel-inicio')).withContext(rol).not.toBeNull();
+      expect(vista.querySelector('app-panel-usuario')).withContext(rol).toBeNull();
+    }
   });
 
-  it('debe permitir cambiar de etapa en la guía interactiva', () => {
-    expect(component.selectedStepIndex).toBe(0);
-    component.selectStep(2);
-    expect(component.selectedStepIndex).toBe(2);
-  });
+  it('la persona que solicita acompañamiento ve su propio espacio', () => {
+    const vista = conRol('Usuario');
 
-  it('debe filtrar herramientas en tiempo real según el término de búsqueda', () => {
-    component.searchQuery = 'cita';
-    const resultados = component.filteredTools;
-    expect(resultados.length).toBeGreaterThan(0);
-    expect(resultados.some(t => t.id === 'cita')).toBeTrue();
-  });
-
-  it('debe excluir herramientas exclusivas de admin si el usuario no tiene rol Admin', () => {
-    authService.currentUser = {
-      nombre: 'Revisor UdeA',
-      email: 'revisor@udea.edu.co',
-      rol: 'Revisor',
-      token: 'fake-token'
-    };
-    fixture.detectChanges();
-
-    const tools = component.filteredTools;
-    expect(tools.some(t => t.id === 'usuarios')).toBeFalse();
-    expect(tools.some(t => t.id === 'maestros')).toBeFalse();
-  });
-
-  it('debe incluir herramientas de administración si el usuario tiene rol Admin', () => {
-    authService.currentUser = {
-      nombre: 'Admin UdeA',
-      email: 'admin@udea.edu.co',
-      rol: 'Admin',
-      token: 'fake-token'
-    };
-    fixture.detectChanges();
-
-    const tools = component.filteredTools;
-    expect(tools.some(t => t.id === 'usuarios')).toBeTrue();
-    expect(tools.some(t => t.id === 'maestros')).toBeTrue();
+    expect(vista.querySelector('app-panel-usuario')).not.toBeNull();
+    expect(vista.querySelector('app-panel-inicio')).toBeNull();
   });
 });

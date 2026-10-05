@@ -1,0 +1,101 @@
+<app-zona-panel
+  titulo="Vigilancia con enfoque diferencial"
+  icono="query_stats"
+  descripcion="Casos activos por identidad de género. Solo datos agregados."
+  [cargando]="cargando()"
+  [error]="error()"
+  [vacio]="!cargando() && !error() && (datos()?.total ?? 0) === 0"
+  mensajeVacio="No hay casos que cumplan estos filtros."
+  accionTexto="Abrir panel completo"
+  accionRuta="/dashboard-revisor"
+  (reintentar)="cargar()"
+>
+  @if (catalogos(); as opciones) {
+    <div class="filtros" role="group" aria-label="Filtros de la vigilancia">
+      <div class="filtros__campo">
+        <label class="filtros__etiqueta" for="filtro-periodo">Periodo</label>
+        <select id="filtro-periodo" class="filtros__select"
+                [(ngModel)]="filtros.periodo" (ngModelChange)="alCambiarFiltro()">
+          @for (opcion of opciones.periodos; track opcion.id) {
+            <option [value]="opcion.id">{{ opcion.nombre }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="filtros__campo">
+        <label class="filtros__etiqueta" for="filtro-sede">Sede</label>
+        <select id="filtro-sede" class="filtros__select"
+                [(ngModel)]="filtros.sede" (ngModelChange)="alCambiarFiltro()">
+          @for (opcion of opciones.sedes; track opcion.id) {
+            <option [value]="opcion.id">{{ opcion.nombre }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="filtros__campo">
+        <label class="filtros__etiqueta" for="filtro-dependencia">Dependencia</label>
+        <select id="filtro-dependencia" class="filtros__select"
+                [(ngModel)]="filtros.dependencia" (ngModelChange)="alCambiarFiltro()">
+          @for (opcion of opciones.dependencias; track opcion.id) {
+            <option [value]="opcion.id">{{ opcion.nombre }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  }
+
+  @if (datos(); as resultado) {
+    <!-- Decorativa: el dato lo porta la tabla (DSH-03-03). -->
+    <div class="barra" aria-hidden="true">
+      @for (grupo of resultado.grupos; track grupo.etiqueta; let i = $index) {
+        @if (!grupo.suprimida) {
+          <span class="barra__tramo" [class]="'barra__tramo--' + (i + 1)"
+                [style.width.%]="(grupo.proporcion ?? 0) * 100"></span>
+        }
+      }
+    </div>
+
+    <table class="tabla" aria-label="Casos activos por identidad de género, con los filtros aplicados">
+      <caption class="tabla__pie">
+        {{ resultado.total | number }} casos · corte {{ resultado.corte | date:'d MMM, h:mm a' }}
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Identidad de género</th>
+          <th scope="col">Casos</th>
+          <th scope="col">Proporción</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (grupo of resultado.grupos; track grupo.etiqueta; let i = $index) {
+          <tr>
+            <th scope="row">
+              <span class="tabla__punto" [class]="'tabla__punto--' + (i + 1)" aria-hidden="true"></span>
+              {{ grupo.etiqueta }}
+            </th>
+            @if (grupo.suprimida) {
+              <td class="tabla__suprimida">
+                {{ etiquetaSuprimida }}
+                <span class="visually-hidden">casos. Dato oculto para proteger la identidad de las personas.</span>
+              </td>
+              <td class="tabla__suprimida" aria-label="Proporción no disponible">—</td>
+            } @else {
+              <td>{{ grupo.casos | number }}</td>
+              <td>{{ grupo.proporcion | percent:'1.0-1' }}</td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (resultado.conSupresion) {
+      <p class="nota-privacidad">
+        <mat-icon aria-hidden="true">shield</mat-icon>
+        <span>
+          Se ocultan los grupos con menos de {{ umbralSupresion }} casos. Con tan pocos
+          registros, el dato permitiría identificar a las personas.
+        </span>
+      </p>
+    }
+  }
+</app-zona-panel>

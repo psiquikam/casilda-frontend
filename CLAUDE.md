@@ -3,7 +3,7 @@
 > Archivo vivo. Se actualiza al cerrar cada fase de trabajo para que cualquier
 > sesión posterior (humana o asistida) retome sin repetir el análisis.
 >
-> **Última actualización:** 12 de septiembre de 2026 (documentación de accesibilidad reubicada en `docs/evidencias/accesibilidad/`)
+> **Última actualización:** 4 de octubre de 2026 (optimización del panel de inicio por rol, subfases 0 a 4)
 
 ---
 
@@ -24,10 +24,14 @@ Documentos de referencia, en orden de precedencia para decisiones de diseño:
 | `.agents/skills/accessibility/SKILL.md` | Criterios WCAG 2.2 aplicados. |
 | `docs/evidencias/accesibilidad/plan_accesibilidad.md` | Diagnóstico, hallazgos H-01…H-18, plan por fases hacia WCAG 2.2 AA y **estado de cada tarea** (§4, §6). |
 | `docs/evidencias/accesibilidad/01-fases-1-5-correcciones.md` | Cómo se implementó cada corrección de las fases 1–5 (evidencia de la entrega del 2026-09-11). |
+| `.claude/skills/casilda-ux/SKILL.md` | Orquesta las fuentes anteriores para toda tarea de UI/UX; incluye flujo de verificación y formato de reporte. |
+| `docs/contratos/MATRIZ_MODULO_ATENCION_VBG.md` | Campos, etiquetas y validaciones del módulo Equipo de Atención. Prevalece en contenido de formularios; en lo visual prevalecen §3 y `casilda-diseno-v1.md`. |
+| `docs/contratos/DASHBOARDS_POR_ROL.md` | Contenido del panel de inicio autenticado por rol y enfoque informado en trauma (no cubre la portada pública). |
 
 ## 2. Stack y comandos
 
-- Angular **21.2** standalone (sin `NgModule`), TypeScript **5.9 strict**, Angular Material 21 (tema M2 compat), RxJS 7.8, SweetAlert2, Karma/Jasmine.
+- Angular **21.2** standalone (sin `NgModule`), TypeScript **5.9 strict**, Angular Material 21 (tema M2 compat), RxJS 7.8, Karma/Jasmine.
+  **SweetAlert2 fue retirado** (ver §4): diálogos y confirmaciones van por `DialogoService`/`MatDialog`, notificaciones por `NotificacionService`.
 - Rutas con `loadComponent` (lazy) y guards `authGuard` / `roleGuard` / `featureCapabilityGuard`.
 
 ```powershell
@@ -75,6 +79,15 @@ espaciados ni radios literales**: siempre `var(--token)`.
 | `QuickExitService` | `src/app/core/security/quick-exit.service.ts` | Limpia `sessionStorage` + llaves `casilda_*` y `userSession`, y redirige con `location.replace()` a `environment.quickExitUrl`. |
 | `ContenidoHomeService` | `src/app/services/contenido-home.service.ts` | Contenido editable del home (`imagen`, `titulo`, `contenido`, vigencia, sección). Hoy devuelve un **mock**; el endpoint previsto es `GET {apiBaseUrl}/contenidos/home`. |
 | `CasildaCardComponent` | `src/app/components/casilda-card/` | Tarjeta puramente presentacional alimentada por `ContenidoDestacadoDto`. |
+| `PanelInicioComponent` | `src/app/components/dashboard/` | Panel del personal, armado por zonas Z1–Z6 desde `DASHBOARD_POR_ROL`. Resuelve el rol **al construirse**: `auth.currentUser` no es una señal. |
+| `PanelUsuarioComponent` | `src/app/components/dashboard-usuario/` | Vista de la persona que solicita acompañamiento, con enfoque informado en trauma. No escribe en `localStorage`. |
+| `ZonaPanelComponent` | `src/app/components/dashboard/zona-panel/` | Envoltura de zona: `h2`, y estados de carga, vacío y error con reintento. **Toda zona nueva la usa.** |
+| `KpiCardComponent` | `src/app/components/dashboard/kpi-card/` | Tarjeta de indicador: etiqueta en tipo oración, definición accesible, periodo, denominador y fecha de corte. |
+| `DASHBOARD_POR_ROL` | `src/app/core/dashboard/dashboard-por-rol.ts` | **Único lugar** donde se decide qué widgets ve cada rol; el orden del registro es el orden visual. |
+| `CATALOGO_MODULOS` | `src/app/core/navegacion/catalogo-navegacion.ts` | **Único nombre, ícono y ruta por módulo**, para menú, panel y títulos de ruta. |
+| `esTelefonoPublicable()` | `src/app/core/security/telefono-crisis.ts` | Un teléfono de crisis solo se muestra si es real: rechaza vacíos, marcadores y secuencias. |
+| `suprimirCeldasPequenas()` | `src/app/core/vigilancia/supresion-celdas.ts` | Supresión de conteos identificables en vistas filtradas, con supresión secundaria. Se aplica **en el servicio**, no en la vista. |
+| `DashboardMetricasService` · `DashboardTrabajoService` · `VigilanciaService` · `MiProcesoService` | `src/app/services/` | Fuentes de datos del panel. Mock tipado + endpoint previsto, con latencia y error simulables (`dashboard-mock.ts`). |
 | `CasildaTitleStrategy` | `src/app/core/a11y/casilda-title.strategy.ts` | Título del documento por ruta (`title` en `app.routes.ts`) + sufijo «Casilda — UdeA». |
 | `EnfoqueRutaService` | `src/app/core/a11y/enfoque-ruta.service.ts` | Foco al `<main id="contenido-principal">` tras cada navegación. |
 | `FiltroColumnaDirective` | `src/app/core/a11y/filtro-columna.directive.ts` | `<input appFiltroColumna="ID del caso">`: nombre accesible, `type="search"`, foco visible. Obligatoria en filtros de cabecera de tabla. |
@@ -173,6 +186,45 @@ Detalle y métricas en `docs/evidencias/accesibilidad/01-fases-1-5-correcciones.
 - **Colateral:** handlers «Eliminar» intercambiados entre Rutas activadas y Remisiones en
   `registro-caso` y `registro-atencion`, corregidos.
 
+### 2026-10-04 — Optimización del panel de inicio por rol (subfases 0 a 4)
+Contrato: `docs/contratos/DASHBOARDS_POR_ROL.md`. Diagnóstico y plan en
+`docs/evidencias/dashboards/00-diagnostico-y-plan.md`; un reporte por subfase (01 a 05).
+
+- **Subfase 0 — Contenido de crisis y atajo.** `telefonoOrientacion` queda **vacío a
+  propósito** en ambos entornos: llevaba `1234567890`, también en `environment.prod.ts`, y
+  se renderizaba sin condición en el banner del rol Usuario. Nuevo
+  `core/security/telefono-crisis.ts` con `esTelefonoPublicable()`, que rechaza vacíos,
+  textos de relleno, repeticiones y rachas consecutivas de 7+ dígitos en cualquier
+  posición. Alcance añadido: el pie público y el CTA de la portada mostraban el mismo
+  número. `Alt + Q` pasa a reconocerse también en macOS (`Option + Q` produce «œ») sin
+  dispararse con `AltGr + Q` del teclado latinoamericano.
+- **Subfase 1 — Correcciones transversales.** Fecha y cifras con pipes sobre `es-CO`
+  (la fecha la rompía un `text-transform: capitalize`, no un pipe); **0 colores literales**
+  en el panel y el encabezado; `h1`–`h3` en `--font-serif`; stepper sin truncar; enlaces
+  `tel:`; el rol pasa de aparecer cuatro veces a una. Se corrigieron `--color-danger` y
+  `--color-info`, que apuntaban a variables inexistentes y afectaban a más de 20
+  componentes fuera del panel.
+- **Subfase 2 — Arquitectura común.** Zonas Z1–Z6 con Z2 antes que Z3; registro
+  `DASHBOARD_POR_ROL` indexado por los cinco roles reales; catálogo central de navegación;
+  servicios mock con DTO y endpoint previsto (patrón `ContenidoHomeService`), con latencia
+  y error simulables; estados de carga, vacío y error en toda zona; franja «Datos de
+  demostración». El panel deja de duplicar el menú lateral.
+- **Subfase 3 — Dashboards del personal.** Vista analítica con filtros de periodo, sede y
+  dependencia para el perfil de Reportes, y **supresión de celdas pequeñas** aplicada en el
+  servicio —con supresión secundaria, sin la cual el valor oculto se recupera restando del
+  total—. Aviso sutil de última profesional activa.
+- **Subfase 4 — Rol Usuario.** Vista propia con enfoque informado en trauma: estado del
+  proceso con siguiente paso y quién lo hace, próxima sesión, acuerdos, canal de contacto y
+  líneas de ayuda. Sin cifras, sin relato de hechos, sin jerga, sin rojo y **sin escribir
+  nada en `localStorage`**. **Sus textos son una propuesta pendiente de validación con el
+  equipo de atención.**
+
+**Componentes y servicios nuevos** (ver §4): `PanelInicioComponent`, `PanelUsuarioComponent`,
+`ZonaPanelComponent`, `KpiCardComponent`, siete widgets, `DashboardMetricasService`,
+`DashboardTrabajoService`, `VigilanciaService`, `MiProcesoService`,
+`core/navegacion/catalogo-navegacion.ts`, `core/dashboard/dashboard-por-rol.ts`,
+`core/vigilancia/supresion-celdas.ts`.
+
 ### Pendiente
 1. Accesibilidad — tareas abiertas priorizadas en
    `docs/evidencias/accesibilidad/plan_accesibilidad.md` §6: fases 0.1/0.2/0.4 (axe,
@@ -183,8 +235,40 @@ Detalle y métricas en `docs/evidencias/accesibilidad/01-fases-1-5-correcciones.
 2. Sustituir el mock de `ContenidoHomeService` por el endpoint real del gestor de contenidos.
 3. Confirmar con Comunicaciones UdeA: dependencia exacta del logosímbolo y uso del
    distintivo de Casilda como favicon.
-4. Datos reales de contacto: `environment.telefonoOrientacion` y los del pie público.
+4. Datos reales de contacto: `environment.telefonoOrientacion` y `environment.telefonoContactoPublico`.
+   Ambos quedan **vacíos a propósito**: mientras no haya dato confirmado, la línea no se
+   muestra (`esTelefonoPublicable()` en `src/app/core/security/telefono-crisis.ts`). Nunca
+   reponer un número de relleno: hay pruebas que fallan si vuelve a aparecer.
 5. Validar con el equipo de atención el tono de los mensajes de error y notificaciones.
+6. **Antes de conectar el backend o de cualquier despliegue fuera de desarrollo:** retirar o
+   condicionar a un flag las cuentas de prueba, `loginAsMock()`, `createMockToken`, las
+   contraseñas genéricas y el selector de roles del encabezado y del login (hallazgo ADD-01
+   de `docs/evidencias/dashboards/00-diagnostico-y-plan.md`). Hoy permiten obtener una sesión
+   `ADMIN` con un clic. Se aceptan como deuda conocida mientras el proyecto esté
+   exclusivamente en etapa de desarrollo y sin backend.
+7. **Panel de inicio — decisiones del equipo que bloquean el cierre de la fase**
+   (detalle en `docs/evidencias/dashboards/00-diagnostico-y-plan.md` §7):
+   - **Validar con el equipo de atención cada texto de la vista del rol Usuario** antes de
+     desplegarla. Es requisito del skill `casilda-ux` y del §5 del contrato.
+   - **P-01** `casilda-diseno-v1.md` no existe en el repositorio ni en el historial de Git,
+     pese a ser fuente de verdad citada aquí, en el skill, en el contrato y en dos archivos
+     de `src/`. Decidir si se incorpora o si `CLAUDE.md` §3 + `_tokens.scss` lo reemplazan.
+   - **P-03** Paleta `--color-data-*` para series de datos (propuesta con contrastes
+     calculados en el §5 del diagnóstico).
+   - **P-05** Categorías oficiales de identidad de género.
+   - **P-06** Umbral de supresión de celdas pequeñas; hoy **5**, el valor que propone el
+     propio contrato (`UMBRAL_SUPRESION` en `core/vigilancia/supresion-celdas.ts`).
+   - **P-07** Nombres oficiales de módulo para `core/navegacion/catalogo-navegacion.ts`.
+   - **P-02 / P-12** Catálogo de roles y modelo de especialidades. Sin el segundo,
+     DSH-08-01 —que cada profesional vea solo los seguimientos de su especialidad— no es
+     implementable: hay un único rol `PROFESIONAL`.
+   - **P-13 / P-14 / P-15 / P-16** Tiempos de respuesta comunicables, nombre identitario,
+     política de lenguaje inclusivo y título/favicon neutros para el rol Usuario.
+8. `npm run lint` acumula **302 warnings** frente a un tope de 299, de modo que
+   `npm run check` no pasa en verde. El salto ocurrió en `d3066e0` (PR #13), antes de esta
+   fase. Decidir si se corrigen los tres avisos o se ajusta el tope.
+9. El spec de `RegisterComponent` falla por `NG0201: No provider found for 'ActivatedRoute'`.
+   Viene del PR #14 y es independiente de esta fase.
 
 ## 6. Reglas que no se deben romper
 

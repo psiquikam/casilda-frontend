@@ -30,7 +30,9 @@ export class QuickExitComponent {
 
   @HostListener('document:keydown', ['$event'])
   manejarAtajo(evento: KeyboardEvent): void {
-    if (evento.altKey && evento.key.toLowerCase() === 'q') {
+    if (this.esAtajoDeSalida(evento)) {
+      // Evita que el carácter traducido por la distribución del teclado
+      // (p. ej. «œ» en macOS) se inserte en el campo enfocado antes de salir.
       evento.preventDefault();
       this.salir();
       return;
@@ -46,5 +48,22 @@ export class QuickExitComponent {
       }
       this.ultimoEscape = ahora;
     }
+  }
+
+  /**
+   * Reconoce `Alt + Q` en las distribuciones de teclado que atendemos.
+   *
+   * `event.key` no basta: en macOS `Option + Q` se traduce a «œ» y el atajo
+   * documentado no disparaba. `event.code` tampoco basta por sí solo: en
+   * teclado latinoamericano `AltGr + Q` escribe «@» y, como en Windows AltGr
+   * se reporta como `Ctrl + Alt`, aceptar `code` sin más haría que la salida
+   * rápida se disparase al escribir un correo electrónico.
+   *
+   * Por eso se acepta cualquiera de las dos señales, pero **solo** con `Alt`
+   * sin `Ctrl` ni `Meta`, que es lo que descarta el caso de AltGr.
+   */
+  private esAtajoDeSalida(evento: KeyboardEvent): boolean {
+    if (!evento.altKey || evento.ctrlKey || evento.metaKey) return false;
+    return evento.key.toLowerCase() === 'q' || evento.code === 'KeyQ';
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -34,7 +34,7 @@ export class ModalCodigosPaisComponent implements OnInit {
   paises: CodigoPais[] = [];
   paisesFiltrados: CodigoPais[] = [];
 
-  constructor(public dialogRef: MatDialogRef<ModalCodigosPaisComponent>) {}
+  readonly dialogRef = inject(MatDialogRef<ModalCodigosPaisComponent>);
 
   ngOnInit(): void {
     this.paises = [...CATALOGO_CODIGOS_PAIS];

@@ -6,6 +6,7 @@ import { of, throwError } from 'rxjs';
 
 import { CasildaHomeComponent } from './casilda-home.component';
 import { ContenidoDestacadoDto, ContenidoHomeService } from '../../services/contenido-home.service';
+import { environment } from '../../../environments/environment';
 
 describe('CasildaHomeComponent', () => {
   let fixture: ComponentFixture<CasildaHomeComponent>;
@@ -86,5 +87,61 @@ describe('CasildaHomeComponent', () => {
     expect(component.errorCarga()).toBeTrue();
     expect(component.cargando()).toBeFalse();
     expect(fixture.nativeElement.querySelector('.home__estado-error')).toBeTruthy();
+  });
+
+  // DSH-05-01: nunca un enlace `tel:` vacío o de relleno en un botón de emergencia.
+  describe('llamado a orientación telefónica', () => {
+    const telefonoOriginal = environment.telefonoOrientacion;
+
+    /**
+     * El componente lee el teléfono de `environment` al construirse, así que se
+     * configura antes de crearlo: la prueba recorre el cableado real en vez de
+     * sustituir la propiedad ya inicializada.
+     */
+    async function crearConTelefono(valor: string): Promise<void> {
+      environment.telefonoOrientacion = valor;
+      await crearComponente();
+    }
+
+    afterEach(() => {
+      environment.telefonoOrientacion = telefonoOriginal;
+    });
+
+    it('el valor de environment no es publicable mientras no haya dato real', () => {
+      expect(environment.telefonoOrientacion).toBe('');
+    });
+
+    it('no ofrece el canal sin número configurado', async () => {
+      await crearConTelefono('');
+
+      const pagina = fixture.nativeElement as HTMLElement;
+      expect(component.hayLineaOrientacion).toBeFalse();
+      expect(pagina.querySelector('a[href^="tel:"]')).toBeNull();
+      expect(pagina.textContent).not.toContain('Orientación telefónica de emergencia');
+    });
+
+    it('rechaza un número de relleno aunque esté configurado', async () => {
+      await crearConTelefono('1234567890');
+
+      const pagina = fixture.nativeElement as HTMLElement;
+      expect(component.hayLineaOrientacion).toBeFalse();
+      expect(pagina.querySelector('a[href^="tel:"]')).toBeNull();
+      expect(pagina.textContent).not.toContain('1234567890');
+    });
+
+    it('ofrece el canal cuando hay un número real', async () => {
+      await crearConTelefono('6042196000');
+
+      const enlace = (fixture.nativeElement as HTMLElement).querySelector('a[href^="tel:"]');
+      expect(component.hayLineaOrientacion).toBeTrue();
+      expect(enlace).not.toBeNull();
+      expect(enlace?.getAttribute('href')).toBe('tel:6042196000');
+    });
+
+    it('conserva el reporte seguro como acción disponible sin línea telefónica', async () => {
+      await crearConTelefono('');
+
+      expect((fixture.nativeElement as HTMLElement).textContent).toContain('Iniciar reporte seguro');
+    });
   });
 });
