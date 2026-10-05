@@ -30,7 +30,8 @@ Documentos de referencia, en orden de precedencia para decisiones de diseño:
 
 ## 2. Stack y comandos
 
-- Angular **21.2** standalone (sin `NgModule`), TypeScript **5.9 strict**, Angular Material 21 (tema M2 compat), RxJS 7.8, SweetAlert2, Karma/Jasmine.
+- Angular **21.2** standalone (sin `NgModule`), TypeScript **5.9 strict**, Angular Material 21 (tema M2 compat), RxJS 7.8, Karma/Jasmine.
+  **SweetAlert2 fue retirado** (ver §4): diálogos y confirmaciones van por `DialogoService`/`MatDialog`, notificaciones por `NotificacionService`.
 - Rutas con `loadComponent` (lazy) y guards `authGuard` / `roleGuard` / `featureCapabilityGuard`.
 
 ```powershell

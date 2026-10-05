@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 import { RegistroCasoComponent } from './registro-caso.component';
 
@@ -47,9 +48,13 @@ describe('RegistroCasoComponent', () => {
   });
 
   it('should open country codes catalog and prefix selected code', () => {
-    const dialogSpy = spyOn((component as any).dialog, 'open').and.returnValue({
+    const dialogRefSimulado = {
       afterClosed: () => ({ subscribe: (fn: (val?: string) => void) => fn('VNZ') })
-    } as any);
+    } as unknown as MatDialogRef<unknown, string>;
+    const dialogSpy = spyOn(
+      (component as unknown as { dialog: MatDialog }).dialog,
+      'open'
+    ).and.returnValue(dialogRefSimulado);
 
     component.casoForm.get('documento')?.setValue('123456');
     component.abrirCatalogoPaises();

@@ -1,5 +1,13 @@
 <div class="cita-container">
 
+  @if (datosDemostracion) {
+    <!-- DSH-12-08: datos simulados mientras el modo de demostración esté activo. -->
+    <p class="franja-demo" role="status">
+      <mat-icon aria-hidden="true">science</mat-icon>
+      <span>Datos de demostración. Las citas de este listado son simuladas.</span>
+    </p>
+  }
+
   <div class="section-header">
     <h2>Citas</h2>
     <span class="subtitle">Gestión de atención y seguimiento de casos con cita activa</span>

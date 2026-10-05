@@ -23,8 +23,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
 
 import { ModalDireccionComponent } from '../modal-direccion/modal-direccion.component';
 import { ModalDiscapacidadComponent } from '../modal-discapacidad/modal-discapacidad.component';
@@ -46,6 +45,8 @@ import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
 import { AuthService } from '../../services/auth.service';
 import { AtencionContextoRequestDto, AtencionRegistroRequestDto, CasoDto, CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, HechoRequestDto, SeguimientoAtencionRequestDto, SolicitudService, VinculoUdeAEnum } from '../../services/solicitud.service';
 import { MaestroDto } from '../../services/listas.service';
+import { MaestrosVbgService } from '../../services/maestros-vbg.service';
+import { RegistroVbgDatosService } from '../../services/registro-vbg-datos.service';
 import { environment } from '../../../environments/environment';
 import { TablaCasosComponent } from '../tabla-casos/tabla-casos.component';
 import { NotificacionService } from '../../core/a11y/notificacion.service';
@@ -89,6 +90,11 @@ import { NotificacionService } from '../../core/a11y/notificacion.service';
 })
 export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   private readonly notificacion = inject(NotificacionService);
+  private readonly maestrosVbg = inject(MaestrosVbgService);
+
+  /** DSH-12-08: franja visible mientras los datos del módulo sean simulados. */
+  readonly datosDemostracion = environment.datosDemostracion;
+  private readonly registroVbgDatos = inject(RegistroVbgDatosService);
   atencionForm!: FormGroup;
   atencionId: number | null = null;
   casoId: number | null = null;
@@ -633,13 +639,12 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     return mun ? mun.nombre : '';
   }
 
+  /**
+   * Catálogos del módulo. En modo de demostración no llama al backend (ver
+   * `MaestrosVbgService`); el formulario es el mismo en ambos modos.
+   */
   private obtenerMaestro(endpoint: string) {
-    return this.http.get<MaestroDto[]>(`${this.maestrosUrl}/${endpoint}`).pipe(
-      catchError((error) => {
-        this.notificacion.error(`No fue posible cargar la lista «${endpoint}». Algunos campos pueden aparecer vacíos.`, error);
-        return of([] as MaestroDto[]);
-      })
-    );
+    return this.maestrosVbg.obtenerCatalogo(endpoint);
   }
 
   private mapNombres(lista: MaestroDto[]): string[] {
@@ -720,7 +725,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   }
 
   private cargarCasos(page = 0, size: number = this.pageSizeCasos): void {
-    this.solicitudService.listarCasosPaginados(page, size).subscribe({
+    this.registroVbgDatos.listarCasosPaginados(page, size).subscribe({
       next: (respuesta) => {
         const filas = respuesta.content.map((caso) => this.mapearCasoATabla(caso));
         this.casoPorAtender = filas;
@@ -852,7 +857,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     });
 
     if (caso?.solicitudId) {
-      this.solicitudService.obtenerPorId(caso.solicitudId).subscribe({
+      this.registroVbgDatos.obtenerPorId(caso.solicitudId).subscribe({
         next: (solicitud) => {
           this.correoRegistrados = (solicitud.correos ?? []).map(c => ({
             tipoId: c.tipoId,
@@ -1158,7 +1163,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     this.dataSource.data = [...this.casoPorAtender];
   }
 
-  editarAcuerdo(element: any) { console.log('Editar', element); }
 
   initForm(): void {
     this.atencionForm = this.fb.group({
@@ -1293,7 +1297,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     this.guardandoCompromisos = true;
     this.construirRegistroAtencionRequest(targetTabIndex)
       .then((dataFinal) => {
-        this.solicitudService.registrarPestana(targetTabIndex, dataFinal).subscribe({
+        this.registroVbgDatos.registrarPestana(targetTabIndex, dataFinal, this.casoId).subscribe({
           next: (atencion) => {
             this.guardandoCompromisos = false;
             this.tabErrors = new Set<string>();
