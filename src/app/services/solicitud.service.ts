@@ -266,6 +266,8 @@ export interface CitaDto {
   telefonoAlterno?: string;
   correoInstitucional?: string;
   correoPersonal?: string;
+  /** VBG-09-01, solo lectura (VBG-09-02). Ver nota en `CasoDto.grupoAtencion`. */
+  grupoAtencion?: string | null;
 }
 
 export interface CasoDto {
@@ -304,6 +306,13 @@ export interface CasoDto {
   departamentoResidencia?: string;
   ciudadResidencia?: string;
   direccionResidencia?: string;
+  /**
+   * VBG-09-01, solo lectura (VBG-09-02). `null`/`undefined` = «Sin calcular».
+   * El cálculo real está bloqueado por el pendiente 17 de la matriz (falta la
+   * tabla de decisión completa); por ahora solo se muestra el valor que ya
+   * trae el caso. En modo de demostración lo provee `CasosSimuladosService`.
+   */
+  grupoAtencion?: string | null;
 }
 
 export interface CasoResponseDto {

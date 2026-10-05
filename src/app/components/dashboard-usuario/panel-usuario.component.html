@@ -62,9 +62,12 @@
       }
     </section>
 
-    <!-- Compromisos de la persona, en tono de acompañamiento (DSH-10-03) -->
+    <!-- Compromisos de la persona, en tono de acompañamiento (DSH-10-03).
+         Título y "fechaCumplimiento": decisión provisional P-VBG-02. Solo se
+         muestran los compromisos de la persona, nunca los de la dupla o
+         profesional (el DTO no modela ese origen a propósito). -->
     <section class="tarjeta" aria-labelledby="titulo-compromisos">
-      <h2 class="tarjeta__titulo" id="titulo-compromisos">Lo que acordamos</h2>
+      <h2 class="tarjeta__titulo" id="titulo-compromisos">Lo que decidiste hacer</h2>
       @if (datos.compromisos.length) {
         <p class="tarjeta__texto">
           Esto es lo que decidiste hacer. No hay prisa: lo retomamos cuando quieras.
@@ -80,9 +83,9 @@
                 @if (compromiso.cumplido) {
                   <span class="visually-hidden">Ya lo hiciste.</span>
                 }
-                @if (compromiso.fechaAcordada) {
+                @if (compromiso.fechaCumplimiento) {
                   <span class="acuerdos__fecha">
-                    Lo pensamos para el {{ compromiso.fechaAcordada | date:'d \'de\' MMMM' }}
+                    Lo pensamos para el {{ compromiso.fechaCumplimiento | date:'d \'de\' MMMM' }}
                   </span>
                 }
               </span>
@@ -90,7 +93,7 @@
           }
         </ul>
       } @else {
-        <p class="tarjeta__texto">Por ahora no hay nada acordado.</p>
+        <p class="tarjeta__texto">Por ahora no tienes nada pendiente por hacer.</p>
       }
     </section>
 

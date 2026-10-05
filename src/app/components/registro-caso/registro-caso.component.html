@@ -1013,12 +1013,19 @@
                         <mat-form-field appearance="outline" subscriptSizing="dynamic">
                           <mat-label>
                             Estado del caso
-                            <button type="button" class="help-tooltip-trigger" matTooltip="Clasificación automática calculada por el sistema según los vínculos institucional/agresor y misionalidad (Grupos 1 al 6)." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+                            <button type="button" class="help-tooltip-trigger" matTooltip="Abierto, en seguimiento o cerrado. Lo decide el equipo de atención, no se calcula." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
                           </mat-label>
                           <mat-select formControlName="estadosCaso">
                             @for (s of estadosCaso; track s) { <mat-option [value]="s">{{s}}</mat-option>
                           }
                         </mat-select>
+                      </mat-form-field>
+                      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                        <mat-label>
+                          Grupo de atención
+                          <button type="button" class="help-tooltip-trigger" matTooltip="Clasificación automática calculada por el sistema según los vínculos institucional/agresor y misionalidad (Grupos 1 al 6). No editable (VBG-09-02)." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+                        </mat-label>
+                        <input matInput [value]="casoSeleccionado?.grupoAtencion ?? 'Sin calcular'" readonly disabled>
                       </mat-form-field>
                     </div>
                   </mat-tab>

@@ -12,6 +12,7 @@ import { DialogoService } from '../../core/a11y/dialogo.service';
 import { MaestrosVbgService } from '../../services/maestros-vbg.service';
 import { MaestroDto } from '../../services/listas.service';
 import { ModalSeguimientosComponent } from '../modal-seguimiento/modal-seguimiento.component';
+import { esUltimaProfesionalActiva } from '../../core/vbg/ultima-profesional-activa';
 
 export interface SeguimientoVbg {
   especialidad: string;
@@ -142,8 +143,7 @@ export class SeccionSeguimientosComponent implements OnInit {
       this.motivoCierreTexto = '';
     };
 
-    const quedanAbiertos = this.seguimientos.some((s) => s !== seguimiento && s.estado === 'Abierto');
-    if (quedanAbiertos) {
+    if (!esUltimaProfesionalActiva(this.seguimientos, seguimiento)) {
       cerrar();
       return;
     }

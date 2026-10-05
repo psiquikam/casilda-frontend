@@ -218,7 +218,6 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
     { tab: 'Documentación', label: 'Lugar de los hechos', control: 'lugarHechos' },
     { tab: 'Documentación', label: 'Violencia de género', control: 'violenciaGenero' },
     { tab: 'Estado del Caso', label: 'Estado del caso', control: 'estadosCaso' },
-    { tab: 'Estado del Caso', label: 'Grupo de atención', control: 'grupoAtencion' },
   ];
 
   psicologicaSel: number[] = [];
@@ -265,7 +264,6 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
   relacionMisionalNivel2Sel: number[] = [];
   estadosCaso: string[] = [];
   catalogoEstadosCaso: MaestroDto[] = [];
-  grupoAtencion: string[] = [];
   listaTiemposOcurridoUnidad: string[] = [];
   catalogoTiemposOcurridoUnidad: MaestroDto[] = [];
 
@@ -509,7 +507,6 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
       relacionMisionalNivel1: this.obtenerMaestro('relacion-misional/nivel-1'),
       relacionMisionalNivel2: this.obtenerMaestro('relacion-misional/nivel-2'),
       estadosCaso: this.obtenerMaestro('estados-caso'),
-      gruposAtencion: this.obtenerMaestro('grupos-atencion'),
       rutasInternas: this.obtenerMaestro('rutas-internas'),
       rutasExternas: this.obtenerMaestro('rutas-externas'),
       modalidadesPsicologicas: this.obtenerMaestro('modalidades-violencia/tipo/1'),
@@ -566,7 +563,6 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
         this.ambitoOcurrencia = this.mapNombres(data.ambitoOcurrencia);
         this.catalogoEstadosCaso = data.estadosCaso;
         this.estadosCaso = this.mapNombres(data.estadosCaso);
-        this.grupoAtencion = this.mapNombres(data.gruposAtencion);
         this.catalogoRutasInternas = data.rutasInternas;
         this.catalogoRutasExternas = data.rutasExternas;
         this.listaPsicologica = data.modalidadesPsicologicas;
@@ -841,7 +837,10 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
       cargo: cita.estadoCita || '',
       telefono: cita.telefonoAlterno || '',
       correoInst: cita.correoInstitucional || '',
-      correoPers: cita.correoPersonal || ''
+      correoPers: cita.correoPersonal || '',
+      // VBG-09-01, solo lectura (VBG-09-02): se conserva para mostrarlo en
+      // «Estado del Caso»; no viene de ningún control del formulario.
+      grupoAtencion: cita.grupoAtencion ?? null
     };
   }
 
@@ -1179,7 +1178,6 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
       detalleViolenciaInformatica: [''],
       violenciaPrejuicio: ['NO'],
       estadosCaso: [''],
-      grupoAtencion: [''],
       detalleViolenciaPrejuicio: [''],
       observacionesTelefono: [''],
       observacionesCorreo: [''],

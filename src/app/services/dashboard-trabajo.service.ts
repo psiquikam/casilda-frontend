@@ -5,6 +5,13 @@ import { environment } from '../../environments/environment';
 import { diasDesdeHoy, respuestaSimulada } from './dashboard-mock';
 
 /**
+ * Decisión provisional P-VBG-07: umbral de «seguimiento sin registro» para
+ * marcarlo como pendiente. Sin respaldo normativo confirmado; cambiar solo
+ * esta constante no requiere tocar el widget que la consume.
+ */
+const UMBRAL_DIAS_SIN_REGISTRO = 15;
+
+/**
  * Lo accionable del panel: qué requiere atención hoy y a quién se atiende.
  *
  * **Mínima exposición de datos personales** (DSH-P6, DSH-08-02): estas listas
@@ -25,10 +32,13 @@ export interface PendienteDto {
   /**
    * `true` si quien consulta es la última profesional activa en el caso.
    *
-   * Anticipa la alerta de cierre general de la matriz (VBG-08-13): si esta
-   * persona cierra su seguimiento, el caso queda sin acompañamiento. Se señala
-   * **de forma sutil** (DSH-08-03): es un aviso, no una urgencia, y no se pinta
-   * en rojo.
+   * Mismo concepto que calcula `esUltimaProfesionalActiva()`
+   * (`core/vbg/ultima-profesional-activa.ts`) al cerrar un seguimiento en
+   * `SeccionSeguimientosComponent` (VBG-08-13), pero aquí es un valor de
+   * mock agregado entre casos, no el resultado de esa función: el panel no
+   * tiene todavía los seguimientos reales de cada caso para calcularlo. Se
+   * señala **de forma sutil** (DSH-08-03): es un aviso, no una urgencia, y
+   * no se pinta en rojo.
    */
   readonly ultimaProfesionalActiva?: boolean;
 }
@@ -102,7 +112,7 @@ const PENDIENTES_POR_ROL: Record<string, readonly PendienteDto[]> = {
       id: 'p-pro-2',
       radicado: 'CAS-2026-145',
       iniciales: 'A. T.',
-      descripcion: 'Seguimiento sin registro en los últimos 15 días',
+      descripcion: `Seguimiento sin registro en los últimos ${UMBRAL_DIAS_SIN_REGISTRO} días`,
       vence: diasDesdeHoy(1).toISOString(),
       ruta: '/registro-atencion',
       ultimaProfesionalActiva: true

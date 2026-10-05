@@ -207,7 +207,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       condition: () => this.atencionForm?.get('violenciaMisional')?.value === 'SI'
     },
     { tab: 'Estado del Caso', label: 'Estado del caso', control: 'estadosCaso' },
-    { tab: 'Estado del Caso', label: 'Grupo de atención', control: 'grupoAtencion' },
   ];
 
   psicologicaSel: number[] = [];
@@ -250,7 +249,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   actividadesMisionales: string[] = [];
   estadosCaso: string[] = [];
   catalogoEstadosCaso: MaestroDto[] = [];
-  grupoAtencion: string[] = [];
   listaTiemposOcurridoUnidad: string[] = [];
   catalogoTiemposOcurridoUnidad: MaestroDto[] = [];
 
@@ -475,7 +473,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       lugaresOcurrencia: this.obtenerMaestro('lugares-ocurrencia'),
       actividadesMisionales: this.obtenerMaestro('actividades-misionales'),
       estadosCaso: this.obtenerMaestro('estados-caso'),
-      gruposAtencion: this.obtenerMaestro('grupos-atencion'),
       rutasInternas: this.obtenerMaestro('rutas-internas'),
       rutasExternas: this.obtenerMaestro('rutas-externas'),
       modalidadesPsicologicas: this.obtenerMaestro('modalidades-violencia/tipo/1'),
@@ -530,7 +527,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         this.actividadesMisionales = this.mapNombres(data.actividadesMisionales);
         this.catalogoEstadosCaso = data.estadosCaso;
         this.estadosCaso = this.mapNombres(data.estadosCaso);
-        this.grupoAtencion = this.mapNombres(data.gruposAtencion);
         this.catalogoRutasInternas = data.rutasInternas;
         this.catalogoRutasExternas = data.rutasExternas;
         this.listaPsicologica = data.modalidadesPsicologicas;
@@ -833,7 +829,10 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       ciudadNacimiento: caso.ciudadNacimiento || '',
       departamentoResidencia: caso.departamentoResidencia || '',
       ciudadResidencia: caso.ciudadResidencia || '',
-      direccionResidencia: caso.direccionResidencia || ''
+      direccionResidencia: caso.direccionResidencia || '',
+      // VBG-09-01, solo lectura (VBG-09-02): se conserva para mostrarlo en
+      // «Estado del Caso»; no viene de ningún control del formulario.
+      grupoAtencion: caso.grupoAtencion ?? null
     };
   }
 
@@ -1166,7 +1165,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       detalleViolenciaInformatica: [''],
       violenciaPrejuicio: ['NO'],
       estadosCaso: [''],
-      grupoAtencion: [''],
       detalleViolenciaPrejuicio: [''],
       observacionesTelefono: [''],
       observacionesCorreo: [''],

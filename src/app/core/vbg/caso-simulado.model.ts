@@ -95,7 +95,8 @@ export function aCitaDto(caso: CasoSimuladoVbg): CitaDto {
     celular: s.celular,
     telefonoAlterno: s.telefonoAlterno,
     correoInstitucional: s.correoInstitucional,
-    correoPersonal: s.correoPersonal
+    correoPersonal: s.correoPersonal,
+    grupoAtencion: caso.grupoAtencion
   };
 }
 
@@ -126,6 +127,7 @@ export function aCasoDto(caso: CasoSimuladoVbg): CasoDto {
     segundoNombre: s.segundoNombre,
     primerApellido: s.primerApellido,
     segundoApellido: s.segundoApellido,
-    fechaNacimiento: s.fechaNacimiento ?? undefined
+    fechaNacimiento: s.fechaNacimiento ?? undefined,
+    grupoAtencion: caso.grupoAtencion
   };
 }
