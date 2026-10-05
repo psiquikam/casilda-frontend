@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Output, inject } from '@angular/core';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { AuthService, MOCK_USERS, MockUserProfile } from '../../../services/auth.service';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -26,13 +26,18 @@ export class HeaderComponent {
 
   readonly auth = inject(AuthService);
   readonly navLayout = inject(NavigationLayoutService);
-  private readonly router = inject(Router);
 
   readonly mockUsers: MockUserProfile[] = Object.values(MOCK_USERS);
 
+  /**
+   * Selector de rol de «Modo Prueba»: recarga la página completa en vez de
+   * navegar por el router. Si ya se está en `/inicio`, `router.navigate`
+   * es un no-op (Angular ignora navegaciones a la misma URL por defecto) y
+   * el panel se queda con los datos del rol anterior hasta un F5 manual.
+   */
   cambiarRolMock(mock: MockUserProfile): void {
     this.auth.loginAsMock(mock.email).subscribe(() => {
-      void this.router.navigate(['/inicio']);
+      window.location.href = '/inicio';
     });
   }
 
