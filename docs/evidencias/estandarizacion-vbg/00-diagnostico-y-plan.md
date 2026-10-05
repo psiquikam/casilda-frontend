@@ -464,7 +464,19 @@ Hecho esto, **`npm run check` en verde pasa a ser el criterio de cierre de cada 
 | **Riesgos** | Es la subfase que más toca la lógica condicional. Mitigación: R-03 y R-04 (ocultar + deshabilitar + limpiar con confirmación), con prueba en ambos sentidos por cada fila de la tabla del §3 de la matriz. |
 | **Terminado** | Cada fila de esa tabla probada al mostrar y al ocultar. Con VBG = `No` el formulario guarda. Ninguna etiqueta difiere de la matriz. |
 
-### M3 — Identificación, presunto agresor y apreciaciones (secciones 4 a 6)
+### M3 — Identificación, presunto agresor y apreciaciones (secciones 4 a 6) ✅ **EJECUTADA (2026-10-05)**
+
+> Resultado en
+> `docs/evidencias/estandarizacion-vbg/03-subfase-M3-identificacion-agresor-apreciaciones.md`.
+> **Hallazgo crítico, no estaba en el diagnóstico original**: `registro-atencion` guardaba
+> el payload de la pestaña equivocada en 7 de sus 8 pestañas (ver detalle en el reporte).
+> Corregido junto con la pestaña «Presunto agresor», que faltaba por completo en ese
+> formulario pese a tener toda la lógica ya escrita.
+> **Correcciones a este diagnóstico**: VBG-04-01 ya existía (el tooltip con el ejemplo de
+> país sí estaba en `registro-caso.component.html:50`); VBG-05-05/05-09 citaba el control
+> equivocado (`otroVinculo` es del vínculo de la persona atendida, no del agresor — el
+> modal del agresor no tenía ningún «¿Cuál?»); VBG-05-08 sí es verificable y cumple
+> («Personal no docente» aparece literal en el catálogo y en el tooltip del modal).
 
 | | |
 |---|---|

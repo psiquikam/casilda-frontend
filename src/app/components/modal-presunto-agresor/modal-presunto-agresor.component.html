@@ -38,6 +38,13 @@
       </mat-select>
     </mat-form-field>
 
+    @if (data.vinculoUniversidad === 'Otro') {
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>¿Cuál? (vínculo con la universidad)</mat-label>
+        <input matInput [(ngModel)]="data.cualVinculoUniversidad" placeholder="Escriba el vínculo">
+      </mat-form-field>
+    }
+
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>
         Vínculo con la víctima
@@ -50,6 +57,13 @@
       </mat-select>
     </mat-form-field>
 
+    @if (data.vinculoVictima === 'Otro') {
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>¿Cuál? (vínculo con la víctima)</mat-label>
+        <input matInput [(ngModel)]="data.cualVinculoVictima" placeholder="Escriba el vínculo">
+      </mat-form-field>
+    }
+
   </div>
 </mat-dialog-content>
 
@@ -57,7 +71,9 @@
   <button mat-button (click)="onNoClick()">Cancelar</button>
   <button mat-flat-button class="btn-confirm"
     [mat-dialog-close]="data"
-    [disabled]="!data.primerNombre && !data.primerApellido && !data.idVinculoUniversidad && !data.idVinculoVictima">
+    [disabled]="(!data.primerNombre && !data.primerApellido && !data.idVinculoUniversidad && !data.idVinculoVictima) ||
+      (data.vinculoUniversidad === 'Otro' && !data.cualVinculoUniversidad) ||
+      (data.vinculoVictima === 'Otro' && !data.cualVinculoVictima)">
     <mat-icon aria-hidden="true">check</mat-icon>
     Guardar
   </button>

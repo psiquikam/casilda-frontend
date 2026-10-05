@@ -1,0 +1,48 @@
+<div class="discapacidad-container">
+  <div class="section-header-inline">
+    <div class="section-title">
+      <mat-icon aria-hidden="true" color="primary">person</mat-icon>
+      <span>Datos del presunto agresor</span>
+    </div>
+    <button mat-icon-button aria-label="Agregar presunto agresor" class="btn-add-inline" (click)="abrirModalAgresor()"
+      matTooltip="Agregar Agresor">
+      <mat-icon aria-hidden="true">add_circle</mat-icon>
+    </button>
+  </div>
+  <div class="table-responsive">
+    <table mat-table [dataSource]="agresoresRegistrados" class="caso-table" aria-label="Presuntos agresores registrados">
+      <ng-container matColumnDef="nombre">
+        <th mat-header-cell scope="col" *matHeaderCellDef> Nombre del agresor </th>
+        <td mat-cell *matCellDef="let element"> {{ formatearNombreAgresor(element) }} </td>
+      </ng-container>
+      <ng-container matColumnDef="vinculoUniversidad">
+        <th mat-header-cell scope="col" *matHeaderCellDef> Vínculo con la UdeA </th>
+        <td mat-cell *matCellDef="let element"> {{element.vinculoUniversidad || 'No
+        registrado'}} </td>
+      </ng-container>
+      <ng-container matColumnDef="vinculoVictima">
+        <th mat-header-cell scope="col" *matHeaderCellDef> Vínculo con la víctima </th>
+        <td mat-cell *matCellDef="let element"> {{element.vinculoVictima || 'No
+        registrado'}} </td>
+      </ng-container>
+      <ng-container matColumnDef="opcion">
+        <th mat-header-cell scope="col" *matHeaderCellDef style="text-align: center;"> Opción
+        </th>
+        <td mat-cell *matCellDef="let i = index" style="text-align: center;">
+          <button mat-icon-button [attr.aria-label]="'Eliminar el presunto agresor de la fila ' + (i + 1)" color="warn" (click)="eliminarAgresor(i)"
+            matTooltip="Eliminar">
+            <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
+          </button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+      <tr mat-row *matRowDef="let row; columns: columnas;"></tr>
+    </table>
+    @if (agresoresRegistrados.length === 0) {
+      <div class="no-results-msg">
+        <mat-icon aria-hidden="true">person</mat-icon>
+        <p>No hay presuntos agresores registrados.</p>
+      </div>
+    }
+  </div>
+</div>
