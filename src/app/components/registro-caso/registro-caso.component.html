@@ -406,21 +406,46 @@
                         </span>
                       </ng-template>
                       <div class="tab-padding grid-2">
-                        <div style="display: flex; gap: 8px;">
-                          <mat-form-field appearance="outline" subscriptSizing="dynamic" style="flex: 1;">
-                            <mat-label>¿Hace cuánto ocurrió el hecho?</mat-label>
-                            <input matInput type="number" formControlName="tiempoOcurridoValor" min="0">
-                          </mat-form-field>
-                          <mat-form-field appearance="outline" subscriptSizing="dynamic"
-                            style="width: 140px;">
-                            <mat-label>Unidad</mat-label>
-                            <mat-select formControlName="tiempoOcurridoUnidad">
-                              @for (u of listaTiemposOcurridoUnidad; track u) {
-                                <mat-option [value]="u">{{u}}</mat-option>
-                              }
-                            </mat-select>
-                          </mat-form-field>
+                        <div class="pregunta-container span-all">
+                          <span class="pregunta-label">
+                            Violencia Basada en Género
+                            <button type="button" class="help-tooltip-trigger" matTooltip="Filtro inicial: define si el hecho constituye VBG para desplegar las modalidades y temporalidad." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+                          </span>
+                          <mat-radio-group formControlName="violenciaGenero" class="radio-group" aria-label="Violencia basada en género">
+                            <mat-radio-button value="SI">Sí</mat-radio-button>
+                            <mat-radio-button value="NO">No</mat-radio-button>
+                          </mat-radio-group>
                         </div>
+                        @if (casoForm.get('violenciaGenero')?.value === 'SI') {
+                          <div class="span-all" style="display: flex; gap: 8px;">
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic" style="flex: 1;">
+                              <mat-label>¿Hace cuánto ocurrió el hecho?</mat-label>
+                              <input matInput type="number" formControlName="tiempoOcurridoValor" min="0">
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic"
+                              style="width: 140px;">
+                              <mat-label>Unidad</mat-label>
+                              <mat-select formControlName="tiempoOcurridoUnidad">
+                                @for (u of listaTiemposOcurridoUnidad; track u) {
+                                  <mat-option [value]="u">{{u}}</mat-option>
+                                }
+                              </mat-select>
+                            </mat-form-field>
+                          </div>
+                        }
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                          <mat-label>Ámbito de Ocurrencia</mat-label>
+                          <mat-select formControlName="ambitoOcurrencia">
+                            @for (c of ambitoOcurrencia; track c) { <mat-option [value]="c">{{c}}</mat-option> }
+                          </mat-select>
+                          <mat-hint>Entorno en el que ocurrió el hecho.</mat-hint>
+                        </mat-form-field>
+                        @if (esAmbitoOtro()) {
+                          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                            <mat-label>¿Cuál? (Ámbito)</mat-label>
+                            <input matInput formControlName="ambitoOcurrenciaOtro">
+                          </mat-form-field>
+                        }
                         <mat-form-field appearance="outline" subscriptSizing="dynamic">
                           <mat-label>¿En qué forma ocurrió el hecho?</mat-label>
                           <mat-select formControlName="queForma">
@@ -450,13 +475,11 @@
                               </mat-autocomplete>
                             </mat-form-field>
                             <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                              <mat-label>
-                                Lugar de Ocurrencia
-                                <button type="button" class="help-tooltip-trigger" matTooltip="Lugar vinculado a bienes inmuebles o predios universitarios (Dentro, Fuera, Mixto)." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
-                              </mat-label>
+                              <mat-label>Lugar de Ocurrencia</mat-label>
                               <mat-select formControlName="lugarHechos">
                                 @for (c of lugarHechos; track c) { <mat-option [value]="c">{{c}}</mat-option> }
                               </mat-select>
+                              <mat-hint>Se refiere a si el hecho ocurrió dentro, fuera o parcialmente dentro de bienes inmuebles o predios de la Universidad de Antioquia.</mat-hint>
                             </mat-form-field>
                             <div class="discapacidad-container span-all">
                               <div class="section-header-inline">
@@ -508,31 +531,29 @@
                                 }
                               </div>
                             </div>
-                            <div class="pregunta-container span-all">
-                              <span class="pregunta-label">
-                                Violencia Basada en Género
-                                <button type="button" class="help-tooltip-trigger" matTooltip="Filtro inicial: define si el hecho constituye VBG para desplegar las modalidades y temporalidad." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
-                              </span>
-                              <mat-radio-group formControlName="violenciaGenero" class="radio-group" aria-label="Violencia basada en género">
-                                <mat-radio-button value="SI">Sí</mat-radio-button>
-                                <mat-radio-button value="NO">No</mat-radio-button>
-                              </mat-radio-group>
-                              <span class="pregunta-label">
-                                Relación Misional / Institucional
-                                <button type="button" class="help-tooltip-trigger" matTooltip="Ocurrió en el desarrollo de actividades misionales (Docencia, Investigación, Extensión), institucionales, en representación de la Universidad o en bienes inmuebles." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
-                              </span>
-                              <mat-radio-group formControlName="violenciaMisional" class="radio-group" aria-label="Relación Misional / Institucional">
-                                <mat-radio-button value="SI">Sí</mat-radio-button>
-                                <mat-radio-button value="NO">No</mat-radio-button>
-                              </mat-radio-group>
-                              @if (casoForm.get('violenciaMisional')?.value === 'SI') {
-                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                  <mat-label>Actividad Misional</mat-label>
-                                  <mat-select formControlName="actividadMisional">
-                                    @for (c of actividadesMisionales; track c) { <mat-option
-                                    [value]="c">{{c}}</mat-option> }
-                                  </mat-select>
-                                </mat-form-field>
+                            <div class="discapacidad-container span-all">
+                              <div class="section-header-inline">
+                                <div class="section-title">
+                                  <mat-icon aria-hidden="true" color="primary">diversity_3</mat-icon>
+                                  <span>Relación Misional / Institucional</span>
+                                </div>
+                                <button type="button" class="help-tooltip-trigger" [matTooltip]="textoProtocoloRelacionMisional" matTooltipClass="casilda-help-tooltip" aria-label="Ayuda">?</button>
+                              </div>
+                              <p class="mat-hint-inline">{{ textoProtocoloRelacionMisional }}</p>
+                              <div class="vbg-options">
+                                @for (c of relacionMisionalNivel1; track c.id) {
+                                  <mat-checkbox [checked]="relacionMisionalNivel1Sel.includes(c.id)"
+                                    (change)="onCheckboxChange($event, c.id, 'relacionMisionalNivel1Sel')">{{c.nombre}}</mat-checkbox>
+                                }
+                              </div>
+                              @if (esRelacionMisionalSeleccionada()) {
+                                <p class="mat-hint-inline">Selecciona al menos una: Docencia, Investigación o Extensión.</p>
+                                <div class="vbg-options">
+                                  @for (c of relacionMisionalNivel2; track c.id) {
+                                    <mat-checkbox [checked]="relacionMisionalNivel2Sel.includes(c.id)"
+                                      (change)="onCheckboxChange($event, c.id, 'relacionMisionalNivel2Sel')">{{c.nombre}}</mat-checkbox>
+                                  }
+                                </div>
                               }
                             </div>
                           </div>
@@ -589,7 +610,32 @@
                                   <div class="vbg-options">
                                     @for (c of listaSexual; track c.id) {
                                       <mat-checkbox [checked]="sexualSel.includes(c.id)"
-                                      (change)="onCheckboxChange($event, c.id, 'sexualSel')">{{c.nombre}}</mat-checkbox>
+                                      (change)="onCheckboxChange($event, c.id, 'sexualSel')">
+                                        {{c.nombre}}
+                                        @if (c.nombre === 'Explotación sexual') {
+                                          <button type="button" class="help-tooltip-trigger" matTooltip="Inducción a la prostitución, proxenetismo con menor de edad, constreñimiento a la prostitución, trata de personas." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+                                        }
+                                      </mat-checkbox>
+                                    }
+                                  </div>
+                                  <div class="vbg-card vbg-subcard">
+                                    <div class="vbg-header">
+                                      <span>
+                                        Violencia facilitada por nuevas tecnologías *
+                                        <button type="button" class="help-tooltip-trigger" matTooltip="Uso, explotación y trata mediante amenazas o extorsión; grooming; creación de contenido sin consentimiento; sexting sin consentimiento." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+                                      </span>
+                                      <mat-radio-group formControlName="violenciaInformatica">
+                                        <mat-radio-button value="SI">Sí</mat-radio-button>
+                                        <mat-radio-button value="NO">No</mat-radio-button>
+                                      </mat-radio-group>
+                                    </div>
+                                    @if (casoForm.get('violenciaInformatica')?.value === 'SI') {
+                                      <div class="vbg-options">
+                                        @for (c of listaInformatica; track c.id) {
+                                          <mat-checkbox [checked]="informaticaSel.includes(c.id)"
+                                          (change)="onCheckboxChange($event, c.id, 'informaticaSel')">{{c.nombre}}</mat-checkbox>
+                                        }
+                                      </div>
                                     }
                                   </div>
                                 }
@@ -624,26 +670,6 @@
                                     @for (c of listaPatrimonial; track c.id) {
                                       <mat-checkbox [checked]="economicaSel.includes(c.id)"
                                       (change)="onCheckboxChange($event, c.id, 'economicaSel')">{{c.nombre}}</mat-checkbox>
-                                    }
-                                  </div>
-                                }
-                              </div>
-                              <div class="vbg-card">
-                                <div class="vbg-header">
-                                  <span>
-                                    Tipo de violencia sexual informática *
-                                    <button type="button" class="help-tooltip-trigger" matTooltip="Abarca grooming, amenazas, creación de contenido y sexting sin consentimiento." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
-                                  </span>
-                                  <mat-radio-group formControlName="violenciaInformatica">
-                                    <mat-radio-button value="SI">Sí</mat-radio-button>
-                                    <mat-radio-button value="NO">No</mat-radio-button>
-                                  </mat-radio-group>
-                                </div>
-                                @if (casoForm.get('violenciaInformatica')?.value === 'SI') {
-                                  <div class="vbg-options">
-                                    @for (c of listaInformatica; track c.id) {
-                                      <mat-checkbox [checked]="informaticaSel.includes(c.id)"
-                                      (change)="onCheckboxChange($event, c.id, 'informaticaSel')">{{c.nombre}}</mat-checkbox>
                                     }
                                   </div>
                                 }
@@ -781,13 +807,14 @@
                         </mat-form-field>
                         <div class="button-container">
                           <span class="btn-label-top">
-                            Consentimiento de Atención*
-                            <button type="button" class="help-tooltip-trigger" matTooltip="Carga del archivo PDF firmado/escaneado entregado por la persona al iniciar la atención." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+                            Consentimiento de Atención
+                            <button type="button" class="help-tooltip-trigger" matTooltip="Carga del archivo PDF firmado/escaneado entregado por la persona al iniciar la atención. Solo PDF, máximo 10 MB. No es obligatorio para guardar." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
                           </span>
                           <button mat-raised-button color="accent" type="button" class="action-btn"
                             (click)="subirArchivo()">
                             <mat-icon aria-hidden="true">cloud_upload</mat-icon> Consentimiento de Atención
                           </button>
+                          <span class="pregunta-label">{{ estadoConsentimiento() }}</span>
                         </div>
                       </div>
                     </mat-tab>

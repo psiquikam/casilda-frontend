@@ -3,6 +3,7 @@ import {
   MODALIDADES_VIOLENCIA,
   VINCULO_UNIVERSIDAD,
   VINCULO_VICTIMA,
+  AMBITO_OCURRENCIA,
   FORMA_OCURRENCIA,
   LUGAR_OCURRENCIA,
   RELACION_MISIONAL,
@@ -34,20 +35,6 @@ function aMaestroDto(opciones: readonly OpcionCatalogoVbg[]): MaestroDto[] {
   }));
 }
 
-/**
- * Hojas de un subárbol completo (todos los descendientes, no solo los
- * hijos directos). La UI actual del módulo es plana; el árbol real se
- * consume desde `CatalogoVbgService` cuando una sección se reconstruya
- * como selector jerárquico (M2 en adelante).
- */
-function descendientes(
-  catalogo: readonly OpcionCatalogoVbg[],
-  codigoRaiz: string
-): OpcionCatalogoVbg[] {
-  const directos = hijosDe(catalogo, codigoRaiz);
-  return directos.flatMap((hijo) => [hijo, ...descendientes(catalogo, hijo.codigo)]);
-}
-
 export const RESPALDO_MAESTROS_VBG: Record<string, MaestroDto[]> = {
   // --- Gobernados por la matriz ---
   'vinculos-udea': aMaestroDto(VINCULO_UNIVERSIDAD),
@@ -55,15 +42,26 @@ export const RESPALDO_MAESTROS_VBG: Record<string, MaestroDto[]> = {
   'tipos-violencia': aMaestroDto(raiz(MODALIDADES_VIOLENCIA)),
   'formas-ocurrencia': aMaestroDto(FORMA_OCURRENCIA),
   'lugares-ocurrencia': aMaestroDto(LUGAR_OCURRENCIA),
+  'ambito-ocurrencia': aMaestroDto(AMBITO_OCURRENCIA), // VBG-01-06, nuevo en M2
+  // `actividades-misionales` queda para no romper `registro-atencion`, que
+  // aún no restructura esta sección (fuera del alcance de M2). `registro-caso`
+  // pasa a los dos niveles de abajo.
   'actividades-misionales': aMaestroDto(RELACION_MISIONAL),
+  'relacion-misional/nivel-1': aMaestroDto(raiz(RELACION_MISIONAL)),
+  'relacion-misional/nivel-2': aMaestroDto(hijosDe(RELACION_MISIONAL, 'misional')),
   'grupos-atencion': aMaestroDto(GRUPOS_ATENCION),
 
   // Subcategorías por tipo. Solo Sexual (tipo 3) tiene hijos en la matriz
   // (decisión provisional del pendiente 8); los demás quedan vacíos: no se
-  // inventan subcategorías que la matriz no define.
+  // inventan subcategorías que la matriz no define. Tipo 3 expone solo los
+  // tres hijos directos seleccionables de Sexual (VBG-03-02): la rama
+  // tecnológica (VBG-03-03) se anida visualmente bajo la misma tarjeta en
+  // el formulario, pero se sirve aparte, en tipo 6 (VBG-03-06).
   'modalidades-violencia/tipo/1': [], // Psicológica
   'modalidades-violencia/tipo/2': [], // Física
-  'modalidades-violencia/tipo/3': aMaestroDto(descendientes(MODALIDADES_VIOLENCIA, 'sexual')),
+  'modalidades-violencia/tipo/3': aMaestroDto(
+    hijosDe(MODALIDADES_VIOLENCIA, 'sexual').filter((o) => o.codigo !== 'violencia-tecnologica')
+  ),
   'modalidades-violencia/tipo/4': [], // Institucional
   'modalidades-violencia/tipo/5': [], // Patrimonial
   // El backend expone "Informática" como tipo 6 de primer nivel; la matriz

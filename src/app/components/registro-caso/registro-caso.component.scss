@@ -522,6 +522,17 @@ input[readonly] {
   border-right: 1px solid $border-soft;
 }
 
+/* VBG-03-06: subárbol de "Violencia facilitada por nuevas tecnologías",
+   anidado visualmente dentro de la tarjeta de Violencia sexual. */
+.vbg-subcard {
+  margin-top: var(--space-3);
+  padding-left: var(--space-4);
+  border-right: none;
+  border-left: 2px solid $border-soft;
+  background-color: var(--color-bg-subtle);
+  border-radius: var(--radius-sm);
+}
+
 .vbg-header {
   display: flex;
   align-items: center;
@@ -563,4 +574,13 @@ input[readonly] {
     width: 20px !important;
     height: 20px !important;
   }
+}
+
+/* VBG-02-01: texto de ayuda del protocolo de Relación Misional, fuera de
+   los campos de Angular Material (R-06 — nunca en placeholder). */
+.mat-hint-inline {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
 }

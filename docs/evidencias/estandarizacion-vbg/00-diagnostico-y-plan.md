@@ -443,7 +443,17 @@ Hecho esto, **`npm run check` en verde pasa a ser el criterio de cierre de cada 
 | **Riesgos** | El respaldo local puede enmascarar un backend caído. Mitigación: cuando se use el respaldo, avisar con `NotificacionService` y marcarlo visiblemente, como la franja «Datos de demostración». |
 | **Terminado** | `npm run check` en verde. El módulo abre sus desplegables sin backend. El glosario está publicado y es el que consultan las demás subfases. |
 
-### M2 — Clasificación y documentación del hecho (secciones 0 a 3)
+### M2 — Clasificación y documentación del hecho (secciones 0 a 3) ✅ **EJECUTADA (2026-10-05)**
+
+> Resultado en `docs/evidencias/estandarizacion-vbg/02-subfase-M2-clasificacion-y-documentacion.md`.
+> **Corrección al §2 de este diagnóstico**: VBG-01-01 (radio VBG) no estaba «NO EXISTE»
+> — ya existía en `registro-caso.component.html`, solo mal posicionado (al final de la
+> pestaña en vez de al inicio); el grep original no lo encontró por buscar fuera del
+> archivo correcto. VBG-01-08 (Lugar de Ocurrencia) tampoco vivía en `modal-hechos`: ese
+> modal tiene un campo de texto libre llamado igual, sin relación con la matriz —
+> confusión de nombres ahora corregida (modal-hechos renombra su campo a «Lugar
+> específico (opcional)»). El campo real, con las opciones Dentro/Fuera/Mixto, siempre
+> estuvo en `registro-caso.component.html`, a nivel de caso.
 
 | | |
 |---|---|
