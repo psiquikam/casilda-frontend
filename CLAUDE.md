@@ -3,7 +3,8 @@
 > Archivo vivo. Se actualiza al cerrar cada fase de trabajo para que cualquier
 > sesión posterior (humana o asistida) retome sin repetir el análisis.
 >
-> **Última actualización:** 4 de octubre de 2026 (optimización del panel de inicio por rol, subfases 0 a 4)
+> **Última actualización:** 5 de octubre de 2026 (estandarización del módulo Equipo de
+> Atención contra la matriz VBG, fases M1 a M5, y corrección de navegación)
 
 ---
 
@@ -27,6 +28,9 @@ Documentos de referencia, en orden de precedencia para decisiones de diseño:
 | `.claude/skills/casilda-ux/SKILL.md` | Orquesta las fuentes anteriores para toda tarea de UI/UX; incluye flujo de verificación y formato de reporte. |
 | `docs/contratos/MATRIZ_MODULO_ATENCION_VBG.md` | Campos, etiquetas y validaciones del módulo Equipo de Atención. Prevalece en contenido de formularios; en lo visual prevalecen §3 y `casilda-diseno-v1.md`. |
 | `docs/contratos/DASHBOARDS_POR_ROL.md` | Contenido del panel de inicio autenticado por rol y enfoque informado en trauma (no cubre la portada pública). |
+| `docs/contratos/GLOSARIO_VBG.md` | Glosario de términos del módulo Equipo de Atención, con la columna del rol Usuario. |
+| `docs/contratos/DECISIONES_PROVISIONALES_VBG.md` | 19 decisiones de contenido/comportamiento pendientes de validar con el equipo clínico/legal; permiten demostrar el módulo mientras se confirma la versión oficial. |
+| `docs/contratos/contrato-contenidos-home.md` | Contrato del endpoint público `GET {apiBaseUrl}/contenidos/home` y del CRUD de administración del gestor de contenidos del home. |
 
 ## 2. Stack y comandos
 
@@ -95,6 +99,12 @@ espaciados ni radios literales**: siempre `var(--token)`.
 | `NotificacionService` | `src/app/core/a11y/notificacion.service.ts` | `error()` / `exito()` / `info()` sobre MatSnackBar con `role` adecuado. **Reemplaza a `console.error`** en los `subscribe`. |
 | `DialogoService` | `src/app/core/a11y/dialogo.service.ts` | `aviso()` y `confirmar()` sobre MatDialog (`AvisoDialogComponent`, `ConfirmDialogComponent`). **SweetAlert2 fue retirado.** |
 | `getPaginadorIntlEs()` | `src/app/core/i18n/paginador-es.ts` | Paginador en español provisto una sola vez en `app.config.ts`. |
+| `MaestrosVbgService` | `src/app/services/maestros-vbg.service.ts` | Catálogos del módulo Equipo de Atención (ámbito, modalidades, vínculos, rutas, grupos de atención…) con respaldo tipado y endpoint previsto; si el backend falla cae al mismo respaldo y avisa por `NotificacionService`. |
+| `RegistroVbgDatosService` | `src/app/services/registro-vbg-datos.service.ts` | Listado paginado de citas y casos para `registro-caso`/`registro-atencion`; delega en `CasosSimuladosService` en modo de demostración. |
+| `CasosSimuladosService` | `src/app/services/casos-simulados.service.ts` | Datos simulados del módulo Equipo de Atención (modo de demostración); nombres, documentos y teléfonos evidentemente ficticios. |
+| `catalogo-vbg.ts` | `src/app/core/catalogos/catalogo-vbg.ts` | **Único catálogo** de códigos y etiquetas literales de la matriz VBG (ámbito, modalidades, vínculos, rutas internas/externas, grupos de atención). |
+| `SeccionSeguimientosComponent` | `src/app/components/seccion-seguimientos/` | Bloque «Seguimientos» compartido entre `registro-caso` y `registro-atencion`; aísla por especialidad y cierra con alerta de última profesional activa. |
+| `esUltimaProfesionalActiva()` | `src/app/core/vbg/ultima-profesional-activa.ts` | Predicado único para decidir si cerrar un seguimiento deja sin profesional activa a esa especialidad. |
 
 ## 5. Bitácora de avances
 
@@ -225,6 +235,65 @@ Contrato: `docs/contratos/DASHBOARDS_POR_ROL.md`. Diagnóstico y plan en
 `core/navegacion/catalogo-navegacion.ts`, `core/dashboard/dashboard-por-rol.ts`,
 `core/vigilancia/supresion-celdas.ts`.
 
+### 2026-10-05 — Estandarización del módulo Equipo de Atención contra la matriz VBG (M1 a M5) y corrección de navegación
+Contrato: `docs/contratos/MATRIZ_MODULO_ATENCION_VBG.md`. Diagnóstico y plan en
+`docs/evidencias/estandarizacion-vbg/00-diagnostico-y-plan.md`; un reporte por subfase (01 a
+05). Nuevos contratos de contenido: `docs/contratos/GLOSARIO_VBG.md` y
+`docs/contratos/DECISIONES_PROVISIONALES_VBG.md` (19 decisiones provisionales, pendientes de
+validar con el equipo clínico/legal).
+
+- **M1 — Higiene y cimientos.** Modo de demostración transversal (`MaestrosVbgService`,
+  `RegistroVbgDatosService`, `CasosSimuladosService`) para probar el módulo sin backend, con
+  la misma franja «Datos de demostración» y datos evidentemente ficticios que ya usaba el
+  panel de inicio. Corregidos de paso: módulo inalcanzable (EST-01), catálogo sin respaldo
+  ante fallo del backend (EST-02), código muerto (EST-04), el spec de `RegisterComponent`
+  (`NG0201`, con `provideRouter([])` en el `TestBed`) y los 3 avisos de lint que habían hecho
+  subir el tope a 302.
+- **M2 — Clasificación y documentación del hecho.** La mayoría de los campos de las
+  secciones 0–3 de la matriz ya existían; el trabajo fue de posición (filtro VBG como primer
+  campo de la pestaña), obligatoriedad condicional (Ámbito/Forma de Ocurrencia solo si
+  VBG = Sí) y dos niveles de Relación Misional/Institucional con validación de al menos una
+  opción marcada.
+- **M3 — Identificación, presunto agresor y apreciaciones.** «Datos del presunto agresor» y
+  «Apreciaciones» se extrajeron a componentes compartidos (`ModalPresuntoAgresorComponent`,
+  `SeccionApreciacionesComponent`) en vez de duplicar la plantilla entre `registro-caso` y
+  `registro-atencion`. Se agregó el campo «¿Cuál?» para cuando el vínculo (universidad o
+  víctima) es «Otro»: no existía en el modal del agresor (el diagnóstico original citaba el
+  control de un campo distinto).
+- **M4 — Acuerdos, compromisos, seguimientos y cierre.** Rutas Internas/Externas pasan de un
+  modal único a dos grupos de checkboxes independientes; «Fecha de Cumplimiento» queda como
+  encabezado correcto (de paso se corrigió un bug preexistente: las columnas «Profesional» y
+  «Compromiso» de esa tabla se mostraban intercambiadas). Se retira «Otros casos y medidas de
+  protección» de la UI sin borrar sus datos ni sus handlers. `SeccionSeguimientosComponent`
+  aísla los seguimientos por especialidad y alerta si cerrar uno deja sin profesional activa
+  a esa especialidad (`esUltimaProfesionalActiva()`). Confirmación antes de vaciar rutas o
+  remisiones al poner Acuerdos = No (EST-03). Especialidades agregadas a las cuentas de
+  prueba `PROFESIONAL` (P-12), requisito para el aislamiento anterior.
+- **M5 — Alineación terminológica y grupo de atención. Cierra el plan M1–M5.** «Grupo de
+  atención» (sección 9 de la matriz) llegaba vacío a la UI por una pérdida de datos en tres
+  capas (`aCitaDto()`/`aCasoDto()` y los dos mapeadores de tabla de `registro-caso`/
+  `registro-atencion`); ahora es un campo de solo lectura propio, sin `FormControl`. Se
+  alineó la terminología del rol Usuario con `P-VBG-02` (`fechaAcordada` →
+  `fechaCumplimiento`, «Lo que acordamos» → «Lo que decidiste hacer»); los KPI del panel
+  declaran su alcance (`P-VBG-01/03`) y el umbral de 15 días del indicador de trabajo queda
+  en una constante documentada (`P-VBG-07`).
+- **Corrección de navegación (hallazgo de M5, fuera de la matriz VBG).** `sidebar` y
+  `horizontal-nav` no consumen `CATALOGO_MODULOS` y tenían una entrada duplicada de
+  «Auditoría de Casos» en Reportes y Métricas; se retiró la duplicada y se corrigieron los
+  títulos de ruta de `solicitud-acompanamiento` y `cita` para que coincidan con el menú. La
+  arquitectura de fondo **no se tocó**: ambos componentes tienen reglas de visibilidad por
+  rol distintas entre sí y secciones institucionales («UAD Equipos 3 y 4», «Ruta Violeta»)
+  que hoy no están modeladas en el catálogo — ver pendiente más abajo.
+- **Selector de rol de «Modo Prueba» (`cambiarRolMock()`).** Cambiar de rol desde el
+  encabezado no refrescaba el panel: `router.navigate(['/inicio'])` es un no-op cuando ya se
+  está en `/inicio` (`onSameUrlNavigation: 'ignore'`, el valor por defecto de Angular, sin
+  override en `app.config.ts`). Se reemplaza por una recarga completa de la página.
+
+**Componentes y servicios nuevos** (ver §4): `MaestrosVbgService`, `RegistroVbgDatosService`,
+`CasosSimuladosService`, `core/catalogos/catalogo-vbg.ts`, `core/vbg/caso-simulado.model.ts`,
+`SeccionSeguimientosComponent`, `esUltimaProfesionalActiva()`, `ModalPresuntoAgresorComponent`,
+`SeccionApreciacionesComponent`.
+
 ### Pendiente
 1. Accesibilidad — tareas abiertas priorizadas en
    `docs/evidencias/accesibilidad/plan_accesibilidad.md` §6: fases 0.1/0.2/0.4 (axe,
@@ -232,7 +301,9 @@ Contrato: `docs/contratos/DASHBOARDS_POR_ROL.md`. Diagnóstico y plan en
    `registro-caso` y `registro-atencion`), 4.2 (136 colores literales sin token), 4.4/4.5
    (reflujo 320 px y texto 200 %), 5.3 (`jasmine-axe`) y Fase 6 (NVDA/VoiceOver, personas
    usuarias, declaración de accesibilidad).
-2. Sustituir el mock de `ContenidoHomeService` por el endpoint real del gestor de contenidos.
+2. Sustituir el mock de `ContenidoHomeService` por el endpoint real del gestor de contenidos,
+   según `docs/contratos/contrato-contenidos-home.md` (host por `environment*.ts`, ruta
+   relativa `/contenidos/home` fija).
 3. Confirmar con Comunicaciones UdeA: dependencia exacta del logosímbolo y uso del
    distintivo de Casilda como favicon.
 4. Datos reales de contacto: `environment.telefonoOrientacion` y `environment.telefonoContactoPublico`.
@@ -259,16 +330,24 @@ Contrato: `docs/contratos/DASHBOARDS_POR_ROL.md`. Diagnóstico y plan en
    - **P-06** Umbral de supresión de celdas pequeñas; hoy **5**, el valor que propone el
      propio contrato (`UMBRAL_SUPRESION` en `core/vigilancia/supresion-celdas.ts`).
    - **P-07** Nombres oficiales de módulo para `core/navegacion/catalogo-navegacion.ts`.
-   - **P-02 / P-12** Catálogo de roles y modelo de especialidades. Sin el segundo,
-     DSH-08-01 —que cada profesional vea solo los seguimientos de su especialidad— no es
-     implementable: hay un único rol `PROFESIONAL`.
+   - **P-02** Catálogo de roles. **P-12 (especialidades) ya se resolvió** en M4: se
+     agregaron a las cuentas de prueba `PROFESIONAL` y `SeccionSeguimientosComponent` ya
+     aísla por especialidad (DSH-08-01); sigue pendiente el catálogo oficial de roles.
    - **P-13 / P-14 / P-15 / P-16** Tiempos de respuesta comunicables, nombre identitario,
      política de lenguaje inclusivo y título/favicon neutros para el rol Usuario.
-8. `npm run lint` acumula **302 warnings** frente a un tope de 299, de modo que
-   `npm run check` no pasa en verde. El salto ocurrió en `d3066e0` (PR #13), antes de esta
-   fase. Decidir si se corrigen los tres avisos o se ajusta el tope.
-9. El spec de `RegisterComponent` falla por `NG0201: No provider found for 'ActivatedRoute'`.
-   Viene del PR #14 y es independiente de esta fase.
+8. **Validar `docs/contratos/DECISIONES_PROVISIONALES_VBG.md`** con el equipo clínico/legal:
+   19 decisiones de contenido que hoy permiten demostrar el módulo Equipo de Atención
+   mientras se confirma la versión oficial (entregable de M1).
+9. **Pendiente 17 de la matriz** (tabla de decisión del Grupo de Atención 1–6) sigue sin
+   definirse: VBG-09-01/02 (M5) solo entregan el campo de solo lectura, no el cálculo.
+10. **Confirmar con Backend** si `VinculoUdeAEnum` (14 códigos) se homologa al árbol de 10
+    valores de `VINCULO_UNIVERSIDAD` en la matriz, o si el frontend debe mapearlos
+    (hallazgo de M1, mismo tipo de pregunta que P-VBG-06 pero para vínculos).
+11. **Navegación:** decidir si `sidebar`/`horizontal-nav` deben terminar consumiendo
+    `CATALOGO_MODULOS` (hallazgo de M5). Esta fase solo corrigió la entrada duplicada de
+    «Auditoría de Casos» y dos títulos de ruta; no tocó la arquitectura de fondo porque
+    ambos componentes tienen reglas de visibilidad por rol distintas entre sí y secciones
+    institucionales («UAD Equipos 3 y 4», «Ruta Violeta») no modeladas en el catálogo.
 
 ## 6. Reglas que no se deben romper
 
