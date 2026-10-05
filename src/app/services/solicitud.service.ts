@@ -361,8 +361,17 @@ export interface SeguimientoAtencionRequestDto {
   idAccion: number;
   idActividad: number;
   descripcion: string;
-  idEstadoSeguimiento: number;
-  idMotivoEstadoSeguimiento: number;
+  // VBG-08-01..04 / VBG-08-10, M4: especialidad del módulo (Jurídico,
+  // Psicojurídico, Psicológico, Psicoorientación), forma provisional
+  // pendiente de confirmación del backend.
+  especialidad?: string;
+  // Decisión provisional del pendiente 16: motivo de cierre en texto libre,
+  // no catálogo. Sustituye a `idEstadoSeguimiento`/`idMotivoEstadoSeguimiento`,
+  // que quedan opcionales por si el backend aún los espera.
+  estado?: string;
+  motivoCierre?: string | null;
+  idEstadoSeguimiento?: number;
+  idMotivoEstadoSeguimiento?: number;
   archivoNombre?: string; // Nombre del archivo
   archivoTipo?: string; // MIME type (ej: application/pdf)
   archivoContenido?: string; // Base64 encoded file content

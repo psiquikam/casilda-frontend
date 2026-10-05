@@ -487,16 +487,29 @@ Hecho esto, **`npm run check` en verde pasa a ser el criterio de cierre de cada 
 | **Riesgos** | Eliminar «Tipo de Apreciación» puede dejar huérfano un campo persistido. **No se borra la columna**: solo sale de la interfaz (punto 5 del §0 de la matriz). |
 | **Terminado** | Los modales tienen un único campo narrativo. Ningún formato de fecha fuera de DD/MM/AAAA. |
 
-### M4 — Acuerdos, compromisos, seguimientos y cierre (secciones 7 y 8)
+### M4 — Acuerdos, compromisos, seguimientos y cierre (secciones 7 y 8) ✅ **EJECUTADA (2026-10-05)**
+
+> Resultado en
+> `docs/evidencias/estandarizacion-vbg/04-subfase-M4-acuerdos-seguimientos-cierre.md`.
+> **Hallazgo que amplió el alcance**: el único bloque «Seguimientos del Caso» existente
+> usaba un catálogo de **modalidad de contacto** (Presencial/Virtual/…), no de
+> **especialidad profesional** — las cuatro subsecciones de VBG-08-01…04 no existían en
+> absoluto, no estaban mal nombradas. Se implementaron desde cero junto con P-12
+> (especialidades de las cuentas de prueba PROFESIONAL), requisito previo del
+> aislamiento VBG-08-10. De paso se encontró y corrigió que el modal de seguimiento
+> cargaba sus tres catálogos con `HttpClient` directo (sin respaldo de demostración, los
+> tres desplegables estaban vacíos en modo demo) y que el selector rápido de rol
+> (header + login) no distinguía entre cuentas PROFESIONAL con el mismo código de rol —
+> con una sola cuenta nunca fue un problema; con las tres nuevas de P-12, las cuatro
+> habrían iniciado sesión siempre como la primera encontrada.
 
 | | |
 |---|---|
-| **IDs** | VBG-07-01…12 · VBG-08-05…13 · EST-03 · **tarea 2.4 del plan de accesibilidad** |
-| **Archivos** | `modal-compromisos-persona` · `modal-compromisos-profesionales` · `modal-seguimiento` · `modal-activar-ruta` · `modal-remision` · **retirar de la UI** `modal-medidas-proteccion` · ambos formularios · `ResumenErroresComponent` |
-| **Alcance** | Pregunta literal de acuerdos. Compromiso **narrativo** con fecha de cumplimiento, en `FormArray`. **Retirar «Medidas de protección» de la interfaz** (VBG-07-12), sin tocar datos. Corregir EST-03 con `DialogoService.confirmar()`. Conectar `ResumenErroresComponent` a ambos formularios. |
-| **Bloqueos** | Pendientes **13**, **14**, **15** (Acción→Actividad), **16** y **P-12**. **Las subsecciones 7.1–7.4 no se implementan sin P-12.** |
-| **Riesgos** | El mayor de la fase: `FormArray` + eliminación ya tuvo un intercambio de manejadores entre «Rutas activadas» y «Remisiones» (R-09). Mitigación: prueba por bloque que verifique que se elimina del arreglo correcto. |
-| **Terminado** | Compromisos narrativos y múltiples, en bloques separados. «Medidas de protección» no aparece. Ningún cambio de acuerdos borra datos sin confirmar. El resumen de errores funciona en ambos formularios. |
+| **IDs** | VBG-07-01…12 · VBG-08-01…13 |
+| **Archivos** | `seccion-seguimientos` (nuevo) · `modal-seguimiento` · `modal-activar-ruta` (retirado) · ambos formularios · `auth.service.ts` · `confirm-dialog` |
+| **Alcance cumplido** | Rutas Internas/Externas como dos grupos de checkboxes. «Medidas de protección» retirado de la UI sin tocar datos. EST-03 corregido con `DialogoService.confirmar()`. «Fecha de Cumplimiento» + corrección de columnas intercambiadas en la tabla de compromisos del profesional. Cuatro módulos de Seguimientos por especialidad, aislados (VBG-08-10), con cierre autónomo de motivo libre (VBG-08-12) y aviso de última activa (VBG-08-13). P-12 (especialidades de cuentas de prueba) resuelto como requisito previo. |
+| **Diferido, no resuelto en esta subfase** | **Tarea 2.4 del plan de accesibilidad** (conectar `ResumenErroresComponent`): investigada antes de empezar — el formulario usa un mecanismo propio (`tabFieldMap`, ~28 campos) en vez de `Validators` de Reactive Forms (solo 2 usos reales, condicionales). Conectar `recolectarErrores()` de forma fiel requiere re-arquitecturar esa validación o un adaptador paralelo — del tamaño de una subfase propia. Sigue como pendiente independiente (§10 y `CLAUDE.md`). El cierre general del caso que el botón «Cerrar el caso» del aviso de última activa podría disparar (VBG-08-13) tampoco se implementó: la propia matriz deja sin resolver si la ventana ejecuta el cierre general o solo lo sugiere. |
+| **Riesgos materializados** | El intercambio de manejadores que R-09 advertía para «Rutas activadas»/«Remisiones» no se repitió aquí; el riesgo real resultó ser el de `HttpClient` sin respaldo en `modal-seguimiento` (ver hallazgo). |
 
 ### M5 — Alineación terminológica y grupo de atención (sección 9)
 
@@ -524,7 +537,7 @@ Hecho esto, **`npm run check` en verde pasa a ser el criterio de cierre de cada 
 | ~~**P-VBG-05**~~ | **RESUELTA (2026-10-05).** Se mantiene el `.gitignore`: las capturas se toman localmente para verificar y lo observado se describe en cada reporte de subfase. | — |
 | ~~**P-VBG-06**~~ | **RESUELTA (2026-10-05).** Se resuelve con el mapeo del catálogo central (M1): el tipo 6 del backend («Informática») se trata como la «Violencia facilitada por nuevas tecnologías» de la matriz, anidada bajo Sexual. La discrepancia completa, incluida la del catálogo de vínculos, queda reportada al equipo de backend en `docs/contratos/GLOSARIO_VBG.md`. | — |
 | **P-VBG-07** | ¿El umbral de «Seguimiento sin registro en los últimos 15 días» del panel tiene respaldo normativo, o es un supuesto que conviene revisar? | M5 |
-| ~~**P-VBG-08**~~ | **RESUELTA (2026-10-05).** Se confirma: se retira de la interfaz en ambos formularios, sin tocar datos ni contratos. Pendiente de ejecutar en M4. | — |
+| ~~**P-VBG-08**~~ | **RESUELTA y EJECUTADA (2026-10-05, M4).** Se retiró de la interfaz en ambos formularios, sin tocar datos ni contratos. | — |
 
 ### Pendientes de la matriz que bloquean esta fase
 

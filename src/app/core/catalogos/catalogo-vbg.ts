@@ -194,6 +194,20 @@ export const RUTAS_EXTERNAS: readonly OpcionCatalogoVbg[] = [
 ];
 
 /* ==========================================================================
+   Sección 8 — Especialidades de seguimiento (VBG-08-01..04)
+   Las cuatro subsecciones de la matriz (7.1-7.4), sin el número de sección
+   (decisión provisional del pendiente 1). Sostienen el aislamiento VBG-08-10
+   junto con la especialidad de las cuentas de prueba PROFESIONAL (P-12).
+   ========================================================================== */
+
+export const ESPECIALIDADES_SEGUIMIENTO: readonly OpcionCatalogoVbg[] = [
+  { codigo: 'juridico', etiqueta: 'Jurídico' },
+  { codigo: 'psicojuridico', etiqueta: 'Psicojurídico' },
+  { codigo: 'psicologico', etiqueta: 'Psicológico' },
+  { codigo: 'psicoorientacion', etiqueta: 'Psicoorientación' }
+];
+
+/* ==========================================================================
    Sección 8 — Acción → Actividad de seguimientos (VBG-08-06, 08-07)
    Pendiente 15 sin definición oficial: catálogo simulado mínimo, marcado
    como provisional (decisión provisional del pendiente 15).

@@ -40,8 +40,8 @@
       <div class="mock-grid">
         @for (mock of mockUsersList; track mock.id) {
           <button type="button" class="btn-mock-pill" [class]="'btn-mock-pill--' + mock.badgeClass"
-            (click)="loginRapidoMock(mock)" [title]="mock.descripcion">
-            <span class="btn-mock-pill__role">{{ mock.rol }}</span>
+            (click)="loginRapidoMock(mock)" [title]="mock.especialidad ? mock.descripcion + ' (' + mock.especialidad + ')' : mock.descripcion">
+            <span class="btn-mock-pill__role">{{ mock.especialidad ? mock.rol + ' · ' + mock.especialidad : mock.rol }}</span>
             <span class="btn-mock-pill__name">{{ mock.nombre.split(' ')[0] }}</span>
           </button>
         }

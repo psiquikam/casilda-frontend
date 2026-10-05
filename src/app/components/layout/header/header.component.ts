@@ -30,9 +30,13 @@ export class HeaderComponent {
 
   readonly mockUsers: MockUserProfile[] = Object.values(MOCK_USERS);
 
-  cambiarRolMock(roleCode: string): void {
-    this.auth.loginAsMock(roleCode).subscribe(() => {
+  cambiarRolMock(mock: MockUserProfile): void {
+    this.auth.loginAsMock(mock.email).subscribe(() => {
       void this.router.navigate(['/inicio']);
     });
+  }
+
+  esCuentaMockActiva(mock: MockUserProfile): boolean {
+    return (this.auth.currentUser?.email || '').toLowerCase() === mock.email.toLowerCase();
   }
 }

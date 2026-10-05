@@ -10,6 +10,10 @@ export interface ConfirmDialogData {
   textoConfirmar?: string;
   /** Ícono decorativo del botón de confirmación; por defecto `delete`. */
   iconoConfirmar?: string;
+  /** Texto del botón de cancelar; por defecto «Cancelar». */
+  textoCancelar?: string;
+  /** Subtítulo bajo el título; por defecto «Esta acción no se puede deshacer». */
+  subtitulo?: string;
 }
 
 @Component({

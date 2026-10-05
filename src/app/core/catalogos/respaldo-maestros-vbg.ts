@@ -7,6 +7,10 @@ import {
   FORMA_OCURRENCIA,
   LUGAR_OCURRENCIA,
   RELACION_MISIONAL,
+  RUTAS_INTERNAS,
+  RUTAS_EXTERNAS,
+  ESPECIALIDADES_SEGUIMIENTO,
+  ACCIONES_SEGUIMIENTO,
   GRUPOS_ATENCION,
   raiz,
   hijosDe,
@@ -50,6 +54,19 @@ export const RESPALDO_MAESTROS_VBG: Record<string, MaestroDto[]> = {
   'relacion-misional/nivel-1': aMaestroDto(raiz(RELACION_MISIONAL)),
   'relacion-misional/nivel-2': aMaestroDto(hijosDe(RELACION_MISIONAL, 'misional')),
   'grupos-atencion': aMaestroDto(GRUPOS_ATENCION),
+  // VBG-07-02/03: rutas internas y externas como dos grupos de checkboxes
+  // (M4), en vez del selector dependiente anterior. «Protocolo de amenazas»
+  // ya viene renombrado desde el catálogo (VBG-07-07).
+  'rutas-internas': aMaestroDto(RUTAS_INTERNAS),
+  'rutas-externas': aMaestroDto(RUTAS_EXTERNAS),
+  // VBG-08-01..04: las cuatro especialidades de Seguimientos, y el catálogo
+  // Acción → Actividad (decisión provisional del pendiente 15, M4).
+  'especialidades-seguimiento': aMaestroDto(ESPECIALIDADES_SEGUIMIENTO),
+  'acciones-seguimiento': aMaestroDto(raiz(ACCIONES_SEGUIMIENTO)),
+  'acciones-seguimiento/padre/llamada-telefonica': aMaestroDto(hijosDe(ACCIONES_SEGUIMIENTO, 'llamada-telefonica')),
+  'acciones-seguimiento/padre/sesion-presencial': aMaestroDto(hijosDe(ACCIONES_SEGUIMIENTO, 'sesion-presencial')),
+  'acciones-seguimiento/padre/sesion-virtual': aMaestroDto(hijosDe(ACCIONES_SEGUIMIENTO, 'sesion-virtual')),
+  'acciones-seguimiento/padre/gestion-documental': aMaestroDto(hijosDe(ACCIONES_SEGUIMIENTO, 'gestion-documental')),
 
   // Subcategorías por tipo. Solo Sexual (tipo 3) tiene hijos en la matriz
   // (decisión provisional del pendiente 8); los demás quedan vacíos: no se
@@ -133,5 +150,13 @@ export const RESPALDO_MAESTROS_VBG: Record<string, MaestroDto[]> = {
   'lugares-entrevista': [
     { id: 1, codigo: 'OFICINA', nombre: 'Oficina de Casilda' },
     { id: 2, codigo: 'VIRTUAL-ENTREVISTA', nombre: 'Virtual' }
+  ],
+  // Modalidad de contacto del seguimiento; no la gobierna la matriz (es
+  // distinta de la especialidad VBG-08-01..04, ver `00-diagnostico-y-plan.md`).
+  'tipos-seguimiento': [
+    { id: 1, codigo: 'PRESENCIAL', nombre: 'Presencial' },
+    { id: 2, codigo: 'TELEFONICO', nombre: 'Telefónico' },
+    { id: 3, codigo: 'VIRTUAL-SEGUIMIENTO', nombre: 'Virtual' },
+    { id: 4, codigo: 'VISITA-DOMICILIARIA', nombre: 'Visita Domiciliaria' }
   ]
 };

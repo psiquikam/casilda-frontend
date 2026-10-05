@@ -49,6 +49,12 @@ export interface MockUserProfile {
   foto: string | null;
   descripcion: string;
   badgeClass: string;
+  /**
+   * P-12 (decisión provisional): solo en cuentas de prueba PROFESIONAL.
+   * Sostiene el aislamiento VBG-08-10 en `modal-seguimiento` y DSH-08-01
+   * en el panel, mientras no exista el modelo real de especialidades.
+   */
+  especialidad?: 'Jurídico' | 'Psicojurídico' | 'Psicológico' | 'Psicoorientación';
 }
 
 function createMockToken(email: string, roleCode: string): string {
@@ -107,7 +113,49 @@ export const MOCK_USERS: Record<string, MockUserProfile> = {
     authorities: ['ROLE_PROFESIONAL'],
     foto: null,
     descripcion: 'Atención técnica directa, citas, expediente y acuerdos.',
-    badgeClass: 'profesional'
+    badgeClass: 'profesional',
+    especialidad: 'Psicojurídico'
+  },
+  // P-12: tres cuentas adicionales para cubrir las cuatro especialidades de
+  // Seguimientos (7.1-7.4, VBG-08-01..04) y probar el aislamiento VBG-08-10.
+  profesionalJuridico: {
+    id: 6,
+    nombre: 'Dr. Andrés Zuluaga (Profesional Jurídico)',
+    email: 'profesional.juridico@udea.edu.co',
+    password: 'Pro123*',
+    rol: 'Profesional',
+    roles: ['PROFESIONAL'],
+    authorities: ['ROLE_PROFESIONAL'],
+    foto: null,
+    descripcion: 'Atención técnica directa, citas, expediente y acuerdos.',
+    badgeClass: 'profesional',
+    especialidad: 'Jurídico'
+  },
+  profesionalPsicologico: {
+    id: 7,
+    nombre: 'Lic. Mariana Vélez (Profesional Psicológico)',
+    email: 'profesional.psicologico@udea.edu.co',
+    password: 'Pro123*',
+    rol: 'Profesional',
+    roles: ['PROFESIONAL'],
+    authorities: ['ROLE_PROFESIONAL'],
+    foto: null,
+    descripcion: 'Atención técnica directa, citas, expediente y acuerdos.',
+    badgeClass: 'profesional',
+    especialidad: 'Psicológico'
+  },
+  profesionalPsicoorientacion: {
+    id: 8,
+    nombre: 'Lic. Daniel Ospina (Profesional Psicoorientación)',
+    email: 'profesional.psicoorientacion@udea.edu.co',
+    password: 'Pro123*',
+    rol: 'Profesional',
+    roles: ['PROFESIONAL'],
+    authorities: ['ROLE_PROFESIONAL'],
+    foto: null,
+    descripcion: 'Atención técnica directa, citas, expediente y acuerdos.',
+    badgeClass: 'profesional',
+    especialidad: 'Psicoorientación'
   },
   revisor: {
     id: 4,
@@ -205,6 +253,17 @@ export class AuthService {
 
   isUsuario(): boolean {
     return this.hasRole('USUARIO');
+  }
+
+  /**
+   * P-12: especialidad de la cuenta de prueba PROFESIONAL activa, o
+   * `undefined` fuera de esas cuentas. Sostiene el aislamiento VBG-08-10 en
+   * `SeccionSeguimientosComponent` y el predicado DSH-08-01 del panel.
+   */
+  getEspecialidadActual(): MockUserProfile['especialidad'] {
+    const email = this.currentUser?.email?.toLowerCase();
+    if (!email) return undefined;
+    return Object.values(MOCK_USERS).find((u) => u.email.toLowerCase() === email)?.especialidad;
   }
 
   isMockUser(): boolean {
