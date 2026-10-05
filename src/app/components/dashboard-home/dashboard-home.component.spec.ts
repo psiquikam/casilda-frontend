@@ -10,23 +10,23 @@ import { MatIconTestingModule } from '@angular/material/icon/testing';
 
 import { DashboardHomeComponent } from './dashboard-home.component';
 import { AuthService } from '../../services/auth.service';
-import { environment } from '../../../environments/environment';
 
 registerLocaleData(localeEsCo);
 
 /**
- * Tras la Subfase 2 este componente solo reparte entre dos vistas: el panel por
- * zonas del personal y la vista del rol Usuario. La lógica de panel se prueba
- * en `panel-inicio.component.spec.ts` y en los specs de cada widget.
+ * Este componente solo reparte entre las dos vistas. El contenido se prueba en
+ * `panel-inicio.component.spec.ts` (personal) y en
+ * `panel-usuario.component.spec.ts` (persona que solicita acompañamiento).
  */
 describe('DashboardHomeComponent', () => {
-  let component: DashboardHomeComponent;
   let fixture: ComponentFixture<DashboardHomeComponent>;
-  let authService: AuthService;
+  let auth: AuthService;
 
-  function sesion(nombre: string, rol: string): void {
-    authService.currentUser = { nombre, email: `${rol.toLowerCase()}@udea.edu.co`, rol, token: 'fake-token' };
+  function conRol(rol: string): HTMLElement {
+    auth.currentUser = { nombre: `Persona ${rol}`, email: 'x@udea.edu.co', rol, token: 't' };
+    fixture = TestBed.createComponent(DashboardHomeComponent);
     fixture.detectChanges();
+    return fixture.nativeElement as HTMLElement;
   }
 
   beforeEach(async () => {
@@ -41,94 +41,25 @@ describe('DashboardHomeComponent', () => {
       ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(DashboardHomeComponent);
-    component = fixture.componentInstance;
-    authService = TestBed.inject(AuthService);
-    sesion('Admin UdeA', 'Admin');
+    auth = TestBed.inject(AuthService);
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(conRol('Admin')).toBeTruthy();
   });
 
-  describe('reparto por rol (DSH-12-01)', () => {
-    it('el personal ve el panel por zonas, no la vista de Usuario', () => {
-      sesion('Lic. Carlos Restrepo', 'Profesional');
-
-      const vista = fixture.nativeElement as HTMLElement;
-      expect(vista.querySelector('app-panel-inicio')).not.toBeNull();
-      expect(vista.querySelector('.portal-usuario')).toBeNull();
-    });
-
-    it('el rol Usuario conserva su vista hasta la Subfase 4', () => {
-      sesion('Valentina Morales', 'Usuario');
-
-      const vista = fixture.nativeElement as HTMLElement;
-      expect(vista.querySelector('.portal-usuario')).not.toBeNull();
-      expect(vista.querySelector('app-panel-inicio')).toBeNull();
-    });
-  });
-
-  describe('navegación duplicada retirada (DSH-04-01, DSH-01-03, DSH-01-05)', () => {
-    it('ninguna vista conserva el buscador ni el conmutador de disposición', () => {
-      for (const rol of ['Admin', 'Coordinador', 'Profesional', 'Revisor', 'Usuario']) {
-        sesion(`Persona ${rol}`, rol);
-
-        const vista = fixture.nativeElement as HTMLElement;
-        expect(vista.querySelector('.search-box')).withContext(rol).toBeNull();
-        expect(vista.querySelector('.layout-toggle-widget')).withContext(rol).toBeNull();
-      }
-    });
-
-    it('el personal ya no ve la grilla de módulos ni las pestañas del panel', () => {
-      sesion('Admin UdeA', 'Admin');
-
-      const vista = fixture.nativeElement as HTMLElement;
-      expect(vista.querySelector('.nav-tabs')).toBeNull();
-      expect(vista.querySelector('.tools-grid')).toBeNull();
-      expect(vista.textContent).not.toContain('Módulos de la Plataforma');
-    });
-  });
-
-  // DSH-05-01 — contenido de crisis en la vista del rol Usuario
-  describe('línea de orientación telefónica', () => {
-    function configurarTelefono(valor: string): void {
-      (component as unknown as { telefonoOrientacion: string }).telefonoOrientacion = valor;
-      fixture.detectChanges();
+  it('el personal ve el panel por zonas', () => {
+    for (const rol of ['Admin', 'Coordinador', 'Profesional', 'Revisor']) {
+      const vista = conRol(rol);
+      expect(vista.querySelector('app-panel-inicio')).withContext(rol).not.toBeNull();
+      expect(vista.querySelector('app-panel-usuario')).withContext(rol).toBeNull();
     }
+  });
 
-    it('el valor de environment no es publicable mientras no haya dato real', () => {
-      expect(component.hayLineaOrientacion).toBeFalse();
-      expect(environment.telefonoOrientacion).toBe('');
-    });
+  it('la persona que solicita acompañamiento ve su propio espacio', () => {
+    const vista = conRol('Usuario');
 
-    it('no muestra la línea en el banner sin número real', () => {
-      sesion('Valentina Morales', 'Usuario');
-      configurarTelefono('');
-
-      const vista = fixture.nativeElement as HTMLElement;
-      expect(vista.querySelector('.banner-ciudadano__help-box')).toBeNull();
-      expect(vista.textContent).not.toContain('Línea de Orientación en Crisis');
-    });
-
-    it('rechaza un número de relleno aunque esté configurado', () => {
-      sesion('Valentina Morales', 'Usuario');
-      configurarTelefono('1234567890');
-
-      const vista = fixture.nativeElement as HTMLElement;
-      expect(component.hayLineaOrientacion).toBeFalse();
-      expect(vista.querySelector('.banner-ciudadano__help-box')).toBeNull();
-      expect(vista.textContent).not.toContain('1234567890');
-    });
-
-    it('muestra la línea cuando hay un número real', () => {
-      sesion('Valentina Morales', 'Usuario');
-      configurarTelefono('6042196000');
-
-      const vista = fixture.nativeElement as HTMLElement;
-      expect(component.hayLineaOrientacion).toBeTrue();
-      expect(vista.querySelector('.banner-ciudadano__help-box')).not.toBeNull();
-      expect(vista.textContent).toContain('6042196000');
-    });
+    expect(vista.querySelector('app-panel-usuario')).not.toBeNull();
+    expect(vista.querySelector('app-panel-inicio')).toBeNull();
   });
 });

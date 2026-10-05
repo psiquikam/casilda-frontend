@@ -473,7 +473,11 @@ arquitectura**, para que la Subfase 2 reorganice contenido ya saneado.
 
 ---
 
-### Subfase 4 — Dashboard del rol Usuario (enfoque informado en trauma)
+### Subfase 4 — Dashboard del rol Usuario (enfoque informado en trauma) ✅ **EJECUTADA (2026-10-04)**
+
+> Resultado en `docs/evidencias/dashboards/05-subfase-4-rol-usuario.md`.
+> **Los textos son una propuesta**: requieren validación del equipo de atención
+> antes de desplegarse. DSH-10-15 (P-16) no se implementó.
 
 | IDs | §5 completo: DSH-10-01…17 · DSH-06-04 · DSH-05-05 |
 |---|---|
@@ -617,11 +621,11 @@ tamaño intrínseco del logo (ADD-06). Sin errores atribuibles al panel.
 | DSH-05-02 | CONFIRMADO → **CORREGIDO** (Subfase 1) | `dashboard-home.component.html:138,840-842` |
 | DSH-05-03 | CONFIRMADO | `dashboard-home.component.html:839-843` |
 | DSH-05-04 | CONFIRMADO → **PARCIAL** (falta P-08) | `dashboard-home.component.html:857-859` |
-| DSH-05-05 | CONFIRMADO | `dashboard-home.component.html:837` |
+| DSH-05-05 | CONFIRMADO → **CORREGIDO** (Subfases 1 y 4) | `dashboard-home.component.html:837` |
 | DSH-06-01 | CONFIRMADO (sin interferencia) | Verificado a 375 px · `_tokens.scss:165-166` |
 | DSH-06-02 | VERIFICADO → **CORREGIDO** (Subfase 0) | `quick-exit.component.ts:33` |
 | DSH-06-03 | CONFIRMADO (cumple) | `quick-exit.service.ts:5,11,38-56` |
-| DSH-06-04 | NO APLICA (contenido nuevo) | — |
+| DSH-06-04 | **IMPLEMENTADO** (Subfase 4) | — |
 | ADD-01 | **ACEPTADO — deuda conocida** | `header.component.html:54-70` · `login.component.html:34-50` · `auth.service.ts:54-73,302-327` |
 | ADD-02 | **CORREGIDO** (Subfase 1) | `_tokens.scss:59,68` |
 | ADD-03 | **CORREGIDO** (Subfase 1) | `dashboard-home.component.scss:598-599` (3,3:1) |
