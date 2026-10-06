@@ -32,24 +32,23 @@ import { ModalTelefonoComponent } from '../modal-telefono/modal-telefono.compone
 import { ModalHechosComponent } from '../modal-hechos/modal-hechos.component';
 import { ModalRemisionComponent } from '../modal-remision/modal-remision.component';
 import { ModalMedidasProteccionComponent } from '../modal-medidas-proteccion/modal-medidas-proteccion.component';
-import { ModalPresuntoAgresorComponent } from '../modal-presunto-agresor/modal-presunto-agresor.component';
-import { ModalActivarRutaComponent } from '../modal-activar-ruta/modal-activar-ruta.component';
-import { ModalApreciacionJuridicaComponent } from '../modal-apreciacion-juridica/modal-apreciacion-juridica.component';
-import { ModalApreciacionPsicologicaComponent } from '../modal-apreciacion-psicologica/modal-apreciacion-psicologica.component';
+import { SeccionPresuntoAgresorComponent, AgresorRegistrado } from '../seccion-presunto-agresor/seccion-presunto-agresor.component';
+import { SeccionApreciacionesComponent, ApreciacionRegistrada } from '../seccion-apreciaciones/seccion-apreciaciones.component';
 import { TablaCitasComponent } from '../tabla-citas/tabla-citas.component';
 
 import { ModalCompromisosPersonaComponent } from '../modal-compromisos-persona/modal-compromisos-persona.component';
 import { ModalCompromisosProfesionalesComponent } from '../modal-compromisos-profesionales/modal-compromisos-profesionales.component';
-import { ModalSeguimientosComponent } from '../modal-seguimiento/modal-seguimiento.component';
+import { SeccionSeguimientosComponent, SeguimientoVbg } from '../seccion-seguimientos/seccion-seguimientos.component';
 import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
 import { AuthService } from '../../services/auth.service';
-import { AtencionContextoRequestDto, AtencionRegistroRequestDto, CasoDto, CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, HechoRequestDto, SeguimientoAtencionRequestDto, SolicitudService, VinculoUdeAEnum } from '../../services/solicitud.service';
+import { AtencionRegistroRequestDto, CasoDto, CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, HechoRequestDto, SeguimientoAtencionRequestDto, SolicitudService, VinculoUdeAEnum } from '../../services/solicitud.service';
 import { MaestroDto } from '../../services/listas.service';
 import { MaestrosVbgService } from '../../services/maestros-vbg.service';
 import { RegistroVbgDatosService } from '../../services/registro-vbg-datos.service';
 import { environment } from '../../../environments/environment';
 import { TablaCasosComponent } from '../tabla-casos/tabla-casos.component';
 import { NotificacionService } from '../../core/a11y/notificacion.service';
+import { DialogoService } from '../../core/a11y/dialogo.service';
 
 @Component({
     selector: 'app-registro-atencion',
@@ -77,6 +76,9 @@ import { NotificacionService } from '../../core/a11y/notificacion.service';
         MatCheckboxModule,
         FormsModule,
         TablaCasosComponent,
+        SeccionPresuntoAgresorComponent,
+        SeccionApreciacionesComponent,
+        SeccionSeguimientosComponent,
     ],
     templateUrl: './registro-atencion.component.html',
     styleUrls: ['./registro-atencion.component.scss', './registro-atencion.consulta.scss'],
@@ -90,6 +92,7 @@ import { NotificacionService } from '../../core/a11y/notificacion.service';
 })
 export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   private readonly notificacion = inject(NotificacionService);
+  private readonly dialogoServicio = inject(DialogoService);
   private readonly maestrosVbg = inject(MaestrosVbgService);
 
   /** DSH-12-08: franja visible mientras los datos del módulo sean simulados. */
@@ -107,7 +110,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   pageIndexCasos = 0;
   pageSizeCasos = 10;
   displayedColumnsTablaInicial: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'tipoAsignacion', 'profesional', 'acciones'];
-  catalogoSeguimiento: string[] = ['Presencial', 'Telefónico', 'Virtual', 'Visita Domiciliaria'];
 
   @ViewChild(MatSort) sort?: MatSort;
 
@@ -143,7 +145,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
 
   expandedElement: any | null = null;
-  tipoSeguimientoSeleccionado?: string;
 
   filterValues: any = {
     id: '',
@@ -157,17 +158,21 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   discapacidadesRegistradas: any[] = [];
   correoRegistrados: any[] = [];
   telefonosRegistrados: any[] = [];
-  apreciacionesJuridicas: any[] = [];
-  apreciacionesPsicologicas: any[] = [];
+  apreciacionesJuridicas: ApreciacionRegistrada[] = [];
+  apreciacionesPsicologicas: ApreciacionRegistrada[] = [];
   hechosRegistrados: any[] = [];
   remisionesRegistrados: any[] = [];
-  activarRutasRegistrados: any[] = [];
+  /** VBG-07-02/03: rutas internas y externas, dos grupos de checkboxes. */
+  rutasInternasSel: number[] = [];
+  rutasExternasSel: number[] = [];
+  catalogoRutasInternas: MaestroDto[] = [];
+  catalogoRutasExternas: MaestroDto[] = [];
   medidasRegistradas: any[] = [];
-  agresoresRegistrados: any[] = [];
+  agresoresRegistrados: AgresorRegistrado[] = [];
 
   compromisosPersona: any[] = [];
   compromisosProfesional: any[] = [];
-  seguimientosRegistrados: any[] = [];
+  seguimientosRegistrados: SeguimientoVbg[] = [];
   guardandoCompromisos = false;
   tabErrors = new Set<string>();
 
@@ -201,12 +206,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       tab: 'Documentación', label: 'Actividad misional', control: 'actividadMisional',
       condition: () => this.atencionForm?.get('violenciaMisional')?.value === 'SI'
     },
-    { tab: 'Presunto agresor', label: 'Primer nombre (agresor)', control: 'presuntoPrimerNombre' },
-    { tab: 'Presunto agresor', label: 'Primer apellido (agresor)', control: 'presuntoPrimerApellido' },
-    { tab: 'Presunto agresor', label: 'Vínculo con la universidad', control: 'presuntoVinculoUniversidad' },
-    { tab: 'Presunto agresor', label: 'Vínculo con la víctima', control: 'presuntoVinculoVictima' },
     { tab: 'Estado del Caso', label: 'Estado del caso', control: 'estadosCaso' },
-    { tab: 'Estado del Caso', label: 'Grupo de atención', control: 'grupoAtencion' },
   ];
 
   psicologicaSel: number[] = [];
@@ -249,7 +249,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   actividadesMisionales: string[] = [];
   estadosCaso: string[] = [];
   catalogoEstadosCaso: MaestroDto[] = [];
-  grupoAtencion: string[] = [];
   listaTiemposOcurridoUnidad: string[] = [];
   catalogoTiemposOcurridoUnidad: MaestroDto[] = [];
 
@@ -309,11 +308,35 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
 
 
+    /**
+     * EST-03 / decisión provisional del pendiente 13: Acuerdos = `No` ya no
+     * vacía rutas y remisiones sin avisar. Si hay registros cargados, se
+     * confirma antes; si se cancela, el radio vuelve a `Sí`.
+     */
     this.atencionForm.get('logroAcuerdo')?.valueChanges.subscribe(valor => {
-      if (valor === 'NO') {
-        this.remisionesRegistrados = [];
-        this.activarRutasRegistrados = [];
+      if (valor !== 'NO') {
+        return;
       }
+      const hayDatosCargados = this.remisionesRegistrados.length > 0
+        || this.rutasInternasSel.length > 0
+        || this.rutasExternasSel.length > 0;
+      if (!hayDatosCargados) {
+        return;
+      }
+      this.dialogoServicio.confirmar({
+        titulo: '¿Vaciar rutas y remisiones?',
+        mensaje: 'Ya hay rutas activadas o remisiones registradas. Al marcar que no se logró un acuerdo, se eliminarán de este caso.',
+        textoConfirmar: 'Vaciar'
+      }).subscribe(confirmado => {
+        if (confirmado) {
+          this.remisionesRegistrados = [];
+          this.rutasInternasSel = [];
+          this.rutasExternasSel = [];
+          this.atencionForm.patchValue({ rutaInternaOtraCual: '', rutaExternaOtraCual: '' });
+        } else {
+          this.atencionForm.get('logroAcuerdo')?.setValue('SI', { emitEvent: false });
+        }
+      });
     });
 
     this.atencionForm.get('vinculo')?.valueChanges.subscribe(valor => {
@@ -415,6 +438,18 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     controlViolenciaMisional.valueChanges.subscribe(aplicarRegla);
   }
 
+  /** VBG-07-02, pendiente 4: "¿Cuál?" opcional al marcar "Otras" en rutas internas. */
+  esRutaInternaOtraSeleccionada(): boolean {
+    const otras = this.catalogoRutasInternas.find((c) => c.codigo === 'otras-rutas-internas');
+    return otras ? this.rutasInternasSel.includes(otras.id) : false;
+  }
+
+  /** VBG-07-03, pendiente 4: "¿Cuál?" opcional al marcar "Otras" en rutas externas. */
+  esRutaExternaOtraSeleccionada(): boolean {
+    const otras = this.catalogoRutasExternas.find((c) => c.codigo === 'otras-rutas-externas');
+    return otras ? this.rutasExternasSel.includes(otras.id) : false;
+  }
+
   private cargarListasMaestras(): void {
     forkJoin({
       sexos: this.obtenerMaestro('sexos'),
@@ -438,7 +473,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       lugaresOcurrencia: this.obtenerMaestro('lugares-ocurrencia'),
       actividadesMisionales: this.obtenerMaestro('actividades-misionales'),
       estadosCaso: this.obtenerMaestro('estados-caso'),
-      gruposAtencion: this.obtenerMaestro('grupos-atencion'),
+      rutasInternas: this.obtenerMaestro('rutas-internas'),
+      rutasExternas: this.obtenerMaestro('rutas-externas'),
       modalidadesPsicologicas: this.obtenerMaestro('modalidades-violencia/tipo/1'),
       modalidadesFisicas: this.obtenerMaestro('modalidades-violencia/tipo/2'),
       modalidadesSexuales: this.obtenerMaestro('modalidades-violencia/tipo/3'),
@@ -491,7 +527,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         this.actividadesMisionales = this.mapNombres(data.actividadesMisionales);
         this.catalogoEstadosCaso = data.estadosCaso;
         this.estadosCaso = this.mapNombres(data.estadosCaso);
-        this.grupoAtencion = this.mapNombres(data.gruposAtencion);
+        this.catalogoRutasInternas = data.rutasInternas;
+        this.catalogoRutasExternas = data.rutasExternas;
         this.listaPsicologica = data.modalidadesPsicologicas;
         this.listaFisica = data.modalidadesFisicas;
         this.listaSexual = data.modalidadesSexuales;
@@ -792,7 +829,10 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       ciudadNacimiento: caso.ciudadNacimiento || '',
       departamentoResidencia: caso.departamentoResidencia || '',
       ciudadResidencia: caso.ciudadResidencia || '',
-      direccionResidencia: caso.direccionResidencia || ''
+      direccionResidencia: caso.direccionResidencia || '',
+      // VBG-09-01, solo lectura (VBG-09-02): se conserva para mostrarlo en
+      // «Estado del Caso»; no viene de ningún control del formulario.
+      grupoAtencion: caso.grupoAtencion ?? null
     };
   }
 
@@ -914,34 +954,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     });
   }
 
-  abrirModalApreciacionJuridica(): void {
-    const dialogRef = this.dialog.open(ModalApreciacionJuridicaComponent, {
-      width: '800px',
-      disableClose: true
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.apreciacionesJuridicas = [...this.apreciacionesJuridicas, result];
-        this.snackBar.open('Apreciación agregada', 'Cerrar', { duration: 2000 });
-      }
-    });
-  }
-
-  abrirModalApreciacionPsicologica(): void {
-    const dialogRef = this.dialog.open(ModalApreciacionPsicologicaComponent, {
-      width: '800px',
-      disableClose: true
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.apreciacionesPsicologicas = [...this.apreciacionesPsicologicas, result];
-        this.snackBar.open('Apreciación agregada', 'Cerrar', { duration: 2000 });
-      }
-    });
-  }
-
   abrirModalDiscapacidad(): void {
     const dialogRef = this.dialog.open(ModalDiscapacidadComponent, {
       width: '800px',
@@ -1012,24 +1024,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     });
   }
 
-  abrirModalAgresor(): void {
-    const dialogRef = this.dialog.open(ModalPresuntoAgresorComponent, {
-      width: '700px',
-      disableClose: true,
-      data: {
-        vinculosUdea: this.catalogoVinculosUdea,
-        vinculosAgresor: this.catalogoVinculosAgresorVictima
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.agresoresRegistrados = [...this.agresoresRegistrados, result];
-        this.snackBar.open('Presunto agresor agregado', 'Cerrar', { duration: 2000 });
-      }
-    });
-  }
-
   abrirModalRemision(): void {
     const dialogRef = this.dialog.open(ModalRemisionComponent, {
       width: '800px',
@@ -1044,19 +1038,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     });
   }
 
-  abrirModalRutaActivada(): void {
-    const dialogRef = this.dialog.open(ModalActivarRutaComponent, {
-      width: '800px',
-      disableClose: true
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.activarRutasRegistrados = [...this.activarRutasRegistrados, result];
-        this.snackBar.open('Hecho agregado', 'Cerrar', { duration: 2000 });
-      }
-    });
-  }
   abrirModalCompromisosPersona(): void {
     const dialogRef = this.dialog.open(ModalCompromisosPersonaComponent, {
       width: '800px',
@@ -1082,24 +1063,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         this.snackBar.open('Hecho agregado', 'Cerrar', { duration: 2000 });
       }
     });
-  }
-  abrirModalSeguimientos(tipoSeguimiento?: string): void {
-    const dialogRef = this.dialog.open(ModalSeguimientosComponent, {
-      width: '800px',
-      disableClose: true,
-      data: { tipoSeguimiento }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.seguimientosRegistrados = [...this.seguimientosRegistrados, result];
-        this.snackBar.open('Hecho agregado', 'Cerrar', { duration: 2000 });
-      }
-    });
-  }
-  eliminarSeguimientos(i: number) {
-    this.seguimientosRegistrados.splice(i, 1);
-    this.seguimientosRegistrados = [...this.seguimientosRegistrados];
   }
   eliminarCompromisosProfesional(i: number) {
     this.compromisosProfesional.splice(i, 1);
@@ -1129,33 +1092,9 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     this.remisionesRegistrados.splice(i, 1);
     this.remisionesRegistrados = [...this.remisionesRegistrados];
   }
-  eliminarRutaActivada(i: number) {
-    this.activarRutasRegistrados.splice(i, 1);
-    this.activarRutasRegistrados = [...this.activarRutasRegistrados];
-  }
   eliminarMedida(i: number) {
     this.medidasRegistradas.splice(i, 1);
     this.medidasRegistradas = [...this.medidasRegistradas];
-  }
-
-  eliminarAgresor(i: number) {
-    this.agresoresRegistrados.splice(i, 1);
-    this.agresoresRegistrados = [...this.agresoresRegistrados];
-  }
-
-  formatearNombreAgresor(agresor: any): string {
-    if (!agresor) return 'Desconocido';
-    const partes = [agresor.primerNombre, agresor.segundoNombre, agresor.primerApellido, agresor.segundoApellido];
-    const nombreCompleto = partes.filter(n => typeof n === 'string' && n.trim() !== '').join(' ');
-    return nombreCompleto || 'Desconocido';
-  }
-  eliminarApreciacionJuridica(i: number) {
-    this.apreciacionesJuridicas.splice(i, 1);
-    this.apreciacionesJuridicas = [...this.apreciacionesJuridicas];
-  }
-  eliminarApreciacionPsicologica(i: number) {
-    this.apreciacionesPsicologicas.splice(i, 1);
-    this.apreciacionesPsicologicas = [...this.apreciacionesPsicologicas];
   }
 
   eliminarAcuerdo(index: number) {
@@ -1198,6 +1137,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       otroVinculo: [''],
       programa: [{ value: '', disabled: true }],
       logroAcuerdo: ['NO'],
+      rutaInternaOtraCual: [''],
+      rutaExternaOtraCual: [''],
       tipoViolencia: [''],
       subcategoriaViolencia: [''],
       tiempoOcurridoValor: [''],
@@ -1209,12 +1150,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       violenciaGenero: [''],
       violenciaMisional: [''],
       actividadMisional: [''],
-      presuntoPrimerNombre: [''],
-      presuntoSegundoNombre: [''],
-      presuntoPrimerApellido: [''],
-      presuntoSegundoApellido: [''],
-      presuntoVinculoUniversidad: [''],
-      presuntoVinculoVictima: [''],
       direccionResidencia: [{ value: '', disabled: true }],
       violenciaPsicologica: ['NO'],
       detalleViolenciaPsicologica: [''],
@@ -1230,7 +1165,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       detalleViolenciaInformatica: [''],
       violenciaPrejuicio: ['NO'],
       estadosCaso: [''],
-      grupoAtencion: [''],
       detalleViolenciaPrejuicio: [''],
       observacionesTelefono: [''],
       observacionesCorreo: [''],
@@ -1278,22 +1212,18 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     return true;
   }
 
-  getLogicalTabIndex(visualIndex: number): number {
-    const isVbgVisible = this.atencionForm.get('violenciaGenero')?.value === 'SI';
-    if (isVbgVisible) {
-      return visualIndex;
-    } else {
-      if (visualIndex < 3) {
-        return visualIndex;
-      } else {
-        return visualIndex + 1;
-      }
-    }
-  }
-
   guardarAtencion(tabIndex: number | null = null): void {
-    const targetVisualIndex = tabIndex !== null && tabIndex !== undefined ? tabIndex : this.activeTabIndex;
-    const targetTabIndex = this.getLogicalTabIndex(targetVisualIndex);
+    /**
+     * Hallazgo crítico de M3: este formulario no tiene las pestañas
+     * «Datos complementarios», «Documentación» ni «VBG» que sí existen en
+     * `registro-caso` (confirmado en M2). `getLogicalTabIndex()` asumía esa
+     * numeración de todas formas y desplazaba el índice como si esas
+     * pestañas pudieran aparecer — por eso cada guardado después de «Datos
+     * de la persona» enviaba el payload de la pestaña equivocada. El índice
+     * visual de la pestaña activa ahora coincide 1:1 con los `case` de
+     * `construirRegistroAtencionRequest`, sin ninguna traducción.
+     */
+    const targetTabIndex = tabIndex !== null && tabIndex !== undefined ? tabIndex : this.activeTabIndex;
     this.guardandoCompromisos = true;
     this.construirRegistroAtencionRequest(targetTabIndex)
       .then((dataFinal) => {
@@ -1348,7 +1278,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   private async construirRegistroAtencionRequest(tabIndex: number): Promise<any> {
     const formRawValue = this.atencionForm.getRawValue();
     const {
-      fechaHora,
       tipoServicio,
       lugarEntrevista,
       regimenSalud,
@@ -1357,30 +1286,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       consentimientoArchivo,
       sexo,
       etnia,
-      identidadSexual,
-      orientacionSexual,
       ciudadResidencia,
       direccionResidencia,
-      unidadAdministrativa,
-      campus,
-      unidadAcademica,
-      vinculo,
-      programa,
-      tiempoOcurridoValor,
-      tiempoOcurridoUnidad,
-      queForma,
-      ciudadHechos,
-      lugarHechos,
-      violenciaGenero,
-      violenciaMisional,
-      actividadMisional,
-      direccionLugar,
-      presuntoPrimerNombre,
-      presuntoSegundoNombre,
-      presuntoPrimerApellido,
-      presuntoSegundoApellido,
-      presuntoVinculoUniversidad,
-      presuntoVinculoVictima,
       observacionesTelefono,
       observacionesCorreo
     } = formRawValue;
@@ -1399,18 +1306,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     const compromisosProfesional = this.compromisosProfesional
       .map((compromiso) => this.mapearCompromisoProfesionalRequest(compromiso, this.atencionId ?? 0))
       .filter((compromiso): compromiso is CompromisoProfesionalRequestDto => compromiso !== null);
-
-    const atencionContexto: AtencionContextoRequestDto = {
-      idUnidadAdministrativa: this.resolverIdMaestro(unidadAdministrativa, this.catalogoUnidadesAdministrativas),
-      idCampus: this.resolverIdMaestro(campus, this.catalogoCampus),
-      idUnidadAcademica: this.resolverIdMaestro(unidadAcademica, this.catalogoUnidadesAcademicas),
-      idVinculoUniversidad: this.resolverIdMaestro(vinculo, this.catalogoVinculosUdea),
-      otroVinculo: this.resolverIdMaestro(vinculo, this.catalogoVinculosUdea) === VinculoUdeAEnum.OTRO_TIPO_DE_VINCULO ? formRawValue.otroVinculo : null,
-      idPrograma: this.resolverIdMaestro(programa, this.catalogoProgramas),
-      idEtnia: etnia ? this.resolverIdMaestro(etnia, this.catalogoEtnias) : null,
-      idCiudadResidencia: ciudadResidencia ? Number(ciudadResidencia) : null,
-      direccionResidencia: direccionResidencia || null
-    };
 
     const correos = this.correoRegistrados
       .filter((c) => c?.correo && c?.tipoId)
@@ -1450,57 +1345,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         };
       case 1:
         return {
-          idCaso: this.casoId,
-          idvinculoudea: this.resolverIdMaestro(vinculo, this.catalogoVinculosUdea),
-          otrovinculo: this.resolverIdMaestro(vinculo, this.catalogoVinculosUdea) === VinculoUdeAEnum.OTRO_TIPO_DE_VINCULO ? formRawValue.otroVinculo : null,
-          idprograma: this.resolverIdMaestro(programa, this.catalogoProgramas),
-          idunidadacademica: this.resolverIdMaestro(unidadAcademica, this.catalogoUnidadesAcademicas),
-          idunidadadministrativa: this.resolverIdMaestro(unidadAdministrativa, this.catalogoUnidadesAdministrativas),
-          idcampus: this.resolverIdMaestro(campus, this.catalogoCampus),
-          observacionesTelefono: observacionesTelefono || null,
-          observacionesCorreo: observacionesCorreo || null,
-          correos: correos.length ? correos : undefined,
-          telefonos: telefonos.length ? telefonos : undefined
-        };
-      case 2:
-        return {
-          idCaso: this.casoId,
-          hechos: hechos.length ? hechos : undefined,
-          hacecuantooccurrio: tiempoOcurridoValor ? Number(tiempoOcurridoValor) : 0,
-          idtiempoocurridounidad: this.resolverIdMaestro(tiempoOcurridoUnidad, this.catalogoTiemposOcurridoUnidad),
-          idformaocurrencia: this.resolverIdMaestro(queForma, this.catalogoFormasOcurrencia),
-          idciudadhechos: ciudadHechos ? Number(ciudadHechos) : null,
-          idlugarocurrencia: this.resolverIdMaestro(lugarHechos, this.catalogoLugaresOcurrencia),
-          violenciabasadagenero: violenciaGenero === true || violenciaGenero === 'SI',
-          hechoviolenciaocurrioactividadesmisionales: violenciaMisional === true || violenciaMisional === 'SI',
-          idactivadmisional: actividadMisional ? this.resolverIdMaestro(actividadMisional, this.catalogoActividadesMisionales) : null
-        };
-      case 3:
-        return {
-          idCaso: this.casoId,
-          modalidadesViolenciaPsicologica: this.psicologicaSel,
-          modalidadesViolenciaFisica: this.fisicaSel,
-          modalidadesViolenciaSexual: this.sexualSel,
-          modalidadesViolenciaInstitucional: this.institucionalSel,
-          modalidadesViolenciaEconomica: this.economicaSel,
-          modalidadesViolenciaInformatica: this.informaticaSel,
-          modalidadesViolenciaPrejuicio: this.prejuicioSel
-        };
-      case 4:
-        const agresoresMapped = this.agresoresRegistrados.map(a => ({
-          primerNombre: a.primerNombre || null,
-          segundoNombre: a.segundoNombre || null,
-          primerApellido: a.primerApellido || null,
-          segundoApellido: a.segundoApellido || null,
-          idVinculoUniversidad: a.idVinculoUniversidad || null,
-          idVinculoVictima: a.idVinculoVictima || null
-        }));
-        return {
-          idCaso: this.casoId,
-          agresores: agresoresMapped
-        };
-      case 5:
-        return {
           casoId: this.casoId,
           idAtencion: this.atencionId,
           idTipoServicio: this.resolverIdMaestro(tipoServicio, this.catalogoTiposServicio),
@@ -1509,7 +1353,22 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
           archivoConsentimientoTipo: consentimientoArchivo?.type,
           archivoConsentimientoContenido
         };
-      case 6:
+      case 2:
+        const agresoresMapped = this.agresoresRegistrados.map(a => ({
+          primerNombre: a.primerNombre || null,
+          segundoNombre: a.segundoNombre || null,
+          primerApellido: a.primerApellido || null,
+          segundoApellido: a.segundoApellido || null,
+          idVinculoUniversidad: a.idVinculoUniversidad || null,
+          cualVinculoUniversidad: a.vinculoUniversidad === 'Otro' ? a.cualVinculoUniversidad || null : null,
+          idVinculoVictima: a.idVinculoVictima || null,
+          cualVinculoVictima: a.vinculoVictima === 'Otro' ? a.cualVinculoVictima || null : null
+        }));
+        return {
+          idCaso: this.casoId,
+          agresores: agresoresMapped
+        };
+      case 3:
         const apreciaciones = [
           ...this.apreciacionesJuridicas.map(a => ({
             idTipoApreciacion: a.idTipoApreciacion,
@@ -1524,12 +1383,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
           idAtencion: this.atencionId,
           apreciaciones
         };
-      case 7:
-        const rutasMapped = this.activarRutasRegistrados.map(r => ({
-          idTipoRutaActivacion: r.idTipoRutaActivacion,
-          idRutaActivacion: r.idRutaActivacion
-        })).filter(r => r.idTipoRutaActivacion !== undefined && r.idRutaActivacion !== undefined);
-
+      case 4:
         const remisionesMapped = this.remisionesRegistrados.map(r => ({
           idTipoRemision: r.idTipoRemision,
           cual: r.cual || null,
@@ -1539,34 +1393,29 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         return {
           idAtencion: this.atencionId || 0,
           logroAcuerdo: logroAcuerdo === true || logroAcuerdo === 'SI',
-          rutas: rutasMapped,
+          // VBG-07-02/03: forma provisional (dos grupos de checkboxes, M4),
+          // pendiente de confirmación del backend — reemplaza a `rutas`.
+          rutasInternas: this.rutasInternasSel,
+          rutaInternaOtraCual: this.esRutaInternaOtraSeleccionada() ? (formRawValue.rutaInternaOtraCual || null) : null,
+          rutasExternas: this.rutasExternasSel,
+          rutaExternaOtraCual: this.esRutaExternaOtraSeleccionada() ? (formRawValue.rutaExternaOtraCual || null) : null,
           remisiones: remisionesMapped
         };
-      case 8:
-        const medidasMapped = this.medidasRegistradas.map(m => ({
-          tipoMedidaId: m.tipoMedidaId,
-          subtipoMedidaId: m.subtipoMedidaId,
-          responsableId: m.responsableId,
-          fechaRegistro: this.formatearFechaLocalDateTime(m.fechaRegistro),
-          descripcion: m.descripcion || ""
-        })).filter(m => m.tipoMedidaId !== undefined && m.tipoMedidaId !== null);
-
-        return {
-          idAtencion: this.atencionId || 0,
-          medidas: medidasMapped
-        };
-      case 9:
+      // VBG-07-12: la pestaña «Medidas de protección» se retiró de la UI (ver plantilla).
+      // `medidasRegistradas`, `abrirModalMedida` y `eliminarMedida` siguen intactos; solo
+      // se retira el `case` de guardado, que ya no es alcanzable por ninguna pestaña visible.
+      case 5:
         return {
           idAtencion: this.atencionId || 0,
           persona: compromisosPersona,
           profesional: compromisosProfesional
         };
-      case 10:
+      case 6:
         return {
           idAtencion: this.atencionId || 0,
           seguimientos: seguimientos
         };
-      case 11:
+      case 7:
         return {
           idCaso: this.casoId,
           idEstadoCaso: this.resolverIdMaestro(formRawValue.estadosCaso, this.catalogoEstadosCaso)
@@ -1604,7 +1453,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     return seguimientos.filter((seguimiento): seguimiento is SeguimientoAtencionRequestDto => seguimiento !== null);
   }
 
-  private async mapearSeguimientoRequest(seguimiento: any, idAtencion: number): Promise<SeguimientoAtencionRequestDto | null> {
+  private async mapearSeguimientoRequest(seguimiento: SeguimientoVbg, idAtencion: number): Promise<SeguimientoAtencionRequestDto | null> {
     const fecha = this.formatearFechaLocalDateTime(seguimiento?.fecha);
     if (!fecha) {
       return null;
@@ -1613,16 +1462,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     const idTipoSeguimiento = Number(seguimiento?.idtiposeguimiento);
     const idAccion = Number(seguimiento?.idaccion);
     const idActividad = Number(seguimiento?.idactividad);
-    const idEstadoSeguimiento = Number(seguimiento?.idestadoseguimiento);
-    const idMotivoEstadoSeguimiento = Number(seguimiento?.idmotivoestado);
 
-    if (
-      !Number.isFinite(idTipoSeguimiento)
-      || !Number.isFinite(idAccion)
-      || !Number.isFinite(idActividad)
-      || !Number.isFinite(idEstadoSeguimiento)
-      || !Number.isFinite(idMotivoEstadoSeguimiento)
-    ) {
+    if (!Number.isFinite(idTipoSeguimiento) || !Number.isFinite(idAccion) || !Number.isFinite(idActividad)) {
       return null;
     }
 
@@ -1636,8 +1477,9 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       idAccion,
       idActividad,
       descripcion: String(seguimiento?.descripcion ?? ''),
-      idEstadoSeguimiento,
-      idMotivoEstadoSeguimiento,
+      especialidad: seguimiento?.especialidad,
+      estado: seguimiento?.estado,
+      motivoCierre: seguimiento?.motivoCierre ?? null,
       archivoNombre: archivo?.name,
       archivoTipo: archivo?.type,
       archivoContenido

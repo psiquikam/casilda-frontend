@@ -464,7 +464,19 @@ Hecho esto, **`npm run check` en verde pasa a ser el criterio de cierre de cada 
 | **Riesgos** | Es la subfase que más toca la lógica condicional. Mitigación: R-03 y R-04 (ocultar + deshabilitar + limpiar con confirmación), con prueba en ambos sentidos por cada fila de la tabla del §3 de la matriz. |
 | **Terminado** | Cada fila de esa tabla probada al mostrar y al ocultar. Con VBG = `No` el formulario guarda. Ninguna etiqueta difiere de la matriz. |
 
-### M3 — Identificación, presunto agresor y apreciaciones (secciones 4 a 6)
+### M3 — Identificación, presunto agresor y apreciaciones (secciones 4 a 6) ✅ **EJECUTADA (2026-10-05)**
+
+> Resultado en
+> `docs/evidencias/estandarizacion-vbg/03-subfase-M3-identificacion-agresor-apreciaciones.md`.
+> **Hallazgo crítico, no estaba en el diagnóstico original**: `registro-atencion` guardaba
+> el payload de la pestaña equivocada en 7 de sus 8 pestañas (ver detalle en el reporte).
+> Corregido junto con la pestaña «Presunto agresor», que faltaba por completo en ese
+> formulario pese a tener toda la lógica ya escrita.
+> **Correcciones a este diagnóstico**: VBG-04-01 ya existía (el tooltip con el ejemplo de
+> país sí estaba en `registro-caso.component.html:50`); VBG-05-05/05-09 citaba el control
+> equivocado (`otroVinculo` es del vínculo de la persona atendida, no del agresor — el
+> modal del agresor no tenía ningún «¿Cuál?»); VBG-05-08 sí es verificable y cumple
+> («Personal no docente» aparece literal en el catálogo y en el tooltip del modal).
 
 | | |
 |---|---|
@@ -475,27 +487,49 @@ Hecho esto, **`npm run check` en verde pasa a ser el criterio de cierre de cada 
 | **Riesgos** | Eliminar «Tipo de Apreciación» puede dejar huérfano un campo persistido. **No se borra la columna**: solo sale de la interfaz (punto 5 del §0 de la matriz). |
 | **Terminado** | Los modales tienen un único campo narrativo. Ningún formato de fecha fuera de DD/MM/AAAA. |
 
-### M4 — Acuerdos, compromisos, seguimientos y cierre (secciones 7 y 8)
+### M4 — Acuerdos, compromisos, seguimientos y cierre (secciones 7 y 8) ✅ **EJECUTADA (2026-10-05)**
+
+> Resultado en
+> `docs/evidencias/estandarizacion-vbg/04-subfase-M4-acuerdos-seguimientos-cierre.md`.
+> **Hallazgo que amplió el alcance**: el único bloque «Seguimientos del Caso» existente
+> usaba un catálogo de **modalidad de contacto** (Presencial/Virtual/…), no de
+> **especialidad profesional** — las cuatro subsecciones de VBG-08-01…04 no existían en
+> absoluto, no estaban mal nombradas. Se implementaron desde cero junto con P-12
+> (especialidades de las cuentas de prueba PROFESIONAL), requisito previo del
+> aislamiento VBG-08-10. De paso se encontró y corrigió que el modal de seguimiento
+> cargaba sus tres catálogos con `HttpClient` directo (sin respaldo de demostración, los
+> tres desplegables estaban vacíos en modo demo) y que el selector rápido de rol
+> (header + login) no distinguía entre cuentas PROFESIONAL con el mismo código de rol —
+> con una sola cuenta nunca fue un problema; con las tres nuevas de P-12, las cuatro
+> habrían iniciado sesión siempre como la primera encontrada.
 
 | | |
 |---|---|
-| **IDs** | VBG-07-01…12 · VBG-08-05…13 · EST-03 · **tarea 2.4 del plan de accesibilidad** |
-| **Archivos** | `modal-compromisos-persona` · `modal-compromisos-profesionales` · `modal-seguimiento` · `modal-activar-ruta` · `modal-remision` · **retirar de la UI** `modal-medidas-proteccion` · ambos formularios · `ResumenErroresComponent` |
-| **Alcance** | Pregunta literal de acuerdos. Compromiso **narrativo** con fecha de cumplimiento, en `FormArray`. **Retirar «Medidas de protección» de la interfaz** (VBG-07-12), sin tocar datos. Corregir EST-03 con `DialogoService.confirmar()`. Conectar `ResumenErroresComponent` a ambos formularios. |
-| **Bloqueos** | Pendientes **13**, **14**, **15** (Acción→Actividad), **16** y **P-12**. **Las subsecciones 7.1–7.4 no se implementan sin P-12.** |
-| **Riesgos** | El mayor de la fase: `FormArray` + eliminación ya tuvo un intercambio de manejadores entre «Rutas activadas» y «Remisiones» (R-09). Mitigación: prueba por bloque que verifique que se elimina del arreglo correcto. |
-| **Terminado** | Compromisos narrativos y múltiples, en bloques separados. «Medidas de protección» no aparece. Ningún cambio de acuerdos borra datos sin confirmar. El resumen de errores funciona en ambos formularios. |
+| **IDs** | VBG-07-01…12 · VBG-08-01…13 |
+| **Archivos** | `seccion-seguimientos` (nuevo) · `modal-seguimiento` · `modal-activar-ruta` (retirado) · ambos formularios · `auth.service.ts` · `confirm-dialog` |
+| **Alcance cumplido** | Rutas Internas/Externas como dos grupos de checkboxes. «Medidas de protección» retirado de la UI sin tocar datos. EST-03 corregido con `DialogoService.confirmar()`. «Fecha de Cumplimiento» + corrección de columnas intercambiadas en la tabla de compromisos del profesional. Cuatro módulos de Seguimientos por especialidad, aislados (VBG-08-10), con cierre autónomo de motivo libre (VBG-08-12) y aviso de última activa (VBG-08-13). P-12 (especialidades de cuentas de prueba) resuelto como requisito previo. |
+| **Diferido, no resuelto en esta subfase** | **Tarea 2.4 del plan de accesibilidad** (conectar `ResumenErroresComponent`): investigada antes de empezar — el formulario usa un mecanismo propio (`tabFieldMap`, ~28 campos) en vez de `Validators` de Reactive Forms (solo 2 usos reales, condicionales). Conectar `recolectarErrores()` de forma fiel requiere re-arquitecturar esa validación o un adaptador paralelo — del tamaño de una subfase propia. Sigue como pendiente independiente (§10 y `CLAUDE.md`). El cierre general del caso que el botón «Cerrar el caso» del aviso de última activa podría disparar (VBG-08-13) tampoco se implementó: la propia matriz deja sin resolver si la ventana ejecuta el cierre general o solo lo sugiere. |
+| **Riesgos materializados** | El intercambio de manejadores que R-09 advertía para «Rutas activadas»/«Remisiones» no se repitió aquí; el riesgo real resultó ser el de `HttpClient` sin respaldo en `modal-seguimiento` (ver hallazgo). |
 
-### M5 — Alineación terminológica y grupo de atención (sección 9)
+### M5 — Alineación terminológica y grupo de atención (sección 9) ✅ **EJECUTADA (2026-10-05)**
+
+> Resultado en
+> `docs/evidencias/estandarizacion-vbg/05-subfase-M5-terminologia-y-cierre.md`.
+> **Hallazgo que amplió el alcance**: `grupoAtencion` ya tenía datos de demostración
+> desde M1 (`'Grupo 2'`, `null`, `'Grupo 5'`), pero se perdía en tres capas distintas
+> (`aCitaDto()`/`aCasoDto()`, los mapeadores de fila de cada formulario, y la plantilla
+> nunca tenía un campo que lo mostrara) y su tooltip estaba pegado al campo equivocado
+> («Estado del caso» describía la fórmula del Grupo de Atención). Las tres pérdidas se
+> corrigieron; el campo de solo lectura ya muestra «Grupo 2» / «Sin calcular» según el
+> caso. **Cierra el plan M1–M5 completo.**
 
 | | |
 |---|---|
-| **IDs** | VBG-09-01, 09-02 · glosario cruzado del §3 · VBG-05-08, 07-07, 03-07 fuera del módulo |
-| **Archivos** | `panel-usuario.component.html` · `mi-proceso.service.ts` · `dashboard-metricas.service.ts` · `dashboard-trabajo.service.ts` · `pendientes.widget.ts` · `sidebar` y `horizontal-nav` · `app.routes.ts` · `catalogo-navegacion.ts` |
-| **Alcance** | **«Lo que acordamos» → «Lo que vas a hacer»** en la vista del rol Usuario. `fechaAcordada` → `fechaCumplimiento`. Distinguir compromisos de la persona y de la dupla en el DTO. Declarar en cada indicador si cuenta VBG = `No`. Unificar el aviso de última profesional activa con el cierre. **Grupo de atención en solo lectura** (VBG-09-02), **sin lógica de cálculo** mientras falte el pendiente 17. |
-| **Bloqueos** | Pendiente **17** (cálculo) · **P-VBG-01/02/03**. |
-| **Riesgos** | Bajo. El único cuidado es **no llevar jerga técnica a la vista del rol Usuario**: el concepto se alinea, el lenguaje no (§5.3 de `DASHBOARDS_POR_ROL.md`). |
-| **Terminado** | Ningún término de la matriz significa cosas distintas en dos pantallas. El grupo de atención no es editable. Las pruebas de la Subfase 4 siguen pasando. |
+| **IDs** | VBG-09-01, 09-02 · P-VBG-01, 02, 03, 07 · glosario cruzado del §3 |
+| **Archivos** | `panel-usuario.component.html` · `mi-proceso.service.ts` · `dashboard-metricas.service.ts` · `dashboard-trabajo.service.ts` · `registro-caso`/`registro-atencion` · `caso-simulado.model.ts` · `solicitud.service.ts` · `core/vbg/ultima-profesional-activa.ts` (nuevo) |
+| **Alcance cumplido** | «Lo que acordamos» → «Lo que decidiste hacer» (P-VBG-02, texto final tomado de la decisión provisional, no del diagnóstico original — ver nota en el reporte). `fechaAcordada` → `fechaCumplimiento`. KPIs declaran origen (P-VBG-01) y alcance VBG (P-VBG-03) en su `definicion`. Umbral de 15 días documentado como constante provisional (P-VBG-07). Predicado único `esUltimaProfesionalActiva()`, usado por `SeccionSeguimientosComponent` (M4); el panel sigue con dato mock aparte, documentado como el mismo concepto. **Grupo de atención en solo lectura** (VBG-09-02), sin lógica de cálculo (pendiente 17 sigue bloqueando eso). Glosario cruzado del §3: confirmado sin ocurrencias fuera del módulo, nada que corregir. |
+| **Fuera de alcance, reportado y no corregido** | `sidebar`/`horizontal-nav` no usan `CATALOGO_MODULOS`: tres nombres para «Nueva solicitud», dos entradas para `/consulta`, íconos repetidos. Es higiene de navegación general, no terminología de la matriz; se deja anotado para una tarea aparte. |
+| **Terminado** | Ningún término de la matriz significa cosas distintas en dos pantallas. El grupo de atención no es editable. `npm run check` sin deuda nueva (255/256 tests, único fallo preexistente). |
 
 ---
 
@@ -505,14 +539,14 @@ Hecho esto, **`npm run check` en verde pasa a ser el criterio de cierre de cada 
 
 | # | Pregunta | Bloquea |
 |---|---|---|
-| **P-VBG-01** | ¿El KPI «Compromisos a 7 días» cuenta solo los de la dupla/profesional, o también los de la persona atendida? | M5 |
-| **P-VBG-02** | ¿La vista del rol Usuario debe mostrar **solo sus propios** compromisos, o también los que asumió el equipo con ella? Lo segundo da transparencia; lo primero evita confusión. | M5 |
-| **P-VBG-03** | ¿Los indicadores institucionales («Casos activos», «En recepción») incluyen los eventos con **VBG = `No`** que la matriz permite guardar? Su definición debe declararlo. | M5 |
+| ~~**P-VBG-01**~~ | **RESUELTA y EJECUTADA (2026-10-05, M5).** Cuenta ambos orígenes (persona + dupla/profesional), declarado en la `definicion` del indicador (`dashboard-metricas.service.ts`). | — |
+| ~~**P-VBG-02**~~ | **RESUELTA y EJECUTADA (2026-10-05, M5).** Solo los propios, bajo «Lo que decidiste hacer» — ya era el comportamiento de hecho; se documentó como decisión deliberada. | — |
+| ~~**P-VBG-03**~~ | **RESUELTA y EJECUTADA (2026-10-05, M5).** Los indicadores institucionales solo cuentan VBG = `Sí`, declarado en su `definicion`. | — |
 | ~~**P-VBG-04**~~ | **RESUELTA (2026-10-05).** El equipo decide trabajar con modo de demostración (`environment.datosDemostracion`): el módulo no llama al backend mientras esté activo. Catálogos, citas, casos y guardado salen de implementaciones simuladas, sin perder el camino HTTP real. Ver `01-subfase-M1-higiene-y-cimientos.md`. | — |
 | ~~**P-VBG-05**~~ | **RESUELTA (2026-10-05).** Se mantiene el `.gitignore`: las capturas se toman localmente para verificar y lo observado se describe en cada reporte de subfase. | — |
 | ~~**P-VBG-06**~~ | **RESUELTA (2026-10-05).** Se resuelve con el mapeo del catálogo central (M1): el tipo 6 del backend («Informática») se trata como la «Violencia facilitada por nuevas tecnologías» de la matriz, anidada bajo Sexual. La discrepancia completa, incluida la del catálogo de vínculos, queda reportada al equipo de backend en `docs/contratos/GLOSARIO_VBG.md`. | — |
-| **P-VBG-07** | ¿El umbral de «Seguimiento sin registro en los últimos 15 días» del panel tiene respaldo normativo, o es un supuesto que conviene revisar? | M5 |
-| ~~**P-VBG-08**~~ | **RESUELTA (2026-10-05).** Se confirma: se retira de la interfaz en ambos formularios, sin tocar datos ni contratos. Pendiente de ejecutar en M4. | — |
+| ~~**P-VBG-07**~~ | **RESUELTA y EJECUTADA (2026-10-05, M5).** Sin respaldo normativo confirmado; queda en `UMBRAL_DIAS_SIN_REGISTRO = 15`, constante documentada como provisional en `dashboard-trabajo.service.ts`. | — |
+| ~~**P-VBG-08**~~ | **RESUELTA y EJECUTADA (2026-10-05, M4).** Se retiró de la interfaz en ambos formularios, sin tocar datos ni contratos. | — |
 
 ### Pendientes de la matriz que bloquean esta fase
 

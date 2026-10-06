@@ -44,12 +44,18 @@ export interface ProximaCitaDto {
   readonly acompanaA: string;
 }
 
-/** Compromiso que la persona decidió asumir. Nunca una tarea impuesta. */
+/**
+ * Compromiso que la persona decidió asumir. Nunca una tarea impuesta.
+ *
+ * Decisión provisional P-VBG-02: esta vista solo muestra los compromisos
+ * **de la persona**, nunca los de la dupla/profesional — por eso el DTO no
+ * modela ningún campo de origen.
+ */
 export interface CompromisoDto {
   readonly id: string;
   readonly descripcion: string;
-  /** Fecha acordada, en ISO 8601. `null` si no se acordó ninguna. */
-  readonly fechaAcordada: string | null;
+  /** Fecha de cumplimiento (VBG-07-09), en ISO 8601. `null` si no se fijó ninguna. */
+  readonly fechaCumplimiento: string | null;
   readonly cumplido: boolean;
 }
 
@@ -85,13 +91,13 @@ const MOCK: MiProcesoDto = {
     {
       id: 'c-1',
       descripcion: 'Escribir lo que quieras contar en la próxima sesión, si te sirve llevarlo anotado.',
-      fechaAcordada: null,
+      fechaCumplimiento: null,
       cumplido: false
     },
     {
       id: 'c-2',
       descripcion: 'Guardar el contacto de la persona que te acompaña en tu teléfono.',
-      fechaAcordada: diasDesdeHoy(5).toISOString(),
+      fechaCumplimiento: diasDesdeHoy(5).toISOString(),
       cumplido: true
     }
   ],

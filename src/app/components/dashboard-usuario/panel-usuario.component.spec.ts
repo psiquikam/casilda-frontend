@@ -150,7 +150,7 @@ describe('PanelUsuarioComponent', () => {
       crear();
       resolver();
 
-      expect(dom().textContent).toContain('Lo que acordamos');
+      expect(dom().textContent).toContain('Lo que decidiste hacer');
       expect(dom().textContent).toContain('No hay prisa');
     }));
 

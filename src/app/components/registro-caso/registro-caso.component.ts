@@ -32,15 +32,13 @@ import { ModalTelefonoComponent } from '../modal-telefono/modal-telefono.compone
 import { ModalHechosComponent } from '../modal-hechos/modal-hechos.component';
 import { ModalRemisionComponent } from '../modal-remision/modal-remision.component';
 import { ModalMedidasProteccionComponent } from '../modal-medidas-proteccion/modal-medidas-proteccion.component';
-import { ModalPresuntoAgresorComponent } from '../modal-presunto-agresor/modal-presunto-agresor.component';
-import { ModalActivarRutaComponent } from '../modal-activar-ruta/modal-activar-ruta.component';
-import { ModalApreciacionJuridicaComponent } from '../modal-apreciacion-juridica/modal-apreciacion-juridica.component';
-import { ModalApreciacionPsicologicaComponent } from '../modal-apreciacion-psicologica/modal-apreciacion-psicologica.component';
+import { SeccionPresuntoAgresorComponent, AgresorRegistrado } from '../seccion-presunto-agresor/seccion-presunto-agresor.component';
+import { SeccionApreciacionesComponent, ApreciacionRegistrada } from '../seccion-apreciaciones/seccion-apreciaciones.component';
 import { TablaCitasComponent } from '../tabla-citas/tabla-citas.component';
 
 import { ModalCompromisosPersonaComponent } from '../modal-compromisos-persona/modal-compromisos-persona.component';
 import { ModalCompromisosProfesionalesComponent } from '../modal-compromisos-profesionales/modal-compromisos-profesionales.component';
-import { ModalSeguimientosComponent } from '../modal-seguimiento/modal-seguimiento.component';
+import { SeccionSeguimientosComponent, SeguimientoVbg } from '../seccion-seguimientos/seccion-seguimientos.component';
 import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
 import { ModalCodigosPaisComponent } from '../modal-codigos-pais/modal-codigos-pais.component';
 import { AuthService } from '../../services/auth.service';
@@ -51,6 +49,7 @@ import { RegistroVbgDatosService } from '../../services/registro-vbg-datos.servi
 import { TEXTO_PROTOCOLO_RELACION_MISIONAL } from '../../core/catalogos/catalogo-vbg';
 import { environment } from '../../../environments/environment';
 import { NotificacionService } from '../../core/a11y/notificacion.service';
+import { DialogoService } from '../../core/a11y/dialogo.service';
 
 @Component({
     selector: 'app-registro-caso',
@@ -76,6 +75,9 @@ import { NotificacionService } from '../../core/a11y/notificacion.service';
         MatProgressSpinnerModule,
         MatAutocompleteModule,
         TablaCitasComponent,
+        SeccionPresuntoAgresorComponent,
+        SeccionApreciacionesComponent,
+        SeccionSeguimientosComponent,
         MatCheckboxModule,
         FormsModule
     ],
@@ -91,6 +93,7 @@ import { NotificacionService } from '../../core/a11y/notificacion.service';
 })
 export class RegistroCasoComponent implements OnInit, AfterViewInit {
   private readonly notificacion = inject(NotificacionService);
+  private readonly dialogoServicio = inject(DialogoService);
   private readonly maestrosVbg = inject(MaestrosVbgService);
 
   /** DSH-12-08: franja visible mientras los datos del módulo sean simulados. */
@@ -109,7 +112,6 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
   pageIndexCitas = 0;
   pageSizeCitas = 10;
   displayedColumnsTablaInicial: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'tipoAsignacion', 'profesional', 'acciones'];
-  catalogoSeguimiento: string[] = ['Presencial', 'Telefónico', 'Virtual', 'Visita Domiciliaria'];
 
   @ViewChild(MatSort) sort?: MatSort;
 
@@ -158,7 +160,6 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
 
 
   expandedElement: any | null = null;
-  tipoSeguimientoSeleccionado?: string;
 
   filterValues: any = {
     id: '',
@@ -172,17 +173,21 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
   discapacidadesRegistradas: any[] = [];
   correoRegistrados: any[] = [];
   telefonosRegistrados: any[] = [];
-  apreciacionesJuridicas: any[] = [];
-  apreciacionesPsicologicas: any[] = [];
+  apreciacionesJuridicas: ApreciacionRegistrada[] = [];
+  apreciacionesPsicologicas: ApreciacionRegistrada[] = [];
   hechosRegistrados: any[] = [];
   remisionesRegistrados: any[] = [];
-  activarRutasRegistrados: any[] = [];
+  /** VBG-07-02/03: rutas internas y externas, dos grupos de checkboxes. */
+  rutasInternasSel: number[] = [];
+  rutasExternasSel: number[] = [];
+  catalogoRutasInternas: MaestroDto[] = [];
+  catalogoRutasExternas: MaestroDto[] = [];
   medidasRegistradas: any[] = [];
-  agresoresRegistrados: any[] = [];
+  agresoresRegistrados: AgresorRegistrado[] = [];
 
   compromisosPersona: any[] = [];
   compromisosProfesional: any[] = [];
-  seguimientosRegistrados: any[] = [];
+  seguimientosRegistrados: SeguimientoVbg[] = [];
   guardandoCompromisos = false;
   tabErrors = new Set<string>();
 
@@ -212,12 +217,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
     { tab: 'Documentación', label: 'Ámbito de Ocurrencia', control: 'ambitoOcurrencia' },
     { tab: 'Documentación', label: 'Lugar de los hechos', control: 'lugarHechos' },
     { tab: 'Documentación', label: 'Violencia de género', control: 'violenciaGenero' },
-    { tab: 'Presunto agresor', label: 'Primer nombre (agresor)', control: 'presuntoPrimerNombre' },
-    { tab: 'Presunto agresor', label: 'Primer apellido (agresor)', control: 'presuntoPrimerApellido' },
-    { tab: 'Presunto agresor', label: 'Vínculo con la universidad', control: 'presuntoVinculoUniversidad' },
-    { tab: 'Presunto agresor', label: 'Vínculo con la víctima', control: 'presuntoVinculoVictima' },
     { tab: 'Estado del Caso', label: 'Estado del caso', control: 'estadosCaso' },
-    { tab: 'Estado del Caso', label: 'Grupo de atención', control: 'grupoAtencion' },
   ];
 
   psicologicaSel: number[] = [];
@@ -264,7 +264,6 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
   relacionMisionalNivel2Sel: number[] = [];
   estadosCaso: string[] = [];
   catalogoEstadosCaso: MaestroDto[] = [];
-  grupoAtencion: string[] = [];
   listaTiemposOcurridoUnidad: string[] = [];
   catalogoTiemposOcurridoUnidad: MaestroDto[] = [];
 
@@ -324,11 +323,35 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
 
 
 
+    /**
+     * EST-03 / decisión provisional del pendiente 13: Acuerdos = `No` ya no
+     * vacía rutas y remisiones sin avisar. Si hay registros cargados, se
+     * confirma antes; si se cancela, el radio vuelve a `Sí`.
+     */
     this.casoForm.get('logroAcuerdo')?.valueChanges.subscribe(valor => {
-      if (valor === 'NO') {
-        this.remisionesRegistrados = [];
-        this.activarRutasRegistrados = [];
+      if (valor !== 'NO') {
+        return;
       }
+      const hayDatosCargados = this.remisionesRegistrados.length > 0
+        || this.rutasInternasSel.length > 0
+        || this.rutasExternasSel.length > 0;
+      if (!hayDatosCargados) {
+        return;
+      }
+      this.dialogoServicio.confirmar({
+        titulo: '¿Vaciar rutas y remisiones?',
+        mensaje: 'Ya hay rutas activadas o remisiones registradas. Al marcar que no se logró un acuerdo, se eliminarán de este caso.',
+        textoConfirmar: 'Vaciar'
+      }).subscribe(confirmado => {
+        if (confirmado) {
+          this.remisionesRegistrados = [];
+          this.rutasInternasSel = [];
+          this.rutasExternasSel = [];
+          this.casoForm.patchValue({ rutaInternaOtraCual: '', rutaExternaOtraCual: '' });
+        } else {
+          this.casoForm.get('logroAcuerdo')?.setValue('SI', { emitEvent: false });
+        }
+      });
     });
 
     this.casoForm.get('vinculo')?.valueChanges.subscribe(valor => {
@@ -447,6 +470,18 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
     return otro ? valor === otro.nombre : false;
   }
 
+  /** VBG-07-02, pendiente 4: "¿Cuál?" opcional al marcar "Otras" en rutas internas. */
+  esRutaInternaOtraSeleccionada(): boolean {
+    const otras = this.catalogoRutasInternas.find((c) => c.codigo === 'otras-rutas-internas');
+    return otras ? this.rutasInternasSel.includes(otras.id) : false;
+  }
+
+  /** VBG-07-03, pendiente 4: "¿Cuál?" opcional al marcar "Otras" en rutas externas. */
+  esRutaExternaOtraSeleccionada(): boolean {
+    const otras = this.catalogoRutasExternas.find((c) => c.codigo === 'otras-rutas-externas');
+    return otras ? this.rutasExternasSel.includes(otras.id) : false;
+  }
+
   private cargarListasMaestras(): void {
     forkJoin({
       sexos: this.obtenerMaestro('sexos'),
@@ -472,7 +507,8 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
       relacionMisionalNivel1: this.obtenerMaestro('relacion-misional/nivel-1'),
       relacionMisionalNivel2: this.obtenerMaestro('relacion-misional/nivel-2'),
       estadosCaso: this.obtenerMaestro('estados-caso'),
-      gruposAtencion: this.obtenerMaestro('grupos-atencion'),
+      rutasInternas: this.obtenerMaestro('rutas-internas'),
+      rutasExternas: this.obtenerMaestro('rutas-externas'),
       modalidadesPsicologicas: this.obtenerMaestro('modalidades-violencia/tipo/1'),
       modalidadesFisicas: this.obtenerMaestro('modalidades-violencia/tipo/2'),
       modalidadesSexuales: this.obtenerMaestro('modalidades-violencia/tipo/3'),
@@ -527,7 +563,8 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
         this.ambitoOcurrencia = this.mapNombres(data.ambitoOcurrencia);
         this.catalogoEstadosCaso = data.estadosCaso;
         this.estadosCaso = this.mapNombres(data.estadosCaso);
-        this.grupoAtencion = this.mapNombres(data.gruposAtencion);
+        this.catalogoRutasInternas = data.rutasInternas;
+        this.catalogoRutasExternas = data.rutasExternas;
         this.listaPsicologica = data.modalidadesPsicologicas;
         this.listaFisica = data.modalidadesFisicas;
         this.listaSexual = data.modalidadesSexuales;
@@ -800,7 +837,10 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
       cargo: cita.estadoCita || '',
       telefono: cita.telefonoAlterno || '',
       correoInst: cita.correoInstitucional || '',
-      correoPers: cita.correoPersonal || ''
+      correoPers: cita.correoPersonal || '',
+      // VBG-09-01, solo lectura (VBG-09-02): se conserva para mostrarlo en
+      // «Estado del Caso»; no viene de ningún control del formulario.
+      grupoAtencion: cita.grupoAtencion ?? null
     };
   }
 
@@ -927,34 +967,6 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
     });
   }
 
-  abrirModalApreciacionJuridica(): void {
-    const dialogRef = this.dialog.open(ModalApreciacionJuridicaComponent, {
-      width: '800px',
-      disableClose: true
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.apreciacionesJuridicas = [...this.apreciacionesJuridicas, result];
-        this.snackBar.open('Apreciación agregada', 'Cerrar', { duration: 2000 });
-      }
-    });
-  }
-
-  abrirModalApreciacionPsicologica(): void {
-    const dialogRef = this.dialog.open(ModalApreciacionPsicologicaComponent, {
-      width: '800px',
-      disableClose: true
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.apreciacionesPsicologicas = [...this.apreciacionesPsicologicas, result];
-        this.snackBar.open('Apreciación agregada', 'Cerrar', { duration: 2000 });
-      }
-    });
-  }
-
   abrirModalDiscapacidad(): void {
     const dialogRef = this.dialog.open(ModalDiscapacidadComponent, {
       width: '800px',
@@ -1025,24 +1037,6 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
     });
   }
 
-  abrirModalAgresor(): void {
-    const dialogRef = this.dialog.open(ModalPresuntoAgresorComponent, {
-      width: '700px',
-      disableClose: true,
-      data: {
-        vinculosUdea: this.catalogoVinculosUdea,
-        vinculosAgresor: this.catalogoVinculosAgresorVictima
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.agresoresRegistrados = [...this.agresoresRegistrados, result];
-        this.snackBar.open('Presunto agresor agregado', 'Cerrar', { duration: 2000 });
-      }
-    });
-  }
-
   abrirModalRemision(): void {
     const dialogRef = this.dialog.open(ModalRemisionComponent, {
       width: '800px',
@@ -1057,19 +1051,6 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
     });
   }
 
-  abrirModalRutaActivada(): void {
-    const dialogRef = this.dialog.open(ModalActivarRutaComponent, {
-      width: '800px',
-      disableClose: true
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.activarRutasRegistrados = [...this.activarRutasRegistrados, result];
-        this.snackBar.open('Hecho agregado', 'Cerrar', { duration: 2000 });
-      }
-    });
-  }
   abrirModalCompromisosPersona(): void {
     const dialogRef = this.dialog.open(ModalCompromisosPersonaComponent, {
       width: '800px',
@@ -1095,24 +1076,6 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
         this.snackBar.open('Hecho agregado', 'Cerrar', { duration: 2000 });
       }
     });
-  }
-  abrirModalSeguimientos(tipoSeguimiento?: string): void {
-    const dialogRef = this.dialog.open(ModalSeguimientosComponent, {
-      width: '800px',
-      disableClose: true,
-      data: { tipoSeguimiento }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.seguimientosRegistrados = [...this.seguimientosRegistrados, result];
-        this.snackBar.open('Hecho agregado', 'Cerrar', { duration: 2000 });
-      }
-    });
-  }
-  eliminarSeguimientos(i: number) {
-    this.seguimientosRegistrados.splice(i, 1);
-    this.seguimientosRegistrados = [...this.seguimientosRegistrados];
   }
   eliminarCompromisosProfesional(i: number) {
     this.compromisosProfesional.splice(i, 1);
@@ -1142,33 +1105,9 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
     this.remisionesRegistrados.splice(i, 1);
     this.remisionesRegistrados = [...this.remisionesRegistrados];
   }
-  eliminarRutaActivada(i: number) {
-    this.activarRutasRegistrados.splice(i, 1);
-    this.activarRutasRegistrados = [...this.activarRutasRegistrados];
-  }
   eliminarMedida(i: number) {
     this.medidasRegistradas.splice(i, 1);
     this.medidasRegistradas = [...this.medidasRegistradas];
-  }
-
-  eliminarAgresor(i: number) {
-    this.agresoresRegistrados.splice(i, 1);
-    this.agresoresRegistrados = [...this.agresoresRegistrados];
-  }
-
-  formatearNombreAgresor(agresor: any): string {
-    if (!agresor) return 'Desconocido';
-    const partes = [agresor.primerNombre, agresor.segundoNombre, agresor.primerApellido, agresor.segundoApellido];
-    const nombreCompleto = partes.filter(n => typeof n === 'string' && n.trim() !== '').join(' ');
-    return nombreCompleto || 'Desconocido';
-  }
-  eliminarApreciacionJuridica(i: number) {
-    this.apreciacionesJuridicas.splice(i, 1);
-    this.apreciacionesJuridicas = [...this.apreciacionesJuridicas];
-  }
-  eliminarApreciacionPsicologica(i: number) {
-    this.apreciacionesPsicologicas.splice(i, 1);
-    this.apreciacionesPsicologicas = [...this.apreciacionesPsicologicas];
   }
 
   eliminarAcuerdo(index: number) {
@@ -1211,6 +1150,8 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
       otroVinculo: [''],
       programa: [{ value: '', disabled: true }],
       logroAcuerdo: ['NO'],
+      rutaInternaOtraCual: [''],
+      rutaExternaOtraCual: [''],
       tipoViolencia: [''],
       subcategoriaViolencia: [''],
       tiempoOcurridoValor: [''],
@@ -1222,12 +1163,6 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
       ciudadHechos: [''],
       lugarHechos: [''],
       violenciaGenero: [''],
-      presuntoPrimerNombre: [''],
-      presuntoSegundoNombre: [''],
-      presuntoPrimerApellido: [''],
-      presuntoSegundoApellido: [''],
-      presuntoVinculoUniversidad: [''],
-      presuntoVinculoVictima: [''],
       direccionResidencia: [''],
       violenciaPsicologica: ['NO'],
       detalleViolenciaPsicologica: [''],
@@ -1243,7 +1178,6 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
       detalleViolenciaInformatica: [''],
       violenciaPrejuicio: ['NO'],
       estadosCaso: [''],
-      grupoAtencion: [''],
       detalleViolenciaPrejuicio: [''],
       observacionesTelefono: [''],
       observacionesCorreo: [''],
@@ -1411,12 +1345,6 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
       lugarHechos,
       violenciaGenero,
       direccionLugar,
-      presuntoPrimerNombre,
-      presuntoSegundoNombre,
-      presuntoPrimerApellido,
-      presuntoSegundoApellido,
-      presuntoVinculoUniversidad,
-      presuntoVinculoVictima,
       observacionesTelefono,
       observacionesCorreo
     } = formRawValue;
@@ -1521,7 +1449,9 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
           primerApellido: a.primerApellido || null,
           segundoApellido: a.segundoApellido || null,
           idVinculoUniversidad: a.idVinculoUniversidad || null,
-          idVinculoVictima: a.idVinculoVictima || null
+          cualVinculoUniversidad: a.vinculoUniversidad === 'Otro' ? a.cualVinculoUniversidad || null : null,
+          idVinculoVictima: a.idVinculoVictima || null,
+          cualVinculoVictima: a.vinculoVictima === 'Otro' ? a.cualVinculoVictima || null : null
         }));
         return {
           idCaso: this.casoId,
@@ -1553,11 +1483,6 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
           apreciaciones
         };
       case 7:
-        const rutasMapped = this.activarRutasRegistrados.map(r => ({
-          idTipoRutaActivacion: r.idTipoRutaActivacion,
-          idRutaActivacion: r.idRutaActivacion
-        })).filter(r => r.idTipoRutaActivacion !== undefined && r.idRutaActivacion !== undefined);
-
         const remisionesMapped = this.remisionesRegistrados.map(r => ({
           idTipoRemision: r.idTipoRemision,
           cual: r.cual || null,
@@ -1567,34 +1492,29 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
         return {
           idAtencion: this.atencionId || 0,
           logroAcuerdo: logroAcuerdo === true || logroAcuerdo === 'SI',
-          rutas: rutasMapped,
+          // VBG-07-02/03: forma provisional (dos grupos de checkboxes, M4),
+          // pendiente de confirmación del backend — reemplaza a `rutas`.
+          rutasInternas: this.rutasInternasSel,
+          rutaInternaOtraCual: this.esRutaInternaOtraSeleccionada() ? (formRawValue.rutaInternaOtraCual || null) : null,
+          rutasExternas: this.rutasExternasSel,
+          rutaExternaOtraCual: this.esRutaExternaOtraSeleccionada() ? (formRawValue.rutaExternaOtraCual || null) : null,
           remisiones: remisionesMapped
         };
+      // VBG-07-12: la pestaña «Medidas de protección» se retiró de la UI (ver plantilla).
+      // `medidasRegistradas`, `abrirModalMedida` y `eliminarMedida` siguen intactos; solo
+      // se retira el `case` de guardado, que ya no es alcanzable por ninguna pestaña visible.
       case 8:
-        const medidasMapped = this.medidasRegistradas.map(m => ({
-          tipoMedidaId: m.tipoMedidaId,
-          subtipoMedidaId: m.subtipoMedidaId,
-          responsableId: m.responsableId,
-          fechaRegistro: this.formatearFechaLocalDateTime(m.fechaRegistro),
-          descripcion: m.descripcion || ""
-        })).filter(m => m.tipoMedidaId !== undefined && m.tipoMedidaId !== null);
-
-        return {
-          idAtencion: this.atencionId || 0,
-          medidas: medidasMapped
-        };
-      case 9:
         return {
           idAtencion: this.atencionId || 0,
           persona: compromisosPersona,
           profesional: compromisosProfesional
         };
-      case 10:
+      case 9:
         return {
           idAtencion: this.atencionId || 0,
           seguimientos: seguimientos
         };
-      case 11:
+      case 10:
         return {
           idCaso: this.casoId,
           idEstadoCaso: this.resolverIdMaestro(formRawValue.estadosCaso, this.catalogoEstadosCaso)
@@ -1632,7 +1552,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
     return seguimientos.filter((seguimiento): seguimiento is SeguimientoAtencionRequestDto => seguimiento !== null);
   }
 
-  private async mapearSeguimientoRequest(seguimiento: any, idAtencion: number): Promise<SeguimientoAtencionRequestDto | null> {
+  private async mapearSeguimientoRequest(seguimiento: SeguimientoVbg, idAtencion: number): Promise<SeguimientoAtencionRequestDto | null> {
     const fecha = this.formatearFechaLocalDateTime(seguimiento?.fecha);
     if (!fecha) {
       return null;
@@ -1641,16 +1561,8 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
     const idTipoSeguimiento = Number(seguimiento?.idtiposeguimiento);
     const idAccion = Number(seguimiento?.idaccion);
     const idActividad = Number(seguimiento?.idactividad);
-    const idEstadoSeguimiento = Number(seguimiento?.idestadoseguimiento);
-    const idMotivoEstadoSeguimiento = Number(seguimiento?.idmotivoestado);
 
-    if (
-      !Number.isFinite(idTipoSeguimiento)
-      || !Number.isFinite(idAccion)
-      || !Number.isFinite(idActividad)
-      || !Number.isFinite(idEstadoSeguimiento)
-      || !Number.isFinite(idMotivoEstadoSeguimiento)
-    ) {
+    if (!Number.isFinite(idTipoSeguimiento) || !Number.isFinite(idAccion) || !Number.isFinite(idActividad)) {
       return null;
     }
 
@@ -1664,8 +1576,9 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
       idAccion,
       idActividad,
       descripcion: String(seguimiento?.descripcion ?? ''),
-      idEstadoSeguimiento,
-      idMotivoEstadoSeguimiento,
+      especialidad: seguimiento?.especialidad,
+      estado: seguimiento?.estado,
+      motivoCierre: seguimiento?.motivoCierre ?? null,
       archivoNombre: archivo?.name,
       archivoTipo: archivo?.type,
       archivoContenido

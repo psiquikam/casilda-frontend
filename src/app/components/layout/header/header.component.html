@@ -59,13 +59,13 @@
         </div>
 
         @for (mock of mockUsers; track mock.id) {
-          <button mat-menu-item type="button" (click)="cambiarRolMock(mock.roles[0])"
-            [class.role-item--active]="auth.hasRole(mock.roles[0])">
-            <mat-icon aria-hidden="true" [class.icon-selected]="auth.hasRole(mock.roles[0])">
-              {{ auth.hasRole(mock.roles[0]) ? 'radio_button_checked' : 'radio_button_unchecked' }}
+          <button mat-menu-item type="button" (click)="cambiarRolMock(mock)"
+            [class.role-item--active]="esCuentaMockActiva(mock)">
+            <mat-icon aria-hidden="true" [class.icon-selected]="esCuentaMockActiva(mock)">
+              {{ esCuentaMockActiva(mock) ? 'radio_button_checked' : 'radio_button_unchecked' }}
             </mat-icon>
-            <span [class.text-selected]="auth.hasRole(mock.roles[0])">
-              {{ mock.rol }} — <small>{{ mock.nombre.split(' ')[0] }}</small>
+            <span [class.text-selected]="esCuentaMockActiva(mock)">
+              {{ mock.especialidad ? mock.rol + ' · ' + mock.especialidad : mock.rol }} — <small>{{ mock.nombre.split(' ')[0] }}</small>
             </span>
           </button>
         }

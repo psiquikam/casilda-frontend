@@ -74,7 +74,7 @@ const INDICADORES_POR_ROL: Record<string, readonly IndicadorDto[]> = {
       id: 'casos-activos',
       etiqueta: 'Casos activos',
       valor: TOTAL_CASOS,
-      definicion: 'Casos con al menos una actuación registrada y sin cierre formal.',
+      definicion: 'Casos con al menos una actuación registrada y sin cierre formal. Solo cuenta eventos con VBG = Sí (P-VBG-03).',
       periodo: 'Acumulado institucional',
       icono: 'folder_shared',
       ruta: '/consulta'
@@ -101,7 +101,7 @@ const INDICADORES_POR_ROL: Record<string, readonly IndicadorDto[]> = {
       id: 'en-recepcion',
       etiqueta: 'En recepción',
       valor: 48,
-      definicion: 'Casos pendientes de valoración inicial.',
+      definicion: 'Casos pendientes de valoración inicial. Solo cuenta eventos con VBG = Sí (P-VBG-03).',
       periodo: 'A la fecha de corte',
       denominador: { valor: TOTAL_CASOS, etiqueta: 'del total de casos activos' },
       icono: 'pending_actions',
@@ -131,7 +131,7 @@ const INDICADORES_POR_ROL: Record<string, readonly IndicadorDto[]> = {
       id: 'casos-equipo',
       etiqueta: 'Casos del equipo',
       valor: TOTAL_CASOS,
-      definicion: 'Casos activos a cargo del equipo de atención.',
+      definicion: 'Casos activos a cargo del equipo de atención. Solo cuenta eventos con VBG = Sí (P-VBG-03).',
       periodo: 'Acumulado institucional',
       icono: 'groups',
       ruta: '/consulta'
@@ -169,7 +169,7 @@ const INDICADORES_POR_ROL: Record<string, readonly IndicadorDto[]> = {
       id: 'compromisos-7-dias',
       etiqueta: 'Compromisos a 7 días',
       valor: 5,
-      definicion: 'Compromisos con fecha de cumplimiento dentro de los próximos 7 días.',
+      definicion: 'Compromisos con fecha de cumplimiento dentro de los próximos 7 días, de la persona y de la dupla/profesional (P-VBG-01).',
       periodo: 'Próximos 7 días',
       icono: 'task_alt',
       ruta: '/mis-asignaciones'

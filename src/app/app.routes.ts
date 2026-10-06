@@ -88,7 +88,7 @@ export const routes: Routes = [
   },
   {
     path: 'solicitud-acompanamiento',
-    title: 'Solicitud de acompañamiento',
+    title: 'Nueva solicitud',
     canActivate: [roleGuard],
     data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR', 'USUARIO'] },
     loadComponent: () => import('./components/formulario-acompanamiento/formulario-acompanamiento.component').then((m) => m.FormularioAcompanamientoComponent)
@@ -145,7 +145,7 @@ export const routes: Routes = [
   },
   {
     path: 'cita',
-    title: 'Agenda de citas',
+    title: 'Citas y agendamiento',
     canActivate: [roleGuard],
     data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR'] },
     loadComponent: () => import('./components/cita/cita.component').then((m) => m.CitaComponent)
