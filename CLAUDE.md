@@ -3,8 +3,9 @@
 > Archivo vivo. Se actualiza al cerrar cada fase de trabajo para que cualquier
 > sesión posterior (humana o asistida) retome sin repetir el análisis.
 >
-> **Última actualización:** 5 de octubre de 2026 (estandarización del módulo Equipo de
-> Atención contra la matriz VBG, fases M1 a M5, y corrección de navegación)
+> **Última actualización:** 5 de octubre de 2026 (incorporación al repositorio de
+> `casilda-diseno-v1.md` y `AGENTS.md`, que cierra el pendiente P-01; antes, estandarización
+> del módulo Equipo de Atención contra la matriz VBG, fases M1 a M5, y corrección de navegación)
 
 ---
 
@@ -18,15 +19,15 @@ Documentos de referencia, en orden de precedencia para decisiones de diseño:
 
 | Documento | Para qué sirve |
 |-----------|----------------|
-| `casilda-diseno-v1.md` | **Fuente de verdad de UI/UX**: marca UdeA, tokens, accesibilidad y hoja de ruta por fases. |
-| `ANALISIS_ARQUITECTURA_Y_MIGRACION.md` | Arquitectura, rutas, servicios y deuda técnica detectada. |
-| `AGENTS.md` | Prompt/rol de la migración Angular 17 → 21 (ya completada). |
-| `.agents/skills/angular_frontend_guidelines/SKILL.md` | Convenciones obligatorias de código Angular del equipo. |
-| `.agents/skills/accessibility/SKILL.md` | Criterios WCAG 2.2 aplicados. |
+| `.agents/supports/casilda-diseno-v1.md` | **Fuente de verdad de UI/UX** (v1): marca UdeA, tokens, Salida Rápida (§4), briefing de landing/login (§5) y hoja de ruta por fases (§6). **Donde divirja del estado actual prevalecen §3 de este archivo y `src/styles/_tokens.scss`** (ver la entrada «Incorporación de los documentos de contexto» en §5). |
+| `ANALISIS_ARQUITECTURA_Y_MIGRACION.md` | Arquitectura, rutas, servicios y deuda técnica detectada. ⚠️ **No está en el repositorio ni en el historial de Git** (ver pendiente 11). |
+| `AGENTS.md` | Prompt/rol de la migración Angular 17 → 21 (ya completada). Se conserva como trazabilidad de cómo se condujo la migración; cita el `ANALISIS_…` anterior. |
+| `.agents/skills/angular_frontend_guidelines/SKILL.md` | Convenciones obligatorias de código Angular del equipo. Único skill versionado. |
+| `.agents/skills/accessibility/SKILL.md` | Criterios WCAG 2.2 aplicados. ⚠️ **Solo local**: la regla `skills/` de `.gitignore` lo excluye (ver pendiente 11). |
 | `docs/evidencias/accesibilidad/plan_accesibilidad.md` | Diagnóstico, hallazgos H-01…H-18, plan por fases hacia WCAG 2.2 AA y **estado de cada tarea** (§4, §6). |
 | `docs/evidencias/accesibilidad/01-fases-1-5-correcciones.md` | Cómo se implementó cada corrección de las fases 1–5 (evidencia de la entrega del 2026-09-11). |
-| `.claude/skills/casilda-ux/SKILL.md` | Orquesta las fuentes anteriores para toda tarea de UI/UX; incluye flujo de verificación y formato de reporte. |
-| `docs/contratos/MATRIZ_MODULO_ATENCION_VBG.md` | Campos, etiquetas y validaciones del módulo Equipo de Atención. Prevalece en contenido de formularios; en lo visual prevalecen §3 y `casilda-diseno-v1.md`. |
+| `.claude/skills/casilda-ux/SKILL.md` | Orquesta las fuentes anteriores para toda tarea de UI/UX; incluye flujo de verificación y formato de reporte. ⚠️ **Solo local**: misma regla `skills/` de `.gitignore` (ver pendiente 11). |
+| `docs/contratos/MATRIZ_MODULO_ATENCION_VBG.md` | Campos, etiquetas y validaciones del módulo Equipo de Atención. Prevalece en contenido de formularios; en lo visual prevalecen §3 y `.agents/supports/casilda-diseno-v1.md`. |
 | `docs/contratos/DASHBOARDS_POR_ROL.md` | Contenido del panel de inicio autenticado por rol y enfoque informado en trauma (no cubre la portada pública). |
 | `docs/contratos/GLOSARIO_VBG.md` | Glosario de términos del módulo Equipo de Atención, con la columna del rol Usuario. |
 | `docs/contratos/DECISIONES_PROVISIONALES_VBG.md` | 19 decisiones de contenido/comportamiento pendientes de validar con el equipo clínico/legal; permiten demostrar el módulo mientras se confirma la versión oficial. |
@@ -294,6 +295,28 @@ validar con el equipo clínico/legal).
 `SeccionSeguimientosComponent`, `esUltimaProfesionalActiva()`, `ModalPresuntoAgresorComponent`,
 `SeccionApreciacionesComponent`.
 
+### 2026-10-05 — Incorporación de los documentos de contexto (cierra P-01)
+Dos documentos que `CLAUDE.md` §1 declaraba normativos vivían solo en el disco local. Se
+versionan para que cualquier sesión posterior los tenga sin depender de un respaldo personal.
+
+- **`.agents/supports/casilda-diseno-v1.md` — cierra el pendiente P-01.** Es el documento real
+  del que se derivó el sistema de diseño: **55 de sus 60 tokens CSS son idénticos** a
+  `src/styles/_tokens.scss`, y su `SITIO_NEUTRAL` (`https://www.google.com`) es el valor de
+  `environment.quickExitUrl` en ambos entornos. La ruta elegida no es nueva: ya la citaba
+  `docs/evidencias/accesibilidad/plan_accesibilidad.md` §791.
+  - **Las 5 divergencias son evoluciones deliberadas, no errores del repositorio:**
+    `--font-serif` y `--font-sans` (el documento dice `Times New Roman` + `Lato`; el proyecto
+    usa `Lora` + `Inter` por decisión del 2026-09-03, conservando los del documento como
+    respaldo), `--color-danger` y `--color-info` (renombrado del prefijo `--udea-red-032` /
+    `--udea-blue-633` a `--udea-pantone-*`) y `--focus-ring` (indirección a
+    `--focus-ring-color`). Por eso §3 y `_tokens.scss` **prevalecen** sobre el documento.
+  - **Lo que el documento no define:** tarjeta de indicador (DSH-11-05), zonas de panel ni
+    paleta `--color-data-*` (P-03). Su hoja de ruta §6 tiene 4 fases y no contempla el panel
+    de inicio, de modo que la arquitectura Z1–Z6 del 2026-10-04 no lo contradice.
+- **`AGENTS.md`** se versiona como trazabilidad del prompt con que se condujo la migración
+  Angular 17 → 21 (ya completada). No tiene efecto sobre el código.
+- Ninguno de los dos contiene credenciales, datos personales ni teléfonos de relleno.
+
 ### Pendiente
 1. Accesibilidad — tareas abiertas priorizadas en
    `docs/evidencias/accesibilidad/plan_accesibilidad.md` §6: fases 0.1/0.2/0.4 (axe,
@@ -321,11 +344,13 @@ validar con el equipo clínico/legal).
    (detalle en `docs/evidencias/dashboards/00-diagnostico-y-plan.md` §7):
    - **Validar con el equipo de atención cada texto de la vista del rol Usuario** antes de
      desplegarla. Es requisito del skill `casilda-ux` y del §5 del contrato.
-   - **P-01** `casilda-diseno-v1.md` no existe en el repositorio ni en el historial de Git,
-     pese a ser fuente de verdad citada aquí, en el skill, en el contrato y en dos archivos
-     de `src/`. Decidir si se incorpora o si `CLAUDE.md` §3 + `_tokens.scss` lo reemplazan.
+   - ~~**P-01**~~ **Resuelto el 2026-10-05:** el documento se incorporó al repositorio en
+     `.agents/supports/casilda-diseno-v1.md` (ruta que ya citaba
+     `docs/evidencias/accesibilidad/plan_accesibilidad.md` §791). **No define tarjeta de
+     indicador, zonas de panel ni paleta de gráficos**, de modo que DSH-11-05 y P-03 siguen
+     abiertos por mérito propio, pero ya no bloqueados por un archivo ausente.
    - **P-03** Paleta `--color-data-*` para series de datos (propuesta con contrastes
-     calculados en el §5 del diagnóstico).
+     calculados en el §5 del diagnóstico). El documento v1 **no la cubre**.
    - **P-05** Categorías oficiales de identidad de género.
    - **P-06** Umbral de supresión de celdas pequeñas; hoy **5**, el valor que propone el
      propio contrato (`UMBRAL_SUPRESION` en `core/vigilancia/supresion-celdas.ts`).
@@ -343,7 +368,21 @@ validar con el equipo clínico/legal).
 10. **Confirmar con Backend** si `VinculoUdeAEnum` (14 códigos) se homologa al árbol de 10
     valores de `VINCULO_UNIVERSIDAD` en la matriz, o si el frontend debe mapearlos
     (hallazgo de M1, mismo tipo de pregunta que P-VBG-06 pero para vínculos).
-11. **Navegación:** decidir si `sidebar`/`horizontal-nav` deben terminar consumiendo
+11. **Documentos de contexto que siguen fuera del repositorio** (hallazgo del 2026-10-05, al
+    incorporar `casilda-diseno-v1.md`):
+    - `ANALISIS_ARQUITECTURA_Y_MIGRACION.md` es fuente de referencia nº 2 en §1 y la fuente de
+      verdad que exige `AGENTS.md`, pero **no está en el repositorio ni en el historial de
+      Git**. Recuperarlo del respaldo de quien condujo la migración o retirar la referencia.
+    - La regla `skills/` de `.gitignore:30` excluye **cualquier** carpeta llamada `skills` en
+      cualquier nivel, así que `.agents/skills/**` y `.claude/skills/casilda-ux/SKILL.md`
+      nunca se versionan, pese a ser normativos en §1.
+      `.agents/skills/angular_frontend_guidelines/SKILL.md` solo sobrevive porque se
+      commiteó antes de la regla. Decidir si los skills propios del equipo
+      (`casilda-ux`, `accessibility`, `angular_frontend_guidelines`) se exceptúan —por
+      ejemplo con `!.agents/skills/` y `!.claude/skills/`— mientras los skills de terceros
+      (con su `LICENSE.txt`) siguen ignorados. **No se tocó `.gitignore` en este cambio**
+      porque versionar ~70 archivos de skills de terceros es una decisión del equipo.
+12. **Navegación:** decidir si `sidebar`/`horizontal-nav` deben terminar consumiendo
     `CATALOGO_MODULOS` (hallazgo de M5). Esta fase solo corrigió la entrada duplicada de
     «Auditoría de Casos» y dos títulos de ruta; no tocó la arquitectura de fondo porque
     ambos componentes tienen reglas de visibilidad por rol distintas entre sí y secciones
