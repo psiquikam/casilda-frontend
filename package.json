@@ -10,6 +10,8 @@
     "test:ci": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",
     "audit:prod": "npm audit --omit=dev --audit-level=high",
     "check": "npm run lint && npm run a11y:audit && npm run test:ci && npm run build",
+    "deploy:vercel:preview": "npm run build && node tools/deploy-vercel.mjs",
+    "deploy:vercel": "npm run build && node tools/deploy-vercel.mjs --prod",
     "lint": "eslint . --max-warnings 299",
     "lint:fix": "eslint . --fix",
     "a11y:audit": "node tools/auditar-accesibilidad.mjs --strict",
