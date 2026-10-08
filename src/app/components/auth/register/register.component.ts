@@ -43,8 +43,10 @@ export class RegisterComponent {
 
   constructor() {
     this.step1Form = this.fb.group({
-      nombre: ['', [Validators.required, Validators.minLength(2)]],
-      apellidos: ['', [Validators.required, Validators.minLength(2)]],
+      primerNombre: ['', [Validators.required, Validators.minLength(2)]],
+      segundoNombre: [''],
+      primerApellido: ['', [Validators.required, Validators.minLength(2)]],
+      segundoApellido: [''],
       tipoDocumento: ['', [Validators.required]],
       documento: ['', [Validators.required, Validators.pattern('^[0-9A-Za-z]+$')]]
     });

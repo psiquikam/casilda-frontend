@@ -214,7 +214,6 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
     { tab: 'Documentación', label: 'Tiempo ocurrido (valor)', control: 'tiempoOcurridoValor' },
     { tab: 'Documentación', label: 'Tiempo ocurrido (unidad)', control: 'tiempoOcurridoUnidad' },
     { tab: 'Documentación', label: '¿De qué forma?', control: 'queForma' },
-    { tab: 'Documentación', label: 'Ámbito de Ocurrencia', control: 'ambitoOcurrencia' },
     { tab: 'Documentación', label: 'Lugar de los hechos', control: 'lugarHechos' },
     { tab: 'Documentación', label: 'Violencia de género', control: 'violenciaGenero' },
     { tab: 'Estado del Caso', label: 'Estado del caso', control: 'estadosCaso' },
@@ -432,25 +431,22 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
 
 
   /**
-   * VBG-01-06/01-07: Ámbito y Forma de Ocurrencia pasan a obligatorios
+   * VBG-01-06/01-07: Forma de Ocurrencia pasa a obligatoria
    * cuando Violencia Basada en Género = `Sí` (§3 de la matriz); con `No`
-   * siguen visibles pero opcionales, no se ocultan.
+   * sigue visible pero opcional, no se oculta.
    */
   private configurarValidacionDocumentacionVbg(): void {
     const controlViolenciaGenero = this.casoForm.get('violenciaGenero');
-    const controlAmbito = this.casoForm.get('ambitoOcurrencia');
     const controlForma = this.casoForm.get('queForma');
 
-    if (!controlViolenciaGenero || !controlAmbito || !controlForma) {
+    if (!controlViolenciaGenero || !controlForma) {
       return;
     }
 
     const aplicarRegla = (valor: unknown) => {
       const obligatorio = valor === 'SI';
-      for (const control of [controlAmbito, controlForma]) {
-        control.setValidators(obligatorio ? [Validators.required] : null);
-        control.updateValueAndValidity({ emitEvent: false });
-      }
+      controlForma.setValidators(obligatorio ? [Validators.required] : null);
+      controlForma.updateValueAndValidity({ emitEvent: false });
     };
 
     aplicarRegla(controlViolenciaGenero.value);
@@ -461,13 +457,6 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
   esRelacionMisionalSeleccionada(): boolean {
     const misional = this.relacionMisionalNivel1.find((c) => c.codigo === 'misional');
     return misional ? this.relacionMisionalNivel1Sel.includes(misional.id) : false;
-  }
-
-  /** Pendiente 4, decisión provisional: "¿Cuál?" es opcional, no condiciona el guardado. */
-  esAmbitoOtro(): boolean {
-    const otro = this.catalogoAmbitoOcurrencia.find((c) => c.codigo === 'otro-ambito');
-    const valor = this.casoForm.get('ambitoOcurrencia')?.value;
-    return otro ? valor === otro.nombre : false;
   }
 
   /** VBG-07-02, pendiente 4: "¿Cuál?" opcional al marcar "Otras" en rutas internas. */
@@ -1157,8 +1146,6 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
       tiempoOcurridoValor: [''],
       tiempoOcurridoUnidad: ['meses'],
       queForma: [''],
-      ambitoOcurrencia: [''],
-      ambitoOcurrenciaOtro: [''],
       departamentoHechos: [''],
       ciudadHechos: [''],
       lugarHechos: [''],
@@ -1340,7 +1327,6 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
       tiempoOcurridoValor,
       tiempoOcurridoUnidad,
       queForma,
-      ambitoOcurrencia,
       ciudadHechos,
       lugarHechos,
       violenciaGenero,
@@ -1421,7 +1407,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
           hacecuantooccurrio: tiempoOcurridoValor ? Number(tiempoOcurridoValor) : 0,
           idtiempoocurridounidad: this.resolverIdMaestro(tiempoOcurridoUnidad, this.catalogoTiemposOcurridoUnidad),
           idformaocurrencia: this.resolverIdMaestro(queForma, this.catalogoFormasOcurrencia),
-          idambitoocurrencia: ambitoOcurrencia ? this.resolverIdMaestro(ambitoOcurrencia, this.catalogoAmbitoOcurrencia) : null,
+          idambitoocurrencia: null,
           idciudadhechos: ciudadHechos ? Number(ciudadHechos) : null,
           idlugarocurrencia: this.resolverIdMaestro(lugarHechos, this.catalogoLugaresOcurrencia),
           violenciabasadagenero: violenciaGenero === true || violenciaGenero === 'SI',

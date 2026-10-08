@@ -23,19 +23,29 @@
         <div class="victim-form-card">
           <div class="grid-form">
             <mat-form-field appearance="outline">
-              <mat-label>Nombre *</mat-label>
-              <input matInput formControlName="nombre" autocomplete="given-name">
-              @if (controlInvalido(step1Form, 'nombre')) {
-                <mat-error>Por favor indícanos tu nombre</mat-error>
+              <mat-label>Primer nombre *</mat-label>
+              <input matInput formControlName="primerNombre" autocomplete="given-name">
+              @if (controlInvalido(step1Form, 'primerNombre')) {
+                <mat-error>Por favor indícanos tu primer nombre</mat-error>
               }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Segundo nombre</mat-label>
+              <input matInput formControlName="segundoNombre" autocomplete="additional-name">
             </mat-form-field>
             
             <mat-form-field appearance="outline">
-              <mat-label>Apellidos *</mat-label>
-              <input matInput formControlName="apellidos" autocomplete="family-name">
-              @if (controlInvalido(step1Form, 'apellidos')) {
-                <mat-error>Por favor indícanos tus apellidos</mat-error>
+              <mat-label>Primer apellido *</mat-label>
+              <input matInput formControlName="primerApellido" autocomplete="family-name">
+              @if (controlInvalido(step1Form, 'primerApellido')) {
+                <mat-error>Por favor indícanos tu primer apellido</mat-error>
               }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Segundo apellido</mat-label>
+              <input matInput formControlName="segundoApellido" autocomplete="family-name">
             </mat-form-field>
 
             <mat-form-field appearance="outline">

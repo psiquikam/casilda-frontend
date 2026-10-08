@@ -28,4 +28,22 @@ describe('RegistroAtencionComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('debe inicializar los controles queForma y ambitoOcurrencia en atencionForm', () => {
+    expect(component.atencionForm.contains('queForma')).toBeTrue();
+    expect(component.atencionForm.contains('ambitoOcurrencia')).toBeTrue();
+    expect(component.atencionForm.contains('ambitoOcurrenciaOtro')).toBeTrue();
+  });
+
+  it('esAmbitoOtro() debe devolver true cuando se selecciona Otro o el código otro-ambito', () => {
+    component.catalogoAmbitoOcurrencia = [
+      { id: 1, codigo: 'laboral', nombre: 'Laboral' },
+      { id: 9, codigo: 'otro-ambito', nombre: 'Otro' }
+    ];
+    component.atencionForm.get('ambitoOcurrencia')?.setValue('Laboral');
+    expect(component.esAmbitoOtro()).toBeFalse();
+
+    component.atencionForm.get('ambitoOcurrencia')?.setValue('Otro');
+    expect(component.esAmbitoOtro()).toBeTrue();
+  });
 });

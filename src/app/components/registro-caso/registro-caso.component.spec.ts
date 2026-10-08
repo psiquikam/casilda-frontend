@@ -64,36 +64,22 @@ describe('RegistroCasoComponent', () => {
   });
 
   describe('VBG-01: lógica condicional de "Violencia Basada en Género"', () => {
-    it('no exige Ámbito ni Forma de Ocurrencia cuando VBG = No', () => {
+    it('no exige Forma de Ocurrencia cuando VBG = No', () => {
       component.casoForm.get('violenciaGenero')?.setValue('NO');
-      expect(component.casoForm.get('ambitoOcurrencia')?.valid).toBeTrue();
       expect(component.casoForm.get('queForma')?.valid).toBeTrue();
     });
 
-    it('exige Ámbito y Forma de Ocurrencia cuando VBG = Sí', () => {
+    it('exige Forma de Ocurrencia cuando VBG = Sí', () => {
       component.casoForm.get('violenciaGenero')?.setValue('SI');
-      expect(component.casoForm.get('ambitoOcurrencia')?.invalid).toBeTrue();
       expect(component.casoForm.get('queForma')?.invalid).toBeTrue();
 
-      component.casoForm.get('ambitoOcurrencia')?.setValue('Laboral');
       component.casoForm.get('queForma')?.setValue('Presencial');
-      expect(component.casoForm.get('ambitoOcurrencia')?.valid).toBeTrue();
       expect(component.casoForm.get('queForma')?.valid).toBeTrue();
     });
 
     it('nunca exige Lugar de Ocurrencia (decisión provisional del pendiente 5)', () => {
       component.casoForm.get('violenciaGenero')?.setValue('SI');
       expect(component.casoForm.get('lugarHechos')?.valid).toBeTrue();
-    });
-  });
-
-  describe('VBG-01-06: "¿Cuál?" opcional al elegir Ámbito = Otro', () => {
-    it('solo se muestra cuando el Ámbito seleccionado es "Otro"', () => {
-      component.casoForm.get('ambitoOcurrencia')?.setValue('Laboral');
-      expect(component.esAmbitoOtro()).toBeFalse();
-
-      component.casoForm.get('ambitoOcurrencia')?.setValue('Otro');
-      expect(component.esAmbitoOtro()).toBeTrue();
     });
   });
 

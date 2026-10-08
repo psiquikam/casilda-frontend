@@ -64,8 +64,10 @@ export class FormularioQuejaComponent {
 
     this.formVictima = this.fb.group({
       identificacion: [''],
-      nombre: ['', Validators.required],
-      apellidos: ['', Validators.required],
+      primerNombre: ['', Validators.required],
+      segundoNombre: [''],
+      primerApellido: ['', Validators.required],
+      segundoApellido: [''],
       correo: ['', [Validators.email]],
       genero: ['', Validators.required],
       cargo: ['', Validators.required],
@@ -73,8 +75,10 @@ export class FormularioQuejaComponent {
 
     this.formVictimario = this.fb.group({
       identificacion: [''],
-      nombre: [''],
-      apellidos: [''],
+      primerNombre: [''],
+      segundoNombre: [''],
+      primerApellido: [''],
+      segundoApellido: [''],
       correo: ['']
     });
 
@@ -100,7 +104,7 @@ export class FormularioQuejaComponent {
   }
 
   ajustarValidaciones(perfil: string) {
-    const campos = ['nombre', 'apellidos', 'genero', 'cargo'];
+    const campos = ['primerNombre', 'primerApellido', 'genero', 'cargo'];
 
     campos.forEach(nombreCampo => {
       const control = this.formVictima.get(nombreCampo);
