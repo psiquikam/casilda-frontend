@@ -433,19 +433,7 @@
                             </mat-form-field>
                           </div>
                         }
-                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                          <mat-label>Ámbito de Ocurrencia</mat-label>
-                          <mat-select formControlName="ambitoOcurrencia">
-                            @for (c of ambitoOcurrencia; track c) { <mat-option [value]="c">{{c}}</mat-option> }
-                          </mat-select>
-                          <mat-hint>Entorno en el que ocurrió el hecho.</mat-hint>
-                        </mat-form-field>
-                        @if (esAmbitoOtro()) {
-                          <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                            <mat-label>¿Cuál? (Ámbito)</mat-label>
-                            <input matInput formControlName="ambitoOcurrenciaOtro">
-                          </mat-form-field>
-                        }
+
                         <mat-form-field appearance="outline" subscriptSizing="dynamic">
                           <mat-label>¿En qué forma ocurrió el hecho?</mat-label>
                           <mat-select formControlName="queForma">

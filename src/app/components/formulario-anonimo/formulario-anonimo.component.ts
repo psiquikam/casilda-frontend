@@ -181,18 +181,6 @@ export class FormularioAnonimoComponent {
     { id: 1, nombre: 'Discriminación por género u orientación sexual o identidad de género' }
   ];
 
-  readonly listaAmbitosOcurrencia: string[] = [
-    'Pareja / expareja',
-    'Laboral',
-    'Académico',
-    'Sindical',
-    'Político',
-    'Público',
-    'Privado',
-    'Familiar',
-    'Otro'
-  ];
-
   readonly listaFormasOcurrencia: string[] = [
     'Presencial',
     'Virtual',
@@ -318,8 +306,10 @@ export class FormularioAnonimoComponent {
       deseaDatosVictima: ['no', Validators.required],
       victima: this.fb.group({
         identificacion: ['', [Validators.pattern(this.REGEX_NUMEROS_IDENTIFICACION)]],
-        nombre: [''],
-        apellidos: ['', [Validators.pattern(this.REGEX_LETRAS)]],
+        primerNombre: [''],
+        segundoNombre: ['', [Validators.pattern(this.REGEX_LETRAS)]],
+        primerApellido: [''],
+        segundoApellido: ['', [Validators.pattern(this.REGEX_LETRAS)]],
         correo: ['', [Validators.email, Validators.pattern(this.REGEX_EMAIL)]],
         genero: [''],
         cargo: ['']
@@ -337,10 +327,17 @@ export class FormularioAnonimoComponent {
     });
 
     this.formPerfil.get('deseaDatosVictima')?.valueChanges.subscribe(val => {
-      const nombreCtrl = this.formVictima.get('nombre');
+      const primerNombreCtrl = this.formVictima.get('primerNombre');
+      const primerApellidoCtrl = this.formVictima.get('primerApellido');
       const cargoCtrl = this.formVictima.get('cargo');
       if (val === 'si') {
-        nombreCtrl?.setValidators([
+        primerNombreCtrl?.setValidators([
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(60),
+          Validators.pattern(this.REGEX_LETRAS)
+        ]);
+        primerApellidoCtrl?.setValidators([
           Validators.required,
           Validators.minLength(2),
           Validators.maxLength(60),
@@ -353,10 +350,12 @@ export class FormularioAnonimoComponent {
           this.formPerfil.get('correoContacto')?.setValue(correoVictima, { emitEvent: false });
         }
       } else {
-        nombreCtrl?.clearValidators();
+        primerNombreCtrl?.clearValidators();
+        primerApellidoCtrl?.clearValidators();
         cargoCtrl?.clearValidators();
       }
-      nombreCtrl?.updateValueAndValidity();
+      primerNombreCtrl?.updateValueAndValidity();
+      primerApellidoCtrl?.updateValueAndValidity();
       cargoCtrl?.updateValueAndValidity();
       this.formPerfil.updateValueAndValidity();
     });
@@ -394,8 +393,6 @@ export class FormularioAnonimoComponent {
       bloque: [''],
       espacio: [''],
       lugarDetalleExterno: [''],
-      ambitoOcurrencia: [''],
-      otroAmbitoOcurrencia: [''],
       formaOcurrencia: [''],
       relacionMisional: ['NO'],
       detalleMisional: [''],
@@ -431,8 +428,10 @@ export class FormularioAnonimoComponent {
 
     this.formVictimario = this.fb.group({
       identificacion: ['', [Validators.pattern(this.REGEX_NUMEROS_IDENTIFICACION)]],
-      nombre: ['', [Validators.pattern(this.REGEX_LETRAS)]],
-      apellidos: ['', [Validators.pattern(this.REGEX_LETRAS)]],
+      primerNombre: ['', [Validators.pattern(this.REGEX_LETRAS)]],
+      segundoNombre: ['', [Validators.pattern(this.REGEX_LETRAS)]],
+      primerApellido: ['', [Validators.pattern(this.REGEX_LETRAS)]],
+      segundoApellido: ['', [Validators.pattern(this.REGEX_LETRAS)]],
       vinculoUniversidad: [''],
       otroVinculoUniversidad: [''],
       vinculoVictima: [''],

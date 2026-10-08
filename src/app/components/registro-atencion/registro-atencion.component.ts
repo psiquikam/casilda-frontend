@@ -179,6 +179,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   private readonly tabFieldMap: { tab: string; label: string; control: string; condition?: () => boolean }[] = [
     { tab: 'Registro de atención', label: 'Tipo de servicio', control: 'tipoServicio' },
     { tab: 'Registro de atención', label: 'Lugar de la entrevista', control: 'lugarEntrevista' },
+    { tab: 'Registro de atención', label: 'Forma de ocurrencia', control: 'queForma' },
+    { tab: 'Registro de atención', label: 'Ámbito de ocurrencia', control: 'ambitoOcurrencia' },
     { tab: 'Datos de la persona', label: 'Tipo de documento', control: 'tipoDocumento' },
     { tab: 'Datos de la persona', label: 'Documento de Identificación', control: 'documento' },
     { tab: 'Datos de la persona', label: 'Fecha de nacimiento', control: 'fechaNacimiento' },
@@ -245,6 +247,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   campusM: string[] = [];
   unidadesAcademicasM: string[] = [];
   queForma: string[] = [];
+  ambitoOcurrencia: string[] = [];
   lugarHechos: string[] = [];
   actividadesMisionales: string[] = [];
   estadosCaso: string[] = [];
@@ -266,6 +269,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   catalogoCampus: MaestroDto[] = [];
   catalogoUnidadesAcademicas: MaestroDto[] = [];
   catalogoFormasOcurrencia: MaestroDto[] = [];
+  catalogoAmbitoOcurrencia: MaestroDto[] = [];
   catalogoLugaresOcurrencia: MaestroDto[] = [];
   catalogoActividadesMisionales: MaestroDto[] = [];
 
@@ -470,6 +474,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       campus: this.obtenerMaestro('campus'),
       unidadesAcademicas: this.obtenerMaestro('unidades-academicas'),
       formasOcurrencia: this.obtenerMaestro('formas-ocurrencia'),
+      ambitoOcurrencia: this.obtenerMaestro('ambito-ocurrencia'),
       lugaresOcurrencia: this.obtenerMaestro('lugares-ocurrencia'),
       actividadesMisionales: this.obtenerMaestro('actividades-misionales'),
       estadosCaso: this.obtenerMaestro('estados-caso'),
@@ -500,6 +505,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         this.catalogoCampus = data.campus;
         this.catalogoUnidadesAcademicas = data.unidadesAcademicas;
         this.catalogoFormasOcurrencia = data.formasOcurrencia;
+        this.catalogoAmbitoOcurrencia = data.ambitoOcurrencia;
         this.catalogoLugaresOcurrencia = data.lugaresOcurrencia;
         this.catalogoActividadesMisionales = data.actividadesMisionales;
 
@@ -523,6 +529,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         this.campusM = this.mapNombres(data.campus);
         this.unidadesAcademicasM = this.mapNombres(data.unidadesAcademicas);
         this.queForma = this.mapNombres(data.formasOcurrencia);
+        this.ambitoOcurrencia = this.mapNombres(data.ambitoOcurrencia);
         this.lugarHechos = this.mapNombres(data.lugaresOcurrencia);
         this.actividadesMisionales = this.mapNombres(data.actividadesMisionales);
         this.catalogoEstadosCaso = data.estadosCaso;
@@ -894,6 +901,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       unidadAdministrativa: caso.unidadAdministrativa || '',
       unidadAcademica: caso.unidadAcademica || '',
       campus: caso.campus || '',
+      queForma: caso.queForma || caso.formaOcurrencia || '',
+      ambitoOcurrencia: caso.ambitoOcurrencia || '',
     });
 
     if (caso?.solicitudId) {
@@ -931,6 +940,12 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
   mostrarQuienRemite(): boolean {
     return this.atencionForm.getRawValue().tipoSolicitud === 'Indirecta';
+  }
+
+  esAmbitoOtro(): boolean {
+    const otro = this.catalogoAmbitoOcurrencia.find((c) => c.codigo === 'otro-ambito');
+    const valor = this.atencionForm.get('ambitoOcurrencia')?.value;
+    return otro ? valor === otro.nombre : (valor === 'Otro');
   }
 
   esOtroVinculo(): boolean {
@@ -1115,6 +1130,9 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       tipoServicio: [''],
       quienRemite: [{ value: 'Unidad de Bienestar Universitario', disabled: true }],
       lugarEntrevista: [''],
+      queForma: [''],
+      ambitoOcurrencia: [''],
+      ambitoOcurrenciaOtro: [''],
       consentimientoArchivo: [null],
       personaAtiende: [{ value: 'Sin asignar', disabled: true }],
       tipoDocumento: [{ value: '', disabled: true }],
@@ -1143,7 +1161,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       subcategoriaViolencia: [''],
       tiempoOcurridoValor: [''],
       tiempoOcurridoUnidad: ['meses'],
-      queForma: [''],
       departamentoHechos: [''],
       ciudadHechos: [''],
       lugarHechos: [''],
@@ -1280,6 +1297,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     const {
       tipoServicio,
       lugarEntrevista,
+      queForma,
+      ambitoOcurrencia,
       regimenSalud,
       eps,
       logroAcuerdo,
@@ -1349,6 +1368,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
           idAtencion: this.atencionId,
           idTipoServicio: this.resolverIdMaestro(tipoServicio, this.catalogoTiposServicio),
           idLugarEntrevista: Number(lugarEntrevista),
+          idFormaOcurrencia: queForma ? this.resolverIdMaestro(queForma, this.catalogoFormasOcurrencia) : null,
+          idAmbitoOcurrencia: ambitoOcurrencia ? this.resolverIdMaestro(ambitoOcurrencia, this.catalogoAmbitoOcurrencia) : null,
           archivoConsentimientoNombre: consentimientoArchivo?.name,
           archivoConsentimientoTipo: consentimientoArchivo?.type,
           archivoConsentimientoContenido

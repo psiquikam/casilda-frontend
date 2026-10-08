@@ -83,26 +83,52 @@
               </div>
 
               <div class="form-field-group">
-                <label class="form-field-label" for="victima-nombre">
-                  Nombre <span class="required-star">*</span>
+                <label class="form-field-label" for="victima-primerNombre">
+                  Primer nombre <span class="required-star">*</span>
                 </label>
                 <mat-form-field appearance="outline" class="full-width">
-                  <input matInput formControlName="nombre" id="victima-nombre" autocomplete="given-name" placeholder="Ej: Juan">
-                  @if (formVictima.get('nombre')?.hasError('required')) {
-                    <mat-error>El nombre es obligatorio</mat-error>
-                  } @else if (formVictima.get('nombre')?.hasError('minlength')) {
+                  <input matInput formControlName="primerNombre" id="victima-primerNombre" autocomplete="given-name" placeholder="Ej: Juan">
+                  @if (formVictima.get('primerNombre')?.hasError('required')) {
+                    <mat-error>El primer nombre es obligatorio</mat-error>
+                  } @else if (formVictima.get('primerNombre')?.hasError('minlength')) {
                     <mat-error>Mínimo 2 caracteres</mat-error>
-                  } @else if (formVictima.get('nombre')?.hasError('pattern')) {
+                  } @else if (formVictima.get('primerNombre')?.hasError('pattern')) {
                     <mat-error>Solo debe contener letras</mat-error>
                   }
                 </mat-form-field>
               </div>
 
               <div class="form-field-group">
-                <label class="form-field-label" for="victima-apellidos">Apellidos</label>
+                <label class="form-field-label" for="victima-segundoNombre">Segundo nombre</label>
                 <mat-form-field appearance="outline" class="full-width">
-                  <input matInput formControlName="apellidos" id="victima-apellidos" autocomplete="family-name" placeholder="Ej: Pérez">
-                  @if (formVictima.get('apellidos')?.hasError('pattern')) {
+                  <input matInput formControlName="segundoNombre" id="victima-segundoNombre" autocomplete="additional-name" placeholder="Ej: Carlos">
+                  @if (formVictima.get('segundoNombre')?.hasError('pattern')) {
+                    <mat-error>Solo debe contener letras</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              <div class="form-field-group">
+                <label class="form-field-label" for="victima-primerApellido">
+                  Primer apellido <span class="required-star">*</span>
+                </label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <input matInput formControlName="primerApellido" id="victima-primerApellido" autocomplete="family-name" placeholder="Ej: Pérez">
+                  @if (formVictima.get('primerApellido')?.hasError('required')) {
+                    <mat-error>El primer apellido es obligatorio</mat-error>
+                  } @else if (formVictima.get('primerApellido')?.hasError('minlength')) {
+                    <mat-error>Mínimo 2 caracteres</mat-error>
+                  } @else if (formVictima.get('primerApellido')?.hasError('pattern')) {
+                    <mat-error>Solo debe contener letras</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              <div class="form-field-group">
+                <label class="form-field-label" for="victima-segundoApellido">Segundo apellido</label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <input matInput formControlName="segundoApellido" id="victima-segundoApellido" autocomplete="family-name" placeholder="Ej: Gómez">
+                  @if (formVictima.get('segundoApellido')?.hasError('pattern')) {
                     <mat-error>Solo debe contener letras</mat-error>
                   }
                 </mat-form-field>
@@ -316,25 +342,6 @@
                 </div>
 
                 <div class="form-field-group">
-                  <label class="form-field-label" for="relato-ambitoOcurrencia">
-                    Ámbito de Ocurrencia
-                    <button type="button"
-                            class="help-tooltip-trigger"
-                            matTooltip="Contexto o espacio de relación social, laboral, académica o comunitaria en el cual se presentaron los hechos."
-                            matTooltipClass="casilda-help-tooltip"
-                            (click)="$event.stopPropagation()"
-                            aria-label="Ayuda sobre ámbito de ocurrencia">?</button>
-                  </label>
-                  <mat-form-field appearance="outline" class="full-width">
-                    <mat-select formControlName="ambitoOcurrencia" id="relato-ambitoOcurrencia" placeholder="Seleccione el ámbito">
-                      @for (amb of listaAmbitosOcurrencia; track amb) {
-                        <mat-option [value]="amb">{{ amb }}</mat-option>
-                      }
-                    </mat-select>
-                  </mat-form-field>
-                </div>
-
-                <div class="form-field-group">
                   <label class="form-field-label" for="relato-formaOcurrencia">
                     Forma de Ocurrencia
                     <button type="button"
@@ -352,15 +359,6 @@
                     </mat-select>
                   </mat-form-field>
                 </div>
-
-                @if (formRelato.get('ambitoOcurrencia')?.value === 'Otro') {
-                  <div class="form-field-group full-width-cell">
-                    <label class="form-field-label" for="relato-otroAmbito">¿Cuál ámbito?</label>
-                    <mat-form-field appearance="outline" class="full-width">
-                      <input matInput formControlName="otroAmbitoOcurrencia" id="relato-otroAmbito" placeholder="Especifique el ámbito de ocurrencia">
-                    </mat-form-field>
-                  </div>
-                }
               </div>
             </div>
           } @else {
@@ -385,25 +383,6 @@
                 </div>
 
                 <div class="form-field-group">
-                  <label class="form-field-label" for="relato-ambitoOcurrenciaExt">
-                    Ámbito de Ocurrencia
-                    <button type="button"
-                            class="help-tooltip-trigger"
-                            matTooltip="Contexto o espacio de relación social, laboral, académica o comunitaria en el cual se presentaron los hechos."
-                            matTooltipClass="casilda-help-tooltip"
-                            (click)="$event.stopPropagation()"
-                            aria-label="Ayuda sobre ámbito de ocurrencia">?</button>
-                  </label>
-                  <mat-form-field appearance="outline" class="full-width">
-                    <mat-select formControlName="ambitoOcurrencia" id="relato-ambitoOcurrenciaExt" placeholder="Seleccione el ámbito">
-                      @for (amb of listaAmbitosOcurrencia; track amb) {
-                        <mat-option [value]="amb">{{ amb }}</mat-option>
-                      }
-                    </mat-select>
-                  </mat-form-field>
-                </div>
-
-                <div class="form-field-group">
                   <label class="form-field-label" for="relato-formaOcurrenciaExt">
                     Forma de Ocurrencia
                     <button type="button"
@@ -421,15 +400,6 @@
                     </mat-select>
                   </mat-form-field>
                 </div>
-
-                @if (formRelato.get('ambitoOcurrencia')?.value === 'Otro') {
-                  <div class="form-field-group full-width-cell">
-                    <label class="form-field-label" for="relato-otroAmbitoExt">¿Cuál ámbito?</label>
-                    <mat-form-field appearance="outline" class="full-width">
-                      <input matInput formControlName="otroAmbitoOcurrencia" id="relato-otroAmbitoExt" placeholder="Especifique el ámbito de ocurrencia">
-                    </mat-form-field>
-                  </div>
-                }
               </div>
             </div>
           }
@@ -828,20 +798,40 @@
           </div>
 
           <div class="form-field-group">
-            <label class="form-field-label" for="victimario-nombre">Nombre</label>
+            <label class="form-field-label" for="victimario-primerNombre">Primer nombre</label>
             <mat-form-field appearance="outline" class="full-width">
-              <input matInput formControlName="nombre" id="victimario-nombre" placeholder="Ej: Juan" autocomplete="off">
-              @if (formVictimario.get('nombre')?.hasError('pattern')) {
+              <input matInput formControlName="primerNombre" id="victimario-primerNombre" placeholder="Ej: Juan" autocomplete="off">
+              @if (formVictimario.get('primerNombre')?.hasError('pattern')) {
                 <mat-error>Solo debe contener letras</mat-error>
               }
             </mat-form-field>
           </div>
 
           <div class="form-field-group">
-            <label class="form-field-label" for="victimario-apellidos">Apellidos</label>
+            <label class="form-field-label" for="victimario-segundoNombre">Segundo nombre</label>
             <mat-form-field appearance="outline" class="full-width">
-              <input matInput formControlName="apellidos" id="victimario-apellidos" placeholder="Ej: Pérez" autocomplete="off">
-              @if (formVictimario.get('apellidos')?.hasError('pattern')) {
+              <input matInput formControlName="segundoNombre" id="victimario-segundoNombre" placeholder="Ej: Carlos" autocomplete="off">
+              @if (formVictimario.get('segundoNombre')?.hasError('pattern')) {
+                <mat-error>Solo debe contener letras</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-field-group">
+            <label class="form-field-label" for="victimario-primerApellido">Primer apellido</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <input matInput formControlName="primerApellido" id="victimario-primerApellido" placeholder="Ej: Pérez" autocomplete="off">
+              @if (formVictimario.get('primerApellido')?.hasError('pattern')) {
+                <mat-error>Solo debe contener letras</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-field-group">
+            <label class="form-field-label" for="victimario-segundoApellido">Segundo apellido</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <input matInput formControlName="segundoApellido" id="victimario-segundoApellido" placeholder="Ej: Gómez" autocomplete="off">
+              @if (formVictimario.get('segundoApellido')?.hasError('pattern')) {
                 <mat-error>Solo debe contener letras</mat-error>
               }
             </mat-form-field>

@@ -54,17 +54,20 @@ describe('FormularioAnonimoComponent', () => {
   it('should conditionally require both victim name and cargo (vinculo) when deseaDatosVictima is si', () => {
     component.formPerfil.get('deseaDatosVictima')?.setValue('si');
     expect(component.formPerfil.valid).toBeFalse();
-    expect(component.formVictima.get('nombre')?.hasError('required')).toBeTrue();
+    expect(component.formVictima.get('primerNombre')?.hasError('required')).toBeTrue();
+    expect(component.formVictima.get('primerApellido')?.hasError('required')).toBeTrue();
     expect(component.formVictima.get('cargo')?.hasError('required')).toBeTrue();
 
-    component.formVictima.get('nombre')?.setValue('Persona Afectada');
+    component.formVictima.get('primerNombre')?.setValue('Persona');
+    component.formVictima.get('primerApellido')?.setValue('Afectada');
     expect(component.formPerfil.valid).toBeFalse();
 
     component.formVictima.get('cargo')?.setValue('Estudiante');
     expect(component.formPerfil.valid).toBeTrue();
 
     component.formPerfil.get('deseaDatosVictima')?.setValue('no');
-    expect(component.formVictima.get('nombre')?.hasError('required')).toBeFalse();
+    expect(component.formVictima.get('primerNombre')?.hasError('required')).toBeFalse();
+    expect(component.formVictima.get('primerApellido')?.hasError('required')).toBeFalse();
     expect(component.formVictima.get('cargo')?.hasError('required')).toBeFalse();
     expect(component.formPerfil.valid).toBeTrue();
   });
@@ -93,7 +96,8 @@ describe('FormularioAnonimoComponent', () => {
     component.formPerfil.get('perfil')?.setValue('anonimo');
     component.formPerfil.get('deseaDatosVictima')?.setValue('si');
     component.formVictima.patchValue({
-      nombre: 'Víctima Afectada',
+      primerNombre: 'Víctima',
+      primerApellido: 'Afectada',
       cargo: 'Estudiante',
       correo: 'victima@udea.edu.co'
     });
@@ -110,7 +114,8 @@ describe('FormularioAnonimoComponent', () => {
     component.formPerfil.get('perfil')?.setValue('anonimo');
     component.formPerfil.get('deseaDatosVictima')?.setValue('si');
     component.formVictima.patchValue({
-      nombre: 'Víctima Afectada',
+      primerNombre: 'Víctima',
+      primerApellido: 'Afectada',
       cargo: 'Estudiante',
       correo: 'sdssdsd'
     });
@@ -263,15 +268,14 @@ describe('FormularioAnonimoComponent', () => {
     expect(component.listaPrejuicio.length).toBe(1);
     expect(component.listaPrejuicio[0].nombre).toBe('Discriminación por género u orientación sexual o identidad de género');
 
-    expect(component.listaAmbitosOcurrencia).toContain('Pareja / expareja');
     expect(component.listaFormasOcurrencia).toContain('Presencial');
     expect(component.listaDetalleMisional).toContain('Misional Docencia');
     expect(component.listaVinculosVictima).toContain('Pareja / Expareja');
   });
 
-  it('should contain new controls for ambito, forma, misionalidad and victimario vinculos', () => {
-    expect(component.formRelato.contains('ambitoOcurrencia')).toBeTrue();
-    expect(component.formRelato.contains('otroAmbitoOcurrencia')).toBeTrue();
+  it('should contain new controls for forma, misionalidad and victimario vinculos', () => {
+    expect(component.formRelato.contains('ambitoOcurrencia')).toBeFalse();
+    expect(component.formRelato.contains('otroAmbitoOcurrencia')).toBeFalse();
     expect(component.formRelato.contains('formaOcurrencia')).toBeTrue();
     expect(component.formRelato.contains('relacionMisional')).toBeTrue();
     expect(component.formRelato.contains('detalleMisional')).toBeTrue();
