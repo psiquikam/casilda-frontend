@@ -74,7 +74,7 @@ export class LoginComponent {
     });
     this.loading = true;
     this.errorMessage = '';
-    this.auth.loginAsMock(mockUser.roles[0]).subscribe({
+    this.auth.loginAsMock(mockUser.email).subscribe({
       next: () => {
         this.loading = false;
         void this.router.navigate([this.auth.getDefaultRoute()]);

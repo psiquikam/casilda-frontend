@@ -1,0 +1,252 @@
+/* Vista del rol Usuario (§5.5 del contrato).
+   Mucho espacio en blanco, una sola columna en móvil y máximo dos en
+   escritorio. Superficies neutras y claras; el verde institucional reservado a
+   la acción principal. **Ninguna superficie roja**: el rojo es solo de la
+   salida rápida. Solo tokens: ningún valor literal. */
+
+.mi-espacio {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6) var(--space-16);
+  box-sizing: border-box;
+
+  &__saludo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  /* `h1`: serif por `_base.scss`. */
+  &__titulo {
+    font-size: var(--font-size-2xl);
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+
+  /* Texto corrido a 16 px, nunca menos, con interlineado amplio (§5.5). */
+  &__intro {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+}
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+
+  /* `h2`: serif por `_base.scss`. */
+  &__titulo {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+
+  &__destacado {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-md);
+    font-weight: 600;
+    line-height: var(--line-height-base);
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+
+  &__texto {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+
+  &__pie {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    margin: 0;
+
+    mat-icon {
+      font-size: 18px !important;
+      width: 18px !important;
+      height: 18px !important;
+      flex-shrink: 0;
+    }
+  }
+
+  &__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+  }
+
+  /* Apoyo y privacidad: superficies serenas, nunca de alarma (DSH-10-05). */
+  &--apoyo {
+    background-color: var(--color-bg-success-light);
+    border-color: var(--color-primary-border);
+  }
+
+  &--privacidad {
+    background-color: var(--color-bg-main);
+  }
+
+  &--cargando {
+    gap: var(--space-4);
+  }
+}
+
+.barra-carga {
+  height: 16px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-subtle);
+  animation: respirar 1.6s ease-in-out infinite;
+
+  &--corta { width: 55%; }
+}
+
+/* Acción principal: una sola por pantalla, en verde institucional. */
+.boton-principal,
+.boton-suave {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch-target-min);
+  padding: var(--space-3) var(--space-6);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  line-height: var(--line-height-tight);
+  text-align: center;
+  text-decoration: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+}
+
+.boton-principal {
+  background-color: var(--color-primary);
+  color: var(--color-text-on-primary);
+  border: 2px solid var(--color-primary);
+
+  &:hover { background-color: var(--color-primary-hover); }
+}
+
+.boton-suave {
+  background-color: var(--color-bg-surface);
+  color: var(--color-secondary);
+  border: 2px solid var(--color-secondary);
+
+  &:hover {
+    background-color: var(--color-secondary);
+    color: var(--color-text-on-primary);
+  }
+}
+
+/* Acuerdos: lista de apoyo, no de tareas. Sin contadores ni porcentajes. */
+.acuerdos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  &__item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  &__marca {
+    color: var(--color-primary);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  &__texto {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-text-secondary);
+  }
+
+  &__fecha {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+  }
+}
+
+.lineas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  &__enlace {
+    align-self: flex-start;
+    min-height: var(--touch-target-min);
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--color-secondary);
+    text-decoration: underline;
+
+    &:hover { color: var(--color-secondary-hover); }
+  }
+
+  &__nota {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+  }
+}
+
+kbd {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  padding: 2px 6px;
+  background-color: var(--color-bg-subtle);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+}
+
+/* Animación mínima y respetuosa de `prefers-reduced-motion`, que `_base.scss`
+   ya neutraliza globalmente (DSH-10-17). */
+@keyframes respirar {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@media (max-width: 600px) {
+  .mi-espacio {
+    padding: var(--space-6) var(--space-4) var(--space-12);
+    gap: var(--space-4);
+  }
+
+  .tarjeta { padding: var(--space-5); }
+}

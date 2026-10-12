@@ -1,0 +1,46 @@
+<section class="zona">
+  <div class="zona__encabezado">
+    <div class="zona__titulo-bloque">
+      <h2 class="zona__titulo">
+        @if (icono()) {
+          <mat-icon class="zona__icono" aria-hidden="true">{{ icono() }}</mat-icon>
+        }
+        <span>{{ titulo() }}</span>
+      </h2>
+      @if (descripcion()) {
+        <p class="zona__descripcion">{{ descripcion() }}</p>
+      }
+    </div>
+    @if (accionTexto() && accionRuta() && !cargando() && !error()) {
+      <a class="zona__accion" [href]="accionRuta()">{{ accionTexto() }}</a>
+    }
+  </div>
+
+  @if (cargando()) {
+    <!-- Esqueleto: ocupa el sitio que tendrá el contenido, para que la zona no
+         salte al cargar. `aria-busy` lo anuncia sin leer las barras. -->
+    <div class="zona__esqueleto" role="status" aria-busy="true">
+      <span class="visually-hidden">Cargando {{ titulo() }}…</span>
+      <span class="zona__barra"></span>
+      <span class="zona__barra zona__barra--corta"></span>
+      <span class="zona__barra"></span>
+    </div>
+  } @else if (error()) {
+    <div class="casilda-alerta casilda-alerta--peligro zona__error" role="alert">
+      <mat-icon aria-hidden="true">error_outline</mat-icon>
+      <div>
+        <p class="zona__error-texto">No pudimos cargar esta información.</p>
+        <button type="button" class="zona__reintentar" (click)="reintentar.emit()">
+          Intentar de nuevo
+        </button>
+      </div>
+    </div>
+  } @else if (vacio()) {
+    <div class="zona__vacio">
+      <mat-icon class="zona__vacio-icono" aria-hidden="true">check_circle_outline</mat-icon>
+      <p>{{ mensajeVacio() }}</p>
+    </div>
+  } @else {
+    <ng-content />
+  }
+</section>

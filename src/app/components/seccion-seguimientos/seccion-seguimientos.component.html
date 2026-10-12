@@ -1,0 +1,74 @@
+@for (esp of especialidades; track esp.id) {
+  <div class="seguimiento-grupo">
+    <div class="seguimiento-grupo__header">
+      <div class="seguimiento-grupo__titulo">
+        <mat-icon aria-hidden="true">assignment_turned_in</mat-icon>
+        <span>{{ esp.nombre }}</span>
+        @if (!puedeGestionar(esp.nombre)) {
+          <span class="seguimiento-grupo__solo-lectura">Solo lectura</span>
+        }
+      </div>
+      @if (puedeGestionar(esp.nombre)) {
+        <button mat-stroked-button type="button" (click)="agregar(esp.nombre)">
+          <mat-icon aria-hidden="true">add_circle</mat-icon>
+          Agregar seguimiento
+        </button>
+      }
+    </div>
+
+    @if (porEspecialidad(esp.nombre).length === 0) {
+      <p class="seguimiento-grupo__vacio">Sin seguimientos registrados en {{ esp.nombre }}.</p>
+    } @else {
+      <ul class="seguimiento-lista">
+        @for (s of porEspecialidad(esp.nombre); track s) {
+          <li class="seguimiento-item" [class.seguimiento-item--cerrado]="s.estado === 'Cerrado'">
+            <div class="seguimiento-item__cabecera">
+              <span class="seguimiento-item__fecha">{{ s.fecha | date: 'dd/MM/yyyy' }}</span>
+              <span class="seguimiento-item__estado" [class.seguimiento-item__estado--cerrado]="s.estado === 'Cerrado'">
+                <mat-icon aria-hidden="true">{{ s.estado === 'Cerrado' ? 'lock' : 'lock_open' }}</mat-icon>
+                {{ s.estado }}
+              </span>
+            </div>
+            <p class="seguimiento-item__accion"><strong>{{ s.accion }}</strong> — {{ s.actividad }}</p>
+            <p class="seguimiento-item__descripcion">{{ s.descripcion }}</p>
+            @if (s.estado === 'Cerrado' && s.motivoCierre) {
+              <p class="seguimiento-item__motivo"><strong>Motivo de cierre:</strong> {{ s.motivoCierre }}</p>
+            }
+
+            @if (puedeGestionar(esp.nombre)) {
+              <div class="seguimiento-item__acciones">
+                @if (s.estado === 'Abierto') {
+                  @if (indiceGlobal(s) === cerrandoIndice) {
+                    <div class="seguimiento-item__cierre">
+                      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="seguimiento-item__cierre-campo">
+                        <mat-label>Motivo de cierre</mat-label>
+                        <textarea matInput rows="2" [(ngModel)]="motivoCierreTexto"
+                          [attr.aria-label]="'Motivo de cierre del seguimiento de ' + esp.nombre"></textarea>
+                      </mat-form-field>
+                      <div class="seguimiento-item__cierre-botones">
+                        <button mat-button type="button" (click)="cancelarCierre()">Cancelar</button>
+                        <button mat-flat-button color="primary" type="button"
+                          [disabled]="!motivoCierreTexto.trim()" (click)="confirmarCierre(s)">
+                          Confirmar cierre
+                        </button>
+                      </div>
+                    </div>
+                  } @else {
+                    <button mat-button type="button" (click)="iniciarCierre(s)">
+                      <mat-icon aria-hidden="true">lock</mat-icon>
+                      Cerrar seguimiento
+                    </button>
+                  }
+                }
+                <button mat-button type="button" color="warn" (click)="eliminar(s)">
+                  <mat-icon aria-hidden="true">delete</mat-icon>
+                  Eliminar
+                </button>
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </div>
+}

@@ -7,7 +7,7 @@
     <div class="title-group">
       <!-- mat-dialog-title enlaza el título con el diálogo (aria-labelledby). -->
       <h2 mat-dialog-title>{{ data.titulo || 'Confirmar acción' }}</h2>
-      <p class="subtitle">Esta acción no se puede deshacer</p>
+      <p class="subtitle">{{ data.subtitulo || 'Esta acción no se puede deshacer' }}</p>
     </div>
   </div>
 
@@ -18,7 +18,7 @@
   <div class="confirm-actions">
     <!-- El foco inicial va a «Cancelar»: la opción segura ante una acción destructiva. -->
     <button mat-stroked-button type="button" cdkFocusInitial (click)="cancelar()">
-      Cancelar
+      {{ data.textoCancelar || 'Cancelar' }}
     </button>
 
     <button mat-flat-button type="button" color="warn" (click)="confirmar()">

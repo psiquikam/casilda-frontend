@@ -1,3 +1,12 @@
+@if (datosDemostracion) {
+  <!-- DSH-12-08: los catálogos y los casos de este módulo son simulados
+       mientras el modo de demostración esté activo. -->
+  <p class="franja-demo" role="status">
+    <mat-icon aria-hidden="true">science</mat-icon>
+    <span>Datos de demostración. Los casos, catálogos y el guardado de este módulo son simulados.</span>
+  </p>
+}
+
 @if (!modoAtencion) {
   <div class="cita-container animate-fade-in">
     <div class="section-header">
@@ -397,21 +406,34 @@
                         </span>
                       </ng-template>
                       <div class="tab-padding grid-2">
-                        <div style="display: flex; gap: 8px;">
-                          <mat-form-field appearance="outline" subscriptSizing="dynamic" style="flex: 1;">
-                            <mat-label>¿Hace cuánto ocurrió el hecho?</mat-label>
-                            <input matInput type="number" formControlName="tiempoOcurridoValor" min="0">
-                          </mat-form-field>
-                          <mat-form-field appearance="outline" subscriptSizing="dynamic"
-                            style="width: 140px;">
-                            <mat-label>Unidad</mat-label>
-                            <mat-select formControlName="tiempoOcurridoUnidad">
-                              @for (u of listaTiemposOcurridoUnidad; track u) {
-                                <mat-option [value]="u">{{u}}</mat-option>
-                              }
-                            </mat-select>
-                          </mat-form-field>
+                        <div class="pregunta-container span-all">
+                          <span class="pregunta-label">
+                            Violencia Basada en Género
+                            <button type="button" class="help-tooltip-trigger" matTooltip="Filtro inicial: define si el hecho constituye VBG para desplegar las modalidades y temporalidad." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+                          </span>
+                          <mat-radio-group formControlName="violenciaGenero" class="radio-group" aria-label="Violencia basada en género">
+                            <mat-radio-button value="SI">Sí</mat-radio-button>
+                            <mat-radio-button value="NO">No</mat-radio-button>
+                          </mat-radio-group>
                         </div>
+                        @if (casoForm.get('violenciaGenero')?.value === 'SI') {
+                          <div class="span-all" style="display: flex; gap: 8px;">
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic" style="flex: 1;">
+                              <mat-label>¿Hace cuánto ocurrió el hecho?</mat-label>
+                              <input matInput type="number" formControlName="tiempoOcurridoValor" min="0">
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" subscriptSizing="dynamic"
+                              style="width: 140px;">
+                              <mat-label>Unidad</mat-label>
+                              <mat-select formControlName="tiempoOcurridoUnidad">
+                                @for (u of listaTiemposOcurridoUnidad; track u) {
+                                  <mat-option [value]="u">{{u}}</mat-option>
+                                }
+                              </mat-select>
+                            </mat-form-field>
+                          </div>
+                        }
+
                         <mat-form-field appearance="outline" subscriptSizing="dynamic">
                           <mat-label>¿En qué forma ocurrió el hecho?</mat-label>
                           <mat-select formControlName="queForma">
@@ -441,13 +463,11 @@
                               </mat-autocomplete>
                             </mat-form-field>
                             <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                              <mat-label>
-                                Lugar de Ocurrencia
-                                <button type="button" class="help-tooltip-trigger" matTooltip="Lugar vinculado a bienes inmuebles o predios universitarios (Dentro, Fuera, Mixto)." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
-                              </mat-label>
+                              <mat-label>Lugar de Ocurrencia</mat-label>
                               <mat-select formControlName="lugarHechos">
                                 @for (c of lugarHechos; track c) { <mat-option [value]="c">{{c}}</mat-option> }
                               </mat-select>
+                              <mat-hint>Se refiere a si el hecho ocurrió dentro, fuera o parcialmente dentro de bienes inmuebles o predios de la Universidad de Antioquia.</mat-hint>
                             </mat-form-field>
                             <div class="discapacidad-container span-all">
                               <div class="section-header-inline">
@@ -499,31 +519,29 @@
                                 }
                               </div>
                             </div>
-                            <div class="pregunta-container span-all">
-                              <span class="pregunta-label">
-                                Violencia Basada en Género
-                                <button type="button" class="help-tooltip-trigger" matTooltip="Filtro inicial: define si el hecho constituye VBG para desplegar las modalidades y temporalidad." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
-                              </span>
-                              <mat-radio-group formControlName="violenciaGenero" class="radio-group" aria-label="Violencia basada en género">
-                                <mat-radio-button value="SI">Sí</mat-radio-button>
-                                <mat-radio-button value="NO">No</mat-radio-button>
-                              </mat-radio-group>
-                              <span class="pregunta-label">
-                                Relación Misional / Institucional
-                                <button type="button" class="help-tooltip-trigger" matTooltip="Ocurrió en el desarrollo de actividades misionales (Docencia, Investigación, Extensión), institucionales, en representación de la Universidad o en bienes inmuebles." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
-                              </span>
-                              <mat-radio-group formControlName="violenciaMisional" class="radio-group" aria-label="Relación Misional / Institucional">
-                                <mat-radio-button value="SI">Sí</mat-radio-button>
-                                <mat-radio-button value="NO">No</mat-radio-button>
-                              </mat-radio-group>
-                              @if (casoForm.get('violenciaMisional')?.value === 'SI') {
-                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                  <mat-label>Actividad Misional</mat-label>
-                                  <mat-select formControlName="actividadMisional">
-                                    @for (c of actividadesMisionales; track c) { <mat-option
-                                    [value]="c">{{c}}</mat-option> }
-                                  </mat-select>
-                                </mat-form-field>
+                            <div class="discapacidad-container span-all">
+                              <div class="section-header-inline">
+                                <div class="section-title">
+                                  <mat-icon aria-hidden="true" color="primary">diversity_3</mat-icon>
+                                  <span>Relación Misional / Institucional</span>
+                                </div>
+                                <button type="button" class="help-tooltip-trigger" [matTooltip]="textoProtocoloRelacionMisional" matTooltipClass="casilda-help-tooltip" aria-label="Ayuda">?</button>
+                              </div>
+                              <p class="mat-hint-inline">{{ textoProtocoloRelacionMisional }}</p>
+                              <div class="vbg-options">
+                                @for (c of relacionMisionalNivel1; track c.id) {
+                                  <mat-checkbox [checked]="relacionMisionalNivel1Sel.includes(c.id)"
+                                    (change)="onCheckboxChange($event, c.id, 'relacionMisionalNivel1Sel')">{{c.nombre}}</mat-checkbox>
+                                }
+                              </div>
+                              @if (esRelacionMisionalSeleccionada()) {
+                                <p class="mat-hint-inline">Selecciona al menos una: Docencia, Investigación o Extensión.</p>
+                                <div class="vbg-options">
+                                  @for (c of relacionMisionalNivel2; track c.id) {
+                                    <mat-checkbox [checked]="relacionMisionalNivel2Sel.includes(c.id)"
+                                      (change)="onCheckboxChange($event, c.id, 'relacionMisionalNivel2Sel')">{{c.nombre}}</mat-checkbox>
+                                  }
+                                </div>
                               }
                             </div>
                           </div>
@@ -580,7 +598,32 @@
                                   <div class="vbg-options">
                                     @for (c of listaSexual; track c.id) {
                                       <mat-checkbox [checked]="sexualSel.includes(c.id)"
-                                      (change)="onCheckboxChange($event, c.id, 'sexualSel')">{{c.nombre}}</mat-checkbox>
+                                      (change)="onCheckboxChange($event, c.id, 'sexualSel')">
+                                        {{c.nombre}}
+                                        @if (c.nombre === 'Explotación sexual') {
+                                          <button type="button" class="help-tooltip-trigger" matTooltip="Inducción a la prostitución, proxenetismo con menor de edad, constreñimiento a la prostitución, trata de personas." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+                                        }
+                                      </mat-checkbox>
+                                    }
+                                  </div>
+                                  <div class="vbg-card vbg-subcard">
+                                    <div class="vbg-header">
+                                      <span>
+                                        Violencia facilitada por nuevas tecnologías *
+                                        <button type="button" class="help-tooltip-trigger" matTooltip="Uso, explotación y trata mediante amenazas o extorsión; grooming; creación de contenido sin consentimiento; sexting sin consentimiento." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+                                      </span>
+                                      <mat-radio-group formControlName="violenciaInformatica">
+                                        <mat-radio-button value="SI">Sí</mat-radio-button>
+                                        <mat-radio-button value="NO">No</mat-radio-button>
+                                      </mat-radio-group>
+                                    </div>
+                                    @if (casoForm.get('violenciaInformatica')?.value === 'SI') {
+                                      <div class="vbg-options">
+                                        @for (c of listaInformatica; track c.id) {
+                                          <mat-checkbox [checked]="informaticaSel.includes(c.id)"
+                                          (change)="onCheckboxChange($event, c.id, 'informaticaSel')">{{c.nombre}}</mat-checkbox>
+                                        }
+                                      </div>
                                     }
                                   </div>
                                 }
@@ -621,26 +664,6 @@
                               </div>
                               <div class="vbg-card">
                                 <div class="vbg-header">
-                                  <span>
-                                    Tipo de violencia sexual informática *
-                                    <button type="button" class="help-tooltip-trigger" matTooltip="Abarca grooming, amenazas, creación de contenido y sexting sin consentimiento." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
-                                  </span>
-                                  <mat-radio-group formControlName="violenciaInformatica">
-                                    <mat-radio-button value="SI">Sí</mat-radio-button>
-                                    <mat-radio-button value="NO">No</mat-radio-button>
-                                  </mat-radio-group>
-                                </div>
-                                @if (casoForm.get('violenciaInformatica')?.value === 'SI') {
-                                  <div class="vbg-options">
-                                    @for (c of listaInformatica; track c.id) {
-                                      <mat-checkbox [checked]="informaticaSel.includes(c.id)"
-                                      (change)="onCheckboxChange($event, c.id, 'informaticaSel')">{{c.nombre}}</mat-checkbox>
-                                    }
-                                  </div>
-                                }
-                              </div>
-                              <div class="vbg-card">
-                                <div class="vbg-header">
                                   <span>Tipo de violencia por prejuicio *</span>
                                   <mat-radio-group formControlName="violenciaPrejuicio">
                                     <mat-radio-button value="SI">Sí</mat-radio-button>
@@ -663,60 +686,11 @@
                           <ng-template matTabLabel>
                             <span>Presunto agresor</span>
                           </ng-template>
-                          <div class="discapacidad-container">
-                            <div class="section-header-inline">
-                              <div class="section-title">
-                                <mat-icon aria-hidden="true" color="primary">person</mat-icon>
-                                <span>Datos del presunto agresor</span>
-                              </div>
-                              <button mat-icon-button aria-label="Agregar presunto agresor" class="btn-add-inline" (click)="abrirModalAgresor()"
-                                matTooltip="Agregar Agresor">
-                                <mat-icon aria-hidden="true">add_circle</mat-icon>
-                              </button>
-                            </div>
-                            <div class="table-responsive">
-                              <table mat-table [dataSource]="agresoresRegistrados" class="caso-table" aria-label="Presuntos agresores registrados">
-                                <ng-container matColumnDef="nombre">
-                                  <th mat-header-cell scope="col" *matHeaderCellDef> Nombre del agresor </th>
-                                  <td mat-cell *matCellDef="let element">
-                                    {{ formatearNombreAgresor(element) }}
-                                  </td>
-                                </ng-container>
-                                <ng-container matColumnDef="vinculoUniversidad">
-                                  <th mat-header-cell scope="col" *matHeaderCellDef> Vínculo con la UdeA </th>
-                                  <td mat-cell *matCellDef="let element"> {{element.vinculoUniversidad || 'No
-                                  registrado'}} </td>
-                                </ng-container>
-                                <ng-container matColumnDef="vinculoVictima">
-                                  <th mat-header-cell scope="col" *matHeaderCellDef> Vínculo con la víctima </th>
-                                  <td mat-cell *matCellDef="let element"> {{element.vinculoVictima || 'No
-                                  registrado'}} </td>
-                                </ng-container>
-                                <ng-container matColumnDef="opcion">
-                                  <th mat-header-cell scope="col" *matHeaderCellDef style="text-align: center;"> Opción
-                                  </th>
-                                  <td mat-cell *matCellDef="let i = index" style="text-align: center;">
-                                    <button mat-icon-button [attr.aria-label]="'Eliminar el presunto agresor de la fila ' + (i + 1)" color="warn" (click)="eliminarAgresor(i)"
-                                      matTooltip="Eliminar">
-                                      <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
-                                    </button>
-                                  </td>
-                                </ng-container>
-                                <tr mat-header-row
-                                  *matHeaderRowDef="['nombre', 'vinculoUniversidad', 'vinculoVictima', 'opcion']">
-                                </tr>
-                                <tr mat-row
-                                  *matRowDef="let row; columns: ['nombre', 'vinculoUniversidad', 'vinculoVictima', 'opcion'];">
-                                </tr>
-                              </table>
-                              @if (agresoresRegistrados.length === 0) {
-                                <div class="no-results-msg">
-                                  <mat-icon aria-hidden="true">person</mat-icon>
-                                  <p>No hay presuntos agresores registrados.</p>
-                                </div>
-                              }
-                            </div>
-                          </div>
+                          <app-seccion-presunto-agresor
+                            [catalogoVinculosUdea]="catalogoVinculosUdea"
+                            [catalogoVinculosAgresorVictima]="catalogoVinculosAgresorVictima"
+                            [(agresoresRegistrados)]="agresoresRegistrados">
+                          </app-seccion-presunto-agresor>
                         </mat-tab>
                         <mat-tab [disabled]="!casoId">
                           <ng-template matTabLabel>
@@ -772,13 +746,14 @@
                         </mat-form-field>
                         <div class="button-container">
                           <span class="btn-label-top">
-                            Consentimiento de Atención*
-                            <button type="button" class="help-tooltip-trigger" matTooltip="Carga del archivo PDF firmado/escaneado entregado por la persona al iniciar la atención." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+                            Consentimiento de Atención
+                            <button type="button" class="help-tooltip-trigger" matTooltip="Carga del archivo PDF firmado/escaneado entregado por la persona al iniciar la atención. Solo PDF, máximo 10 MB. No es obligatorio para guardar." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
                           </span>
                           <button mat-raised-button color="accent" type="button" class="action-btn"
                             (click)="subirArchivo()">
                             <mat-icon aria-hidden="true">cloud_upload</mat-icon> Consentimiento de Atención
                           </button>
+                          <span class="pregunta-label">{{ estadoConsentimiento() }}</span>
                         </div>
                       </div>
                     </mat-tab>
@@ -786,92 +761,10 @@
                       <ng-template matTabLabel>
                         <span>Apreciaciones psicojurídicas</span>
                       </ng-template>
-                      <div class="discapacidad-container">
-                        <div class="section-header-inline">
-                          <div class="section-title">
-                            <mat-icon aria-hidden="true" color="primary">assignment</mat-icon>
-                            <span>Apreciaciones jurídicas</span>
-                          </div>
-                          <button mat-icon-button aria-label="Agregar apreciación jurídica" class="btn-add-inline"
-                            (click)="abrirModalApreciacionJuridica()" matTooltip="Agregar Apreciación">
-                            <mat-icon aria-hidden="true">add_circle</mat-icon>
-                          </button>
-                        </div>
-                        <div class="table-responsive">
-                          <table mat-table [dataSource]="apreciacionesJuridicas" class="caso-table" aria-label="Apreciaciones jurídicas">
-                            <ng-container matColumnDef="tipo">
-                              <th mat-header-cell scope="col" *matHeaderCellDef> Tipo </th>
-                              <td mat-cell *matCellDef="let element"> {{element.tipo}} </td>
-                            </ng-container>
-                            <ng-container matColumnDef="descripcion">
-                              <th mat-header-cell scope="col" *matHeaderCellDef> Descripción </th>
-                              <td mat-cell *matCellDef="let element"> {{element.descripcion}} </td>
-                            </ng-container>
-                            <ng-container matColumnDef="acciones">
-                              <th mat-header-cell scope="col" *matHeaderCellDef style="text-align: center;">
-                              Acciones </th>
-                              <td mat-cell *matCellDef="let i = index" style="text-align: center;">
-                                <button mat-icon-button [attr.aria-label]="'Eliminar la apreciación jurídica de la fila ' + (i + 1)" color="warn"
-                                  (click)="eliminarApreciacionJuridica(i)" matTooltip="Eliminar">
-                                  <mat-icon aria-hidden="true">delete</mat-icon>
-                                </button>
-                              </td>
-                            </ng-container>
-                            <tr mat-header-row *matHeaderRowDef="['tipo', 'descripcion', 'acciones']"></tr>
-                            <tr mat-row *matRowDef="let row; columns: ['tipo', 'descripcion', 'acciones'];">
-                            </tr>
-                          </table>
-                          @if (apreciacionesJuridicas.length === 0) {
-                            <div class="no-results-msg">
-                              <mat-icon aria-hidden="true">assignment</mat-icon>
-                              <p>No hay apreciaciones jurídicas registradas.</p>
-                            </div>
-                          }
-                        </div>
-                      </div>
-                      <div class="discapacidad-container">
-                        <div class="section-header-inline">
-                          <div class="section-title">
-                            <mat-icon aria-hidden="true" color="primary">assignment</mat-icon>
-                            <span>Apreciaciones Psicológicas</span>
-                          </div>
-                          <button mat-icon-button aria-label="Agregar apreciación psicológica" class="btn-add-inline"
-                            (click)="abrirModalApreciacionPsicologica()" matTooltip="Agregar Apreciación">
-                            <mat-icon aria-hidden="true">add_circle</mat-icon>
-                          </button>
-                        </div>
-                        <div class="table-responsive">
-                          <table mat-table [dataSource]="apreciacionesPsicologicas" class="caso-table" aria-label="Apreciaciones psicológicas">
-                            <ng-container matColumnDef="tipo">
-                              <th mat-header-cell scope="col" *matHeaderCellDef> Tipo </th>
-                              <td mat-cell *matCellDef="let element"> {{element.tipo}} </td>
-                            </ng-container>
-                            <ng-container matColumnDef="descripcion">
-                              <th mat-header-cell scope="col" *matHeaderCellDef> Descripción </th>
-                              <td mat-cell *matCellDef="let element"> {{element.descripcion}} </td>
-                            </ng-container>
-                            <ng-container matColumnDef="acciones">
-                              <th mat-header-cell scope="col" *matHeaderCellDef style="text-align: center;">
-                              Acciones </th>
-                              <td mat-cell *matCellDef="let i = index" style="text-align: center;">
-                                <button mat-icon-button [attr.aria-label]="'Eliminar la apreciación psicológica de la fila ' + (i + 1)" color="warn"
-                                  (click)="eliminarApreciacionPsicologica(i)" matTooltip="Eliminar">
-                                  <mat-icon aria-hidden="true">delete</mat-icon>
-                                </button>
-                              </td>
-                            </ng-container>
-                            <tr mat-header-row *matHeaderRowDef="['tipo', 'descripcion', 'acciones']"></tr>
-                            <tr mat-row *matRowDef="let row; columns: ['tipo', 'descripcion', 'acciones'];">
-                            </tr>
-                          </table>
-                          @if (apreciacionesPsicologicas.length === 0) {
-                            <div class="no-results-msg">
-                              <mat-icon aria-hidden="true">assignment</mat-icon>
-                              <p>No hay apreciaciones psicológicas registradas.</p>
-                            </div>
-                          }
-                        </div>
-                      </div>
+                      <app-seccion-apreciaciones
+                        [(apreciacionesJuridicas)]="apreciacionesJuridicas"
+                        [(apreciacionesPsicologicas)]="apreciacionesPsicologicas">
+                      </app-seccion-apreciaciones>
                     </mat-tab>
                     <mat-tab [disabled]="!atencionId">
                       <ng-template matTabLabel>
@@ -890,44 +783,41 @@
                             <div class="section-header-inline">
                               <div class="section-title">
                                 <mat-icon aria-hidden="true" color="primary">assignment</mat-icon>
-                                <span>Activación de ruta</span>
+                                <span>Rutas Internas</span>
                               </div>
-                              <button mat-icon-button aria-label="Agregar ruta activada" class="btn-add-inline"
-                                (click)="abrirModalRutaActivada()" matTooltip="Agregar Apreciación">
-                                <mat-icon aria-hidden="true">add_circle</mat-icon>
-                              </button>
                             </div>
-                            <div class="table-responsive">
-                              <table mat-table [dataSource]="activarRutasRegistrados" class="caso-table" aria-label="Rutas activadas">
-                                <ng-container matColumnDef="tipo">
-                                  <th mat-header-cell scope="col" *matHeaderCellDef> Tipo </th>
-                                  <td mat-cell *matCellDef="let element"> {{element.tipo}} </td>
-                                </ng-container>
-                                <ng-container matColumnDef="cual">
-                                  <th mat-header-cell scope="col" *matHeaderCellDef> Cual </th>
-                                  <td mat-cell *matCellDef="let element"> {{element.cual}} </td>
-                                </ng-container>
-                                <ng-container matColumnDef="acciones">
-                                  <th mat-header-cell scope="col" *matHeaderCellDef style="text-align: center;">
-                                  Acciones </th>
-                                  <td mat-cell *matCellDef="let i = index" style="text-align: center;">
-                                    <button mat-icon-button [attr.aria-label]="'Eliminar la ruta activada de la fila ' + (i + 1)" color="warn" (click)="eliminarRutaActivada(i)"
-                                      matTooltip="Eliminar">
-                                      <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
-                                    </button>
-                                  </td>
-                                </ng-container>
-                                <tr mat-header-row *matHeaderRowDef="['tipo', 'cual', 'acciones']"></tr>
-                                <tr mat-row *matRowDef="let row; columns: ['tipo', 'cual', 'acciones'];">
-                                </tr>
-                              </table>
-                              @if (activarRutasRegistrados.length === 0) {
-                                <div class="no-results-msg">
-                                  <mat-icon aria-hidden="true">assignment</mat-icon>
-                                  <p>No hay activaciones de rutas registradas.</p>
-                                </div>
+                            <div class="vbg-options">
+                              @for (c of catalogoRutasInternas; track c.id) {
+                                <mat-checkbox [checked]="rutasInternasSel.includes(c.id)"
+                                  (change)="onCheckboxChange($event, c.id, 'rutasInternasSel')">{{c.nombre}}</mat-checkbox>
                               }
                             </div>
+                            @if (esRutaInternaOtraSeleccionada()) {
+                              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>¿Cuál? (ruta interna)</mat-label>
+                                <input matInput formControlName="rutaInternaOtraCual">
+                              </mat-form-field>
+                            }
+                          </div>
+                          <div class="discapacidad-container">
+                            <div class="section-header-inline">
+                              <div class="section-title">
+                                <mat-icon aria-hidden="true" color="primary">assignment</mat-icon>
+                                <span>Rutas Externas</span>
+                              </div>
+                            </div>
+                            <div class="vbg-options">
+                              @for (c of catalogoRutasExternas; track c.id) {
+                                <mat-checkbox [checked]="rutasExternasSel.includes(c.id)"
+                                  (change)="onCheckboxChange($event, c.id, 'rutasExternasSel')">{{c.nombre}}</mat-checkbox>
+                              }
+                            </div>
+                            @if (esRutaExternaOtraSeleccionada()) {
+                              <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                <mat-label>¿Cuál? (ruta externa)</mat-label>
+                                <input matInput formControlName="rutaExternaOtraCual">
+                              </mat-form-field>
+                            }
                           </div>
                           <div class="discapacidad-container">
                             <div class="section-header-inline">
@@ -987,66 +877,10 @@
                         }
                       </div>
                     </mat-tab>
-                    <mat-tab [disabled]="!atencionId">
-                      <ng-template matTabLabel>
-                        <span>Medidas de protección</span>
-                      </ng-template>
-                      <div class="discapacidad-container">
-                        <div class="section-header-inline">
-                          <div class="section-title">
-                            <mat-icon aria-hidden="true" color="primary">security</mat-icon>
-                            <span>Medidas de protección</span>
-                          </div>
-                          <button mat-icon-button aria-label="Agregar medida de protección" class="btn-add-inline" (click)="abrirModalMedida()"
-                            matTooltip="Agregar Medida">
-                            <mat-icon aria-hidden="true">add_circle</mat-icon>
-                          </button>
-                        </div>
-                        <div class="table-responsive">
-                          <table mat-table [dataSource]="medidasRegistradas" class="caso-table" aria-label="Medidas de protección registradas">
-                            <ng-container matColumnDef="tipoMedida">
-                              <th mat-header-cell scope="col" *matHeaderCellDef> Tipo de medida </th>
-                              <td mat-cell *matCellDef="let element"> {{element.tipoMedida}} </td>
-                            </ng-container>
-                            <ng-container matColumnDef="responsable">
-                              <th mat-header-cell scope="col" *matHeaderCellDef> Responsable </th>
-                              <td mat-cell *matCellDef="let element"> {{element.responsable}} </td>
-                            </ng-container>
-                            <ng-container matColumnDef="fechaRegistro">
-                              <th mat-header-cell scope="col" *matHeaderCellDef> Fecha de registro </th>
-                              <td mat-cell *matCellDef="let element"> {{element.fechaRegistro |
-                              date:'dd/MM/yyyy'}} </td>
-                            </ng-container>
-                            <ng-container matColumnDef="descripcion">
-                              <th mat-header-cell scope="col" *matHeaderCellDef> Descripción </th>
-                              <td mat-cell *matCellDef="let element"> {{element.descripcion}} </td>
-                            </ng-container>
-                            <ng-container matColumnDef="opcion">
-                              <th mat-header-cell scope="col" *matHeaderCellDef style="text-align: center;"> Opción
-                              </th>
-                              <td mat-cell *matCellDef="let i = index" style="text-align: center;">
-                                <button mat-icon-button [attr.aria-label]="'Eliminar la medida de protección de la fila ' + (i + 1)" color="warn" (click)="eliminarMedida(i)"
-                                  matTooltip="Eliminar">
-                                  <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
-                                </button>
-                              </td>
-                            </ng-container>
-                            <tr mat-header-row
-                              *matHeaderRowDef="['tipoMedida', 'responsable', 'fechaRegistro', 'descripcion', 'opcion']">
-                            </tr>
-                            <tr mat-row
-                              *matRowDef="let row; columns: ['tipoMedida', 'responsable', 'fechaRegistro', 'descripcion', 'opcion'];">
-                            </tr>
-                          </table>
-                          @if (medidasRegistradas.length === 0) {
-                            <div class="no-results-msg">
-                              <mat-icon aria-hidden="true">security</mat-icon>
-                              <p>No hay medidas de protección registradas.</p>
-                            </div>
-                          }
-                        </div>
-                      </div>
-                    </mat-tab>
+                    <!-- VBG-07-12: «Otros casos y medidas de protección» se retira de la UI.
+                         No se borran `medidasRegistradas`, `abrirModalMedida`, `eliminarMedida`
+                         ni el payload de guardado (case correspondiente) — solo la pestaña. -->
+
                     <mat-tab [disabled]="!atencionId">
                       <ng-template matTabLabel>
                         <span>Otros compromisos</span>
@@ -1065,7 +899,7 @@
                           </div>
                           <table mat-table [dataSource]="compromisosPersona" class="caso-table" aria-label="Compromisos de la persona">
                             <ng-container matColumnDef="fecha">
-                              <th mat-header-cell scope="col" *matHeaderCellDef> Fecha </th>
+                              <th mat-header-cell scope="col" *matHeaderCellDef> Fecha de Cumplimiento </th>
                               <td mat-cell *matCellDef="let element"> {{element.fecha |
                               date:'dd/MM/yyyy'}} </td>
                             </ng-container>
@@ -1109,12 +943,12 @@
                           </div>
                           <table mat-table [dataSource]="compromisosProfesional" class="caso-table" aria-label="Compromisos del profesional">
                             <ng-container matColumnDef="fecha">
-                              <th mat-header-cell scope="col" *matHeaderCellDef> Fecha </th>
+                              <th mat-header-cell scope="col" *matHeaderCellDef> Fecha de Cumplimiento </th>
                               <td mat-cell *matCellDef="let element"> {{element.fecha |
                               date:'dd/MM/yyyy'}} </td>
                             </ng-container>
                             <ng-container matColumnDef="profesional">
-                              <th mat-header-cell scope="col" *matHeaderCellDef> Fecha </th>
+                              <th mat-header-cell scope="col" *matHeaderCellDef> Profesional </th>
                               <td mat-cell *matCellDef="let element"> {{element.profesional}} </td>
                             </ng-container>
                             <ng-container matColumnDef="compromisos">
@@ -1134,7 +968,7 @@
                             <tr mat-header-row
                             *matHeaderRowDef="['fecha', 'profesional', 'compromisos', 'acciones']"></tr>
                             <tr mat-row
-                              *matRowDef="let row; columns: ['fecha', 'compromisos', 'profesional', 'acciones'];">
+                              *matRowDef="let row; columns: ['fecha', 'profesional', 'compromisos', 'acciones'];">
                             </tr>
                           </table>
                           @if (compromisosProfesional.length === 0) {
@@ -1151,79 +985,8 @@
                         <span>Seguimientos</span>
                       </ng-template>
                       <div class="tab-padding">
-                        <div class="discapacidad-container">
-                          <div class="section-header-inline">
-                            <div class="section-title">
-                              <span>Seguimientos del Caso</span>
-                            </div>
-                            <mat-form-field appearance="outline" subscriptSizing="dynamic"
-                              class="seguimiento-select">
-                              <mat-label>Tipo de Seguimiento</mat-label>
-                              <mat-select [(ngModel)]="tipoSeguimientoSeleccionado"
-                                [ngModelOptions]="{standalone: true}">
-                                @for (s of catalogoSeguimiento; track s) {
-                                  <mat-option [value]="s">{{s}}</mat-option>
-                                }
-                              </mat-select>
-                            </mat-form-field>
-                            <button mat-icon-button aria-label="Agregar seguimiento" class="btn-add-inline"
-                              (click)="abrirModalSeguimientos(tipoSeguimientoSeleccionado)"
-                              matTooltip="Agregar Remisión">
-                              <mat-icon aria-hidden="true">add_circle</mat-icon>
-                            </button>
-                          </div>
-                          <div class="table-responsive">
-                            <table mat-table [dataSource]="seguimientosRegistrados" class="caso-table" aria-label="Seguimientos registrados">
-                              <ng-container matColumnDef="tipoSeguimiento">
-                                <th mat-header-cell scope="col" *matHeaderCellDef> Tipo Seguimiento </th>
-                                <td mat-cell *matCellDef="let element"> {{element.tipoSeguimiento}}
-                                </td>
-                              </ng-container>
-                              <ng-container matColumnDef="fecha">
-                                <th mat-header-cell scope="col" *matHeaderCellDef> Fecha </th>
-                                <td mat-cell *matCellDef="let element"> {{element.fecha |
-                                date:'dd/MM/yyyy'}} </td>
-                              </ng-container>
-                              <ng-container matColumnDef="actividad">
-                                <th mat-header-cell scope="col" *matHeaderCellDef> Acción / Actividad </th>
-                                <td mat-cell *matCellDef="let element">
-                                  <strong>{{element.accion}}</strong>: {{element.actividad}}
-                                </td>
-                              </ng-container>
-                              <ng-container matColumnDef="estado">
-                                <th mat-header-cell scope="col" *matHeaderCellDef> Estado </th>
-                                <td mat-cell *matCellDef="let element"> {{element.estadoSeguimiento}}
-                                </td>
-                              </ng-container>
-                              <ng-container matColumnDef="descripcion">
-                                <th mat-header-cell scope="col" *matHeaderCellDef> Descripción </th>
-                                <td mat-cell *matCellDef="let element"> {{element.descripcion}} </td>
-                              </ng-container>
-                              <ng-container matColumnDef="acciones">
-                                <th mat-header-cell scope="col" *matHeaderCellDef style="text-align: center;">
-                                Acciones </th>
-                                <td mat-cell *matCellDef="let i = index" style="text-align: center;">
-                                  <button mat-icon-button [attr.aria-label]="'Eliminar el seguimiento de la fila ' + (i + 1)" color="warn"
-                                    (click)="eliminarSeguimientos(i)" matTooltip="Eliminar">
-                                    <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
-                                  </button>
-                                </td>
-                              </ng-container>
-                              <tr mat-header-row
-                                *matHeaderRowDef="['tipoSeguimiento', 'fecha', 'actividad', 'estado', 'descripcion', 'acciones']">
-                              </tr>
-                              <tr mat-row
-                                *matRowDef="let row; columns: ['tipoSeguimiento', 'fecha', 'actividad', 'estado', 'descripcion', 'acciones'];">
-                              </tr>
-                            </table>
-                            @if (seguimientosRegistrados.length === 0) {
-                              <div class="no-results-msg">
-                                <mat-icon aria-hidden="true">assignment_late</mat-icon>
-                                <p>No hay seguimientos registrados para este caso.</p>
-                              </div>
-                            }
-                          </div>
-                        </div>
+                        <app-seccion-seguimientos
+                          [(seguimientos)]="seguimientosRegistrados"></app-seccion-seguimientos>
                       </div>
                     </mat-tab>
                     <mat-tab [disabled]="!atencionId">
@@ -1238,12 +1001,19 @@
                         <mat-form-field appearance="outline" subscriptSizing="dynamic">
                           <mat-label>
                             Estado del caso
-                            <button type="button" class="help-tooltip-trigger" matTooltip="Clasificación automática calculada por el sistema según los vínculos institucional/agresor y misionalidad (Grupos 1 al 6)." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+                            <button type="button" class="help-tooltip-trigger" matTooltip="Abierto, en seguimiento o cerrado. Lo decide el equipo de atención, no se calcula." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
                           </mat-label>
                           <mat-select formControlName="estadosCaso">
                             @for (s of estadosCaso; track s) { <mat-option [value]="s">{{s}}</mat-option>
                           }
                         </mat-select>
+                      </mat-form-field>
+                      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                        <mat-label>
+                          Grupo de atención
+                          <button type="button" class="help-tooltip-trigger" matTooltip="Clasificación automática calculada por el sistema según los vínculos institucional/agresor y misionalidad (Grupos 1 al 6). No editable (VBG-09-02)." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
+                        </mat-label>
+                        <input matInput [value]="casoSeleccionado?.grupoAtencion ?? 'Sin calcular'" readonly disabled>
                       </mat-form-field>
                     </div>
                   </mat-tab>

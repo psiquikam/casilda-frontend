@@ -1,6 +1,6 @@
 ---
 name: angular_frontend_guidelines
-description: Guidelines and conventions for CASILDA Angular frontend development (standalone components, Material 17, Reactive Forms, lists)
+description: Guidelines and conventions for CASILDA Angular frontend development (standalone components, Material 21, Reactive Forms, lists)
 ---
 
 # Copilot Instructions — sistema-casilda-fnsp (Frontend Angular)
@@ -9,13 +9,15 @@ description: Guidelines and conventions for CASILDA Angular frontend development
 Sistema CASILDA — frontend Angular para gestión de solicitudes de acompañamiento psicosocial y jurídico de la Universidad de Antioquia.
 
 ## Stack tecnológico
-- **Angular 17** con **componentes standalone**
-- **Angular Material 17** para todos los componentes UI
+- **Angular 21** con **componentes standalone** (sin `NgModule`)
+- **Angular Material 21** para todos los componentes UI (tema M2 compat)
 - **Reactive Forms** (`FormBuilder`, `FormGroup`, `Validators`)
 - **RxJS 7.8** — `Observable`, `forkJoin`, `BehaviorSubject`, `catchError`
-- **SweetAlert2** para confirmaciones/alertas
+- **`DialogoService`** (MatDialog) para confirmaciones y avisos, y **`NotificacionService`**
+  (MatSnackBar) para errores y notificaciones. **SweetAlert2 fue retirado del proyecto:**
+  no se usa `Swal`, `alert()` ni `confirm()` (ver `CLAUDE.md` §4 y §6 regla 8)
 - **HttpClient** con interceptor JWT automático (`authInterceptor`)
-- **Node 20.x** — build: `npm run build`
+- **Node 24.x** (ver `.nvmrc`) — build: `npm run build`
 
 ## Configuración de entorno
 ```typescript

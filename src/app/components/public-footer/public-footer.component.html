@@ -1,10 +1,14 @@
 <footer class="public-footer">
   <h2 class="visually-hidden">Canales de contacto de CASILDA</h2>
   <ul class="public-footer__lista">
-    <li class="public-footer__item">
-      <span class="public-footer__icono" aria-hidden="true"><mat-icon aria-hidden="true">phone</mat-icon></span>
-      <a href="tel:1234567890">1234567890</a>
-    </li>
+    <!-- El teléfono solo aparece con un dato real configurado: un número de
+         relleno en un canal de contacto impide que alguien reciba ayuda. -->
+    @if (hayTelefonoContacto) {
+      <li class="public-footer__item">
+        <span class="public-footer__icono" aria-hidden="true"><mat-icon aria-hidden="true">phone</mat-icon></span>
+        <a [href]="'tel:' + telefonoContacto">{{ telefonoContacto }}</a>
+      </li>
+    }
     <li class="public-footer__item">
       <span class="public-footer__icono" aria-hidden="true"><mat-icon aria-hidden="true">mail_outline</mat-icon></span>
       <a href="mailto:proyectocasilda&#64;udea.edu.co">proyectocasilda&#64;udea.edu.co</a>

@@ -3,7 +3,9 @@
 > Archivo vivo. Se actualiza al cerrar cada fase de trabajo para que cualquier
 > sesión posterior (humana o asistida) retome sin repetir el análisis.
 >
-> **Última actualización:** 12 de septiembre de 2026 (documentación de accesibilidad reubicada en `docs/evidencias/accesibilidad/`)
+> **Última actualización:** 5 de octubre de 2026 (incorporación al repositorio de
+> `casilda-diseno-v1.md` y `AGENTS.md`, que cierra el pendiente P-01; antes, estandarización
+> del módulo Equipo de Atención contra la matriz VBG, fases M1 a M5, y corrección de navegación)
 
 ---
 
@@ -17,17 +19,24 @@ Documentos de referencia, en orden de precedencia para decisiones de diseño:
 
 | Documento | Para qué sirve |
 |-----------|----------------|
-| `casilda-diseno-v1.md` | **Fuente de verdad de UI/UX**: marca UdeA, tokens, accesibilidad y hoja de ruta por fases. |
-| `ANALISIS_ARQUITECTURA_Y_MIGRACION.md` | Arquitectura, rutas, servicios y deuda técnica detectada. |
-| `AGENTS.md` | Prompt/rol de la migración Angular 17 → 21 (ya completada). |
-| `.agents/skills/angular_frontend_guidelines/SKILL.md` | Convenciones obligatorias de código Angular del equipo. |
-| `.agents/skills/accessibility/SKILL.md` | Criterios WCAG 2.2 aplicados. |
+| `.agents/supports/casilda-diseno-v1.md` | **Fuente de verdad de UI/UX** (v1): marca UdeA, tokens, Salida Rápida (§4), briefing de landing/login (§5) y hoja de ruta por fases (§6). **Donde divirja del estado actual prevalecen §3 de este archivo y `src/styles/_tokens.scss`** (ver la entrada «Incorporación de los documentos de contexto» en §5). |
+| `ANALISIS_ARQUITECTURA_Y_MIGRACION.md` | Arquitectura, rutas, servicios y deuda técnica detectada. ⚠️ **No está en el repositorio ni en el historial de Git** (ver pendiente 11). |
+| `AGENTS.md` | Prompt/rol de la migración Angular 17 → 21 (ya completada). Se conserva como trazabilidad de cómo se condujo la migración; cita el `ANALISIS_…` anterior. |
+| `.agents/skills/angular_frontend_guidelines/SKILL.md` | Convenciones obligatorias de código Angular del equipo. Único skill versionado. |
+| `.agents/skills/accessibility/SKILL.md` | Criterios WCAG 2.2 aplicados. ⚠️ **Solo local**: la regla `skills/` de `.gitignore` lo excluye (ver pendiente 11). |
 | `docs/evidencias/accesibilidad/plan_accesibilidad.md` | Diagnóstico, hallazgos H-01…H-18, plan por fases hacia WCAG 2.2 AA y **estado de cada tarea** (§4, §6). |
 | `docs/evidencias/accesibilidad/01-fases-1-5-correcciones.md` | Cómo se implementó cada corrección de las fases 1–5 (evidencia de la entrega del 2026-09-11). |
+| `.claude/skills/casilda-ux/SKILL.md` | Orquesta las fuentes anteriores para toda tarea de UI/UX; incluye flujo de verificación y formato de reporte. ⚠️ **Solo local**: misma regla `skills/` de `.gitignore` (ver pendiente 11). |
+| `docs/contratos/MATRIZ_MODULO_ATENCION_VBG.md` | Campos, etiquetas y validaciones del módulo Equipo de Atención. Prevalece en contenido de formularios; en lo visual prevalecen §3 y `.agents/supports/casilda-diseno-v1.md`. |
+| `docs/contratos/DASHBOARDS_POR_ROL.md` | Contenido del panel de inicio autenticado por rol y enfoque informado en trauma (no cubre la portada pública). |
+| `docs/contratos/GLOSARIO_VBG.md` | Glosario de términos del módulo Equipo de Atención, con la columna del rol Usuario. |
+| `docs/contratos/DECISIONES_PROVISIONALES_VBG.md` | 19 decisiones de contenido/comportamiento pendientes de validar con el equipo clínico/legal; permiten demostrar el módulo mientras se confirma la versión oficial. |
+| `docs/contratos/contrato-contenidos-home.md` | Contrato del endpoint público `GET {apiBaseUrl}/contenidos/home` y del CRUD de administración del gestor de contenidos del home. |
 
 ## 2. Stack y comandos
 
-- Angular **21.2** standalone (sin `NgModule`), TypeScript **5.9 strict**, Angular Material 21 (tema M2 compat), RxJS 7.8, SweetAlert2, Karma/Jasmine.
+- Angular **21.2** standalone (sin `NgModule`), TypeScript **5.9 strict**, Angular Material 21 (tema M2 compat), RxJS 7.8, Karma/Jasmine.
+  **SweetAlert2 fue retirado** (ver §4): diálogos y confirmaciones van por `DialogoService`/`MatDialog`, notificaciones por `NotificacionService`.
 - Rutas con `loadComponent` (lazy) y guards `authGuard` / `roleGuard` / `featureCapabilityGuard`.
 
 ```powershell
@@ -75,6 +84,15 @@ espaciados ni radios literales**: siempre `var(--token)`.
 | `QuickExitService` | `src/app/core/security/quick-exit.service.ts` | Limpia `sessionStorage` + llaves `casilda_*` y `userSession`, y redirige con `location.replace()` a `environment.quickExitUrl`. |
 | `ContenidoHomeService` | `src/app/services/contenido-home.service.ts` | Contenido editable del home (`imagen`, `titulo`, `contenido`, vigencia, sección). Hoy devuelve un **mock**; el endpoint previsto es `GET {apiBaseUrl}/contenidos/home`. |
 | `CasildaCardComponent` | `src/app/components/casilda-card/` | Tarjeta puramente presentacional alimentada por `ContenidoDestacadoDto`. |
+| `PanelInicioComponent` | `src/app/components/dashboard/` | Panel del personal, armado por zonas Z1–Z6 desde `DASHBOARD_POR_ROL`. Resuelve el rol **al construirse**: `auth.currentUser` no es una señal. |
+| `PanelUsuarioComponent` | `src/app/components/dashboard-usuario/` | Vista de la persona que solicita acompañamiento, con enfoque informado en trauma. No escribe en `localStorage`. |
+| `ZonaPanelComponent` | `src/app/components/dashboard/zona-panel/` | Envoltura de zona: `h2`, y estados de carga, vacío y error con reintento. **Toda zona nueva la usa.** |
+| `KpiCardComponent` | `src/app/components/dashboard/kpi-card/` | Tarjeta de indicador: etiqueta en tipo oración, definición accesible, periodo, denominador y fecha de corte. |
+| `DASHBOARD_POR_ROL` | `src/app/core/dashboard/dashboard-por-rol.ts` | **Único lugar** donde se decide qué widgets ve cada rol; el orden del registro es el orden visual. |
+| `CATALOGO_MODULOS` | `src/app/core/navegacion/catalogo-navegacion.ts` | **Único nombre, ícono y ruta por módulo**, para menú, panel y títulos de ruta. |
+| `esTelefonoPublicable()` | `src/app/core/security/telefono-crisis.ts` | Un teléfono de crisis solo se muestra si es real: rechaza vacíos, marcadores y secuencias. |
+| `suprimirCeldasPequenas()` | `src/app/core/vigilancia/supresion-celdas.ts` | Supresión de conteos identificables en vistas filtradas, con supresión secundaria. Se aplica **en el servicio**, no en la vista. |
+| `DashboardMetricasService` · `DashboardTrabajoService` · `VigilanciaService` · `MiProcesoService` | `src/app/services/` | Fuentes de datos del panel. Mock tipado + endpoint previsto, con latencia y error simulables (`dashboard-mock.ts`). |
 | `CasildaTitleStrategy` | `src/app/core/a11y/casilda-title.strategy.ts` | Título del documento por ruta (`title` en `app.routes.ts`) + sufijo «Casilda — UdeA». |
 | `EnfoqueRutaService` | `src/app/core/a11y/enfoque-ruta.service.ts` | Foco al `<main id="contenido-principal">` tras cada navegación. |
 | `FiltroColumnaDirective` | `src/app/core/a11y/filtro-columna.directive.ts` | `<input appFiltroColumna="ID del caso">`: nombre accesible, `type="search"`, foco visible. Obligatoria en filtros de cabecera de tabla. |
@@ -82,6 +100,12 @@ espaciados ni radios literales**: siempre `var(--token)`.
 | `NotificacionService` | `src/app/core/a11y/notificacion.service.ts` | `error()` / `exito()` / `info()` sobre MatSnackBar con `role` adecuado. **Reemplaza a `console.error`** en los `subscribe`. |
 | `DialogoService` | `src/app/core/a11y/dialogo.service.ts` | `aviso()` y `confirmar()` sobre MatDialog (`AvisoDialogComponent`, `ConfirmDialogComponent`). **SweetAlert2 fue retirado.** |
 | `getPaginadorIntlEs()` | `src/app/core/i18n/paginador-es.ts` | Paginador en español provisto una sola vez en `app.config.ts`. |
+| `MaestrosVbgService` | `src/app/services/maestros-vbg.service.ts` | Catálogos del módulo Equipo de Atención (ámbito, modalidades, vínculos, rutas, grupos de atención…) con respaldo tipado y endpoint previsto; si el backend falla cae al mismo respaldo y avisa por `NotificacionService`. |
+| `RegistroVbgDatosService` | `src/app/services/registro-vbg-datos.service.ts` | Listado paginado de citas y casos para `registro-caso`/`registro-atencion`; delega en `CasosSimuladosService` en modo de demostración. |
+| `CasosSimuladosService` | `src/app/services/casos-simulados.service.ts` | Datos simulados del módulo Equipo de Atención (modo de demostración); nombres, documentos y teléfonos evidentemente ficticios. |
+| `catalogo-vbg.ts` | `src/app/core/catalogos/catalogo-vbg.ts` | **Único catálogo** de códigos y etiquetas literales de la matriz VBG (ámbito, modalidades, vínculos, rutas internas/externas, grupos de atención). |
+| `SeccionSeguimientosComponent` | `src/app/components/seccion-seguimientos/` | Bloque «Seguimientos» compartido entre `registro-caso` y `registro-atencion`; aísla por especialidad y cierra con alerta de última profesional activa. |
+| `esUltimaProfesionalActiva()` | `src/app/core/vbg/ultima-profesional-activa.ts` | Predicado único para decidir si cerrar un seguimiento deja sin profesional activa a esa especialidad. |
 
 ## 5. Bitácora de avances
 
@@ -173,6 +197,126 @@ Detalle y métricas en `docs/evidencias/accesibilidad/01-fases-1-5-correcciones.
 - **Colateral:** handlers «Eliminar» intercambiados entre Rutas activadas y Remisiones en
   `registro-caso` y `registro-atencion`, corregidos.
 
+### 2026-10-04 — Optimización del panel de inicio por rol (subfases 0 a 4)
+Contrato: `docs/contratos/DASHBOARDS_POR_ROL.md`. Diagnóstico y plan en
+`docs/evidencias/dashboards/00-diagnostico-y-plan.md`; un reporte por subfase (01 a 05).
+
+- **Subfase 0 — Contenido de crisis y atajo.** `telefonoOrientacion` queda **vacío a
+  propósito** en ambos entornos: llevaba `1234567890`, también en `environment.prod.ts`, y
+  se renderizaba sin condición en el banner del rol Usuario. Nuevo
+  `core/security/telefono-crisis.ts` con `esTelefonoPublicable()`, que rechaza vacíos,
+  textos de relleno, repeticiones y rachas consecutivas de 7+ dígitos en cualquier
+  posición. Alcance añadido: el pie público y el CTA de la portada mostraban el mismo
+  número. `Alt + Q` pasa a reconocerse también en macOS (`Option + Q` produce «œ») sin
+  dispararse con `AltGr + Q` del teclado latinoamericano.
+- **Subfase 1 — Correcciones transversales.** Fecha y cifras con pipes sobre `es-CO`
+  (la fecha la rompía un `text-transform: capitalize`, no un pipe); **0 colores literales**
+  en el panel y el encabezado; `h1`–`h3` en `--font-serif`; stepper sin truncar; enlaces
+  `tel:`; el rol pasa de aparecer cuatro veces a una. Se corrigieron `--color-danger` y
+  `--color-info`, que apuntaban a variables inexistentes y afectaban a más de 20
+  componentes fuera del panel.
+- **Subfase 2 — Arquitectura común.** Zonas Z1–Z6 con Z2 antes que Z3; registro
+  `DASHBOARD_POR_ROL` indexado por los cinco roles reales; catálogo central de navegación;
+  servicios mock con DTO y endpoint previsto (patrón `ContenidoHomeService`), con latencia
+  y error simulables; estados de carga, vacío y error en toda zona; franja «Datos de
+  demostración». El panel deja de duplicar el menú lateral.
+- **Subfase 3 — Dashboards del personal.** Vista analítica con filtros de periodo, sede y
+  dependencia para el perfil de Reportes, y **supresión de celdas pequeñas** aplicada en el
+  servicio —con supresión secundaria, sin la cual el valor oculto se recupera restando del
+  total—. Aviso sutil de última profesional activa.
+- **Subfase 4 — Rol Usuario.** Vista propia con enfoque informado en trauma: estado del
+  proceso con siguiente paso y quién lo hace, próxima sesión, acuerdos, canal de contacto y
+  líneas de ayuda. Sin cifras, sin relato de hechos, sin jerga, sin rojo y **sin escribir
+  nada en `localStorage`**. **Sus textos son una propuesta pendiente de validación con el
+  equipo de atención.**
+
+**Componentes y servicios nuevos** (ver §4): `PanelInicioComponent`, `PanelUsuarioComponent`,
+`ZonaPanelComponent`, `KpiCardComponent`, siete widgets, `DashboardMetricasService`,
+`DashboardTrabajoService`, `VigilanciaService`, `MiProcesoService`,
+`core/navegacion/catalogo-navegacion.ts`, `core/dashboard/dashboard-por-rol.ts`,
+`core/vigilancia/supresion-celdas.ts`.
+
+### 2026-10-05 — Estandarización del módulo Equipo de Atención contra la matriz VBG (M1 a M5) y corrección de navegación
+Contrato: `docs/contratos/MATRIZ_MODULO_ATENCION_VBG.md`. Diagnóstico y plan en
+`docs/evidencias/estandarizacion-vbg/00-diagnostico-y-plan.md`; un reporte por subfase (01 a
+05). Nuevos contratos de contenido: `docs/contratos/GLOSARIO_VBG.md` y
+`docs/contratos/DECISIONES_PROVISIONALES_VBG.md` (19 decisiones provisionales, pendientes de
+validar con el equipo clínico/legal).
+
+- **M1 — Higiene y cimientos.** Modo de demostración transversal (`MaestrosVbgService`,
+  `RegistroVbgDatosService`, `CasosSimuladosService`) para probar el módulo sin backend, con
+  la misma franja «Datos de demostración» y datos evidentemente ficticios que ya usaba el
+  panel de inicio. Corregidos de paso: módulo inalcanzable (EST-01), catálogo sin respaldo
+  ante fallo del backend (EST-02), código muerto (EST-04), el spec de `RegisterComponent`
+  (`NG0201`, con `provideRouter([])` en el `TestBed`) y los 3 avisos de lint que habían hecho
+  subir el tope a 302.
+- **M2 — Clasificación y documentación del hecho.** La mayoría de los campos de las
+  secciones 0–3 de la matriz ya existían; el trabajo fue de posición (filtro VBG como primer
+  campo de la pestaña), obligatoriedad condicional (Ámbito/Forma de Ocurrencia solo si
+  VBG = Sí) y dos niveles de Relación Misional/Institucional con validación de al menos una
+  opción marcada.
+- **M3 — Identificación, presunto agresor y apreciaciones.** «Datos del presunto agresor» y
+  «Apreciaciones» se extrajeron a componentes compartidos (`ModalPresuntoAgresorComponent`,
+  `SeccionApreciacionesComponent`) en vez de duplicar la plantilla entre `registro-caso` y
+  `registro-atencion`. Se agregó el campo «¿Cuál?» para cuando el vínculo (universidad o
+  víctima) es «Otro»: no existía en el modal del agresor (el diagnóstico original citaba el
+  control de un campo distinto).
+- **M4 — Acuerdos, compromisos, seguimientos y cierre.** Rutas Internas/Externas pasan de un
+  modal único a dos grupos de checkboxes independientes; «Fecha de Cumplimiento» queda como
+  encabezado correcto (de paso se corrigió un bug preexistente: las columnas «Profesional» y
+  «Compromiso» de esa tabla se mostraban intercambiadas). Se retira «Otros casos y medidas de
+  protección» de la UI sin borrar sus datos ni sus handlers. `SeccionSeguimientosComponent`
+  aísla los seguimientos por especialidad y alerta si cerrar uno deja sin profesional activa
+  a esa especialidad (`esUltimaProfesionalActiva()`). Confirmación antes de vaciar rutas o
+  remisiones al poner Acuerdos = No (EST-03). Especialidades agregadas a las cuentas de
+  prueba `PROFESIONAL` (P-12), requisito para el aislamiento anterior.
+- **M5 — Alineación terminológica y grupo de atención. Cierra el plan M1–M5.** «Grupo de
+  atención» (sección 9 de la matriz) llegaba vacío a la UI por una pérdida de datos en tres
+  capas (`aCitaDto()`/`aCasoDto()` y los dos mapeadores de tabla de `registro-caso`/
+  `registro-atencion`); ahora es un campo de solo lectura propio, sin `FormControl`. Se
+  alineó la terminología del rol Usuario con `P-VBG-02` (`fechaAcordada` →
+  `fechaCumplimiento`, «Lo que acordamos» → «Lo que decidiste hacer»); los KPI del panel
+  declaran su alcance (`P-VBG-01/03`) y el umbral de 15 días del indicador de trabajo queda
+  en una constante documentada (`P-VBG-07`).
+- **Corrección de navegación (hallazgo de M5, fuera de la matriz VBG).** `sidebar` y
+  `horizontal-nav` no consumen `CATALOGO_MODULOS` y tenían una entrada duplicada de
+  «Auditoría de Casos» en Reportes y Métricas; se retiró la duplicada y se corrigieron los
+  títulos de ruta de `solicitud-acompanamiento` y `cita` para que coincidan con el menú. La
+  arquitectura de fondo **no se tocó**: ambos componentes tienen reglas de visibilidad por
+  rol distintas entre sí y secciones institucionales («UAD Equipos 3 y 4», «Ruta Violeta»)
+  que hoy no están modeladas en el catálogo — ver pendiente más abajo.
+- **Selector de rol de «Modo Prueba» (`cambiarRolMock()`).** Cambiar de rol desde el
+  encabezado no refrescaba el panel: `router.navigate(['/inicio'])` es un no-op cuando ya se
+  está en `/inicio` (`onSameUrlNavigation: 'ignore'`, el valor por defecto de Angular, sin
+  override en `app.config.ts`). Se reemplaza por una recarga completa de la página.
+
+**Componentes y servicios nuevos** (ver §4): `MaestrosVbgService`, `RegistroVbgDatosService`,
+`CasosSimuladosService`, `core/catalogos/catalogo-vbg.ts`, `core/vbg/caso-simulado.model.ts`,
+`SeccionSeguimientosComponent`, `esUltimaProfesionalActiva()`, `ModalPresuntoAgresorComponent`,
+`SeccionApreciacionesComponent`.
+
+### 2026-10-05 — Incorporación de los documentos de contexto (cierra P-01)
+Dos documentos que `CLAUDE.md` §1 declaraba normativos vivían solo en el disco local. Se
+versionan para que cualquier sesión posterior los tenga sin depender de un respaldo personal.
+
+- **`.agents/supports/casilda-diseno-v1.md` — cierra el pendiente P-01.** Es el documento real
+  del que se derivó el sistema de diseño: **55 de sus 60 tokens CSS son idénticos** a
+  `src/styles/_tokens.scss`, y su `SITIO_NEUTRAL` (`https://www.google.com`) es el valor de
+  `environment.quickExitUrl` en ambos entornos. La ruta elegida no es nueva: ya la citaba
+  `docs/evidencias/accesibilidad/plan_accesibilidad.md` §791.
+  - **Las 5 divergencias son evoluciones deliberadas, no errores del repositorio:**
+    `--font-serif` y `--font-sans` (el documento dice `Times New Roman` + `Lato`; el proyecto
+    usa `Lora` + `Inter` por decisión del 2026-09-03, conservando los del documento como
+    respaldo), `--color-danger` y `--color-info` (renombrado del prefijo `--udea-red-032` /
+    `--udea-blue-633` a `--udea-pantone-*`) y `--focus-ring` (indirección a
+    `--focus-ring-color`). Por eso §3 y `_tokens.scss` **prevalecen** sobre el documento.
+  - **Lo que el documento no define:** tarjeta de indicador (DSH-11-05), zonas de panel ni
+    paleta `--color-data-*` (P-03). Su hoja de ruta §6 tiene 4 fases y no contempla el panel
+    de inicio, de modo que la arquitectura Z1–Z6 del 2026-10-04 no lo contradice.
+- **`AGENTS.md`** se versiona como trazabilidad del prompt con que se condujo la migración
+  Angular 17 → 21 (ya completada). No tiene efecto sobre el código.
+- Ninguno de los dos contiene credenciales, datos personales ni teléfonos de relleno.
+
 ### Pendiente
 1. Accesibilidad — tareas abiertas priorizadas en
    `docs/evidencias/accesibilidad/plan_accesibilidad.md` §6: fases 0.1/0.2/0.4 (axe,
@@ -180,11 +324,69 @@ Detalle y métricas en `docs/evidencias/accesibilidad/01-fases-1-5-correcciones.
    `registro-caso` y `registro-atencion`), 4.2 (136 colores literales sin token), 4.4/4.5
    (reflujo 320 px y texto 200 %), 5.3 (`jasmine-axe`) y Fase 6 (NVDA/VoiceOver, personas
    usuarias, declaración de accesibilidad).
-2. Sustituir el mock de `ContenidoHomeService` por el endpoint real del gestor de contenidos.
+2. Sustituir el mock de `ContenidoHomeService` por el endpoint real del gestor de contenidos,
+   según `docs/contratos/contrato-contenidos-home.md` (host por `environment*.ts`, ruta
+   relativa `/contenidos/home` fija).
 3. Confirmar con Comunicaciones UdeA: dependencia exacta del logosímbolo y uso del
    distintivo de Casilda como favicon.
-4. Datos reales de contacto: `environment.telefonoOrientacion` y los del pie público.
+4. Datos reales de contacto: `environment.telefonoOrientacion` y `environment.telefonoContactoPublico`.
+   Ambos quedan **vacíos a propósito**: mientras no haya dato confirmado, la línea no se
+   muestra (`esTelefonoPublicable()` en `src/app/core/security/telefono-crisis.ts`). Nunca
+   reponer un número de relleno: hay pruebas que fallan si vuelve a aparecer.
 5. Validar con el equipo de atención el tono de los mensajes de error y notificaciones.
+6. **Antes de conectar el backend o de cualquier despliegue fuera de desarrollo:** retirar o
+   condicionar a un flag las cuentas de prueba, `loginAsMock()`, `createMockToken`, las
+   contraseñas genéricas y el selector de roles del encabezado y del login (hallazgo ADD-01
+   de `docs/evidencias/dashboards/00-diagnostico-y-plan.md`). Hoy permiten obtener una sesión
+   `ADMIN` con un clic. Se aceptan como deuda conocida mientras el proyecto esté
+   exclusivamente en etapa de desarrollo y sin backend.
+7. **Panel de inicio — decisiones del equipo que bloquean el cierre de la fase**
+   (detalle en `docs/evidencias/dashboards/00-diagnostico-y-plan.md` §7):
+   - **Validar con el equipo de atención cada texto de la vista del rol Usuario** antes de
+     desplegarla. Es requisito del skill `casilda-ux` y del §5 del contrato.
+   - ~~**P-01**~~ **Resuelto el 2026-10-05:** el documento se incorporó al repositorio en
+     `.agents/supports/casilda-diseno-v1.md` (ruta que ya citaba
+     `docs/evidencias/accesibilidad/plan_accesibilidad.md` §791). **No define tarjeta de
+     indicador, zonas de panel ni paleta de gráficos**, de modo que DSH-11-05 y P-03 siguen
+     abiertos por mérito propio, pero ya no bloqueados por un archivo ausente.
+   - **P-03** Paleta `--color-data-*` para series de datos (propuesta con contrastes
+     calculados en el §5 del diagnóstico). El documento v1 **no la cubre**.
+   - **P-05** Categorías oficiales de identidad de género.
+   - **P-06** Umbral de supresión de celdas pequeñas; hoy **5**, el valor que propone el
+     propio contrato (`UMBRAL_SUPRESION` en `core/vigilancia/supresion-celdas.ts`).
+   - **P-07** Nombres oficiales de módulo para `core/navegacion/catalogo-navegacion.ts`.
+   - **P-02** Catálogo de roles. **P-12 (especialidades) ya se resolvió** en M4: se
+     agregaron a las cuentas de prueba `PROFESIONAL` y `SeccionSeguimientosComponent` ya
+     aísla por especialidad (DSH-08-01); sigue pendiente el catálogo oficial de roles.
+   - **P-13 / P-14 / P-15 / P-16** Tiempos de respuesta comunicables, nombre identitario,
+     política de lenguaje inclusivo y título/favicon neutros para el rol Usuario.
+8. **Validar `docs/contratos/DECISIONES_PROVISIONALES_VBG.md`** con el equipo clínico/legal:
+   19 decisiones de contenido que hoy permiten demostrar el módulo Equipo de Atención
+   mientras se confirma la versión oficial (entregable de M1).
+9. **Pendiente 17 de la matriz** (tabla de decisión del Grupo de Atención 1–6) sigue sin
+   definirse: VBG-09-01/02 (M5) solo entregan el campo de solo lectura, no el cálculo.
+10. **Confirmar con Backend** si `VinculoUdeAEnum` (14 códigos) se homologa al árbol de 10
+    valores de `VINCULO_UNIVERSIDAD` en la matriz, o si el frontend debe mapearlos
+    (hallazgo de M1, mismo tipo de pregunta que P-VBG-06 pero para vínculos).
+11. **Documentos de contexto que siguen fuera del repositorio** (hallazgo del 2026-10-05, al
+    incorporar `casilda-diseno-v1.md`):
+    - `ANALISIS_ARQUITECTURA_Y_MIGRACION.md` es fuente de referencia nº 2 en §1 y la fuente de
+      verdad que exige `AGENTS.md`, pero **no está en el repositorio ni en el historial de
+      Git**. Recuperarlo del respaldo de quien condujo la migración o retirar la referencia.
+    - La regla `skills/` de `.gitignore:30` excluye **cualquier** carpeta llamada `skills` en
+      cualquier nivel, así que `.agents/skills/**` y `.claude/skills/casilda-ux/SKILL.md`
+      nunca se versionan, pese a ser normativos en §1.
+      `.agents/skills/angular_frontend_guidelines/SKILL.md` solo sobrevive porque se
+      commiteó antes de la regla. Decidir si los skills propios del equipo
+      (`casilda-ux`, `accessibility`, `angular_frontend_guidelines`) se exceptúan —por
+      ejemplo con `!.agents/skills/` y `!.claude/skills/`— mientras los skills de terceros
+      (con su `LICENSE.txt`) siguen ignorados. **No se tocó `.gitignore` en este cambio**
+      porque versionar ~70 archivos de skills de terceros es una decisión del equipo.
+12. **Navegación:** decidir si `sidebar`/`horizontal-nav` deben terminar consumiendo
+    `CATALOGO_MODULOS` (hallazgo de M5). Esta fase solo corrigió la entrada duplicada de
+    «Auditoría de Casos» y dos títulos de ruta; no tocó la arquitectura de fondo porque
+    ambos componentes tienen reglas de visibilidad por rol distintas entre sí y secciones
+    institucionales («UAD Equipos 3 y 4», «Ruta Violeta») no modeladas en el catálogo.
 
 ## 6. Reglas que no se deben romper
 

@@ -20,19 +20,18 @@
 
     <div class="form-row-full">
       <mat-form-field appearance="outline">
-        <mat-label>Lugar de Ocurrencia *</mat-label>
+        <mat-label>Lugar específico (opcional)</mat-label>
         <input matInput [(ngModel)]="data.lugar" placeholder="Ej: Aula 204, Oficina, Virtual...">
+        <mat-hint>Detalle del sitio dentro de este hecho. No es el campo "Lugar de Ocurrencia" (Dentro/Fuera/Mixto) de la pestaña Documentación.</mat-hint>
       </mat-form-field>
     </div>
 
     <div class="form-row-full">
       <mat-form-field appearance="outline" class="field-descripcion">
-        <mat-label>
-          Descripción de los Hechos *
-          <button type="button" class="help-tooltip-trigger" matTooltip="Describa los hechos en circunstancias de tiempo, modo y lugar." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
-        </mat-label>
+        <mat-label>Descripción de los Hechos *</mat-label>
         <textarea matInput [(ngModel)]="data.descripcion" rows="4"
           placeholder="Describa en detalle lo ocurrido..."></textarea>
+        <mat-hint>Describa los hechos en circunstancias de tiempo, modo y lugar.</mat-hint>
       </mat-form-field>
     </div>
 
@@ -42,7 +41,7 @@
 <mat-dialog-actions align="end" class="modal-actions">
   <button mat-button (click)="onNoClick()">Cancelar</button>
 
-  <button mat-flat-button class="btn-confirm" [mat-dialog-close]="data" [disabled]="!data.fecha || !data.descripcion || !data.lugar">
+  <button mat-flat-button class="btn-confirm" [mat-dialog-close]="data" [disabled]="!data.fecha || !data.descripcion">
     <mat-icon aria-hidden="true">check</mat-icon>
     Agregar
   </button>

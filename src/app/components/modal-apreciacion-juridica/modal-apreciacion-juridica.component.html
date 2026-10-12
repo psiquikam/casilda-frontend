@@ -4,26 +4,16 @@
 </h2>
 
 <mat-dialog-content class="modal-content">
-  <div class="form-row">
-    <mat-form-field appearance="outline" class="field-tipo">
-      <mat-label>Tipo de Apreciación</mat-label>
-      <mat-select [(ngModel)]="data.idTipoApreciacion" (valueChange)="onTipoChange($event)">
-        @for (tipo of tiposApreciacion; track tipo.id) {
-          <mat-option [value]="tipo.id">{{ tipo.nombre }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="field-desc">
-      <mat-label>Descripción Jurídica</mat-label>
-      <input matInput [(ngModel)]="data.descripcion" placeholder="Detalle el concepto o estado legal">
-    </mat-form-field>
-  </div>
+  <mat-form-field appearance="outline" class="field-desc">
+    <mat-label>Apreciación jurídica</mat-label>
+    <textarea matInput [(ngModel)]="data.descripcion" rows="4"
+      placeholder="Detalle el concepto o estado legal"></textarea>
+  </mat-form-field>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end" class="modal-actions">
   <button mat-button (click)="onNoClick()">Cancelar</button>
-  <button mat-flat-button class="btn-confirm" [mat-dialog-close]="data" [disabled]="!data.tipo || !data.descripcion">
+  <button mat-flat-button class="btn-confirm" [mat-dialog-close]="data" [disabled]="!data.descripcion">
     <mat-icon aria-hidden="true">check</mat-icon>
     Agregar a la lista
   </button>

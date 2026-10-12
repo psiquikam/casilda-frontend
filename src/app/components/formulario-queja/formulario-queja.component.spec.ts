@@ -38,8 +38,8 @@ describe('FormularioQuejaComponent', () => {
     component.formPerfil.get('perfil')?.setValue('tercero_logueado');
     expect(component.tipoUsuario).toBe('tercero_logueado');
 
-    expect(component.formVictima.get('nombre')?.hasError('required')).toBeTrue();
-    expect(component.formVictima.get('apellidos')?.hasError('required')).toBeTrue();
+    expect(component.formVictima.get('primerNombre')?.hasError('required')).toBeTrue();
+    expect(component.formVictima.get('primerApellido')?.hasError('required')).toBeTrue();
     expect(component.formVictima.get('genero')?.hasError('required')).toBeTrue();
     expect(component.formVictima.get('cargo')?.hasError('required')).toBeTrue();
   });
@@ -48,7 +48,7 @@ describe('FormularioQuejaComponent', () => {
     component.formPerfil.get('perfil')?.setValue('tercero_logueado');
     component.formPerfil.get('perfil')?.setValue('victima_logueada');
 
-    expect(component.formVictima.get('nombre')?.hasError('required')).toBeFalse();
+    expect(component.formVictima.get('primerNombre')?.hasError('required')).toBeFalse();
   });
 
   it('should open success dialog when submitting complaint', () => {

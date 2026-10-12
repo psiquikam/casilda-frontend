@@ -36,8 +36,10 @@ export class ModalPresuntoAgresorComponent {
     segundoApellido: '',
     idVinculoUniversidad: null as number | null,
     vinculoUniversidad: '',
+    cualVinculoUniversidad: '',
     idVinculoVictima: null as number | null,
-    vinculoVictima: ''
+    vinculoVictima: '',
+    cualVinculoVictima: ''
   };
 
   catalogoVinculosUdea: MaestroDto[] = [];
@@ -53,11 +55,17 @@ export class ModalPresuntoAgresorComponent {
   onVinculoUdeaChange(id: number): void {
     const selected = this.catalogoVinculosUdea.find(v => v.id === id);
     this.data.vinculoUniversidad = selected ? selected.nombre : '';
+    if (this.data.vinculoUniversidad !== 'Otro') {
+      this.data.cualVinculoUniversidad = '';
+    }
   }
 
   onVinculoVictimaChange(id: number): void {
     const selected = this.catalogoVinculosAgresorVictima.find(v => v.id === id);
     this.data.vinculoVictima = selected ? selected.nombre : '';
+    if (this.data.vinculoVictima !== 'Otro') {
+      this.data.cualVinculoVictima = '';
+    }
   }
 
   onNoClick(): void {

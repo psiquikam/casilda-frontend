@@ -5,6 +5,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { environment } from '../../../environments/environment';
 import { CasildaCardComponent } from '../casilda-card/casilda-card.component';
+import { esTelefonoPublicable } from '../../core/security/telefono-crisis';
 import { ContenidoDestacadoDto, ContenidoHomeService } from '../../services/contenido-home.service';
 
 /**
@@ -23,6 +24,15 @@ export class CasildaHomeComponent implements OnInit {
   private readonly contenidoHome = inject(ContenidoHomeService);
 
   readonly telefonoOrientacion = environment.telefonoOrientacion;
+
+  /**
+   * El llamado a orientación telefónica solo se ofrece si hay un número real.
+   * Un `tel:` vacío o con un número de relleno en un botón rotulado
+   * «de emergencia» es peor que no ofrecer el canal (DSH-05-01).
+   */
+  get hayLineaOrientacion(): boolean {
+    return esTelefonoPublicable(this.telefonoOrientacion);
+  }
 
   readonly cargando = signal(true);
   readonly errorCarga = signal(false);

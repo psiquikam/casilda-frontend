@@ -1,6 +1,5 @@
 import { Component, Inject, OnInit, inject } from '@angular/core';
 
-import { HttpClient } from '@angular/common/http';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -10,8 +9,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { environment } from '../../../environments/environment';
 import { MaestroDto } from '../../services/listas.service';
+import { MaestrosVbgService } from '../../services/maestros-vbg.service';
 
 @Component({
     selector: 'app-modal-remisiones',
@@ -31,14 +30,11 @@ import { MaestroDto } from '../../services/listas.service';
 })
 export class ModalSeguimientosComponent implements OnInit {
 
-  private readonly http = inject(HttpClient);
-  private readonly maestrosUrl = `${environment.apiBaseUrl}/maestros`;
+  private readonly maestrosVbg = inject(MaestrosVbgService);
 
   tiposSeguimiento: MaestroDto[] = [];
   acciones: MaestroDto[] = [];
   actividades: MaestroDto[] = [];
-  estadosSeguimiento: MaestroDto[] = [];
-  motivosEstadoSeguimiento: MaestroDto[] = [];
 
   cargandoMaestros = false;
 
@@ -51,10 +47,6 @@ export class ModalSeguimientosComponent implements OnInit {
     idactividad: null as number | null,
     actividad: '',
     descripcion: '',
-    idestadoseguimiento: null as number | null,
-    estadoSeguimiento: '',
-    idmotivoestado: null as number | null,
-    motivoEstado: '',
     archivo: null as File | null
   };
 
@@ -89,11 +81,11 @@ export class ModalSeguimientosComponent implements OnInit {
     this.data.actividad = '';
     this.actividades = [];
 
-    if (id == null) {
+    if (id == null || !item?.codigo) {
       return;
     }
 
-    this.http.get<MaestroDto[]>(`${this.maestrosUrl}/actividades/por-accion/${id}`).subscribe({
+    this.maestrosVbg.obtenerCatalogo(`acciones-seguimiento/padre/${item.codigo}`).subscribe({
       next: (data) => { this.actividades = data; },
       error: () => { this.actividades = []; }
     });
@@ -105,22 +97,9 @@ export class ModalSeguimientosComponent implements OnInit {
     this.data.actividad = item?.nombre ?? '';
   }
 
-  seleccionarEstadoSeguimiento(id: number | null): void {
-    const item = this.estadosSeguimiento.find((x) => x.id === id);
-    this.data.idestadoseguimiento = id;
-    this.data.estadoSeguimiento = item?.nombre ?? '';
-  }
-
-  seleccionarMotivoEstado(id: number | null): void {
-    const item = this.motivosEstadoSeguimiento.find((x) => x.id === id);
-    this.data.idmotivoestado = id;
-    this.data.motivoEstado = item?.nombre ?? '';
-  }
-
   guardar(): void {
     if (!this.data.fecha || this.data.idtiposeguimiento == null || this.data.idaccion == null ||
-        this.data.idactividad == null || this.data.idestadoseguimiento == null ||
-        this.data.idmotivoestado == null || !this.data.descripcion) {
+        this.data.idactividad == null || !this.data.descripcion) {
       return;
     }
 
@@ -139,7 +118,7 @@ export class ModalSeguimientosComponent implements OnInit {
   private cargarMaestrosSeguimiento(): void {
     this.cargandoMaestros = true;
 
-    this.http.get<MaestroDto[]>(`${this.maestrosUrl}/tipos-seguimiento`).subscribe({
+    this.maestrosVbg.obtenerCatalogo('tipos-seguimiento').subscribe({
       next: (data) => {
         this.tiposSeguimiento = data;
         this.intentarBloquearTipoDesdeEntrada();
@@ -151,19 +130,9 @@ export class ModalSeguimientosComponent implements OnInit {
       }
     });
 
-    this.http.get<MaestroDto[]>(`${this.maestrosUrl}/acciones`).subscribe({
+    this.maestrosVbg.obtenerCatalogo('acciones-seguimiento').subscribe({
       next: (data) => { this.acciones = data; },
       error: () => { this.acciones = []; }
-    });
-
-    this.http.get<MaestroDto[]>(`${this.maestrosUrl}/estados-seguimiento`).subscribe({
-      next: (data) => { this.estadosSeguimiento = data; },
-      error: () => { this.estadosSeguimiento = []; }
-    });
-
-    this.http.get<MaestroDto[]>(`${this.maestrosUrl}/motivos-estado-seguimiento`).subscribe({
-      next: (data) => { this.motivosEstadoSeguimiento = data; },
-      error: () => { this.motivosEstadoSeguimiento = []; }
     });
   }
 

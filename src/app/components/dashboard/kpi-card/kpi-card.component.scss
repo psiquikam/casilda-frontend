@@ -1,0 +1,96 @@
+.kpi {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:has(.kpi__enlace:hover),
+  &:has(.kpi__enlace:focus-visible) {
+    border-color: var(--color-primary-border);
+    box-shadow: var(--shadow-md);
+  }
+
+  &__cabecera {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  /* Tipo oración, nunca MAYÚSCULAS sostenidas (DSH-11-04). */
+  &__etiqueta {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text-secondary);
+  }
+
+  &__info {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--touch-target-min);
+    height: var(--touch-target-min);
+    margin: calc(var(--space-2) * -1);
+    background: none;
+    border: none;
+    border-radius: var(--radius-full);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    flex-shrink: 0;
+    /* Por encima del enlace que cubre la tarjeta. */
+    position: relative;
+    z-index: 1;
+
+    &:hover { color: var(--color-primary); }
+
+    mat-icon {
+      font-size: 18px !important;
+      width: 18px !important;
+      height: 18px !important;
+    }
+  }
+
+  &__valor {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-2xl);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    line-height: 1;
+    margin: 0;
+  }
+
+  &__matiz {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--color-text-secondary);
+  }
+
+  &__contexto {
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  &__corte {
+    color: var(--color-text-muted);
+  }
+
+  /* Cubre la tarjeta para hacerla clicable sin anidar interactivos. */
+  &__enlace {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-lg);
+  }
+}

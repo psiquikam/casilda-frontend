@@ -1,0 +1,428 @@
+/* Estilos compartidos por los widgets del panel. Solo tokens: ningún color,
+   tipografía, espaciado ni radio literal (regla 1 de `CLAUDE.md`). */
+
+/* --- Z2: lista de pendientes --- */
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-border);
+
+    &:last-child { border-bottom: none; }
+  }
+
+  &__texto {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  &__descripcion {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+  }
+
+  &__radicado {
+    font-family: var(--font-mono);
+    color: var(--color-text-secondary);
+  }
+
+  &__accion {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-height: var(--touch-target-min);
+    padding: var(--space-2) var(--space-3);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: var(--color-secondary);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    flex-shrink: 0;
+
+    &:hover { background-color: var(--color-secondary-tint); }
+
+    mat-icon {
+      font-size: 18px !important;
+      width: 18px !important;
+      height: 18px !important;
+    }
+  }
+}
+
+/* --- Z3: cuadrícula de indicadores --- */
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: var(--space-4);
+}
+
+/* --- Tablas de los widgets --- */
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+
+  th, td {
+    text-align: left;
+    padding: var(--space-3) var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  thead th {
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    color: var(--color-text-muted);
+    border-bottom: 2px solid var(--color-border);
+  }
+
+  tbody th {
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  td { color: var(--color-text-secondary); }
+
+  tbody tr:last-child th,
+  tbody tr:last-child td { border-bottom: none; }
+
+  &__radicado {
+    display: block;
+    font-family: var(--font-mono);
+    color: var(--color-text-primary);
+  }
+
+  &__iniciales {
+    display: block;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+  }
+
+  &__punto {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: var(--space-2);
+    border-radius: var(--radius-full);
+
+    &--1 { background-color: var(--color-primary); }
+    &--2 { background-color: var(--color-comp-blue); }
+    &--3 { background-color: var(--color-comp-purple); }
+    &--4 { background-color: var(--color-comp-orange); }
+  }
+}
+
+/* --- Barra decorativa de la distribución --- */
+.barra {
+  display: flex;
+  width: 100%;
+  height: 12px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  background-color: var(--color-bg-subtle);
+
+  &__tramo {
+    height: 100%;
+
+    &--1 { background-color: var(--color-primary); }
+    &--2 { background-color: var(--color-comp-blue); }
+    &--3 { background-color: var(--color-comp-purple); }
+    &--4 { background-color: var(--color-comp-orange); }
+  }
+}
+
+/* --- Ocupación del equipo --- */
+.ocupacion {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+
+  &__pista {
+    display: block;
+    width: 72px;
+    height: 8px;
+    border-radius: var(--radius-full);
+    background-color: var(--color-bg-subtle);
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  &__barra {
+    display: block;
+    height: 100%;
+
+    &--bajo { background-color: var(--color-secondary); }
+    &--normal { background-color: var(--color-success); }
+    /* Ámbar, no rojo: el rojo queda para la salida rápida (DSH-P5). */
+    &--alto { background-color: var(--color-warning); }
+  }
+
+  &__cifra {
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-primary);
+  }
+}
+
+/* --- Z5: accesos frecuentes --- */
+.accesos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+
+  &__enlace {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--touch-target-min);
+    padding: var(--space-2) var(--space-4);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: var(--color-secondary);
+    text-decoration: none;
+    background-color: var(--color-bg-surface);
+    border: 1.5px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+
+    &:hover {
+      background-color: var(--color-secondary);
+      color: var(--color-text-on-primary);
+      border-color: var(--color-secondary);
+    }
+  }
+}
+
+/* --- Z6: ayuda y protocolos --- */
+.ayuda {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+
+  &__disparador {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    min-height: var(--touch-target-min);
+    padding: var(--space-4) var(--space-5);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+
+    &:hover { background-color: var(--color-bg-main); }
+
+    > mat-icon:first-child { color: var(--color-primary); flex-shrink: 0; }
+  }
+
+  &__titulo {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-base);
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  &__pista {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    flex: 1;
+  }
+
+  &__chevron {
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+  }
+
+  &__contenido {
+    display: none;
+    gap: var(--space-6);
+    padding: 0 var(--space-5) var(--space-5);
+    border-top: 1px solid var(--color-border);
+
+    &--abierta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      padding-top: var(--space-5);
+    }
+  }
+
+  &__bloque {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  /* `h3`: serif por `_base.scss`. */
+  &__subtitulo {
+    font-size: var(--font-size-base);
+    margin: 0;
+  }
+
+  &__nota {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+
+  &__ruta,
+  &__lista {
+    margin: 0;
+    padding-left: var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    line-height: var(--line-height-base);
+
+    strong { color: var(--color-text-primary); }
+
+    a {
+      color: var(--color-secondary);
+      font-weight: 700;
+      text-decoration: underline;
+    }
+  }
+
+  &__lista { list-style: none; padding-left: 0; }
+
+  &__ruta li {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 600px) {
+  .lista__item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .tabla {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+/* --- Filtros de la vista analítica (§4.5) --- */
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+
+  &__campo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 170px;
+    flex: 1;
+  }
+
+  &__etiqueta {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    color: var(--color-text-secondary);
+  }
+
+  &__select {
+    min-height: var(--touch-target-min);
+    padding: var(--space-2) var(--space-3);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-surface);
+    border: 1.5px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+
+    &:focus-visible {
+      border-color: var(--color-primary);
+      outline: var(--focus-ring);
+      outline-offset: 1px;
+    }
+  }
+}
+
+/* --- Celdas suprimidas y su explicación --- */
+.tabla {
+  &__pie {
+    caption-side: bottom;
+    padding-top: var(--space-3);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    text-align: left;
+  }
+
+  &__suprimida {
+    font-family: var(--font-mono);
+    color: var(--color-text-muted);
+  }
+}
+
+.nota-privacidad {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-bg-info-light);
+  border-left: 4px solid var(--color-secondary);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-base);
+
+  mat-icon {
+    color: var(--color-secondary);
+    flex-shrink: 0;
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
+  }
+}
+
+/* Aviso sutil de última profesional activa (DSH-08-03). No es una urgencia:
+   sin rojo, sin contador y sin signos de admiración. */
+.lista__aviso {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  color: var(--color-secondary);
+
+  mat-icon {
+    font-size: 14px !important;
+    width: 14px !important;
+    height: 14px !important;
+  }
+}

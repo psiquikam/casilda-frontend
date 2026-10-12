@@ -32,7 +32,7 @@ describe('PublicHeaderComponent', () => {
     const nav: HTMLElement = fixture.nativeElement.querySelector('nav');
 
     expect(nav.getAttribute('aria-label')).toBeTruthy();
-    expect(nav.querySelectorAll('li a').length).toBe(3);
+    expect(nav.querySelectorAll('li a').length).toBe(4);
   });
 
   it('debe ofrecer un acceso de regreso al inicio', () => {

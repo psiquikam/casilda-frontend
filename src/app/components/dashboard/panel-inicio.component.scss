@@ -1,0 +1,60 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-6) var(--space-12);
+  box-sizing: border-box;
+
+  &__demo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    padding: var(--space-2) var(--space-4);
+    background-color: var(--color-bg-warning-light);
+    border: 1px solid var(--color-warning);
+    border-radius: var(--radius-md);
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+
+    mat-icon {
+      color: var(--color-warning);
+      flex-shrink: 0;
+      font-size: 20px !important;
+      width: 20px !important;
+      height: 20px !important;
+    }
+  }
+
+  /* Z1 en una línea: el saludo no debe competir con el contenido (DSH-01-04). */
+  &__saludo {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  /* `h1`: serif por `_base.scss`. */
+  &__titulo {
+    font-size: var(--font-size-xl);
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+
+  &__fecha {
+    font-family: var(--font-sans);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .panel {
+    padding: var(--space-4) var(--space-4) var(--space-8);
+    gap: var(--space-4);
+  }
+}

@@ -1,0 +1,52 @@
+<div class="panel">
+
+  @if (datosDemostracion) {
+    <!-- Franja visible mientras los indicadores vengan de datos simulados, para
+         que nadie los interprete como cifras reales (DSH-12-08). -->
+    <p class="panel__demo" role="status">
+      <mat-icon aria-hidden="true">science</mat-icon>
+      <span>Datos de demostración. Las cifras de este panel son simuladas.</span>
+    </p>
+  }
+
+  <!-- Z1 — Saludo compacto en una línea -->
+  <header class="panel__saludo">
+    <h1 class="panel__titulo">Hola, {{ nombreCorto }}</h1>
+    <p class="panel__fecha">{{ hoy | date:'fullDate' }}</p>
+  </header>
+
+  <!-- Z2 — Atención requerida, antes que los indicadores (DSH-07-01) -->
+  @if (incluye('pendientes')) {
+    <app-widget-pendientes [rol]="rol" />
+  }
+
+  <!-- Z3 — Indicadores clave -->
+  @if (incluye('kpis')) {
+    <app-widget-kpis [rol]="rol" />
+  }
+
+  <!-- Z4 — Vista principal del rol -->
+  @if (incluye('distribucion-identidad')) {
+    <app-widget-distribucion-identidad />
+  }
+  @if (incluye('vigilancia')) {
+    <app-widget-vigilancia />
+  }
+  @if (incluye('agenda-hoy')) {
+    <app-widget-agenda-hoy />
+  }
+  @if (incluye('carga-equipo')) {
+    <app-widget-carga-equipo />
+  }
+
+  <!-- Z5 — Accesos frecuentes -->
+  @if (incluye('accesos-frecuentes')) {
+    <app-widget-accesos-frecuentes [rol]="rol" [esAdmin]="esAdmin" />
+  }
+
+  <!-- Z6 — Ayuda y protocolos -->
+  @if (incluye('ayuda-protocolos')) {
+    <app-widget-ayuda-protocolos />
+  }
+
+</div>

@@ -14,6 +14,8 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { MatDialog } from '@angular/material/dialog';
 import { ReprogramarCitaModalComponent } from '../modal-reprogramar-cita/modal-reprogramar-cita.component';
 import { SolicitudService, CitaDto, EstadoCitaEnum } from '../../services/solicitud.service';
+import { RegistroVbgDatosService } from '../../services/registro-vbg-datos.service';
+import { environment } from '../../../environments/environment';
 import { formatOnlyDate } from '../../custom-date-adapter';
 import { FiltroColumnaDirective } from '../../core/a11y/filtro-columna.directive';
 import { NotificacionService } from '../../core/a11y/notificacion.service';
@@ -41,6 +43,10 @@ export class CitaComponent implements OnInit, AfterViewInit {
   private router = inject(Router);
   private dialog = inject(MatDialog);
   private solicitudService = inject(SolicitudService);
+  private readonly registroVbgDatos = inject(RegistroVbgDatosService);
+
+  /** DSH-12-08: franja visible mientras los datos sean simulados. */
+  readonly datosDemostracion = environment.datosDemostracion;
   formatOnlyDate = formatOnlyDate;
 
   displayedColumns: string[] = ['expand', 'id', 'nombre', 'documento', 'fechaCita', 'profesional', 'tipoSolicitud', 'estadoCita', 'acciones'];
@@ -70,7 +76,7 @@ export class CitaComponent implements OnInit, AfterViewInit {
 
   cargarCitas(page: number, size: number): void {
     this.cargando = true;
-    this.solicitudService.listarCitasPaginadas(page, size).subscribe({
+    this.registroVbgDatos.listarCitasPaginadas(page, size).subscribe({
       next: (respuesta) => {
         this.dataSource.data = respuesta.content;
         this.totalElementos = respuesta.totalElements;

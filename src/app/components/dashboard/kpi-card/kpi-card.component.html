@@ -1,0 +1,45 @@
+<article class="kpi">
+  <div class="kpi__cabecera">
+    <span class="kpi__etiqueta">{{ indicador().etiqueta }}</span>
+    <button
+      type="button"
+      class="kpi__info"
+      [attr.aria-label]="etiquetaDefinicion()"
+      [matTooltip]="indicador().definicion"
+    >
+      <mat-icon aria-hidden="true">info_outline</mat-icon>
+    </button>
+  </div>
+
+  <p class="kpi__valor">
+    @if (indicador().comparador) {
+      <span class="kpi__matiz">{{ indicador().comparador }}</span>
+    }
+    @if (indicador().proporcion) {
+      {{ indicador().valor | percent:'1.0-1' }}
+    } @else {
+      {{ indicador().valor | number }}
+    }
+    @if (indicador().unidad) {
+      <span class="kpi__matiz">{{ indicador().unidad }}</span>
+    }
+  </p>
+
+  <p class="kpi__contexto">
+    {{ indicador().periodo }}
+    @if (indicador().denominador; as d) {
+      · {{ d.valor | number }} {{ d.etiqueta }}
+    }
+    <span class="kpi__corte">Corte: {{ corte() | date:'d MMM, h:mm a' }}</span>
+  </p>
+
+  <!-- La definición también debe ser alcanzable por lector de pantalla: el
+       tooltip solo aparece con puntero o foco visual (DSH-11-01). -->
+  <span class="visually-hidden">{{ indicador().definicion }}</span>
+
+  @if (esClicable()) {
+    <a class="kpi__enlace" [routerLink]="indicador().ruta">
+      <span class="visually-hidden">Ver {{ indicador().etiqueta.toLowerCase() }}</span>
+    </a>
+  }
+</article>

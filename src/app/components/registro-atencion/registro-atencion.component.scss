@@ -390,3 +390,28 @@ input[readonly] { color: #555; cursor: default; }
 .vbg-header mat-radio-group { display: flex; gap: 10px; }
 .vbg-options { display: flex; flex-direction: column; gap: 6px; }
 
+
+/* Franja «Datos de demostración» (DSH-12-08). Mismos tokens que
+   `panel-inicio.component.scss`, para que la señal se vea igual en todo el
+   aplicativo. */
+.franja-demo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-4);
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--color-bg-warning-light);
+  border: 1px solid var(--color-warning);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+
+  mat-icon {
+    color: var(--color-warning);
+    flex-shrink: 0;
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
+  }
+}

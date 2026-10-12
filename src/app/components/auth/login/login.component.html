@@ -40,8 +40,8 @@
       <div class="mock-grid">
         @for (mock of mockUsersList; track mock.id) {
           <button type="button" class="btn-mock-pill" [class]="'btn-mock-pill--' + mock.badgeClass"
-            (click)="loginRapidoMock(mock)" [title]="mock.descripcion">
-            <span class="btn-mock-pill__role">{{ mock.rol }}</span>
+            (click)="loginRapidoMock(mock)" [title]="mock.especialidad ? mock.descripcion + ' (' + mock.especialidad + ')' : mock.descripcion">
+            <span class="btn-mock-pill__role">{{ mock.especialidad ? mock.rol + ' · ' + mock.especialidad : mock.rol }}</span>
             <span class="btn-mock-pill__name">{{ mock.nombre.split(' ')[0] }}</span>
           </button>
         }
@@ -93,6 +93,13 @@
         {{ loading ? 'Verificando tus credenciales, espera un momento.' : '' }}
       </p>
     </form>
+
+    <p class="login__registro">
+      ¿No tienes cuenta?
+      <a routerLink="/registro" class="login__registro-enlace">
+        Crea una de forma segura
+      </a>
+    </p>
 
     <p class="login__recuperacion">
       <a [href]="'mailto:' + correoSoporte + '?subject=Recuperaci%C3%B3n%20de%20contrase%C3%B1a%20CASILDA'">

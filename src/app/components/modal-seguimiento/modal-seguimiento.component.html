@@ -50,26 +50,6 @@
       <mat-label>Descripción *</mat-label>
       <textarea matInput [(ngModel)]="data.descripcion" rows="5" placeholder="Ingrese detalles"></textarea>
     </mat-form-field>
-
-    <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
-      <mat-form-field appearance="outline">
-        <mat-label>Estado de seguimiento *</mat-label>
-        <mat-select [(ngModel)]="data.idestadoseguimiento" (ngModelChange)="seleccionarEstadoSeguimiento($event)">
-          @for (opcion of estadosSeguimiento; track opcion) {
-            <mat-option [value]="opcion.id">{{opcion.nombre}}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline">
-        <mat-label>Motivo del estado *</mat-label>
-        <mat-select [(ngModel)]="data.idmotivoestado" (ngModelChange)="seleccionarMotivoEstado($event)">
-          @for (opcion of motivosEstadoSeguimiento; track opcion) {
-            <mat-option [value]="opcion.id">{{opcion.nombre}}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-    </div>
   </div>
 
   <div class="file-section">
@@ -84,7 +64,7 @@
 <mat-dialog-actions align="end" class="modal-actions">
   <button mat-button (click)="onNoClick()">Cancelar</button>
   <button mat-flat-button class="btn-confirm" (click)="guardar()"
-                [disabled]="data.idtiposeguimiento === null || data.idaccion === null || data.idactividad === null || data.idestadoseguimiento === null || data.idmotivoestado === null || !data.descripcion || !data.fecha">
+                [disabled]="data.idtiposeguimiento === null || data.idaccion === null || data.idactividad === null || !data.descripcion || !data.fecha">
     <mat-icon aria-hidden="true">check</mat-icon>
     Guardar Seguimiento
   </button>
