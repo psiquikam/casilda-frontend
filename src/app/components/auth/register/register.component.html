@@ -116,11 +116,11 @@
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Número de teléfono (Opcional)</mat-label>
-              <input matInput type="tel" formControlName="telefono" autocomplete="tel" inputmode="tel">
-              <mat-hint>Si deseas que te contactemos por llamada.</mat-hint>
+              <mat-label>Número de celular *</mat-label>
+              <input matInput type="tel" formControlName="telefono" autocomplete="tel" inputmode="numeric">
+              <mat-hint>Lo usaremos únicamente para verificar tu cuenta de forma segura.</mat-hint>
               @if (controlInvalido(step2Form, 'telefono')) {
-                <mat-error>El teléfono debe contener solo números</mat-error>
+                <mat-error>Ingresa un número de celular válido (mínimo 7 dígitos)</mat-error>
               }
             </mat-form-field>
           </div>
