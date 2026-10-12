@@ -1,4 +1,4 @@
-.stepper-wrapper {
+﻿.stepper-wrapper {
   max-width: 1000px;
   margin: var(--space-4, 20px) auto var(--space-8, 40px);
   padding: var(--space-2, 10px);
@@ -248,16 +248,21 @@
     align-items: center;
     gap: 8px;
   }
+}
+
 .actions {
   display: flex;
   justify-content: flex-end;
   gap: var(--space-3);
   margin-top: var(--space-6);
 }
+
 .register__volver {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
+  align-self: flex-start;
+  min-height: 44px;
   margin-bottom: var(--space-2);
   color: var(--color-secondary);
   font-weight: 600;
@@ -274,5 +279,4 @@
     height: 20px;
     font-size: 20px;
   }
-}
 }
