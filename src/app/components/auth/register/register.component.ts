@@ -46,7 +46,7 @@ export class RegisterComponent {
       primerNombre: ['', [Validators.required, Validators.minLength(2)]],
       segundoNombre: [''],
       primerApellido: ['', [Validators.required, Validators.minLength(2)]],
-      segundoApellido: [''],
+      segundoApellido: ['', [Validators.required, Validators.minLength(2)]],
       tipoDocumento: ['', [Validators.required]],
       documento: ['', [Validators.required, Validators.pattern('^[0-9A-Za-z]+$')]]
     });
@@ -54,7 +54,7 @@ export class RegisterComponent {
     this.step2Form = this.fb.group({
       relacionUniversidad: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      telefono: ['', [Validators.pattern('^[0-9]*$')]]
+      telefono: ['', [Validators.required, Validators.pattern('^[0-9]+$'), Validators.minLength(7), Validators.maxLength(15)]]
     });
 
     this.step3Form = this.fb.group({
