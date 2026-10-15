@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, of, tap, catchError } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-export const AUTH_REQUIRED_MESSAGE = 'Tu sesión venció o no has iniciado sesión. Debes autenticarte para continuar.';
+export const AUTH_REQUIRED_MESSAGE = 'La sesión ha expirado o no ha sido iniciada. Se requiere autenticación para continuar.';
 
 export interface UserSession {
   email: string;

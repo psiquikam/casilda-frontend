@@ -85,7 +85,7 @@ export class CasoComponent implements OnInit {
         this.cargando = false;
       },
       error: (err) => {
-        this.notificacion.error('No fue posible cargar las solicitudes. Recarga la página o intenta más tarde.', err);
+        this.notificacion.error('No fue posible cargar las solicitudes. Recargue la página o intente más tarde.', err);
         this.cargando = false;
       }
     });
@@ -230,7 +230,7 @@ export class CasoComponent implements OnInit {
       width: '350px',
       data: {
         titulo: 'Eliminar caso',
-        mensaje: `¿Seguro que deseas eliminar el caso ${element.id}?`
+        mensaje: `¿Confirma que desea eliminar el caso ${element.id}?`
       }
     });
 
@@ -238,7 +238,7 @@ export class CasoComponent implements OnInit {
       if (confirmado) {
         this.solicitudService.eliminar(element.solicitudId).subscribe({
           next: () => this.cargarDatos(this.pageIndex, this.pageSize),
-          error: (err) => this.notificacion.error('No fue posible eliminar el caso. Intenta de nuevo.', err)
+          error: (err) => this.notificacion.error('No fue posible eliminar el caso. Intente de nuevo.', err)
         });
       }
     });
@@ -261,7 +261,7 @@ export class CasoComponent implements OnInit {
           fechaReparto: result.fechaReparto
         }).subscribe({
           next: () => this.cargarDatos(this.pageIndex, this.pageSize),
-          error: (err) => this.notificacion.error('No fue posible asignar el caso. Intenta de nuevo.', err)
+          error: (err) => this.notificacion.error('No fue posible asignar el caso. Intente de nuevo.', err)
         });
       }
     });

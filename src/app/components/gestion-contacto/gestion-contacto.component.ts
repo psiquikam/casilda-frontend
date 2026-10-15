@@ -140,7 +140,7 @@ export class DetalleAcompanamientoComponent implements OnInit, AfterViewInit {
         });
       },
       error: (err) => {
-        this.notificacion.error('No fue posible cargar las solicitudes. Recarga la página o intenta más tarde.', err);
+        this.notificacion.error('No fue posible cargar las solicitudes. Recargue la página o intente más tarde.', err);
         this.cargando = false;
       }
     });

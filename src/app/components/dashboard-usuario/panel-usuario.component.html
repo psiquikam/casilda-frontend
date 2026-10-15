@@ -4,23 +4,23 @@
   <header class="mi-espacio__saludo">
     <h1 class="mi-espacio__titulo">Hola, {{ nombre }}</h1>
     <p class="mi-espacio__intro">
-      Este es tu espacio. Aquí puedes ver cómo va tu proceso y comunicarte con
-      el equipo que te acompaña, a tu ritmo.
+      Espacio de acompañamiento institucional. Aquí es posible consultar el estado del proceso y comunicarse con
+      el equipo a cargo.
     </p>
   </header>
 
   @if (cargando()) {
     <div class="tarjeta tarjeta--cargando" role="status" aria-busy="true">
-      <span class="visually-hidden">Cargando tu información…</span>
+      <span class="visually-hidden">Cargando información…</span>
       <span class="barra-carga"></span>
       <span class="barra-carga barra-carga--corta"></span>
     </div>
   } @else if (error()) {
     <div class="tarjeta" role="alert">
-      <h2 class="tarjeta__titulo">No pudimos cargar tu información</h2>
+      <h2 class="tarjeta__titulo">No fue posible cargar la información</h2>
       <p class="tarjeta__texto">
-        Puede ser algo pasajero. Si quieres, inténtalo de nuevo; y si prefieres,
-        escríbenos y lo revisamos contigo.
+        Puede ser una intermitencia temporal. Es posible intentar de nuevo o comunicarse
+        a través de los canales institucionales.
       </p>
       <button type="button" class="boton-suave" (click)="cargar()">Intentar de nuevo</button>
     </div>
@@ -28,7 +28,7 @@
 
     <!-- Estado del proceso: qué sigue y quién lo hace (DSH-10-01) -->
     <section class="tarjeta" aria-labelledby="titulo-estado">
-      <h2 class="tarjeta__titulo" id="titulo-estado">Cómo va tu proceso</h2>
+      <h2 class="tarjeta__titulo" id="titulo-estado">Estado del proceso</h2>
       <p class="tarjeta__destacado">{{ datos.estado.resumen }}</p>
       <p class="tarjeta__texto">{{ datos.estado.siguientePaso }}</p>
       <p class="tarjeta__pie">
@@ -45,19 +45,19 @@
 
     <!-- Próxima cita, con opción de pedir un cambio (DSH-10-02) -->
     <section class="tarjeta" aria-labelledby="titulo-cita">
-      <h2 class="tarjeta__titulo" id="titulo-cita">Tu próxima sesión</h2>
+      <h2 class="tarjeta__titulo" id="titulo-cita">Próxima sesión</h2>
       @if (datos.proximaCita; as cita) {
         <p class="tarjeta__destacado">{{ cita.inicio | date:'EEEE d \'de\' MMMM, h:mm a' }}</p>
         <p class="tarjeta__texto">
           {{ cita.modalidad }} · {{ cita.lugar }}<br>
-          Te acompaña {{ cita.acompanaA }}.
+          Acompañamiento a cargo de {{ cita.acompanaA }}.
         </p>
         <div class="tarjeta__acciones">
           <a class="boton-suave" routerLink="/solicitud-acompanamiento">Pedir otro horario</a>
         </div>
       } @else {
         <p class="tarjeta__texto">
-          Aquí verás tu próxima sesión cuando la acordemos contigo.
+          Aquí se mostrará la próxima sesión una vez sea programada.
         </p>
       }
     </section>
@@ -67,10 +67,10 @@
          muestran los compromisos de la persona, nunca los de la dupla o
          profesional (el DTO no modela ese origen a propósito). -->
     <section class="tarjeta" aria-labelledby="titulo-compromisos">
-      <h2 class="tarjeta__titulo" id="titulo-compromisos">Lo que decidiste hacer</h2>
+      <h2 class="tarjeta__titulo" id="titulo-compromisos">Acuerdos y compromisos</h2>
       @if (datos.compromisos.length) {
         <p class="tarjeta__texto">
-          Esto es lo que decidiste hacer. No hay prisa: lo retomamos cuando quieras.
+          Acuerdos y compromisos establecidos para el proceso.
         </p>
         <ul class="acuerdos">
           @for (compromiso of datos.compromisos; track compromiso.id) {
@@ -81,11 +81,11 @@
               <span class="acuerdos__texto">
                 {{ compromiso.descripcion }}
                 @if (compromiso.cumplido) {
-                  <span class="visually-hidden">Ya lo hiciste.</span>
+                  <span class="visually-hidden">Actividad realizada.</span>
                 }
                 @if (compromiso.fechaCumplimiento) {
                   <span class="acuerdos__fecha">
-                    Lo pensamos para el {{ compromiso.fechaCumplimiento | date:'d \'de\' MMMM' }}
+                    Programado para el {{ compromiso.fechaCumplimiento | date:'d \'de\' MMMM' }}
                   </span>
                 }
               </span>
@@ -93,32 +93,32 @@
           }
         </ul>
       } @else {
-        <p class="tarjeta__texto">Por ahora no tienes nada pendiente por hacer.</p>
+        <p class="tarjeta__texto">Por ahora no hay compromisos pendientes.</p>
       }
     </section>
 
     <!-- Contacto y preferencias (DSH-10-04, DSH-10-06) -->
     <section class="tarjeta" aria-labelledby="titulo-contacto">
-      <h2 class="tarjeta__titulo" id="titulo-contacto">Cómo nos comunicamos contigo</h2>
+      <h2 class="tarjeta__titulo" id="titulo-contacto">Canal de comunicación</h2>
       <p class="tarjeta__texto">
-        Nos pediste que te contactáramos por <strong>{{ datos.preferencias.canal | lowercase }}</strong>,
+        Canal de contacto preferente: <strong>{{ datos.preferencias.canal | lowercase }}</strong>,
         {{ datos.preferencias.franjaHoraria | lowercase }}.
         @if (datos.preferencias.sePuedeDejarMensaje) {
-          Podemos dejarte un mensaje si no contestas.
+          Se autorizó dejar mensaje en caso de no respuesta.
         } @else {
-          No dejamos mensajes si no contestas.
+          No se dejan mensajes en caso de no respuesta.
         }
       </p>
       <div class="tarjeta__acciones">
-        <a class="boton-suave" routerLink="/solicitud-acompanamiento">Cambiar cómo te contactamos</a>
+        <a class="boton-suave" routerLink="/solicitud-acompanamiento">Cambiar medio de contacto</a>
       </div>
     </section>
 
     <!-- Reportar otra situación. Acción, no urgencia. -->
     <section class="tarjeta" aria-labelledby="titulo-reportar">
-      <h2 class="tarjeta__titulo" id="titulo-reportar">¿Quieres contarnos algo más?</h2>
+      <h2 class="tarjeta__titulo" id="titulo-reportar">¿Desea solicitar una nueva atención?</h2>
       <p class="tarjeta__texto">
-        Puedes abrir una nueva solicitud de acompañamiento cuando lo necesites.
+        Es posible abrir una nueva solicitud de acompañamiento cuando se requiera.
       </p>
       <div class="tarjeta__acciones">
         <a class="boton-principal" routerLink="/reportar-caso">Pedir acompañamiento</a>
@@ -128,7 +128,7 @@
 
   <!-- Líneas de ayuda: siempre accesibles, en tono sereno (DSH-10-05) -->
   <section class="tarjeta tarjeta--apoyo" aria-labelledby="titulo-apoyo">
-    <h2 class="tarjeta__titulo" id="titulo-apoyo">Si necesitas hablar con alguien ahora</h2>
+    <h2 class="tarjeta__titulo" id="titulo-apoyo">Líneas de ayuda y orientación</h2>
     <p class="tarjeta__texto">Estas líneas atienden de forma gratuita y confidencial.</p>
     <ul class="lineas">
       @if (hayLineaOrientacion) {
@@ -150,14 +150,14 @@
 
   <!-- Seguridad al navegar (DSH-06-04) -->
   <section class="tarjeta tarjeta--privacidad" aria-labelledby="titulo-privacidad">
-    <h2 class="tarjeta__titulo" id="titulo-privacidad">Tu privacidad al navegar</h2>
+    <h2 class="tarjeta__titulo" id="titulo-privacidad">Privacidad durante la navegación</h2>
     <p class="tarjeta__texto">
-      El botón <strong>Salida rápida</strong> te lleva de inmediato a otra página y borra lo
-      que quedó guardado en este navegador. También puedes usarlo con
+      El botón <strong>Salida rápida</strong> redirige de inmediato a otra página y borra la
+      información temporal guardada en este navegador. También es posible activarlo con
       <kbd>Alt</kbd> + <kbd>Q</kbd>.
     </p>
     <p class="tarjeta__texto">
-      Ten en cuenta que <strong>no borra todo el historial del navegador</strong>. Si usas un
+      Tenga en cuenta que <strong>no borra todo el historial del navegador</strong>. Si se utiliza un
       computador o un teléfono compartido, abrir una ventana privada o de incógnito deja
       menos rastro.
     </p>

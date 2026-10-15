@@ -48,7 +48,7 @@ export class ModalCorreoComponent implements OnInit {
   ngOnInit(): void {
     this.http.get<TipoCorreoDto[]>(`${environment.apiBaseUrl}/maestros/tipos-correo`).subscribe({
       next: (tipos) => this.tiposCorreo = tipos,
-      error: (err) => this.notificacion.error('No fue posible cargar los tipos de correo. Cierra el diálogo e intenta de nuevo.', err)
+      error: (err) => this.notificacion.error('No fue posible cargar los tipos de correo. Cierre el diálogo e intente de nuevo.', err)
     });
   }
 

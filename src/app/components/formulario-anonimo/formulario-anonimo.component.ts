@@ -50,9 +50,9 @@ export const TEXTOS_REPORTE: Record<ModoReporte, TextosReporte> = {
     botonEnviar: 'Finalizar y Enviar Reporte Anónimo',
     claveBorrador: 'casilda_borrador_anonimo',
     exitoTitulo: '¡Reporte Anónimo Registrado!',
-    exitoMensaje: 'Tu reporte anónimo ha sido recibido con éxito. Un profesional especializado revisará la información de forma confidencial.',
+    exitoMensaje: 'El reporte anónimo ha sido recibido con éxito. Un profesional especializado revisará la información de forma confidencial.',
     exitoLabelCodigo: 'ID ÚNICO DE REPORTE ANÓNIMO',
-    exitoInstruccion: 'Guarda este ID. Si en algún momento deseas activar una ruta de atención o acompañamiento institucional, inicia sesión en la plataforma e ingresa este ID para vincular tu caso.'
+    exitoInstruccion: 'Conserve este identificador (ID). Para activar una ruta de atención o acompañamiento institucional, inicie sesión en la plataforma e ingrese este ID para vincular el caso.'
   },
   autenticado: {
     titulo: 'Reportar caso de violencia basada en género',
@@ -62,9 +62,9 @@ export const TEXTOS_REPORTE: Record<ModoReporte, TextosReporte> = {
     botonEnviar: 'Finalizar y Enviar Reporte',
     claveBorrador: 'casilda_borrador_reporte',
     exitoTitulo: '¡Reporte Registrado!',
-    exitoMensaje: 'Tu reporte ha sido recibido con éxito. Un profesional especializado revisará la información de forma confidencial.',
+    exitoMensaje: 'El reporte ha sido recibido con éxito. Un profesional especializado revisará la información de forma confidencial.',
     exitoLabelCodigo: 'ID ÚNICO DE REPORTE',
-    exitoInstruccion: 'Guarda este ID. Podrás consultar el avance de tu caso desde «Seguimiento de Trámite» en Mis Solicitudes.'
+    exitoInstruccion: 'Conserve este identificador (ID). Se podrá consultar el avance del caso desde «Seguimiento de Trámite» en Mis Solicitudes.'
   }
 };
 
@@ -111,11 +111,11 @@ export class FormularioAnonimoComponent {
   erroresRelato: ErrorFormulario[] = [];
 
   private readonly camposRelato: DescripcionCampos = {
-    sedeCampus: { etiqueta: 'Campus', mensajes: { required: 'Indícanos en qué campus ocurrió.' } },
-    lugarDetalleExterno: { etiqueta: 'Lugar fuera de la Universidad', mensajes: { required: 'Cuéntanos, aunque sea de forma aproximada, dónde ocurrió.' } },
-    fecha: { etiqueta: 'Fecha de los hechos', mensajes: { required: 'Puedes escribir una fecha aproximada o elegir «Se desconoce».' } },
-    tipoVbg: { etiqueta: 'Tipos de violencia', mensajes: { required: 'Selecciona al menos un tipo o modalidad de violencia.' } },
-    descripcion: { etiqueta: 'Descripción', mensajes: { minlength: 'Si decides describir los hechos, escribe al menos 20 caracteres.' } }
+    sedeCampus: { etiqueta: 'Campus', mensajes: { required: 'Indique en qué campus ocurrió.' } },
+    lugarDetalleExterno: { etiqueta: 'Lugar fuera de la Universidad', mensajes: { required: 'Indique, aunque sea de forma aproximada, el lugar donde ocurrió.' } },
+    fecha: { etiqueta: 'Fecha de los hechos', mensajes: { required: 'Es posible indicar una fecha aproximada o seleccionar «Se desconoce».' } },
+    tipoVbg: { etiqueta: 'Tipos de violencia', mensajes: { required: 'Seleccione al menos un tipo o modalidad de violencia.' } },
+    descripcion: { etiqueta: 'Descripción', mensajes: { minlength: 'Si se describen los hechos, ingrese al menos 20 caracteres.' } }
   };
 
   readonly tiposVbg: MaestroDto[] = [
@@ -598,7 +598,7 @@ export class FormularioAnonimoComponent {
         guardadoEl: new Date().toISOString()
       };
       localStorage.setItem(this.textos.claveBorrador, JSON.stringify(borrador));
-      this.notificacion.exito('Borrador guardado. Tu avance queda solo en este navegador.');
+      this.notificacion.exito('Borrador guardado. El avance se conserva únicamente en este navegador.');
     } catch {
       // Manejo preventivo si localStorage no estuviese accesible
     }

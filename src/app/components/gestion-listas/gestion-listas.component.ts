@@ -104,7 +104,7 @@ export class GestionListasComponent implements OnInit {
         this.paginacion[listKey].pageSize = resp.size;
       },
       error: (error) => {
-        this.notificacion.error(`No fue posible cargar la lista «${listKey}». Recarga la página o intenta más tarde.`, error);
+        this.notificacion.error(`No fue posible cargar la lista «${listKey}». Recargue la página o intente más tarde.`, error);
         this.listas[listKey] = [];
         this.paginacion[listKey].totalElements = 0;
       }
@@ -121,20 +121,20 @@ export class GestionListasComponent implements OnInit {
         this.paginacion[listKey].pageIndex = 0;
         this.cargarPagina(listKey);
       },
-      error: (error) => this.notificacion.error(`No fue posible agregar el elemento a «${listKey}». Intenta de nuevo.`, error)
+      error: (error) => this.notificacion.error(`No fue posible agregar el elemento a «${listKey}». Intente de nuevo.`, error)
     });
   }
 
   borrar(nombreLista: string, item: MaestroDto) {
     this.dialogo.confirmar({
       titulo: 'Eliminar elemento',
-      mensaje: `¿Deseas eliminar «${item.nombre}» de la lista?`
+      mensaje: `¿Desea eliminar «${item.nombre}» de la lista?`
     }).subscribe((confirmado) => {
       if (confirmado) {
         const listKey = nombreLista as ListaTabKey;
         this.listasService.eliminarItem$(nombreLista, item.id).subscribe({
           next: () => this.cargarPagina(listKey),
-          error: (error) => this.notificacion.error(`No fue posible eliminar el elemento de «${listKey}». Intenta de nuevo.`, error)
+          error: (error) => this.notificacion.error(`No fue posible eliminar el elemento de «${listKey}». Intente de nuevo.`, error)
         });
       }
     });
@@ -162,7 +162,7 @@ export class GestionListasComponent implements OnInit {
           this.editandoItem = null;
           this.cargarPagina(listKey);
         },
-        error: (error) => this.notificacion.error(`No fue posible guardar la edición en «${listKey}». Intenta de nuevo.`, error)
+        error: (error) => this.notificacion.error(`No fue posible guardar la edición en «${listKey}». Intente de nuevo.`, error)
       });
     }
   }

@@ -65,7 +65,7 @@ export class GestionUsuariosComponent implements OnInit {
         this.pageIndex = respuesta.number;
         this.pageSize = respuesta.size;
       },
-      error: (err) => this.notificacion.error('No fue posible cargar los usuarios. Recarga la página o intenta más tarde.', err)
+      error: (err) => this.notificacion.error('No fue posible cargar los usuarios. Recargue la página o intente más tarde.', err)
     });
   }
 
@@ -94,12 +94,12 @@ export class GestionUsuariosComponent implements OnInit {
       if (usuario) {
         this.usuarioService.actualizar(usuario.id, request).subscribe({
           next: () => this.cargarUsuarios(this.pageIndex, this.pageSize),
-          error: (err) => this.notificacion.error('No fue posible actualizar el usuario. Revisa los datos e intenta de nuevo.', err)
+          error: (err) => this.notificacion.error('No fue posible actualizar el usuario. Revise los datos e intente de nuevo.', err)
         });
       } else {
         this.usuarioService.crear(request).subscribe({
           next: () => this.cargarUsuarios(this.pageIndex, this.pageSize),
-          error: (err) => this.notificacion.error('No fue posible crear el usuario. Revisa los datos e intenta de nuevo.', err)
+          error: (err) => this.notificacion.error('No fue posible crear el usuario. Revise los datos e intente de nuevo.', err)
         });
       }
     });
@@ -108,12 +108,12 @@ export class GestionUsuariosComponent implements OnInit {
   eliminarUsuario(id: number) {
     this.dialogo.confirmar({
       titulo: 'Eliminar usuario',
-      mensaje: '¿Deseas eliminar este usuario? Perderá el acceso al sistema.'
+      mensaje: '¿Desea eliminar este usuario? Perderá el acceso al sistema.'
     }).subscribe((confirmado) => {
       if (confirmado) {
         this.usuarioService.eliminar(id).subscribe({
           next: () => this.cargarUsuarios(this.pageIndex, this.pageSize),
-          error: (err) => this.notificacion.error('No fue posible eliminar el usuario. Intenta de nuevo.', err)
+          error: (err) => this.notificacion.error('No fue posible eliminar el usuario. Intente de nuevo.', err)
         });
       }
     });
@@ -123,7 +123,7 @@ export class GestionUsuariosComponent implements OnInit {
     const nuevoActivo = usuario.estado !== 'Activo';
     this.usuarioService.cambiarEstado(usuario.id, nuevoActivo).subscribe({
       next: () => this.cargarUsuarios(this.pageIndex, this.pageSize),
-      error: (err) => this.notificacion.error('No fue posible cambiar el estado del usuario. Intenta de nuevo.', err)
+      error: (err) => this.notificacion.error('No fue posible cambiar el estado del usuario. Intente de nuevo.', err)
     });
   }
 }

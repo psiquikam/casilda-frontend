@@ -28,7 +28,7 @@
     </a>
 
     <h1 class="login__titulo">Ingreso a CASILDA</h1>
-    <p class="login__subtitulo">Usa el correo con el que fuiste registrado para continuar.</p>
+    <p class="login__subtitulo">Use el correo con el que se registró para continuar.</p>
 
     <!-- ACCESO RÁPIDO PARA VALIDACIÓN DE ROLES (FASE 2) -->
     <div class="login__mock-section" aria-label="Cuentas de prueba para verificación de roles">
@@ -36,7 +36,7 @@
         <mat-icon aria-hidden="true" class="mock-header__icon">science</mat-icon>
         <span class="mock-header__title">Cuentas de prueba (Roles Fase 2)</span>
       </div>
-      <p class="mock-desc">Haz clic en cualquier rol para iniciar sesión instantáneamente y verificar sus accesos y vistas:</p>
+      <p class="mock-desc">Haga clic en cualquier rol para iniciar sesión instantáneamente y verificar sus accesos y vistas:</p>
       <div class="mock-grid">
         @for (mock of mockUsersList; track mock.id) {
           <button type="button" class="btn-mock-pill" [class]="'btn-mock-pill--' + mock.badgeClass"
@@ -53,13 +53,13 @@
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Correo electrónico</mat-label>
         <input matInput type="email" formControlName="email" autocomplete="username"
-          inputmode="email" placeholder="tucorreo@ejemplo.com"
+          inputmode="email" placeholder="correo@ejemplo.com"
           [attr.aria-invalid]="emailInvalido" aria-describedby="ayuda-email">
         @if (emailInvalido) {
-          <mat-error>Escribe un correo electrónico válido, por ejemplo tucorreo@ejemplo.com</mat-error>
+          <mat-error>Ingrese un correo electrónico válido, por ejemplo correo@ejemplo.com</mat-error>
         }
       </mat-form-field>
-      <p id="ayuda-email" class="login__ayuda">Es el correo con el que te registraron en CASILDA.</p>
+      <p id="ayuda-email" class="login__ayuda">Correo registrado en CASILDA.</p>
 
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Contraseña</mat-label>
@@ -71,7 +71,7 @@
           <mat-icon aria-hidden="true">{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
         </button>
         @if (passwordInvalido) {
-          <mat-error>Escribe tu contraseña para continuar</mat-error>
+          <mat-error>Ingrese la contraseña para continuar</mat-error>
         }
       </mat-form-field>
 
@@ -90,20 +90,20 @@
       </button>
 
       <p class="login__estado" role="status" aria-live="polite">
-        {{ loading ? 'Verificando tus credenciales, espera un momento.' : '' }}
+        {{ loading ? 'Verificando credenciales, por favor espere un momento.' : '' }}
       </p>
     </form>
 
     <p class="login__registro">
-      ¿No tienes cuenta?
+      ¿No tiene una cuenta?
       <a routerLink="/registro" class="login__registro-enlace">
-        Crea una de forma segura
+        Cree una cuenta de forma segura
       </a>
     </p>
 
     <p class="login__recuperacion">
       <a [href]="'mailto:' + correoSoporte + '?subject=Recuperaci%C3%B3n%20de%20contrase%C3%B1a%20CASILDA'">
-        ¿Olvidaste tu contraseña? Escríbenos para recuperarla
+        ¿Olvidó su contraseña? Solicite asistencia para recuperarla
       </a>
     </p>
   </main>

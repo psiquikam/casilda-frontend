@@ -92,7 +92,7 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
         this.cargando = false;
       },
       error: (err) => {
-        this.notificacion.error('No fue posible cargar las solicitudes. Recarga la página o intenta más tarde.', err);
+        this.notificacion.error('No fue posible cargar las solicitudes. Recargue la página o intente más tarde.', err);
         this.cargando = false;
       }
     });
@@ -242,7 +242,7 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
       width: '350px',
       data: {
         titulo: 'Eliminar solicitud',
-        mensaje: `¿Seguro que deseas eliminar la solicitud asociada al caso ${element.id}?`
+        mensaje: `¿Confirma que desea eliminar la solicitud asociada al caso ${element.id}?`
       }
     });
 
@@ -250,7 +250,7 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
       if (confirmado) {
         this.solicitudService.eliminar(element.solicitudId).subscribe({
           next: () => this.cargarDatos(this.pageIndex, this.pageSize),
-          error: (err) => this.notificacion.error('No fue posible eliminar la solicitud. Intenta de nuevo.', err)
+          error: (err) => this.notificacion.error('No fue posible eliminar la solicitud. Intente de nuevo.', err)
         });
       }
     });
@@ -273,7 +273,7 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
           fechaReparto: result.fechaReparto
         }).subscribe({
           next: () => this.cargarDatos(this.pageIndex, this.pageSize),
-          error: (err) => this.notificacion.error('No fue posible asignar la solicitud. Intenta de nuevo.', err)
+          error: (err) => this.notificacion.error('No fue posible asignar la solicitud. Intente de nuevo.', err)
         });
       }
     });

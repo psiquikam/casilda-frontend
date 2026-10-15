@@ -18,7 +18,7 @@
         <div class="section-title-with-tooltip">
           <h2>Información Personal</h2>
         </div>
-        <p class="vbg-section-subtitle">Queremos saber cómo dirigirnos a ti de forma respetuosa.</p>
+        <p class="vbg-section-subtitle">Información de identificación para el registro personal.</p>
 
         <div class="victim-form-card">
           <div class="grid-form">
@@ -26,7 +26,7 @@
               <mat-label>Primer nombre *</mat-label>
               <input matInput formControlName="primerNombre" autocomplete="given-name">
               @if (controlInvalido(step1Form, 'primerNombre')) {
-                <mat-error>Por favor ingresa tu primer nombre</mat-error>
+                <mat-error>Por favor ingrese el primer nombre</mat-error>
               }
             </mat-form-field>
 
@@ -39,7 +39,7 @@
               <mat-label>Primer apellido *</mat-label>
               <input matInput formControlName="primerApellido" autocomplete="family-name">
               @if (controlInvalido(step1Form, 'primerApellido')) {
-                <mat-error>Por favor ingresa tu primer apellido</mat-error>
+                <mat-error>Por favor ingrese el primer apellido</mat-error>
               }
             </mat-form-field>
 
@@ -47,7 +47,7 @@
               <mat-label>Segundo apellido *</mat-label>
               <input matInput formControlName="segundoApellido" autocomplete="family-name">
               @if (controlInvalido(step1Form, 'segundoApellido')) {
-                <mat-error>Por favor ingresa tu segundo apellido</mat-error>
+                <mat-error>Por favor ingrese el segundo apellido</mat-error>
               }
             </mat-form-field>
 
@@ -89,7 +89,7 @@
         <div class="section-title-with-tooltip">
           <h2>Datos de Contacto e Institución</h2>
         </div>
-        <p class="vbg-section-subtitle">Estos datos nos permitirán comunicarnos contigo de manera segura y conocer tu vínculo con la Universidad.</p>
+        <p class="vbg-section-subtitle">Datos requeridos para establecer contacto de manera segura y registrar el vínculo institucional.</p>
 
         <div class="victim-form-card">
           <div class="grid-form">
@@ -111,18 +111,18 @@
             <mat-form-field appearance="outline">
               <mat-label>Correo electrónico seguro *</mat-label>
               <input matInput type="email" formControlName="email" autocomplete="email" inputmode="email">
-              <mat-hint>Usa un correo al que solo tú tengas acceso.</mat-hint>
+              <mat-hint>Utilice un correo electrónico de uso estrictamente personal.</mat-hint>
               @if (controlInvalido(step2Form, 'email')) {
-                <mat-error>Escribe un correo válido</mat-error>
+                <mat-error>Ingrese un correo electrónico válido</mat-error>
               }
             </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>Número de celular *</mat-label>
               <input matInput type="tel" formControlName="telefono" autocomplete="tel" inputmode="numeric">
-              <mat-hint>Lo usaremos únicamente para verificar tu cuenta de forma segura.</mat-hint>
+              <mat-hint>Se utilizará únicamente para verificar la cuenta de forma segura.</mat-hint>
               @if (controlInvalido(step2Form, 'telefono')) {
-                <mat-error>Ingresa un número de celular válido (mínimo 7 dígitos)</mat-error>
+                <mat-error>Ingrese un número de celular válido (mínimo 7 dígitos)</mat-error>
               }
             </mat-form-field>
           </div>
@@ -143,7 +143,7 @@
         <div class="section-title-with-tooltip">
           <h2>Seguridad y Confidencialidad</h2>
         </div>
-        <p class="vbg-section-subtitle">Protege el acceso a tu información y autoriza el manejo de tus datos.</p>
+        <p class="vbg-section-subtitle">Defina las credenciales de acceso y autorice el tratamiento de datos.</p>
 
         <div class="victim-form-card">
           <div class="grid-form">
@@ -181,7 +181,7 @@
           <p>La información recopilada a través de este canal se gestiona bajo estrictos protocolos de confidencialidad institucional. No se almacenará ningún dato que comprometa su identidad sin su consentimiento expreso, de acuerdo a la ley de Habeas Data.</p>
           <mat-checkbox formControlName="habeasData">He leído y acepto el manejo y política de tratamiento de datos</mat-checkbox>
           @if (controlInvalido(step3Form, 'habeasData')) {
-            <mat-error style="font-size: 14px; color: var(--color-danger-text); display: block; margin-top: 8px;">Debes aceptar la política para continuar.</mat-error>
+            <mat-error style="font-size: 14px; color: var(--color-danger-text); display: block; margin-top: 8px;">Debe aceptar la política para continuar.</mat-error>
           }
         </div>
 
@@ -198,7 +198,7 @@
             @if (loading) {
               <mat-spinner diameter="20" aria-hidden="true"></mat-spinner>
             }
-            {{ loading ? 'Creando cuenta…' : 'Crear mi cuenta segura' }}
+            {{ loading ? 'Creando cuenta…' : 'Crear cuenta segura' }}
           </button>
         </div>
         

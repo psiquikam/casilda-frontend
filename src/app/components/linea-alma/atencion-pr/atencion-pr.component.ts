@@ -721,11 +721,11 @@ export class AtencionPrComponent implements OnInit {
     const documento = String(this.registroCasoForm.get('documento')?.value ?? '').trim();
 
     if (!tipoDocumentoId) {
-      this.snackBar.open('Selecciona el tipo de documento.', 'Cerrar', { duration: 3000 });
+      this.snackBar.open('Seleccione el tipo de documento.', 'Cerrar', { duration: 3000 });
       return;
     }
     if (!documento) {
-      this.snackBar.open('Ingresa el número de documento.', 'Cerrar', { duration: 3000 });
+      this.snackBar.open('Ingrese el número de documento.', 'Cerrar', { duration: 3000 });
       return;
     }
 
@@ -997,7 +997,7 @@ export class AtencionPrComponent implements OnInit {
 
   registrarIntentoContacto(): void {
     if (!this.idRegistroCreado) {
-      this.snackBar.open('Primero guarda el registro Línea ALMA.', 'Cerrar', { duration: 4000 });
+      this.snackBar.open('Primero guarde el registro Línea ALMA.', 'Cerrar', { duration: 4000 });
       return;
     }
     if (this.contactoFechaCtrl.invalid || this.contactoResultadoCtrl.invalid) {

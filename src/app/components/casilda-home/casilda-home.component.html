@@ -3,9 +3,9 @@
   <section class="hero" aria-labelledby="hero-titulo">
     <h1 id="hero-titulo" class="hero__titulo">CASILDA: un espacio seguro de escucha y orientación</h1>
     <p class="hero__intro">
-      Si viviste o presenciaste una situación de discriminación o violencia basada en género en la
-      Universidad de Antioquia, aquí puedes contarlo a tu ritmo. Tú decides qué compartir y cuándo
-      hacerlo: te acompañamos en cada paso.
+      Canal institucional de la Universidad de Antioquia para el reporte y acompañamiento ante
+      situaciones de discriminación o violencia basada en género. Un espacio seguro, confidencial
+      y con orientación en cada paso.
     </p>
 
     <div class="hero__acciones">
@@ -27,9 +27,9 @@
   <aside class="casilda-alerta home__privacidad">
     <mat-icon aria-hidden="true">lock</mat-icon>
     <p>
-      <strong>Tu navegación es segura.</strong> Puedes reportar de forma anónima si lo prefieres, y
-      la información que compartas se maneja bajo estricto secreto profesional. Si necesitas salir
-      de inmediato, usa el botón <strong>Salida rápida</strong> o presiona <kbd>Alt</kbd> + <kbd>Q</kbd>.
+      <strong>Navegación segura.</strong> Es posible realizar reportes de forma anónima y
+      la información suministrada se maneja bajo estricto secreto profesional. Para salir
+      de inmediato, use el botón <strong>Salida rápida</strong> o presione <kbd>Alt</kbd> + <kbd>Q</kbd>.
     </p>
   </aside>
 
@@ -42,14 +42,14 @@
     <div class="casilda-alerta casilda-alerta--precaucion home__estado-error" role="status" aria-live="polite">
       <mat-icon aria-hidden="true">error_outline</mat-icon>
       <div>
-        <p>No pudimos cargar las opciones de atención en este momento. Tu información sigue protegida.</p>
+        <p>No fue posible cargar las opciones de atención en este momento. La información permanece protegida.</p>
         <button type="button" class="boton boton--secundario" (click)="cargarContenido()">Reintentar</button>
       </div>
     </div>
   } @else {
     @if (acciones().length) {
       <section class="home__seccion" aria-labelledby="titulo-acciones">
-        <h2 id="titulo-acciones" class="home__seccion-titulo">¿Qué necesitas hacer hoy?</h2>
+        <h2 id="titulo-acciones" class="home__seccion-titulo">Opciones de atención y gestión</h2>
         <ul class="home__grid">
           @for (item of acciones(); track item.id) {
             <li><app-casilda-card [contenido]="item"></app-casilda-card></li>

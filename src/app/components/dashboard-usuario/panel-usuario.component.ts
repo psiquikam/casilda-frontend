@@ -71,7 +71,7 @@ export class PanelUsuarioComponent implements OnInit {
       error: () => {
         this.error.set(true);
         this.cargando.set(false);
-        this.notificacion.error('No pudimos cargar tu información en este momento.');
+        this.notificacion.error('No fue posible cargar la información en este momento.');
       }
     });
   }
