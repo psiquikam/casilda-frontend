@@ -125,7 +125,7 @@ describe('PanelUsuarioComponent', () => {
       resolver();
 
       const texto = dom().textContent ?? '';
-      expect(texto).toContain('Cómo va tu proceso');
+      expect(texto).toContain('Estado del proceso');
       expect(texto).toContain('De esto se encarga');
     }));
 
@@ -142,7 +142,7 @@ describe('PanelUsuarioComponent', () => {
       crear();
       resolver();
 
-      expect(dom().textContent).toContain('Tu próxima sesión');
+      expect(dom().textContent).toContain('Próxima sesión');
       expect(dom().textContent).toContain('Pedir otro horario');
     }));
 
@@ -150,16 +150,16 @@ describe('PanelUsuarioComponent', () => {
       crear();
       resolver();
 
-      expect(dom().textContent).toContain('Lo que decidiste hacer');
-      expect(dom().textContent).toContain('No hay prisa');
+      expect(dom().textContent).toContain('Acuerdos y compromisos');
+      expect(dom().textContent).toContain('Acuerdos y compromisos establecidos');
     }));
 
     it('declara el canal que la persona eligió (DSH-10-06)', fakeAsync(() => {
       crear();
       resolver();
 
-      expect(dom().textContent).toContain('Cómo nos comunicamos contigo');
-      expect(dom().textContent).toContain('Cambiar cómo te contactamos');
+      expect(dom().textContent).toContain('Canal de comunicación');
+      expect(dom().textContent).toContain('Cambiar medio de contacto');
     }));
 
     it('ofrece un estado vacío cálido cuando no hay cita', fakeAsync(() => {
@@ -174,7 +174,7 @@ describe('PanelUsuarioComponent', () => {
       );
       crear();
 
-      expect(dom().textContent).toContain('Aquí verás tu próxima sesión cuando la acordemos contigo');
+      expect(dom().textContent).toContain('Aquí se mostrará la próxima sesión una vez sea programada');
     }));
   });
 

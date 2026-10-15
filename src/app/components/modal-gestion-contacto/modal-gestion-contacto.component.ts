@@ -205,7 +205,7 @@ export class ModalGestionComponent implements OnInit {
         this.dialogRef.close(true);
       },
       error: (err) => {
-        this.notificacion.error('No fue posible registrar el intento de contacto. Intenta de nuevo.', err);
+        this.notificacion.error('No fue posible registrar el intento de contacto. Intente de nuevo.', err);
         this.guardando = false;
       }
     });

@@ -60,7 +60,7 @@ export class DialogUsuarioComponent implements OnInit {
           this.userForm.get('idRol')?.setValue(roles[0].id);
         }
       },
-      error: (err) => this.notificacion.error('No fue posible cargar los roles. Cierra el diálogo e intenta de nuevo.', err)
+      error: (err) => this.notificacion.error('No fue posible cargar los roles. Cierre el diálogo e intente de nuevo.', err)
     });
   }
 

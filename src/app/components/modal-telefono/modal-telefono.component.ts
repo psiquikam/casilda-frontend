@@ -48,7 +48,7 @@ export class ModalTelefonoComponent implements OnInit {
   ngOnInit(): void {
     this.http.get<TipoTelefonoDto[]>(`${environment.apiBaseUrl}/maestros/tipos-telefono`).subscribe({
       next: (tipos) => this.tiposTelefono = tipos,
-      error: (err) => this.notificacion.error('No fue posible cargar los tipos de teléfono. Cierra el diálogo e intenta de nuevo.', err)
+      error: (err) => this.notificacion.error('No fue posible cargar los tipos de teléfono. Cierre el diálogo e intente de nuevo.', err)
     });
   }
 

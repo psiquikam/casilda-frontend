@@ -151,7 +151,7 @@ const INDICADORES_POR_ROL: Record<string, readonly IndicadorDto[]> = {
       id: 'mis-casos',
       etiqueta: 'Mis casos activos',
       valor: 12,
-      definicion: 'Casos asignados a tu cuenta y sin cierre formal.',
+      definicion: 'Casos asignados a la cuenta y sin cierre formal.',
       periodo: 'A la fecha de corte',
       icono: 'folder_shared',
       ruta: '/mis-asignaciones'
@@ -160,7 +160,7 @@ const INDICADORES_POR_ROL: Record<string, readonly IndicadorDto[]> = {
       id: 'citas-hoy',
       etiqueta: 'Mis citas de hoy',
       valor: 4,
-      definicion: 'Atenciones agendadas en tu agenda para hoy.',
+      definicion: 'Atenciones programadas en la agenda para hoy.',
       periodo: 'Hoy',
       icono: 'event_available',
       ruta: '/cita'

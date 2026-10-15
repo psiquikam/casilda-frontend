@@ -166,7 +166,7 @@ export class CitaComponent implements OnInit, AfterViewInit {
           observaciones: f.observaciones
         }).subscribe({
           next: () => this.cargarCitas(this.pageIndex, this.pageSize),
-          error: (err) => this.notificacion.error('No fue posible cancelar la cita. Intenta de nuevo.', err)
+          error: (err) => this.notificacion.error('No fue posible cancelar la cita. Intente de nuevo.', err)
         });
       } else {
         const f = result.formulario;
@@ -177,7 +177,7 @@ export class CitaComponent implements OnInit, AfterViewInit {
           observaciones: f.observaciones
         }).subscribe({
           next: () => this.cargarCitas(this.pageIndex, this.pageSize),
-          error: (err) => this.notificacion.error('No fue posible reprogramar la cita. Intenta de nuevo.', err)
+          error: (err) => this.notificacion.error('No fue posible reprogramar la cita. Intente de nuevo.', err)
         });
       }
     });

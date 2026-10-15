@@ -137,12 +137,12 @@ export class FormularioAcompanamientoComponent implements OnInit {
     const documento = this.acompanamientoForm.get('remitenteNumeroDocumento')?.value?.trim();
 
     if (!tipoDocumentoId) {
-      this.snackBar.open('Selecciona el tipo de documento del remitente.', 'Cerrar', { duration: 3000 });
+      this.snackBar.open('Seleccione el tipo de documento del remitente.', 'Cerrar', { duration: 3000 });
       return;
     }
 
     if (!documento) {
-      this.snackBar.open('Ingresa el número de documento del remitente.', 'Cerrar', { duration: 3000 });
+      this.snackBar.open('Ingrese el número de documento del remitente.', 'Cerrar', { duration: 3000 });
       return;
     }
 
@@ -173,12 +173,12 @@ export class FormularioAcompanamientoComponent implements OnInit {
     const documento = this.acompanamientoForm.get('numeroDocumento')?.value?.trim();
 
     if (!tipoDocumentoId) {
-      this.snackBar.open('Selecciona el tipo de documento del solicitante.', 'Cerrar', { duration: 3000 });
+      this.snackBar.open('Seleccione el tipo de documento del solicitante.', 'Cerrar', { duration: 3000 });
       return;
     }
 
     if (!documento) {
-      this.snackBar.open('Ingresa el número de documento del solicitante.', 'Cerrar', { duration: 3000 });
+      this.snackBar.open('Ingrese el número de documento del solicitante.', 'Cerrar', { duration: 3000 });
       return;
     }
 
@@ -257,7 +257,7 @@ export class FormularioAcompanamientoComponent implements OnInit {
     remitenteUnidadAdministrativa: { etiqueta: 'Unidad administrativa del remitente' },
     remitenteUnidadAcademica: { etiqueta: 'Unidad académica del remitente' },
     tipoDocumento: { etiqueta: 'Tipo de documento del solicitante' },
-    numeroDocumento: { etiqueta: 'Número de documento del solicitante', mensajes: { pattern: 'Escribe solo números, sin puntos ni espacios.' } },
+    numeroDocumento: { etiqueta: 'Número de documento del solicitante', mensajes: { pattern: 'Ingrese únicamente números, sin puntos ni espacios.' } },
     fechaNacimiento: { etiqueta: 'Fecha de nacimiento del solicitante' },
     primerNombre: { etiqueta: 'Primer nombre del solicitante' },
     primerApellido: { etiqueta: 'Primer apellido del solicitante' },
@@ -342,7 +342,7 @@ export class FormularioAcompanamientoComponent implements OnInit {
           width: '400px',
           data: {
             titulo: '¡Solicitud Creada!',
-            mensaje: 'Tu requerimiento ha sido registrado en el sistema.',
+            mensaje: 'El requerimiento ha sido registrado en el sistema.',
           }
         });
         this.acompanamientoForm.reset();
@@ -351,7 +351,7 @@ export class FormularioAcompanamientoComponent implements OnInit {
       },
       error: (error) => {
         this.enviando = false;
-        this.notificacion.error('No fue posible enviar la solicitud. Tus datos siguen en el formulario; intenta de nuevo.', error);
+        this.notificacion.error('No fue posible enviar la solicitud. Los datos siguen en el formulario; intente de nuevo.', error);
         const msg = error?.error?.message || 'Error al enviar la solicitud. Intente de nuevo.';
         this.snackBar.open(msg, 'Cerrar', { duration: 5000 });
       }

@@ -67,7 +67,7 @@ export class RepartoModalComponent implements OnInit {
         this.tiposServicio = tiposServicio;
         this.gruposProfesionales = grupos;
       },
-      error: (err) => this.notificacion.error('No fue posible cargar los datos del formulario. Cierra el diálogo e intenta de nuevo.', err)
+      error: (err) => this.notificacion.error('No fue posible cargar los datos del formulario. Cierre el diálogo e intente de nuevo.', err)
     });
   }
 

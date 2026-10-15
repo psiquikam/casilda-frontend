@@ -211,7 +211,7 @@ export class ModalDetalleSolicitudComponent implements OnInit {
         this.dialogRef.close(solicitudActualizada);
       },
       error: (error) => {
-        this.notificacion.error('No fue posible guardar los cambios de la solicitud. Intenta de nuevo.', error);
+        this.notificacion.error('No fue posible guardar los cambios de la solicitud. Intente de nuevo.', error);
         this.guardando = false;
         this.snackBar.open(this.obtenerMensajeError(error), 'Cerrar', {
           duration: 6000,

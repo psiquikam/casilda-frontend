@@ -177,7 +177,7 @@ describe('PanelInicioComponent', () => {
     resolverCarga();
 
     const zona = (fixture.nativeElement as HTMLElement).querySelector('app-widget-pendientes');
-    expect(zona?.textContent).toContain('No tienes pendientes para hoy');
+    expect(zona?.textContent).toContain('No hay pendientes para hoy');
   }));
 
   it('avisa de forma sutil cuando se es la última profesional activa (DSH-08-03)', fakeAsync(() => {

@@ -202,7 +202,7 @@ export class ListasService {
 
     this.agregarItem$(lista, nombre, codigo).subscribe({
       next: () => this.cargarListas(),
-      error: (error) => this.notificacion.error(`No fue posible agregar el elemento a «${listaKey}». Intenta de nuevo.`, error)
+      error: (error) => this.notificacion.error(`No fue posible agregar el elemento a «${listaKey}». Intente de nuevo.`, error)
     });
   }
 
@@ -213,7 +213,7 @@ export class ListasService {
 
     this.eliminarItem$(lista, id).subscribe({
       next: () => this.cargarListas(),
-      error: (error) => this.notificacion.error(`No fue posible eliminar el elemento de «${listaKey}». Intenta de nuevo.`, error)
+      error: (error) => this.notificacion.error(`No fue posible eliminar el elemento de «${listaKey}». Intente de nuevo.`, error)
     });
   }
 
@@ -224,7 +224,7 @@ export class ListasService {
 
     this.editarItem$(lista, id, nombre, codigo).subscribe({
       next: () => this.cargarListas(),
-      error: (error) => this.notificacion.error(`No fue posible guardar la edición en «${listaKey}». Intenta de nuevo.`, error)
+      error: (error) => this.notificacion.error(`No fue posible guardar la edición en «${listaKey}». Intente de nuevo.`, error)
     });
   }
 

@@ -22,7 +22,7 @@ export interface EstadoProcesoDto {
   readonly resumen: string;
   /** Qué sigue y **quién** lo hace: reduce la incertidumbre (DSH-10-01). */
   readonly siguientePaso: string;
-  readonly loHace: 'El equipo de Casilda' | 'Tú, cuando quieras';
+  readonly loHace: 'El equipo de Casilda' | 'La persona solicitante';
   /**
    * Plazo comunicable.
    *
@@ -76,8 +76,8 @@ export interface MiProcesoDto {
 const MOCK: MiProcesoDto = {
   estado: {
     id: 'en-acompanamiento',
-    resumen: 'Tu solicitud fue recibida y ya tienes acompañamiento en curso.',
-    siguientePaso: 'Nos vemos en la próxima sesión que acordamos contigo.',
+    resumen: 'La solicitud fue recibida y el acompañamiento se encuentra en curso.',
+    siguientePaso: 'Continuación en la próxima sesión programada.',
     loHace: 'El equipo de Casilda',
     plazo: null
   },
@@ -90,13 +90,13 @@ const MOCK: MiProcesoDto = {
   compromisos: [
     {
       id: 'c-1',
-      descripcion: 'Escribir lo que quieras contar en la próxima sesión, si te sirve llevarlo anotado.',
+      descripcion: 'Anotar los puntos que se deseen tratar en la próxima sesión.',
       fechaCumplimiento: null,
       cumplido: false
     },
     {
       id: 'c-2',
-      descripcion: 'Guardar el contacto de la persona que te acompaña en tu teléfono.',
+      descripcion: 'Guardar el contacto del equipo de acompañamiento en el teléfono.',
       fechaCumplimiento: diasDesdeHoy(5).toISOString(),
       cumplido: true
     }

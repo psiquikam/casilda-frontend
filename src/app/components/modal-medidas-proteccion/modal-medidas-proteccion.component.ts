@@ -49,12 +49,12 @@ export class ModalMedidasProteccionComponent implements OnInit {
   ngOnInit(): void {
     this.solicitudService.listarTiposMedida().subscribe({
       next: (tipos) => this.tiposMedidaList = tipos,
-      error: (err) => this.notificacion.error('No fue posible cargar los tipos de medida. Cierra el diálogo e intenta de nuevo.', err)
+      error: (err) => this.notificacion.error('No fue posible cargar los tipos de medida. Cierre el diálogo e intente de nuevo.', err)
     });
 
     this.solicitudService.listarResponsablesMedida().subscribe({
       next: (resps) => this.responsablesList = resps,
-      error: (err) => this.notificacion.error('No fue posible cargar los responsables. Cierra el diálogo e intenta de nuevo.', err)
+      error: (err) => this.notificacion.error('No fue posible cargar los responsables. Cierre el diálogo e intente de nuevo.', err)
     });
   }
 
@@ -68,7 +68,7 @@ export class ModalMedidasProteccionComponent implements OnInit {
     if (tipoId) {
       this.solicitudService.listarSubTiposMedidaPorTipo(tipoId).subscribe({
         next: (subtipos) => this.subtiposMedidaList = subtipos,
-        error: (err) => this.notificacion.error('No fue posible cargar los subtipos de medida. Intenta seleccionar de nuevo el tipo.', err)
+        error: (err) => this.notificacion.error('No fue posible cargar los subtipos de medida. Intente seleccionar de nuevo el tipo.', err)
       });
     }
   }

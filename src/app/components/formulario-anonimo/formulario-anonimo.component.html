@@ -181,8 +181,8 @@
 
         <!-- Preferencia de Contacto Opcional -->
         <div class="contact-preference-section">
-          <h2>¿Deseas proporcionar medios para que te contactemos de forma opcional?</h2>
-          <p class="selector-subtitle">Si decides ser contactado(a), un profesional especializado podrá comunicarse contigo de manera confidencial.</p>
+          <h2>¿Desea registrar medios de contacto de forma opcional?</h2>
+          <p class="selector-subtitle">Si se autoriza el contacto, un profesional especializado podrá comunicarse de manera confidencial.</p>
 
           <mat-radio-group formControlName="deseaContacto" class="victim-radios">
             <div class="profile-card mini" [class.selected]="formPerfil.get('deseaContacto')?.value === 'no'">
@@ -500,7 +500,7 @@
               <h3 class="form-section-title">Tipos y modalidades de violencia <span class="required-star">*</span></h3>
             </div>
             <p class="vbg-section-subtitle">
-              Selecciona directamente las etiquetas o situaciones que describan lo ocurrido. Puedes elegir varias opciones.
+              Seleccione directamente las etiquetas o situaciones que describan lo ocurrido. Es posible elegir varias opciones.
             </p>
 
             @if (mostrarErrorTipoVbg) {
@@ -757,9 +757,9 @@
             <label class="visually-hidden" for="relato-descripcion">Descripción de los hechos</label>
 
             <mat-form-field appearance="outline" class="full-width compact-desc-field">
-              <textarea matInput formControlName="descripcion" id="relato-descripcion" rows="3" placeholder="Si lo deseas, puedes darnos más detalles aquí..."></textarea>
+              <textarea matInput formControlName="descripcion" id="relato-descripcion" rows="3" placeholder="Si lo desea, puede proporcionar más detalles aquí..."></textarea>
               @if (formRelato.get('descripcion')?.hasError('minlength')) {
-                <mat-error>Mínimo 20 caracteres si decides detallar los hechos (actual: {{ formRelato.get('descripcion')?.value?.trim()?.length || 0 }})</mat-error>
+                <mat-error>Mínimo 20 caracteres si se detallan los hechos (actual: {{ formRelato.get('descripcion')?.value?.trim()?.length || 0 }})</mat-error>
               }
             </mat-form-field>
           </div>

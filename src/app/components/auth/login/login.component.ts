@@ -104,7 +104,7 @@ export class LoginComponent {
       error: () => {
         this.loading = false;
         this.errorMessage =
-          'No pudimos validar esos datos. Revisa tu correo electrónico y tu contraseña, e inténtalo de nuevo.';
+          'No fue posible validar los datos suministrados. Verifique el correo electrónico y la contraseña, e intente nuevamente.';
       }
     });
   }

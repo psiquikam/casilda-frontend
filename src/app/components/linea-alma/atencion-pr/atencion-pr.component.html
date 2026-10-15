@@ -358,7 +358,7 @@
                               <mat-form-field appearance="outline" subscriptSizing="dynamic">
                                 <mat-label>Programa</mat-label>
                                 <mat-select formControlName="programa"
-                                  [matTooltip]="!registroCasoForm.get('unidadAcademica')?.value ? 'Primero selecciona una unidad académica' : ''">
+                                  [matTooltip]="!registroCasoForm.get('unidadAcademica')?.value ? 'Primero seleccione una unidad académica' : ''">
                                   @for (f of programasFiltrados; track f.id) {
                                     <mat-option [value]="f.id">{{f.nombre}}</mat-option>
                                   }
@@ -594,7 +594,7 @@
                           @if (!idRegistroCreado) {
                             <div class="no-results-msg">
                               <mat-icon aria-hidden="true">info</mat-icon>
-                              <p>Guarda primero el registro Línea ALMA para poder agregar intentos de contacto.</p>
+                              <p>Guarde primero el registro Línea ALMA para poder agregar intentos de contacto.</p>
                             </div>
                           }
 
