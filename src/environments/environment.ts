@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  apiBaseUrl: 'http://35.208.251.66:8080/api-casilda',
+  apiBaseUrl: 'https://casildaqa.duckdns.org/api-casilda',
   /** Destino neutral de la Salida Rápida (componente de seguridad VBG). */
   quickExitUrl: 'https://www.google.com',
   /**
