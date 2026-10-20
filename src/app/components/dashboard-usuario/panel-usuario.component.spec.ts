@@ -25,6 +25,16 @@ describe('PanelUsuarioComponent', () => {
   let fixture: ComponentFixture<PanelUsuarioComponent>;
   let componente: PanelUsuarioComponent;
 
+  // Estas pruebas cubren el modo de demostración: sin él, el contenido no
+  // sale de datos simulados. El caso contrario se prueba aparte.
+  const modoOriginal = environment.datosDemostracion;
+  beforeEach(() => {
+    environment.datosDemostracion = true;
+  });
+  afterEach(() => {
+    environment.datosDemostracion = modoOriginal;
+  });
+
   function dom(): HTMLElement {
     return fixture.nativeElement as HTMLElement;
   }
@@ -52,6 +62,20 @@ describe('PanelUsuarioComponent', () => {
       rol: 'Usuario',
       token: 't'
     };
+  });
+
+  it('fuera del modo de demostración no pide ni muestra un proceso simulado', () => {
+    environment.datosDemostracion = false;
+    const obtener = spyOn(TestBed.inject(MiProcesoService), 'obtenerMiProceso').and.callThrough();
+    crear();
+
+    const texto = dom().textContent ?? '';
+    expect(obtener).not.toHaveBeenCalled();
+    expect(componente.cargando()).toBeFalse();
+    expect(texto).not.toContain('Estado del proceso');
+    expect(texto).not.toContain('Próxima sesión');
+    expect(texto).toContain('Pedir acompañamiento');
+    expect(texto).toContain('Líneas de ayuda');
   });
 
   it('saluda con el nombre de la persona, sin el dato del sistema', () => {
