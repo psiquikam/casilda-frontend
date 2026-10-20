@@ -47,7 +47,27 @@ export const DASHBOARD_POR_ROL: Record<RolCasilda, readonly WidgetId[]> = {
   USUARIO: []
 };
 
-/** Widgets del rol, o los del rol Usuario (vacío) si el código no se reconoce. */
-export function widgetsDelRol(rol: string): readonly WidgetId[] {
-  return DASHBOARD_POR_ROL[rol as RolCasilda] ?? [];
+/**
+ * Widgets cuyo servicio solo tiene datos simulados: el backend todavía no
+ * publica `/dashboard/*` ni `/vigilancia/*` (verificado contra el OpenAPI de
+ * QA el 2026-10-20). Fuera del modo de demostración no se muestran, para no
+ * presentar cifras inventadas como reales. Cuando un endpoint exista, su
+ * widget sale de esta lista.
+ */
+export const WIDGETS_SIN_BACKEND: ReadonlySet<WidgetId> = new Set<WidgetId>([
+  'pendientes',
+  'kpis',
+  'distribucion-identidad',
+  'vigilancia',
+  'agenda-hoy',
+  'carga-equipo'
+]);
+
+/**
+ * Widgets del rol, o los del rol Usuario (vacío) si el código no se reconoce.
+ * Sin `datosDemostracion` se omiten los de `WIDGETS_SIN_BACKEND`.
+ */
+export function widgetsDelRol(rol: string, datosDemostracion: boolean): readonly WidgetId[] {
+  const widgets = DASHBOARD_POR_ROL[rol as RolCasilda] ?? [];
+  return datosDemostracion ? widgets : widgets.filter((widget) => !WIDGETS_SIN_BACKEND.has(widget));
 }

@@ -5,7 +5,8 @@
  *  - `ng build` borra `dist/` en cada compilación y con ella el enlace `.vercel`
  *    que crea la CLI; aquí se restituye antes de desplegar.
  *  - El `vercel.json` de la raíz no viaja con el build; se copia al directorio
- *    de salida para conservar la reescritura `/(.*) → /index.html` del SPA.
+ *    de salida para conservar la reescritura `/(.*) → /index.html` del SPA y
+ *    los encabezados de seguridad.
  *
  * Uso: npm run deploy:vercel:preview   (compila y sube una vista previa)
  *      npm run deploy:vercel           (compila y sube a producción)
@@ -29,12 +30,12 @@ writeFileSync(
   `${JSON.stringify(PROJECT_LINK)}\n`,
 );
 
-// Solo las reescrituras aplican a un despliegue estático; el resto del
-// vercel.json (buildCommand, installCommand…) describe el flujo desde Git.
-const { rewrites } = JSON.parse(readFileSync('vercel.json', 'utf8'));
+// Solo las reescrituras y los encabezados aplican a un despliegue estático; el
+// resto del vercel.json (buildCommand, installCommand…) describe el flujo desde Git.
+const { rewrites, headers } = JSON.parse(readFileSync('vercel.json', 'utf8'));
 writeFileSync(
   join(OUTPUT_DIR, 'vercel.json'),
-  `${JSON.stringify({ rewrites }, null, 2)}\n`,
+  `${JSON.stringify({ rewrites, headers }, null, 2)}\n`,
 );
 
 const args = ['deploy', OUTPUT_DIR, '--yes', ...process.argv.slice(2)];

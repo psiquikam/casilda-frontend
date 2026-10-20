@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map, of } from 'rxjs';
 
 import { environment } from '../../environments/environment';
 
@@ -29,9 +30,9 @@ export interface ContenidoDestacadoDto {
 }
 
 /**
- * Contenido de referencia mientras el backend expone el endpoint real.
- * Reproduce las opciones vigentes del home para poder emular el servicio.
- * ÚNICO punto a eliminar cuando `GET /contenidos/home` esté disponible.
+ * Contenido de referencia para el modo de demostración. Reproduce las opciones
+ * del home para poder probar la portada sin backend; fuera de ese modo el
+ * contenido sale de `GET /contenidos/home`.
  */
 const CONTENIDO_MOCK: readonly ContenidoDestacadoDto[] = [
   {
@@ -119,17 +120,22 @@ export function estaVigente(contenido: ContenidoDestacadoDto, referencia: Date =
 
 @Injectable({ providedIn: 'root' })
 export class ContenidoHomeService {
-  /** Endpoint previsto para el panel del gestor de contenidos. */
+  private readonly http = inject(HttpClient);
+
+  /** Endpoint público del gestor de contenidos (no requiere token). */
   readonly endpoint = `${environment.apiBaseUrl}/contenidos/home`;
 
   /**
    * Contenido vigente del home.
    *
-   * TODO(backend): reemplazar por `this.http.get<ContenidoDestacadoDto[]>(this.endpoint)`
-   * cuando el endpoint del gestor de contenidos esté publicado. La firma del
-   * método y el DTO no deben cambiar.
+   * En modo de demostración sale de `CONTENIDO_MOCK`; si no, del backend. La
+   * vigencia se vuelve a filtrar aquí aunque el backend ya la aplique, para que
+   * una tarjeta vencida en caché no se muestre.
    */
   listarContenidoVigente(referencia: Date = new Date()): Observable<ContenidoDestacadoDto[]> {
-    return of(CONTENIDO_MOCK.filter((contenido) => estaVigente(contenido, referencia)));
+    const fuente = environment.datosDemostracion
+      ? of([...CONTENIDO_MOCK])
+      : this.http.get<ContenidoDestacadoDto[]>(this.endpoint);
+    return fuente.pipe(map((contenidos) => contenidos.filter((contenido) => estaVigente(contenido, referencia))));
   }
 }

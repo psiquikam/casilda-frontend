@@ -1,9 +1,14 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { ContenidoDestacadoDto, ContenidoHomeService, estaVigente } from './contenido-home.service';
+import { environment } from '../../environments/environment';
 
 describe('ContenidoHomeService', () => {
   let service: ContenidoHomeService;
+  let http: HttpTestingController;
+  const modoOriginal = environment.datosDemostracion;
 
   const contenidoBase: ContenidoDestacadoDto = {
     id: 99,
@@ -16,11 +21,20 @@ describe('ContenidoHomeService', () => {
   };
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting()]
+    });
     service = TestBed.inject(ContenidoHomeService);
+    http = TestBed.inject(HttpTestingController);
   });
 
-  it('debe entregar contenido para las dos secciones del home', (done) => {
+  afterEach(() => {
+    environment.datosDemostracion = modoOriginal;
+    http.verify();
+  });
+
+  it('en modo de demostración entrega contenido para las dos secciones del home, sin red', (done) => {
+    environment.datosDemostracion = true;
     service.listarContenidoVigente(new Date('2026-06-01T00:00:00Z')).subscribe({
       next: (contenidos) => {
         expect(contenidos.length).toBeGreaterThan(0);
@@ -35,6 +49,23 @@ describe('ContenidoHomeService', () => {
       },
       error: done.fail
     });
+  });
+
+  it('fuera del modo de demostración consulta el endpoint público y filtra la vigencia', (done) => {
+    environment.datosDemostracion = false;
+    const vencido = { ...contenidoBase, id: 100, vigenciaFin: '2026-02-01T00:00:00Z' };
+
+    service.listarContenidoVigente(new Date('2026-06-01T00:00:00Z')).subscribe({
+      next: (contenidos) => {
+        expect(contenidos.map((c) => c.id)).toEqual([99]);
+        done();
+      },
+      error: done.fail
+    });
+
+    const peticion = http.expectOne(service.endpoint);
+    expect(peticion.request.method).toBe('GET');
+    peticion.flush([contenidoBase, vencido]);
   });
 
   it('debe excluir contenido cuya vigencia aún no inicia', () => {

@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { AuthService, MOCK_USERS, MockUserProfile } from '../../../services/auth.service';
+import { environment } from '../../../../environments/environment';
 
 /**
  * Ingreso al sistema. La pantalla se mantiene en una sola
@@ -36,7 +37,8 @@ export class LoginComponent {
 
   readonly loginForm: FormGroup;
   readonly correoSoporte = 'proyectocasilda@udea.edu.co';
-  readonly mockUsersList: MockUserProfile[] = Object.values(MOCK_USERS);
+  /** Vacía fuera del modo de demostración: el bloque de acceso rápido no se muestra. */
+  readonly mockUsersList: MockUserProfile[] = environment.datosDemostracion ? Object.values(MOCK_USERS) : [];
 
   hidePassword = true;
   errorMessage = '';

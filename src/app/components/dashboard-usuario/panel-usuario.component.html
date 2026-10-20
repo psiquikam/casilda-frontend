@@ -113,18 +113,19 @@
         <a class="boton-suave" routerLink="/solicitud-acompanamiento">Cambiar medio de contacto</a>
       </div>
     </section>
-
-    <!-- Reportar otra situación. Acción, no urgencia. -->
-    <section class="tarjeta" aria-labelledby="titulo-reportar">
-      <h2 class="tarjeta__titulo" id="titulo-reportar">¿Desea solicitar una nueva atención?</h2>
-      <p class="tarjeta__texto">
-        Es posible abrir una nueva solicitud de acompañamiento cuando se requiera.
-      </p>
-      <div class="tarjeta__acciones">
-        <a class="boton-principal" routerLink="/reportar-caso">Pedir acompañamiento</a>
-      </div>
-    </section>
   }
+
+  <!-- Reportar otra situación. Acción, no urgencia. No depende del proceso:
+       se ofrece también cuando no hay datos del proceso disponibles. -->
+  <section class="tarjeta" aria-labelledby="titulo-reportar">
+    <h2 class="tarjeta__titulo" id="titulo-reportar">¿Desea solicitar una nueva atención?</h2>
+    <p class="tarjeta__texto">
+      Es posible abrir una nueva solicitud de acompañamiento cuando se requiera.
+    </p>
+    <div class="tarjeta__acciones">
+      <a class="boton-principal" routerLink="/reportar-caso">Pedir acompañamiento</a>
+    </div>
+  </section>
 
   <!-- Líneas de ayuda: siempre accesibles, en tono sereno (DSH-10-05) -->
   <section class="tarjeta tarjeta--apoyo" aria-labelledby="titulo-apoyo">

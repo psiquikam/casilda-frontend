@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, of, tap, catchError } from 'rxjs';
+import { Observable, of, tap, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export const AUTH_REQUIRED_MESSAGE = 'La sesión ha expirado o no ha sido iniciada. Se requiere autenticación para continuar.';
@@ -57,6 +57,8 @@ export interface MockUserProfile {
   especialidad?: 'Jurídico' | 'Psicojurídico' | 'Psicológico' | 'Psicoorientación';
 }
 
+const FIRMA_TOKEN_PRUEBA = 'mockSignatureCasildaTokenValidation2026';
+
 function createMockToken(email: string, roleCode: string): string {
   const header = btoa(JSON.stringify({ alg: 'HS384', typ: 'JWT' }))
     .replace(/=/g, '')
@@ -74,8 +76,15 @@ function createMockToken(email: string, roleCode: string): string {
     .replace(/=/g, '')
     .replace(/\+/g, '-')
     .replace(/\//g, '_');
-  const signature = 'mockSignatureCasildaTokenValidation2026';
-  return `${header}.${payload}.${signature}`;
+  return `${header}.${payload}.${FIRMA_TOKEN_PRUEBA}`;
+}
+
+/**
+ * Las cuentas de prueba solo existen en modo de demostración. Se lee en cada
+ * llamada, no al construir el servicio, para que las pruebas puedan activarlo.
+ */
+function cuentasPruebaHabilitadas(): boolean {
+  return environment.datosDemostracion;
 }
 
 export const MOCK_USERS: Record<string, MockUserProfile> = {
@@ -262,15 +271,15 @@ export class AuthService {
    */
   getEspecialidadActual(): MockUserProfile['especialidad'] {
     const email = this.currentUser?.email?.toLowerCase();
-    if (!email) return undefined;
+    if (!email || !cuentasPruebaHabilitadas()) return undefined;
     return Object.values(MOCK_USERS).find((u) => u.email.toLowerCase() === email)?.especialidad;
   }
 
   isMockUser(): boolean {
-    if (!this.currentUser) return false;
+    if (!this.currentUser || !cuentasPruebaHabilitadas()) return false;
     const token = this.currentUser.token || '';
     return (
-      token.includes('mockSignatureCasildaTokenValidation2026') ||
+      token.includes(FIRMA_TOKEN_PRUEBA) ||
       token.startsWith('mock-') ||
       Object.values(MOCK_USERS).some((u) => u.email.toLowerCase() === this.currentUser?.email.toLowerCase())
     );
@@ -304,7 +313,9 @@ export class AuthService {
 
   loginWithCredentials(email: string, password: string): Observable<AuthLoginResponse> {
     const emailNorm = email.trim().toLowerCase();
-    const mockUser = Object.values(MOCK_USERS).find((u) => u.email.toLowerCase() === emailNorm);
+    const mockUser = cuentasPruebaHabilitadas()
+      ? Object.values(MOCK_USERS).find((u) => u.email.toLowerCase() === emailNorm)
+      : undefined;
 
     // Si es un usuario mockeado reconocido, permitir autenticación inmediata para pruebas
     if (mockUser && (password === mockUser.password || password === '123456' || password === 'password123')) {
@@ -359,6 +370,9 @@ export class AuthService {
   }
 
   loginAsMock(roleCodeOrKey: string): Observable<AuthLoginResponse> {
+    if (!cuentasPruebaHabilitadas()) {
+      return throwError(() => new Error('Las cuentas de prueba están deshabilitadas fuera del modo de demostración.'));
+    }
     const key = roleCodeOrKey.toLowerCase().replace(/^role_/, '');
     const user =
       MOCK_USERS[key] ||
@@ -396,7 +410,15 @@ export class AuthService {
 
     try {
       const session: unknown = JSON.parse(saved);
-      if (this.isValidSession(session) && !this.isTokenExpired(session.token)) return session;
+      // Una sesión de prueba guardada antes de apagar el modo de demostración
+      // no se reutiliza: su token no lo acepta el backend.
+      if (
+        this.isValidSession(session) &&
+        !this.isTokenExpired(session.token) &&
+        (cuentasPruebaHabilitadas() || !session.token.endsWith(FIRMA_TOKEN_PRUEBA))
+      ) {
+        return session;
+      }
     } catch {
       // La sesión corrupta se elimina de forma segura más abajo.
     }

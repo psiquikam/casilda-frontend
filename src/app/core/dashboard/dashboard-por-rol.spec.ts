@@ -1,4 +1,4 @@
-import { DASHBOARD_POR_ROL, widgetsDelRol, type RolCasilda } from './dashboard-por-rol';
+import { DASHBOARD_POR_ROL, WIDGETS_SIN_BACKEND, widgetsDelRol, type RolCasilda } from './dashboard-por-rol';
 
 /** El registro es el único lugar donde se decide qué ve cada rol (DSH-12-02). */
 describe('registro de widgets por rol', () => {
@@ -35,6 +35,20 @@ describe('registro de widgets por rol', () => {
   });
 
   it('devuelve una lista vacía para un rol desconocido, sin lanzar', () => {
-    expect(widgetsDelRol('ROL_INEXISTENTE')).toEqual([]);
+    expect(widgetsDelRol('ROL_INEXISTENTE', true)).toEqual([]);
+  });
+
+  it('en modo de demostración devuelve el registro completo del rol', () => {
+    for (const rol of rolesPersonal) {
+      expect(widgetsDelRol(rol, true)).withContext(rol).toEqual(DASHBOARD_POR_ROL[rol]);
+    }
+  });
+
+  it('fuera del modo de demostración omite los widgets sin endpoint en el backend', () => {
+    for (const rol of rolesPersonal) {
+      const widgets = widgetsDelRol(rol, false);
+      expect(widgets.some((w) => WIDGETS_SIN_BACKEND.has(w))).withContext(rol).toBeFalse();
+      expect(widgets).withContext(rol).toEqual(['accesos-frecuentes', 'ayuda-protocolos']);
+    }
   });
 });
