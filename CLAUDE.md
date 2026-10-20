@@ -317,6 +317,26 @@ versionan para que cualquier sesión posterior los tenga sin depender de un resp
   Angular 17 → 21 (ya completada). No tiene efecto sobre el código.
 - Ninguno de los dos contiene credenciales, datos personales ni teléfonos de relleno.
 
+### 2026-10-20 — Conexión al backend QA y modo de demostración apagado
+- **Backend QA:** `environment.ts` apunta a `https://casildaqa.duckdns.org/api-casilda`
+  (login probado con un usuario real; CORS abierto; OpenAPI en `/api-casilda/api-docs`).
+  `environment.prod.ts` sigue con la URL anterior hasta configurar el despliegue.
+- **`environment.datosDemostracion` gobierna todo dato ficticio** y queda en `false` en ambos
+  entornos. Antes, en `false` solo se ocultaba la franja: el panel seguía mostrando cifras
+  simuladas **sin aviso** y las cuentas de prueba seguían activas en producción. Ahora, sin el flag:
+  - Cuentas de prueba deshabilitadas en `AuthService` (sin atajo ni respaldo con token falso,
+    `loginAsMock()` falla, `isMockUser()` y `getEspecialidadActual()` no aplican) y ocultas en el
+    login y en el menú del encabezado. Una sesión de prueba guardada en el navegador se descarta.
+  - Panel de inicio: solo saludo, accesos y ayuda. `WIDGETS_SIN_BACKEND`
+    (`core/dashboard/dashboard-por-rol.ts`) lista los widgets cuyo endpoint (`/dashboard/*`,
+    `/vigilancia/*`) no existe en el backend; cuando exista, el widget sale de la lista.
+  - Rol Usuario: no se pide ni se muestra `MiProcesoService` (sin endpoint).
+  - Home: `ContenidoHomeService` consulta `GET /contenidos/home`, público en QA. **Hoy devuelve
+    `[]`**: la portada no muestra tarjetas hasta que se cargue contenido.
+  - Módulo Equipo de Atención: catálogos, citas y casos vienen del backend.
+- Las pruebas que cubren el modo de demostración lo activan de forma explícita; hay pruebas
+  nuevas para el comportamiento sin él.
+
 ### Pendiente
 1. Accesibilidad — tareas abiertas priorizadas en
    `docs/evidencias/accesibilidad/plan_accesibilidad.md` §6: fases 0.1/0.2/0.4 (axe,
@@ -324,9 +344,9 @@ versionan para que cualquier sesión posterior los tenga sin depender de un resp
    `registro-caso` y `registro-atencion`), 4.2 (136 colores literales sin token), 4.4/4.5
    (reflujo 320 px y texto 200 %), 5.3 (`jasmine-axe`) y Fase 6 (NVDA/VoiceOver, personas
    usuarias, declaración de accesibilidad).
-2. Sustituir el mock de `ContenidoHomeService` por el endpoint real del gestor de contenidos,
-   según `docs/contratos/contrato-contenidos-home.md` (host por `environment*.ts`, ruta
-   relativa `/contenidos/home` fija).
+2. ~~Sustituir el mock de `ContenidoHomeService`~~ **Resuelto el 2026-10-20**: fuera del modo
+   de demostración consulta `GET /contenidos/home`. Queda **cargar contenido en QA** (hoy
+   devuelve `[]`) y verificar que sus `seccion` sean `acciones` / `informacion`.
 3. Confirmar con Comunicaciones UdeA: dependencia exacta del logosímbolo y uso del
    distintivo de Casilda como favicon.
 4. Datos reales de contacto: `environment.telefonoOrientacion` y `environment.telefonoContactoPublico`.
@@ -334,12 +354,10 @@ versionan para que cualquier sesión posterior los tenga sin depender de un resp
    muestra (`esTelefonoPublicable()` en `src/app/core/security/telefono-crisis.ts`). Nunca
    reponer un número de relleno: hay pruebas que fallan si vuelve a aparecer.
 5. Validar con el equipo de atención el tono de los mensajes de error y notificaciones.
-6. **Antes de conectar el backend o de cualquier despliegue fuera de desarrollo:** retirar o
-   condicionar a un flag las cuentas de prueba, `loginAsMock()`, `createMockToken`, las
-   contraseñas genéricas y el selector de roles del encabezado y del login (hallazgo ADD-01
-   de `docs/evidencias/dashboards/00-diagnostico-y-plan.md`). Hoy permiten obtener una sesión
-   `ADMIN` con un clic. Se aceptan como deuda conocida mientras el proyecto esté
-   exclusivamente en etapa de desarrollo y sin backend.
+6. ~~Condicionar a un flag las cuentas de prueba~~ **Resuelto el 2026-10-20** con
+   `environment.datosDemostracion` (hallazgo ADD-01). Queda: `MOCK_USERS` y sus contraseñas
+   siguen en el bundle aunque no sirvan para entrar; retirarlos del código si se quiere que
+   no se publiquen. **Nunca desplegar con `datosDemostracion: true`.**
 7. **Panel de inicio — decisiones del equipo que bloquean el cierre de la fase**
    (detalle en `docs/evidencias/dashboards/00-diagnostico-y-plan.md` §7):
    - **Validar con el equipo de atención cada texto de la vista del rol Usuario** antes de
@@ -387,6 +405,15 @@ versionan para que cualquier sesión posterior los tenga sin depender de un resp
     «Auditoría de Casos» y dos títulos de ruta; no tocó la arquitectura de fondo porque
     ambos componentes tienen reglas de visibilidad por rol distintas entre sí y secciones
     institucionales («UAD Equipos 3 y 4», «Ruta Violeta») no modeladas en el catálogo.
+13. **Backend QA — huecos detectados contra su OpenAPI (2026-10-20):**
+    - El login no devuelve **especialidad**: con usuarios reales, `SeccionSeguimientosComponent`
+      deja las cuatro especialidades en solo lectura (nadie puede agregar seguimientos). Pedir el
+      campo a Backend o decidir otra regla para VBG-08-10.
+    - No existen `/maestros/ambito-ocurrencia`, `rutas-internas`, `rutas-externas`,
+      `especialidades-seguimiento` ni `acciones-seguimiento`: el módulo cae al respaldo de la
+      matriz y avisa por `NotificacionService`. Confirmar si los códigos del respaldo coinciden
+      con los que espera el backend al guardar.
+    - Sin endpoints para el panel (`/dashboard/*`, `/vigilancia/*`) ni para «mi proceso».
 
 ## 6. Reglas que no se deben romper
 
