@@ -18,9 +18,13 @@ export const environment = {
    */
   telefonoContactoPublico: '',
   /**
-   * Los indicadores del panel se sirven hoy de datos simulados. Con este flag
-   * activo, la interfaz lo declara con una franja visible, para que nadie
-   * interprete los mocks como cifras reales en una demostración (DSH-12-08).
+   * Modo de demostración, para probar la interfaz sin backend. Activo:
+   * cuentas de prueba (login rápido y selector de rol del encabezado), datos
+   * simulados en el panel de inicio, el módulo Equipo de Atención y el home, y
+   * una franja visible que lo declara (DSH-12-08). Inactivo: todo sale de
+   * `apiBaseUrl` y las zonas sin endpoint en el backend no se muestran.
+   * **Nunca `true` en un entorno desplegado**: las cuentas de prueba dan una
+   * sesión ADMIN con un clic (pendiente 6 de `CLAUDE.md`).
    */
   datosDemostracion: false,
   features: {
