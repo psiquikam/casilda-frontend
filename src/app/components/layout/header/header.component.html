@@ -52,25 +52,27 @@
 
         <mat-divider></mat-divider>
 
-        <!-- SECCIÓN DE PRUEBAS: CAMBIO RÁPIDO DE USUARIO / ROL -->
-        <div class="user-menu-group-header">
-          <mat-icon aria-hidden="true">swap_horiz</mat-icon>
-          <span>Cambiar Rol (Modo Prueba)</span>
-        </div>
+        <!-- SECCIÓN DE PRUEBAS: CAMBIO RÁPIDO DE USUARIO / ROL (solo modo de demostración) -->
+        @if (mockUsers.length) {
+          <div class="user-menu-group-header">
+            <mat-icon aria-hidden="true">swap_horiz</mat-icon>
+            <span>Cambiar Rol (Modo Prueba)</span>
+          </div>
 
-        @for (mock of mockUsers; track mock.id) {
-          <button mat-menu-item type="button" (click)="cambiarRolMock(mock)"
-            [class.role-item--active]="esCuentaMockActiva(mock)">
-            <mat-icon aria-hidden="true" [class.icon-selected]="esCuentaMockActiva(mock)">
-              {{ esCuentaMockActiva(mock) ? 'radio_button_checked' : 'radio_button_unchecked' }}
-            </mat-icon>
-            <span [class.text-selected]="esCuentaMockActiva(mock)">
-              {{ mock.especialidad ? mock.rol + ' · ' + mock.especialidad : mock.rol }} — <small>{{ mock.nombre.split(' ')[0] }}</small>
-            </span>
-          </button>
+          @for (mock of mockUsers; track mock.id) {
+            <button mat-menu-item type="button" (click)="cambiarRolMock(mock)"
+              [class.role-item--active]="esCuentaMockActiva(mock)">
+              <mat-icon aria-hidden="true" [class.icon-selected]="esCuentaMockActiva(mock)">
+                {{ esCuentaMockActiva(mock) ? 'radio_button_checked' : 'radio_button_unchecked' }}
+              </mat-icon>
+              <span [class.text-selected]="esCuentaMockActiva(mock)">
+                {{ mock.especialidad ? mock.rol + ' · ' + mock.especialidad : mock.rol }} — <small>{{ mock.nombre.split(' ')[0] }}</small>
+              </span>
+            </button>
+          }
+
+          <mat-divider></mat-divider>
         }
-
-        <mat-divider></mat-divider>
 
         <div class="user-menu-group-header">
           <mat-icon aria-hidden="true">view_quilt</mat-icon>

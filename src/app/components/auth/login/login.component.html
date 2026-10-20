@@ -30,23 +30,25 @@
     <h1 class="login__titulo">Ingreso a CASILDA</h1>
     <p class="login__subtitulo">Use el correo con el que se registró para continuar.</p>
 
-    <!-- ACCESO RÁPIDO PARA VALIDACIÓN DE ROLES (FASE 2) -->
-    <div class="login__mock-section" aria-label="Cuentas de prueba para verificación de roles">
-      <div class="mock-header">
-        <mat-icon aria-hidden="true" class="mock-header__icon">science</mat-icon>
-        <span class="mock-header__title">Cuentas de prueba (Roles Fase 2)</span>
+    <!-- ACCESO RÁPIDO PARA VALIDACIÓN DE ROLES: solo en modo de demostración -->
+    @if (mockUsersList.length) {
+      <div class="login__mock-section" aria-label="Cuentas de prueba para verificación de roles">
+        <div class="mock-header">
+          <mat-icon aria-hidden="true" class="mock-header__icon">science</mat-icon>
+          <span class="mock-header__title">Cuentas de prueba (Roles Fase 2)</span>
+        </div>
+        <p class="mock-desc">Haga clic en cualquier rol para iniciar sesión instantáneamente y verificar sus accesos y vistas:</p>
+        <div class="mock-grid">
+          @for (mock of mockUsersList; track mock.id) {
+            <button type="button" class="btn-mock-pill" [class]="'btn-mock-pill--' + mock.badgeClass"
+              (click)="loginRapidoMock(mock)" [title]="mock.especialidad ? mock.descripcion + ' (' + mock.especialidad + ')' : mock.descripcion">
+              <span class="btn-mock-pill__role">{{ mock.especialidad ? mock.rol + ' · ' + mock.especialidad : mock.rol }}</span>
+              <span class="btn-mock-pill__name">{{ mock.nombre.split(' ')[0] }}</span>
+            </button>
+          }
+        </div>
       </div>
-      <p class="mock-desc">Haga clic en cualquier rol para iniciar sesión instantáneamente y verificar sus accesos y vistas:</p>
-      <div class="mock-grid">
-        @for (mock of mockUsersList; track mock.id) {
-          <button type="button" class="btn-mock-pill" [class]="'btn-mock-pill--' + mock.badgeClass"
-            (click)="loginRapidoMock(mock)" [title]="mock.especialidad ? mock.descripcion + ' (' + mock.especialidad + ')' : mock.descripcion">
-            <span class="btn-mock-pill__role">{{ mock.especialidad ? mock.rol + ' · ' + mock.especialidad : mock.rol }}</span>
-            <span class="btn-mock-pill__name">{{ mock.nombre.split(' ')[0] }}</span>
-          </button>
-        }
-      </div>
-    </div>
+    }
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
 
