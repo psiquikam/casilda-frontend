@@ -144,6 +144,17 @@
     margin-bottom: var(--space-3, 15px);
     font-size: 0.95rem;
   }
+
+  .habeas-data-link {
+    color: var(--color-secondary);
+    font-weight: 600;
+    text-decoration: underline;
+
+    &:hover {
+      color: var(--color-secondary-hover, var(--color-secondary));
+      text-decoration: none;
+    }
+  }
 }
 
 /* Grillas de dos columnas con alineación superior para evitar deformaciones por error */
