@@ -36,10 +36,11 @@ export class AccesosFrecuentesWidget {
 
   /** Atajos sugeridos por rol, en orden de uso esperado. */
   private readonly porRol: Record<string, readonly string[]> = {
-    ADMIN: ['usuarios', 'maestros', 'indicadores'],
+    ADMIN: ['usuarios', 'maestros', 'contenidos-home', 'indicadores'],
     COORDINADOR: ['consulta', 'citas', 'nueva-solicitud'],
     PROFESIONAL: ['registro-atencion', 'citas', 'mis-asignaciones'],
-    REVISOR: ['indicadores', 'consulta', 'seguimiento']
+    REVISOR: ['indicadores', 'consulta', 'seguimiento'],
+    GESTOR_CONTENIDO: ['contenidos-home']
   };
 
   readonly accesos = computed(() => {

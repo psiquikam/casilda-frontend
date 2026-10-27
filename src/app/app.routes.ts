@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { featureCapabilityGuard } from './core/features/feature-capability.guard';
 import { authGuard } from './services/auth.guard';
 import { roleGuard } from './services/role.guard';
+import { cambiosSinGuardarGuard } from './core/navegacion/cambios-sin-guardar.guard';
 
 export const routes: Routes = [
   {
@@ -69,6 +70,32 @@ export const routes: Routes = [
     canActivate: [roleGuard],
     data: { roles: ['ADMIN'] },
     loadComponent: () => import('./components/gestion-usuarios/gestion-usuarios.component').then((m) => m.GestionUsuariosComponent)
+  },
+  {
+    // Gestor de contenidos del home (rol GESTOR_CONTENIDO, rol_id 6). Admin entra
+    // por la regla general de `roleGuard`. Las tres vistas comparten carga diferida.
+    path: 'gestion-contenidos',
+    canActivate: [roleGuard],
+    data: { roles: ['GESTOR_CONTENIDO'] },
+    children: [
+      {
+        path: '',
+        title: 'Contenidos del inicio',
+        loadComponent: () => import('./components/gestion-contenidos/gestion-contenidos.component').then((m) => m.GestionContenidosComponent)
+      },
+      {
+        path: 'nuevo',
+        title: 'Nuevo contenido del inicio',
+        canDeactivate: [cambiosSinGuardarGuard],
+        loadComponent: () => import('./components/gestion-contenidos/editor-contenido/editor-contenido.component').then((m) => m.EditorContenidoComponent)
+      },
+      {
+        path: ':id',
+        title: 'Editar contenido del inicio',
+        canDeactivate: [cambiosSinGuardarGuard],
+        loadComponent: () => import('./components/gestion-contenidos/editor-contenido/editor-contenido.component').then((m) => m.EditorContenidoComponent)
+      }
+    ]
   },
   {
     path: 'dashboard-revisor',

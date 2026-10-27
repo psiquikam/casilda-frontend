@@ -24,7 +24,7 @@ export type WidgetId =
   | 'accesos-frecuentes'
   | 'ayuda-protocolos';
 
-export type RolCasilda = 'ADMIN' | 'COORDINADOR' | 'PROFESIONAL' | 'REVISOR' | 'USUARIO';
+export type RolCasilda = 'ADMIN' | 'COORDINADOR' | 'PROFESIONAL' | 'REVISOR' | 'USUARIO' | 'GESTOR_CONTENIDO';
 
 export const DASHBOARD_POR_ROL: Record<RolCasilda, readonly WidgetId[]> = {
   // ¿La plataforma está bien configurada y funcionando? (§4.1)
@@ -40,6 +40,11 @@ export const DASHBOARD_POR_ROL: Record<RolCasilda, readonly WidgetId[]> = {
   // A diferencia del Admin, el perfil analítico necesita filtrar por periodo,
   // sede y dependencia; por eso usa `vigilancia` y no la distribución fija.
   REVISOR: ['pendientes', 'kpis', 'vigilancia', 'accesos-frecuentes', 'ayuda-protocolos'],
+
+  // ¿Qué tengo que publicar o actualizar en la portada? Su trabajo vive en un
+  // solo módulo, así que el panel se limita a llevarlo allí: los indicadores y
+  // protocolos del equipo de atención no le corresponden.
+  GESTOR_CONTENIDO: ['accesos-frecuentes'],
 
   // El dashboard del rol Usuario se rediseña completo en la Subfase 4 con
   // enfoque informado en trauma (§5). Hasta entonces conserva su vista actual:

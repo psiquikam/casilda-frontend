@@ -5,7 +5,7 @@ import { filter } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
 import { environment } from '../../../../environments/environment';
 
-export type MenuSectionKey = 'admin' | 'atencion' | 'alma' | 'uad' | 'reportes' | 'violeta' | 'usuario';
+export type MenuSectionKey = 'admin' | 'contenidos' | 'atencion' | 'alma' | 'uad' | 'reportes' | 'violeta' | 'usuario';
 
 @Component({
   selector: 'app-sidebar',
@@ -21,6 +21,7 @@ export class SidebarComponent implements OnInit {
 
   expandedSections: Record<MenuSectionKey, boolean> = {
     admin: true,
+    contenidos: true,
     atencion: true,
     alma: false,
     uad: false,
@@ -49,6 +50,8 @@ export class SidebarComponent implements OnInit {
   private autoExpandActiveSection(url: string): void {
     if (url.includes('/gestion-usuarios') || url.includes('/gestion-sistema')) {
       this.expandedSections.admin = true;
+    } else if (url.includes('/gestion-contenidos')) {
+      this.expandedSections.contenidos = true;
     } else if (
       url.includes('/solicitud-acompanamiento') ||
       url.includes('/consulta') ||
