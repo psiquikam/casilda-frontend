@@ -12,7 +12,7 @@
       }
     </div>
     @if (accionTexto() && accionRuta() && !cargando() && !error()) {
-      <a class="zona__accion" [href]="accionRuta()">{{ accionTexto() }}</a>
+      <a class="zona__accion" [routerLink]="accionRuta()" [queryParams]="accionParametros()">{{ accionTexto() }}</a>
     }
   </div>
 
