@@ -36,6 +36,13 @@
   }
 }
 
+/* Vista previa de una tarjeta navegable: mismo filete superior que en la portada,
+   sin hover ni foco porque no navega. */
+.tarjeta--previa-accion {
+  border-color: var(--color-primary-border);
+  border-top-color: var(--color-primary);
+}
+
 .tarjeta__imagen {
   width: 64px;
   height: 64px;

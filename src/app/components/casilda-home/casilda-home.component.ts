@@ -6,6 +6,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { environment } from '../../../environments/environment';
 import { CasildaCardComponent } from '../casilda-card/casilda-card.component';
 import { esTelefonoPublicable } from '../../core/security/telefono-crisis';
+import { SECCIONES_CONTENIDO } from '../../core/contenidos/catalogo-contenidos';
 import { ContenidoDestacadoDto, ContenidoHomeService } from '../../services/contenido-home.service';
 
 /**
@@ -38,8 +39,18 @@ export class CasildaHomeComponent implements OnInit {
   readonly errorCarga = signal(false);
   private readonly contenidos = signal<ContenidoDestacadoDto[]>([]);
 
-  readonly acciones = computed(() => this.contenidos().filter((c) => c.seccion === 'acciones'));
-  readonly informacion = computed(() => this.contenidos().filter((c) => c.seccion === 'informacion'));
+  /**
+   * Bloques de la portada en el orden del catálogo, cada uno con sus tarjetas en
+   * el orden en que llegan del backend. Un bloque sin tarjetas no se pinta.
+   * Los títulos salen de `SECCIONES_CONTENIDO`, el mismo catálogo que usa el
+   * módulo de gestión, para que quien edita lea los mismos nombres que la portada.
+   */
+  readonly secciones = computed(() =>
+    SECCIONES_CONTENIDO.map((seccion) => ({
+      ...seccion,
+      items: this.contenidos().filter((c) => c.seccion === seccion.valor)
+    })).filter((seccion) => seccion.items.length > 0)
+  );
 
   ngOnInit(): void {
     this.cargarContenido();
