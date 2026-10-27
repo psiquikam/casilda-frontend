@@ -88,6 +88,54 @@ describe('AuthService', () => {
     expect(service.hasRole('USUARIO')).toBeTrue();
   });
 
+  describe('rol Gestor de contenidos (rol_id 6)', () => {
+    // Forma real del login: `rol` trae el nombre y `roles` el código.
+    const sesionGestor = (): UserSession => ({
+      email: 'gestor@udea.edu.co',
+      nombre: 'Gestora de contenidos',
+      rol: 'Gestor de contenidos',
+      roles: ['GESTOR_CONTENIDO'],
+      authorities: ['ROLE_GESTOR_CONTENIDO'],
+      token: jwt(Math.floor(Date.now() / 1000) + 3600)
+    });
+
+    it('conserva la sesión al recargar aunque rol traiga el nombre y no el código', () => {
+      localStorage.setItem('userSession', JSON.stringify(sesionGestor()));
+
+      const service = createService();
+
+      expect(service.isAuthenticated()).toBeTrue();
+      expect(localStorage.getItem('userSession')).not.toBeNull();
+    });
+
+    it('lo reconoce como gestor y no lo confunde con el rol Usuario', () => {
+      localStorage.setItem('userSession', JSON.stringify(sesionGestor()));
+
+      const service = createService();
+
+      expect(service.isGestorContenido()).toBeTrue();
+      expect(service.isUsuario()).toBeFalse();
+      expect(service.isAdmin()).toBeFalse();
+      expect(service.getRoleCode()).toBe('GESTOR_CONTENIDO');
+      expect(service.getRoleName()).toBe('Gestor de contenidos');
+      expect(service.hasAnyRole(['GESTOR_CONTENIDO'])).toBeTrue();
+      expect(service.hasAnyRole(['USUARIO'])).toBeFalse();
+    });
+  });
+
+  it('sigue descartando una sesión con un rol que el frontend no conoce', () => {
+    localStorage.setItem('userSession', JSON.stringify({
+      ...session(Math.floor(Date.now() / 1000) + 3600),
+      rol: 'Invitado',
+      roles: ['INVITADO']
+    }));
+
+    const service = createService();
+
+    expect(service.isAuthenticated()).toBeFalse();
+    expect(localStorage.getItem('userSession')).toBeNull();
+  });
+
   it('elimina una sesión corrupta sin interrumpir la aplicación', () => {
     localStorage.setItem('userSession', '{sesion-invalida');
 
