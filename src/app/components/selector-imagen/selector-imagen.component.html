@@ -1,0 +1,55 @@
+<div class="selector" [class.selector--arrastrando]="arrastrando()" [class.selector--error]="error()"
+  (dragover)="alArrastrar($event, true)" (dragleave)="alArrastrar($event, false)" (drop)="alSoltar($event)">
+
+  <input #entrada type="file" class="selector__entrada" [accept]="extensiones()" tabindex="-1" aria-hidden="true"
+    (change)="alElegir($event)">
+
+  @if (imagenUrl(); as url) {
+    <div class="selector__vista">
+      <img class="selector__imagen" [src]="url" alt="" aria-hidden="true" width="96" height="96">
+      <div class="selector__detalle">
+        <p class="selector__nombre">
+          @if (nombreArchivo()) {
+            <mat-icon aria-hidden="true">fiber_new</mat-icon>
+            {{ nombreArchivo() }}
+          } @else {
+            <mat-icon aria-hidden="true">image</mat-icon>
+            Imagen actual
+          }
+        </p>
+        <div class="selector__botones">
+          <button type="button" class="selector__boton" [id]="idEntrada()"
+            [attr.aria-describedby]="error() ? idError() + ' ' + idAyuda() : idAyuda()" (click)="abrirSelector()">
+            <mat-icon aria-hidden="true">swap_horiz</mat-icon>
+            Cambiar imagen
+          </button>
+          <button type="button" class="selector__boton selector__boton--quitar" (click)="alQuitar()">
+            <mat-icon aria-hidden="true">delete_outline</mat-icon>
+            Quitar imagen
+          </button>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="selector__zona">
+      <mat-icon class="selector__zona-icono" aria-hidden="true">add_photo_alternate</mat-icon>
+      <p class="selector__zona-texto">Arrastre una imagen aquí o</p>
+      <button type="button" class="selector__boton selector__boton--principal" [id]="idEntrada()"
+        [attr.aria-describedby]="error() ? idError() + ' ' + idAyuda() : idAyuda()" (click)="abrirSelector()">
+        <mat-icon aria-hidden="true">upload</mat-icon>
+        Elegir imagen
+      </button>
+    </div>
+  }
+
+  <p class="selector__ayuda" [id]="idAyuda()">
+    {{ formatos() }}. Máximo {{ tamanoMaximoKb() | number }} KB. {{ ayudaSinImagen() }}
+  </p>
+
+  @if (error(); as mensaje) {
+    <p class="selector__error" [id]="idError()" role="alert">
+      <mat-icon aria-hidden="true">error_outline</mat-icon>
+      {{ mensaje }}
+    </p>
+  }
+</div>

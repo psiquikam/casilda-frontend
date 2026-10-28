@@ -1,0 +1,269 @@
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-6) var(--space-12);
+}
+
+.editor__volver {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  align-self: flex-start;
+  min-height: var(--touch-target-min);
+  font-weight: 600;
+  color: var(--color-secondary);
+  text-decoration: none;
+
+  &:hover { text-decoration: underline; }
+}
+
+/* `h1`: serif por `_base.scss`. */
+.editor__titulo {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-size-2xl);
+  color: var(--color-text-primary);
+}
+
+.editor__intro {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+/* Escritorio: formulario a la izquierda, vista previa fija a la derecha.
+   Móvil: formulario, vista previa y acciones en una sola columna. */
+.editor__cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  grid-template-areas:
+    'formulario previa'
+    'acciones   previa';
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.editor__formulario {
+  grid-area: formulario;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+.editor__grupo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-5);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  min-width: 0;
+}
+
+.editor__leyenda {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  float: left; /* Saca la leyenda del borde del fieldset y la deja como encabezado de la tarjeta. */
+  width: 100%;
+  margin-bottom: var(--space-2);
+  padding: 0;
+  font-family: var(--font-serif);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text-primary);
+
+  + * { clear: both; }
+}
+
+.editor__paso {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary-tint);
+  color: var(--color-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+}
+
+.editor__campo {
+  width: 100%;
+}
+
+.editor__fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+
+  > .editor__campo { flex: 1 1 220px; }
+  > .editor__campo--ancho { flex: 3 1 280px; }
+  > .editor__campo--corto { flex: 1 1 140px; max-width: 200px; }
+}
+
+.editor__pregunta {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* --- Secciones como tarjetas seleccionables --- */
+.editor__secciones {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.editor__seccion {
+  padding: var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+
+  &--activa {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary-tint);
+  }
+}
+
+.editor__seccion-titulo {
+  display: block;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.editor__seccion-descripcion {
+  display: block;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-base);
+}
+
+/* --- Vista previa --- */
+.editor__previa {
+  grid-area: previa;
+  align-self: stretch;
+}
+
+.editor__previa-pegajosa {
+  position: sticky;
+  top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background-color: var(--color-bg-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.editor__previa-titulo {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+
+.editor__previa-seccion {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.editor__previa-marco {
+  max-width: 320px;
+}
+
+.editor__previa-estado {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+
+  p {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+  }
+}
+
+/* --- Acciones --- */
+.editor__acciones {
+  grid-area: acciones;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-3);
+
+  /* El spinner verde por defecto desaparece sobre el botón verde. */
+  .mat-mdc-progress-spinner {
+    --mdc-circular-progress-active-indicator-color: var(--color-text-on-primary);
+    --mat-progress-spinner-active-indicator-color: var(--color-text-on-primary);
+  }
+}
+
+/* --- Estados --- */
+.editor__esqueleto {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.editor__barra {
+  height: 56px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-subtle);
+  animation: editor-latido 1.4s ease-in-out infinite;
+
+  &--corta { width: 60%; }
+}
+
+.editor__error-texto {
+  margin: 0 0 var(--space-3);
+}
+
+@keyframes editor-latido {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+@media (max-width: 960px) {
+  .editor__cuerpo {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'formulario'
+      'previa'
+      'acciones';
+  }
+
+  .editor__previa-pegajosa {
+    position: static;
+  }
+
+  .editor__previa-marco {
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .editor {
+    padding: var(--space-4) var(--space-4) var(--space-8);
+  }
+
+  .editor__grupo {
+    padding: var(--space-4);
+  }
+
+  .editor__fila > .editor__campo--corto {
+    max-width: none;
+  }
+
+  .editor__acciones .boton {
+    flex: 1 1 100%;
+  }
+}

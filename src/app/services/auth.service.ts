@@ -32,11 +32,25 @@ export type UserRole =
   | 'Profesional'
   | 'Revisor'
   | 'Usuario'
+  | 'Gestor de contenidos'
   | 'ADMIN'
   | 'COORDINADOR'
   | 'PROFESIONAL'
   | 'REVISOR'
-  | 'USUARIO';
+  | 'USUARIO'
+  | 'GESTOR_CONTENIDO';
+
+/**
+ * Códigos de rol que reconoce el frontend. Coinciden con `rol.codigo` del
+ * backend (`database/initial_data.sql`), que el login devuelve en `roles`.
+ * `GESTOR_CONTENIDO` (rol_id 6) administra los contenidos de la portada.
+ */
+export const ROLES_CASILDA = ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR', 'USUARIO', 'GESTOR_CONTENIDO'] as const;
+
+/** `ROLE_admin` / `admin` → `ADMIN`: el backend y las cuentas de prueba no coinciden en el formato. */
+function normalizarRol(rol: string | null | undefined): string {
+  return (rol ?? '').trim().toUpperCase().replace(/^ROLE_/, '');
+}
 
 export interface MockUserProfile {
   id: number;
@@ -225,6 +239,8 @@ export class AuthService {
     if (raw.includes('COORD')) return 'COORDINADOR';
     if (raw.includes('PROF')) return 'PROFESIONAL';
     if (raw.includes('REVIS')) return 'REVISOR';
+    // El login real trae `rol: 'Gestor de contenidos'` (nombre) y `roles: ['GESTOR_CONTENIDO']` (código).
+    if (raw.includes('GESTOR') || raw.includes('CONTENIDO')) return 'GESTOR_CONTENIDO';
     return 'USUARIO';
   }
 
@@ -239,6 +255,8 @@ export class AuthService {
         return 'Profesional';
       case 'REVISOR':
         return 'Revisor';
+      case 'GESTOR_CONTENIDO':
+        return 'Gestor de contenidos';
       default:
         return 'Usuario';
     }
@@ -264,6 +282,10 @@ export class AuthService {
     return this.hasRole('USUARIO');
   }
 
+  isGestorContenido(): boolean {
+    return this.hasRole('GESTOR_CONTENIDO');
+  }
+
   /**
    * P-12: especialidad de la cuenta de prueba PROFESIONAL activa, o
    * `undefined` fuera de esas cuentas. Sostiene el aislamiento VBG-08-10 en
@@ -287,16 +309,9 @@ export class AuthService {
 
   hasRole(role: string): boolean {
     if (!this.currentUser) return false;
-    const target = role.toUpperCase().replace(/^ROLE_/, '');
-    const userRole = (this.currentUser.rol || '').toUpperCase().replace(/^ROLE_/, '');
-    if (userRole === target) return true;
-    if (this.currentUser.roles?.some((r) => r.toUpperCase().replace(/^ROLE_/, '') === target)) {
-      return true;
-    }
-    if (this.currentUser.authorities?.some((a) => a.toUpperCase().replace(/^ROLE_/, '') === target)) {
-      return true;
-    }
-    return false;
+    const target = normalizarRol(role);
+    const { rol, roles = [], authorities = [] } = this.currentUser;
+    return [rol, ...roles, ...authorities].some((r) => normalizarRol(r) === target);
   }
 
   hasAnyRole(roles: string[]): boolean {
@@ -430,20 +445,19 @@ export class AuthService {
   private isValidSession(value: unknown): value is UserSession {
     if (!value || typeof value !== 'object') return false;
     const session = value as Partial<UserSession>;
-    const validRoles = [
-      'admin',
-      'coordinador',
-      'profesional',
-      'revisor',
-      'usuario'
-    ];
-    const roleString = (session.rol || session.roles?.[0] || '').toLowerCase().replace(/^role_/, '');
+    // Se revisan `rol` y `roles`: el backend pone en `rol` el *nombre* del rol
+    // («Gestor de contenidos») y en `roles` el *código*. Mirar solo `rol`
+    // descartaba la sesión del gestor de contenidos en cada recarga.
+    const candidatos = [session.rol, ...(Array.isArray(session.roles) ? session.roles : [])];
+    const rolReconocido = candidatos.some((r) =>
+      (ROLES_CASILDA as readonly string[]).includes(normalizarRol(r))
+    );
     return (
       typeof session.email === 'string' &&
       typeof session.nombre === 'string' &&
       typeof session.token === 'string' &&
       session.token.length > 0 &&
-      validRoles.includes(roleString)
+      rolReconocido
     );
   }
 

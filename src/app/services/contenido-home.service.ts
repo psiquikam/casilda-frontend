@@ -3,6 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map, of } from 'rxjs';
 
 import { environment } from '../../environments/environment';
+import type { SeccionContenido } from '../core/contenidos/catalogo-contenidos';
+import { estaVigente } from '../core/contenidos/reglas-contenido';
+
+// Se reexporta para no romper a quien ya la importaba desde aquí.
+export { estaVigente };
 
 /**
  * Contenido editable que alimenta las tarjetas de opción del Home.
@@ -12,21 +17,22 @@ import { environment } from '../../environments/environment';
  */
 export interface ContenidoDestacadoDto {
   id: number;
-  /** URL de la imagen principal de la tarjeta. */
-  imagen: string;
+  /**
+   * Imagen de la tarjeta. Puede llegar como ruta relativa a la API
+   * (`/contenidos/imagenes/…`), `assets/…` o `null`: se resuelve con
+   * `resolverImagenContenido()` antes de enlazarla.
+   */
+  imagen: string | null;
   titulo: string;
   contenido: string;
   /** Inicio de vigencia (ISO 8601). */
   vigenciaInicio: string;
   /** Fin de vigencia (ISO 8601). `null` = sin fecha de expiración. */
   vigenciaFin: string | null;
-  /**
-   * Ruta interna a la que dirige la tarjeta. Extensión pendiente de confirmar
-   * con backend; si llega vacía la tarjeta se muestra como informativa.
-   */
+  /** Ruta interna a la que dirige la tarjeta. Vacía o no interna: tarjeta informativa. */
   enlace?: string | null;
   /** Bloque del home donde se ubica la tarjeta. */
-  seccion: 'acciones' | 'informacion';
+  seccion: SeccionContenido;
 }
 
 /**
@@ -106,17 +112,6 @@ const CONTENIDO_MOCK: readonly ContenidoDestacadoDto[] = [
     seccion: 'informacion'
   }
 ];
-
-/** Indica si un contenido está vigente en la fecha dada. */
-export function estaVigente(contenido: ContenidoDestacadoDto, referencia: Date = new Date()): boolean {
-  const inicio = new Date(contenido.vigenciaInicio).getTime();
-  if (Number.isNaN(inicio) || inicio > referencia.getTime()) return false;
-
-  if (!contenido.vigenciaFin) return true;
-
-  const fin = new Date(contenido.vigenciaFin).getTime();
-  return Number.isNaN(fin) ? true : fin >= referencia.getTime();
-}
 
 @Injectable({ providedIn: 'root' })
 export class ContenidoHomeService {
