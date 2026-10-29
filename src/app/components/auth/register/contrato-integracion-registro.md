@@ -1,154 +1,50 @@
-# Contrato de Integración: Registro de Usuario (Casilda Frontend -> Spring Boot)
+# Integración del registro de usuario
 
-Este documento define la estructura de datos en formato JSON que el Frontend enviará al Backend para registrar un nuevo usuario en el sistema.
+El formulario consume el contrato publicado por el backend en Swagger. La URL base se toma de `environment.apiBaseUrl`.
 
-## Endpoint Propuesto
-- **URL**: `/api/v1/usuarios/registro` (o `/api/v1/auth/register`)
-- **Método HTTP**: `POST`
-- **Content-Type**: `application/json`
+## Endpoints
 
----
+| Método | Ruta | Uso |
+|---|---|---|
+| `GET` | `/auth/vinculos-udea` | Cargar las opciones de vínculo institucional (`id`, `codigo`, `nombre`). |
+| `POST` | `/auth/register` | Crear la cuenta con el vínculo seleccionado por su identificador. |
 
-## Payload (Request Body)
+## Solicitud de registro
 
 ```json
 {
-  "primerNombre": "string", // Requerido (mínimo 2 caracteres)
-  "segundoNombre": "string", // Opcional (puede ser null o vacío)
-  "primerApellido": "string", // Requerido (mínimo 2 caracteres)
-  "segundoApellido": "string", // Opcional (si se diligencia, entre 2 y 50 caracteres)
-  "tipoDocumento": "string", // Requerido. Opciones: "CC", "TI", "CE", "PA", "OT"
-  "documento": "string", // Requerido. Alfanumérico
-  "relacionUniversidad": "string", // Requerido. Opciones: "Estudiante", "Docente", "Administrativo", "Egresado", "Contratista", "Otro"
-  "email": "string", // Requerido. Formato correo electrónico válido
-  "telefono": "string", // Requerido. Solo dígitos (7 a 15 caracteres) para futura verificación
-  "password": "string", // Requerido (mínimo 8 caracteres)
-  "habeasData": true // Requerido. Siempre debe ser true
+  "primerNombre": "Ana",
+  "segundoNombre": "María",
+  "primerApellido": "Pérez",
+  "segundoApellido": "Gómez",
+  "tipoDocumento": "CC",
+  "documento": "123ABC",
+  "vinculoUdeaId": 8,
+  "email": "ana@udea.edu.co",
+  "telefono": "3001234567",
+  "password": "no-incluir-credenciales-reales",
+  "habeasData": true
 }
 ```
 
-> **Nota sobre `confirmPassword`:** Es un campo de validación de interfaz (UI). El Frontend valida que coincida con `password` antes del envío y no requiere ser persistido en el Backend.
+`segundoNombre` se omite si no se diligencia. `confirmPassword` solo se utiliza para validar el formulario y nunca se envía. `habeasData` se envía como `true` únicamente después de que la persona acepta la política.
 
----
+## Validaciones
 
-### Mapeo de Campos y Reglas de Validación
+- `primerNombre` y `primerApellido`: requeridos, entre 2 y 50 caracteres.
+- `segundoNombre`: opcional, máximo 50 caracteres.
+- `segundoApellido`: el Swagger consultado actualmente lo marca como requerido, entre 2 y 50 caracteres. El frontend lo exige temporalmente para ajustarse al contrato publicado; cuando backend lo haga opcional, se debe retirar el validador `required`.
+- `tipoDocumento`: requerido; opciones del formulario: `CC`, `TI`, `CE`, `PA`, `OT`.
+- `documento`: requerido, alfanumérico, máximo 50 caracteres.
+- `vinculoUdeaId`: se envía como el `id` numérico de una opción obtenida del catálogo; el formulario requiere seleccionar una.
+- `email`: requerido y validado como correo electrónico; se normaliza a minúsculas antes del envío.
+- `telefono`: requerido, solo dígitos, entre 7 y 15 caracteres.
+- `password`: entre 8 y 72 caracteres. No se registra en consola ni se incluye en mensajes de error.
 
-| Campo | Tipo | Obligatorio | Reglas / Restricciones | Descripción |
-|---|---|:---:|---|---|
-| `primerNombre` | String | Sí | Min 2 caracteres, solo texto | Primer nombre del usuario |
-| `segundoNombre` | String | No | Opcional | Segundo nombre |
-| `primerApellido` | String | Sí | Min 2 caracteres, solo texto | Primer apellido |
-| `segundoApellido` | String | No | Opcional; si se diligencia, entre 2 y 50 caracteres | Segundo apellido |
-| `tipoDocumento` | String | Sí | `CC`, `TI`, `CE`, `PA`, `OT` | Tipo de identificación |
-| `documento` | String | Sí | Alfanumérico | Número de documento |
-| `relacionUniversidad` | String | Sí | `Estudiante`, `Docente`, `Administrativo`, `Egresado`, `Contratista`, `Otro` | Vínculo institucional con la UdeA |
-| `email` | String | Sí | Formato RFC 5322 (email) | Correo electrónico institucional o personal seguro |
-| `telefono` | String | Sí | Numérico, 7 a 15 dígitos | Número de celular para verificación de cuenta |
-| `password` | String | Sí | Min 8 caracteres | Contraseña (se debe almacenar hasheada con BCrypt/Argon2) |
-| `habeasData` | Boolean | Sí | Debe ser `true` | Autorización expresa de política y tratamiento de datos |
+## Respuesta y errores
 
----
+La respuesta exitosa contiene `mensaje`, `usuarioId` y `email`. Tras el éxito, el formulario muestra la confirmación y un enlace para iniciar sesión; el registro no inicia una sesión automáticamente.
 
-### Referencia DTO (Java / Spring Boot)
+El formulario muestra el mensaje de backend cuando está disponible (`mensaje` o `message`), incluidos los detalles de validación en `errores`. Si no hay detalle, presenta mensajes para validación (`400`), duplicidad (`409`) o vínculo/tipo de documento inexistente (`404`).
 
-Para facilitar la implementación en Spring Boot (`UsuarioRegistroDTO.java`):
-
-```java
-package co.edu.udea.casilda.dto;
-
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
-
-public class UsuarioRegistroDTO {
-
-    @NotBlank(message = "El primer nombre es obligatorio")
-    @Size(min = 2, max = 50, message = "El primer nombre debe tener entre 2 y 50 caracteres")
-    private String primerNombre;
-
-    @Size(max = 50, message = "El segundo nombre no puede exceder 50 caracteres")
-    private String segundoNombre; // Opcional
-
-    @NotBlank(message = "El primer apellido es obligatorio")
-    @Size(min = 2, max = 50, message = "El primer apellido debe tener entre 2 y 50 caracteres")
-    private String primerApellido;
-
-    @Pattern(regexp = "^$|^.{2,50}$", message = "El segundo apellido, si se ingresa, debe tener entre 2 y 50 caracteres")
-    private String segundoApellido;
-
-    @NotBlank(message = "El tipo de documento es obligatorio")
-    private String tipoDocumento;
-
-    @NotBlank(message = "El número de documento es obligatorio")
-    @Pattern(regexp = "^[0-9A-Za-z]+$", message = "El documento debe ser alfanumérico")
-    private String documento;
-
-    @NotBlank(message = "La relación con la universidad es obligatoria")
-    private String relacionUniversidad;
-
-    @NotBlank(message = "El correo electrónico es obligatorio")
-    @Email(message = "El formato de correo electrónico no es válido")
-    private String email;
-
-    @NotBlank(message = "El número de celular es obligatorio para verificación")
-    @Pattern(regexp = "^[0-9]{7,15}$", message = "El teléfono debe contener entre 7 y 15 dígitos")
-    private String telefono;
-
-    @NotBlank(message = "La contraseña es obligatoria")
-    @Size(min = 8, message = "La contraseña debe tener mínimo 8 caracteres")
-    private String password;
-
-    @NotNull(message = "Debe aceptar el tratamiento de datos personales")
-    @AssertTrue(message = "Debe aceptar la política de tratamiento de datos (Habeas Data)")
-    private Boolean habeasData;
-
-    // Getters, Setters y Constructor
-}
-```
-
----
-
-## Respuestas Esperadas (Response)
-
-### 201 Created
-- **Descripción**: Usuario registrado exitosamente.
-- **Body sugerido**:
-```json
-{
-  "mensaje": "Usuario creado exitosamente.",
-  "usuarioId": "uuid-o-id",
-  "email": "usuario@udea.edu.co"
-}
-```
-
-### 400 Bad Request (Validación o Duplicado)
-- **Descripción**: Datos faltantes, formato inválido, o documento/correo ya registrado.
-- **Body sugerido**:
-```json
-{
-  "timestamp": "2026-10-13T10:00:00Z",
-  "status": 400,
-  "error": "Bad Request",
-  "mensaje": "El correo ingresado ya se encuentra registrado en el sistema.",
-  "errores": [
-    {
-      "campo": "email",
-      "mensaje": "El correo ingresado ya se encuentra registrado"
-    }
-  ]
-}
-```
-
-### 409 Conflict
-- **Descripción**: Conflicto por duplicidad de documento de identidad.
-- **Body sugerido**:
-```json
-{
-  "status": 409,
-  "error": "Conflict",
-  "mensaje": "Ya existe un usuario con el documento de identidad ingresado."
-}
-```
+Las pruebas usan `HttpTestingController`; no se debe invocar el `POST` contra QA con datos ficticios porque crearía una cuenta real.

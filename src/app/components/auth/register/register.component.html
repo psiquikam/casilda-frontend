@@ -7,7 +7,17 @@
   </div>
 
   <h1 class="formulario-titulo">Crear una cuenta en CASILDA</h1>
-  
+
+  @if (successMessage) {
+    <section class="casilda-alerta casilda-alerta--exito" role="status" aria-live="polite">
+      <mat-icon aria-hidden="true">check_circle</mat-icon>
+      <div>
+        <h2>Registro completado</h2>
+        <p>{{ successMessage }}</p>
+        <a mat-raised-button color="primary" routerLink="/login">Ir a iniciar sesión</a>
+      </div>
+    </section>
+  } @else {
   <mat-stepper linear #stepper>
     
     <!-- Paso 1: Información Personal -->
@@ -44,10 +54,10 @@
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Segundo apellido (opcional)</mat-label>
+              <mat-label>Segundo apellido *</mat-label>
               <input matInput formControlName="segundoApellido" autocomplete="family-name">
               @if (controlInvalido(step1Form, 'segundoApellido')) {
-                <mat-error>Si lo ingresas, debe tener entre 2 y 50 caracteres</mat-error>
+                <mat-error>Es obligatorio y debe tener entre 2 y 50 caracteres</mat-error>
               }
             </mat-form-field>
 
@@ -95,18 +105,26 @@
           <div class="grid-form">
             <mat-form-field appearance="outline" class="full-width-cell">
               <mat-label>Relación con la universidad *</mat-label>
-              <mat-select formControlName="relacionUniversidad" placeholder="Seleccione su vínculo">
-                <mat-option value="Estudiante">Estudiante</mat-option>
-                <mat-option value="Docente">Docente</mat-option>
-                <mat-option value="Administrativo">Administrativo</mat-option>
-                <mat-option value="Egresado">Egresado(a)</mat-option>
-                <mat-option value="Contratista">Contratista</mat-option>
-                <mat-option value="Otro">Otro</mat-option>
+              <mat-select formControlName="vinculoUdeaId" placeholder="Seleccione su vínculo">
+                @for (vinculo of vinculosUdea; track vinculo.id) {
+                  <mat-option [value]="vinculo.id">{{ vinculo.nombre }}</mat-option>
+                }
               </mat-select>
-              @if (controlInvalido(step2Form, 'relacionUniversidad')) {
+              @if (controlInvalido(step2Form, 'vinculoUdeaId')) {
                 <mat-error>La relación con la universidad es obligatoria</mat-error>
               }
             </mat-form-field>
+
+            @if (cargandoVinculos) {
+              <p class="full-width-cell" role="status">Cargando vínculos institucionales…</p>
+            }
+            @if (errorVinculos) {
+              <div class="casilda-alerta casilda-alerta--peligro full-width-cell" role="alert">
+                <mat-icon aria-hidden="true">error_outline</mat-icon>
+                <span>{{ errorVinculos }}</span>
+                <button type="button" mat-button (click)="cargarVinculosUdea()">Reintentar</button>
+              </div>
+            }
 
             <mat-form-field appearance="outline">
               <mat-label>Correo electrónico seguro *</mat-label>
@@ -130,7 +148,8 @@
 
         <div class="actions">
           <button type="button" mat-button matStepperPrevious>Atrás</button>
-          <button type="button" mat-raised-button color="primary" matStepperNext>Continuar</button>
+          <button type="button" mat-raised-button color="primary" matStepperNext
+            [disabled]="cargandoVinculos || !!errorVinculos || vinculosUdea.length === 0">Continuar</button>
         </div>
       </form>
     </mat-step>
@@ -212,4 +231,5 @@
     </mat-step>
 
   </mat-stepper>
+  }
 </div>
