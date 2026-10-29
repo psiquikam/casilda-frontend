@@ -43,6 +43,24 @@ describe('LoginComponent', () => {
     expect(fixture.nativeElement.querySelector(`label[for="${password.id}"]`)).toBeTruthy();
   });
 
+  it('debe mostrar la ayuda del correo dentro del campo y reemplazarla por el error, sin desbordarse', () => {
+    const email: HTMLInputElement = fixture.nativeElement.querySelector('input[formcontrolname="email"]');
+    const campo: HTMLElement = email.closest('mat-form-field')!;
+    const hint: HTMLElement = campo.querySelector('mat-hint')!;
+
+    expect(hint.textContent).toContain('Correo registrado en CASILDA.');
+    expect(email.getAttribute('aria-describedby')).toContain(hint.id);
+    expect(campo.querySelector('.mat-mdc-form-field-subscript-dynamic-size')).toBeTruthy();
+
+    component.loginForm.get('email')?.setValue('correo-invalido');
+    component.loginForm.markAllAsTouched();
+    fixture.detectChanges();
+
+    const error: HTMLElement = campo.querySelector('mat-error')!;
+    expect(campo.querySelector('mat-hint')).toBeNull();
+    expect(email.getAttribute('aria-describedby')).toContain(error.id);
+  });
+
   it('debe describir el botón de visibilidad de la contraseña para lectores de pantalla', () => {
     const toggle: HTMLButtonElement = fixture.nativeElement.querySelector('button[mat-icon-button]');
 
