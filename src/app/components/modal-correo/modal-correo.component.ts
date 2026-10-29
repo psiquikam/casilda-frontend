@@ -6,6 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { ErrorStateMatcher } from '@angular/material/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
@@ -43,6 +44,12 @@ export class ModalCorreoComponent implements OnInit {
     correo: ''
   };
 
+  readonly errorStateMatcher: ErrorStateMatcher = {
+    isErrorState: (control) => Boolean(
+      control?.invalid && (control.dirty || control.touched || this.data.correo)
+    )
+  };
+
   constructor(public dialogRef: MatDialogRef<ModalCorreoComponent>) { }
 
   ngOnInit(): void {
@@ -57,14 +64,28 @@ export class ModalCorreoComponent implements OnInit {
     this.data.tipo = found ? found.nombre : '';
   }
 
+  get esInstitucional(): boolean {
+    return (this.data.tipo || '').toLowerCase().includes('institucional');
+  }
+
+  get patronCorreo(): string {
+    return this.esInstitucional
+      ? '^[a-zA-Z0-9._%+-]+@udea\\.edu\\.co$'
+      : '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$';
+  }
+
   isValidEmail(email: string): boolean {
+    const trimmed = (email || '').trim();
+    if (this.esInstitucional) {
+      return /^[a-zA-Z0-9._%+-]+@udea\.edu\.co$/i.test(trimmed);
+    }
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return emailRegex.test(email);
+    return emailRegex.test(trimmed);
   }
 
   get canSubmit(): boolean {
     return this.data.tipoId !== null &&
-      this.isValidEmail(this.data.correo.trim());
+      this.isValidEmail(this.data.correo);
   }
 
   guardar(): void {

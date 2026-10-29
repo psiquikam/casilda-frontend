@@ -1,32 +1,42 @@
 <h2 mat-dialog-title class="modal-title">
   <mat-icon aria-hidden="true">phone</mat-icon>
-  Agregar Teléfono
+  Agregar teléfono
 </h2>
 
 <mat-dialog-content class="modal-content">
   <div class="form-row">
 
     <mat-form-field appearance="outline" class="field-tipo">
-      <mat-label>Tipo</mat-label>
-      <mat-select [(ngModel)]="data.tipoId" (selectionChange)="onTipoChange($event.value)">
+      <mat-label>Tipo de teléfono</mat-label>
+      <mat-select [(ngModel)]="data.tipoId" name="tipoTelefonoVal" #tipoTelefonoVal="ngModel"
+        required [errorStateMatcher]="errorStateMatcher" (selectionChange)="onTipoChange($event.value)">
         @for (tipo of tiposTelefono; track tipo) {
           <mat-option [value]="tipo.id">{{ tipo.nombre }}</mat-option>
         }
       </mat-select>
+      @if (tipoTelefonoVal.hasError('required') && (tipoTelefonoVal.touched || data.telefono)) {
+        <mat-error>Seleccione el tipo de teléfono</mat-error>
+      }
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="field-tel">
       <mat-label>Teléfono</mat-label>
       <input matInput [(ngModel)]="data.telefono" name="telefonoVal" #telefonoVal="ngModel"
+        required
+        [errorStateMatcher]="errorStateMatcher"
         minlength="10"
         maxlength="10"
         inputmode="numeric"
         pattern="\d*"
         (input)="soloDigitosTelefono($event)"
         placeholder="Ej: 3001234567">
-        @if (telefonoVal.invalid && (telefonoVal.dirty || telefonoVal.touched)) {
+        @if ((telefonoVal.touched && !data.telefono.trim()) || (data.telefono && data.telefono.trim().length !== 10)) {
           <mat-error>
-            El teléfono debe tener 10 dígitos
+            @if (!data.telefono.trim()) {
+              Ingrese el número de teléfono
+            } @else {
+              El teléfono debe tener exactamente 10 dígitos
+            }
           </mat-error>
         }
       </mat-form-field>
@@ -38,7 +48,7 @@
   <mat-dialog-actions align="end" class="modal-actions">
     <button mat-button (click)="onNoClick()">Cancelar</button>
 
-    <button mat-flat-button class="btn-confirm" (click)="guardar()" [disabled]="!canSubmit">
+    <button type="button" mat-flat-button class="btn-confirm" (click)="guardar()" [disabled]="!canSubmit">
       <mat-icon aria-hidden="true">check</mat-icon>
       Agregar
     </button>

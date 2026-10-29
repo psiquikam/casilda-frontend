@@ -1,0 +1,8 @@
+{
+  "/api-casilda": {
+    "target": "https://casildaqa.duckdns.org",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

@@ -117,7 +117,7 @@ export const routes: Routes = [
   },
   {
     path: 'consulta',
-    title: 'Consulta de solicitudes',
+    title: 'Bandeja de reparto',
     canActivate: [roleGuard],
     data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR'] },
     loadComponent: () => import('./components/consulta/consulta.component').then((m) => m.ConsultaComponent)

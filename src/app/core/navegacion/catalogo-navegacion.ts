@@ -89,8 +89,8 @@ export const CATALOGO_MODULOS: readonly ModuloCasilda[] = [
   },
   {
     id: 'consulta',
-    nombre: 'Consulta de solicitudes',
-    icono: 'manage_search',
+    nombre: 'Bandeja de reparto',
+    icono: 'move_to_inbox',
     ruta: '/consulta',
     roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR'],
     seccion: 'Equipo de atención'

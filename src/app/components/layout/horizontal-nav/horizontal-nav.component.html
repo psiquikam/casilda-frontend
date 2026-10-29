@@ -64,8 +64,8 @@
           <span>Nueva Solicitud</span>
         </a>
         <a mat-menu-item routerLink="/consulta" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
-          <mat-icon aria-hidden="true">search</mat-icon>
-          <span>Consulta de Solicitudes</span>
+          <mat-icon aria-hidden="true">move_to_inbox</mat-icon>
+          <span>Bandeja de reparto</span>
         </a>
         @if (features.assignmentsPrototype) {
           <a mat-menu-item routerLink="/mis-asignaciones" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
@@ -263,8 +263,8 @@
               </a>
               <a routerLink="/consulta" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
                 class="hnav-mobile-item" (click)="closeMobileMenu()">
-                <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">search</mat-icon>
-                <span class="hnav-mobile-item__text">Consulta de Solicitudes</span>
+                <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">move_to_inbox</mat-icon>
+                <span class="hnav-mobile-item__text">Bandeja de reparto</span>
               </a>
               @if (features.assignmentsPrototype) {
                 <a routerLink="/mis-asignaciones" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"

@@ -73,6 +73,8 @@ export class ModalDetalleSolicitudComponent implements OnInit {
 
   tiposDocumento: MaestroDto[] = [];
   identidadesGenero: MaestroDto[] = [];
+  vinculosUniversidad: MaestroDto[] = [];
+  vinculosAgresorVictima: MaestroDto[] = [];
   cargos: MaestroDto[] = [];
   campusLista: MaestroDto[] = [];
   unidadesAdministrativas: MaestroDto[] = [];
@@ -104,9 +106,76 @@ export class ModalDetalleSolicitudComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.listasService.obtenerMaestro('vinculos-udea').subscribe({
+      next: (vinculos) => { this.vinculosUniversidad = vinculos; },
+      error: (error) => {
+        this.vinculosUniversidad = [];
+        this.notificacion.error('No fue posible cargar los vínculos con la universidad.', error);
+      }
+    });
+    this.listasService.obtenerMaestro('vinculos-agresor-victima').subscribe({
+      next: (vinculos) => { this.vinculosAgresorVictima = vinculos; },
+      error: (error) => {
+        this.vinculosAgresorVictima = [];
+        this.notificacion.error('No fue posible cargar los vínculos con la víctima.', error);
+      }
+    });
+
     const info = this.data?.info ?? {};
     const esIndirecta = !!(info.remitentePrimerNombre || info.remitentePrimerApellido);
     const fechaNacimiento = this.parsearFechaParaControl(info.fechaNacimiento);
+
+    let datosLocales: any = null;
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const guardado =
+          (info.solicitudId ? localStorage.getItem(`casilda_caso_${info.solicitudId}`) : null) ||
+          (info.id ? localStorage.getItem(`casilda_caso_${info.id}`) : null) ||
+          (info.numeroDocumento ? localStorage.getItem(`casilda_doc_${info.numeroDocumento}`) : null) ||
+          (info.documentoSolicitante ? localStorage.getItem(`casilda_doc_${info.documentoSolicitante}`) : null);
+        if (guardado) {
+          datosLocales = JSON.parse(guardado);
+        }
+      }
+    } catch {
+      // Ignorar si localStorage no está disponible
+    }
+
+    const descripcionHechos =
+      info.descripcionHechos ||
+      info.descripcion ||
+      datosLocales?.descripcionHechos ||
+      '';
+    const lugarOcurrencia =
+      info.lugarOcurrencia ||
+      info.lugar ||
+      datosLocales?.lugarOcurrencia ||
+      '';
+    const agresorIdentificacion =
+      info.agresorIdentificacion ||
+      datosLocales?.agresorIdentificacion ||
+      '';
+    const agresorNombre =
+      info.agresorNombre ||
+      info.presuntoAgresor ||
+      datosLocales?.agresorNombre ||
+      (info.presuntoPrimerNombre ? `${info.presuntoPrimerNombre} ${info.presuntoPrimerApellido || ''}`.trim() : '');
+    const agresorVinculoUdeaId = info.agresorVinculoUdeaId ?? datosLocales?.agresorVinculoUdeaId ?? null;
+    const agresorOtroVinculoUdea = info.agresorOtroVinculoUdea ?? datosLocales?.agresorOtroVinculoUdea ?? '';
+    const agresorVinculoVictimaId = info.agresorVinculoVictimaId ?? datosLocales?.agresorVinculoVictimaId ?? null;
+    const agresorOtroVinculoVictima = info.agresorOtroVinculoVictima ?? datosLocales?.agresorOtroVinculoVictima ?? '';
+    const agresorCorreo =
+      info.agresorCorreo ||
+      datosLocales?.agresorCorreo ||
+      '';
+    const agresorRemitirUad =
+      info.agresorRemitirUad ||
+      datosLocales?.agresorRemitirUad ||
+      '';
+    const evidenciasResumen =
+      info.evidenciasResumen ||
+      datosLocales?.evidenciasResumen ||
+      (info.evidenciasArchivos?.length ? `${info.evidenciasArchivos.length} archivo(s) adjunto(s)` : '');
 
     this.detalleForm = this.fb.group({
       remitentePrimerNombre: [info.remitentePrimerNombre ?? '', esIndirecta ? Validators.required : []],
@@ -128,9 +197,25 @@ export class ModalDetalleSolicitudComponent implements OnInit {
       primerApellido: [info.primerApellido ?? '', Validators.required],
       segundoApellido: [info.segundoApellido ?? ''],
       identidadGenero: [info.identidadGeneroId ?? null],
+      vinculoUniversidad: [info.vinculoUniversidadId ?? null],
       medioSolicitud: [info.medioSolicitudId ?? null, Validators.required],
       observacionesTelefono: [info.observacionesTelefono ?? ''],
-      observacionesCorreo: [info.observacionesCorreo ?? '']
+      observacionesCorreo: [info.observacionesCorreo ?? ''],
+
+      // Hechos y situación
+      descripcionHechos: [descripcionHechos, Validators.required],
+      lugarOcurrencia: [lugarOcurrencia],
+      evidenciasResumen: [evidenciasResumen],
+
+      // Presunto agresor
+      agresorIdentificacion: [agresorIdentificacion],
+      agresorNombre: [agresorNombre],
+      agresorVinculoUdeaId: [agresorVinculoUdeaId],
+      agresorOtroVinculoUdea: [agresorOtroVinculoUdea],
+      agresorVinculoVictimaId: [agresorVinculoVictimaId],
+      agresorOtroVinculoVictima: [agresorOtroVinculoVictima],
+      agresorCorreo: [agresorCorreo],
+      agresorRemitirUad: [agresorRemitirUad]
     });
 
     const correosInfo = Array.isArray(info?.correos) ? (info.correos as ContactoInfo[]) : [];
@@ -161,6 +246,16 @@ export class ModalDetalleSolicitudComponent implements OnInit {
     return !!(info.remitentePrimerNombre || info.remitentePrimerApellido);
   }
 
+  get esOtroVinculoAgresorUniversidad(): boolean {
+    const id = Number(this.detalleForm?.get('agresorVinculoUdeaId')?.value);
+    return this.esOpcionOtro(this.vinculosUniversidad.find((vinculo) => vinculo.id === id)?.nombre);
+  }
+
+  get esOtroVinculoAgresorVictima(): boolean {
+    const id = Number(this.detalleForm?.get('agresorVinculoVictimaId')?.value);
+    return this.esOpcionOtro(this.vinculosAgresorVictima.find((vinculo) => vinculo.id === id)?.nombre);
+  }
+
   abrirModalCorreo(): void {
     const ref = this.dialog.open(ModalCorreoComponent, { width: '600px', disableClose: true });
     ref.afterClosed().subscribe(result => {
@@ -187,6 +282,12 @@ export class ModalDetalleSolicitudComponent implements OnInit {
 
   guardar(): void {
     if (this.detalleForm.invalid || this.guardando) {
+      this.detalleForm.markAllAsTouched();
+      return;
+    }
+
+    if (this.correoRegistrados.length === 0 || this.telefonosRegistrados.length === 0) {
+      this.notificacion.error('La solicitud debe conservar al menos un correo electrónico y un teléfono.');
       return;
     }
 
@@ -200,15 +301,40 @@ export class ModalDetalleSolicitudComponent implements OnInit {
     }
 
     this.guardando = true;
+    const request = this.construirRequestActualizacion();
 
-    this.solicitudService.actualizar(solicitudId, this.construirRequestActualizacion()).subscribe({
+    this.solicitudService.actualizar(solicitudId, request).subscribe({
       next: (solicitudActualizada) => {
         this.guardando = false;
-        this.snackBar.open(`Solicitud ${solicitudActualizada.codigo} actualizada correctamente.`, 'Cerrar', {
+
+        const mergedResult = {
+          ...this.data.info,
+          ...solicitudActualizada,
+          ...request,
+          id: solicitudActualizada?.codigo || this.data.info?.id,
+          solicitudId: solicitudActualizada?.id || solicitudId
+        };
+
+        try {
+          if (typeof localStorage !== 'undefined') {
+            const datosCaso = request.datosCaso;
+            localStorage.setItem(`casilda_caso_${solicitudId}`, JSON.stringify(datosCaso));
+            if (this.data.info?.id) {
+              localStorage.setItem(`casilda_caso_${this.data.info.id}`, JSON.stringify(datosCaso));
+            }
+            if (request.numeroDocumento) {
+              localStorage.setItem(`casilda_doc_${request.numeroDocumento}`, JSON.stringify(datosCaso));
+            }
+          }
+        } catch {
+          // Ignorar si localStorage no está disponible
+        }
+
+        this.snackBar.open(`Solicitud ${mergedResult.codigo || mergedResult.id} actualizada correctamente.`, 'Cerrar', {
           duration: 5000,
           panelClass: ['snack-success']
         });
-        this.dialogRef.close(solicitudActualizada);
+        this.dialogRef.close(mergedResult);
       },
       error: (error) => {
         this.notificacion.error('No fue posible guardar los cambios de la solicitud. Intente de nuevo.', error);
@@ -223,6 +349,18 @@ export class ModalDetalleSolicitudComponent implements OnInit {
 
   private construirRequestActualizacion(): UpdateSolicitudDto {
     const formValue = this.detalleForm.getRawValue();
+    const vinculoAgresorUniversidad = this.vinculosUniversidad.find(
+      (vinculo) => vinculo.id === Number(formValue.agresorVinculoUdeaId)
+    );
+    const vinculoAgresorVictima = this.vinculosAgresorVictima.find(
+      (vinculo) => vinculo.id === Number(formValue.agresorVinculoVictimaId)
+    );
+    const otroVinculoUniversidad = this.esOtroVinculoAgresorUniversidad
+      ? this.normalizarTextoOpcional(formValue.agresorOtroVinculoUdea)
+      : null;
+    const otroVinculoVictima = this.esOtroVinculoAgresorVictima
+      ? this.normalizarTextoOpcional(formValue.agresorOtroVinculoVictima)
+      : null;
     return {
       primerNombre: this.normalizarTexto(formValue.primerNombre),
       segundoNombre: this.normalizarTextoOpcional(formValue.segundoNombre),
@@ -232,6 +370,7 @@ export class ModalDetalleSolicitudComponent implements OnInit {
       numeroDocumento: this.normalizarTextoOpcional(formValue.numeroDocumento),
       fechaNacimiento: this.formatearFecha(formValue.fechaNacimiento),
       identidadGeneroId: formValue.identidadGenero ?? null,
+      vinculoUniversidadId: formValue.vinculoUniversidad ?? null,
       correos: this.correoRegistrados
         .filter((correo) => correo.correo && correo.tipoId != null)
         .map((correo) => ({
@@ -258,7 +397,37 @@ export class ModalDetalleSolicitudComponent implements OnInit {
       remitenteNumeroDocumento: this.tieneRemitente ? this.normalizarTextoOpcional(formValue.remitenteNumeroDocumento) : null,
       observacionesTelefono: this.normalizarTextoOpcional(formValue.observacionesTelefono),
       observacionesCorreo: this.normalizarTextoOpcional(formValue.observacionesCorreo),
-      medioSolicitudId: formValue.medioSolicitud ?? null
+      medioSolicitudId: formValue.medioSolicitud ?? null,
+
+      // Campos de hechos, contexto y presunto agresor
+      descripcionHechos: this.normalizarTextoOpcional(formValue.descripcionHechos),
+      lugarOcurrencia: this.normalizarTextoOpcional(formValue.lugarOcurrencia),
+      agresorIdentificacion: this.normalizarTextoOpcional(formValue.agresorIdentificacion),
+      agresorNombre: this.normalizarTextoOpcional(formValue.agresorNombre),
+      agresorVinculoUdeaId: formValue.agresorVinculoUdeaId ?? null,
+      agresorVinculoUdea: this.normalizarTextoOpcional(vinculoAgresorUniversidad?.nombre),
+      agresorOtroVinculoUdea: otroVinculoUniversidad,
+      agresorVinculoVictimaId: formValue.agresorVinculoVictimaId ?? null,
+      agresorVinculoVictima: this.normalizarTextoOpcional(vinculoAgresorVictima?.nombre),
+      agresorOtroVinculoVictima: otroVinculoVictima,
+      agresorCorreo: this.normalizarTextoOpcional(formValue.agresorCorreo),
+      agresorRemitirUad: this.normalizarTextoOpcional(formValue.agresorRemitirUad),
+      evidenciasResumen: this.normalizarTextoOpcional(formValue.evidenciasResumen),
+      datosCaso: {
+        descripcionHechos: this.normalizarTextoOpcional(formValue.descripcionHechos),
+        lugarOcurrencia: this.normalizarTextoOpcional(formValue.lugarOcurrencia),
+        agresorIdentificacion: this.normalizarTextoOpcional(formValue.agresorIdentificacion),
+        agresorNombre: this.normalizarTextoOpcional(formValue.agresorNombre),
+        agresorVinculoUdeaId: formValue.agresorVinculoUdeaId ?? null,
+        agresorVinculoUdea: otroVinculoUniversidad || this.normalizarTextoOpcional(vinculoAgresorUniversidad?.nombre),
+        agresorOtroVinculoUdea: otroVinculoUniversidad,
+        agresorVinculoVictimaId: formValue.agresorVinculoVictimaId ?? null,
+        agresorVinculoVictima: otroVinculoVictima || this.normalizarTextoOpcional(vinculoAgresorVictima?.nombre),
+        agresorOtroVinculoVictima: otroVinculoVictima,
+        agresorCorreo: this.normalizarTextoOpcional(formValue.agresorCorreo),
+        agresorRemitirUad: this.normalizarTextoOpcional(formValue.agresorRemitirUad),
+        evidenciasResumen: this.normalizarTextoOpcional(formValue.evidenciasResumen)
+      }
     };
   }
 
@@ -337,6 +506,10 @@ export class ModalDetalleSolicitudComponent implements OnInit {
   private normalizarTextoOpcional(valor: unknown): string | null {
     const texto = this.normalizarTexto(valor);
     return texto ? texto : null;
+  }
+
+  private esOpcionOtro(nombre: string | null | undefined): boolean {
+    return this.normalizarTexto(nombre).toLowerCase().startsWith('otro');
   }
 
   private obtenerMensajeError(error: unknown): string {
