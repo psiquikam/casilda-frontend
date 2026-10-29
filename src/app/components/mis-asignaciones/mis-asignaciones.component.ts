@@ -1,37 +1,77 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
-import { RouterLink } from '@angular/router';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { ModalGestionComponent } from '../modal-gestion-contacto/modal-gestion-contacto.component';
+import { ContactoMockService, SolicitudContactoMock } from '../../services/contacto-mock.service';
+import { NotificacionService } from '../../core/a11y/notificacion.service';
+import { formatOnlyDate } from '../../custom-date-adapter';
 
 @Component({
-    selector: 'app-mis-asignaciones',
-    imports: [CommonModule, MatTableModule, MatCardModule, MatIconModule, MatButtonModule, MatChipsModule, RouterLink],
-    templateUrl: './mis-asignaciones.component.html',
-    styleUrls: ['./mis-asignaciones.component.scss']
+  selector: 'app-mis-asignaciones',
+  imports: [
+    CommonModule,
+    MatTableModule,
+    MatCardModule,
+    MatIconModule,
+    MatButtonModule,
+    MatChipsModule,
+    MatDialogModule,
+    MatTooltipModule
+  ],
+  templateUrl: './mis-asignaciones.component.html',
+  styleUrls: ['./mis-asignaciones.component.scss']
 })
-export class MisAsignacionesComponent {
-  // Datos simulados de los casos asignados al profesional logueado
-  misCasos = [
-    { id: 'ACO-1029', fecha: '2025-12-18', victima: 'Laura V.', estado: 'Sin cita'},
-    { id: 'ACO-0982', fecha: '2025-12-10', victima: 'Carlos D.', estado: 'Vencido'},
-    { id: 'ACO-1105', fecha: '2025-12-19', victima: 'Ana M.', estado: 'Con cita'},
-    { id: 'ACO-1200', fecha: '2025-12-20', victima: 'Pedro S.', estado: 'Cerrado'},
-  ];
+export class MisAsignacionesComponent implements OnInit {
+  private readonly contactoMock = inject(ContactoMockService);
+  private readonly dialog = inject(MatDialog);
+  private readonly notificacion = inject(NotificacionService);
 
-  displayedColumns: string[] = ['id', 'fecha', 'victima', 'estado', 'accion'];
+  misCasos: SolicitudContactoMock[] = [];
+  displayedColumns: string[] = ['id', 'fechaAsignacion', 'profesional', 'solicitante', 'fechaCita', 'estado', 'accion'];
 
-  // Función para definir colores de los estados
+  ngOnInit(): void {
+    this.cargarAsignaciones();
+  }
+
+  get cantidadEnEspera(): number {
+    return this.misCasos.filter((caso) => caso.estado === 'En espera de cita').length;
+  }
+
+  get cantidadDesistidos(): number {
+    return this.misCasos.filter((caso) => caso.estado === 'Desistido').length;
+  }
+
+  cargarAsignaciones(): void {
+    this.misCasos = this.contactoMock.listarSolicitudes();
+  }
+
+  gestionar(caso: SolicitudContactoMock): void {
+    this.dialog.open(ModalGestionComponent, {
+      width: '900px',
+      maxWidth: '95vw',
+      data: { ...caso, soloLectura: false }
+    }).afterClosed().subscribe((result) => {
+      if (result) this.cargarAsignaciones();
+    });
+  }
+
+  desistir(caso: SolicitudContactoMock): void {
+    this.contactoMock.desistir(caso.id);
+    this.cargarAsignaciones();
+    this.notificacion.exito(`La solicitud ${caso.codigo} quedó marcada como desistida.`);
+  }
+
+  mostrarFecha(fecha: string | null): string {
+    return fecha ? formatOnlyDate(fecha) : 'Sin cita asignada';
+  }
+
   getEstadoClass(estado: string): string {
-    switch (estado.toLowerCase()) {
-      case 'sin cita': return 'status-warning';
-      case 'con cita': return 'status-info';
-      case 'vencido': return 'status-danger';
-      case 'cerrado': return 'status-success';
-      default: return '';
-    }
+    return estado === 'Desistido' ? 'status-danger' : 'status-warning';
   }
 }

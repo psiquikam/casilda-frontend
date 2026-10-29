@@ -1,7 +1,6 @@
 import { Component, Inject, OnInit, inject } from '@angular/core';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,16 +10,22 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { SolicitudService, ContactoTelefonicoDto } from '../../services/solicitud.service';
-import { environment } from '../../../environments/environment';
+import { ContactoMockService } from '../../services/contacto-mock.service';
+import { ContactoTelefonicoDto, ContactoTelefonicoRequestDto } from '../../services/solicitud.service';
 import { NotificacionService } from '../../core/a11y/notificacion.service';
 
-/** Resultado que permite concertar cita en primera llamada */
+/** Resultados simulados mientras se desarrolla la integración con el backend. */
+const RESULTADO_NO_CONTESTA = 'No contesta';
 const RESULTADO_EXITOSO = 'Contesta y se concerta cita';
+const RESULTADOS_CONTACTO = [
+  RESULTADO_NO_CONTESTA,
+  RESULTADO_EXITOSO,
+  'Contesta, solicita nueva llamada',
+  'No desea continuar con el acompañamiento'
+];
 
 @Component({
     selector: 'app-modal-gestion',
@@ -34,7 +39,6 @@ const RESULTADO_EXITOSO = 'Contesta y se concerta cita';
     MatTableModule,
     MatTabsModule,
     MatIconModule,
-    MatProgressSpinnerModule,
     MatSnackBarModule,
     MatDatepickerModule,
     MatNativeDateModule
@@ -47,12 +51,12 @@ export class ModalGestionComponent implements OnInit {
 
   contactoForm!: FormGroup;
   guardando = false;
-  cargandoHistorial = false;
+  errorHistorial = false;
 
   historialContactos: ContactoTelefonicoDto[] = [];
   columnasHistorial: string[] = ['fecha', 'resultado', 'observacion'];
 
-  resultados: string[] = [];
+  resultados = RESULTADOS_CONTACTO;
 
   mostrarCamposCita = false;
 
@@ -67,14 +71,10 @@ export class ModalGestionComponent implements OnInit {
   /** Máximo de llamadas antes de asignación unilateral de cita */
   maxLlamadas = 2;
 
-  private readonly maestrosUrl = `${environment.apiBaseUrl}/maestros`;
-  private readonly parametrosUrl = `${environment.apiBaseUrl}/parametros`;
-
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<ModalGestionComponent>,
-    private solicitudService: SolicitudService,
-    private http: HttpClient,
+    private contactoMock: ContactoMockService,
     private snackBar: MatSnackBar,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
@@ -85,7 +85,7 @@ export class ModalGestionComponent implements OnInit {
       hora: [{ value: this.getHoraActual(), disabled: true }, Validators.required],
       jornada: [{ value: '', disabled: true }],
       resultado: ['', Validators.required],
-      observacion: ['', [Validators.required, Validators.minLength(5)]],
+      observacion: [''],
       fechaCita: [''],
       horaCita: ['']
     });
@@ -103,53 +103,67 @@ export class ModalGestionComponent implements OnInit {
       this.recalcularMostrarCamposCita(value);
     });
 
-    // Cargar datos desde el backend
-    this.cargarMaxLlamadas();
-    this.cargarResultados();
+    this.actualizarValidadoresContacto('');
     this.cargarHistorial();
   }
 
   /** Calcula si se deben mostrar los campos de cita según el resultado y el número de llamada */
   private recalcularMostrarCamposCita(resultado: string): void {
     const numeroDeLlamada = this.historialContactos.length + 1;
+    const noContesta = resultado === RESULTADO_NO_CONTESTA;
     const esConcertada = resultado === RESULTADO_EXITOSO;
-    const esUnilateral = numeroDeLlamada >= this.maxLlamadas;
-    this.mostrarCamposCita = esConcertada || esUnilateral;
-    this.actualizarValidadoresCita();
-  }
-
-  cargarMaxLlamadas(): void {
-    this.http.get<number>(`${this.parametrosUrl}/max-llamadas-contacto`).subscribe({
-      next: (valor) => {
-        this.maxLlamadas = valor;
-        // Recalcular por si ya hay resultado seleccionado
-        const resultado = this.contactoForm.get('resultado')?.value;
-        if (resultado) this.recalcularMostrarCamposCita(resultado);
-      },
-      error: () => { this.maxLlamadas = 2; }
-    });
-  }
-
-  cargarResultados(): void {
-    this.http.get<{ id: number; nombre: string }[]>(`${this.maestrosUrl}/resultados-contacto-telefonico`).subscribe({
-      next: (lista) => { this.resultados = lista.map(r => r.nombre); },
-      error: () => { this.resultados = []; }
-    });
+    const esUnilateral = !noContesta && numeroDeLlamada >= this.maxLlamadas;
+    this.mostrarCamposCita = !noContesta && (esConcertada || esUnilateral);
+    this.actualizarValidadoresContacto(resultado);
   }
 
   cargarHistorial(): void {
-    if (!this.data?.id) return;
-    this.cargandoHistorial = true;
-    this.solicitudService.listarContactos(this.data.id).subscribe({
-      next: (contactos) => {
-        this.historialContactos = contactos.map((c) => {
-          const { fecha, hora } = this.separarFechaHora(c.fecha);
-          return { ...c, fecha, hora };
+    if (!Number.isInteger(this.data?.id) || this.data.id <= 0) {
+      this.errorHistorial = true;
+      this.notificacion.error('No se pudo identificar la solicitud para cargar su historial.');
+      return;
+    }
+
+    try {
+      this.historialContactos = this.contactoMock.listarContactos(this.data.id)
+        .map((contacto) => {
+          const { fecha, hora } = this.separarFechaHora(contacto.fecha);
+          return { ...contacto, fecha, hora };
         });
-        this.cargandoHistorial = false;
-      },
-      error: () => { this.cargandoHistorial = false; }
-    });
+      this.errorHistorial = false;
+      this.recalcularMostrarCamposCita(this.contactoForm.get('resultado')?.value);
+    } catch (error) {
+      this.historialContactos = [];
+      this.errorHistorial = true;
+      this.notificacion.error('No fue posible cargar el historial de contacto.', error);
+    }
+  }
+
+  private actualizarValidadoresContacto(resultado: string): void {
+    const observacion = this.contactoForm.get('observacion');
+    const fechaCita = this.contactoForm.get('fechaCita');
+    const horaCita = this.contactoForm.get('horaCita');
+
+    if (resultado === RESULTADO_NO_CONTESTA) {
+      observacion?.clearValidators();
+      fechaCita?.clearValidators();
+      horaCita?.clearValidators();
+      this.contactoForm.patchValue({ fechaCita: '', horaCita: '' });
+    } else {
+      observacion?.setValidators([Validators.required, Validators.minLength(5)]);
+      if (this.mostrarCamposCita) {
+        fechaCita?.setValidators([Validators.required, this.dateGreaterThanTodayValidator.bind(this)]);
+        horaCita?.setValidators([Validators.required]);
+      } else {
+        fechaCita?.clearValidators();
+        horaCita?.clearValidators();
+        this.contactoForm.patchValue({ fechaCita: '', horaCita: '' });
+      }
+    }
+
+    observacion?.updateValueAndValidity({ emitEvent: false });
+    fechaCita?.updateValueAndValidity({ emitEvent: false });
+    horaCita?.updateValueAndValidity({ emitEvent: false });
   }
 
   private dateGreaterThanTodayValidator(control: any) {
@@ -161,19 +175,6 @@ export class ModalGestionComponent implements OnInit {
     return selectedDate > today ? null : { dateNotGreaterThanToday: true };
   }
 
-  private actualizarValidadoresCita(): void {
-    if (this.mostrarCamposCita) {
-      this.contactoForm.get('fechaCita')?.setValidators([Validators.required, this.dateGreaterThanTodayValidator.bind(this)]);
-      this.contactoForm.get('horaCita')?.setValidators([Validators.required]);
-    } else {
-      this.contactoForm.get('fechaCita')?.clearValidators();
-      this.contactoForm.get('horaCita')?.clearValidators();
-      this.contactoForm.patchValue({ fechaCita: '', horaCita: '' });
-    }
-    this.contactoForm.get('fechaCita')?.updateValueAndValidity();
-    this.contactoForm.get('horaCita')?.updateValueAndValidity();
-  }
-
   private formatFecha(fecha: any): string {
     if (!fecha) return '';
     if (typeof fecha === 'string') return fecha;
@@ -181,34 +182,34 @@ export class ModalGestionComponent implements OnInit {
   }
 
   registrarIntento(): void {
-    if (this.contactoForm.invalid) return;
+    if (this.contactoForm.invalid || this.guardando) return;
 
     const val = this.contactoForm.getRawValue();
     this.guardando = true;
 
-    this.solicitudService.registrarContacto(this.data.id, {
+    const datos: ContactoTelefonicoRequestDto = {
       fecha: this.combinarFechaHoraParaBackend(val.fecha, val.hora),
       resultado: val.resultado,
-      observacion: val.observacion,
+      observacion: val.observacion || '',
       fechaCita: val.fechaCita ? this.formatFecha(val.fechaCita) : undefined,
       horaCita: val.horaCita || undefined
-    }).subscribe({
-      next: (contacto) => {
-        this.guardando = false;
-        if (contacto.citaCreada) {
-          this.snackBar.open(
-            `✅ Cita registrada para el ${contacto.fechaCita ?? val.fechaCita}.`,
-            'Cerrar',
-            { duration: 5000, panelClass: ['snack-success'] }
-          );
-        }
-        this.dialogRef.close(true);
-      },
-      error: (err) => {
-        this.notificacion.error('No fue posible registrar el intento de contacto. Intente de nuevo.', err);
-        this.guardando = false;
+    };
+
+    try {
+      const contacto = this.contactoMock.registrarContacto(this.data.id, datos);
+      if (contacto.citaCreada) {
+        this.snackBar.open(
+          `Cita registrada para el ${contacto.fechaCita ?? val.fechaCita}.`,
+          'Cerrar',
+          { duration: 5000, panelClass: ['snack-success'] }
+        );
       }
-    });
+      this.dialogRef.close(true);
+    } catch (error) {
+      this.notificacion.error('No fue posible registrar el intento de contacto.', error);
+    } finally {
+      this.guardando = false;
+    }
   }
 
   private getToday(): string {
