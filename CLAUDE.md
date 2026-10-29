@@ -3,9 +3,8 @@
 > Archivo vivo. Se actualiza al cerrar cada fase de trabajo para que cualquier
 > sesión posterior (humana o asistida) retome sin repetir el análisis.
 >
-> **Última actualización:** 5 de octubre de 2026 (incorporación al repositorio de
-> `casilda-diseno-v1.md` y `AGENTS.md`, que cierra el pendiente P-01; antes, estandarización
-> del módulo Equipo de Atención contra la matriz VBG, fases M1 a M5, y corrección de navegación)
+> **Última actualización:** 27 de octubre de 2026 (módulo «Contenidos del inicio» para el rol
+> `GESTOR_CONTENIDO` y portada conectada a las imágenes del backend; antes, conexión al backend QA)
 
 ---
 
@@ -106,6 +105,11 @@ espaciados ni radios literales**: siempre `var(--token)`.
 | `catalogo-vbg.ts` | `src/app/core/catalogos/catalogo-vbg.ts` | **Único catálogo** de códigos y etiquetas literales de la matriz VBG (ámbito, modalidades, vínculos, rutas internas/externas, grupos de atención). |
 | `SeccionSeguimientosComponent` | `src/app/components/seccion-seguimientos/` | Bloque «Seguimientos» compartido entre `registro-caso` y `registro-atencion`; aísla por especialidad y cierra con alerta de última profesional activa. |
 | `esUltimaProfesionalActiva()` | `src/app/core/vbg/ultima-profesional-activa.ts` | Predicado único para decidir si cerrar un seguimiento deja sin profesional activa a esa especialidad. |
+| `catalogo-contenidos.ts` · `reglas-contenido.ts` | `src/app/core/contenidos/` | **Único lugar** con secciones, destinos de enlace, límites e imagen de respaldo del home, y con las reglas puras (vigencia, URL de imagen, enlace interno). Los comparten la portada y el módulo de gestión. |
+| `ContenidoAdminService` + `interpretarErrorContenido()` | `src/app/services/contenido-admin.service.ts` | CRUD multipart de `/contenidos` (roles `GESTOR_CONTENIDO` y `ADMIN`) y traducción de los dos formatos de error `400` del backend a mensajes por campo. |
+| `GestionContenidosComponent` · `EditorContenidoComponent` | `src/app/components/gestion-contenidos/` | Módulo «Contenidos del inicio» (`/gestion-contenidos`): listado por sección con filtro por estado, y editor con vista previa en vivo hecha con `CasildaCardComponent`. |
+| `SelectorImagenComponent` | `src/app/components/selector-imagen/` | Carga de una imagen con vista previa, arrastrar y soltar, y validación de tipo y peso en el cliente. Controlado: el padre es dueño del archivo y de la URL temporal. |
+| `cambiosSinGuardarGuard` | `src/app/core/navegacion/cambios-sin-guardar.guard.ts` | `canDeactivate` reutilizable: confirma antes de abandonar un formulario con cambios (`ConCambiosPendientes`). |
 
 ## 5. Bitácora de avances
 
@@ -317,6 +321,53 @@ versionan para que cualquier sesión posterior los tenga sin depender de un resp
   Angular 17 → 21 (ya completada). No tiene efecto sobre el código.
 - Ninguno de los dos contiene credenciales, datos personales ni teléfonos de relleno.
 
+### 2026-10-20 — Conexión al backend QA y modo de demostración apagado
+- **Backend QA:** `environment.ts` apunta a `https://casildaqa.duckdns.org/api-casilda`
+  (login probado con un usuario real; CORS abierto; OpenAPI en `/api-casilda/api-docs`).
+  `environment.prod.ts` sigue con la URL anterior hasta configurar el despliegue.
+- **`environment.datosDemostracion` gobierna todo dato ficticio** y queda en `false` en ambos
+  entornos. Antes, en `false` solo se ocultaba la franja: el panel seguía mostrando cifras
+  simuladas **sin aviso** y las cuentas de prueba seguían activas en producción. Ahora, sin el flag:
+  - Cuentas de prueba deshabilitadas en `AuthService` (sin atajo ni respaldo con token falso,
+    `loginAsMock()` falla, `isMockUser()` y `getEspecialidadActual()` no aplican) y ocultas en el
+    login y en el menú del encabezado. Una sesión de prueba guardada en el navegador se descarta.
+  - Panel de inicio: solo saludo, accesos y ayuda. `WIDGETS_SIN_BACKEND`
+    (`core/dashboard/dashboard-por-rol.ts`) lista los widgets cuyo endpoint (`/dashboard/*`,
+    `/vigilancia/*`) no existe en el backend; cuando exista, el widget sale de la lista.
+  - Rol Usuario: no se pide ni se muestra `MiProcesoService` (sin endpoint).
+  - Home: `ContenidoHomeService` consulta `GET /contenidos/home`, público en QA. **Hoy devuelve
+    `[]`**: la portada no muestra tarjetas hasta que se cargue contenido.
+  - Módulo Equipo de Atención: catálogos, citas y casos vienen del backend.
+- Las pruebas que cubren el modo de demostración lo activan de forma explícita; hay pruebas
+  nuevas para el comportamiento sin él.
+
+### 2026-10-27 — Módulo «Contenidos del inicio» (rol `GESTOR_CONTENIDO`)
+Contrato: `docs/contratos/contrato-contenidos-home.md` §8.1 (forma real del CRUD, verificada contra el
+OpenAPI de QA y el `ContenidoController` de `origin/main` del backend).
+
+- **Rol `GESTOR_CONTENIDO` (rol_id 6).** `AuthService` no lo conocía: `getRoleCode()` lo degradaba a
+  `USUARIO` y `isValidSession()` **descartaba su sesión en cada recarga**, porque el login trae en `rol` el
+  *nombre* («Gestor de contenidos») y solo miraba ese campo. Ahora revisa `rol` y `roles` contra
+  `ROLES_CASILDA`, y expone `isGestorContenido()`. Entra en `DASHBOARD_POR_ROL` (solo accesos),
+  `CATALOGO_MODULOS` (`contenidos-home`), los accesos frecuentes, `sidebar` y `horizontal-nav`; se le
+  ocultan UAD y Ruta Violeta, cuyas rutas lo rechazaban.
+- **Módulo `/gestion-contenidos`** (lista, `nuevo`, `:id`). El listado imita la portada: un bloque por
+  sección con los mismos títulos, estado calculado (publicado/programado/vencido) con la regla de vigencia
+  de la portada y filtro local. El editor agrupa el formulario en cuatro preguntas (qué dice, dónde va,
+  cuándo se ve, con qué imagen), muestra una **vista previa en vivo con la misma tarjeta de la portada**,
+  pide fechas por día (inicio 00:00, fin 23:59:59 local; conserva el instante original si el día no cambia),
+  limita el enlace a rutas públicas, sugiere la siguiente posición libre y protege los cambios sin guardar.
+- **Portada:** las imágenes subidas por el gestor llegaban como `/contenidos/imagenes/…`, relativas a la
+  API, y el navegador las pedía al dominio del frontend: **no se veía ninguna**. `resolverImagenContenido()`
+  las resuelve contra `apiBaseUrl`, con respaldo si falta o falla la imagen; un `enlace` que no es ruta
+  interna ya no navega. Los títulos de sección salen del catálogo compartido.
+- **Colateral:** `ZonaPanelComponent` pintaba su acción con `href`, que recargaba la SPA completa en cada
+  clic del panel de inicio; ahora usa `routerLink` (+ `accionParametros`).
+
+**Componentes y servicios nuevos** (ver §4): `core/contenidos/*`, `ContenidoAdminService`,
+`GestionContenidosComponent`, `EditorContenidoComponent`, `ContenidoItemComponent`,
+`EstadoVigenciaComponent`, `SelectorImagenComponent`, `cambiosSinGuardarGuard`.
+
 ### Pendiente
 1. Accesibilidad — tareas abiertas priorizadas en
    `docs/evidencias/accesibilidad/plan_accesibilidad.md` §6: fases 0.1/0.2/0.4 (axe,
@@ -324,9 +375,10 @@ versionan para que cualquier sesión posterior los tenga sin depender de un resp
    `registro-caso` y `registro-atencion`), 4.2 (136 colores literales sin token), 4.4/4.5
    (reflujo 320 px y texto 200 %), 5.3 (`jasmine-axe`) y Fase 6 (NVDA/VoiceOver, personas
    usuarias, declaración de accesibilidad).
-2. Sustituir el mock de `ContenidoHomeService` por el endpoint real del gestor de contenidos,
-   según `docs/contratos/contrato-contenidos-home.md` (host por `environment*.ts`, ruta
-   relativa `/contenidos/home` fija).
+2. ~~Sustituir el mock de `ContenidoHomeService`~~ **Resuelto el 2026-10-20**; desde el 2026-10-27 el
+   contenido se administra en `/gestion-contenidos`. Quedan en QA tres registros de prueba («Asesoría»,
+   «Linea», «test_put», este con un `enlace` basura) que conviene depurar desde el módulo antes de
+   mostrar la portada.
 3. Confirmar con Comunicaciones UdeA: dependencia exacta del logosímbolo y uso del
    distintivo de Casilda como favicon.
 4. Datos reales de contacto: `environment.telefonoOrientacion` y `environment.telefonoContactoPublico`.
@@ -334,12 +386,10 @@ versionan para que cualquier sesión posterior los tenga sin depender de un resp
    muestra (`esTelefonoPublicable()` en `src/app/core/security/telefono-crisis.ts`). Nunca
    reponer un número de relleno: hay pruebas que fallan si vuelve a aparecer.
 5. Validar con el equipo de atención el tono de los mensajes de error y notificaciones.
-6. **Antes de conectar el backend o de cualquier despliegue fuera de desarrollo:** retirar o
-   condicionar a un flag las cuentas de prueba, `loginAsMock()`, `createMockToken`, las
-   contraseñas genéricas y el selector de roles del encabezado y del login (hallazgo ADD-01
-   de `docs/evidencias/dashboards/00-diagnostico-y-plan.md`). Hoy permiten obtener una sesión
-   `ADMIN` con un clic. Se aceptan como deuda conocida mientras el proyecto esté
-   exclusivamente en etapa de desarrollo y sin backend.
+6. ~~Condicionar a un flag las cuentas de prueba~~ **Resuelto el 2026-10-20** con
+   `environment.datosDemostracion` (hallazgo ADD-01). Queda: `MOCK_USERS` y sus contraseñas
+   siguen en el bundle aunque no sirvan para entrar; retirarlos del código si se quiere que
+   no se publiquen. **Nunca desplegar con `datosDemostracion: true`.**
 7. **Panel de inicio — decisiones del equipo que bloquean el cierre de la fase**
    (detalle en `docs/evidencias/dashboards/00-diagnostico-y-plan.md` §7):
    - **Validar con el equipo de atención cada texto de la vista del rol Usuario** antes de
@@ -387,6 +437,29 @@ versionan para que cualquier sesión posterior los tenga sin depender de un resp
     «Auditoría de Casos» y dos títulos de ruta; no tocó la arquitectura de fondo porque
     ambos componentes tienen reglas de visibilidad por rol distintas entre sí y secciones
     institucionales («UAD Equipos 3 y 4», «Ruta Violeta») no modeladas en el catálogo.
+13. **Backend QA — huecos detectados contra su OpenAPI (2026-10-20):**
+    - El login no devuelve **especialidad**: con usuarios reales, `SeccionSeguimientosComponent`
+      deja las cuatro especialidades en solo lectura (nadie puede agregar seguimientos). Pedir el
+      campo a Backend o decidir otra regla para VBG-08-10.
+    - No existen `/maestros/ambito-ocurrencia`, `rutas-internas`, `rutas-externas`,
+      `especialidades-seguimiento` ni `acciones-seguimiento`: el módulo cae al respaldo de la
+      matriz y avisa por `NotificacionService`. Confirmar si los códigos del respaldo coinciden
+      con los que espera el backend al guardar.
+    - Sin endpoints para el panel (`/dashboard/*`, `/vigilancia/*`) ni para «mi proceso».
+14. **Gestor de contenidos — pendientes (2026-10-27):**
+    - **CORS de QA:** el 2026-10-27 el preflight `OPTIONS` respondía `403` desde `http://localhost:4200`
+      (también para `/auth/login`), y `GET /contenidos/home` no devolvía `Access-Control-Allow-Origin`.
+      Confirmar con Backend `app.cors.allowed-origins` del despliegue QA: sin eso no se puede probar el
+      módulo, ni la portada, desde el servidor local.
+    - **Prueba de punta a punta con un usuario `GESTOR_CONTENIDO` real** de QA (crear con imagen, editar,
+      quitar imagen, eliminar). Las pruebas unitarias cubren el contrato, pero no el servidor.
+    - **Modo de demostración:** el módulo no tiene datos simulados (consume siempre el backend) ni cuenta de
+      prueba del rol. Con `datosDemostracion: true` y una cuenta de prueba ADMIN, el backend responde `401`.
+    - **Validar con Comunicaciones/equipo** los textos de ayuda del módulo y la lista de destinos de enlace
+      (`DESTINOS_ENLACE`); hoy solo ofrece rutas públicas.
+    - **Deuda:** `PagedResponseDto<T>` está declarado tres veces (`listas.service.ts`,
+      `solicitud.service.ts`, `usuario.service.ts`); el módulo reutiliza el de `listas.service.ts`. Unificarlo
+      en un solo archivo de tipos compartidos.
 
 ## 6. Reglas que no se deben romper
 

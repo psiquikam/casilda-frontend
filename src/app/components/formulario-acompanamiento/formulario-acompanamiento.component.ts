@@ -1,8 +1,22 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { catchError, map, of, switchMap } from 'rxjs';
 import { MatTableModule } from '@angular/material/table';
+
+export function fechaNacimientoPasadaValidator(control: AbstractControl): ValidationErrors | null {
+  if (!control.value) return null;
+  const fecha = new Date(control.value);
+  if (isNaN(fecha.getTime())) return null;
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  if (fecha >= hoy) {
+    return { fechaFutura: true };
+  }
+  return null;
+}
 
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -20,7 +34,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { ListasService, MaestroDto } from '../../services/listas.service';
-import { PersonaSearchDto, SolicitudService } from '../../services/solicitud.service';
+import { PersonaSearchDto, SolicitudService, SolicitudAcompanamientoRequest } from '../../services/solicitud.service';
 import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
 import { ModalCorreoComponent } from '../modal-correo/modal-correo.component';
 import { ModalTelefonoComponent } from '../modal-telefono/modal-telefono.component';
@@ -43,6 +57,7 @@ import { NotificacionService } from '../../core/a11y/notificacion.service';
 export class FormularioAcompanamientoComponent implements OnInit {
   private readonly notificacion = inject(NotificacionService);
   private fb = inject(FormBuilder);
+  private router = inject(Router);
   private listasService = inject(ListasService);
   private solicitudService = inject(SolicitudService);
   private snackBar = inject(MatSnackBar);
@@ -56,11 +71,38 @@ export class FormularioAcompanamientoComponent implements OnInit {
   tiposDocumento: MaestroDto[] = [];
   identidadesGenero: MaestroDto[] = [];
   cargos: MaestroDto[] = [];
+  vinculosUniversidad: MaestroDto[] = [];
+  vinculosAgresorVictima: MaestroDto[] = [];
   correoRegistrados: any[] = [];
   telefonosRegistrados: any[] = [];
   enviando = false;
   buscandoRemitente = false;
   buscandoSolicitante = false;
+
+  readonly rolesUdeaVictimario: string[] = [
+    'Estudiante',
+    'Docente',
+    'Personal Administrativo',
+    'Personal no docente',
+    'Personal Directivo',
+    'Contratista / Proveedor'
+  ];
+
+  readonly REGEX_NUMEROS_IDENTIFICACION = /^[0-9]{5,15}$/;
+  readonly REGEX_LETRAS = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+
+  readonly maxFechaNacimiento: Date = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    d.setHours(23, 59, 59, 999);
+    return d;
+  })();
+
+  get form(): FormGroup {
+    return this.acompanamientoForm;
+  }
+
+  archivosEvidencia: { nombre: string; tamano: string; file: File }[] = [];
 
   constructor() {
     this.listasService.listas$
@@ -73,6 +115,20 @@ export class FormularioAcompanamientoComponent implements OnInit {
         this.tiposDocumento = data.tiposDocumento;
         this.identidadesGenero = data.identidadesGenero;
         this.cargos = data.cargos;
+      });
+
+    this.listasService.obtenerMaestro('vinculos-udea')
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (vinculos) => { this.vinculosUniversidad = vinculos; },
+        error: () => { this.vinculosUniversidad = []; }
+      });
+
+    this.listasService.obtenerMaestro('vinculos-agresor-victima')
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (vinculos) => { this.vinculosAgresorVictima = vinculos; },
+        error: () => { this.vinculosAgresorVictima = []; }
       });
   }
 
@@ -99,14 +155,39 @@ export class FormularioAcompanamientoComponent implements OnInit {
 
       tipoDocumento: [null, Validators.required],
       numeroDocumento: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
-      fechaNacimiento: [null, Validators.required],
+      fechaNacimiento: [null, fechaNacimientoPasadaValidator],
       primerNombre: ['', Validators.required],
       segundoNombre: [''],
       primerApellido: ['', Validators.required],
       segundoApellido: [''],
       identidadGenero: [null, Validators.required],
+      vinculoUniversidad: [null],
+      correos: [[], Validators.required],
+      telefonos: [[], Validators.required],
       observacionesTelefono: [''],
-      observacionesCorreo: ['']
+      observacionesCorreo: [''],
+
+      // Paso 3: Hechos (El Caso)
+      tipoLugar: [null],
+      sedeCampus: [''],
+      facultad: [''],
+      bloque: [''],
+      espacio: [''],
+      lugarDetalleExterno: [''],
+      descripcionHechos: ['', Validators.required],
+
+      // Paso 4: Presunto agresor (Victimario)
+      agresorIdentificacion: ['', [Validators.pattern(this.REGEX_NUMEROS_IDENTIFICACION)]],
+      agresorPrimerNombre: ['', [Validators.pattern(this.REGEX_LETRAS)]],
+      agresorSegundoNombre: ['', [Validators.pattern(this.REGEX_LETRAS)]],
+      agresorPrimerApellido: ['', [Validators.pattern(this.REGEX_LETRAS)]],
+      agresorSegundoApellido: ['', [Validators.pattern(this.REGEX_LETRAS)]],
+      agresorVinculoUniversidad: [''],
+      agresorOtroVinculoUniversidad: [''],
+      agresorVinculoVictima: [''],
+      agresorOtroVinculoVictima: [''],
+      agresorCorreo: [''],
+      agresorRemitirUad: ['no']
     });
   }
 
@@ -128,6 +209,12 @@ export class FormularioAcompanamientoComponent implements OnInit {
         control?.updateValueAndValidity();
       });
     });
+
+    this.acompanamientoForm.get('agresorVinculoUniversidad')?.valueChanges.subscribe(() => {
+      if (!this.esVictimarioUdea) {
+        this.acompanamientoForm.get('agresorRemitirUad')?.setValue('no');
+      }
+    });
   }
 
   buscarRemitente(event?: Event): void {
@@ -137,12 +224,12 @@ export class FormularioAcompanamientoComponent implements OnInit {
     const documento = this.acompanamientoForm.get('remitenteNumeroDocumento')?.value?.trim();
 
     if (!tipoDocumentoId) {
-      this.snackBar.open('Selecciona el tipo de documento del remitente.', 'Cerrar', { duration: 3000 });
+      this.snackBar.open('Seleccione el tipo de documento del remitente.', 'Cerrar', { duration: 3000 });
       return;
     }
 
     if (!documento) {
-      this.snackBar.open('Ingresa el número de documento del remitente.', 'Cerrar', { duration: 3000 });
+      this.snackBar.open('Ingrese el número de documento del remitente.', 'Cerrar', { duration: 3000 });
       return;
     }
 
@@ -173,12 +260,12 @@ export class FormularioAcompanamientoComponent implements OnInit {
     const documento = this.acompanamientoForm.get('numeroDocumento')?.value?.trim();
 
     if (!tipoDocumentoId) {
-      this.snackBar.open('Selecciona el tipo de documento del solicitante.', 'Cerrar', { duration: 3000 });
+      this.snackBar.open('Seleccione el tipo de documento del solicitante.', 'Cerrar', { duration: 3000 });
       return;
     }
 
     if (!documento) {
-      this.snackBar.open('Ingresa el número de documento del solicitante.', 'Cerrar', { duration: 3000 });
+      this.snackBar.open('Ingrese el número de documento del solicitante.', 'Cerrar', { duration: 3000 });
       return;
     }
 
@@ -207,6 +294,7 @@ export class FormularioAcompanamientoComponent implements OnInit {
           telefono: t.telefono,
           descripcion: t.descripcion ?? ''
         }));
+        this.actualizarContactosEnFormulario();
       },
       error: (err) => {
         this.buscandoSolicitante = false;
@@ -218,16 +306,42 @@ export class FormularioAcompanamientoComponent implements OnInit {
 
   abrirModalCorreo(): void {
     const dialogRef = this.dialog.open(ModalCorreoComponent, { width: '800px' });
-    dialogRef.afterClosed().subscribe(res => { if (res) this.correoRegistrados = [...this.correoRegistrados, res]; });
+    dialogRef.afterClosed().subscribe(res => {
+      if (res) {
+        this.correoRegistrados = [...this.correoRegistrados, res];
+        this.actualizarContactosEnFormulario();
+      }
+    });
   }
 
   abrirModalTelefono(): void {
     const dialogRef = this.dialog.open(ModalTelefonoComponent, { width: '800px' });
-    dialogRef.afterClosed().subscribe(res => { if (res) this.telefonosRegistrados = [...this.telefonosRegistrados, res]; });
+    dialogRef.afterClosed().subscribe(res => {
+      if (res) {
+        this.telefonosRegistrados = [...this.telefonosRegistrados, res];
+        this.actualizarContactosEnFormulario();
+      }
+    });
   }
 
-  eliminarCorreo(i: number) { this.correoRegistrados = this.correoRegistrados.filter((_, idx) => idx !== i); }
-  eliminarTelefono(i: number) { this.telefonosRegistrados = this.telefonosRegistrados.filter((_, idx) => idx !== i); }
+  eliminarCorreo(i: number): void {
+    this.correoRegistrados = this.correoRegistrados.filter((_, idx) => idx !== i);
+    this.actualizarContactosEnFormulario();
+  }
+
+  eliminarTelefono(i: number): void {
+    this.telefonosRegistrados = this.telefonosRegistrados.filter((_, idx) => idx !== i);
+    this.actualizarContactosEnFormulario();
+  }
+
+  private actualizarContactosEnFormulario(): void {
+    this.acompanamientoForm.patchValue({
+      correos: this.correoRegistrados,
+      telefonos: this.telefonosRegistrados
+    });
+    this.acompanamientoForm.get('correos')?.updateValueAndValidity();
+    this.acompanamientoForm.get('telefonos')?.updateValueAndValidity();
+  }
 
   private toDateControlValue(value?: string | null): Date | null {
     if (!value) return null;
@@ -241,6 +355,50 @@ export class FormularioAcompanamientoComponent implements OnInit {
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
     return `${day}/${month}/${year}`;
+  }
+
+  onArchivosSeleccionados(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files) {
+      for (const file of Array.from(input.files)) {
+        const tamanoFormateado = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+        this.archivosEvidencia.push({
+          nombre: file.name,
+          tamano: tamanoFormateado,
+          file
+        });
+      }
+      input.value = '';
+    }
+  }
+
+  eliminarArchivo(index: number): void {
+    this.archivosEvidencia.splice(index, 1);
+  }
+
+  get esVictimarioUdea(): boolean {
+    const vinculoId = Number(this.acompanamientoForm?.get('agresorVinculoUniversidad')?.value);
+    const vinculo = this.vinculosUniversidad.find(item => item.id === vinculoId)?.nombre;
+    if (!vinculo) {
+      return false;
+    }
+    return this.rolesUdeaVictimario.some(r => vinculo.toLowerCase().includes(r.toLowerCase())) ||
+           vinculo.includes('Estudiante') ||
+           vinculo.includes('Docente') ||
+           vinculo.includes('Personal no docente') ||
+           vinculo.includes('Personal Administrativo') ||
+           vinculo.includes('Personal Directivo') ||
+           vinculo.includes('Contratista');
+  }
+
+  get esOtroVinculoAgresorUniversidad(): boolean {
+    const vinculoId = Number(this.acompanamientoForm?.get('agresorVinculoUniversidad')?.value);
+    return this.vinculosUniversidad.find(item => item.id === vinculoId)?.nombre.trim().toLowerCase() === 'otro';
+  }
+
+  get esOtroVinculoAgresorVictima(): boolean {
+    const vinculoId = Number(this.acompanamientoForm?.get('agresorVinculoVictima')?.value);
+    return this.vinculosAgresorVictima.find(item => item.id === vinculoId)?.nombre.trim().toLowerCase() === 'otro';
   }
 
   /** Errores del envío para el resumen enfocable (WCAG 3.3.1); pestaña activa del formulario. */
@@ -257,11 +415,19 @@ export class FormularioAcompanamientoComponent implements OnInit {
     remitenteUnidadAdministrativa: { etiqueta: 'Unidad administrativa del remitente' },
     remitenteUnidadAcademica: { etiqueta: 'Unidad académica del remitente' },
     tipoDocumento: { etiqueta: 'Tipo de documento del solicitante' },
-    numeroDocumento: { etiqueta: 'Número de documento del solicitante', mensajes: { pattern: 'Escribe solo números, sin puntos ni espacios.' } },
+    numeroDocumento: { etiqueta: 'Número de documento del solicitante', mensajes: { pattern: 'Ingrese únicamente números, sin puntos ni espacios.' } },
     fechaNacimiento: { etiqueta: 'Fecha de nacimiento del solicitante' },
     primerNombre: { etiqueta: 'Primer nombre del solicitante' },
     primerApellido: { etiqueta: 'Primer apellido del solicitante' },
-    identidadGenero: { etiqueta: 'Identidad de género del solicitante' }
+    identidadGenero: { etiqueta: 'Identidad de género del solicitante' },
+    correos: { etiqueta: 'Correo electrónico del solicitante', mensajes: { required: 'Agregue al menos un correo electrónico.' } },
+    telefonos: { etiqueta: 'Teléfono del solicitante', mensajes: { required: 'Agregue al menos un teléfono.' } },
+    descripcionHechos: { etiqueta: 'Descripción de los hechos', mensajes: { required: 'Describa los hechos para continuar.' } },
+    agresorIdentificacion: { etiqueta: 'Identificación del presunto agresor', mensajes: { pattern: 'Solo números (entre 5 y 15 dígitos).' } },
+    agresorPrimerNombre: { etiqueta: 'Primer nombre del presunto agresor', mensajes: { pattern: 'Solo debe contener letras.' } },
+    agresorSegundoNombre: { etiqueta: 'Segundo nombre del presunto agresor', mensajes: { pattern: 'Solo debe contener letras.' } },
+    agresorPrimerApellido: { etiqueta: 'Primer apellido del presunto agresor', mensajes: { pattern: 'Solo debe contener letras.' } },
+    agresorSegundoApellido: { etiqueta: 'Segundo apellido del presunto agresor', mensajes: { pattern: 'Solo debe contener letras.' } }
   };
 
   /** Muestra la pestaña que contiene el campo antes de que el resumen lo enfoque. */
@@ -303,7 +469,63 @@ export class FormularioAcompanamientoComponent implements OnInit {
         telefono: String(t.telefono).trim()
       }));
 
-    const payload = {
+    const nombreAgresorCompleto = [
+      fv.agresorPrimerNombre,
+      fv.agresorSegundoNombre,
+      fv.agresorPrimerApellido,
+      fv.agresorSegundoApellido
+    ].filter(Boolean).join(' ').trim();
+
+    const vinculoAgresorUniversidad = this.vinculosUniversidad.find(
+      vinculo => vinculo.id === Number(fv.agresorVinculoUniversidad)
+    );
+    const vinculoAgresorVictima = this.vinculosAgresorVictima.find(
+      vinculo => vinculo.id === Number(fv.agresorVinculoVictima)
+    );
+    const agresorVinculoUdeaNombre = this.esOtroVinculoAgresorUniversidad
+      ? fv.agresorOtroVinculoUniversidad?.trim() || vinculoAgresorUniversidad?.nombre || null
+      : vinculoAgresorUniversidad?.nombre || null;
+    const agresorVinculoVictimaNombre = this.esOtroVinculoAgresorVictima
+      ? fv.agresorOtroVinculoVictima?.trim() || vinculoAgresorVictima?.nombre || null
+      : vinculoAgresorVictima?.nombre || null;
+    const hayDatosAgresor = Boolean(
+      fv.agresorIdentificacion?.trim() ||
+      nombreAgresorCompleto ||
+      fv.agresorVinculoUniversidad ||
+      fv.agresorVinculoVictima ||
+      fv.agresorCorreo?.trim()
+    );
+
+    const lugarCompleto = fv.tipoLugar === 'interno'
+      ? [fv.sedeCampus, fv.facultad, fv.bloque, fv.espacio].filter(Boolean).join(' - ') || null
+      : fv.tipoLugar === 'externo'
+        ? fv.lugarDetalleExterno?.trim() || null
+        : null;
+
+    const datosCaso = {
+      tipoLugar: fv.tipoLugar,
+      sedeCampus: fv.sedeCampus,
+      facultad: fv.facultad,
+      bloque: fv.bloque,
+      espacio: fv.espacio,
+      lugarDetalleExterno: fv.lugarDetalleExterno,
+      lugarOcurrencia: lugarCompleto,
+      descripcionHechos: fv.descripcionHechos || 'No se registró descripción detallada.',
+      vinculoUniversidadId: fv.vinculoUniversidad,
+      agresorIdentificacion: fv.agresorIdentificacion,
+      agresorNombre: nombreAgresorCompleto || null,
+      agresorVinculoUdeaId: fv.agresorVinculoUniversidad || null,
+      agresorVinculoUdea: agresorVinculoUdeaNombre,
+      agresorOtroVinculoUdea: this.esOtroVinculoAgresorUniversidad ? fv.agresorOtroVinculoUniversidad?.trim() || null : null,
+      agresorVinculoVictimaId: fv.agresorVinculoVictima || null,
+      agresorVinculoVictima: agresorVinculoVictimaNombre,
+      agresorOtroVinculoVictima: this.esOtroVinculoAgresorVictima ? fv.agresorOtroVinculoVictima?.trim() || null : null,
+      agresorCorreo: fv.agresorCorreo,
+      agresorRemitirUad: hayDatosAgresor ? fv.agresorRemitirUad : null,
+      evidenciasResumen: this.archivosEvidencia.length ? `${this.archivosEvidencia.length} archivo(s) adjunto(s)` : 'Sin archivos adjuntos'
+    };
+
+    const payload: SolicitudAcompanamientoRequest = {
       tipoSolicitudId,
       medioSolicitudId,
       observacionesTelefono: fv.observacionesTelefono || null,
@@ -315,8 +537,9 @@ export class FormularioAcompanamientoComponent implements OnInit {
         segundoApellido: fv.segundoApellido || null,
         tipoDocumentoId: fv.tipoDocumento,
         numeroDocumento: fv.numeroDocumento,
-        fechaNacimiento: this.formatDate(fv.fechaNacimiento)!,
+        fechaNacimiento: this.formatDate(fv.fechaNacimiento),
         identidadGeneroId: fv.identidadGenero,
+        vinculoUniversidadId: fv.vinculoUniversidad ?? null,
         correos,
         telefonos
       },
@@ -331,27 +554,84 @@ export class FormularioAcompanamientoComponent implements OnInit {
         campusId: fv.remitenteCampus,
         unidadAdministrativaId: fv.remitenteUnidadAdministrativa,
         unidadAcademicaId: fv.remitenteUnidadAcademica
-      } : null
+      } : null,
+      descripcionHechos: fv.descripcionHechos || null,
+      lugarOcurrencia: lugarCompleto,
+      agresorIdentificacion: fv.agresorIdentificacion || null,
+      agresorNombre: nombreAgresorCompleto || null,
+      agresorVinculoUdeaId: fv.agresorVinculoUniversidad || null,
+      agresorVinculoUdea: agresorVinculoUdeaNombre,
+      agresorOtroVinculoUdea: this.esOtroVinculoAgresorUniversidad ? fv.agresorOtroVinculoUniversidad?.trim() || null : null,
+      agresorVinculoVictimaId: fv.agresorVinculoVictima || null,
+      agresorVinculoVictima: agresorVinculoVictimaNombre,
+      agresorOtroVinculoVictima: this.esOtroVinculoAgresorVictima ? fv.agresorOtroVinculoVictima?.trim() || null : null,
+      agresorCorreo: fv.agresorCorreo?.trim() || null,
+      agresorRemitirUad: hayDatosAgresor ? fv.agresorRemitirUad || null : null,
+      evidenciasResumen: this.archivosEvidencia.length ? `${this.archivosEvidencia.length} archivo(s) adjunto(s)` : null,
+      datosCaso
     };
 
     this.enviando = true;
-    this.solicitudService.crearAcompanamiento(payload).subscribe({
-      next: (response) => {
+    const archivos = this.archivosEvidencia.map((evidencia) => evidencia.file);
+    this.solicitudService.crearAcompanamiento(payload).pipe(
+      switchMap((resp) => {
+        if (!resp?.id || archivos.length === 0) {
+          return of({ resp, errorEvidencias: null });
+        }
+        return this.solicitudService.subirEvidencias(resp.id, archivos).pipe(
+          map(() => ({ resp, errorEvidencias: null })),
+          catchError((errorEvidencias) => of({ resp, errorEvidencias }))
+        );
+      })
+    ).subscribe({
+      next: ({ resp, errorEvidencias }) => {
         this.enviando = false;
-        this.dialog.open(DialogoExitoComponent, {
+        try {
+          if (resp?.id) {
+            localStorage.setItem(`casilda_caso_${resp.id}`, JSON.stringify(datosCaso));
+          }
+          if (resp?.codigo) {
+            localStorage.setItem(`casilda_caso_${resp.codigo}`, JSON.stringify(datosCaso));
+          }
+          if (fv.numeroDocumento) {
+            localStorage.setItem(`casilda_doc_${fv.numeroDocumento}`, JSON.stringify(datosCaso));
+          }
+        } catch {
+          // Si el almacenamiento local no está disponible, continuar sin error
+        }
+
+        if (errorEvidencias) {
+          this.notificacion.error(
+            'La solicitud se creó, pero no fue posible adjuntar las evidencias. Puede agregarlas al editar la solicitud.',
+            errorEvidencias
+          );
+        }
+
+        const dialogRef = this.dialog.open(DialogoExitoComponent, {
           width: '400px',
           data: {
-            titulo: '¡Solicitud Creada!',
-            mensaje: 'Tu requerimiento ha sido registrado en el sistema.',
+            titulo: '¡Solicitud creada!',
+            mensaje: errorEvidencias
+              ? 'El requerimiento fue registrado, pero las evidencias no pudieron adjuntarse.'
+              : 'El requerimiento ha sido registrado en el sistema.',
           }
         });
-        this.acompanamientoForm.reset();
+        dialogRef.afterClosed().subscribe(() => {
+          this.router.navigate(['/consulta']);
+        });
+        this.acompanamientoForm.reset({
+          tipoLugar: null,
+          correos: [],
+          telefonos: [],
+          agresorRemitirUad: 'no'
+        });
         this.correoRegistrados = [];
         this.telefonosRegistrados = [];
+        this.archivosEvidencia = [];
       },
       error: (error) => {
         this.enviando = false;
-        this.notificacion.error('No fue posible enviar la solicitud. Tus datos siguen en el formulario; intenta de nuevo.', error);
+        this.notificacion.error('No fue posible enviar la solicitud. Los datos siguen en el formulario; intente de nuevo.', error);
         const msg = error?.error?.message || 'Error al enviar la solicitud. Intente de nuevo.';
         this.snackBar.open(msg, 'Cerrar', { duration: 5000 });
       }
@@ -360,9 +640,15 @@ export class FormularioAcompanamientoComponent implements OnInit {
 
   cancelar(): void {
     if (confirm('¿Desea limpiar todos los campos del formulario?')) {
-      this.acompanamientoForm.reset();
+      this.acompanamientoForm.reset({
+        tipoLugar: null,
+        correos: [],
+        telefonos: [],
+        agresorRemitirUad: 'no'
+      });
       this.correoRegistrados = [];
       this.telefonosRegistrados = [];
+      this.archivosEvidencia = [];
     }
   }
 }

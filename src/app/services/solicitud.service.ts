@@ -21,8 +21,9 @@ export interface DatosSolicitanteRequest {
   segundoApellido?: string | null;
   tipoDocumentoId: number;
   numeroDocumento: string;
-  fechaNacimiento: string; // formato yyyy-MM-dd
+  fechaNacimiento?: string | null; // formato dd/MM/yyyy
   identidadGeneroId: number;
+  vinculoUniversidadId?: number | null;
   campusId?: number | null;
   unidadAdministrativaId?: number | null;
   unidadAcademicaId?: number | null;
@@ -50,6 +51,37 @@ export interface SolicitudAcompanamientoRequest {
   observacionesCorreo?: string | null;
   datosSolicitante: DatosSolicitanteRequest;
   datosRemitente?: DatosRemitenteRequest | null;
+  descripcionHechos?: string | null;
+  lugarOcurrencia?: string | null;
+  tipoLugar?: string | null;
+  sedeCampus?: string | null;
+  facultad?: string | null;
+  bloque?: string | null;
+  espacio?: string | null;
+  lugarDetalleExterno?: string | null;
+  formaOcurrencia?: string | null;
+  relacionMisional?: string | null;
+  detalleMisional?: string | null;
+  fechaOcurrencia?: string | null;
+  fechaHechos?: string | null;
+  horaHechos?: string | null;
+  tiposVbg?: string[];
+  agresorIdentificacion?: string | null;
+  agresorPrimerNombre?: string | null;
+  agresorSegundoNombre?: string | null;
+  agresorPrimerApellido?: string | null;
+  agresorSegundoApellido?: string | null;
+  agresorNombre?: string | null;
+  agresorVinculoUdeaId?: number | null;
+  agresorVinculoUdea?: string | null;
+  agresorOtroVinculoUdea?: string | null;
+  agresorVinculoVictimaId?: number | null;
+  agresorVinculoVictima?: string | null;
+  agresorOtroVinculoVictima?: string | null;
+  agresorCorreo?: string | null;
+  agresorRemitirUad?: string | null;
+  evidenciasResumen?: string | null;
+  datosCaso?: any;
 }
 
 export interface SolicitudAcompanamientoResponse {
@@ -64,6 +96,38 @@ export interface SolicitudAcompanamientoResponse {
   unidadAdministrativa: string;
   profesional: string;
   tipoAsignacion: string;
+  // Hechos y situación
+  descripcionHechos?: string | null;
+  descripcion?: string | null;
+  lugarOcurrencia?: string | null;
+  lugar?: string | null;
+  tipoLugar?: string | null;
+  relacionMisional?: string | null;
+  actividadMisional?: boolean | null;
+  fechaOcurrencia?: string | null;
+  fechaOcurrenciaRapida?: string | null;
+  fechaHechos?: string | null;
+  horaHechos?: string | null;
+  tiposVbg?: string[];
+  tipoViolencia?: string | null;
+  hechos?: { descripcion?: string; lugar?: string; fecha?: string }[];
+  agresorNombre?: string | null;
+  presuntoAgresor?: string | null;
+  presuntoPrimerNombre?: string | null;
+  presuntoPrimerApellido?: string | null;
+  agresorIdentificacion?: string | null;
+  agresorVinculoUdeaId?: number | null;
+  agresorVinculoUdea?: string | null;
+  agresorOtroVinculoUdea?: string | null;
+  agresorVinculoVictimaId?: number | null;
+  agresorVinculoVictima?: string | null;
+  agresorOtroVinculoVictima?: string | null;
+  vinculoVictima?: string | null;
+  agresorCorreo?: string | null;
+  agresorRemitirUad?: string | null;
+  evidenciasResumen?: string | null;
+  evidenciasArchivos?: any[];
+  datosCaso?: any;
   // Solicitante resumen
   nombreSolicitante: string;
   documentoSolicitante: string;
@@ -78,6 +142,8 @@ export interface SolicitudAcompanamientoResponse {
   segundoApellido: string;
   identidadGeneroId?: number | null;
   identidadGenero: string;
+  vinculoUniversidadId?: number | null;
+  vinculoUniversidad?: string | null;
   idDepartamentoResidencia?: number | null;
   idCiudadResidencia?: number | null;
   direccionResidencia?: string | null;
@@ -164,6 +230,7 @@ export interface UpdateSolicitudDto {
   numeroDocumento?: string | null;
   fechaNacimiento?: string | null;
   identidadGeneroId?: number | null;
+  vinculoUniversidadId?: number | null;
   correos?: {
     tipoId?: number | null;
     tipo?: string | null;
@@ -187,6 +254,24 @@ export interface UpdateSolicitudDto {
   observacionesTelefono?: string | null;
   observacionesCorreo?: string | null;
   medioSolicitudId?: number | null;
+  // Campos de hechos, contexto y agresor
+  descripcionHechos?: string | null;
+  lugarOcurrencia?: string | null;
+  relacionMisional?: string | null;
+  fechaOcurrencia?: string | null;
+  tiposVbg?: string[];
+  agresorIdentificacion?: string | null;
+  agresorNombre?: string | null;
+  agresorVinculoUdeaId?: number | null;
+  agresorVinculoUdea?: string | null;
+  agresorOtroVinculoUdea?: string | null;
+  agresorVinculoVictimaId?: number | null;
+  agresorVinculoVictima?: string | null;
+  agresorOtroVinculoVictima?: string | null;
+  agresorCorreo?: string | null;
+  agresorRemitirUad?: string | null;
+  evidenciasResumen?: string | null;
+  datosCaso?: any;
 }
 
 export interface AsignarSolicitudDto {
@@ -194,12 +279,13 @@ export interface AsignarSolicitudDto {
   idTipoAsignacion: number;
   idTipoServicio: number;
   observaciones: string;
-  fechaReparto?: string;
+  fechaReparto: string;
 }
 
 export interface GrupoProfesionalDto {
   id: number;
   nombre: string;
+  activo?: boolean;
 }
 
 export interface ContactoTelefonicoDto {
@@ -618,6 +704,7 @@ export interface OtroCasoDto {
 export class SolicitudService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiBaseUrl}/solicitudes`;
+  private readonly maestrosUrl = `${environment.apiBaseUrl}/maestros`;
   private readonly citasUrl = `${environment.apiBaseUrl}/citas`;
   private readonly casosUrl = `${environment.apiBaseUrl}/casos`;
   private readonly atencionesUrl = `${environment.apiBaseUrl}/atenciones`;
@@ -633,6 +720,12 @@ export class SolicitudService {
 
   crearAcompanamiento(request: SolicitudAcompanamientoRequest): Observable<SolicitudAcompanamientoResponse> {
     return this.http.post<SolicitudAcompanamientoResponse>(`${this.apiUrl}/acompanamiento`, request);
+  }
+
+  subirEvidencias(id: number, archivos: File[]): Observable<unknown[]> {
+    const formData = new FormData();
+    archivos.forEach((archivo) => formData.append('archivos', archivo, archivo.name));
+    return this.http.post<unknown[]>(`${this.apiUrl}/acompanamiento/${id}/evidencias`, formData);
   }
 
   obtenerPorId(id: number): Observable<SolicitudAcompanamientoResponse> {
@@ -667,6 +760,14 @@ export class SolicitudService {
 
   asignar(id: number, datos: AsignarSolicitudDto): Observable<SolicitudAcompanamientoResponse> {
     return this.http.post<SolicitudAcompanamientoResponse>(`${this.apiUrl}/acompanamiento/${id}/asignar`, datos);
+  }
+
+  listarTiposAsignacion(): Observable<MaestroDto[]> {
+    return this.http.get<MaestroDto[]>(`${this.maestrosUrl}/tipos-asignacion`);
+  }
+
+  listarTiposServicio(): Observable<MaestroDto[]> {
+    return this.http.get<MaestroDto[]>(`${this.maestrosUrl}/tipos-servicio`);
   }
 
   listarGruposProfesionales(): Observable<GrupoProfesionalDto[]> {

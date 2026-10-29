@@ -5,8 +5,18 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 import { RegistroCasoComponent } from './registro-caso.component';
+import { environment } from '../../../environments/environment';
 
 describe('RegistroCasoComponent', () => {
+  // Estas pruebas cubren el modo de demostración: sin él, los catálogos
+  // salen del respaldo de la matriz, sin red.
+  const modoOriginal = environment.datosDemostracion;
+  beforeEach(() => {
+    environment.datosDemostracion = true;
+  });
+  afterEach(() => {
+    environment.datosDemostracion = modoOriginal;
+  });
   let component: RegistroCasoComponent;
   let fixture: ComponentFixture<RegistroCasoComponent>;
 

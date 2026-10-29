@@ -36,7 +36,7 @@
   border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 700;
-  text-transform: uppercase;
+  text-transform: none;
 
   &.admin { background: var(--color-bg-danger-light); color: var(--color-danger); }
   &.revisor { background: var(--color-bg-success-light); color: #16a34a; }

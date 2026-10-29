@@ -23,8 +23,8 @@ import { DashboardTrabajoService, PendienteDto } from '../../../services/dashboa
     <app-zona-panel
       titulo="Atención requerida"
       icono="assignment_late"
-      descripcion="Lo que necesita una decisión tuya hoy."
-      mensajeVacio="No tienes pendientes para hoy."
+      descripcion="Casos y solicitudes que requieren gestión hoy."
+      mensajeVacio="No hay pendientes para hoy."
       [cargando]="cargando()"
       [error]="error()"
       [vacio]="!cargando() && !error() && pendientes().length === 0"
@@ -41,7 +41,7 @@ import { DashboardTrabajoService, PendienteDto } from '../../../services/dashboa
                      (DSH-08-03, matriz VBG-08-13). -->
                 <span class="lista__aviso">
                   <mat-icon aria-hidden="true">info_outline</mat-icon>
-                  <span>Eres la última profesional activa en este caso</span>
+                  <span>Es la última profesional activa en este caso</span>
                 </span>
               }
               <span class="lista__meta">
@@ -90,7 +90,7 @@ export class PendientesWidget implements OnInit {
       error: () => {
         this.error.set(true);
         this.cargando.set(false);
-        this.notificacion.error('No pudimos cargar tus pendientes.');
+        this.notificacion.error('No fue posible cargar los pendientes.');
       }
     });
   }

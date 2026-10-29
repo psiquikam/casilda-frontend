@@ -153,9 +153,9 @@ export class SeccionSeguimientosComponent implements OnInit {
     // el cierre general del caso.
     this.dialogoServicio
       .confirmar({
-        titulo: 'Eres la última profesional activa en este caso',
+        titulo: 'Es la última profesional activa en este caso',
         subtitulo: 'No quedan seguimientos abiertos de ninguna especialidad',
-        mensaje: 'Puedes cerrar también el caso general, o mantenerlo abierto y cerrar solo este seguimiento.',
+        mensaje: 'Puede cerrar también el caso general, o mantenerlo abierto y cerrar solo este seguimiento.',
         textoConfirmar: 'Cerrar el caso',
         textoCancelar: 'Mantener el caso abierto',
         iconoConfirmar: 'task_alt'

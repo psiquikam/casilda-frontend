@@ -84,7 +84,7 @@
     background-color: var(--color-bg-main);
     padding: 12px 20px;
     font-size: var(--font-size-sm); /* piso 14px (WCAG 1.4.4) */
-    text-transform: uppercase;
+    text-transform: none;
     color: var(--color-text-muted);
     border-bottom: 1px solid var(--color-border);
   }

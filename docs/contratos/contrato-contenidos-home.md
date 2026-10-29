@@ -3,8 +3,11 @@
 > **Para:** equipo de Backend de CASILDA
 > **De:** equipo de Frontend (`casilda-frontend`, Angular 21)
 > **Fecha:** 21 de septiembre de 2026
-> **Estado actual en frontend:** implementado contra un **mock en memoria**; el consumo HTTP
-> real está pendiente de que este endpoint exista.
+> **Estado actual (2026-10-27):** el backend expone el endpoint público y el CRUD de
+> administración (`ContenidoController`, `origin/main` de `casilda-backend`). El frontend consume
+> ambos: la portada lee `GET /contenidos/home` y el módulo **Contenidos del inicio**
+> (`/gestion-contenidos`, rol `GESTOR_CONTENIDO`) administra los contenidos. La forma real del CRUD
+> está en el §8.1; donde difiera de la propuesta original, prevalece el §8.1.
 
 ---
 
@@ -424,6 +427,36 @@ Requisitos de estos endpoints:
 - **Auditoría:** registrar quién creó/modificó/despublicó cada contenido y cuándo. El Home es
   la cara pública de un sistema de VBG; un cambio de texto no trazable es un riesgo
   institucional.
+
+### 8.1 Contrato implementado (verificado contra el OpenAPI de QA el 2026-10-27)
+
+| Método | Ruta | Cuerpo / parámetros | Respuesta |
+|---|---|---|---|
+| `GET` | `/contenidos?page&size` | — | `200` página Spring (`content`, `totalPages`…) de `ContenidoResponse`, ordenada por `orden` y `titulo`; excluye eliminados. |
+| `GET` | `/contenidos/{id}` | — | `200` `ContenidoResponse` · `404` si no existe o está eliminado. |
+| `POST` | `/contenidos` | `multipart/form-data`: parte `contenido` (JSON `ContenidoRequest`, con `Content-Type: application/json`) y parte opcional `imagen` (archivo). | `201` `ContenidoResponse` · `400`. |
+| `PUT` | `/contenidos/{id}?eliminarImagen=` | Igual que `POST`. Sin `imagen` ni `eliminarImagen=true`, la imagen actual se conserva. | `200` · `400` · `404`. |
+| `DELETE` | `/contenidos/{id}` | — | `204` (borrado lógico) · `404`. |
+
+- **Roles:** `ADMIN` y `GESTOR_CONTENIDO` (rol_id 6, `database/initial_data.sql`). El login devuelve el
+  *nombre* del rol en `rol` («Gestor de contenidos») y el *código* en `roles` (`GESTOR_CONTENIDO`).
+- **`ContenidoRequest`:** `titulo` (obligatorio, ≤ 160), `contenido` (obligatorio), `vigenciaInicio`
+  (obligatoria, `Instant`), `vigenciaFin` (opcional, posterior al inicio), `enlace` (opcional, empieza por
+  `/`), `seccion` (`acciones` | `informacion`) y `orden` (opcional, `0` por defecto). **No hay
+  reordenamiento masivo**: el `POST /contenidos/orden` propuesto no se implementó; la posición se edita en
+  cada contenido.
+- **Imagen:** PNG, WEBP o SVG (el SVG se sanea en el servidor), máximo **400 KB**. El campo `imagen` llega
+  como ruta **relativa a la API** (`/contenidos/imagenes/<uuid>.svg`), servida públicamente bajo el mismo
+  prefijo: el frontend la resuelve contra `apiBaseUrl` (`resolverImagenContenido()`). Puede ser `null`;
+  entonces se usa el distintivo de Casilda.
+- **Errores `400`:** dos formas. Validación de anotaciones →
+  `{ message, validationErrors: { campo: mensaje } }`; vigencia e imagen → `{ message }` suelto. El
+  frontend las traduce con `interpretarErrorContenido()` y las muestra junto a cada campo. La forma
+  `errores: [{ campo, mensaje }]` propuesta arriba **no** es la implementada.
+- **Caché:** `GET /contenidos/home` responde `Cache-Control: public, max-age=300`. Un cambio puede tardar
+  hasta 5 minutos en verse en la portada; el módulo de gestión lo advierte.
+- **Auditoría:** `ContenidoResponse` trae `createdAt/By` y `modifiedAt/By`; el listado muestra la última
+  edición de cada contenido.
 
 ---
 

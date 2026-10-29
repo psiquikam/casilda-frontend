@@ -18,7 +18,7 @@ import { DashboardMetricasService, IndicadorDto } from '../../../services/dashbo
       [cargando]="cargando()"
       [error]="error()"
       [vacio]="!cargando() && !error() && indicadores().length === 0"
-      mensajeVacio="Todavía no hay indicadores definidos para tu perfil."
+      mensajeVacio="Todavía no hay indicadores definidos para este perfil."
       (reintentar)="cargar()"
     >
       <div class="kpis">

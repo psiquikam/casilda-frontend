@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { NavigationLayoutService } from '../../../services/navigation-layout.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-header',
@@ -27,7 +28,8 @@ export class HeaderComponent {
   readonly auth = inject(AuthService);
   readonly navLayout = inject(NavigationLayoutService);
 
-  readonly mockUsers: MockUserProfile[] = Object.values(MOCK_USERS);
+  /** Vacía fuera del modo de demostración: el selector de rol no se muestra. */
+  readonly mockUsers: MockUserProfile[] = environment.datosDemostracion ? Object.values(MOCK_USERS) : [];
 
   /**
    * Selector de rol de «Modo Prueba»: recarga la página completa en vez de

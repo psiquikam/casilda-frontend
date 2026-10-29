@@ -42,8 +42,15 @@ export class PanelUsuarioComponent implements OnInit {
   readonly telefonoOrientacion = environment.telefonoOrientacion;
   readonly hayLineaOrientacion = esTelefonoPublicable(this.telefonoOrientacion);
 
+  /**
+   * `MiProcesoService` solo tiene datos simulados (no hay endpoint en el
+   * backend). Fuera del modo de demostración no se pide ni se muestra: un
+   * estado de proceso inventado es peor que no mostrarlo.
+   */
+  readonly procesoDisponible = environment.datosDemostracion;
+
   readonly proceso = signal<MiProcesoDto | null>(null);
-  readonly cargando = signal(true);
+  readonly cargando = signal(this.procesoDisponible);
   readonly error = signal(false);
 
   /**
@@ -57,7 +64,9 @@ export class PanelUsuarioComponent implements OnInit {
   readonly nombre = this.calcularNombre();
 
   ngOnInit(): void {
-    this.cargar();
+    if (this.procesoDisponible) {
+      this.cargar();
+    }
   }
 
   cargar(): void {
@@ -71,7 +80,7 @@ export class PanelUsuarioComponent implements OnInit {
       error: () => {
         this.error.set(true);
         this.cargando.set(false);
-        this.notificacion.error('No pudimos cargar tu información en este momento.');
+        this.notificacion.error('No fue posible cargar la información en este momento.');
       }
     });
   }

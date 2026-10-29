@@ -3,6 +3,8 @@ import { provideRouter } from '@angular/router';
 
 import { CasildaCardComponent } from './casilda-card.component';
 import { ContenidoDestacadoDto } from '../../services/contenido-home.service';
+import { IMAGEN_RESPALDO } from '../../core/contenidos/catalogo-contenidos';
+import { environment } from '../../../environments/environment';
 
 describe('CasildaCardComponent', () => {
   let fixture: ComponentFixture<CasildaCardComponent>;
@@ -50,5 +52,42 @@ describe('CasildaCardComponent', () => {
 
     expect(fixture.nativeElement.querySelector('a')).toBeNull();
     expect(fixture.nativeElement.querySelector('article.tarjeta')).toBeTruthy();
+  });
+
+  it('resuelve contra la API la imagen que sube el gestor de contenidos', () => {
+    fixture.componentRef.setInput('contenido', { ...contenido, imagen: '/contenidos/imagenes/abc.svg' });
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('img').getAttribute('src'))
+      .toBe(`${environment.apiBaseUrl}/contenidos/imagenes/abc.svg`);
+  });
+
+  it('usa la imagen de respaldo si el contenido no tiene imagen o la suya no carga', () => {
+    fixture.componentRef.setInput('contenido', { ...contenido, imagen: null });
+    fixture.detectChanges();
+    const img: HTMLImageElement = fixture.nativeElement.querySelector('img');
+    expect(img.getAttribute('src')).toBe(IMAGEN_RESPALDO);
+
+    fixture.componentRef.setInput('contenido', { ...contenido, imagen: '/contenidos/imagenes/borrada.png' });
+    fixture.detectChanges();
+    img.dispatchEvent(new Event('error'));
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('img').getAttribute('src')).toBe(IMAGEN_RESPALDO);
+  });
+
+  it('no navega con un enlace que no es una ruta interna', () => {
+    fixture.componentRef.setInput('contenido', { ...contenido, enlace: '//sitio-externo.com' });
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('a')).toBeNull();
+  });
+
+  it('en vista previa conserva el aspecto de acción pero no navega', () => {
+    fixture.componentRef.setInput('contenido', contenido);
+    fixture.componentRef.setInput('vistaPrevia', true);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('a')).toBeNull();
+    expect(fixture.nativeElement.querySelector('article.tarjeta--previa-accion')).toBeTruthy();
   });
 });

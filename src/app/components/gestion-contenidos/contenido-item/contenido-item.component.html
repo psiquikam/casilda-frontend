@@ -1,0 +1,59 @@
+@let item = contenido();
+
+<article class="item" [class.item--vencido]="estado() === 'vencido'" [attr.aria-labelledby]="'contenido-titulo-' + item.id">
+  <img class="item__imagen" [src]="imagenUrl()" alt="" aria-hidden="true"
+    width="56" height="56" loading="lazy" decoding="async" (error)="alFallarImagen()">
+
+  <div class="item__cuerpo">
+    <div class="item__cabecera">
+      <h3 class="item__titulo" [id]="'contenido-titulo-' + item.id">{{ item.titulo }}</h3>
+      <app-estado-vigencia [estado]="estado()" />
+    </div>
+
+    <p class="item__texto">{{ item.contenido }}</p>
+
+    <ul class="item__datos">
+      <li>
+        <mat-icon aria-hidden="true">event</mat-icon>
+        <span>
+          Desde {{ item.vigenciaInicio | date:'d MMM y' }}
+          @if (item.vigenciaFin) {
+            hasta {{ item.vigenciaFin | date:'d MMM y' }}
+          } @else {
+            · sin fecha de fin
+          }
+        </span>
+      </li>
+      <li>
+        <mat-icon aria-hidden="true">{{ tieneEnlace() ? 'link' : 'link_off' }}</mat-icon>
+        <span>{{ destino() }}</span>
+      </li>
+      <li>
+        <mat-icon aria-hidden="true">format_list_numbered</mat-icon>
+        <span>Posición {{ item.orden }}</span>
+      </li>
+    </ul>
+
+    @if (ultimaEdicion().fecha) {
+      <p class="item__auditoria">
+        Última edición: {{ ultimaEdicion().fecha | date:'d MMM y, h:mm a' }}
+        @if (ultimaEdicion().autor) {
+          · {{ ultimaEdicion().autor }}
+        }
+      </p>
+    }
+  </div>
+
+  <div class="item__acciones">
+    <a class="item__accion item__accion--editar" [routerLink]="['/gestion-contenidos', item.id]"
+      [attr.aria-label]="'Editar «' + item.titulo + '»'">
+      <mat-icon aria-hidden="true">edit</mat-icon>
+      <span>Editar</span>
+    </a>
+    <button type="button" class="item__accion item__accion--eliminar" [disabled]="eliminando()"
+      [attr.aria-label]="'Eliminar «' + item.titulo + '»'" (click)="eliminar.emit(item)">
+      <mat-icon aria-hidden="true">delete_outline</mat-icon>
+      <span>Eliminar</span>
+    </button>
+  </div>
+</article>

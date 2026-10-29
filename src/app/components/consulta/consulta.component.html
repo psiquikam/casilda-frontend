@@ -1,8 +1,8 @@
 <div class="consulta-container">
   <header class="page-header">
     <div class="header-content">
-      <h1>Consulta Solicitud de Atención</h1>
-      <p>Gestión y seguimiento de solicitudes por estado actual</p>
+      <h1>Bandeja de reparto</h1>
+      <p>Gestión y distribución de solicitudes por estado actual</p>
     </div>
   </header>
 
@@ -19,17 +19,22 @@
   <div class="table-responsive">
     <!-- Anuncia el resultado del filtrado por columna (WCAG 4.1.3). -->
     <p class="visually-hidden" role="status" aria-live="polite">
-      {{ dataSource.filteredData.length }} resultados encontrados
+      {{ dataSource?.filteredData?.length ?? 0 }} resultados encontrados
     </p>
     <table mat-table [dataSource]="dataSource" multiTemplateDataRows aria-label="Solicitudes">
 
       <ng-container matColumnDef="expand">
-        <th mat-header-cell scope="col" *matHeaderCellDef><span class="visually-hidden">Detalle</span></th>
+        <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-expand">
+          <div class="header-inline-container header-inline-container--empty">
+            <span class="column-title visually-hidden">Detalle</span>
+            <div class="header-spacer-box" aria-hidden="true"></div>
+          </div>
+        </th>
         <td mat-cell *matCellDef="let element">
           <button mat-icon-button [attr.aria-label]="'Ver el detalle de la solicitud ' + element.id"
             [attr.aria-expanded]="expandedElement === element"
             [attr.aria-controls]="'detalle-' + element.id"
-            (click)="(expandedElement = expandedElement === element ? null : element); $event.stopPropagation()">
+            (click)="toggleExpand(element, $event)">
             <mat-icon aria-hidden="true" [ngClass]="expandedElement === element ? 'icon-remove' : 'icon-add'">
               {{expandedElement === element ? 'remove_circle' : 'add_circle'}}
             </mat-icon>
@@ -38,20 +43,24 @@
       </ng-container>
 
       <ng-container matColumnDef="id">
-        <th mat-header-cell scope="col" *matHeaderCellDef>
+        <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-id">
           <div class="header-inline-container">
             <span class="column-title">ID</span>
-            <div class="search-box-slim"><input appFiltroColumna="ID de la solicitud" (keyup)="applyFilter('id', $event)" placeholder="Filtrar"></div>
+            <mat-form-field appearance="outline" class="filter-field-mat" subscriptSizing="dynamic">
+              <input matInput appFiltroColumna="ID de la solicitud" (keyup)="applyFilter('id', $event)" placeholder="Filtrar">
+            </mat-form-field>
           </div>
         </th>
         <td mat-cell *matCellDef="let element" class="id-cell">#{{element.id}}</td>
       </ng-container>
 
       <ng-container matColumnDef="nombre">
-        <th mat-header-cell scope="col" *matHeaderCellDef>
+        <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-nombre">
           <div class="header-inline-container">
             <span class="column-title">Usuario</span>
-            <div class="search-box-slim"><input appFiltroColumna="nombre de la persona usuaria" (keyup)="applyFilter('nombre', $event)" placeholder="Buscar..."></div>
+            <mat-form-field appearance="outline" class="filter-field-mat" subscriptSizing="dynamic">
+              <input matInput appFiltroColumna="nombre de la persona usuaria" (keyup)="applyFilter('nombre', $event)" placeholder="Buscar...">
+            </mat-form-field>
           </div>
         </th>
         <td mat-cell *matCellDef="let element">
@@ -61,10 +70,12 @@
       </ng-container>
 
       <ng-container matColumnDef="documento">
-        <th mat-header-cell scope="col" *matHeaderCellDef>
+        <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-documento">
           <div class="header-inline-container">
             <span class="column-title">Doc.</span>
-            <div class="search-box-slim"><input appFiltroColumna="número de documento" (keyup)="applyFilter('documento', $event)" placeholder="N°"></div>
+            <mat-form-field appearance="outline" class="filter-field-mat" subscriptSizing="dynamic">
+              <input matInput appFiltroColumna="número de documento" (keyup)="applyFilter('documento', $event)" placeholder="N°">
+            </mat-form-field>
           </div>
         </th>
         <td mat-cell *matCellDef="let element">
@@ -73,122 +84,223 @@
       </ng-container>
 
       <ng-container matColumnDef="fecha">
-        <th mat-header-cell scope="col" *matHeaderCellDef>
+        <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-fecha">
           <div class="header-inline-container">
-            <span class="column-title">Fecha</span>
-            <div class="search-box-slim"><input appFiltroColumna="fecha" (keyup)="applyFilter('fecha', $event)" placeholder="dd/MM/yyyy"></div>
+            <span class="column-title">Fecha de solicitud</span>
+            <mat-form-field appearance="outline" class="filter-field-mat" subscriptSizing="dynamic">
+              <input matInput appFiltroColumna="fecha de solicitud" (keyup)="applyFilter('fecha', $event)" placeholder="dd/MM/yyyy">
+            </mat-form-field>
           </div>
         </th>
         <td mat-cell *matCellDef="let element">{{element.fecha}}</td>
       </ng-container>
 
       <ng-container matColumnDef="tipoAsignacion">
-        <th mat-header-cell scope="col" *matHeaderCellDef>
+        <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-tipoAsignacion">
           <div class="header-inline-container">
-            <span class="column-title">Tipo de Asignación</span>
-            <div class="search-box-slim"><input appFiltroColumna="tipo de asignación" (keyup)="applyFilter('tipoAsignacion', $event)" placeholder="Filtrar...">
-            </div>
-          </div>
-        </th>
-        <td mat-cell *matCellDef="let element"><span class="badge-soft">{{element.tipoAsignacion}}</span></td>
-      </ng-container>
-
-      <ng-container matColumnDef="estado">
-        <th mat-header-cell scope="col" *matHeaderCellDef>
-          <div class="header-inline-container">
-            <span class="column-title">Estado</span>
+            <span class="column-title">Tipo de reparto</span>
+            <mat-form-field appearance="outline" class="filter-field-mat" subscriptSizing="dynamic">
+              <mat-select aria-label="Filtrar por tipo de reparto"
+                placeholder="Todas"
+                [(value)]="filterValues.tipoAsignacion"
+                (selectionChange)="applySelectFilter('tipoAsignacion', $event.value)">
+                <mat-option value="">Todas</mat-option>
+                <mat-option value="esperando reparto">Esperando reparto</mat-option>
+                @for (tipo of opcionesTipoReparto; track tipo) {
+                  <mat-option [value]="tipo">{{ tipo }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
           </div>
         </th>
         <td mat-cell *matCellDef="let element">
-          <span class="badge-estado" [ngClass]="{
-            'badge-sin-asignar': !element.profesional || element.profesional === 'Sin asignar',
-            'badge-activo': element.estado !== 'Cerrado' && element.estado !== 'Abierto en transición' && element.profesional && element.profesional !== 'Sin asignar',
-            'badge-transicion': element.estado === 'Abierto en transición',
-            'badge-cerrado': element.estado === 'Cerrado'
-          }">{{element.estado || 'Sin asignar'}}</span>
+          @if (element.tipoAsignacionDisplay === 'Esperando reparto') {
+            <span class="badge-esperando">Esperando reparto</span>
+          } @else if (element.tipoAsignacionDisplay) {
+            <span class="badge-soft">{{ element.tipoAsignacionDisplay }}</span>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="estado">
+        <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-estado">
+          <div class="header-inline-container">
+            <span class="column-title">Estado</span>
+            <mat-form-field appearance="outline" class="filter-field-mat" subscriptSizing="dynamic">
+              <mat-select aria-label="Filtrar por estado de la solicitud"
+                placeholder="Todos"
+                [(value)]="filterValues.estado"
+                (selectionChange)="applySelectFilter('estado', $event.value)">
+                <mat-option value="">Todos</mat-option>
+                <mat-option value="esperando reparto">Esperando reparto</mat-option>
+                <mat-option value="repartida">Repartida</mat-option>
+                <mat-option value="cerrado">Cerrado</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </th>
+        <td mat-cell *matCellDef="let element">
+          @if (element.estadoDisplay === 'Esperando reparto') {
+            <span class="badge-esperando">Esperando reparto</span>
+          } @else {
+            <span class="badge-estado" [ngClass]="{
+              'badge-activo': element.estadoDisplay === 'Repartida',
+              'badge-cerrado': element.estadoDisplay === 'Cerrado'
+            }">{{element.estadoDisplay}}</span>
+          }
         </td>
       </ng-container>
 
       <ng-container matColumnDef="profesional">
-        <th mat-header-cell scope="col" *matHeaderCellDef>
+        <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-profesional">
           <div class="header-inline-container">
-            <span class="column-title">Asignado</span>
-            <div class="search-box-slim"><input appFiltroColumna="profesional asignado" (keyup)="applyFilter('profesional', $event)" placeholder="Filtrar...">
-            </div>
+            <span class="column-title">Repartido a</span>
+            <mat-form-field appearance="outline" class="filter-field-mat" subscriptSizing="dynamic">
+              <mat-select aria-label="Filtrar por profesional o dupla asignada"
+                placeholder="Todos"
+                [(value)]="filterValues.profesional"
+                (selectionChange)="applySelectFilter('profesional', $event.value)">
+                <mat-option value="">Todos</mat-option>
+                <mat-option value="esperando reparto">Esperando reparto</mat-option>
+                @if (opcionesProfesionales.length === 0) {
+                  <mat-option disabled>No hay profesionales o duplas disponibles</mat-option>
+                }
+                @for (prof of opcionesProfesionales; track prof) {
+                  <mat-option [value]="prof">{{ prof }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
           </div>
         </th>
         <td mat-cell *matCellDef="let element">
-          <span class="estado-asignacion" [class.estado-asignacion--pendiente]="element.profesional === 'Sin asignar'">
-            @if (element.profesional === 'Sin asignar') {
-              <mat-icon aria-hidden="true">error_outline</mat-icon>
-            }
-            {{ element.profesional }}
-          </span>
+          @if (element.profesionalDisplay === 'Esperando reparto') {
+            <span class="badge-esperando">Esperando reparto</span>
+          } @else {
+            <span class="profesional-nombre">{{ element.profesionalDisplay }}</span>
+          }
         </td>
       </ng-container>
 
       <ng-container matColumnDef="acciones">
-        <th mat-header-cell scope="col" *matHeaderCellDef><span class="column-title">Acciones</span></th>
+        <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-acciones">
+          <div class="header-inline-container header-inline-container--actions">
+            <span class="column-title column-title--center">Acciones</span>
+            <div class="header-spacer-box" aria-hidden="true"></div>
+          </div>
+        </th>
         <td mat-cell *matCellDef="let element">
           <div class="action-buttons-container">
 
-            @if (showReparto) {
-              <button mat-icon-button [attr.aria-label]="'Repartir o asignar el caso ' + element.id" class="action-purple" (click)="irAReparto(element)">
+            @if (showReparto && puedeGestionarSolicitudes) {
+              <button mat-icon-button class="btn-action btn-action-repartir"
+                matTooltip="Repartir caso"
+                [attr.aria-label]="'Repartir el caso ' + element.id"
+                (click)="irAReparto(element)">
                 <mat-icon aria-hidden="true">assignment_ind</mat-icon>
               </button>
             }
-            <button mat-icon-button [attr.aria-label]="'Visualizar el caso ' + element.id" class="action-visible" (click)="abrirModal(element, 'visualizar')">
-              <mat-icon aria-hidden="true" svgIcon="icono-ver"></mat-icon>
+            <button mat-icon-button class="btn-action btn-action-ver"
+              matTooltip="Visualizar detalle"
+              [attr.aria-label]="'Visualizar el caso ' + element.id"
+              (click)="abrirModal(element, 'visualizar')">
+              <mat-icon aria-hidden="true">visibility</mat-icon>
             </button>
-            <button mat-icon-button [attr.aria-label]="'Editar el caso ' + element.id" class="action-purple" (click)="abrirModal(element, 'editar')">
-              <mat-icon aria-hidden="true" svgIcon="icono-editar"></mat-icon>
-            </button>
-            <button mat-icon-button [attr.aria-label]="'Eliminar el caso ' + element.id" class="action-danger" (click)="eliminarCaso(element)">
-              <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
-            </button>
+            @if (puedeGestionarSolicitudes) {
+              <button mat-icon-button class="btn-action btn-action-editar"
+                matTooltip="Editar solicitud"
+                [attr.aria-label]="'Editar el caso ' + element.id"
+                (click)="abrirModal(element, 'editar')">
+                <mat-icon aria-hidden="true">edit</mat-icon>
+              </button>
+              <button mat-icon-button class="btn-action btn-action-eliminar"
+                matTooltip="Eliminar solicitud"
+                [attr.aria-label]="'Eliminar el caso ' + element.id"
+                (click)="eliminarCaso(element)">
+                <mat-icon aria-hidden="true">delete_outline</mat-icon>
+              </button>
+            }
           </div>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="expandedDetail">
         <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
-          <div class="element-detail" [id]="'detalle-' + element.id" [attr.inert]="element === expandedElement ? null : ''" [@detailExpand]="element === expandedElement ? 'expanded' : 'collapsed'">
-            <div class="detail-grid">
+          <div class="element-detail" [id]="'detalle-' + element.id" [inert]="element !== expandedElement" [@detailExpand]="element === expandedElement ? 'expanded' : 'collapsed'">
+            <div class="detail-full-wrapper">
 
-              <div class="detail-item">
-                <strong>Tipo Solicitud:</strong> {{element.tipoSolicitud}}
+              <!-- Bloque 1: Descripción de la situación / Hechos del caso -->
+              <div class="detail-card detail-narrative-card">
+                <div class="detail-card-header">
+                  <mat-icon aria-hidden="true" class="card-icon">description</mat-icon>
+                  <span class="card-title">Descripción del caso y situación reportada</span>
+                </div>
+                <p class="narrative-text">{{ element.descripcionHechos }}</p>
               </div>
 
-              <div class="detail-item">
-                <strong>Facultad:</strong> {{element.remitenteFacultad}}
-              </div>
+              <div class="detail-cards-grid">
+                <div class="detail-card">
+                  <div class="detail-card-header">
+                    <mat-icon aria-hidden="true" class="card-icon">account_circle</mat-icon>
+                    <span class="card-title">Datos de contacto</span>
+                  </div>
+                  <div class="detail-key-values">
+                    <div class="kv-item">
+                      <span class="kv-label">Tipo de solicitud:</span>
+                      <span class="kv-value">{{ element.tipoSolicitud }}</span>
+                    </div>
+                    <div class="kv-item">
+                      <span class="kv-label">Teléfono:</span>
+                      <span class="kv-value">{{ element.telefonoContacto }}</span>
+                    </div>
+                    <div class="kv-item">
+                      <span class="kv-label">Correo electrónico:</span>
+                      <span class="kv-value">{{ element.correoContacto }}</span>
+                    </div>
+                  </div>
+                </div>
 
-              <div class="detail-item">
-                <strong>Campus:</strong> {{element.remitenteCampus}}
-              </div>
-
-              <div class="detail-item">
-                <strong>Identidad Género:</strong> {{element.identidadGenero}}
-              </div>
-
-              <div class="detail-item">
-                <strong>Celular:</strong> {{element.celular}}
-              </div>
-
-              <div class="detail-item">
-                <strong>Cargo:</strong> {{element.remitenteCargo}}
-              </div>
-
-              <div class="detail-item">
-                <strong>Teléfono:</strong> {{element.telefonoAlterno}}
-              </div>
-
-              <div class="detail-item">
-                <strong>Correo Institucional:</strong> {{element.correoInstitucional}}
-              </div>
-
-              <div class="detail-item">
-                <strong>Correo Personal:</strong> {{element.correoPersonal}}
+                <div class="detail-card">
+                  <div class="detail-card-header">
+                    <mat-icon aria-hidden="true" class="card-icon">person_off</mat-icon>
+                    <span class="card-title">Presunta persona agresora</span>
+                  </div>
+                  @if (element.tieneDatosAgresor) {
+                    <div class="detail-key-values">
+                      @if (element.agresorIdentificacion) {
+                        <div class="kv-item">
+                          <span class="kv-label">Identificación:</span>
+                          <span class="kv-value">{{ element.agresorIdentificacion }}</span>
+                        </div>
+                      }
+                      @if (element.agresorNombre) {
+                        <div class="kv-item">
+                          <span class="kv-label">Nombre:</span>
+                          <span class="kv-value">{{ element.agresorNombre }}</span>
+                        </div>
+                      }
+                      @if (element.agresorVinculoUdea) {
+                        <div class="kv-item">
+                          <span class="kv-label">Vínculo con la universidad:</span>
+                          <span class="kv-value">{{ element.agresorVinculoUdea }}</span>
+                        </div>
+                      }
+                      @if (element.agresorVinculoVictima) {
+                        <div class="kv-item">
+                          <span class="kv-label">Vínculo con la víctima:</span>
+                          <span class="kv-value">{{ element.agresorVinculoVictima }}</span>
+                        </div>
+                      }
+                      @if (element.agresorCorreo) {
+                        <div class="kv-item">
+                          <span class="kv-label">Información adicional:</span>
+                          <span class="kv-value">{{ element.agresorCorreo }}</span>
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <p class="detail-empty-value">No se registró información.</p>
+                  }
+                  </div>
               </div>
 
             </div>
@@ -203,7 +315,7 @@
       <tr mat-row *matRowDef="let row; columns: expandedDetailColumns" class="detail-row"></tr>
     </table>
 
-    @if (dataSource.filteredData.length === 0) {
+    @if (!dataSource || dataSource.filteredData.length === 0) {
       <div class="no-results-msg">
         <mat-icon aria-hidden="true">info_outline</mat-icon>
         <p>{{ msgVacio }}</p>

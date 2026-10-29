@@ -11,14 +11,22 @@ export class LoadingService {
   show(): void {
     this.pendingRequests += 1;
     if (this.pendingRequests === 1) {
-      this.loadingSubject.next(true);
+      queueMicrotask(() => {
+        if (this.pendingRequests > 0) {
+          this.loadingSubject.next(true);
+        }
+      });
     }
   }
 
   hide(): void {
     this.pendingRequests = Math.max(0, this.pendingRequests - 1);
     if (this.pendingRequests === 0) {
-      this.loadingSubject.next(false);
+      queueMicrotask(() => {
+        if (this.pendingRequests === 0) {
+          this.loadingSubject.next(false);
+        }
+      });
     }
   }
 }

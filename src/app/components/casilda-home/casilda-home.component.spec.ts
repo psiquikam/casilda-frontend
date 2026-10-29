@@ -59,8 +59,11 @@ describe('CasildaHomeComponent', () => {
   it('debe distribuir el contenido recibido en sus dos secciones', async () => {
     await crearComponente();
 
-    expect(component.acciones().length).toBe(1);
-    expect(component.informacion().length).toBe(1);
+    const secciones = component.secciones();
+    expect(secciones.map((s) => s.valor)).toEqual(['acciones', 'informacion']);
+    expect(secciones.map((s) => s.items.length)).toEqual([1, 1]);
+    const titulos = Array.from(fixture.nativeElement.querySelectorAll('h2') as NodeListOf<HTMLElement>).map((h) => h.textContent?.trim());
+    expect(titulos).toEqual(['Opciones de atención y gestión', 'Información de interés general']);
     expect(component.cargando()).toBeFalse();
   });
 

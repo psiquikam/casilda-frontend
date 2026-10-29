@@ -53,7 +53,7 @@
     border-radius: 20px;
     font-size: 0.75rem;
     font-weight: 700;
-    text-transform: uppercase;
+    text-transform: none;
 
     &.status-warning { background: var(--color-bg-warning-light); color: #92400e; }
     &.status-info { background: var(--color-bg-info-light); color: #1e40af; }

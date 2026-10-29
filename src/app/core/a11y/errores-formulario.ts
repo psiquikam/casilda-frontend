@@ -18,8 +18,8 @@ export type DescripcionCampos = Record<string, {
 }>;
 
 const MENSAJES_GENERICOS: Record<string, string> = {
-  required: 'Necesitamos este dato para continuar.',
-  email: 'Revisa que el correo tenga el formato nombre@dominio.com.',
+  required: 'Este dato es requerido para continuar.',
+  email: 'Verifique que el correo tenga el formato nombre@dominio.com.',
   pattern: 'El formato no coincide con el esperado.',
   minlength: 'Es demasiado corto.',
   maxlength: 'Es demasiado largo.'
@@ -44,7 +44,7 @@ export function recolectarErrores(
     const control: AbstractControl | null = form.get(nombre);
     if (!control || control.valid || control.disabled || !control.errors) continue;
     const clave = Object.keys(control.errors)[0];
-    const mensaje = desc.mensajes?.[clave] ?? desc.mensajes?.['default'] ?? MENSAJES_GENERICOS[clave] ?? 'Revisa este campo.';
+    const mensaje = desc.mensajes?.[clave] ?? desc.mensajes?.['default'] ?? MENSAJES_GENERICOS[clave] ?? 'Verifique este campo.';
     errores.push({ id: `${prefijoId}-${nombre}`, etiqueta: desc.etiqueta, mensaje });
   }
   return errores;

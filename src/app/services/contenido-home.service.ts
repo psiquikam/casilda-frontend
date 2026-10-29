@@ -1,7 +1,13 @@
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map, of } from 'rxjs';
 
 import { environment } from '../../environments/environment';
+import type { SeccionContenido } from '../core/contenidos/catalogo-contenidos';
+import { estaVigente } from '../core/contenidos/reglas-contenido';
+
+// Se reexporta para no romper a quien ya la importaba desde aquí.
+export { estaVigente };
 
 /**
  * Contenido editable que alimenta las tarjetas de opción del Home.
@@ -11,34 +17,35 @@ import { environment } from '../../environments/environment';
  */
 export interface ContenidoDestacadoDto {
   id: number;
-  /** URL de la imagen principal de la tarjeta. */
-  imagen: string;
+  /**
+   * Imagen de la tarjeta. Puede llegar como ruta relativa a la API
+   * (`/contenidos/imagenes/…`), `assets/…` o `null`: se resuelve con
+   * `resolverImagenContenido()` antes de enlazarla.
+   */
+  imagen: string | null;
   titulo: string;
   contenido: string;
   /** Inicio de vigencia (ISO 8601). */
   vigenciaInicio: string;
   /** Fin de vigencia (ISO 8601). `null` = sin fecha de expiración. */
   vigenciaFin: string | null;
-  /**
-   * Ruta interna a la que dirige la tarjeta. Extensión pendiente de confirmar
-   * con backend; si llega vacía la tarjeta se muestra como informativa.
-   */
+  /** Ruta interna a la que dirige la tarjeta. Vacía o no interna: tarjeta informativa. */
   enlace?: string | null;
   /** Bloque del home donde se ubica la tarjeta. */
-  seccion: 'acciones' | 'informacion';
+  seccion: SeccionContenido;
 }
 
 /**
- * Contenido de referencia mientras el backend expone el endpoint real.
- * Reproduce las opciones vigentes del home para poder emular el servicio.
- * ÚNICO punto a eliminar cuando `GET /contenidos/home` esté disponible.
+ * Contenido de referencia para el modo de demostración. Reproduce las opciones
+ * del home para poder probar la portada sin backend; fuera de ese modo el
+ * contenido sale de `GET /contenidos/home`.
  */
 const CONTENIDO_MOCK: readonly ContenidoDestacadoDto[] = [
   {
     id: 1,
     imagen: 'assets/uad_equipo_3_y_4.svg',
     titulo: 'Registrar queja disciplinaria (UAD 3 y 4)',
-    contenido: 'Registra formalmente una queja ante la Unidad de Asuntos Disciplinarios. Tu relato se maneja bajo reserva.',
+    contenido: 'Registro formal de quejas ante la Unidad de Asuntos Disciplinarios. El relato se gestiona bajo reserva.',
     vigenciaInicio: '2026-01-01T00:00:00Z',
     vigenciaFin: null,
     enlace: '/formulario-anonimo',
@@ -48,7 +55,7 @@ const CONTENIDO_MOCK: readonly ContenidoDestacadoDto[] = [
     id: 2,
     imagen: 'assets/equipo_atencion.svg',
     titulo: 'Solicitud al equipo de atención VBG',
-    contenido: 'Contacta al equipo especializado para recibir orientación y acompañamiento psicosocial y jurídico.',
+    contenido: 'Contacto con el equipo especializado para recibir orientación y acompañamiento psicosocial y jurídico.',
     vigenciaInicio: '2026-01-01T00:00:00Z',
     vigenciaFin: null,
     enlace: '/formulario-anonimo',
@@ -68,7 +75,7 @@ const CONTENIDO_MOCK: readonly ContenidoDestacadoDto[] = [
     id: 4,
     imagen: 'assets/seguridad_bienes_y_servicios.svg',
     titulo: 'Atención por seguridad a personas y bienes',
-    contenido: 'Reporta incidentes que requieran respuesta de seguridad inmediata dentro del campus.',
+    contenido: 'Reporte de incidentes que requieran respuesta de seguridad inmediata dentro del campus.',
     vigenciaInicio: '2026-01-01T00:00:00Z',
     vigenciaFin: null,
     enlace: null,
@@ -78,7 +85,7 @@ const CONTENIDO_MOCK: readonly ContenidoDestacadoDto[] = [
     id: 5,
     imagen: 'assets/reportes_informes_indicadores.svg',
     titulo: 'Indicadores internos',
-    contenido: 'Consulta los datos y métricas que el sistema CASILDA consolida sobre la atención institucional.',
+    contenido: 'Consulta de datos y métricas que el sistema CASILDA consolida sobre la atención institucional.',
     vigenciaInicio: '2026-01-01T00:00:00Z',
     vigenciaFin: null,
     enlace: null,
@@ -106,30 +113,24 @@ const CONTENIDO_MOCK: readonly ContenidoDestacadoDto[] = [
   }
 ];
 
-/** Indica si un contenido está vigente en la fecha dada. */
-export function estaVigente(contenido: ContenidoDestacadoDto, referencia: Date = new Date()): boolean {
-  const inicio = new Date(contenido.vigenciaInicio).getTime();
-  if (Number.isNaN(inicio) || inicio > referencia.getTime()) return false;
-
-  if (!contenido.vigenciaFin) return true;
-
-  const fin = new Date(contenido.vigenciaFin).getTime();
-  return Number.isNaN(fin) ? true : fin >= referencia.getTime();
-}
-
 @Injectable({ providedIn: 'root' })
 export class ContenidoHomeService {
-  /** Endpoint previsto para el panel del gestor de contenidos. */
+  private readonly http = inject(HttpClient);
+
+  /** Endpoint público del gestor de contenidos (no requiere token). */
   readonly endpoint = `${environment.apiBaseUrl}/contenidos/home`;
 
   /**
    * Contenido vigente del home.
    *
-   * TODO(backend): reemplazar por `this.http.get<ContenidoDestacadoDto[]>(this.endpoint)`
-   * cuando el endpoint del gestor de contenidos esté publicado. La firma del
-   * método y el DTO no deben cambiar.
+   * En modo de demostración sale de `CONTENIDO_MOCK`; si no, del backend. La
+   * vigencia se vuelve a filtrar aquí aunque el backend ya la aplique, para que
+   * una tarjeta vencida en caché no se muestre.
    */
   listarContenidoVigente(referencia: Date = new Date()): Observable<ContenidoDestacadoDto[]> {
-    return of(CONTENIDO_MOCK.filter((contenido) => estaVigente(contenido, referencia)));
+    const fuente = environment.datosDemostracion
+      ? of([...CONTENIDO_MOCK])
+      : this.http.get<ContenidoDestacadoDto[]>(this.endpoint);
+    return fuente.pipe(map((contenidos) => contenidos.filter((contenido) => estaVigente(contenido, referencia))));
   }
 }

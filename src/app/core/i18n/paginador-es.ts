@@ -9,16 +9,19 @@ import { MatPaginatorIntl } from '@angular/material/paginator';
  */
 export function getPaginadorIntlEs(): MatPaginatorIntl {
   const intl = new MatPaginatorIntl();
-  intl.itemsPerPageLabel = 'Elementos por página:';
+  intl.itemsPerPageLabel = 'Registros por página:';
   intl.nextPageLabel = 'Página siguiente';
   intl.previousPageLabel = 'Página anterior';
   intl.firstPageLabel = 'Primera página';
   intl.lastPageLabel = 'Última página';
   intl.getRangeLabel = (page: number, pageSize: number, length: number) => {
-    if (length === 0 || pageSize === 0) return `0 de ${length}`;
-    const inicio = page * pageSize;
-    const fin = inicio < length ? Math.min(inicio + pageSize, length) : inicio + pageSize;
-    return `${inicio + 1} – ${fin} de ${length}`;
+    if (length === 0) return '0 registros';
+    if (page === 0 && length <= pageSize) {
+      return `Mostrando ${length} ${length === 1 ? 'registro en total' : 'registros en total'}`;
+    }
+    const inicio = page * pageSize + 1;
+    const fin = Math.min((page + 1) * pageSize, length);
+    return `Mostrando ${inicio} - ${fin} de ${length} registros`;
   };
   return intl;
 }

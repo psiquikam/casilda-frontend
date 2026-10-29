@@ -1,17 +1,24 @@
 <div class="modal-container">
   <h2 mat-dialog-title class="modal-header">
     <mat-icon aria-hidden="true">assignment_ind</mat-icon>
-    <span>Asignar Caso: {{ data.id }}</span>
+    <span>Repartir caso: {{ data.id }}</span>
   </h2>
 
   <mat-dialog-content class="modal-content">
     <form [formGroup]="repartoForm" class="reparto-form">
 
+      @if (cargandoCatalogos) {
+        <div class="loading-state" role="status" aria-live="polite">
+          <mat-spinner diameter="32"></mat-spinner>
+          <span>Cargando opciones de reparto...</span>
+        </div>
+      }
+
       <div class="form-grid">
         <mat-form-field appearance="outline">
-          <mat-label>Tipo de Asignación</mat-label>
-          <mat-select formControlName="idTipoAsignacion">
-            @for (tipo of tiposAsignacion; track tipo) {
+          <mat-label>Tipo de reparto</mat-label>
+          <mat-select formControlName="idTipoAsignacion" placeholder="Seleccione un tipo">
+            @for (tipo of tiposAsignacion; track tipo.id) {
               <mat-option [value]="tipo.id">{{ tipo.nombre }}</mat-option>
             }
           </mat-select>
@@ -19,17 +26,20 @@
 
         <mat-form-field appearance="outline">
           <mat-label>Servicio</mat-label>
-          <mat-select formControlName="idTipoServicio">
-            @for (serv of tiposServicio; track serv) {
+          <mat-select formControlName="idTipoServicio" placeholder="Seleccione un servicio">
+            @for (serv of tiposServicio; track serv.id) {
               <mat-option [value]="serv.id">{{ serv.nombre }}</mat-option>
             }
           </mat-select>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Profesional o Dupla</mat-label>
-          <mat-select formControlName="grupoProfesionalId">
-            @for (grupo of gruposProfesionales; track grupo) {
+          <mat-label>Profesional o dupla</mat-label>
+          <mat-select formControlName="grupoProfesionalId" placeholder="Seleccione un profesional o dupla">
+            @if (gruposProfesionales.length === 0 && !cargandoCatalogos) {
+              <mat-option disabled>No hay profesionales o duplas disponibles</mat-option>
+            }
+            @for (grupo of gruposProfesionales; track grupo.id) {
               <mat-option [value]="grupo.id">
                 {{ grupo.nombre }}
               </mat-option>
@@ -39,19 +49,23 @@
       </div>
 
       <mat-form-field appearance="outline" class="full-width desc-field">
-        <mat-label>Observaciones de la asignación</mat-label>
-        <textarea matInput rows="4" formControlName="observaciones"></textarea>
+        <mat-label>Observaciones del reparto</mat-label>
+        <textarea matInput rows="4" formControlName="observaciones" placeholder="Ingrese las observaciones del reparto..."></textarea>
       </mat-form-field>
 
     </form>
   </mat-dialog-content>
 
   <mat-dialog-actions align="end" class="modal-footer">
-    <button mat-button (click)="cerrar()" color="warn">Cancelar</button>
+    <button mat-button (click)="cerrar()" color="warn" [disabled]="guardando">Cancelar</button>
     <button mat-flat-button class="btn-confirm" (click)="guardar()"
-      [disabled]="repartoForm.invalid">
-      <mat-icon aria-hidden="true">check_circle</mat-icon>
-      Confirmar Asignación
+      [disabled]="repartoForm.invalid || cargandoCatalogos || guardando">
+      @if (guardando) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        <mat-icon aria-hidden="true">check_circle</mat-icon>
+      }
+      <span>{{ guardando ? 'Guardando...' : 'Confirmar reparto' }}</span>
     </button>
   </mat-dialog-actions>
 </div>

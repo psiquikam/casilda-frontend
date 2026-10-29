@@ -13,12 +13,23 @@ import { AuthService } from '../../services/auth.service';
 import { LATENCIA_MOCK_MS } from '../../services/dashboard-mock';
 import { DashboardTrabajoService } from '../../services/dashboard-trabajo.service';
 import { of } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 registerLocaleData(localeEsCo);
 
 describe('PanelInicioComponent', () => {
   let fixture: ComponentFixture<PanelInicioComponent>;
   let auth: AuthService;
+
+  // Estas pruebas cubren el modo de demostración: sin él, el contenido no
+  // sale de datos simulados. El caso contrario se prueba aparte.
+  const modoOriginal = environment.datosDemostracion;
+  beforeEach(() => {
+    environment.datosDemostracion = true;
+  });
+  afterEach(() => {
+    environment.datosDemostracion = modoOriginal;
+  });
 
   /** Deja pasar la latencia simulada del mock y repinta. */
   function resolverCarga(): void {
@@ -84,6 +95,26 @@ describe('PanelInicioComponent', () => {
   it('declara que las cifras son simuladas mientras el flag esté activo (DSH-12-08)', () => {
     const franja = (fixture.nativeElement as HTMLElement).querySelector('.panel__demo');
     expect(franja?.textContent).toContain('Datos de demostración');
+  });
+
+  describe('fuera del modo de demostración', () => {
+    it('no muestra la franja ni los widgets sin endpoint en el backend', () => {
+      environment.datosDemostracion = false;
+      for (const rol of ['Admin', 'Coordinador', 'Profesional', 'Revisor']) {
+        comoRol(rol);
+
+        const panel = fixture.nativeElement as HTMLElement;
+        expect(panel.querySelector('.panel__demo')).withContext(rol).toBeNull();
+        expect(
+          panel.querySelector(
+            'app-widget-pendientes, app-widget-kpis, app-widget-distribucion-identidad, ' +
+              'app-widget-vigilancia, app-widget-agenda-hoy, app-widget-carga-equipo'
+          )
+        ).withContext(rol).toBeNull();
+        expect(panel.querySelector('app-widget-accesos-frecuentes')).withContext(rol).not.toBeNull();
+        expect(panel.querySelector('h1')).withContext(rol).not.toBeNull();
+      }
+    });
   });
 
   describe('zonas por rol', () => {
@@ -177,7 +208,7 @@ describe('PanelInicioComponent', () => {
     resolverCarga();
 
     const zona = (fixture.nativeElement as HTMLElement).querySelector('app-widget-pendientes');
-    expect(zona?.textContent).toContain('No tienes pendientes para hoy');
+    expect(zona?.textContent).toContain('No hay pendientes para hoy');
   }));
 
   it('avisa de forma sutil cuando se es la última profesional activa (DSH-08-03)', fakeAsync(() => {

@@ -78,6 +78,16 @@ export const CATALOGO_MODULOS: readonly ModuloCasilda[] = [
     seccion: 'Administración'
   },
 
+  // --- Gestión de contenidos (GESTOR_CONTENIDO; Admin por la regla general) ---
+  {
+    id: 'contenidos-home',
+    nombre: 'Contenidos del inicio',
+    icono: 'web',
+    ruta: '/gestion-contenidos',
+    roles: ['GESTOR_CONTENIDO'],
+    seccion: 'Gestión de contenidos'
+  },
+
   // --- Equipo de atención ---
   {
     id: 'nueva-solicitud',
@@ -89,8 +99,8 @@ export const CATALOGO_MODULOS: readonly ModuloCasilda[] = [
   },
   {
     id: 'consulta',
-    nombre: 'Consulta de solicitudes',
-    icono: 'manage_search',
+    nombre: 'Bandeja de reparto',
+    icono: 'move_to_inbox',
     ruta: '/consulta',
     roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR'],
     seccion: 'Equipo de atención'

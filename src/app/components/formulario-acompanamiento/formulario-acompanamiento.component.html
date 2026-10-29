@@ -1,7 +1,7 @@
 <div class="form-container">
   <header class="page-header">
     <div>
-      <h1>Solicitud de Acompañamiento</h1>
+      <h1>Solicitud de acompañamiento</h1>
       <p>Complete la información para procesar su requerimiento</p>
     </div>
   </header>
@@ -13,50 +13,58 @@
         <!-- Resumen enfocable de errores al enviar (WCAG 3.3.1 / 3.3.3). -->
         <app-resumen-errores [errores]="erroresEnvio" (campoSolicitado)="revelarCampo($event)" />
 
-        <div class="profile-selector">
-          <h2 class="section-title">¿Desea registrar una solicitud?</h2>
-          <mat-radio-group formControlName="tipoReporte" class="profile-grid" id="acomp-tipoReporte" tabindex="-1">
-            <div class="profile-card" [class.selected]="acompanamientoForm.get('tipoReporte')?.value === 'directa'">
-              <mat-radio-button value="directa">
-                <strong>Solicitud Directa</strong>
-                <p>Usted es la persona que requiere el acompañamiento.</p>
-              </mat-radio-button>
-            </div>
-            <div class="profile-card" [class.selected]="acompanamientoForm.get('tipoReporte')?.value === 'indirecta'">
-              <mat-radio-button value="indirecta">
-                <strong>Solicitud Indirecta</strong>
-                <p>Usted reporta el caso de un tercero que requiere apoyo.</p>
-              </mat-radio-button>
-            </div>
-          </mat-radio-group>
-        </div>
+        <div class="top-selectors-grid">
+          <div class="profile-selector">
+            <h2 class="section-title">¿Desea registrar una solicitud? <span class="required-marker" aria-hidden="true">*</span></h2>
+            <mat-radio-group formControlName="tipoReporte" class="profile-grid" id="acomp-tipoReporte" tabindex="-1">
+              <div class="profile-card" [class.selected]="acompanamientoForm.get('tipoReporte')?.value === 'directa'">
+                <mat-radio-button value="directa">
+                  <strong>Solicitud directa</strong>
+                  <p>Usted es la persona que requiere el acompañamiento.</p>
+                </mat-radio-button>
+              </div>
+              <div class="profile-card" [class.selected]="acompanamientoForm.get('tipoReporte')?.value === 'indirecta'">
+                <mat-radio-button value="indirecta">
+                  <strong>Solicitud indirecta</strong>
+                  <p>Usted reporta el caso de un tercero que requiere apoyo.</p>
+                </mat-radio-button>
+              </div>
+            </mat-radio-group>
+            @if (acompanamientoForm.get('tipoReporte')?.hasError('required') && acompanamientoForm.get('tipoReporte')?.touched) {
+              <p class="field-error" role="alert">Seleccione si la solicitud es directa o indirecta.</p>
+            }
+          </div>
 
-        <div class="profile-selector">
-          <h2 class="section-title">¿Cuál es el medio por donde llegó la solicitud?</h2>
-          <mat-radio-group formControlName="medioSolicitud" class="profile-grid" id="acomp-medioSolicitud" tabindex="-1">
-            <div class="profile-card"
-              [class.selected]="acompanamientoForm.get('medioSolicitud')?.value === 'presencial'">
-              <mat-radio-button value="presencial">
-                <strong>Presencial</strong>
-                <p>Solicitud realizada de manera presencial.</p>
-              </mat-radio-button>
-            </div>
-            <div class="profile-card" [class.selected]="acompanamientoForm.get('medioSolicitud')?.value === 'virtual'">
-              <mat-radio-button value="virtual">
-                <strong>Virtual</strong>
-                <p>Solicitud realizada de manera virtual.</p>
-              </mat-radio-button>
-            </div>
-          </mat-radio-group>
+          <div class="profile-selector">
+            <h2 class="section-title">¿Cuál es el medio por donde llegó la solicitud? <span class="required-marker" aria-hidden="true">*</span></h2>
+            <mat-radio-group formControlName="medioSolicitud" class="profile-grid" id="acomp-medioSolicitud" tabindex="-1">
+              <div class="profile-card"
+                [class.selected]="acompanamientoForm.get('medioSolicitud')?.value === 'presencial'">
+                <mat-radio-button value="presencial">
+                  <strong>Presencial</strong>
+                  <p>Solicitud realizada de manera presencial.</p>
+                </mat-radio-button>
+              </div>
+              <div class="profile-card" [class.selected]="acompanamientoForm.get('medioSolicitud')?.value === 'virtual'">
+                <mat-radio-button value="virtual">
+                  <strong>Virtual</strong>
+                  <p>Solicitud realizada de manera virtual.</p>
+                </mat-radio-button>
+              </div>
+            </mat-radio-group>
+            @if (acompanamientoForm.get('medioSolicitud')?.hasError('required') && acompanamientoForm.get('medioSolicitud')?.touched) {
+              <p class="field-error" role="alert">Seleccione el medio por el que llegó la solicitud.</p>
+            }
+          </div>
         </div>
 
         @if (acompanamientoForm.get('tipoReporte')?.value === 'indirecta') {
           <mat-tab-group animationDuration="200ms" class="form-tabs" [(selectedIndex)]="tabSeleccionada">
-            <mat-tab label="Información del Remitente">
+            <mat-tab label="Información del remitente">
               <div class="tab-body-padding">
                 <div class="row">
                   <mat-form-field appearance="outline">
-                    <mat-label>Tipo Documento</mat-label>
+                    <mat-label>Tipo de documento</mat-label>
                     <mat-select formControlName="remitenteTipoDocumento">
                       @for (t of tiposDocumento; track t.id) {
                         <mat-option [value]="t.id">{{t.nombre}}</mat-option>
@@ -64,7 +72,7 @@
                     </mat-select>
                   </mat-form-field>
                   <mat-form-field appearance="outline">
-                    <mat-label>Número Documento</mat-label>
+                    <mat-label>Número de documento</mat-label>
                     <input matInput formControlName="remitenteNumeroDocumento" (keyup.enter)="buscarRemitente($event)">
                     <button matSuffix mat-icon-button aria-label="Buscar funcionario por documento" class="btn-search-doc" type="button"
                       (click)="buscarRemitente($event)" [disabled]="buscandoRemitente" matTooltip="Buscar funcionario">
@@ -77,21 +85,27 @@
                     </button>
                   </mat-form-field>
                   <mat-form-field appearance="outline">
-                    <mat-label>Primer Nombre</mat-label>
+                    <mat-label>Primer nombre</mat-label>
                     <input matInput formControlName="remitentePrimerNombre" id="acomp-remitentePrimerNombre" autocomplete="given-name">
+                    @if (acompanamientoForm.get('remitentePrimerNombre')?.hasError('required')) {
+                      <mat-error>Ingrese el primer nombre del remitente</mat-error>
+                    }
                   </mat-form-field>
                   <mat-form-field appearance="outline">
-                    <mat-label>Segundo Nombre</mat-label>
+                    <mat-label>Segundo nombre</mat-label>
                     <input matInput formControlName="remitenteSegundoNombre" autocomplete="additional-name">
                   </mat-form-field>
                 </div>
                 <div class="row">
                   <mat-form-field appearance="outline">
-                    <mat-label>Primer Apellido</mat-label>
+                    <mat-label>Primer apellido</mat-label>
                     <input matInput formControlName="remitentePrimerApellido" id="acomp-remitentePrimerApellido" autocomplete="family-name">
+                    @if (acompanamientoForm.get('remitentePrimerApellido')?.hasError('required')) {
+                      <mat-error>Ingrese el primer apellido del remitente</mat-error>
+                    }
                   </mat-form-field>
                   <mat-form-field appearance="outline">
-                    <mat-label>Segundo Apellido</mat-label>
+                    <mat-label>Segundo apellido</mat-label>
                     <input matInput formControlName="remitenteSegundoApellido">
                   </mat-form-field>
                   <mat-form-field appearance="outline">
@@ -101,6 +115,9 @@
                         <mat-option [value]="c.id">{{c.nombre}}</mat-option>
                       }
                     </mat-select>
+                    @if (acompanamientoForm.get('remitenteCargo')?.hasError('required')) {
+                      <mat-error>Seleccione el cargo del remitente</mat-error>
+                    }
                   </mat-form-field>
                   <mat-form-field appearance="outline">
                     <mat-label>Campus</mat-label>
@@ -109,29 +126,38 @@
                         <mat-option [value]="c.id">{{c.nombre}}</mat-option>
                       }
                     </mat-select>
+                    @if (acompanamientoForm.get('remitenteCampus')?.hasError('required')) {
+                      <mat-error>Seleccione el campus del remitente</mat-error>
+                    }
                   </mat-form-field>
                 </div>
                 <div class="row">
                   <mat-form-field appearance="outline">
-                    <mat-label>Unidad Administrativa</mat-label>
+                    <mat-label>Unidad administrativa</mat-label>
                     <mat-select formControlName="remitenteUnidadAdministrativa" id="acomp-remitenteUnidadAdministrativa">
                       @for (d of unidadesAdministrativas; track d.id) {
                         <mat-option [value]="d.id">{{d.nombre}}</mat-option>
                       }
                     </mat-select>
+                    @if (acompanamientoForm.get('remitenteUnidadAdministrativa')?.hasError('required')) {
+                      <mat-error>Seleccione la unidad administrativa</mat-error>
+                    }
                   </mat-form-field>
                   <mat-form-field appearance="outline">
-                    <mat-label>Unidad Académica</mat-label>
+                    <mat-label>Unidad académica</mat-label>
                     <mat-select formControlName="remitenteUnidadAcademica" id="acomp-remitenteUnidadAcademica">
                       @for (f of unidadesAcademicas; track f.id) {
                         <mat-option [value]="f.id">{{f.nombre}}</mat-option>
                       }
                     </mat-select>
+                    @if (acompanamientoForm.get('remitenteUnidadAcademica')?.hasError('required')) {
+                      <mat-error>Seleccione la unidad académica</mat-error>
+                    }
                   </mat-form-field>
                 </div>
               </div>
             </mat-tab>
-            <mat-tab label="Información del Solicitante">
+            <mat-tab label="Información del solicitante">
               <div class="tab-body-padding">
                 <ng-container *ngTemplateOutlet="camposSolicitante"></ng-container>
               </div>
@@ -141,7 +167,7 @@
 
         @if (acompanamientoForm.get('tipoReporte')?.value === 'directa') {
           <div class="form-section">
-            <h3 class="section-title-divider">Datos del Solicitante</h3>
+            <h3 class="section-title-divider">Datos del solicitante</h3>
             <ng-container *ngTemplateOutlet="camposSolicitante"></ng-container>
           </div>
         }
@@ -149,15 +175,18 @@
         <ng-template #camposSolicitante>
           <div class="row">
             <mat-form-field appearance="outline">
-              <mat-label>Tipo Documento</mat-label>
+              <mat-label>Tipo de documento</mat-label>
               <mat-select formControlName="tipoDocumento" id="acomp-tipoDocumento">
                 @for (t of tiposDocumento; track t.id) {
                   <mat-option [value]="t.id">{{t.nombre}}</mat-option>
                 }
               </mat-select>
+              @if (acompanamientoForm.get('tipoDocumento')?.hasError('required')) {
+                <mat-error>Seleccione el tipo de documento</mat-error>
+              }
             </mat-form-field>
             <mat-form-field appearance="outline">
-              <mat-label>Número Documento</mat-label>
+              <mat-label>Número de documento</mat-label>
               <input matInput formControlName="numeroDocumento" id="acomp-numeroDocumento" (keyup.enter)="buscarSolicitante($event)">
               <button matSuffix mat-icon-button aria-label="Buscar solicitante por documento" class="btn-search-doc" type="button" (click)="buscarSolicitante($event)"
                 [disabled]="buscandoSolicitante" matTooltip="Buscar solicitante">
@@ -168,155 +197,528 @@
                   <mat-spinner diameter="18"></mat-spinner>
                 }
               </button>
+              @if (acompanamientoForm.get('numeroDocumento')?.hasError('required')) {
+                <mat-error>Ingrese el número de documento</mat-error>
+              } @else if (acompanamientoForm.get('numeroDocumento')?.hasError('pattern')) {
+                <mat-error>Ingrese únicamente números, sin puntos ni espacios</mat-error>
+              }
             </mat-form-field>
             <mat-form-field appearance="outline">
-              <mat-label>Fecha de Nacimiento</mat-label>
-              <input matInput [matDatepicker]="pickerNac" formControlName="fechaNacimiento" id="acomp-fechaNacimiento">
+              <mat-label>Fecha de nacimiento</mat-label>
+              <input matInput [matDatepicker]="pickerNac" [max]="maxFechaNacimiento" formControlName="fechaNacimiento" id="acomp-fechaNacimiento">
               <mat-datepicker-toggle matIconSuffix [for]="pickerNac"></mat-datepicker-toggle>
-              <mat-datepicker #pickerNac></mat-datepicker>
+              <mat-datepicker #pickerNac startView="multi-year"></mat-datepicker>
+              @if (acompanamientoForm.get('fechaNacimiento')?.hasError('fechaFutura') || acompanamientoForm.get('fechaNacimiento')?.hasError('matDatepickerMax')) {
+                <mat-error>La fecha de nacimiento debe ser anterior a hoy</mat-error>
+              }
             </mat-form-field>
             <mat-form-field appearance="outline">
-              <mat-label>Primer Nombre</mat-label>
+              <mat-label>Primer nombre</mat-label>
               <input matInput formControlName="primerNombre" id="acomp-primerNombre">
+              @if (acompanamientoForm.get('primerNombre')?.hasError('required')) {
+                <mat-error>Ingrese el primer nombre</mat-error>
+              }
             </mat-form-field>
           </div>
 
           <div class="row">
-
             <mat-form-field appearance="outline">
-              <mat-label>Segundo Nombre</mat-label>
+              <mat-label>Segundo nombre</mat-label>
               <input matInput formControlName="segundoNombre">
             </mat-form-field>
             <mat-form-field appearance="outline">
-              <mat-label>Primer Apellido</mat-label>
+              <mat-label>Primer apellido</mat-label>
               <input matInput formControlName="primerApellido" id="acomp-primerApellido">
+              @if (acompanamientoForm.get('primerApellido')?.hasError('required')) {
+                <mat-error>Ingrese el primer apellido</mat-error>
+              }
             </mat-form-field>
             <mat-form-field appearance="outline">
-              <mat-label>Segundo Apellido</mat-label>
+              <mat-label>Segundo apellido</mat-label>
               <input matInput formControlName="segundoApellido">
             </mat-form-field>
             <mat-form-field appearance="outline">
-              <mat-label>Identidad de Género</mat-label>
+              <mat-label>Identidad de género</mat-label>
               <mat-select formControlName="identidadGenero" id="acomp-identidadGenero">
                 @for (ig of identidadesGenero; track ig.id) {
                   <mat-option [value]="ig.id">{{ig.nombre}}</mat-option>
                 }
               </mat-select>
+              @if (acompanamientoForm.get('identidadGenero')?.hasError('required')) {
+                <mat-error>Seleccione la identidad de género</mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Vínculo con la universidad</mat-label>
+              <mat-select formControlName="vinculoUniversidad" id="acomp-vinculoUniversidad">
+                @for (vinculo of vinculosUniversidad; track vinculo.id) {
+                  <mat-option [value]="vinculo.id">{{ vinculo.nombre }}</mat-option>
+                }
+              </mat-select>
             </mat-form-field>
           </div>
 
-          <div class="discapacidad-container">
-            <div class="section-header-inline">
-              <div class="section-title">
-                <mat-icon aria-hidden="true" color="primary">email</mat-icon>
-                <span>Correos Electrónicos</span>
+          <div class="contacto-dual-grid">
+            <div class="discapacidad-container" id="acomp-correos" tabindex="-1">
+              <div class="section-header-inline">
+                <div class="section-title">
+                  <mat-icon aria-hidden="true" color="primary">email</mat-icon>
+                  <span>Correos electrónicos <span class="required-marker" aria-hidden="true">*</span></span>
+                </div>
+
+                <button type="button" mat-icon-button aria-label="Agregar correo electrónico" class="btn-add-inline" (click)="abrirModalCorreo()" matTooltip="Agregar correo">
+                  <mat-icon aria-hidden="true">add_circle</mat-icon>
+                </button>
               </div>
 
-              <button mat-icon-button aria-label="Agregar correo electrónico" class="btn-add-inline" (click)="abrirModalCorreo()" matTooltip="Agregar Correo">
-                <mat-icon aria-hidden="true">add_circle</mat-icon>
-              </button>
-            </div>
+              <div class="table-responsive">
+                <table mat-table [dataSource]="correoRegistrados" class="atencion-table" aria-label="Correos electrónicos registrados">
 
-            <div class="table-responsive">
-              <table mat-table [dataSource]="correoRegistrados" class="atencion-table" aria-label="Correos electrónicos registrados">
+                  <ng-container matColumnDef="tipo">
+                    <th mat-header-cell scope="col" *matHeaderCellDef> Tipo </th>
+                    <td mat-cell *matCellDef="let element"> {{element.tipo}} </td>
+                  </ng-container>
 
-                <ng-container matColumnDef="tipo">
-                  <th mat-header-cell scope="col" *matHeaderCellDef> Tipo </th>
-                  <td mat-cell *matCellDef="let element"> {{element.tipo}} </td>
-                </ng-container>
+                  <ng-container matColumnDef="correo">
+                    <th mat-header-cell scope="col" *matHeaderCellDef> Correo electrónico </th>
+                    <td mat-cell *matCellDef="let element"> {{element.correo}} </td>
+                  </ng-container>
 
-                <ng-container matColumnDef="correo">
-                  <th mat-header-cell scope="col" *matHeaderCellDef> Correo Electrónico </th>
-                  <td mat-cell *matCellDef="let element"> {{element.correo}} </td>
-                </ng-container>
+                  <ng-container matColumnDef="acciones">
+                    <th mat-header-cell scope="col" *matHeaderCellDef style="text-align: center;">
+                    Acciones </th>
+                    <td mat-cell *matCellDef="let i = index" style="text-align: center;">
+                      <button mat-icon-button [attr.aria-label]="'Eliminar el correo de la fila ' + (i + 1)" (click)="eliminarCorreo(i)" matTooltip="Eliminar">
+                        <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
+                      </button>
+                    </td>
+                  </ng-container>
 
-                <ng-container matColumnDef="acciones">
-                  <th mat-header-cell scope="col" *matHeaderCellDef style="text-align: center;">
-                  Acciones </th>
-                  <td mat-cell *matCellDef="let i = index" style="text-align: center;">
-                    <button mat-icon-button [attr.aria-label]="'Eliminar el correo de la fila ' + (i + 1)" (click)="eliminarCorreo(i)" matTooltip="Eliminar">
-                      <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
-                    </button>
-                  </td>
-                </ng-container>
+                  <tr mat-header-row *matHeaderRowDef="['tipo', 'correo', 'acciones']"></tr>
+                  <tr mat-row *matRowDef="let row; columns: ['tipo', 'correo', 'acciones'];">
+                  </tr>
+                </table>
 
-                <tr mat-header-row *matHeaderRowDef="['tipo', 'correo', 'acciones']"></tr>
-                <tr mat-row *matRowDef="let row; columns: ['tipo', 'correo', 'acciones'];">
-                </tr>
-              </table>
-
-              @if (correoRegistrados.length === 0) {
-                <div class="no-results-msg">
-                  <mat-icon aria-hidden="true">mail_outline</mat-icon>
-                  <p>No hay correos adicionales registrados.</p>
-                </div>
+                @if (correoRegistrados.length === 0) {
+                  <div class="no-results-msg">
+                    <mat-icon aria-hidden="true">mail_outline</mat-icon>
+                    <p>No hay correos adicionales registrados.</p>
+                  </div>
+                }
+              </div>
+              @if (acompanamientoForm.get('correos')?.hasError('required') && acompanamientoForm.get('correos')?.touched) {
+                <p class="contact-error" role="alert">Agregue al menos un correo electrónico.</p>
               }
+              <div style="margin-top: 10px; width: 100%;">
+                <mat-form-field appearance="outline" style="width: 100%;">
+                  <mat-label>Observaciones de correo</mat-label>
+                  <textarea matInput formControlName="observacionesCorreo"
+                  placeholder="Observaciones adicionales sobre los correos..."></textarea>
+                </mat-form-field>
+              </div>
             </div>
-            <div style="margin-top: 10px; width: 100%;">
-              <mat-form-field appearance="outline" style="width: 100%;">
-                <mat-label>Observaciones de Correo</mat-label>
-                <textarea matInput formControlName="observacionesCorreo"
-                placeholder="Observaciones adicionales sobre los correos..."></textarea>
-              </mat-form-field>
-            </div>
-          </div>
-          <div class="discapacidad-container">
-            <div class="section-header-inline">
-              <div class="section-title">
-                <mat-icon aria-hidden="true" color="primary">phone_enabled</mat-icon>
-                <span>Telefonos</span>
+
+            <div class="discapacidad-container" id="acomp-telefonos" tabindex="-1">
+              <div class="section-header-inline">
+                <div class="section-title">
+                  <mat-icon aria-hidden="true" color="primary">phone_enabled</mat-icon>
+                  <span>Teléfonos <span class="required-marker" aria-hidden="true">*</span></span>
+                </div>
+
+                <button type="button" mat-icon-button aria-label="Agregar teléfono" class="btn-add-inline" (click)="abrirModalTelefono()"
+                  matTooltip="Agregar teléfono">
+                  <mat-icon aria-hidden="true">add_circle</mat-icon>
+                </button>
               </div>
 
-              <button mat-icon-button aria-label="Agregar teléfono" class="btn-add-inline" (click)="abrirModalTelefono()"
-                matTooltip="Agregar Telefono">
-                <mat-icon aria-hidden="true">add_circle</mat-icon>
-              </button>
-            </div>
+              <div class="table-responsive">
+                <table mat-table [dataSource]="telefonosRegistrados" class="atencion-table" aria-label="Teléfonos registrados">
 
-            <div class="table-responsive">
-              <table mat-table [dataSource]="telefonosRegistrados" class="atencion-table" aria-label="Teléfonos registrados">
+                  <ng-container matColumnDef="tipo">
+                    <th mat-header-cell scope="col" *matHeaderCellDef> Tipo </th>
+                    <td mat-cell *matCellDef="let element"> {{element.tipo}} </td>
+                  </ng-container>
 
-                <ng-container matColumnDef="tipo">
-                  <th mat-header-cell scope="col" *matHeaderCellDef> Tipo </th>
-                  <td mat-cell *matCellDef="let element"> {{element.tipo}} </td>
-                </ng-container>
+                  <ng-container matColumnDef="correo">
+                    <th mat-header-cell scope="col" *matHeaderCellDef> Teléfono </th>
+                    <td mat-cell *matCellDef="let element"> {{element.telefono}} </td>
+                  </ng-container>
 
-                <ng-container matColumnDef="correo">
-                  <th mat-header-cell scope="col" *matHeaderCellDef> Telefono </th>
-                  <td mat-cell *matCellDef="let element"> {{element.telefono}} </td>
-                </ng-container>
+                  <ng-container matColumnDef="acciones">
+                    <th mat-header-cell scope="col" *matHeaderCellDef style="text-align: center;">
+                    Acciones </th>
+                    <td mat-cell *matCellDef="let i = index" style="text-align: center;">
+                      <button mat-icon-button [attr.aria-label]="'Eliminar el teléfono de la fila ' + (i + 1)" (click)="eliminarTelefono(i)" matTooltip="Eliminar">
+                        <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
+                      </button>
+                    </td>
+                  </ng-container>
 
-                <ng-container matColumnDef="acciones">
-                  <th mat-header-cell scope="col" *matHeaderCellDef style="text-align: center;">
-                  Acciones </th>
-                  <td mat-cell *matCellDef="let i = index" style="text-align: center;">
-                    <button mat-icon-button [attr.aria-label]="'Eliminar el teléfono de la fila ' + (i + 1)" (click)="eliminarTelefono(i)" matTooltip="Eliminar">
-                      <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
-                    </button>
-                  </td>
-                </ng-container>
+                  <tr mat-header-row *matHeaderRowDef="['tipo', 'correo', 'acciones']"></tr>
+                  <tr mat-row *matRowDef="let row; columns: ['tipo', 'correo', 'acciones'];">
+                  </tr>
+                </table>
 
-                <tr mat-header-row *matHeaderRowDef="['tipo', 'correo', 'acciones']"></tr>
-                <tr mat-row *matRowDef="let row; columns: ['tipo', 'correo', 'acciones'];">
-                </tr>
-              </table>
-
-              @if (telefonosRegistrados.length === 0) {
-                <div class="no-results-msg">
-                  <mat-icon aria-hidden="true">phone_enabled</mat-icon>
-                  <p>No hay Telefonos adicionales registrados.</p>
-                </div>
+                @if (telefonosRegistrados.length === 0) {
+                  <div class="no-results-msg">
+                    <mat-icon aria-hidden="true">phone_enabled</mat-icon>
+                    <p>No hay teléfonos adicionales registrados.</p>
+                  </div>
+                }
+              </div>
+              @if (acompanamientoForm.get('telefonos')?.hasError('required') && acompanamientoForm.get('telefonos')?.touched) {
+                <p class="contact-error" role="alert">Agregue al menos un teléfono.</p>
               }
-            </div>
-            <div style="margin-top: 10px; width: 100%;">
-              <mat-form-field appearance="outline" style="width: 100%;">
-                <mat-label>Observaciones de Teléfono</mat-label>
-                <textarea matInput formControlName="observacionesTelefono"
-                placeholder="Observaciones adicionales sobre los teléfonos..."></textarea>
-              </mat-form-field>
+              <div style="margin-top: 10px; width: 100%;">
+                <mat-form-field appearance="outline" style="width: 100%;">
+                  <mat-label>Observaciones de teléfono</mat-label>
+                  <textarea matInput formControlName="observacionesTelefono"
+                  placeholder="Observaciones adicionales sobre los teléfonos..."></textarea>
+                </mat-form-field>
+              </div>
             </div>
           </div>
         </ng-template>
+
+        <!-- Secciones adicionales incorporadas del Reporte Anónimo (Pasos 3, 4 y 5) -->
+        @if (acompanamientoForm.get('tipoReporte')?.value) {
+
+          <!-- SECCIÓN 3: Información de los Hechos (El Caso) -->
+          <div class="form-section hechos-card-section">
+            <h3 class="section-title-divider">
+              <mat-icon aria-hidden="true" color="primary">assignment</mat-icon>
+              <span>Información de los hechos</span>
+            </h3>
+
+            <div class="hechos-top-grid">
+              <!-- 1. Lugar de Ocurrencia -->
+              <div class="lugar-section">
+                <h4 class="form-subsection-title">Lugar de ocurrencia (opcional)</h4>
+                <p class="selector-subtitle">Indique si la situación ocurrió dentro de las instalaciones universitarias o en un espacio externo:</p>
+
+                <mat-radio-group formControlName="tipoLugar" class="location-radios">
+                  <div class="profile-card mini" [class.selected]="acompanamientoForm.get('tipoLugar')?.value === 'interno'">
+                    <mat-radio-button value="interno">
+                      <strong>Dentro de la universidad</strong>
+                      <p>Campus, sedes universitarias, bloques o dependencias de la UdeA.</p>
+                    </mat-radio-button>
+                  </div>
+                  <div class="profile-card mini" [class.selected]="acompanamientoForm.get('tipoLugar')?.value === 'externo'">
+                    <mat-radio-button value="externo">
+                      <strong>Fuera de la universidad</strong>
+                      <p>Espacios externos, alrededores, plataformas virtuales, prácticas o residencia.</p>
+                    </mat-radio-button>
+                  </div>
+                </mat-radio-group>
+
+                @if (acompanamientoForm.get('tipoLugar')?.value === 'interno') {
+                  <div class="location-details-box">
+                    <div class="grid-form">
+                      <div class="form-field-group">
+                        <label class="form-field-label" for="acomp-sedeCampus">Campus</label>
+                        <mat-form-field appearance="outline" class="full-width">
+                          <mat-select formControlName="sedeCampus" id="acomp-sedeCampus" placeholder="Seleccione un campus">
+                            @for (campus of campusLista; track campus.id) {
+                              <mat-option [value]="campus.nombre">{{ campus.nombre }}</mat-option>
+                            }
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
+
+                      <div class="form-field-group">
+                        <label class="form-field-label" for="acomp-facultad">Facultad</label>
+                        <mat-form-field appearance="outline" class="full-width">
+                          <input matInput formControlName="facultad" id="acomp-facultad" placeholder="Ej: Facultad de Medicina, Ingeniería, etc.">
+                        </mat-form-field>
+                      </div>
+
+                      <div class="form-field-group">
+                        <label class="form-field-label" for="acomp-bloque">Bloque</label>
+                        <mat-form-field appearance="outline" class="full-width">
+                          <input matInput formControlName="bloque" id="acomp-bloque" placeholder="Ej: Bloque 12, Bloque 22, etc.">
+                        </mat-form-field>
+                      </div>
+
+                      <div class="form-field-group">
+                        <label class="form-field-label" for="acomp-espacio">Espacio específico</label>
+                        <mat-form-field appearance="outline" class="full-width">
+                          <input matInput formControlName="espacio" id="acomp-espacio" placeholder="Ej: Aula 201, Cafetería central, Coliseo, etc.">
+                        </mat-form-field>
+                      </div>
+
+                    </div>
+                  </div>
+                } @else if (acompanamientoForm.get('tipoLugar')?.value === 'externo') {
+                  <div class="location-details-box">
+                    <div class="grid-form">
+                      <div class="form-field-group full-width-cell">
+                        <label class="form-field-label" for="acomp-lugarDetalleExterno">
+                          Descripción del lugar externo
+                          <button type="button"
+                                  class="help-tooltip-trigger"
+                                  matTooltip="Indique detalles o referencias que faciliten individualizar el sitio o plataforma externa."
+                                  matTooltipClass="casilda-help-tooltip"
+                                  (click)="$event.stopPropagation()"
+                                  aria-label="Ayuda sobre lugar externo">?</button>
+                        </label>
+                        <mat-form-field appearance="outline" class="full-width">
+                          <input matInput formControlName="lugarDetalleExterno" id="acomp-lugarDetalleExterno" placeholder="Ej: Vía pública cerca al campus, entorno virtual / redes sociales, residencia, etc.">
+                        </mat-form-field>
+                      </div>
+
+                    </div>
+                  </div>
+                }
+              </div>
+
+            </div>
+
+            <!-- 5. Descripción de los hechos -->
+            <div class="description-section">
+              <div class="section-title-with-tooltip">
+                <h4 class="form-subsection-title">
+                  Descripción de los hechos <span class="required-marker" aria-hidden="true">*</span>
+                  <button type="button"
+                          class="help-tooltip-trigger"
+                          matTooltip="Campo de redacción libre y confidencial para detallar los hechos en orden cronológico o según los recuerde."
+                          matTooltipClass="casilda-help-tooltip"
+                          (click)="$event.stopPropagation()"
+                          aria-label="Ayuda sobre descripción de los hechos">?</button>
+                </h4>
+              </div>
+              <p class="selector-subtitle">Describa libremente la situación, indicando circunstancias de tiempo, modo y lugar:</p>
+
+              <div class="form-field-group">
+                <mat-form-field appearance="outline" class="full-width compact-desc-field">
+                  <mat-label>Descripción de los hechos</mat-label>
+                  <textarea matInput formControlName="descripcionHechos" id="acomp-descripcionHechos" rows="3" placeholder="Detalles de la situación ocurrida..."></textarea>
+                  @if (acompanamientoForm.get('descripcionHechos')?.hasError('required')) {
+                    <mat-error>Describa los hechos para continuar</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECCIÓN 4: Presunta Persona Agresora (Victimario) -->
+          <div class="form-section victimario-card-section">
+            <h3 class="section-title-divider">
+              <mat-icon aria-hidden="true" color="primary">person_outline</mat-icon>
+              <span>Presunta persona agresora (opcional)</span>
+            </h3>
+            <p class="selector-subtitle">Si conoce información de la persona señalada o presunto agresor, regístrela a continuación:</p>
+
+            <div class="grid-agresor">
+              <div class="form-field-group">
+                <label class="form-field-label" for="acomp-agresorIdentificacion">
+                  Identificación
+                  <button type="button"
+                          class="help-tooltip-trigger"
+                          matTooltip="Documento de identidad si lo conoce (cédula, TI, etc.). Solo números entre 5 y 15 dígitos."
+                          matTooltipClass="casilda-help-tooltip"
+                          (click)="$event.stopPropagation()"
+                          aria-label="Ayuda sobre identificación del agresor">?</button>
+                </label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <input matInput formControlName="agresorIdentificacion" id="acomp-agresorIdentificacion" inputmode="numeric" autocomplete="off" placeholder="Ej: 1020304050">
+                  @if (acompanamientoForm.get('agresorIdentificacion')?.hasError('pattern')) {
+                    <mat-error>Solo números (entre 5 y 15 dígitos)</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              <div class="form-field-group">
+                <label class="form-field-label" for="acomp-agresorPrimerNombre">Primer nombre</label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <input matInput formControlName="agresorPrimerNombre" id="acomp-agresorPrimerNombre" placeholder="Ej: Juan" autocomplete="off">
+                  @if (acompanamientoForm.get('agresorPrimerNombre')?.hasError('pattern')) {
+                    <mat-error>Solo debe contener letras</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              <div class="form-field-group">
+                <label class="form-field-label" for="acomp-agresorSegundoNombre">Segundo nombre</label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <input matInput formControlName="agresorSegundoNombre" id="acomp-agresorSegundoNombre" placeholder="Ej: Carlos" autocomplete="off">
+                  @if (acompanamientoForm.get('agresorSegundoNombre')?.hasError('pattern')) {
+                    <mat-error>Solo debe contener letras</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              <div class="form-field-group">
+                <label class="form-field-label" for="acomp-agresorPrimerApellido">Primer apellido</label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <input matInput formControlName="agresorPrimerApellido" id="acomp-agresorPrimerApellido" placeholder="Ej: Pérez" autocomplete="off">
+                  @if (acompanamientoForm.get('agresorPrimerApellido')?.hasError('pattern')) {
+                    <mat-error>Solo debe contener letras</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              <div class="form-field-group">
+                <label class="form-field-label" for="acomp-agresorSegundoApellido">Segundo apellido</label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <input matInput formControlName="agresorSegundoApellido" id="acomp-agresorSegundoApellido" placeholder="Ej: Gómez" autocomplete="off">
+                  @if (acompanamientoForm.get('agresorSegundoApellido')?.hasError('pattern')) {
+                    <mat-error>Solo debe contener letras</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              <div class="form-field-group">
+                <label class="form-field-label" for="acomp-agresorVinculoUniversidad">
+                  Vínculo con la universidad
+                  <button type="button"
+                          class="help-tooltip-trigger"
+                          matTooltip="Relación institucional de la persona señalada con la UdeA."
+                          matTooltipClass="casilda-help-tooltip"
+                          (click)="$event.stopPropagation()"
+                          aria-label="Ayuda sobre vínculo con la universidad">?</button>
+                </label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-select formControlName="agresorVinculoUniversidad" id="acomp-agresorVinculoUniversidad" placeholder="Seleccione el vínculo">
+                    @for (vinculo of vinculosUniversidad; track vinculo.id) {
+                      <mat-option [value]="vinculo.id">{{ vinculo.nombre }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              @if (esOtroVinculoAgresorUniversidad) {
+                <div class="form-field-group full-width-cell">
+                  <label class="form-field-label" for="acomp-agresorOtroVinculoUniversidad">¿Cuál vínculo con la universidad?</label>
+                  <mat-form-field appearance="outline" class="full-width">
+                    <input matInput formControlName="agresorOtroVinculoUniversidad" id="acomp-agresorOtroVinculoUniversidad" placeholder="Especifique el vínculo con la universidad">
+                  </mat-form-field>
+                </div>
+              }
+
+              <div class="form-field-group">
+                <label class="form-field-label" for="acomp-agresorVinculoVictima">
+                  Vínculo con la víctima
+                  <button type="button"
+                          class="help-tooltip-trigger"
+                          matTooltip="Relación interpersonal o académica entre el presunto agresor y la víctima."
+                          matTooltipClass="casilda-help-tooltip"
+                          (click)="$event.stopPropagation()"
+                          aria-label="Ayuda sobre vínculo con la víctima">?</button>
+                </label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-select formControlName="agresorVinculoVictima" id="acomp-agresorVinculoVictima" placeholder="Seleccione el vínculo">
+                    @for (vinculo of vinculosAgresorVictima; track vinculo.id) {
+                      <mat-option [value]="vinculo.id">{{ vinculo.nombre }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              @if (esOtroVinculoAgresorVictima) {
+                <div class="form-field-group full-width-cell">
+                  <label class="form-field-label" for="acomp-agresorOtroVinculoVictima">¿Cuál vínculo con la víctima?</label>
+                  <mat-form-field appearance="outline" class="full-width">
+                    <input matInput formControlName="agresorOtroVinculoVictima" id="acomp-agresorOtroVinculoVictima" placeholder="Especifique la relación con la víctima">
+                  </mat-form-field>
+                </div>
+              }
+
+              <div class="form-field-group">
+                <label class="form-field-label" for="acomp-agresorCorreo">
+                  Correo o información adicional
+                  <button type="button"
+                          class="help-tooltip-trigger"
+                          matTooltip="Correo electrónico, dependencia donde labora, apodo u otros datos de identificación."
+                          matTooltipClass="casilda-help-tooltip"
+                          (click)="$event.stopPropagation()"
+                          aria-label="Ayuda sobre información adicional del presunto agresor">?</button>
+                </label>
+                <mat-form-field appearance="outline" class="full-width">
+                  <input matInput formControlName="agresorCorreo" id="acomp-agresorCorreo" placeholder="Ej: correo, dependencia o apodo" autocomplete="off">
+                </mat-form-field>
+              </div>
+            </div>
+
+            @if (esVictimarioUdea) {
+              <div class="uad-section">
+                <div class="uad-header">
+                  <mat-icon aria-hidden="true">gavel</mat-icon>
+                  <h4>Atención disciplinaria por la Unidad de Asuntos Disciplinarios (UAD)</h4>
+                </div>
+                <p class="uad-text">
+                  Dado que la persona señalada hace parte de la comunidad universitaria, este caso es susceptible de ser conocido y tramitado disciplinariamente por la <strong>Unidad de Asuntos Disciplinarios (UAD)</strong>.
+                </p>
+                <p class="uad-question">
+                  ¿Desea que la UAD conozca este caso para iniciar las actuaciones institucionales correspondientes?
+                </p>
+                <mat-radio-group formControlName="agresorRemitirUad" class="location-radios">
+                  <div class="profile-card mini" [class.selected]="acompanamientoForm.get('agresorRemitirUad')?.value === 'si'">
+                    <mat-radio-button value="si">
+                      <strong>Sí</strong>
+                      <p>Autorizo remitir y poner el caso en conocimiento de la UAD.</p>
+                    </mat-radio-button>
+                  </div>
+                  <div class="profile-card mini" [class.selected]="acompanamientoForm.get('agresorRemitirUad')?.value === 'no'">
+                    <mat-radio-button value="no">
+                      <strong>No</strong>
+                      <p>Por el momento prefiero que no sea remitido a la UAD (se mantendrá confidencial con fines de acompañamiento).</p>
+                    </mat-radio-button>
+                  </div>
+                </mat-radio-group>
+              </div>
+            }
+          </div>
+
+          <!-- SECCIÓN 5: Evidencias y Documentos Adjuntos -->
+          <div class="form-section evidencias-card-section">
+            <h3 class="section-title-divider">
+              <mat-icon aria-hidden="true" color="primary">attach_file</mat-icon>
+              <span>Evidencias y documentos adjuntos (opcional)</span>
+            </h3>
+            <p class="selector-subtitle">Adjunte archivos de evidencia que respalden la solicitud (capturas de pantalla, audios, documentos o fotos):</p>
+
+            <div class="upload-zone" (click)="fileInput.click()" (keydown.enter)="fileInput.click()" tabindex="0" role="button" aria-label="Seleccionar o arrastrar archivos de evidencia">
+              <mat-icon aria-hidden="true">cloud_upload</mat-icon>
+              <div class="upload-zone-content">
+                <p>Haga clic o arrastre aquí archivos de evidencia</p>
+                <span class="upload-hint">Formatos permitidos: imágenes, documentos PDF, audios. Tamaño máx. recomendado: 20MB.</span>
+              </div>
+              <input type="file" #fileInput multiple (change)="onArchivosSeleccionados($event)" style="display: none;">
+            </div>
+
+            @if (archivosEvidencia.length > 0) {
+              <div class="table-responsive" style="max-height: 200px;">
+                <table class="atencion-table" aria-label="Archivos de evidencia adjuntados">
+                  <thead>
+                    <tr>
+                      <th scope="col" style="padding: 0 10px; font-weight: 700;">Nombre del archivo</th>
+                      <th scope="col" style="padding: 0 10px; font-weight: 700;">Tamaño</th>
+                      <th scope="col" style="text-align: center; padding: 0 10px; font-weight: 700;">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (archivo of archivosEvidencia; track $index) {
+                      <tr>
+                        <td style="padding: 0 10px;">
+                          <div style="display: flex; align-items: center; gap: 6px;">
+                            <mat-icon aria-hidden="true" style="font-size: 18px; width: 18px; height: 18px; color: var(--color-primary);">insert_drive_file</mat-icon>
+                            <span>{{ archivo.nombre }}</span>
+                          </div>
+                        </td>
+                        <td style="padding: 0 10px;">{{ archivo.tamano }}</td>
+                        <td style="text-align: center; padding: 0 10px;">
+                          <button mat-icon-button [attr.aria-label]="'Eliminar archivo ' + archivo.nombre" (click)="eliminarArchivo($index)" matTooltip="Eliminar archivo">
+                            <mat-icon aria-hidden="true" svgIcon="icono-eliminar"></mat-icon>
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </div>
+        }
 
       </form>
     </mat-card-content>

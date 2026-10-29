@@ -7,6 +7,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { ErrorStateMatcher } from '@angular/material/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { NotificacionService } from '../../core/a11y/notificacion.service';
@@ -43,12 +44,18 @@ export class ModalTelefonoComponent implements OnInit {
       telefono: ''
     };
 
+  readonly errorStateMatcher: ErrorStateMatcher = {
+    isErrorState: (control) => Boolean(
+      control?.invalid && (control.dirty || control.touched || this.data.telefono)
+    )
+  };
+
   constructor(public dialogRef: MatDialogRef<ModalTelefonoComponent>) {}
 
   ngOnInit(): void {
     this.http.get<TipoTelefonoDto[]>(`${environment.apiBaseUrl}/maestros/tipos-telefono`).subscribe({
       next: (tipos) => this.tiposTelefono = tipos,
-      error: (err) => this.notificacion.error('No fue posible cargar los tipos de teléfono. Cierra el diálogo e intenta de nuevo.', err)
+      error: (err) => this.notificacion.error('No fue posible cargar los tipos de teléfono. Cierre el diálogo e intente de nuevo.', err)
     });
   }
 

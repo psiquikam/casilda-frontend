@@ -74,7 +74,8 @@ La URL base de la API se define en los archivos de entorno de Angular:
 // src/environments/environment.ts (desarrollo)
 export const environment = {
   production: false,
-  apiBaseUrl: 'http://35.208.251.66:8080/api-casilda'
+  apiBaseUrl: 'https://casildaqa.duckdns.org/api-casilda',
+  datosDemostracion: false
 };
 ```
 
@@ -82,9 +83,12 @@ export const environment = {
 // src/environments/environment.prod.ts (producción)
 export const environment = {
   production: true,
-  apiBaseUrl: 'http://35.208.251.66:8080/api-casilda'
+  apiBaseUrl: 'https://casildaqa.duckdns.org/api-casilda',
+  datosDemostracion: false
 };
 ```
+
+`datosDemostracion` activa cuentas de prueba y datos simulados para probar sin backend; **nunca** debe ir en `true` en un entorno desplegado.
 
 **Nunca** se deben hardcodear URLs de API en componentes o servicios: siempre se consume `environment.apiBaseUrl`.
 

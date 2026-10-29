@@ -77,6 +77,31 @@
       <hr class="nav-divider">
     }
 
+    <!-- GESTIÓN DE CONTENIDOS (Gestor de contenidos y Admin) — nombre e ícono de CATALOGO_MODULOS -->
+    @if (auth.isAdmin() || auth.isGestorContenido()) {
+      <div class="nav-section">
+        <button type="button" id="toggle-contenidos" class="section-toggle" (click)="toggleSection('contenidos')"
+          [attr.aria-expanded]="isExpanded('contenidos')" aria-controls="section-contenidos">
+          <span class="section-toggle__title">
+            <mat-icon class="section-toggle__icon" aria-hidden="true">edit_note</mat-icon>
+            <span>Gestión de contenidos</span>
+          </span>
+          <mat-icon class="section-toggle__chevron" [class.is-expanded]="isExpanded('contenidos')" aria-hidden="true">
+            expand_more
+          </mat-icon>
+        </button>
+        @if (isExpanded('contenidos')) {
+          <div id="section-contenidos" class="section-content" role="region" aria-labelledby="toggle-contenidos">
+            <a routerLink="/gestion-contenidos" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
+              <mat-icon class="nav-item__icon" aria-hidden="true">web</mat-icon>
+              <span class="nav-item__text">Contenidos del inicio</span>
+            </a>
+          </div>
+        }
+      </div>
+      <hr class="nav-divider">
+    }
+
     <!-- 2. EQUIPO DE ATENCIÓN (Admin, Coordinador y Profesional) -->
     @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional()) {
       <div class="nav-section">
@@ -97,8 +122,8 @@
               <span class="nav-item__text">Nueva Solicitud</span>
             </a>
             <a routerLink="/consulta" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
-              <mat-icon class="nav-item__icon" aria-hidden="true">search</mat-icon>
-              <span class="nav-item__text">Consulta Solicitudes</span>
+              <mat-icon class="nav-item__icon" aria-hidden="true">move_to_inbox</mat-icon>
+              <span class="nav-item__text">Bandeja de reparto</span>
             </a>
             @if (features.assignmentsPrototype) {
               <a routerLink="/mis-asignaciones" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
@@ -150,7 +175,7 @@
     }
 
     <!-- 4. UAD EQUIPO 3 Y 4 (Funcionarios) -->
-    @if (!auth.isUsuario()) {
+    @if (!auth.isUsuario() && !auth.isGestorContenido()) {
       <div class="nav-section">
         <button type="button" id="toggle-uad" class="section-toggle" (click)="toggleSection('uad')"
           [attr.aria-expanded]="isExpanded('uad')" aria-controls="section-uad">
@@ -208,7 +233,8 @@
     }
 
     <!-- 6. RUTA VIOLETA (Funcionalidad transversal institucional) -->
-    @if (features.publicTrackingPrototype && !auth.isUsuario()) {
+    <!-- El gestor de contenidos no gestiona casos: la ruta no le corresponde. -->
+    @if (features.publicTrackingPrototype && !auth.isUsuario() && !auth.isGestorContenido()) {
       <div class="nav-section">
         <button type="button" id="toggle-violeta" class="section-toggle" (click)="toggleSection('violeta')"
           [attr.aria-expanded]="isExpanded('violeta')" aria-controls="section-violeta">

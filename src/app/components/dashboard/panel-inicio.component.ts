@@ -64,7 +64,7 @@ export class PanelInicioComponent {
    */
   readonly rol = this.auth.getRoleCode();
   readonly esAdmin = this.auth.isAdmin();
-  readonly widgets: readonly WidgetId[] = widgetsDelRol(this.rol);
+  readonly widgets: readonly WidgetId[] = widgetsDelRol(this.rol, this.datosDemostracion);
 
   /**
    * Nombre de pila, para que el saludo no compita con el contenido.

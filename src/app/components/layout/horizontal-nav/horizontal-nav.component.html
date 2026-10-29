@@ -49,6 +49,14 @@
       </mat-menu>
     }
 
+    <!-- Gestión de contenidos (Gestor de contenidos y Admin): un solo módulo, enlace directo -->
+    @if (auth.isAdmin() || auth.isGestorContenido()) {
+      <a routerLink="/gestion-contenidos" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
+        <mat-icon class="hnav-icon" aria-hidden="true">web</mat-icon>
+        <span class="hnav-text">Contenidos del inicio</span>
+      </a>
+    }
+
     <!-- 2. Equipo de Atención (Admin, Coordinador y Profesional) -->
     @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional()) {
       <button type="button" class="hnav-dropdown-btn" [matMenuTriggerFor]="atencionMenu"
@@ -64,8 +72,8 @@
           <span>Nueva Solicitud</span>
         </a>
         <a mat-menu-item routerLink="/consulta" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
-          <mat-icon aria-hidden="true">search</mat-icon>
-          <span>Consulta de Solicitudes</span>
+          <mat-icon aria-hidden="true">move_to_inbox</mat-icon>
+          <span>Bandeja de reparto</span>
         </a>
         @if (features.assignmentsPrototype) {
           <a mat-menu-item routerLink="/mis-asignaciones" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
@@ -97,7 +105,7 @@
     }
 
     <!-- 4. UAD (Equipos 3 y 4 - Funcionarios) -->
-    @if (!auth.isUsuario()) {
+    @if (!auth.isUsuario() && !auth.isGestorContenido()) {
       <button type="button" class="hnav-dropdown-btn" [matMenuTriggerFor]="uadMenu"
         aria-label="Abrir menú de UAD">
         <mat-icon class="hnav-icon" aria-hidden="true">balance</mat-icon>
@@ -130,7 +138,7 @@
     }
 
     <!-- 6. Ruta Violeta (Transversal para funcionarios) -->
-    @if (features.publicTrackingPrototype && !auth.isUsuario()) {
+    @if (features.publicTrackingPrototype && !auth.isUsuario() && !auth.isGestorContenido()) {
       <a routerLink="/seguimiento" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
         <mat-icon class="hnav-icon" aria-hidden="true">diversity_1</mat-icon>
         <span class="hnav-text">Ruta Violeta</span>
@@ -240,6 +248,15 @@
         </div>
       }
 
+      <!-- GESTIÓN DE CONTENIDOS (Gestor de contenidos y Admin) -->
+      @if (auth.isAdmin() || auth.isGestorContenido()) {
+        <a routerLink="/gestion-contenidos" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+          class="hnav-mobile-item" (click)="closeMobileMenu()">
+          <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">web</mat-icon>
+          <span class="hnav-mobile-item__text">Contenidos del inicio</span>
+        </a>
+      }
+
       <!-- 2. EQUIPO DE ATENCIÓN (Admin, Coordinador y Profesional) -->
       @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional()) {
         <div class="hnav-mobile-group">
@@ -263,8 +280,8 @@
               </a>
               <a routerLink="/consulta" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
                 class="hnav-mobile-item" (click)="closeMobileMenu()">
-                <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">search</mat-icon>
-                <span class="hnav-mobile-item__text">Consulta de Solicitudes</span>
+                <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">move_to_inbox</mat-icon>
+                <span class="hnav-mobile-item__text">Bandeja de reparto</span>
               </a>
               @if (features.assignmentsPrototype) {
                 <a routerLink="/mis-asignaciones" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
@@ -301,7 +318,7 @@
       }
 
       <!-- 4. UAD (Funcionarios) -->
-      @if (!auth.isUsuario()) {
+      @if (!auth.isUsuario() && !auth.isGestorContenido()) {
         <div class="hnav-mobile-group">
           <button type="button" class="hnav-mobile-group-header" (click)="toggleSection('uad')"
             [attr.aria-expanded]="isSectionExpanded('uad')">
@@ -345,7 +362,7 @@
       }
 
       <!-- 6. Ruta Violeta -->
-      @if (features.publicTrackingPrototype && !auth.isUsuario()) {
+      @if (features.publicTrackingPrototype && !auth.isUsuario() && !auth.isGestorContenido()) {
         <a routerLink="/seguimiento" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
           class="hnav-mobile-item" (click)="closeMobileMenu()">
           <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">diversity_1</mat-icon>

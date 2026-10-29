@@ -411,7 +411,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         controlPrograma?.enable({ emitEvent: false });
       },
       error: (err) => {
-        this.notificacion.error('No fue posible cargar los programas académicos. Intenta seleccionar de nuevo la unidad.', err);
+        this.notificacion.error('No fue posible cargar los programas académicos. Intente seleccionar de nuevo la unidad.', err);
         this.listaProgramas = [];
         controlPrograma?.disable({ emitEvent: false });
       }
@@ -548,7 +548,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         this.lugaresEntrevista = data.lugaresEntrevista;
       },
       error: (error) => {
-        this.notificacion.error('No fue posible cargar las listas del formulario. Recarga la página o intenta más tarde.', error);
+        this.notificacion.error('No fue posible cargar las listas del formulario. Recargue la página o intente más tarde.', error);
       }
     });
   }
@@ -779,7 +779,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         this.pageSizeCasos = respuesta.size;
       },
       error: (error) => {
-        this.notificacion.error('No fue posible cargar los casos. Recarga la página o intenta más tarde.', error);
+        this.notificacion.error('No fue posible cargar los casos. Recargue la página o intente más tarde.', error);
         this.casoPorAtender = [];
         this.dataSource.data = [];
         this.totalElementosCasos = 0;
@@ -920,7 +920,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
           }));
         },
         error: (error) => {
-          this.notificacion.error('No fue posible cargar el detalle de la solicitud. Intenta abrir la cita de nuevo.', error);
+          this.notificacion.error('No fue posible cargar el detalle de la solicitud. Intente abrir la cita de nuevo.', error);
         }
       });
     }
@@ -1279,7 +1279,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
           },
           error: (error) => {
             this.guardandoCompromisos = false;
-            this.notificacion.error('No fue posible guardar el registro de atención. Tus datos siguen en el formulario; intenta de nuevo.', error);
+            this.notificacion.error('No fue posible guardar el registro de atención. Los datos siguen en el formulario; intente de nuevo.', error);
             const msg = 'No fue posible guardar los datos de la pestaña';
             this.snackBar.open(msg, 'Cerrar', { duration: 3500 });
           }
@@ -1287,7 +1287,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       })
       .catch((error) => {
         this.guardandoCompromisos = false;
-        this.notificacion.error('No fue posible preparar el registro de atención. Revisa los datos e intenta de nuevo.', error);
+        this.notificacion.error('No fue posible preparar el registro de atención. Revise los datos e intente de nuevo.', error);
         this.snackBar.open('No fue posible preparar el archivo o los seguimientos', 'Cerrar', { duration: 3500 });
       });
   }

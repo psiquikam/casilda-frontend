@@ -37,19 +37,19 @@
         <mat-tab label="Remitente">
           <div class="form-grid">
             <mat-form-field appearance="outline">
-              <mat-label>Primer Nombre</mat-label>
+              <mat-label>Primer nombre</mat-label>
               <input matInput formControlName="remitentePrimerNombre">
             </mat-form-field>
             <mat-form-field appearance="outline">
-              <mat-label>Segundo Nombre</mat-label>
+              <mat-label>Segundo nombre</mat-label>
               <input matInput formControlName="remitenteSegundoNombre">
             </mat-form-field>
             <mat-form-field appearance="outline">
-              <mat-label>Primer Apellido</mat-label>
+              <mat-label>Primer apellido</mat-label>
               <input matInput formControlName="remitentePrimerApellido">
             </mat-form-field>
             <mat-form-field appearance="outline">
-              <mat-label>Segundo Apellido</mat-label>
+              <mat-label>Segundo apellido</mat-label>
               <input matInput formControlName="remitenteSegundoApellido">
             </mat-form-field>
             <mat-form-field appearance="outline">
@@ -69,7 +69,7 @@
               </mat-select>
             </mat-form-field>
             <mat-form-field appearance="outline">
-              <mat-label>Unidad Administrativa</mat-label>
+              <mat-label>Unidad administrativa</mat-label>
               <mat-select formControlName="remitenteUnidadAdministrativa">
                 @for (d of unidadesAdministrativas; track d) {
                   <mat-option [value]="d.id">{{ d.nombre }}</mat-option>
@@ -77,7 +77,7 @@
               </mat-select>
             </mat-form-field>
             <mat-form-field appearance="outline">
-              <mat-label>Unidad Académica</mat-label>
+              <mat-label>Unidad académica</mat-label>
               <mat-select formControlName="remitenteUnidadAcademica">
                 @for (f of unidadesAcademicas; track f) {
                   <mat-option [value]="f.id">{{ f.nombre }}</mat-option>
@@ -85,7 +85,7 @@
               </mat-select>
             </mat-form-field>
             <mat-form-field appearance="outline">
-              <mat-label>Tipo Documento</mat-label>
+              <mat-label>Tipo de documento</mat-label>
               <mat-select formControlName="remitenteTipoDocumento">
                 @for (t of tiposDocumento; track t) {
                   <mat-option [value]="t.id">{{ t.nombre }}</mat-option>
@@ -93,7 +93,7 @@
               </mat-select>
             </mat-form-field>
             <mat-form-field appearance="outline">
-              <mat-label>Número Documento</mat-label>
+              <mat-label>Número de documento</mat-label>
               <input matInput formControlName="remitenteNumeroDocumento">
             </mat-form-field>
           </div>
@@ -104,7 +104,7 @@
         <div class="form-grid">
 
           <mat-form-field appearance="outline">
-            <mat-label>Tipo Documento</mat-label>
+            <mat-label>Tipo de documento</mat-label>
             <mat-select formControlName="tipoDocumento">
               @for (t of tiposDocumento; track t) {
                 <mat-option [value]="t.id">{{ t.nombre }}</mat-option>
@@ -113,42 +113,51 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Número Documento</mat-label>
+            <mat-label>Número de documento</mat-label>
             <input matInput formControlName="numeroDocumento">
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Fecha Nacimiento</mat-label>
+            <mat-label>Fecha de nacimiento</mat-label>
             <input matInput [matDatepicker]="pickerNac" formControlName="fechaNacimiento">
             <mat-datepicker-toggle matSuffix [for]="pickerNac"></mat-datepicker-toggle>
             <mat-datepicker #pickerNac></mat-datepicker>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Primer Nombre</mat-label>
+            <mat-label>Primer nombre</mat-label>
             <input matInput formControlName="primerNombre">
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Segundo Nombre</mat-label>
+            <mat-label>Segundo nombre</mat-label>
             <input matInput formControlName="segundoNombre">
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Primer Apellido</mat-label>
+            <mat-label>Primer apellido</mat-label>
             <input matInput formControlName="primerApellido">
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Segundo Apellido</mat-label>
+            <mat-label>Segundo apellido</mat-label>
             <input matInput formControlName="segundoApellido">
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Identidad de Género</mat-label>
+            <mat-label>Identidad de género</mat-label>
             <mat-select formControlName="identidadGenero">
               @for (ig of identidadesGenero; track ig) {
                 <mat-option [value]="ig.id">{{ ig.nombre }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Vínculo con la universidad</mat-label>
+            <mat-select formControlName="vinculoUniversidad">
+              @for (vinculo of vinculosUniversidad; track vinculo.id) {
+                <mat-option [value]="vinculo.id">{{ vinculo.nombre }}</mat-option>
               }
             </mat-select>
           </mat-form-field>
@@ -160,11 +169,11 @@
           <div class="section-header-inline">
             <div class="section-title">
               <mat-icon aria-hidden="true" color="primary">email</mat-icon>
-              <span>Correos Electrónicos</span>
+              <span>Correos electrónicos</span>
             </div>
             @if (!esVisualizacion) {
               <button mat-icon-button aria-label="Agregar correo electrónico" class="btn-add-inline" (click)="abrirModalCorreo()"
-                matTooltip="Agregar Correo">
+                matTooltip="Agregar correo">
                 <mat-icon aria-hidden="true">add_circle</mat-icon>
               </button>
             }
@@ -202,7 +211,7 @@
           </div>
           <div style="margin-top: 10px; width: 100%;">
             <mat-form-field appearance="outline" style="width: 100%;">
-              <mat-label>Observaciones de Correo</mat-label>
+              <mat-label>Observaciones de correo</mat-label>
               <textarea matInput formControlName="observacionesCorreo"
               placeholder="Observaciones adicionales sobre los correos..."></textarea>
             </mat-form-field>
@@ -218,7 +227,7 @@
             </div>
             @if (!esVisualizacion) {
               <button mat-icon-button aria-label="Agregar teléfono" class="btn-add-inline" (click)="abrirModalTelefono()"
-                matTooltip="Agregar Teléfono">
+                matTooltip="Agregar teléfono">
                 <mat-icon aria-hidden="true">add_circle</mat-icon>
               </button>
             }
@@ -256,13 +265,112 @@
           </div>
           <div style="margin-top: 10px; width: 100%;">
             <mat-form-field appearance="outline" style="width: 100%;">
-              <mat-label>Observaciones de Teléfono</mat-label>
+              <mat-label>Observaciones de teléfono</mat-label>
               <textarea matInput formControlName="observacionesTelefono"
               placeholder="Observaciones adicionales sobre los teléfonos..."></textarea>
             </mat-form-field>
           </div>
         </div>
 
+      </mat-tab>
+
+      <mat-tab label="Hechos y situación">
+        <div style="padding: 16px 0; display: flex; flex-direction: column; gap: 16px;">
+          @if (esVisualizacion) {
+            <div class="discapacidad-container" style="padding: 16px; margin-top: 0; background: var(--color-bg-surface); border-radius: 8px;">
+              <div class="section-header-inline" style="margin-bottom: 8px;">
+                <div class="section-title">
+                  <mat-icon aria-hidden="true" color="primary">description</mat-icon>
+                  <span>Descripción del caso y hechos reportados</span>
+                </div>
+              </div>
+              <p style="margin: 0; line-height: 1.6; color: var(--color-text-primary); font-size: 14px; white-space: pre-wrap;">
+                {{ detalleForm.get('descripcionHechos')?.value || 'Sin descripción detallada registrada.' }}
+              </p>
+            </div>
+          } @else {
+            <div style="width: 100%; margin-top: 4px;">
+              <mat-form-field appearance="outline" style="width: 100%;">
+                <mat-label>Descripción del caso y hechos reportados</mat-label>
+                <textarea matInput formControlName="descripcionHechos" rows="4"
+                  placeholder="Detalles de la situación ocurrida..."></textarea>
+                @if (detalleForm.get('descripcionHechos')?.hasError('required')) {
+                  <mat-error>La descripción de los hechos es obligatoria.</mat-error>
+                }
+              </mat-form-field>
+            </div>
+          }
+
+          <div class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Lugar de los hechos (opcional)</mat-label>
+              <input matInput formControlName="lugarOcurrencia">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Evidencias / soportes (opcional)</mat-label>
+              <input matInput formControlName="evidenciasResumen">
+            </mat-form-field>
+          </div>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Presunta persona agresora">
+        <div style="padding: 16px 0; display: flex; flex-direction: column; gap: 16px;">
+          <div class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Identificación</mat-label>
+              <input matInput formControlName="agresorIdentificacion" placeholder="Documento si se conoce">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Nombre completo / señalada</mat-label>
+              <input matInput formControlName="agresorNombre" placeholder="Nombres y apellidos">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Vínculo con la universidad</mat-label>
+              <mat-select formControlName="agresorVinculoUdeaId" placeholder="Seleccione el vínculo">
+                @for (vinculo of vinculosUniversidad; track vinculo.id) {
+                  <mat-option [value]="vinculo.id">{{ vinculo.nombre }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Vínculo con la víctima</mat-label>
+              <mat-select formControlName="agresorVinculoVictimaId" placeholder="Seleccione el vínculo">
+                @for (vinculo of vinculosAgresorVictima; track vinculo.id) {
+                  <mat-option [value]="vinculo.id">{{ vinculo.nombre }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            @if (esOtroVinculoAgresorUniversidad) {
+              <mat-form-field appearance="outline">
+                <mat-label>Otro vínculo con la universidad</mat-label>
+                <input matInput formControlName="agresorOtroVinculoUdea" placeholder="Especifique el vínculo">
+              </mat-form-field>
+            }
+
+            @if (esOtroVinculoAgresorVictima) {
+              <mat-form-field appearance="outline">
+                <mat-label>Otro vínculo con la víctima</mat-label>
+                <input matInput formControlName="agresorOtroVinculoVictima" placeholder="Especifique el vínculo">
+              </mat-form-field>
+            }
+
+            <mat-form-field appearance="outline">
+              <mat-label>Correo o información adicional</mat-label>
+              <input matInput formControlName="agresorCorreo" placeholder="Correo, apodo o dependencia">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Remisión a UAD</mat-label>
+              <input matInput formControlName="agresorRemitirUad" placeholder="Autorización trámite UAD">
+            </mat-form-field>
+          </div>
+        </div>
       </mat-tab>
 
     </mat-tab-group>

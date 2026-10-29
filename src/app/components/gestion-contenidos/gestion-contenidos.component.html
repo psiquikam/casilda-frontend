@@ -1,0 +1,104 @@
+<div class="gestion">
+
+  <header class="gestion__cabecera">
+    <div class="gestion__titulos">
+      <h1 class="gestion__titulo">Contenidos del inicio</h1>
+      <p class="gestion__intro">
+        Las tarjetas que publique aquí las ve cualquier persona que visite la portada de Casilda,
+        sin necesidad de iniciar sesión.
+      </p>
+    </div>
+    <div class="gestion__acciones">
+      <a class="boton boton--secundario" routerLink="/home" target="_blank" rel="noopener">
+        <mat-icon aria-hidden="true">open_in_new</mat-icon>
+        Ver portada
+        <span class="visually-hidden">(se abre en una pestaña nueva)</span>
+      </a>
+      <a class="boton boton--primario" routerLink="nuevo">
+        <mat-icon aria-hidden="true">add</mat-icon>
+        Nuevo contenido
+      </a>
+    </div>
+  </header>
+
+  <!-- El endpoint público responde con `Cache-Control: max-age=300`: quien acaba
+       de guardar y abre la portada podría no ver el cambio todavía. -->
+  <p class="casilda-alerta gestion__aviso">
+    <mat-icon aria-hidden="true">schedule</mat-icon>
+    <span>
+      Los cambios pueden tardar <strong>hasta 5 minutos</strong> en verse en la portada.
+      Los contenidos <strong>programados</strong> aparecen solos en su fecha de inicio y los
+      <strong>vencidos</strong> dejan de mostrarse sin que tenga que eliminarlos.
+    </span>
+  </p>
+
+  @if (cargando()) {
+    <div class="gestion__esqueleto" role="status" aria-busy="true">
+      <span class="visually-hidden">Cargando los contenidos del inicio…</span>
+      @for (fila of [1, 2, 3]; track fila) {
+        <span class="gestion__barra"></span>
+      }
+    </div>
+  } @else if (errorCarga()) {
+    <div class="casilda-alerta casilda-alerta--peligro gestion__error" role="alert">
+      <mat-icon aria-hidden="true">error_outline</mat-icon>
+      <div>
+        <p>No pudimos cargar los contenidos. La portada sigue mostrando lo que ya estaba publicado.</p>
+        <button type="button" class="boton boton--secundario" (click)="cargar()">Intentar de nuevo</button>
+      </div>
+    </div>
+  } @else if (total() === 0) {
+    <section class="gestion__vacio" aria-labelledby="gestion-vacio-titulo">
+      <mat-icon class="gestion__vacio-icono" aria-hidden="true">web</mat-icon>
+      <h2 id="gestion-vacio-titulo">La portada todavía no tiene contenidos</h2>
+      <p>
+        Mientras no haya tarjetas publicadas, la portada solo muestra la presentación de Casilda y el
+        acceso al reporte seguro. Cree la primera para orientar a quienes la visitan.
+      </p>
+      <a class="boton boton--primario" routerLink="nuevo">
+        <mat-icon aria-hidden="true">add</mat-icon>
+        Crear el primer contenido
+      </a>
+    </section>
+  } @else {
+    <div class="gestion__filtros" role="group" aria-label="Filtrar contenidos por estado">
+      @for (opcion of filtros(); track opcion.valor) {
+        <button type="button" class="gestion__filtro" [attr.aria-pressed]="filtro() === opcion.valor"
+          (click)="filtrar(opcion.valor)">
+          <mat-icon aria-hidden="true">{{ opcion.icono }}</mat-icon>
+          {{ opcion.texto }}
+          <span class="gestion__filtro-cantidad">{{ opcion.cantidad }}</span>
+        </button>
+      }
+    </div>
+    <p class="visually-hidden" role="status" aria-live="polite">
+      {{ cantidadVisible() === 1 ? 'Se muestra 1 contenido' : 'Se muestran ' + cantidadVisible() + ' contenidos' }}
+    </p>
+
+    @for (seccion of secciones(); track seccion.valor) {
+      <app-zona-panel
+        [titulo]="seccion.titulo"
+        [icono]="seccion.icono"
+        [descripcion]="seccion.descripcion"
+        [vacio]="seccion.items.length === 0"
+        [mensajeVacio]="mensajeVacio(seccion.titulo)"
+        accionTexto="Agregar en esta sección"
+        accionRuta="/gestion-contenidos/nuevo"
+        [accionParametros]="{ seccion: seccion.valor }"
+      >
+        <ul class="gestion__lista">
+          @for (item of seccion.items; track item.contenido.id) {
+            <li>
+              <app-contenido-item
+                [contenido]="item.contenido"
+                [estado]="item.estado"
+                [eliminando]="eliminandoId() === item.contenido.id"
+                (eliminar)="eliminar($event)"
+              />
+            </li>
+          }
+        </ul>
+      </app-zona-panel>
+    }
+  }
+</div>

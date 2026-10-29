@@ -1,11 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
 import { AuthService, UserSession, MOCK_USERS } from './auth.service';
+import { environment } from '../../environments/environment';
 
 describe('AuthService', () => {
   const router = jasmine.createSpyObj<Router>('Router', ['navigate']);
+  const modoOriginal = environment.datosDemostracion;
 
   const jwt = (expiresAt: number): string => {
     const payload = btoa(JSON.stringify({ exp: expiresAt }));
@@ -35,6 +37,10 @@ describe('AuthService', () => {
   beforeEach(() => {
     localStorage.clear();
     router.navigate.calls.reset();
+  });
+
+  afterEach(() => {
+    environment.datosDemostracion = modoOriginal;
   });
 
   it('recupera una sesión vigente y reconoce el rol Usuario', () => {
@@ -82,6 +88,54 @@ describe('AuthService', () => {
     expect(service.hasRole('USUARIO')).toBeTrue();
   });
 
+  describe('rol Gestor de contenidos (rol_id 6)', () => {
+    // Forma real del login: `rol` trae el nombre y `roles` el código.
+    const sesionGestor = (): UserSession => ({
+      email: 'gestor@udea.edu.co',
+      nombre: 'Gestora de contenidos',
+      rol: 'Gestor de contenidos',
+      roles: ['GESTOR_CONTENIDO'],
+      authorities: ['ROLE_GESTOR_CONTENIDO'],
+      token: jwt(Math.floor(Date.now() / 1000) + 3600)
+    });
+
+    it('conserva la sesión al recargar aunque rol traiga el nombre y no el código', () => {
+      localStorage.setItem('userSession', JSON.stringify(sesionGestor()));
+
+      const service = createService();
+
+      expect(service.isAuthenticated()).toBeTrue();
+      expect(localStorage.getItem('userSession')).not.toBeNull();
+    });
+
+    it('lo reconoce como gestor y no lo confunde con el rol Usuario', () => {
+      localStorage.setItem('userSession', JSON.stringify(sesionGestor()));
+
+      const service = createService();
+
+      expect(service.isGestorContenido()).toBeTrue();
+      expect(service.isUsuario()).toBeFalse();
+      expect(service.isAdmin()).toBeFalse();
+      expect(service.getRoleCode()).toBe('GESTOR_CONTENIDO');
+      expect(service.getRoleName()).toBe('Gestor de contenidos');
+      expect(service.hasAnyRole(['GESTOR_CONTENIDO'])).toBeTrue();
+      expect(service.hasAnyRole(['USUARIO'])).toBeFalse();
+    });
+  });
+
+  it('sigue descartando una sesión con un rol que el frontend no conoce', () => {
+    localStorage.setItem('userSession', JSON.stringify({
+      ...session(Math.floor(Date.now() / 1000) + 3600),
+      rol: 'Invitado',
+      roles: ['INVITADO']
+    }));
+
+    const service = createService();
+
+    expect(service.isAuthenticated()).toBeFalse();
+    expect(localStorage.getItem('userSession')).toBeNull();
+  });
+
   it('elimina una sesión corrupta sin interrumpir la aplicación', () => {
     localStorage.setItem('userSession', '{sesion-invalida');
 
@@ -125,7 +179,8 @@ describe('AuthService', () => {
     expect(service.getDefaultRoute()).toBe('/inicio');
   });
 
-  it('permite iniciar sesión con usuario mockeado', (done) => {
+  it('en modo de demostración permite iniciar sesión con usuario mockeado', (done) => {
+    environment.datosDemostracion = true;
     const service = createService();
 
     service.loginAsMock('coordinador').subscribe((res) => {
@@ -135,6 +190,59 @@ describe('AuthService', () => {
       expect(service.isCoordinador()).toBeTrue();
       expect(localStorage.getItem('userSession')).toBeTruthy();
       done();
+    });
+  });
+
+  describe('fuera del modo de demostración', () => {
+    beforeEach(() => {
+      environment.datosDemostracion = false;
+    });
+
+    it('rechaza el inicio de sesión rápido con cuentas de prueba', (done) => {
+      const service = createService();
+
+      service.loginAsMock('admin').subscribe({
+        next: () => done.fail('no debía iniciar sesión'),
+        error: () => {
+          expect(service.currentUser).toBeNull();
+          expect(localStorage.getItem('userSession')).toBeNull();
+          done();
+        }
+      });
+    });
+
+    it('envía al backend las credenciales de una cuenta de prueba y no inventa sesión si falla', (done) => {
+      const service = createService();
+      const http = TestBed.inject(HttpTestingController);
+      const admin = MOCK_USERS['admin'];
+
+      service.loginWithCredentials(admin.email, admin.password).subscribe({
+        next: () => done.fail('no debía iniciar sesión'),
+        error: () => {
+          expect(service.currentUser).toBeNull();
+          done();
+        }
+      });
+
+      http
+        .expectOne((req) => req.url.endsWith('/auth/login'))
+        .flush({ message: 'Credenciales inválidas' }, { status: 400, statusText: 'Bad Request' });
+      http.verify();
+    });
+
+    it('descarta una sesión de prueba guardada en el navegador', () => {
+      environment.datosDemostracion = true;
+      const demo = createService();
+      demo.loginAsMock('admin').subscribe();
+      expect(localStorage.getItem('userSession')).toBeTruthy();
+
+      environment.datosDemostracion = false;
+      TestBed.resetTestingModule();
+      const service = createService();
+
+      expect(service.currentUser).toBeNull();
+      expect(service.isMockUser()).toBeFalse();
+      expect(localStorage.getItem('userSession')).toBeNull();
     });
   });
 });

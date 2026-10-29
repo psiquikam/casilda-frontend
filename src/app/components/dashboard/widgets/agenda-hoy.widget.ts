@@ -20,12 +20,12 @@ import { CitaAgendaDto, DashboardTrabajoService } from '../../../services/dashbo
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-zona-panel
-      titulo="Tu agenda de hoy"
+      titulo="Agenda de hoy"
       icono="event_available"
       [cargando]="cargando()"
       [error]="error()"
       [vacio]="!cargando() && !error() && citas().length === 0"
-      mensajeVacio="No tienes citas agendadas para hoy."
+      mensajeVacio="No hay citas agendadas para hoy."
       accionTexto="Gestionar agenda"
       accionRuta="/cita"
       (reintentar)="cargar()"
@@ -87,7 +87,7 @@ export class AgendaHoyWidget implements OnInit {
       error: () => {
         this.error.set(true);
         this.cargando.set(false);
-        this.notificacion.error('No pudimos cargar tu agenda de hoy.');
+        this.notificacion.error('No fue posible cargar la agenda de hoy.');
       }
     });
   }
