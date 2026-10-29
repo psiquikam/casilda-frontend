@@ -17,12 +17,12 @@
 
   .modal-content {
     padding: 24px;
-    overflow: hidden;
+    overflow: visible;
 
     .form-row {
       display: flex;
       gap: 12px;
-      align-items: center;
+      align-items: flex-start;
       width: 100%;
 
       .field-tipo { flex: 0.8; min-width: 120px; }
@@ -53,7 +53,7 @@
   }
 }
 
-::ng-deep .mat-mdc-dialog-container {
+:host ::ng-deep {
   .mat-mdc-form-field {
     .mat-mdc-text-field-wrapper {
       height: 48px;
@@ -75,7 +75,17 @@
     }
 
     .mat-mdc-form-field-subscript-wrapper {
-      display: none;
+      margin-top: 4px;
+      font-size: 12px;
+      line-height: 14px;
+    }
+
+    mat-error {
+      color: var(--color-danger, #d32f2f) !important;
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      padding-top: 2px;
     }
   }
 }

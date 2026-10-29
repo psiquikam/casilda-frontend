@@ -1,32 +1,43 @@
 <h2 mat-dialog-title class="modal-title">
   <mat-icon aria-hidden="true">email</mat-icon>
-  Agregar Correo
+  Agregar correo
 </h2>
 
 <mat-dialog-content class="modal-content">
   <div class="form-row">
 
     <mat-form-field appearance="outline" class="field-tipo">
-      <mat-label>Tipo de Correo</mat-label>
-      <mat-select [(ngModel)]="data.tipoId" (ngModelChange)="onTipoChange($event)">
+      <mat-label>Tipo de correo</mat-label>
+      <mat-select [(ngModel)]="data.tipoId" name="tipoCorreoVal" #tipoCorreoVal="ngModel"
+        required [errorStateMatcher]="errorStateMatcher" (ngModelChange)="onTipoChange($event)">
         @for (tipo of tiposCorreo; track tipo) {
           <mat-option [value]="tipo.id">{{ tipo.nombre }}</mat-option>
         }
       </mat-select>
+      @if (tipoCorreoVal.hasError('required') && (tipoCorreoVal.touched || data.correo)) {
+        <mat-error>Seleccione el tipo de correo</mat-error>
+      }
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="field-correo">
       <mat-label>Correo</mat-label>
       <input matInput [(ngModel)]="data.correo" name="correoVal" #correoVal="ngModel"
         required
-        pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
-        placeholder="Ej: user@gmail.com">
-        @if (correoVal.invalid && (correoVal.dirty || correoVal.touched)) {
-          <mat-error>
+        [errorStateMatcher]="errorStateMatcher"
+        [pattern]="patronCorreo"
+        [placeholder]="esInstitucional ? 'usuario@udea.edu.co' : 'Ej: usuario@gmail.com'">
+      @if ((correoVal.touched && !data.correo.trim()) || (data.correo && !isValidEmail(data.correo))) {
+        <mat-error>
+          @if (!data.correo.trim()) {
+            Ingrese el correo electrónico
+          } @else if (esInstitucional) {
+            El correo institucional debe ser del dominio &#64;udea.edu.co
+          } @else {
             Ingrese un correo electrónico válido (ej: usuario&#64;dominio.com)
-          </mat-error>
-        }
-      </mat-form-field>
+          }
+        </mat-error>
+      }
+    </mat-form-field>
 
 
     </div>
@@ -35,7 +46,7 @@
   <mat-dialog-actions align="end" class="modal-actions">
     <button mat-button (click)="onNoClick()">Cancelar</button>
 
-    <button mat-flat-button class="btn-confirm" (click)="guardar()" [disabled]="!canSubmit">
+    <button type="button" mat-flat-button class="btn-confirm" (click)="guardar()" [disabled]="!canSubmit">
       <mat-icon aria-hidden="true">check</mat-icon>
       Agregar a la lista
     </button>

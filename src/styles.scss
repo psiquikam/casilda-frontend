@@ -267,3 +267,17 @@ body {
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3) !important;
 }
 
+/* Eliminación de mayúsculas forzadas (uppercase / titlecase) en encabezados de tablas (Sentence case institucional) */
+th.mat-header-cell,
+th.mat-mdc-header-cell,
+.mat-mdc-header-cell {
+  text-transform: none !important;
+}
+
+/* Los campos obligatorios se identifican de forma consistente en toda la aplicación. */
+.required-marker,
+.mat-mdc-form-field-required-marker {
+  color: #c62828 !important;
+  font-weight: 800;
+}
+

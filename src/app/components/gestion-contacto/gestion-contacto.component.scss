@@ -86,10 +86,10 @@ th.mat-mdc-header-cell {
 
 .column-title {
   font-size: var(--font-size-sm); /* piso 14px (WCAG 1.4.4) */
-  font-weight: 850;
+  font-weight: 750;
   color: var(--color-text-primary);
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
+  text-transform: none;
+  letter-spacing: 0.1px;
 }
 
 .search-box-slim {

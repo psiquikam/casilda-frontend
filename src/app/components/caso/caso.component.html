@@ -1,7 +1,7 @@
 <div class="caso-container">
   <header class="page-header">
     <div class="header-content">
-      <h1>Consulta Caso</h1>
+      <h1>Consulta de casos</h1>
       <p>Gestión y seguimiento de casos por estado actual</p>
     </div>
   </header>
@@ -25,16 +25,6 @@
             dataSource: dataSourceActivos,
             showReparto: false,
             msgVacio: 'No hay casos activos con profesional asignado en este momento.'
-          }"></ng-container>
-        </div>
-      </mat-tab>
-
-      <mat-tab label="Abierto en transición ({{totalAbiertoTransicion}})">
-        <div class="tab-body-wrapper">
-          <ng-container *ngTemplateOutlet="tablaCasos; context: {
-            dataSource: dataSourceTransicion,
-            showReparto: false,
-            msgVacio: 'No se registran casos en proceso de transición.'
           }"></ng-container>
         </div>
       </mat-tab>

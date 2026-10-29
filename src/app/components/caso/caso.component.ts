@@ -50,7 +50,6 @@ export class CasoComponent implements OnInit {
   expandedDetailColumns: string[] = ['expandedDetail'];
 
   dataSourceActivos = new MatTableDataSource<any>([]);
-  dataSourceTransicion = new MatTableDataSource<any>([]);
   dataSourceCerrados = new MatTableDataSource<any>([]);
   dataSourceSinRepartir = new MatTableDataSource<any>([]);
   totalElementos = 0;
@@ -146,11 +145,7 @@ export class CasoComponent implements OnInit {
 
     this.dataSourceActivos.data = this.solicitudes.filter(c =>
       c.profesional && c.profesional !== 'Sin asignar' &&
-      c.estado !== 'Cerrado' && c.estado !== 'Abierto en transición'
-    );
-
-    this.dataSourceTransicion.data = this.solicitudes.filter(c =>
-      c.estado === 'Abierto en transición'
+      c.estado !== 'Cerrado'
     );
 
     this.dataSourceCerrados.data = this.solicitudes.filter(c =>
@@ -158,7 +153,7 @@ export class CasoComponent implements OnInit {
     );
 
     const filterPredicate = this.createFilter();
-    [this.dataSourceSinRepartir, this.dataSourceActivos, this.dataSourceTransicion, this.dataSourceCerrados]
+    [this.dataSourceSinRepartir, this.dataSourceActivos, this.dataSourceCerrados]
       .forEach(ds => ds.filterPredicate = filterPredicate);
   }
 
@@ -170,7 +165,6 @@ export class CasoComponent implements OnInit {
     [
       this.dataSourceSinRepartir,
       this.dataSourceActivos,
-      this.dataSourceTransicion,
       this.dataSourceCerrados
     ].forEach(ds => {
       ds.filter = filterString;
@@ -219,7 +213,20 @@ export class CasoComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && modo === 'editar') {
-        Object.assign(element, this.mapToItem(result));
+        const itemMapeado = this.mapToItem(result);
+        Object.assign(element, itemMapeado);
+        if (result.descripcionHechos) element.descripcionHechos = result.descripcionHechos;
+        if (result.lugarOcurrencia) element.lugarOcurrencia = result.lugarOcurrencia;
+        if (result.relacionMisional) element.relacionMisional = result.relacionMisional;
+        if (result.fechaOcurrencia) element.fechaOcurrencia = result.fechaOcurrencia;
+        if (result.tiposVbg) element.tiposVbg = result.tiposVbg;
+        if (result.agresorIdentificacion) element.agresorIdentificacion = result.agresorIdentificacion;
+        if (result.agresorNombre) element.agresorNombre = result.agresorNombre;
+        if (result.agresorVinculoUdea) element.agresorVinculoUdea = result.agresorVinculoUdea;
+        if (result.agresorVinculoVictima) element.agresorVinculoVictima = result.agresorVinculoVictima;
+        if (result.agresorCorreo) element.agresorCorreo = result.agresorCorreo;
+        if (result.agresorRemitirUad) element.agresorRemitirUad = result.agresorRemitirUad;
+        if (result.evidenciasResumen) element.evidenciasResumen = result.evidenciasResumen;
         this.inicializarTablas();
       }
     });
@@ -253,16 +260,7 @@ export class CasoComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.solicitudService.asignar(element.solicitudId, {
-          grupoProfesionalId: result.grupoProfesionalId,
-          idTipoAsignacion: result.idTipoAsignacion,
-          idTipoServicio: result.idTipoServicio,
-          observaciones: result.observaciones,
-          fechaReparto: result.fechaReparto
-        }).subscribe({
-          next: () => this.cargarDatos(this.pageIndex, this.pageSize),
-          error: (err) => this.notificacion.error('No fue posible asignar el caso. Intente de nuevo.', err)
-        });
+        this.cargarDatos(this.pageIndex, this.pageSize);
       }
     });
   }
@@ -279,7 +277,4 @@ export class CasoComponent implements OnInit {
     return this.dataSourceActivos.data.length;
   }
 
-  get totalAbiertoTransicion(): number {
-    return this.dataSourceTransicion.data.length;
-  }
 }
