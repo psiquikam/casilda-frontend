@@ -16,7 +16,7 @@ Este documento define la estructura de datos en formato JSON que el Frontend env
   "primerNombre": "string", // Requerido (mínimo 2 caracteres)
   "segundoNombre": "string", // Opcional (puede ser null o vacío)
   "primerApellido": "string", // Requerido (mínimo 2 caracteres)
-  "segundoApellido": "string", // Requerido (mínimo 2 caracteres)
+  "segundoApellido": "string", // Opcional (si se diligencia, entre 2 y 50 caracteres)
   "tipoDocumento": "string", // Requerido. Opciones: "CC", "TI", "CE", "PA", "OT"
   "documento": "string", // Requerido. Alfanumérico
   "relacionUniversidad": "string", // Requerido. Opciones: "Estudiante", "Docente", "Administrativo", "Egresado", "Contratista", "Otro"
@@ -38,7 +38,7 @@ Este documento define la estructura de datos en formato JSON que el Frontend env
 | `primerNombre` | String | Sí | Min 2 caracteres, solo texto | Primer nombre del usuario |
 | `segundoNombre` | String | No | Opcional | Segundo nombre |
 | `primerApellido` | String | Sí | Min 2 caracteres, solo texto | Primer apellido |
-| `segundoApellido` | String | Sí | Min 2 caracteres, solo texto | Segundo apellido |
+| `segundoApellido` | String | No | Opcional; si se diligencia, entre 2 y 50 caracteres | Segundo apellido |
 | `tipoDocumento` | String | Sí | `CC`, `TI`, `CE`, `PA`, `OT` | Tipo de identificación |
 | `documento` | String | Sí | Alfanumérico | Número de documento |
 | `relacionUniversidad` | String | Sí | `Estudiante`, `Docente`, `Administrativo`, `Egresado`, `Contratista`, `Otro` | Vínculo institucional con la UdeA |
@@ -76,8 +76,7 @@ public class UsuarioRegistroDTO {
     @Size(min = 2, max = 50, message = "El primer apellido debe tener entre 2 y 50 caracteres")
     private String primerApellido;
 
-    @NotBlank(message = "El segundo apellido es obligatorio")
-    @Size(min = 2, max = 50, message = "El segundo apellido debe tener entre 2 y 50 caracteres")
+    @Pattern(regexp = "^$|^.{2,50}$", message = "El segundo apellido, si se ingresa, debe tener entre 2 y 50 caracteres")
     private String segundoApellido;
 
     @NotBlank(message = "El tipo de documento es obligatorio")

@@ -46,7 +46,7 @@ export class RegisterComponent {
       primerNombre: ['', [Validators.required, Validators.minLength(2)]],
       segundoNombre: [''],
       primerApellido: ['', [Validators.required, Validators.minLength(2)]],
-      segundoApellido: ['', [Validators.required, Validators.minLength(2)]],
+      segundoApellido: ['', [Validators.minLength(2), Validators.maxLength(50)]],
       tipoDocumento: ['', [Validators.required]],
       documento: ['', [Validators.required, Validators.pattern('^[0-9A-Za-z]+$')]]
     });
