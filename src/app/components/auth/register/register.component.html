@@ -44,10 +44,10 @@
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Segundo apellido *</mat-label>
+              <mat-label>Segundo apellido (opcional)</mat-label>
               <input matInput formControlName="segundoApellido" autocomplete="family-name">
               @if (controlInvalido(step1Form, 'segundoApellido')) {
-                <mat-error>Por favor ingrese el segundo apellido</mat-error>
+                <mat-error>Si lo ingresas, debe tener entre 2 y 50 caracteres</mat-error>
               }
             </mat-form-field>
 
@@ -178,7 +178,13 @@
 
         <div class="policy-box">
           <h2>Tratamiento de Información (Habeas Data)</h2>
-          <p>La información recopilada a través de este canal se gestiona bajo estrictos protocolos de confidencialidad institucional. No se almacenará ningún dato que comprometa su identidad sin su consentimiento expreso, de acuerdo a la ley de Habeas Data.</p>
+          <p>La información recopilada a través de este canal se gestiona bajo estrictos protocolos de confidencialidad institucional. No se almacenará ningún dato que comprometa su identidad sin su consentimiento expreso, de acuerdo a la
+            <a
+              href="https://www.udea.edu.co/wps/wcm/connect/udea/998902b9-aa42-43bc-9d5c-995030fc88e7/manual.pdf?MOD=AJPERES&CVID=l67xpp8"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="habeas-data-link">ley de Habeas Data de la Universidad de Antioquia</a>.
+          </p>
           <mat-checkbox formControlName="habeasData">He leído y acepto el manejo y política de tratamiento de datos</mat-checkbox>
           @if (controlInvalido(step3Form, 'habeasData')) {
             <mat-error style="font-size: 14px; color: var(--color-danger-text); display: block; margin-top: 8px;">Debe aceptar la política para continuar.</mat-error>

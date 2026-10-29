@@ -24,4 +24,20 @@ describe('RegisterComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('allows the second surname to be empty', () => {
+    expect(component.step1Form.get('segundoApellido')?.valid).toBeTrue();
+  });
+
+  it('requires at least two characters when the second surname is provided', () => {
+    const segundoApellido = component.step1Form.get('segundoApellido');
+    segundoApellido?.setValue('A');
+    expect(segundoApellido?.hasError('minlength')).toBeTrue();
+
+    segundoApellido?.setValue('Lo');
+    expect(segundoApellido?.valid).toBeTrue();
+
+    segundoApellido?.setValue('A'.repeat(51));
+    expect(segundoApellido?.hasError('maxlength')).toBeTrue();
+  });
 });
