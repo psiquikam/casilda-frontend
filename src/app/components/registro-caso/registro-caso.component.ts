@@ -97,7 +97,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
   private readonly maestrosVbg = inject(MaestrosVbgService);
 
   /** DSH-12-08: franja visible mientras los datos del módulo sean simulados. */
-  readonly datosDemostracion = environment.datosDemostracion;
+  datosDemostracion = environment.datosDemostracion;
   readonly textoProtocoloRelacionMisional = TEXTO_PROTOCOLO_RELACION_MISIONAL;
   private readonly registroVbgDatos = inject(RegistroVbgDatosService);
   casoForm!: FormGroup;
@@ -195,7 +195,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
     { tab: 'Registro de atención', label: 'Tipo de servicio', control: 'tipoServicio' },
     { tab: 'Registro de atención', label: 'Lugar de la entrevista', control: 'lugarEntrevista' },
     { tab: 'Datos de la persona', label: 'Tipo de documento', control: 'tipoDocumento' },
-    { tab: 'Datos de la persona', label: 'Documento de Identificación', control: 'documento' },
+    { tab: 'Datos de la persona', label: 'Documento de identificación', control: 'documento' },
     { tab: 'Datos de la persona', label: 'Fecha de nacimiento', control: 'fechaNacimiento' },
     { tab: 'Datos de la persona', label: 'Primer nombre', control: 'primerNombre' },
     { tab: 'Datos de la persona', label: 'Primer apellido', control: 'primerApellido' },
@@ -216,7 +216,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
     { tab: 'Documentación', label: '¿De qué forma?', control: 'queForma' },
     { tab: 'Documentación', label: 'Lugar de los hechos', control: 'lugarHechos' },
     { tab: 'Documentación', label: 'Violencia de género', control: 'violenciaGenero' },
-    { tab: 'Estado del Caso', label: 'Estado del caso', control: 'estadosCaso' },
+    { tab: 'Estado del caso', label: 'Estado del caso', control: 'estadosCaso' },
   ];
 
   psicologicaSel: number[] = [];
@@ -789,6 +789,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
   private cargarCitas(page = 0, size: number = this.pageSizeCitas): void {
     this.registroVbgDatos.listarCitasPaginadas(page, size, undefined, EstadoCitaEnum.CANCELADA).subscribe({
       next: (respuesta) => {
+        this.datosDemostracion = this.registroVbgDatos.usandoDatosDemostracion();
         const filas = respuesta.content.map((cita) => this.mapearCitaATabla(cita));
         this.casoPorAtender = filas;
         this.dataSource.data = filas;
@@ -1220,7 +1221,7 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
     if (this.esRelacionMisionalSeleccionada() && this.relacionMisionalNivel2Sel.length === 0) {
       this.tabErrors.add('Documentación');
       if (!errorsByTab['Documentación']) errorsByTab['Documentación'] = [];
-      errorsByTab['Documentación'].push('Relación misional: Docencia, Investigación o Extensión');
+      errorsByTab['Documentación'].push('Relación misional: docencia, investigación o extensión');
     }
 
     if (this.tabErrors.size > 0) {

@@ -63,11 +63,11 @@ export class GestionListasComponent implements OnInit {
   };
 
   readonly etiquetas: Record<string, string> = {
-    tiposSolicitud: 'Tipos de Solicitud',
+    tiposSolicitud: 'Tipos de solicitud',
     campus: 'Campus',
     unidadesAdministrativas: 'Unidades Administrativas',
     facultades: 'Facultades',
-    tiposDocumento: 'Tipos de Documento'
+    tiposDocumento: 'Tipos de documento'
   };
 
   readonly listasConCodigo = new Set(['tiposDocumento']);

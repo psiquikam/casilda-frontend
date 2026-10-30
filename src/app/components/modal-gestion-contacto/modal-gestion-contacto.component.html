@@ -1,14 +1,14 @@
 <div class="modal-container">
   <h2 mat-dialog-title class="modal-header">
-    <mat-icon aria-hidden="true">{{ data.soloLectura ? 'history' : 'contact_phone' }}</mat-icon>
-    <span>{{ data.soloLectura ? 'Historial de Contacto' : 'Gestión de Contacto' }} - {{ data.id }}</span>
+    <mat-icon aria-hidden="true">{{ data.soloLectura ? 'history' : esDesistimiento ? 'person_off' : 'contact_phone' }}</mat-icon>
+    <span>{{ data.soloLectura ? 'Historial de contacto' : esDesistimiento ? 'Desistimiento' : 'Gestión de contacto' }} - {{ data.codigo || data.id }}</span>
   </h2>
 
   <mat-dialog-content class="modal-content">
     <mat-tab-group animationDuration="0ms">
 
       @if (!data.soloLectura) {
-        <mat-tab label="Intento de Comunicación">
+        <mat-tab [label]="esDesistimiento ? 'Registro de desistimiento' : 'Intento de comunicación'">
           <div class="tab-body-wrapper">
             <!-- Los campos describen a terceras personas (no a quien usa el sistema): sin autocompletado,
                  para que el navegador no sugiera los datos del profesional (WCAG 1.3.5 no aplica). -->
@@ -16,11 +16,11 @@
               <div class="form-grid">
                 <mat-form-field appearance="outline">
                   <mat-label>Fecha</mat-label>
-                  <input matInput type="date" formControlName="fecha" [readonly]="true">
+                  <input matInput type="date" formControlName="fecha">
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>Hora</mat-label>
-                  <input matInput type="time" formControlName="hora" [readonly]="true">
+                  <input matInput type="time" formControlName="hora">
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>Jornada</mat-label>
@@ -28,21 +28,25 @@
                 </mat-form-field>
                 <mat-form-field appearance="outline">
                   <mat-label>Resultado</mat-label>
-                  <mat-select formControlName="resultado">
-                    @for (r of resultados; track r) {
-                      <mat-option [value]="r">{{ r }}</mat-option>
-                    }
-                  </mat-select>
+                  @if (esDesistimiento) {
+                    <input matInput [value]="resultadoDesistimiento" readonly>
+                  } @else {
+                    <mat-select formControlName="resultado">
+                      @for (r of resultados; track r) {
+                        <mat-option [value]="r">{{ r }}</mat-option>
+                      }
+                    </mat-select>
+                  }
                 </mat-form-field>
               </div>
               <mat-form-field appearance="outline" class="full-width desc-field">
-                <mat-label>Observaciones Detalladas</mat-label>
+                <mat-label>{{ esDesistimiento ? 'Motivo del desistimiento' : 'Observaciones detalladas' }}</mat-label>
                 <textarea matInput rows="4" formControlName="observacion"></textarea>
               </mat-form-field>
               @if (mostrarCamposCita) {
                 <div class="form-grid">
                   <mat-form-field appearance="outline">
-                    <mat-label>Fecha de Cita</mat-label>
+                    <mat-label>Fecha de cita</mat-label>
                     <input matInput [matDatepicker]="pickerCita" formControlName="fechaCita" [min]="minCitaDate">
                     <mat-datepicker-toggle matIconSuffix [for]="pickerCita"></mat-datepicker-toggle>
                     <mat-datepicker #pickerCita></mat-datepicker>
@@ -54,7 +58,7 @@
                     }
                   </mat-form-field>
                   <mat-form-field appearance="outline">
-                    <mat-label>Hora de Cita</mat-label>
+                    <mat-label>Hora de cita</mat-label>
                     <input matInput type="time" formControlName="horaCita">
                   </mat-form-field>
                 </div>
@@ -62,7 +66,7 @@
               <div class="form-actions">
                 <button mat-flat-button class="btn-save" type="submit" [disabled]="contactoForm.invalid">
                   <mat-icon aria-hidden="true">save</mat-icon>
-                  Guardar Registro
+                  {{ esDesistimiento ? 'Registrar desistimiento' : 'Guardar registro' }}
                 </button>
               </div>
             </form>
@@ -76,7 +80,7 @@
             <table mat-table [dataSource]="historialContactos" aria-label="Historial de contactos">
 
               <ng-container matColumnDef="fecha">
-                <th mat-header-cell scope="col" *matHeaderCellDef>Fecha / Hora</th>
+                <th mat-header-cell scope="col" *matHeaderCellDef>Fecha / hora</th>
                 <td mat-cell *matCellDef="let e">
                   <div class="cell-date">
                     <strong>{{ e.fecha }}</strong>

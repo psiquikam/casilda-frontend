@@ -27,7 +27,7 @@
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="flex-field">
-    <mat-label>Seleccione el Compromiso</mat-label>
+    <mat-label>Seleccione el compromiso</mat-label>
     <mat-select [(ngModel)]="data.idtipocompromiso" (ngModelChange)="seleccionarCompromiso($event)"
       [disabled]="cargandoCompromisos">
       @for (opcion of tiposCompromiso; track opcion) {

@@ -38,6 +38,6 @@ describe('DashboardRevisorComponent', () => {
     expect(component.stats.modalidades.length).toBeGreaterThan(3);
     const labels = component.stats.modalidades.map(m => m.label);
     expect(labels).toContain('Violencia Psicológica');
-    expect(labels).toContain('Discriminación por Género u Orientación');
+    expect(labels).toContain('Discriminación por género u orientación');
   });
 });

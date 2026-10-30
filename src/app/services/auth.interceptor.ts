@@ -1,13 +1,11 @@
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { AUTH_REQUIRED_MESSAGE, AuthService } from './auth.service';
 import { DialogoService } from '../core/a11y/dialogo.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
-  const router = inject(Router);
   const dialogo = inject(DialogoService);
   const token = authService.getToken();
 
@@ -28,17 +26,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
             { bloqueante: true }
           )
           .subscribe();
-      } else if (error.status === 403 && !isAuthEndpoint) {
-        const isCatalogOrMaestro = req.url.includes('/maestros') || req.url.includes('/catalogos');
-        const isExempt = Boolean(
-          (typeof authService.isAdmin === 'function' && authService.isAdmin()) ||
-          (typeof authService.isMockUser === 'function' && authService.isMockUser())
-        );
-
-        if (!isCatalogOrMaestro && !isExempt) {
-          void router.navigate(['/acceso-denegado']);
-        }
       }
+      // Un 403 no invalida el token ni el acceso a la ruta actual. Se propaga
+      // al servicio/componente para que esa operación concreta muestre su
+      // error o fallback; los permisos de navegación los resuelve roleGuard.
       return throwError(() => error);
     })
   );

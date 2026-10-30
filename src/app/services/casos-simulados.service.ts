@@ -4,6 +4,8 @@ import { Observable, of } from 'rxjs';
 import type {
   CasoDto,
   CitaDto,
+  ContactoTelefonicoDto,
+  ContactoTelefonicoRequestDto,
   PagedResponseDto,
   SolicitudAcompanamientoResponse
 } from './solicitud.service';
@@ -32,6 +34,35 @@ import { respuestaSimulada } from './dashboard-mock';
 @Injectable({ providedIn: 'root' })
 export class CasosSimuladosService {
   private readonly casos = signal<CasoSimuladoVbg[]>(this.semilla());
+  private readonly contactosPorSolicitud = new Map<number, ContactoTelefonicoDto[]>();
+
+  listarSolicitudesAsignadas(): SolicitudAcompanamientoResponse[] {
+    return this.casos().map((caso) => ({ ...caso.solicitud }));
+  }
+
+  tieneSolicitud(solicitudId: number): boolean {
+    return this.casos().some((caso) => caso.solicitudId === solicitudId);
+  }
+
+  listarContactosSolicitud(solicitudId: number): ContactoTelefonicoDto[] {
+    return [...(this.contactosPorSolicitud.get(solicitudId) ?? [])];
+  }
+
+  registrarContactoSolicitud(
+    solicitudId: number,
+    datos: ContactoTelefonicoRequestDto
+  ): ContactoTelefonicoDto {
+    const contacto: ContactoTelefonicoDto = {
+      ...datos,
+      jornada: this.jornadaDesdeFecha(datos.fecha),
+      citaCreada: Boolean(datos.fechaCita),
+      fechaCita: datos.fechaCita,
+      horaCita: datos.horaCita
+    };
+    const actuales = this.contactosPorSolicitud.get(solicitudId) ?? [];
+    this.contactosPorSolicitud.set(solicitudId, [...actuales, contacto]);
+    return contacto;
+  }
 
   listarCitas(page: number, size: number): Observable<PagedResponseDto<CitaDto>> {
     const citas = this.casos().map(aCitaDto);
@@ -118,6 +149,11 @@ export class CasosSimuladosService {
     ];
   }
 
+  private jornadaDesdeFecha(fecha: string): string {
+    const hora = Number(fecha.match(/T(\d{2})/)?.[1] ?? 0);
+    return hora < 12 ? 'Mañana' : 'Tarde';
+  }
+
   private crearCaso(datos: {
     id: number;
     codigo: string;
@@ -152,7 +188,7 @@ export class CasosSimuladosService {
       tipoAsignacion: 'Directa',
       nombreSolicitante: nombreCompleto,
       documentoSolicitante: datos.documento,
-      tipoDocumento: 'Cédula de Ciudadanía',
+      tipoDocumento: 'Cédula de ciudadanía',
       numeroDocumento: datos.documento,
       fechaNacimiento: null,
       primerNombre,

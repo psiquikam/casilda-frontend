@@ -35,7 +35,7 @@
   font-size: var(--font-size-sm); /* piso 14px (WCAG 1.4.4) */
   font-weight: 700;
   color: var(--color-primary);
-  text-transform: uppercase;
+    text-transform: none;
   letter-spacing: 0.3px;
 
   mat-icon {

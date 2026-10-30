@@ -5,6 +5,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 import { ModalGestionComponent } from './modal-gestion-contacto.component';
+import { AsignacionesService } from '../../services/asignaciones.service';
 
 describe('ModalGestionComponent', () => {
   let component: ModalGestionComponent;
@@ -17,6 +18,7 @@ describe('ModalGestionComponent', () => {
         provideNoopAnimations(),
         provideHttpClient(),
         provideHttpClientTesting(),
+        { provide: AsignacionesService, useValue: {} },
         { provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } },
         { provide: MAT_DIALOG_DATA, useValue: {} }
       ]

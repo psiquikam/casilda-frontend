@@ -86,7 +86,7 @@ $text-dark: var(--color-text-primary);
     color: $text-dark;
     font-weight: 700;
     font-size: var(--font-size-sm); /* piso 14px (WCAG 1.4.4) */
-    text-transform: uppercase;
+    text-transform: none;
     padding: 0 10px !important;
     border-bottom: 2px solid $border-soft;
   }

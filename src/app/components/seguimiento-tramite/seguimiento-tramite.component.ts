@@ -30,7 +30,7 @@ export class SeguimientoTramiteComponent {
   // Etapas específicas para Acompañamiento
   private flujoAcompanamiento = [
     { id: 1, nombre: 'Solicitud Recibida', icon: 'pending_actions' },
-    { id: 2, nombre: 'Asignación de Profesional', icon: 'person_add' },
+    { id: 2, nombre: 'Asignación de profesional', icon: 'person_add' },
     { id: 3, nombre: 'En Intervención/Citas', icon: 'record_voice_over' },
     { id: 4, nombre: 'Caso Cerrado', icon: 'verified' }
   ];

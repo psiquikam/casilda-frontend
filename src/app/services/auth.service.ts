@@ -68,11 +68,6 @@ export type UserRole =
  */
 export const ROLES_CASILDA = ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR', 'USUARIO', 'GESTOR_CONTENIDO'] as const;
 
-/** `ROLE_admin` / `admin` → `ADMIN`: el backend y las cuentas de prueba no coinciden en el formato. */
-function normalizarRol(rol: string | null | undefined): string {
-  return (rol ?? '').trim().toUpperCase().replace(/^ROLE_/, '');
-}
-
 export interface MockUserProfile {
   id: number;
   nombre: string;
@@ -231,6 +226,20 @@ interface JwtPayload {
   exp?: number;
 }
 
+type CodigoRol = 'ADMIN' | 'COORDINADOR' | 'PROFESIONAL' | 'REVISOR' | 'USUARIO' | 'GESTOR_CONTENIDO';
+
+function normalizarCodigoRol(valor: string | null | undefined): CodigoRol | '' {
+  const rol = (valor || '').toUpperCase().replace(/^ROLE_/, '');
+  if (rol.includes('ADMIN')) return 'ADMIN';
+  if (rol.includes('COORD')) return 'COORDINADOR';
+  if (rol.includes('PROF')) return 'PROFESIONAL';
+  if (rol.includes('REVIS')) return 'REVISOR';
+  // El login real trae `rol: 'Gestor de contenidos'` (nombre) y `roles: ['GESTOR_CONTENIDO']` (código).
+  if (rol.includes('GESTOR') || rol.includes('CONTENIDO')) return 'GESTOR_CONTENIDO';
+  if (rol.includes('USUAR')) return 'USUARIO';
+  return '';
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
@@ -255,14 +264,12 @@ export class AuthService {
   }
 
   getRoleCode(): string {
-    const raw = (this.currentUser?.roles?.[0] || this.currentUser?.rol || '').toUpperCase();
-    if (raw.includes('ADMIN')) return 'ADMIN';
-    if (raw.includes('COORD')) return 'COORDINADOR';
-    if (raw.includes('PROF')) return 'PROFESIONAL';
-    if (raw.includes('REVIS')) return 'REVISOR';
-    // El login real trae `rol: 'Gestor de contenidos'` (nombre) y `roles: ['GESTOR_CONTENIDO']` (código).
-    if (raw.includes('GESTOR') || raw.includes('CONTENIDO')) return 'GESTOR_CONTENIDO';
-    return 'USUARIO';
+    const candidatos = [
+      ...(this.currentUser?.roles ?? []),
+      this.currentUser?.rol,
+      ...(this.currentUser?.authorities ?? [])
+    ];
+    return candidatos.map(normalizarCodigoRol).find(Boolean) || 'USUARIO';
   }
 
   getRoleName(): string {
@@ -330,9 +337,14 @@ export class AuthService {
 
   hasRole(role: string): boolean {
     if (!this.currentUser) return false;
-    const target = normalizarRol(role);
-    const { rol, roles = [], authorities = [] } = this.currentUser;
-    return [rol, ...roles, ...authorities].some((r) => normalizarRol(r) === target);
+    const target = normalizarCodigoRol(role);
+    if (!target) return false;
+    const rolesSesion = [
+      this.currentUser.rol,
+      ...(this.currentUser.roles ?? []),
+      ...(this.currentUser.authorities ?? [])
+    ];
+    return rolesSesion.some((rol) => normalizarCodigoRol(rol) === target);
   }
 
   hasAnyRole(roles: string[]): boolean {
@@ -474,19 +486,14 @@ export class AuthService {
   private isValidSession(value: unknown): value is UserSession {
     if (!value || typeof value !== 'object') return false;
     const session = value as Partial<UserSession>;
-    // Se revisan `rol` y `roles`: el backend pone en `rol` el *nombre* del rol
-    // («Gestor de contenidos») y en `roles` el *código*. Mirar solo `rol`
-    // descartaba la sesión del gestor de contenidos en cada recarga.
-    const candidatos = [session.rol, ...(Array.isArray(session.roles) ? session.roles : [])];
-    const rolReconocido = candidatos.some((r) =>
-      (ROLES_CASILDA as readonly string[]).includes(normalizarRol(r))
-    );
+    // Se revisan `rol` (nombre) y `roles` (código); `authorities` no basta para validar la sesión.
+    const rolesSesion = [session.rol, ...(Array.isArray(session.roles) ? session.roles : [])];
     return (
       typeof session.email === 'string' &&
       typeof session.nombre === 'string' &&
       typeof session.token === 'string' &&
       session.token.length > 0 &&
-      rolReconocido
+      rolesSesion.some((rol) => Boolean(normalizarCodigoRol(rol)))
     );
   }
 

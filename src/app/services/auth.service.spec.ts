@@ -88,6 +88,18 @@ describe('AuthService', () => {
     expect(service.hasRole('USUARIO')).toBeTrue();
   });
 
+  it('normaliza Administrador y ROLE_ADMINISTRADOR como rol admin', () => {
+    const sesionAdministrador = session(Math.floor(Date.now() / 1000) + 3600, 'Administrador');
+    localStorage.setItem('userSession', JSON.stringify(sesionAdministrador));
+
+    const service = createService();
+
+    expect(service.isAuthenticated()).toBeTrue();
+    expect(service.isAdmin()).toBeTrue();
+    expect(service.hasRole('ROLE_ADMIN')).toBeTrue();
+    expect(service.getRoleCode()).toBe('ADMIN');
+  });
+
   describe('rol Gestor de contenidos (rol_id 6)', () => {
     // Forma real del login: `rol` trae el nombre y `roles` el código.
     const sesionGestor = (): UserSession => ({

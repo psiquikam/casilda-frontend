@@ -3,7 +3,7 @@
        mientras el modo de demostración esté activo. -->
   <p class="franja-demo" role="status">
     <mat-icon aria-hidden="true">science</mat-icon>
-    <span>Datos de demostración. Los casos, catálogos y el guardado de este módulo son simulados.</span>
+    <span>Datos de demostración. Los casos mostrados y los cambios realizados sobre ellos son simulados.</span>
   </p>
 }
 
@@ -63,7 +63,7 @@
                         </mat-select>
                       </mat-form-field>
                       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                        <mat-label>Fecha de Nacimiento</mat-label>
+                        <mat-label>Fecha de nacimiento</mat-label>
                         <input matInput [matDatepicker]="picker2" formControlName="fechaNacimiento">
                         <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
                         <mat-datepicker #picker2></mat-datepicker>
@@ -85,7 +85,7 @@
                         <input matInput formControlName="segundoApellido">
                       </mat-form-field>
                       <mat-form-field appearance="outline">
-                        <mat-label>Regimen de Salud</mat-label>
+                        <mat-label>Régimen de salud</mat-label>
                         <mat-select formControlName="eps">
                           @for (v of listaRegimenSalud; track v) {
                             <mat-option [value]="v">{{v}}</mat-option>
@@ -93,7 +93,7 @@
                         </mat-select>
                       </mat-form-field>
                       <mat-form-field appearance="outline">
-                        <mat-label>EPS - Regimen de Salud</mat-label>
+                        <mat-label>EPS - régimen de salud</mat-label>
                         <mat-select formControlName="regimenSalud">
                           @for (v of listaEPSRegimen; track v) {
                             <mat-option [value]="v">{{v}}</mat-option>
@@ -101,7 +101,7 @@
                         </mat-select>
                       </mat-form-field>
                       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                        <mat-label>Departamento de Nacimiento</mat-label>
+                        <mat-label>Departamento de nacimiento</mat-label>
                         <input type="text" placeholder="Seleccione..." matInput
                           formControlName="departamentoNacimiento" [matAutocomplete]="autoDepNac">
                           <mat-autocomplete #autoDepNac="matAutocomplete"
@@ -112,7 +112,7 @@
                           </mat-autocomplete>
                         </mat-form-field>
                         <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                          <mat-label>Ciudad de Nacimiento</mat-label>
+                          <mat-label>Ciudad de nacimiento</mat-label>
                           <input type="text" placeholder="Seleccione..." matInput
                             formControlName="ciudadNacimiento" [matAutocomplete]="autoMunNac">
                             <mat-autocomplete #autoMunNac="matAutocomplete"
@@ -123,7 +123,7 @@
                             </mat-autocomplete>
                           </mat-form-field>
                           <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                            <mat-label>Departamento de Residencia</mat-label>
+                            <mat-label>Departamento de residencia</mat-label>
                             <input type="text" placeholder="Seleccione..." matInput
                               formControlName="departamentoResidencia" [matAutocomplete]="autoDepRes">
                               <mat-autocomplete #autoDepRes="matAutocomplete"
@@ -134,7 +134,7 @@
                               </mat-autocomplete>
                             </mat-form-field>
                             <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                              <mat-label>Ciudad de Residencia</mat-label>
+                              <mat-label>Ciudad de residencia</mat-label>
                               <input type="text" placeholder="Seleccione..." matInput
                                 formControlName="ciudadResidencia" [matAutocomplete]="autoMunRes">
                                 <mat-autocomplete #autoMunRes="matAutocomplete"
@@ -152,7 +152,7 @@
                               </mat-select>
                             </mat-form-field>
                             <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                              <mat-label>Identidad de Género</mat-label>
+                              <mat-label>Identidad de género</mat-label>
                               <mat-select formControlName="identidadSexual">
                                 @for (i of listaIdentidadSexual; track i) { <mat-option
                                 [value]="i">{{i}}</mat-option> }
@@ -184,7 +184,7 @@
                               </button>
                               <mat-form-field appearance="outline" subscriptSizing="dynamic"
                                 class="direccion-field">
-                                <mat-label>Dirección de Residencia Registrada</mat-label>
+                                <mat-label>Dirección de residencia registrada</mat-label>
                                 <input matInput formControlName="direccionResidencia" readonly
                                   placeholder="No se ha registrado dirección">
                                   <mat-icon aria-hidden="true" matSuffix color="primary">location_on</mat-icon>
@@ -339,7 +339,7 @@
                           </div>
                           <div style="margin-top: 10px; width: 100%;">
                             <mat-form-field appearance="outline" style="width: 100%;">
-                              <mat-label>Observaciones de Correo</mat-label>
+                              <mat-label>Observaciones de correo</mat-label>
                               <textarea matInput formControlName="observacionesCorreo"
                               placeholder="Observaciones adicionales sobre los correos..."></textarea>
                             </mat-form-field>
@@ -389,7 +389,7 @@
                           </div>
                           <div style="margin-top: 10px; width: 100%;">
                             <mat-form-field appearance="outline" style="width: 100%;">
-                              <mat-label>Observaciones de Teléfono</mat-label>
+                              <mat-label>Observaciones de teléfono</mat-label>
                               <textarea matInput formControlName="observacionesTelefono"
                               placeholder="Observaciones adicionales sobre los teléfonos..."></textarea>
                             </mat-form-field>
@@ -463,7 +463,7 @@
                               </mat-autocomplete>
                             </mat-form-field>
                             <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                              <mat-label>Lugar de Ocurrencia</mat-label>
+                              <mat-label>Lugar de ocurrencia</mat-label>
                               <mat-select formControlName="lugarHechos">
                                 @for (c of lugarHechos; track c) { <mat-option [value]="c">{{c}}</mat-option> }
                               </mat-select>
@@ -535,7 +535,7 @@
                                 }
                               </div>
                               @if (esRelacionMisionalSeleccionada()) {
-                                <p class="mat-hint-inline">Seleccione al menos una: Docencia, Investigación o Extensión.</p>
+                                <p class="mat-hint-inline">Seleccione al menos una: docencia, investigación o extensión.</p>
                                 <div class="vbg-options">
                                   @for (c of relacionMisionalNivel2; track c.id) {
                                     <mat-checkbox [checked]="relacionMisionalNivel2Sel.includes(c.id)"
@@ -899,7 +899,7 @@
                           </div>
                           <table mat-table [dataSource]="compromisosPersona" class="caso-table" aria-label="Compromisos de la persona">
                             <ng-container matColumnDef="fecha">
-                              <th mat-header-cell scope="col" *matHeaderCellDef> Fecha de Cumplimiento </th>
+                              <th mat-header-cell scope="col" *matHeaderCellDef> Fecha de cumplimiento </th>
                               <td mat-cell *matCellDef="let element"> {{element.fecha |
                               date:'dd/MM/yyyy'}} </td>
                             </ng-container>
@@ -943,7 +943,7 @@
                           </div>
                           <table mat-table [dataSource]="compromisosProfesional" class="caso-table" aria-label="Compromisos del profesional">
                             <ng-container matColumnDef="fecha">
-                              <th mat-header-cell scope="col" *matHeaderCellDef> Fecha de Cumplimiento </th>
+                              <th mat-header-cell scope="col" *matHeaderCellDef> Fecha de cumplimiento </th>
                               <td mat-cell *matCellDef="let element"> {{element.fecha |
                               date:'dd/MM/yyyy'}} </td>
                             </ng-container>

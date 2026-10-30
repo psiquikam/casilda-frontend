@@ -107,7 +107,7 @@ export const CATALOGO_MODULOS: readonly ModuloCasilda[] = [
   },
   {
     id: 'mis-asignaciones',
-    nombre: 'Mis asignaciones',
+    nombre: 'Bandeja de contacto',
     icono: 'assignment_ind',
     ruta: '/mis-asignaciones',
     roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR'],

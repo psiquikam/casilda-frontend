@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, catchError, of, switchMap } from 'rxjs';
 
 import { environment } from '../../environments/environment';
 import {
@@ -29,6 +29,11 @@ import { CasosSimuladosService } from './casos-simulados.service';
 export class RegistroVbgDatosService {
   private readonly solicitudService = inject(SolicitudService);
   private readonly casosSimulados = inject(CasosSimuladosService);
+  private usarRespaldo = false;
+
+  usandoDatosDemostracion(): boolean {
+    return environment.datosDemostracion || this.usarRespaldo;
+  }
 
   listarCitasPaginadas(
     page: number,
@@ -39,18 +44,46 @@ export class RegistroVbgDatosService {
     if (environment.datosDemostracion) {
       return this.casosSimulados.listarCitas(page, size);
     }
-    return this.solicitudService.listarCitasPaginadas(page, size, idEstadoCita, excluirEstadoCitaId);
+    return this.solicitudService
+      .listarCitasPaginadas(page, size, idEstadoCita, excluirEstadoCitaId)
+      .pipe(
+        switchMap((respuesta) => {
+          this.usarRespaldo = respuesta.content.length === 0;
+          return this.usarRespaldo
+            ? this.casosSimulados.listarCitas(page, size)
+            : of(respuesta);
+        }),
+        catchError(() => {
+          this.usarRespaldo = true;
+          return this.casosSimulados.listarCitas(page, size);
+        })
+      );
   }
 
   listarCasosPaginados(page: number, size: number): Observable<PagedResponseDto<CasoDto>> {
     if (environment.datosDemostracion) {
       return this.casosSimulados.listarCasos(page, size);
     }
-    return this.solicitudService.listarCasosPaginados(page, size);
+    return this.solicitudService.listarCasosPaginados(page, size).pipe(
+      switchMap((respuesta) => {
+        this.usarRespaldo = respuesta.content.length === 0;
+        return this.usarRespaldo
+          ? this.casosSimulados.listarCasos(page, size)
+          : of(respuesta);
+      }),
+      catchError(() => {
+        this.usarRespaldo = true;
+        return this.casosSimulados.listarCasos(page, size);
+      })
+    );
   }
 
   obtenerPorId(solicitudId: number): Observable<SolicitudAcompanamientoResponse> {
-    if (environment.datosDemostracion) {
+    if (
+      environment.datosDemostracion ||
+      this.usarRespaldo ||
+      this.casosSimulados.tieneSolicitud(solicitudId)
+    ) {
       return this.casosSimulados.obtenerSolicitud(solicitudId);
     }
     return this.solicitudService.obtenerPorId(solicitudId);
@@ -67,7 +100,11 @@ export class RegistroVbgDatosService {
     datos: unknown,
     casoIdActual: number | null = null
   ): Observable<{ id?: number; codigo?: string }> {
-    if (environment.datosDemostracion) {
+    if (
+      environment.datosDemostracion ||
+      this.usarRespaldo ||
+      (casoIdActual != null && this.casosSimulados.tieneSolicitud(casoIdActual))
+    ) {
       return this.casosSimulados.guardarPestana(casoIdActual, tabIndex, datos);
     }
     return this.solicitudService.registrarPestana(tabIndex, datos);

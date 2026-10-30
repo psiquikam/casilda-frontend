@@ -88,8 +88,10 @@ export interface SolicitudAcompanamientoResponse {
   id: number;
   codigo: string;
   tipoSolicitud: string;
+  idEstadoSolicitud?: number | null;
   estado: string;
   fechaCreacion: string;
+  fechaReparto?: string | null;
   observacionesTelefono?: string | null;
   observacionesCorreo?: string | null;
   // Para la tabla
@@ -297,6 +299,7 @@ export interface ContactoTelefonicoDto {
   citaCreada?: boolean;
   citaId?: number;
   fechaCita?: string;
+  horaCita?: string;
 }
 
 export interface ContactoTelefonicoRequestDto {

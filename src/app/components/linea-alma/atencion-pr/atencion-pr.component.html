@@ -127,7 +127,7 @@
                   </mat-select>
                 </mat-form-field>
                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Número de Documento</mat-label>
+                  <mat-label>Número de documento</mat-label>
                   <input matInput formControlName="documento" inputmode="numeric" pattern="\d*"
                     [maxlength]="maxLongitudDocumento" (input)="soloDigitos($event)"
                     (keyup.enter)="buscarPersona($event)">
@@ -166,7 +166,7 @@
                       <input matInput formControlName="segundoApellido">
                     </mat-form-field>
                     <mat-form-field appearance="outline">
-                      <mat-label>Regimen de Salud</mat-label>
+                      <mat-label>Régimen de salud</mat-label>
                       <mat-select formControlName="regimenSalud">
                         @for (v of regimenes; track v.id) {
                           <mat-option [value]="v.id">{{v.nombre}}</mat-option>
@@ -174,7 +174,7 @@
                       </mat-select>
                     </mat-form-field>
                     <mat-form-field appearance="outline">
-                      <mat-label>EPS - Regimen de Salud</mat-label>
+                      <mat-label>EPS - régimen de salud</mat-label>
                       <mat-select formControlName="eps">
                         @for (v of eps; track v.id) {
                           <mat-option [value]="v.id">{{v.nombre}}</mat-option>
@@ -182,7 +182,7 @@
                       </mat-select>
                     </mat-form-field>
                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                      <mat-label>Departamento de Nacimiento</mat-label>
+                      <mat-label>Departamento de nacimiento</mat-label>
                       <input type="text" placeholder="Seleccione..." matInput
                         formControlName="departamentoNacimiento" [matAutocomplete]="autoDepNac">
                         <mat-autocomplete #autoDepNac="matAutocomplete"
@@ -193,7 +193,7 @@
                         </mat-autocomplete>
                       </mat-form-field>
                       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                        <mat-label>Ciudad de Nacimiento</mat-label>
+                        <mat-label>Ciudad de nacimiento</mat-label>
                         <input type="text" placeholder="Seleccione..." matInput
                           formControlName="ciudadNacimiento" [matAutocomplete]="autoMunNac">
                           <mat-autocomplete #autoMunNac="matAutocomplete"
@@ -204,7 +204,7 @@
                           </mat-autocomplete>
                         </mat-form-field>
                         <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                          <mat-label>Departamento de Residencia</mat-label>
+                          <mat-label>Departamento de residencia</mat-label>
                           <input type="text" placeholder="Seleccione..." matInput
                             formControlName="departamentoResidencia" [matAutocomplete]="autoDepRes">
                             <mat-autocomplete #autoDepRes="matAutocomplete"
@@ -215,7 +215,7 @@
                             </mat-autocomplete>
                           </mat-form-field>
                           <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                            <mat-label>Ciudad de Residencia</mat-label>
+                            <mat-label>Ciudad de residencia</mat-label>
                             <input type="text" placeholder="Seleccione..." matInput
                               formControlName="ciudadResidencia" [matAutocomplete]="autoMunRes">
                               <mat-autocomplete #autoMunRes="matAutocomplete"
@@ -234,7 +234,7 @@
                               </mat-select>
                             </mat-form-field>
                             <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                              <mat-label>Identidad de Género</mat-label>
+                              <mat-label>Identidad de género</mat-label>
                               <mat-select formControlName="identidadSexual">
                                 @for (i of identidadesGenero; track i.id) {
                                   <mat-option [value]="i.id">{{i.nombre}}</mat-option>
@@ -268,7 +268,7 @@
                             </button>
 
                             <mat-form-field appearance="outline" subscriptSizing="dynamic" class="direccion-field">
-                              <mat-label>Dirección de Residencia Registrada</mat-label>
+                              <mat-label>Dirección de residencia registrada</mat-label>
                               <input matInput formControlName="direccionResidencia" readonly
                                 placeholder="No se ha registrado dirección">
                                 <mat-icon aria-hidden="true" matSuffix color="primary">location_on</mat-icon>
@@ -435,7 +435,7 @@
 
                               <div style="margin-top: 10px; width: 100%;">
                                 <mat-form-field appearance="outline" style="width: 100%;">
-                                  <mat-label>Observaciones de Correo</mat-label>
+                                  <mat-label>Observaciones de correo</mat-label>
                                   <textarea matInput formControlName="observacionesCorreo"
                                   placeholder="Observaciones adicionales sobre los correos..."></textarea>
                                 </mat-form-field>
@@ -493,7 +493,7 @@
 
                               <div style="margin-top: 10px; width: 100%;">
                                 <mat-form-field appearance="outline" style="width: 100%;">
-                                  <mat-label>Observaciones de Teléfono</mat-label>
+                                  <mat-label>Observaciones de teléfono</mat-label>
                                   <textarea matInput formControlName="observacionesTelefono"
                                   placeholder="Observaciones adicionales sobre los teléfonos..."></textarea>
                                 </mat-form-field>
