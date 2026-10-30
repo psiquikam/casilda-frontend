@@ -3,8 +3,29 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, of, tap, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
+import type { MaestroDto } from './listas.service';
 
 export const AUTH_REQUIRED_MESSAGE = 'La sesión ha expirado o no ha sido iniciada. Se requiere autenticación para continuar.';
+
+export interface AuthRegisterRequest {
+  primerNombre: string;
+  segundoNombre?: string;
+  primerApellido: string;
+  segundoApellido?: string;
+  tipoDocumento: string;
+  documento: string;
+  vinculoUdeaId: number;
+  email: string;
+  telefono: string;
+  password: string;
+  habeasData: true;
+}
+
+export interface AuthRegisterResponse {
+  mensaje?: string;
+  usuarioId?: number;
+  email?: string;
+}
 
 export interface UserSession {
   email: string;
@@ -324,6 +345,14 @@ export class AuthService {
 
   getDefaultRoute(): string {
     return '/inicio';
+  }
+
+  listarVinculosUdea(): Observable<MaestroDto[]> {
+    return this.http.get<MaestroDto[]>(`${this.apiUrl}/vinculos-udea`);
+  }
+
+  registrarUsuario(datos: AuthRegisterRequest): Observable<AuthRegisterResponse> {
+    return this.http.post<AuthRegisterResponse>(`${this.apiUrl}/register`, datos);
   }
 
   loginWithCredentials(email: string, password: string): Observable<AuthLoginResponse> {
