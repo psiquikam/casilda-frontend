@@ -102,11 +102,11 @@ export const routes: Routes = [
   },
   {
     path: 'mis-asignaciones',
-    title: 'Mis asignaciones',
+    title: 'Bandeja de contacto',
     canMatch: [featureCapabilityGuard],
     canActivate: [roleGuard],
     data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR'], feature: 'assignmentsPrototype' },
-    loadComponent: () => import('./components/mis-asignaciones/mis-asignaciones.component').then((m) => m.MisAsignacionesComponent)
+    loadComponent: () => import('./components/gestion-contacto/gestion-contacto.component').then((m) => m.DetalleAcompanamientoComponent)
   },
   {
     path: 'detalle-acompanamiento/:id',

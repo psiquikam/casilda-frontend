@@ -1,13 +1,22 @@
 <div class="consulta-container">
   <header class="page-header">
     <div class="header-content">
-      <button type="button" class="back-link" (click)="regresar()">
-        <mat-icon aria-hidden="true">arrow_back</mat-icon> Volver al Panel
-      </button>
-      <h1>Gestión de Contacto</h1>
-      <p>Administre el seguimiento y primer contacto de las solicitudes</p>
+      @if (esDetalle) {
+        <button type="button" class="back-link" (click)="regresar()">
+          <mat-icon aria-hidden="true">arrow_back</mat-icon> Volver a la bandeja de contacto
+        </button>
+      }
+      <h1>Bandeja de contacto</h1>
+      <p>Administre el seguimiento y primer contacto de las solicitudes asignadas</p>
     </div>
   </header>
+
+  @if (usaDemostracion) {
+    <div class="demo-notice" role="status">
+      <mat-icon aria-hidden="true">science</mat-icon>
+      Datos de demostración: el servicio no devolvió asignaciones disponibles.
+    </div>
+  }
 
   <mat-card class="table-card">
     <div class="table-responsive">
@@ -18,7 +27,12 @@
       <table mat-table [dataSource]="dataSourceAsignados" multiTemplateDataRows aria-label="Casos asignados">
 
         <ng-container matColumnDef="expand">
-          <th mat-header-cell scope="col" *matHeaderCellDef><span class="visually-hidden">Detalle</span></th>
+          <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-expand">
+            <div class="header-inline-container header-inline-container--empty">
+              <span class="column-title visually-hidden">Detalle</span>
+              <div class="header-spacer-box" aria-hidden="true"></div>
+            </div>
+          </th>
           <td mat-cell *matCellDef="let element">
             <button mat-icon-button [attr.aria-label]="'Ver el detalle del caso ' + element.id"
               [attr.aria-expanded]="expandedElement === element"
@@ -31,55 +45,81 @@
           </td>
         </ng-container>
 
-        <ng-container matColumnDef="id">
-          <th mat-header-cell scope="col" *matHeaderCellDef>
-            <div class="header-inline-container">
-              <span class="column-title">ID Caso</span>
-              <div class="search-box-slim"><input appFiltroColumna="ID del caso" (keyup)="applyFilter('id', $event)" placeholder="Filtrar"></div>
-            </div>
-          </th>
-          <td mat-cell *matCellDef="let element" class="id-cell">#{{element.id}}</td>
-        </ng-container>
-
         <ng-container matColumnDef="nombre">
-          <th mat-header-cell scope="col" *matHeaderCellDef>
+          <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-nombre">
             <div class="header-inline-container">
               <span class="column-title">Usuario</span>
-              <div class="search-box-slim"><input appFiltroColumna="nombre de la persona usuaria" (keyup)="applyFilter('nombre', $event)" placeholder="Buscar..."></div>
+              <mat-form-field appearance="outline" class="filter-field-mat" subscriptSizing="dynamic">
+                <input matInput appFiltroColumna="nombre de la persona usuaria" (keyup)="applyFilter('nombre', $event)" placeholder="Buscar...">
+              </mat-form-field>
             </div>
           </th>
-          <td mat-cell *matCellDef="let element">
-            <span>{{element.nombre}}</span>
-          </td>
+          <td mat-cell *matCellDef="let element">{{element.nombre}}</td>
         </ng-container>
 
         <ng-container matColumnDef="documento">
-          <th mat-header-cell scope="col" *matHeaderCellDef>
+          <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-documento">
             <div class="header-inline-container">
               <span class="column-title">Doc.</span>
-              <div class="search-box-slim"><input appFiltroColumna="número de documento" (keyup)="applyFilter('documento', $event)" placeholder="N°"></div>
+              <mat-form-field appearance="outline" class="filter-field-mat" subscriptSizing="dynamic">
+                <input matInput appFiltroColumna="número de documento" (keyup)="applyFilter('documento', $event)" placeholder="N°">
+              </mat-form-field>
             </div>
           </th>
-          <td mat-cell *matCellDef="let element">
-            {{element.tipoDocumento}} - {{element.documento}}
-          </td>
+          <td mat-cell *matCellDef="let element">{{element.tipoDocumento}} - {{element.documento}}</td>
         </ng-container>
 
-        <ng-container matColumnDef="fecha">
-          <th mat-header-cell scope="col" *matHeaderCellDef>
+        <ng-container matColumnDef="fechaReparto">
+          <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-fechaReparto">
             <div class="header-inline-container">
-              <span class="column-title">Fecha</span>
-              <div class="search-box-slim"><input appFiltroColumna="fecha" (keyup)="applyFilter('fecha', $event)" placeholder="dd/MM/yyyy"></div>
+              <span class="column-title">Fecha de reparto</span>
+              <mat-form-field appearance="outline" class="filter-field-mat" subscriptSizing="dynamic">
+                <input matInput appFiltroColumna="fecha de reparto" (keyup)="applyFilter('fecha', $event)" placeholder="dd/MM/yyyy">
+              </mat-form-field>
             </div>
           </th>
           <td mat-cell *matCellDef="let element">{{element.fecha}}</td>
         </ng-container>
 
-        <ng-container matColumnDef="tipoAsignacion">
-          <th mat-header-cell scope="col" *matHeaderCellDef>
+        <ng-container matColumnDef="fechaCita">
+          <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-fechaCita">
             <div class="header-inline-container">
-              <span class="column-title">Tipo de Asignación</span>
-              <div class="search-box-slim"><input appFiltroColumna="tipo de asignación" (keyup)="applyFilter('tipoAsignacion', $event)" placeholder="..."></div>
+              <span class="column-title">Fecha de cita</span>
+              <mat-form-field appearance="outline" class="filter-field-mat" subscriptSizing="dynamic">
+                <mat-select aria-label="Filtrar por cita sin agendar"
+                  placeholder="Todas"
+                  [(value)]="filterValues.estadoCita"
+                  (selectionChange)="applySelectFilter('estadoCita', $event.value)">
+                  <mat-option value="">Todas</mat-option>
+                  <mat-option [value]="SIN_AGENDAR">{{ SIN_AGENDAR }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let element">
+            @if (element.fechaCita) {
+              <span class="cita-fecha">{{ element.fechaCita }}</span>
+            } @else {
+              <span class="cita-vacia"><mat-icon aria-hidden="true">event_busy</mat-icon>{{ SIN_AGENDAR }}</span>
+            }
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="tipoAsignacion">
+          <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-tipoAsignacion">
+            <div class="header-inline-container">
+              <span class="column-title">Tipo de asignación</span>
+              <mat-form-field appearance="outline" class="filter-field-mat" subscriptSizing="dynamic">
+                <mat-select aria-label="Filtrar por tipo de asignación"
+                  placeholder="Todas"
+                  [(value)]="filterValues.tipoAsignacion"
+                  (selectionChange)="applySelectFilter('tipoAsignacion', $event.value)">
+                  <mat-option value="">Todas</mat-option>
+                  @for (tipo of opcionesTipoAsignacion; track tipo) {
+                    <mat-option [value]="tipo">{{ tipo }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
             </div>
           </th>
           <td mat-cell *matCellDef="let element">
@@ -88,10 +128,20 @@
         </ng-container>
 
         <ng-container matColumnDef="profesional">
-          <th mat-header-cell scope="col" *matHeaderCellDef>
+          <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-profesional">
             <div class="header-inline-container">
-              <span class="column-title">Asignado</span>
-              <div class="search-box-slim"><input appFiltroColumna="profesional asignado" (keyup)="applyFilter('profesional', $event)" placeholder="..."></div>
+              <span class="column-title">Asignado a</span>
+              <mat-form-field appearance="outline" class="filter-field-mat" subscriptSizing="dynamic">
+                <mat-select aria-label="Filtrar por profesional asignado"
+                  placeholder="Todos"
+                  [(value)]="filterValues.profesional"
+                  (selectionChange)="applySelectFilter('profesional', $event.value)">
+                  <mat-option value="">Todos</mat-option>
+                  @for (prof of opcionesProfesionales; track prof) {
+                    <mat-option [value]="prof">{{ prof }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
             </div>
           </th>
           <td mat-cell *matCellDef="let element">
@@ -105,22 +155,36 @@
         </ng-container>
 
         <ng-container matColumnDef="acciones">
-          <th mat-header-cell scope="col" *matHeaderCellDef>
-            <div class="column-title text-center">Acciones</div>
+          <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-acciones">
+            <div class="header-inline-container header-inline-container--actions">
+              <span class="column-title column-title--center">Acciones</span>
+              <div class="header-spacer-box" aria-hidden="true"></div>
+            </div>
           </th>
           <td mat-cell *matCellDef="let element">
+            @let sinProfesional = !element.profesional || element.profesional === 'Sin asignar';
+            @let maxAlcanzado = (numIntentosMap[element.id] || 0) >= maxLlamadas;
             <div class="action-buttons-container">
-              <button mat-icon-button class="action-purple"
+              <button mat-icon-button class="btn-action btn-action-contactar"
+                [matTooltip]="sinProfesional ? 'Sin asignar — no disponible' : maxAlcanzado ? 'Máximo de intentos alcanzado' : 'Registrar intento de contacto'"
                 [attr.aria-label]="'Registrar intento de contacto del caso ' + element.id"
-                [matTooltip]="(!element.profesional || element.profesional === 'Sin asignar') ? 'Sin asignar — no disponible' : (numIntentosMap[element.id] || 0) >= maxLlamadas ? 'Máx. intentos alcanzados' : 'Intento de contacto'"
-                [disabled]="!element.profesional || element.profesional === 'Sin asignar' || (numIntentosMap[element.id] || 0) >= maxLlamadas"
+                [disabled]="sinProfesional || maxAlcanzado"
                 (click)="abrirModalGestion(element); $event.stopPropagation()">
                 <mat-icon aria-hidden="true">phone_enabled</mat-icon>
               </button>
-              <button mat-icon-button [attr.aria-label]="'Ver el historial de contacto del caso ' + element.id" class="action-visible" matTooltip="Ver historial"
-                [disabled]="!element.profesional || element.profesional === 'Sin asignar'"
+              <button mat-icon-button class="btn-action btn-action-historial"
+                matTooltip="Ver historial"
+                [attr.aria-label]="'Ver el historial de contacto del caso ' + element.id"
+                [disabled]="sinProfesional"
                 (click)="abrirHistorial(element); $event.stopPropagation()">
-                <mat-icon aria-hidden="true" svgIcon="icono-ver"></mat-icon>
+                <mat-icon aria-hidden="true">history</mat-icon>
+              </button>
+              <button mat-icon-button class="btn-action btn-action-desistir"
+                matTooltip="Registrar desistimiento"
+                [attr.aria-label]="'Registrar desistimiento del caso ' + element.id"
+                [disabled]="sinProfesional"
+                (click)="abrirDesistimiento(element); $event.stopPropagation()">
+                <mat-icon aria-hidden="true">person_off</mat-icon>
               </button>
             </div>
           </td>
@@ -134,7 +198,7 @@
                 <div class="detail-item"><strong>Facultad:</strong> {{element.facultad}}</div>
                 <div class="detail-item"><strong>Campus:</strong> {{element.campus}}</div>
                 <div class="detail-item"><strong>Celular:</strong> {{element.celular}}</div>
-                <div class="detail-item"><strong>Correo Institucional:</strong> {{element.correoInst}}</div>
+                <div class="detail-item"><strong>Correo institucional:</strong> {{element.correoInst}}</div>
               </div>
             </div>
           </td>
@@ -147,7 +211,7 @@
         <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
       </table>
 
-      @if (dataSourceAsignados.data.length === 0) {
+      @if (dataSourceAsignados.data.length === 0 && !cargando) {
         <div class="no-results-msg">
           <mat-icon aria-hidden="true">info_outline</mat-icon>
           <p>No se encontraron registros para gestionar.</p>

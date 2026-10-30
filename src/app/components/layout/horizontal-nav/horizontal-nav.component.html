@@ -17,7 +17,7 @@
 
       <a routerLink="/seguimiento" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
         <mat-icon class="hnav-icon" aria-hidden="true">track_changes</mat-icon>
-        <span class="hnav-text">Seguimiento de Trámite</span>
+        <span class="hnav-text">Seguimiento de trámite</span>
       </a>
 
       @if (features.complaintIntakePrototype) {
@@ -40,11 +40,11 @@
       <mat-menu #adminMenu="matMenu" class="hnav-menu">
         <a mat-menu-item routerLink="/gestion-usuarios" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
           <mat-icon aria-hidden="true">manage_accounts</mat-icon>
-          <span>Gestión de Usuarios</span>
+          <span>Gestión de usuarios</span>
         </a>
         <a mat-menu-item routerLink="/gestion-sistema" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
           <mat-icon aria-hidden="true">tune</mat-icon>
-          <span>Maestros del Sistema</span>
+          <span>Maestros del sistema</span>
         </a>
       </mat-menu>
     }
@@ -54,7 +54,7 @@
       <button type="button" class="hnav-dropdown-btn" [matMenuTriggerFor]="atencionMenu"
         aria-label="Abrir menú del Equipo de Atención">
         <mat-icon class="hnav-icon" aria-hidden="true">volunteer_activism</mat-icon>
-        <span class="hnav-text">Equipo de Atención</span>
+        <span class="hnav-text">Equipo de atención</span>
         <mat-icon class="hnav-chevron" aria-hidden="true">arrow_drop_down</mat-icon>
       </button>
 
@@ -70,20 +70,20 @@
         @if (features.assignmentsPrototype) {
           <a mat-menu-item routerLink="/mis-asignaciones" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
             <mat-icon aria-hidden="true">assignment_ind</mat-icon>
-            <span>Mis Asignaciones</span>
+          <span>Bandeja de contacto</span>
           </a>
         }
         <a mat-menu-item routerLink="/cita" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
           <mat-icon aria-hidden="true">calendar_month</mat-icon>
-          <span>Citas y Agendamiento</span>
+          <span>Citas y agendamiento</span>
         </a>
         <a mat-menu-item routerLink="/registro-caso" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
           <mat-icon aria-hidden="true">folder_shared</mat-icon>
-          <span>Registro de Caso</span>
+          <span>Registro de caso</span>
         </a>
         <a mat-menu-item routerLink="/registro-atencion" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
           <mat-icon aria-hidden="true">handshake</mat-icon>
-          <span>Registro de Atención</span>
+          <span>Registro de atención</span>
         </a>
       </mat-menu>
     }
@@ -115,7 +115,7 @@
         @if (features.publicTrackingPrototype) {
           <a mat-menu-item routerLink="/seguimiento" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
             <mat-icon aria-hidden="true">track_changes</mat-icon>
-            <span>Seguimiento de Trámites</span>
+            <span>Seguimiento de trámites</span>
           </a>
         }
       </mat-menu>
@@ -125,7 +125,7 @@
     @if ((auth.isAdmin() || auth.isCoordinador() || auth.isRevisor()) && features.reviewerDashboardPrototype) {
       <a routerLink="/dashboard-revisor" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
         <mat-icon class="hnav-icon" aria-hidden="true">bar_chart</mat-icon>
-        <span class="hnav-text">Panel de Indicadores</span>
+        <span class="hnav-text">Panel de indicadores</span>
       </a>
     }
 
@@ -150,7 +150,7 @@
         <mat-icon class="hnav-mobile-toggle__icon" aria-hidden="true">
           {{ mobileMenuOpen() ? 'close' : 'menu' }}
         </mat-icon>
-        <span class="hnav-mobile-toggle__label">Menú de Navegación</span>
+        <span class="hnav-mobile-toggle__label">Menú de navegación</span>
       </div>
       <div class="hnav-mobile-toggle__right">
         <span class="hnav-mobile-toggle__status">{{ mobileMenuOpen() ? 'Cerrar' : 'Explorar' }}</span>
@@ -168,7 +168,7 @@
       <a routerLink="/inicio" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
         class="hnav-mobile-item hnav-mobile-item--root" (click)="closeMobileMenu()">
         <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">dashboard</mat-icon>
-        <span class="hnav-mobile-item__text">Panel de Inicio</span>
+        <span class="hnav-mobile-item__text">Panel de inicio</span>
       </a>
 
       <!-- SECCIÓN USUARIO (No Funcionario) -->
@@ -178,7 +178,7 @@
             [attr.aria-expanded]="isSectionExpanded('usuario')">
             <span class="hnav-mobile-group-title">
               <mat-icon class="hnav-mobile-group-icon" aria-hidden="true">volunteer_activism</mat-icon>
-              <span>Mis Trámites y Solicitudes</span>
+              <span>Mis trámites y solicitudes</span>
             </span>
             <mat-icon class="hnav-mobile-group-chevron" [class.is-expanded]="isSectionExpanded('usuario')" aria-hidden="true">
               expand_more
@@ -195,7 +195,7 @@
               <a routerLink="/seguimiento" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
                 class="hnav-mobile-item" (click)="closeMobileMenu()">
                 <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">track_changes</mat-icon>
-                <span class="hnav-mobile-item__text">Seguimiento de Trámite</span>
+                <span class="hnav-mobile-item__text">Seguimiento de trámite</span>
               </a>
               @if (features.complaintIntakePrototype) {
                 <a routerLink="/nueva-queja" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
@@ -228,12 +228,12 @@
               <a routerLink="/gestion-usuarios" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
                 class="hnav-mobile-item" (click)="closeMobileMenu()">
                 <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">manage_accounts</mat-icon>
-                <span class="hnav-mobile-item__text">Gestión de Usuarios</span>
+                <span class="hnav-mobile-item__text">Gestión de usuarios</span>
               </a>
               <a routerLink="/gestion-sistema" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
                 class="hnav-mobile-item" (click)="closeMobileMenu()">
                 <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">tune</mat-icon>
-                <span class="hnav-mobile-item__text">Maestros del Sistema</span>
+                <span class="hnav-mobile-item__text">Maestros del sistema</span>
               </a>
             </div>
           }
@@ -247,7 +247,7 @@
             [attr.aria-expanded]="isSectionExpanded('atencion')">
             <span class="hnav-mobile-group-title">
               <mat-icon class="hnav-mobile-group-icon" aria-hidden="true">volunteer_activism</mat-icon>
-              <span>Equipo de Atención</span>
+              <span>Equipo de atención</span>
             </span>
             <mat-icon class="hnav-mobile-group-chevron" [class.is-expanded]="isSectionExpanded('atencion')" aria-hidden="true">
               expand_more
@@ -270,23 +270,23 @@
                 <a routerLink="/mis-asignaciones" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
                   class="hnav-mobile-item" (click)="closeMobileMenu()">
                   <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">assignment_ind</mat-icon>
-                  <span class="hnav-mobile-item__text">Mis Asignaciones</span>
+                <span class="hnav-mobile-item__text">Bandeja de contacto</span>
                 </a>
               }
               <a routerLink="/cita" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
                 class="hnav-mobile-item" (click)="closeMobileMenu()">
                 <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">calendar_month</mat-icon>
-                <span class="hnav-mobile-item__text">Citas y Agendamiento</span>
+                <span class="hnav-mobile-item__text">Citas y agendamiento</span>
               </a>
               <a routerLink="/registro-caso" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
                 class="hnav-mobile-item" (click)="closeMobileMenu()">
                 <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">folder_shared</mat-icon>
-                <span class="hnav-mobile-item__text">Registro de Caso</span>
+                <span class="hnav-mobile-item__text">Registro de caso</span>
               </a>
               <a routerLink="/registro-atencion" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
                 class="hnav-mobile-item" (click)="closeMobileMenu()">
                 <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">handshake</mat-icon>
-                <span class="hnav-mobile-item__text">Registro de Atención</span>
+                <span class="hnav-mobile-item__text">Registro de atención</span>
               </a>
             </div>
           }
@@ -327,7 +327,7 @@
                 <a routerLink="/seguimiento" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
                   class="hnav-mobile-item" (click)="closeMobileMenu()">
                   <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">track_changes</mat-icon>
-                  <span class="hnav-mobile-item__text">Seguimiento de Trámites</span>
+                  <span class="hnav-mobile-item__text">Seguimiento de trámites</span>
                 </a>
               }
             </div>
@@ -340,7 +340,7 @@
         <a routerLink="/dashboard-revisor" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
           class="hnav-mobile-item" (click)="closeMobileMenu()">
           <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">bar_chart</mat-icon>
-          <span class="hnav-mobile-item__text">Panel de Indicadores</span>
+          <span class="hnav-mobile-item__text">Panel de indicadores</span>
         </a>
       }
 

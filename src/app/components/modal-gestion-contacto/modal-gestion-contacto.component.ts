@@ -15,12 +15,15 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { SolicitudService, ContactoTelefonicoDto } from '../../services/solicitud.service';
+import { ContactoTelefonicoDto } from '../../services/solicitud.service';
 import { environment } from '../../../environments/environment';
 import { NotificacionService } from '../../core/a11y/notificacion.service';
+import { AsignacionesService, SolicitudAsignada } from '../../services/asignaciones.service';
 
 /** Resultado que permite concertar cita en primera llamada */
 const RESULTADO_EXITOSO = 'Contesta y se concerta cita';
+/** Resultado fijo cuando la persona desiste del acompañamiento */
+const RESULTADO_DESISTIMIENTO = 'Desistimiento';
 
 @Component({
     selector: 'app-modal-gestion',
@@ -55,6 +58,8 @@ export class ModalGestionComponent implements OnInit {
   resultados: string[] = [];
 
   mostrarCamposCita = false;
+  esDesistimiento = false;
+  readonly resultadoDesistimiento = RESULTADO_DESISTIMIENTO;
 
   minCitaDate: Date = (() => {
     const today = new Date();
@@ -64,16 +69,12 @@ export class ModalGestionComponent implements OnInit {
     return tomorrow;
   })();
 
-  /** Máximo de llamadas antes de asignación unilateral de cita */
-  maxLlamadas = 2;
-
   private readonly maestrosUrl = `${environment.apiBaseUrl}/maestros`;
-  private readonly parametrosUrl = `${environment.apiBaseUrl}/parametros`;
 
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<ModalGestionComponent>,
-    private solicitudService: SolicitudService,
+    private asignacionesService: AsignacionesService,
     private http: HttpClient,
     private snackBar: MatSnackBar,
     @Inject(MAT_DIALOG_DATA) public data: any
@@ -81,8 +82,8 @@ export class ModalGestionComponent implements OnInit {
 
   ngOnInit(): void {
     this.contactoForm = this.fb.group({
-      fecha: [{ value: this.getToday(), disabled: true }, Validators.required],
-      hora: [{ value: this.getHoraActual(), disabled: true }, Validators.required],
+      fecha: [this.getToday(), Validators.required],
+      hora: [this.getHoraActual(), Validators.required],
       jornada: [{ value: '', disabled: true }],
       resultado: ['', Validators.required],
       observacion: ['', [Validators.required, Validators.minLength(5)]],
@@ -103,31 +104,18 @@ export class ModalGestionComponent implements OnInit {
       this.recalcularMostrarCamposCita(value);
     });
 
-    // Cargar datos desde el backend
-    this.cargarMaxLlamadas();
+    this.esDesistimiento = this.data?.modo === 'desistimiento';
+    if (this.esDesistimiento) {
+      this.contactoForm.patchValue({ resultado: RESULTADO_DESISTIMIENTO });
+    }
     this.cargarResultados();
     this.cargarHistorial();
   }
 
-  /** Calcula si se deben mostrar los campos de cita según el resultado y el número de llamada */
+  /** La fecha y hora de cita solo se habilitan cuando se concierta cita en la llamada. */
   private recalcularMostrarCamposCita(resultado: string): void {
-    const numeroDeLlamada = this.historialContactos.length + 1;
-    const esConcertada = resultado === RESULTADO_EXITOSO;
-    const esUnilateral = numeroDeLlamada >= this.maxLlamadas;
-    this.mostrarCamposCita = esConcertada || esUnilateral;
+    this.mostrarCamposCita = resultado === RESULTADO_EXITOSO;
     this.actualizarValidadoresCita();
-  }
-
-  cargarMaxLlamadas(): void {
-    this.http.get<number>(`${this.parametrosUrl}/max-llamadas-contacto`).subscribe({
-      next: (valor) => {
-        this.maxLlamadas = valor;
-        // Recalcular por si ya hay resultado seleccionado
-        const resultado = this.contactoForm.get('resultado')?.value;
-        if (resultado) this.recalcularMostrarCamposCita(resultado);
-      },
-      error: () => { this.maxLlamadas = 2; }
-    });
   }
 
   cargarResultados(): void {
@@ -138,9 +126,10 @@ export class ModalGestionComponent implements OnInit {
   }
 
   cargarHistorial(): void {
-    if (!this.data?.id) return;
+    const solicitud = this.data?.solicitudAsignada as SolicitudAsignada | undefined;
+    if (!solicitud) return;
     this.cargandoHistorial = true;
-    this.solicitudService.listarContactos(this.data.id).subscribe({
+    this.asignacionesService.listarContactos(solicitud).subscribe({
       next: (contactos) => {
         this.historialContactos = contactos.map((c) => {
           const { fecha, hora } = this.separarFechaHora(c.fecha);
@@ -183,10 +172,16 @@ export class ModalGestionComponent implements OnInit {
   registrarIntento(): void {
     if (this.contactoForm.invalid) return;
 
+    const solicitud = this.data?.solicitudAsignada as SolicitudAsignada | undefined;
+    if (!solicitud) {
+      this.notificacion.error('No fue posible identificar la solicitud que se desea gestionar.');
+      return;
+    }
+
     const val = this.contactoForm.getRawValue();
     this.guardando = true;
 
-    this.solicitudService.registrarContacto(this.data.id, {
+    this.asignacionesService.registrarContacto(solicitud, {
       fecha: this.combinarFechaHoraParaBackend(val.fecha, val.hora),
       resultado: val.resultado,
       observacion: val.observacion,

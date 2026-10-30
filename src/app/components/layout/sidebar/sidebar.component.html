@@ -5,7 +5,7 @@
     <a routerLink="/inicio" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item nav-item--home"
       aria-label="Ir al panel de inicio principal">
       <mat-icon class="nav-item__icon" aria-hidden="true">dashboard</mat-icon>
-      <span class="nav-item__text">Panel de Inicio</span>
+      <span class="nav-item__text">Panel de inicio</span>
     </a>
   </div>
 
@@ -34,7 +34,7 @@
             </a>
             <a routerLink="/seguimiento" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
               <mat-icon class="nav-item__icon" aria-hidden="true">track_changes</mat-icon>
-              <span class="nav-item__text">Seguimiento de Trámite</span>
+              <span class="nav-item__text">Seguimiento de trámite</span>
             </a>
             @if (features.complaintIntakePrototype) {
               <a routerLink="/nueva-queja" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
@@ -69,7 +69,7 @@
             </a>
             <a routerLink="/gestion-sistema" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
               <mat-icon class="nav-item__icon" aria-hidden="true">tune</mat-icon>
-              <span class="nav-item__text">Maestros del Sistema</span>
+              <span class="nav-item__text">Maestros del sistema</span>
             </a>
           </div>
         }
@@ -84,7 +84,7 @@
           [attr.aria-expanded]="isExpanded('atencion')" aria-controls="section-atencion">
           <span class="section-toggle__title">
             <mat-icon class="section-toggle__icon" aria-hidden="true">volunteer_activism</mat-icon>
-            <span>Equipo de Atención</span>
+            <span>Equipo de atención</span>
           </span>
           <mat-icon class="section-toggle__chevron" [class.is-expanded]="isExpanded('atencion')" aria-hidden="true">
             expand_more
@@ -103,20 +103,20 @@
             @if (features.assignmentsPrototype) {
               <a routerLink="/mis-asignaciones" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
                 <mat-icon class="nav-item__icon" aria-hidden="true">assignment_ind</mat-icon>
-                <span class="nav-item__text">Mis Asignaciones</span>
+              <span class="nav-item__text">Bandeja de contacto</span>
               </a>
             }
             <a routerLink="/cita" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
               <mat-icon class="nav-item__icon" aria-hidden="true">calendar_month</mat-icon>
-              <span class="nav-item__text">Citas y Agendamiento</span>
+              <span class="nav-item__text">Citas y agendamiento</span>
             </a>
             <a routerLink="/registro-caso" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
               <mat-icon class="nav-item__icon" aria-hidden="true">folder_shared</mat-icon>
-              <span class="nav-item__text">Registro de Caso</span>
+              <span class="nav-item__text">Registro de caso</span>
             </a>
             <a routerLink="/registro-atencion" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
               <mat-icon class="nav-item__icon" aria-hidden="true">handshake</mat-icon>
-              <span class="nav-item__text">Registro de Atención</span>
+              <span class="nav-item__text">Registro de atención</span>
             </a>
           </div>
         }
@@ -189,7 +189,7 @@
           [attr.aria-expanded]="isExpanded('reportes')" aria-controls="section-reportes">
           <span class="section-toggle__title">
             <mat-icon class="section-toggle__icon" aria-hidden="true">insights</mat-icon>
-            <span>Reportes y Métricas</span>
+            <span>Reportes y métricas</span>
           </span>
           <mat-icon class="section-toggle__chevron" [class.is-expanded]="isExpanded('reportes')" aria-hidden="true">
             expand_more
@@ -199,7 +199,7 @@
           <div id="section-reportes" class="section-content" role="region" aria-labelledby="toggle-reportes">
             <a routerLink="/dashboard-revisor" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
               <mat-icon class="nav-item__icon" aria-hidden="true">bar_chart</mat-icon>
-              <span class="nav-item__text">Panel de Indicadores</span>
+              <span class="nav-item__text">Panel de indicadores</span>
             </a>
           </div>
         }
