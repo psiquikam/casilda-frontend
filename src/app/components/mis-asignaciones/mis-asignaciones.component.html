@@ -1,7 +1,7 @@
 <div class="asignaciones-container">
   <header class="page-header">
     <div>
-      <h1>Bandeja de contacto</h1>
+      <h1>Gestión de contacto</h1>
       <p>Gestión de acompañamientos psicosociales bajo su responsabilidad.</p>
       <span class="demo-label">Datos de demostración: los cambios se conservan solo mientras la aplicación está abierta.</span>
     </div>
@@ -18,54 +18,110 @@
 
   <mat-card class="table-card">
     <div class="table-responsive">
-      <table mat-table [dataSource]="misCasos" aria-label="Bandeja de contacto">
+      <p class="visually-hidden" role="status" aria-live="polite">
+        {{ dataSource.filteredData.length }} resultados encontrados
+      </p>
+      <table mat-table [dataSource]="dataSource" aria-label="Solicitudes de gestión de contacto">
         <ng-container matColumnDef="id">
-          <th mat-header-cell scope="col" *matHeaderCellDef>Radicado</th>
-          <td mat-cell *matCellDef="let element"><strong>{{ element.codigo }}</strong></td>
+          <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-id">
+            <div class="header-inline-container">
+              <span class="column-title">Radicado</span>
+              <mat-form-field appearance="outline" class="filter-field-mat" subscriptSizing="dynamic">
+                <input matInput appFiltroColumna="radicado" (keyup)="applyFilter('id', $event)" placeholder="Filtrar">
+              </mat-form-field>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let element" class="id-cell"><strong>{{ element.codigo }}</strong></td>
         </ng-container>
 
         <ng-container matColumnDef="fechaAsignacion">
-          <th mat-header-cell scope="col" *matHeaderCellDef>Fecha de asignación</th>
+          <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-fecha">
+            <div class="header-inline-container">
+              <span class="column-title">Fecha de asignación</span>
+              <mat-form-field appearance="outline" class="filter-field-mat" subscriptSizing="dynamic">
+                <input matInput appFiltroColumna="fecha de asignación" (keyup)="applyFilter('fechaAsignacion', $event)" placeholder="dd/MM/yyyy">
+              </mat-form-field>
+            </div>
+          </th>
           <td mat-cell *matCellDef="let element">{{ mostrarFecha(element.fechaAsignacion) }}</td>
         </ng-container>
 
         <ng-container matColumnDef="profesional">
-          <th mat-header-cell scope="col" *matHeaderCellDef>Profesional de contacto</th>
-          <td mat-cell *matCellDef="let element">{{ element.profesional }}</td>
+          <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-profesional">
+            <div class="header-inline-container">
+              <span class="column-title">Profesional de contacto</span>
+              <mat-form-field appearance="outline" class="filter-field-mat" subscriptSizing="dynamic">
+                <input matInput appFiltroColumna="profesional de contacto" (keyup)="applyFilter('profesional', $event)" placeholder="Buscar...">
+              </mat-form-field>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let element" class="profesional-nombre">{{ element.profesional }}</td>
         </ng-container>
 
         <ng-container matColumnDef="solicitante">
-          <th mat-header-cell scope="col" *matHeaderCellDef>Solicitante</th>
+          <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-solicitante">
+            <div class="header-inline-container">
+              <span class="column-title">Solicitante</span>
+              <mat-form-field appearance="outline" class="filter-field-mat" subscriptSizing="dynamic">
+                <input matInput appFiltroColumna="solicitante" (keyup)="applyFilter('solicitante', $event)" placeholder="Buscar...">
+              </mat-form-field>
+            </div>
+          </th>
           <td mat-cell *matCellDef="let element">{{ element.solicitante }}</td>
         </ng-container>
 
         <ng-container matColumnDef="fechaCita">
-          <th mat-header-cell scope="col" *matHeaderCellDef>Fecha de cita</th>
+          <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-fecha">
+            <div class="header-inline-container">
+              <span class="column-title">Fecha de cita</span>
+              <mat-form-field appearance="outline" class="filter-field-mat" subscriptSizing="dynamic">
+                <input matInput appFiltroColumna="fecha de cita" (keyup)="applyFilter('fechaCita', $event)" placeholder="dd/MM/yyyy">
+              </mat-form-field>
+            </div>
+          </th>
           <td mat-cell *matCellDef="let element">{{ mostrarFecha(element.fechaCita) }}</td>
         </ng-container>
 
         <ng-container matColumnDef="estado">
-          <th mat-header-cell scope="col" *matHeaderCellDef>Estado</th>
+          <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-estado">
+            <div class="header-inline-container">
+              <span class="column-title">Estado</span>
+              <mat-form-field appearance="outline" class="filter-field-mat" subscriptSizing="dynamic">
+                <mat-select aria-label="Filtrar por estado de la solicitud"
+                  placeholder="Todos"
+                  (selectionChange)="applySelectFilter('estado', $event.value)">
+                  <mat-option value="">Todos</mat-option>
+                  <mat-option value="en espera de cita">En espera de cita</mat-option>
+                  <mat-option value="desistido">Desistido</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </th>
           <td mat-cell *matCellDef="let element">
             <span class="status-pill" [ngClass]="getEstadoClass(element.estado)">{{ element.estado }}</span>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="accion">
-          <th mat-header-cell scope="col" *matHeaderCellDef>Acciones</th>
+          <th mat-header-cell scope="col" *matHeaderCellDef class="mat-column-acciones">
+            <div class="header-inline-container header-inline-container--actions">
+              <span class="column-title column-title--center">Acciones</span>
+              <div class="header-spacer-box" aria-hidden="true"></div>
+            </div>
+          </th>
           <td mat-cell *matCellDef="let element">
-            <div class="action-buttons">
-              <button mat-flat-button color="primary" type="button"
+            <div class="action-buttons-container">
+              <button mat-icon-button class="btn-action btn-action-ver" type="button"
+                matTooltip="Gestionar contacto"
                 [attr.aria-label]="'Gestionar contacto de la solicitud ' + element.codigo"
                 (click)="gestionar(element)">
                 <mat-icon aria-hidden="true">contact_phone</mat-icon>
-                Contacto
               </button>
-              <button mat-stroked-button color="warn" type="button"
+              <button mat-icon-button class="btn-action btn-action-eliminar" type="button"
+                matTooltip="Desistir solicitud"
                 [attr.aria-label]="'Marcar como desistida la solicitud ' + element.codigo"
                 (click)="desistir(element)">
                 <mat-icon aria-hidden="true">person_off</mat-icon>
-                Desistir
               </button>
             </div>
           </td>
@@ -74,6 +130,13 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
+      @if (dataSource.filteredData.length === 0) {
+        <div class="no-results-msg">
+          <mat-icon aria-hidden="true">info_outline</mat-icon>
+          <p>No hay solicitudes que coincidan con los filtros.</p>
+        </div>
+      }
+      <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
     </div>
   </mat-card>
 </div>

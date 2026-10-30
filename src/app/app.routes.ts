@@ -129,7 +129,7 @@ export const routes: Routes = [
   },
   {
     path: 'mis-asignaciones',
-    title: 'Mis asignaciones',
+    title: 'Gestión de contacto',
     canMatch: [featureCapabilityGuard],
     canActivate: [roleGuard],
     data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR'], feature: 'assignmentsPrototype' },

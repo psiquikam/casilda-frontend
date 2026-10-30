@@ -53,6 +53,18 @@ describe('MisAsignacionesComponent', () => {
     expect(contactoMock.listarSolicitudes).toHaveBeenCalled();
     expect(component.misCasos[0].codigo).toBe('ACO-1029');
     expect(component.cantidadEnEspera).toBe(1);
+    expect(fixture.nativeElement.querySelector('h1')?.textContent.trim()).toBe('Gestión de contacto');
+    expect(component.dataSource.data).toEqual(component.misCasos);
+  });
+
+  it('filters the table by the selected column value', () => {
+    const input = document.createElement('input');
+    input.value = '0982';
+    const event = new Event('keyup');
+    Object.defineProperty(event, 'target', { value: input });
+    component.applyFilter('id', event);
+
+    expect(component.dataSource.filteredData.map(({ codigo }) => codigo)).toEqual(['ACO-0982']);
   });
 
   it('opens the contact modal with the selected numeric request ID', () => {

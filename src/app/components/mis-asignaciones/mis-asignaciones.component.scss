@@ -1,5 +1,8 @@
 .asignaciones-container {
-  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
   background-color: var(--color-bg-main);
   min-height: 100vh;
 
@@ -7,9 +10,15 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
+    margin-bottom: 4px;
 
-    h1 { margin: 0; color: var(--color-text-primary); font-weight: 800; }
+    h1 {
+      margin: 0;
+      color: var(--color-text-primary);
+      font-weight: 900;
+      font-size: 1.5rem;
+      letter-spacing: -0.5px;
+    }
     p { color: var(--color-text-muted); margin: 5px 0 0; }
 
     .user-welcome {
@@ -50,26 +59,168 @@
   }
 
   .table-card {
-    border-radius: 16px;
+    border-radius: 12px;
+    border: none;
     overflow: hidden;
-    padding: 20px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    padding: 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
   }
 
   .table-responsive {
+    width: 100%;
     overflow-x: auto;
   }
 
   table {
-    min-width: 1050px;
+    min-width: 1200px;
     width: 100%;
   }
 
-  .action-buttons {
+  tr.mat-mdc-header-row {
+    height: auto !important;
+    min-height: 86px;
+    background: white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    border-bottom: 2px solid var(--color-border);
+  }
+
+  th.mat-mdc-header-cell {
+    vertical-align: top !important;
+    padding: 12px 8px 10px !important;
+
+    &.mat-column-id { min-width: 125px; }
+    &.mat-column-fecha { min-width: 155px; }
+    &.mat-column-profesional { min-width: 180px; }
+    &.mat-column-solicitante { min-width: 140px; }
+    &.mat-column-estado { min-width: 175px; }
+    &.mat-column-acciones { min-width: 112px; text-align: center; }
+  }
+
+  .header-inline-container {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
     gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+
+    &--actions { align-items: center; }
+  }
+
+  .column-title {
+    display: flex;
+    align-items: flex-start;
+    height: 36px;
+    margin: 0;
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+    font-weight: 750;
+    line-height: 1.25;
+    white-space: normal;
+
+    &--center {
+      justify-content: center;
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+  .header-spacer-box { height: 36px; }
+
+  .filter-field-mat {
+    width: 100%;
+    font-size: var(--font-size-sm);
+
+    ::ng-deep {
+      .mat-mdc-text-field-wrapper {
+        height: 36px !important;
+        padding: 0 8px !important;
+        background-color: #fff !important;
+        border-radius: var(--radius-sm) !important;
+      }
+
+      .mat-mdc-form-field-flex,
+      .mat-mdc-form-field-infix {
+        display: flex !important;
+        align-items: center !important;
+        height: 36px !important;
+        min-height: 36px !important;
+        padding: 0 !important;
+      }
+
+      .mat-mdc-select-trigger,
+      .mat-mdc-input-element {
+        height: 36px;
+        font-size: var(--font-size-sm);
+      }
+
+      .mat-mdc-form-field-subscript-wrapper { display: none !important; }
+    }
+  }
+
+  .id-cell {
+    color: var(--color-primary);
+    font-weight: 800;
+  }
+
+  .profesional-nombre {
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+  }
+
+  .action-buttons-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+
+    .btn-action {
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      width: 36px !important;
+      height: 36px !important;
+      padding: 0 !important;
+      border: 1px solid transparent;
+      border-radius: 8px !important;
+
+      mat-icon {
+        width: 18px;
+        height: 18px;
+        font-size: 18px;
+      }
+    }
+
+    .btn-action-ver {
+      color: #0284c7;
+      background-color: #e0f2fe;
+      border-color: #bae6fd;
+    }
+
+    .btn-action-eliminar {
+      color: #dc2626;
+      background-color: #fee2e2;
+      border-color: #fecaca;
+    }
+  }
+
+  .no-results-msg {
+    padding: 40px;
+    color: var(--color-text-muted);
+    text-align: center;
+
+    mat-icon {
+      width: 40px;
+      height: 40px;
+      font-size: 40px;
+      opacity: 0.5;
+    }
+  }
+
+  mat-paginator {
+    border-top: 1px solid var(--color-border);
   }
 
   .status-pill {
