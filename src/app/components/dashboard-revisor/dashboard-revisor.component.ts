@@ -48,22 +48,22 @@ export class DashboardRevisorComponent {
       { label: 'Estudiantes', count: 85, porcentaje: 54.5, icon: 'school', colorClass: 'student' },
       { label: 'Docentes', count: 42, porcentaje: 26.9, icon: 'history_edu', colorClass: 'teacher' },
       { label: 'Personal Administrativo', count: 21, porcentaje: 13.5, icon: 'badge', colorClass: 'admin' },
-      { label: 'Egresados y Contratistas', count: 8, porcentaje: 5.1, icon: 'engineering', colorClass: 'contractor' }
+      { label: 'Egresados y contratistas', count: 8, porcentaje: 5.1, icon: 'engineering', colorClass: 'contractor' }
     ],
     // Modalidades de violencia VBG
     modalidades: [
       { label: 'Violencia Psicológica', count: 72, porcentaje: 46.2, icon: 'psychology' },
-      { label: 'Discriminación por Género u Orientación', count: 44, porcentaje: 28.2, icon: 'diversity_3' },
-      { label: 'Violencia y Acoso Sexual', count: 31, porcentaje: 19.9, icon: 'shield' },
+      { label: 'Discriminación por género u orientación', count: 44, porcentaje: 28.2, icon: 'diversity_3' },
+      { label: 'Violencia y acoso sexual', count: 31, porcentaje: 19.9, icon: 'shield' },
       { label: 'Violencia Física', count: 18, porcentaje: 11.5, icon: 'healing' },
-      { label: 'Violencia Económica y Patrimonial', count: 12, porcentaje: 7.7, icon: 'account_balance' }
+      { label: 'Violencia económica y patrimonial', count: 12, porcentaje: 7.7, icon: 'account_balance' }
     ],
     // Estado del trámite
     estados: [
-      { label: 'Citas Asignadas (Psicología / Derecho)', count: 52, porcentaje: 33.3, colorClass: 'progress-citas' },
+      { label: 'Citas asignadas (psicología / derecho)', count: 52, porcentaje: 33.3, colorClass: 'progress-citas' },
       { label: 'En Recepción e Indagación Inicial', count: 48, porcentaje: 30.8, colorClass: 'progress-recepcion' },
       { label: 'En Acompañamiento Activo (Expediente)', count: 41, porcentaje: 26.3, colorClass: 'progress-activo' },
-      { label: 'Cierre con Acuerdos y Remisión', count: 15, porcentaje: 9.6, colorClass: 'progress-cierre' }
+      { label: 'Cierre con acuerdos y remisión', count: 15, porcentaje: 9.6, colorClass: 'progress-cierre' }
     ],
     // Sedes y Campus UdeA
     sedes: [

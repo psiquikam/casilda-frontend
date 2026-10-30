@@ -130,7 +130,7 @@ $text-muted: var(--color-text-muted);
     font-size: var(--font-size-sm); /* piso 14px (WCAG 1.4.4) */
     font-weight: 850;
     color: $text-dark;
-    text-transform: uppercase;
+    text-transform: none;
     letter-spacing: 0.3px;
     padding: 10px 16px;
     border-bottom: 2px solid $border-soft;

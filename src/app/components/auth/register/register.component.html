@@ -54,9 +54,9 @@
             <mat-form-field appearance="outline">
               <mat-label>Tipo documento identidad *</mat-label>
               <mat-select formControlName="tipoDocumento" placeholder="Seleccione el tipo">
-                <mat-option value="CC">Cédula de Ciudadanía</mat-option>
-                <mat-option value="TI">Tarjeta de Identidad</mat-option>
-                <mat-option value="CE">Cédula de Extranjería</mat-option>
+                <mat-option value="CC">Cédula de ciudadanía</mat-option>
+                <mat-option value="TI">Tarjeta de identidad</mat-option>
+                <mat-option value="CE">Cédula de extranjería</mat-option>
                 <mat-option value="PA">Pasaporte</mat-option>
                 <mat-option value="OT">Otro</mat-option>
               </mat-select>
@@ -87,7 +87,7 @@
         <ng-template matStepLabel>Contacto e Institución</ng-template>
         
         <div class="section-title-with-tooltip">
-          <h2>Datos de Contacto e Institución</h2>
+          <h2>Datos de contacto e institución</h2>
         </div>
         <p class="vbg-section-subtitle">Datos requeridos para establecer contacto de manera segura y registrar el vínculo institucional.</p>
 
@@ -141,7 +141,7 @@
         <ng-template matStepLabel>Seguridad</ng-template>
         
         <div class="section-title-with-tooltip">
-          <h2>Seguridad y Confidencialidad</h2>
+          <h2>Seguridad y confidencialidad</h2>
         </div>
         <p class="vbg-section-subtitle">Defina las credenciales de acceso y autorice el tratamiento de datos.</p>
 
@@ -177,7 +177,7 @@
         </div>
 
         <div class="policy-box">
-          <h2>Tratamiento de Información (Habeas Data)</h2>
+          <h2>Tratamiento de información (habeas data)</h2>
           <p>La información recopilada a través de este canal se gestiona bajo estrictos protocolos de confidencialidad institucional. No se almacenará ningún dato que comprometa su identidad sin su consentimiento expreso, de acuerdo a la ley de Habeas Data.</p>
           <mat-checkbox formControlName="habeasData">He leído y acepto el manejo y política de tratamiento de datos</mat-checkbox>
           @if (controlInvalido(step3Form, 'habeasData')) {

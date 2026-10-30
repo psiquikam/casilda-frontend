@@ -187,8 +187,8 @@ export const RUTAS_INTERNAS: readonly OpcionCatalogoVbg[] = [
 export const RUTAS_EXTERNAS: readonly OpcionCatalogoVbg[] = [
   { codigo: 'salud', etiqueta: 'Salud' },
   { codigo: 'fiscalia', etiqueta: 'Fiscalía' },
-  { codigo: 'comisaria-familia', etiqueta: 'Comisaría de Familia' },
-  { codigo: 'inspeccion-policia', etiqueta: 'Inspección de Policía' },
+  { codigo: 'comisaria-familia', etiqueta: 'Comisaría de familia' },
+  { codigo: 'inspeccion-policia', etiqueta: 'Inspección de policía' },
   { codigo: 'procuraduria', etiqueta: 'Procuraduría General de la Nación' },
   { codigo: 'otras-rutas-externas', etiqueta: 'Otras' }
 ];

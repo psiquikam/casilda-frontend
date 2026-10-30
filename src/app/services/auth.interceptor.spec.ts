@@ -1,7 +1,6 @@
 import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { authInterceptor } from './auth.interceptor';
 import { AuthService } from './auth.service';
@@ -9,7 +8,6 @@ import { DialogoService } from '../core/a11y/dialogo.service';
 
 describe('authInterceptor', () => {
   const auth = jasmine.createSpyObj<AuthService>('AuthService', ['getToken', 'logout']);
-  const router = jasmine.createSpyObj<Router>('Router', ['navigate']);
   const dialogo = jasmine.createSpyObj<DialogoService>('DialogoService', ['aviso']);
   let http: HttpClient;
   let controller: HttpTestingController;
@@ -17,7 +15,6 @@ describe('authInterceptor', () => {
   beforeEach(() => {
     auth.getToken.and.returnValue('token-vigente');
     auth.logout.calls.reset();
-    router.navigate.calls.reset();
     dialogo.aviso.calls.reset();
     dialogo.aviso.and.returnValue(of(undefined));
 
@@ -26,7 +23,6 @@ describe('authInterceptor', () => {
         provideHttpClient(withInterceptors([authInterceptor])),
         provideHttpClientTesting(),
         { provide: AuthService, useValue: auth },
-        { provide: Router, useValue: router },
         { provide: DialogoService, useValue: dialogo }
       ]
     });
@@ -50,7 +46,7 @@ describe('authInterceptor', () => {
     );
   });
 
-  it('conserva la sesión y redirige ante una respuesta 403', () => {
+  it('conserva la sesión y la ruta actual ante una respuesta 403', () => {
     http.get('/recurso-restringido').subscribe({ error: () => undefined });
     const request = controller.expectOne('/recurso-restringido');
 
@@ -58,6 +54,5 @@ describe('authInterceptor', () => {
 
     expect(auth.logout).not.toHaveBeenCalled();
     expect(dialogo.aviso).not.toHaveBeenCalled();
-    expect(router.navigate).toHaveBeenCalledWith(['/acceso-denegado']);
   });
 });

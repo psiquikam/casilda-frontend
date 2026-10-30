@@ -53,9 +53,9 @@ export const DEFAULT_MAESTROS: Record<ListaKey, MaestroDto[]> = {
     { id: 4, codigo: 'FAC_SOC', nombre: 'Facultad de Ciencias Sociales y Humanas' }
   ],
   tiposDocumento: [
-    { id: 1, codigo: 'CC', nombre: 'Cédula de Ciudadanía' },
-    { id: 2, codigo: 'TI', nombre: 'Tarjeta de Identidad' },
-    { id: 3, codigo: 'CE', nombre: 'Cédula de Extranjería' },
+    { id: 1, codigo: 'CC', nombre: 'Cédula de ciudadanía' },
+    { id: 2, codigo: 'TI', nombre: 'Tarjeta de identidad' },
+    { id: 3, codigo: 'CE', nombre: 'Cédula de extranjería' },
     { id: 4, codigo: 'PAS', nombre: 'Pasaporte' }
   ],
   identidadesGenero: [
@@ -71,7 +71,7 @@ export const DEFAULT_MAESTROS: Record<ListaKey, MaestroDto[]> = {
     { id: 4, codigo: 'CON', nombre: 'Contratista / Egresado' }
   ],
   medioSolicitud: [
-    { id: 1, codigo: 'PRES', nombre: 'Presencial en Punto de Atención' },
+    { id: 1, codigo: 'PRES', nombre: 'Presencial en punto de atención' },
     { id: 2, codigo: 'TEL', nombre: 'Línea Telefónica Institucional' },
     { id: 3, codigo: 'WEB', nombre: 'Portal Web CASILDA' },
     { id: 4, codigo: 'REM', nombre: 'Remisión Interna UdeA' }

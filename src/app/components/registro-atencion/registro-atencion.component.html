@@ -3,7 +3,7 @@
        mientras el modo de demostración esté activo. -->
   <p class="franja-demo" role="status">
     <mat-icon aria-hidden="true">science</mat-icon>
-    <span>Datos de demostración. Los casos, catálogos y el guardado de este módulo son simulados.</span>
+    <span>Datos de demostración. Los casos mostrados y los cambios realizados sobre ellos son simulados.</span>
   </p>
 }
 
@@ -45,7 +45,7 @@
                 <div class="tab-padding">
                   <div class="grid-3">
                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                      <mat-label>Documento de Identificación</mat-label>
+                      <mat-label>Documento de identificación</mat-label>
                       <input matInput formControlName="documento" readonly inputmode="numeric"
                         pattern="\d*" [maxlength]="maxLongitudDocumento"
                         (input)="soloDigitos($event)">
@@ -75,7 +75,7 @@
                         <input matInput formControlName="segundoApellido" readonly>
                       </mat-form-field>
                       <mat-form-field appearance="outline">
-                        <mat-label>Regimen de Salud</mat-label>
+                        <mat-label>Régimen de salud</mat-label>
                         <input matInput formControlName="regimenSalud" readonly>
                       </mat-form-field>
                       <mat-form-field appearance="outline">
@@ -83,19 +83,19 @@
                         <input matInput formControlName="eps" readonly>
                       </mat-form-field>
                       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                        <mat-label>Departamento de Nacimiento</mat-label>
+                        <mat-label>Departamento de nacimiento</mat-label>
                         <input matInput formControlName="departamentoNacimiento" readonly>
                       </mat-form-field>
                       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                        <mat-label>Ciudad de Nacimiento</mat-label>
+                        <mat-label>Ciudad de nacimiento</mat-label>
                         <input matInput formControlName="ciudadNacimiento" readonly>
                       </mat-form-field>
                       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                        <mat-label>Departamento de Residencia</mat-label>
+                        <mat-label>Departamento de residencia</mat-label>
                         <input matInput formControlName="departamentoResidencia" readonly>
                       </mat-form-field>
                       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                        <mat-label>Ciudad de Residencia</mat-label>
+                        <mat-label>Ciudad de residencia</mat-label>
                         <input matInput formControlName="ciudadResidencia" readonly>
                       </mat-form-field>
                       <mat-form-field appearance="outline" subscriptSizing="dynamic">
@@ -103,7 +103,7 @@
                         <input matInput formControlName="sexo" readonly>
                       </mat-form-field>
                       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                        <mat-label>Identidad de Género</mat-label>
+                        <mat-label>Identidad de género</mat-label>
                         <input matInput formControlName="identidadSexual" readonly>
                       </mat-form-field>
                       <mat-form-field appearance="outline" subscriptSizing="dynamic">
@@ -117,7 +117,7 @@
                       <div class="direccion-row">
                         <mat-form-field appearance="outline" subscriptSizing="dynamic"
                           class="direccion-field">
-                          <mat-label>Dirección de Residencia Registrada</mat-label>
+                          <mat-label>Dirección de residencia registrada</mat-label>
                           <input matInput formControlName="direccionResidencia" readonly
                             placeholder="No se ha registrado dirección">
                             <mat-icon aria-hidden="true" matSuffix color="primary">location_on</mat-icon>
@@ -362,7 +362,7 @@
                     </div>
                     <table mat-table [dataSource]="compromisosPersona" class="atencion-table" aria-label="Compromisos de la persona">
                       <ng-container matColumnDef="fecha">
-                        <th mat-header-cell scope="col" *matHeaderCellDef> Fecha de Cumplimiento </th>
+                        <th mat-header-cell scope="col" *matHeaderCellDef> Fecha de cumplimiento </th>
                         <td mat-cell *matCellDef="let element"> {{element.fecha |
                         date:'dd/MM/yyyy'}} </td>
                       </ng-container>
@@ -406,7 +406,7 @@
                     </div>
                     <table mat-table [dataSource]="compromisosProfesional" class="atencion-table" aria-label="Compromisos del profesional">
                       <ng-container matColumnDef="fecha">
-                        <th mat-header-cell scope="col" *matHeaderCellDef> Fecha de Cumplimiento </th>
+                        <th mat-header-cell scope="col" *matHeaderCellDef> Fecha de cumplimiento </th>
                         <td mat-cell *matCellDef="let element"> {{element.fecha |
                         date:'dd/MM/yyyy'}} </td>
                       </ng-container>

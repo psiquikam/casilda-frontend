@@ -102,7 +102,7 @@ export const RESPALDO_MAESTROS_VBG: Record<string, MaestroDto[]> = {
   ],
   programas: [
     { id: 1, codigo: 'DEMO-MED', nombre: 'Medicina (demostración)' },
-    { id: 2, codigo: 'DEMO-ING-SIS', nombre: 'Ingeniería de Sistemas (demostración)' },
+    { id: 2, codigo: 'DEMO-ING-SIS', nombre: 'Ingeniería de sistemas (demostración)' },
     { id: 3, codigo: 'DEMO-DER', nombre: 'Derecho (demostración)' }
   ],
   'orientaciones-sexuales': [

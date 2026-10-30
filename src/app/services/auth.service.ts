@@ -196,6 +196,18 @@ interface JwtPayload {
   exp?: number;
 }
 
+type CodigoRol = 'ADMIN' | 'COORDINADOR' | 'PROFESIONAL' | 'REVISOR' | 'USUARIO';
+
+function normalizarCodigoRol(valor: string | null | undefined): CodigoRol | '' {
+  const rol = (valor || '').toUpperCase().replace(/^ROLE_/, '');
+  if (rol.includes('ADMIN')) return 'ADMIN';
+  if (rol.includes('COORD')) return 'COORDINADOR';
+  if (rol.includes('PROF')) return 'PROFESIONAL';
+  if (rol.includes('REVIS')) return 'REVISOR';
+  if (rol.includes('USUAR')) return 'USUARIO';
+  return '';
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
@@ -220,12 +232,12 @@ export class AuthService {
   }
 
   getRoleCode(): string {
-    const raw = (this.currentUser?.roles?.[0] || this.currentUser?.rol || '').toUpperCase();
-    if (raw.includes('ADMIN')) return 'ADMIN';
-    if (raw.includes('COORD')) return 'COORDINADOR';
-    if (raw.includes('PROF')) return 'PROFESIONAL';
-    if (raw.includes('REVIS')) return 'REVISOR';
-    return 'USUARIO';
+    const candidatos = [
+      ...(this.currentUser?.roles ?? []),
+      this.currentUser?.rol,
+      ...(this.currentUser?.authorities ?? [])
+    ];
+    return candidatos.map(normalizarCodigoRol).find(Boolean) || 'USUARIO';
   }
 
   getRoleName(): string {
@@ -287,16 +299,14 @@ export class AuthService {
 
   hasRole(role: string): boolean {
     if (!this.currentUser) return false;
-    const target = role.toUpperCase().replace(/^ROLE_/, '');
-    const userRole = (this.currentUser.rol || '').toUpperCase().replace(/^ROLE_/, '');
-    if (userRole === target) return true;
-    if (this.currentUser.roles?.some((r) => r.toUpperCase().replace(/^ROLE_/, '') === target)) {
-      return true;
-    }
-    if (this.currentUser.authorities?.some((a) => a.toUpperCase().replace(/^ROLE_/, '') === target)) {
-      return true;
-    }
-    return false;
+    const target = normalizarCodigoRol(role);
+    if (!target) return false;
+    const rolesSesion = [
+      this.currentUser.rol,
+      ...(this.currentUser.roles ?? []),
+      ...(this.currentUser.authorities ?? [])
+    ];
+    return rolesSesion.some((rol) => normalizarCodigoRol(rol) === target);
   }
 
   hasAnyRole(roles: string[]): boolean {
@@ -430,20 +440,13 @@ export class AuthService {
   private isValidSession(value: unknown): value is UserSession {
     if (!value || typeof value !== 'object') return false;
     const session = value as Partial<UserSession>;
-    const validRoles = [
-      'admin',
-      'coordinador',
-      'profesional',
-      'revisor',
-      'usuario'
-    ];
-    const roleString = (session.rol || session.roles?.[0] || '').toLowerCase().replace(/^role_/, '');
+    const rolesSesion = [session.rol, ...(session.roles ?? []), ...(session.authorities ?? [])];
     return (
       typeof session.email === 'string' &&
       typeof session.nombre === 'string' &&
       typeof session.token === 'string' &&
       session.token.length > 0 &&
-      validRoles.includes(roleString)
+      rolesSesion.some((rol) => Boolean(normalizarCodigoRol(rol)))
     );
   }
 

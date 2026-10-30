@@ -96,7 +96,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   private readonly maestrosVbg = inject(MaestrosVbgService);
 
   /** DSH-12-08: franja visible mientras los datos del módulo sean simulados. */
-  readonly datosDemostracion = environment.datosDemostracion;
+  datosDemostracion = environment.datosDemostracion;
   private readonly registroVbgDatos = inject(RegistroVbgDatosService);
   atencionForm!: FormGroup;
   atencionId: number | null = null;
@@ -182,7 +182,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     { tab: 'Registro de atención', label: 'Forma de ocurrencia', control: 'queForma' },
     { tab: 'Registro de atención', label: 'Ámbito de ocurrencia', control: 'ambitoOcurrencia' },
     { tab: 'Datos de la persona', label: 'Tipo de documento', control: 'tipoDocumento' },
-    { tab: 'Datos de la persona', label: 'Documento de Identificación', control: 'documento' },
+    { tab: 'Datos de la persona', label: 'Documento de identificación', control: 'documento' },
     { tab: 'Datos de la persona', label: 'Fecha de nacimiento', control: 'fechaNacimiento' },
     { tab: 'Datos de la persona', label: 'Primer nombre', control: 'primerNombre' },
     { tab: 'Datos de la persona', label: 'Primer apellido', control: 'primerApellido' },
@@ -208,7 +208,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       tab: 'Documentación', label: 'Actividad misional', control: 'actividadMisional',
       condition: () => this.atencionForm?.get('violenciaMisional')?.value === 'SI'
     },
-    { tab: 'Estado del Caso', label: 'Estado del caso', control: 'estadosCaso' },
+    { tab: 'Estado del caso', label: 'Estado del caso', control: 'estadosCaso' },
   ];
 
   psicologicaSel: number[] = [];
@@ -771,6 +771,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   private cargarCasos(page = 0, size: number = this.pageSizeCasos): void {
     this.registroVbgDatos.listarCasosPaginados(page, size).subscribe({
       next: (respuesta) => {
+        this.datosDemostracion = this.registroVbgDatos.usandoDatosDemostracion();
         const filas = respuesta.content.map((caso) => this.mapearCasoATabla(caso));
         this.casoPorAtender = filas;
         this.dataSource.data = filas;

@@ -47,7 +47,7 @@ export const TEXTOS_REPORTE: Record<ModoReporte, TextosReporte> = {
     preguntaPerfil: '¿Cómo desea realizar su reporte anónimo?',
     perfilAfectada: 'Reporte anónimo sobre una situación que le ocurrió directamente a usted.',
     perfilTercero: 'Reporte anónimo en representación de un tercero o como testigo presencial.',
-    botonEnviar: 'Finalizar y Enviar Reporte Anónimo',
+    botonEnviar: 'Finalizar y enviar reporte anónimo',
     claveBorrador: 'casilda_borrador_anonimo',
     exitoTitulo: '¡Reporte Anónimo Registrado!',
     exitoMensaje: 'El reporte anónimo ha sido recibido con éxito. Un profesional especializado revisará la información de forma confidencial.',
@@ -59,12 +59,12 @@ export const TEXTOS_REPORTE: Record<ModoReporte, TextosReporte> = {
     preguntaPerfil: '¿Cómo desea realizar su reporte?',
     perfilAfectada: 'Reporte sobre una situación que le ocurrió directamente a usted.',
     perfilTercero: 'Reporte en representación de un tercero o como testigo presencial.',
-    botonEnviar: 'Finalizar y Enviar Reporte',
+    botonEnviar: 'Finalizar y enviar reporte',
     claveBorrador: 'casilda_borrador_reporte',
     exitoTitulo: '¡Reporte Registrado!',
     exitoMensaje: 'El reporte ha sido recibido con éxito. Un profesional especializado revisará la información de forma confidencial.',
     exitoLabelCodigo: 'ID ÚNICO DE REPORTE',
-    exitoInstruccion: 'Conserve este identificador (ID). Se podrá consultar el avance del caso desde «Seguimiento de Trámite» en Mis Solicitudes.'
+    exitoInstruccion: 'Conserve este identificador (ID). Se podrá consultar el avance del caso desde «Seguimiento de trámite» en Mis solicitudes.'
   }
 };
 
@@ -123,9 +123,9 @@ export class FormularioAnonimoComponent {
     { id: 2, nombre: 'Violencia Física' },
     { id: 3, nombre: 'Violencia Sexual' },
     { id: 4, nombre: 'Violencia Institucional' },
-    { id: 5, nombre: 'Violencia Económica o Patrimonial' },
+    { id: 5, nombre: 'Violencia económica o patrimonial' },
     { id: 6, nombre: 'Violencia Digital / Informática' },
-    { id: 7, nombre: 'Discriminación o Violencia por Prejuicio' },
+    { id: 7, nombre: 'Discriminación o violencia por prejuicio' },
     { id: 8, nombre: 'Otro tipo de violencia' }
   ];
 
@@ -622,9 +622,9 @@ export class FormularioAnonimoComponent {
       { control: 'violenciaFisica', sel: 'fisicaSel', label: 'Violencia Física' },
       { control: 'violenciaSexual', sel: 'sexualSel', label: 'Violencia Sexual' },
       { control: 'violenciaInstitucional', sel: 'institucionalSel', label: 'Violencia Institucional' },
-      { control: 'violenciaEconomica', sel: 'economicaSel', label: 'Violencia Económica o Patrimonial' },
+      { control: 'violenciaEconomica', sel: 'economicaSel', label: 'Violencia económica o patrimonial' },
       { control: 'violenciaInformatica', sel: 'informaticaSel', label: 'Violencia Digital / Informática' },
-      { control: 'violenciaPrejuicio', sel: 'prejuicioSel', label: 'Discriminación o Violencia por Prejuicio' },
+      { control: 'violenciaPrejuicio', sel: 'prejuicioSel', label: 'Discriminación o violencia por prejuicio' },
     ];
 
     mapeo.forEach(m => {
@@ -649,9 +649,9 @@ export class FormularioAnonimoComponent {
       { control: 'violenciaFisica', sel: this.fisicaSel, label: 'Violencia Física' },
       { control: 'violenciaSexual', sel: this.sexualSel, label: 'Violencia Sexual' },
       { control: 'violenciaInstitucional', sel: this.institucionalSel, label: 'Violencia Institucional' },
-      { control: 'violenciaEconomica', sel: this.economicaSel, label: 'Violencia Económica o Patrimonial' },
+      { control: 'violenciaEconomica', sel: this.economicaSel, label: 'Violencia económica o patrimonial' },
       { control: 'violenciaInformatica', sel: this.informaticaSel, label: 'Violencia Digital / Informática' },
-      { control: 'violenciaPrejuicio', sel: this.prejuicioSel, label: 'Discriminación o Violencia por Prejuicio' },
+      { control: 'violenciaPrejuicio', sel: this.prejuicioSel, label: 'Discriminación o violencia por prejuicio' },
     ];
 
     const tiposActivos: string[] = [];
@@ -681,9 +681,9 @@ export class FormularioAnonimoComponent {
     if (this.formRelato.get('violenciaFisica')?.value === 'SI') tiposActivos.push('Violencia Física');
     if (this.formRelato.get('violenciaSexual')?.value === 'SI') tiposActivos.push('Violencia Sexual');
     if (this.formRelato.get('violenciaInstitucional')?.value === 'SI') tiposActivos.push('Violencia Institucional');
-    if (this.formRelato.get('violenciaEconomica')?.value === 'SI') tiposActivos.push('Violencia Económica o Patrimonial');
+    if (this.formRelato.get('violenciaEconomica')?.value === 'SI') tiposActivos.push('Violencia económica o patrimonial');
     if (this.formRelato.get('violenciaInformatica')?.value === 'SI') tiposActivos.push('Violencia Digital / Informática');
-    if (this.formRelato.get('violenciaPrejuicio')?.value === 'SI') tiposActivos.push('Discriminación o Violencia por Prejuicio');
+    if (this.formRelato.get('violenciaPrejuicio')?.value === 'SI') tiposActivos.push('Discriminación o violencia por prejuicio');
 
     const control = this.formRelato.get('tipoVbg');
     if (control) {
@@ -703,9 +703,9 @@ export class FormularioAnonimoComponent {
       { control: 'violenciaFisica', label: 'Violencia Física' },
       { control: 'violenciaSexual', label: 'Violencia Sexual' },
       { control: 'violenciaInstitucional', label: 'Violencia Institucional' },
-      { control: 'violenciaEconomica', label: 'Violencia Económica o Patrimonial' },
+      { control: 'violenciaEconomica', label: 'Violencia económica o patrimonial' },
       { control: 'violenciaInformatica', label: 'Violencia Digital / Informática' },
-      { control: 'violenciaPrejuicio', label: 'Discriminación o Violencia por Prejuicio' },
+      { control: 'violenciaPrejuicio', label: 'Discriminación o violencia por prejuicio' },
     ];
 
     mapa.forEach(m => {

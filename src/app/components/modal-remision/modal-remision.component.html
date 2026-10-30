@@ -7,7 +7,7 @@
   <div class="form-row">
 
     <mat-form-field appearance="outline" class="field-tipo">
-      <mat-label>Tipo de Remisión</mat-label>
+      <mat-label>Tipo de remisión</mat-label>
       <mat-select [(ngModel)]="data.tipo" (ngModelChange)="onTipoRemisionChange()">
         @for (tipo of tiposRemision; track tipo.id) {
           <mat-option [value]="tipo">{{ tipo.nombre }}</mat-option>

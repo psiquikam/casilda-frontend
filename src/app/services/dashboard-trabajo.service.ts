@@ -68,7 +68,7 @@ const PENDIENTES_POR_ROL: Record<string, readonly PendienteDto[]> = {
       id: 'p-adm-2',
       radicado: '—',
       iniciales: '—',
-      descripcion: '2 catálogos de Maestros del Sistema con elementos incompletos',
+      descripcion: '2 catálogos de maestros del sistema con elementos incompletos',
       vence: diasDesdeHoy(2).toISOString(),
       ruta: '/gestion-sistema'
     }
