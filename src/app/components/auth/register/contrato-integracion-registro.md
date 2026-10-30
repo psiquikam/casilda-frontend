@@ -27,13 +27,13 @@ El formulario consume el contrato publicado por el backend en Swagger. La URL ba
 }
 ```
 
-`segundoNombre` se omite si no se diligencia. `confirmPassword` solo se utiliza para validar el formulario y nunca se envía. `habeasData` se envía como `true` únicamente después de que la persona acepta la política.
+`segundoNombre` y `segundoApellido` se omiten si no se diligencian. `confirmPassword` solo se utiliza para validar el formulario y nunca se envía. `habeasData` se envía como `true` únicamente después de que la persona acepta la política.
 
 ## Validaciones
 
 - `primerNombre` y `primerApellido`: requeridos, entre 2 y 50 caracteres.
 - `segundoNombre`: opcional, máximo 50 caracteres.
-- `segundoApellido`: el Swagger consultado actualmente lo marca como requerido, entre 2 y 50 caracteres. El frontend lo exige temporalmente para ajustarse al contrato publicado; cuando backend lo haga opcional, se debe retirar el validador `required`.
+- `segundoApellido`: opcional; si se diligencia, debe tener entre 2 y 50 caracteres.
 - `tipoDocumento`: requerido; opciones del formulario: `CC`, `TI`, `CE`, `PA`, `OT`.
 - `documento`: requerido, alfanumérico, máximo 50 caracteres.
 - `vinculoUdeaId`: se envía como el `id` numérico de una opción obtenida del catálogo; el formulario requiere seleccionar una.
@@ -47,4 +47,4 @@ La respuesta exitosa contiene `mensaje`, `usuarioId` y `email`. Tras el éxito, 
 
 El formulario muestra el mensaje de backend cuando está disponible (`mensaje` o `message`), incluidos los detalles de validación en `errores`. Si no hay detalle, presenta mensajes para validación (`400`), duplicidad (`409`) o vínculo/tipo de documento inexistente (`404`).
 
-Las pruebas usan `HttpTestingController`; no se debe invocar el `POST` contra QA con datos ficticios porque crearía una cuenta real.
+Las pruebas automatizadas usan respuestas simuladas y no crean cuentas. El `POST` contra QA crea una cuenta persistente; no debe probarse con datos ficticios sin autorización.

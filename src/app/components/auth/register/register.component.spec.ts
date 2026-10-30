@@ -43,9 +43,9 @@ describe('RegisterComponent', () => {
     expect(component.step2Form.get('vinculoUdeaId')?.enabled).toBeTrue();
   });
 
-  it('requires the second surname while the API contract marks it as required', () => {
+  it('allows the second surname to be empty and validates it when provided', () => {
     const segundoApellido = component.step1Form.get('segundoApellido');
-    expect(segundoApellido?.hasError('required')).toBeTrue();
+    expect(segundoApellido?.valid).toBeTrue();
 
     segundoApellido?.setValue('A');
     expect(segundoApellido?.hasError('minlength')).toBeTrue();
@@ -68,7 +68,7 @@ describe('RegisterComponent', () => {
     });
     component.step2Form.setValue({
       vinculoUdeaId: 8,
-      email: ' PERSONA@UDEA.EDU.CO ',
+      email: 'PERSONA@UDEA.EDU.CO',
       telefono: '3001234567'
     });
     component.step3Form.setValue({
@@ -95,6 +95,33 @@ describe('RegisterComponent', () => {
     expect(component.successMessage).toBe('Usuario creado exitosamente.');
     expect(component.loading).toBeFalse();
     expect(component.step3Form.get('confirmPassword')?.value).toBe('');
+  });
+
+  it('omits the second surname from the API payload when left blank', () => {
+    component.step1Form.setValue({
+      primerNombre: 'Ana',
+      segundoNombre: '',
+      primerApellido: 'Pérez',
+      segundoApellido: '',
+      tipoDocumento: 'CC',
+      documento: '123ABC'
+    });
+    component.step2Form.setValue({
+      vinculoUdeaId: 8,
+      email: 'ana@udea.edu.co',
+      telefono: '3001234567'
+    });
+    component.step3Form.setValue({
+      password: 'ClaveSegura123',
+      confirmPassword: 'ClaveSegura123',
+      habeasData: true
+    });
+
+    component.onSubmit();
+
+    const payload = auth.registrarUsuario.calls.mostRecent().args[0];
+    expect('segundoApellido' in payload).toBeFalse();
+    expect(payload.primerApellido).toBe('Pérez');
   });
 
   it('shows backend validation errors and unlocks the form to retry', () => {

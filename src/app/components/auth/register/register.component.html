@@ -54,10 +54,10 @@
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Segundo apellido *</mat-label>
+              <mat-label>Segundo apellido (opcional)</mat-label>
               <input matInput formControlName="segundoApellido" autocomplete="family-name">
               @if (controlInvalido(step1Form, 'segundoApellido')) {
-                <mat-error>Es obligatorio y debe tener entre 2 y 50 caracteres</mat-error>
+                <mat-error>Si lo ingresa, debe tener entre 2 y 50 caracteres</mat-error>
               }
             </mat-form-field>
 

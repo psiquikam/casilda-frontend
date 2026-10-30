@@ -54,7 +54,7 @@ export class RegisterComponent implements OnInit {
       primerNombre: ['', [Validators.required, Validators.pattern(/\S/), Validators.minLength(2), Validators.maxLength(50)]],
       segundoNombre: ['', [Validators.maxLength(50)]],
       primerApellido: ['', [Validators.required, Validators.pattern(/\S/), Validators.minLength(2), Validators.maxLength(50)]],
-      segundoApellido: ['', [Validators.required, Validators.pattern(/\S/), Validators.minLength(2), Validators.maxLength(50)]],
+      segundoApellido: ['', [Validators.pattern(/\S/), Validators.minLength(2), Validators.maxLength(50)]],
       tipoDocumento: ['', [Validators.required]],
       documento: ['', [Validators.required, Validators.maxLength(50), Validators.pattern('^[0-9A-Za-z]+$')]]
     });
@@ -158,7 +158,7 @@ export class RegisterComponent implements OnInit {
       primerNombre: identidad.primerNombre.trim(),
       segundoNombre: identidad.segundoNombre.trim() || undefined,
       primerApellido: identidad.primerApellido.trim(),
-      segundoApellido: identidad.segundoApellido.trim(),
+      ...(identidad.segundoApellido.trim() ? { segundoApellido: identidad.segundoApellido.trim() } : {}),
       tipoDocumento: identidad.tipoDocumento,
       documento: identidad.documento.trim(),
       vinculoUdeaId: Number(contacto.vinculoUdeaId),

@@ -11,7 +11,7 @@ export interface AuthRegisterRequest {
   primerNombre: string;
   segundoNombre?: string;
   primerApellido: string;
-  segundoApellido: string;
+  segundoApellido?: string;
   tipoDocumento: string;
   documento: string;
   vinculoUdeaId: number;
