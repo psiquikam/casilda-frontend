@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
-import { AuthService, UserSession, MOCK_USERS } from './auth.service';
+import { AuthRegisterRequest, AuthService, UserSession, MOCK_USERS } from './auth.service';
 import { environment } from '../../environments/environment';
 
 describe('AuthService', () => {
@@ -100,6 +100,54 @@ describe('AuthService', () => {
     expect(service.getRoleCode()).toBe('ADMIN');
   });
 
+  describe('rol Gestor de contenidos (rol_id 6)', () => {
+    // Forma real del login: `rol` trae el nombre y `roles` el código.
+    const sesionGestor = (): UserSession => ({
+      email: 'gestor@udea.edu.co',
+      nombre: 'Gestora de contenidos',
+      rol: 'Gestor de contenidos',
+      roles: ['GESTOR_CONTENIDO'],
+      authorities: ['ROLE_GESTOR_CONTENIDO'],
+      token: jwt(Math.floor(Date.now() / 1000) + 3600)
+    });
+
+    it('conserva la sesión al recargar aunque rol traiga el nombre y no el código', () => {
+      localStorage.setItem('userSession', JSON.stringify(sesionGestor()));
+
+      const service = createService();
+
+      expect(service.isAuthenticated()).toBeTrue();
+      expect(localStorage.getItem('userSession')).not.toBeNull();
+    });
+
+    it('lo reconoce como gestor y no lo confunde con el rol Usuario', () => {
+      localStorage.setItem('userSession', JSON.stringify(sesionGestor()));
+
+      const service = createService();
+
+      expect(service.isGestorContenido()).toBeTrue();
+      expect(service.isUsuario()).toBeFalse();
+      expect(service.isAdmin()).toBeFalse();
+      expect(service.getRoleCode()).toBe('GESTOR_CONTENIDO');
+      expect(service.getRoleName()).toBe('Gestor de contenidos');
+      expect(service.hasAnyRole(['GESTOR_CONTENIDO'])).toBeTrue();
+      expect(service.hasAnyRole(['USUARIO'])).toBeFalse();
+    });
+  });
+
+  it('sigue descartando una sesión con un rol que el frontend no conoce', () => {
+    localStorage.setItem('userSession', JSON.stringify({
+      ...session(Math.floor(Date.now() / 1000) + 3600),
+      rol: 'Invitado',
+      roles: ['INVITADO']
+    }));
+
+    const service = createService();
+
+    expect(service.isAuthenticated()).toBeFalse();
+    expect(localStorage.getItem('userSession')).toBeNull();
+  });
+
   it('elimina una sesión corrupta sin interrumpir la aplicación', () => {
     localStorage.setItem('userSession', '{sesion-invalida');
 
@@ -141,6 +189,52 @@ describe('AuthService', () => {
 
     service.currentUser = session(Math.floor(Date.now() / 1000) + 3600, 'Profesional');
     expect(service.getDefaultRoute()).toBe('/inicio');
+  });
+
+  it('consulta los vínculos institucionales disponibles en el endpoint de autenticación', (done) => {
+    const service = createService();
+    const http = TestBed.inject(HttpTestingController);
+
+    service.listarVinculosUdea().subscribe((vinculos) => {
+      expect(vinculos).toEqual([{ id: 8, codigo: 'EST', nombre: 'Estudiante' }]);
+      done();
+    });
+
+    const request = http.expectOne(`${environment.apiBaseUrl}/auth/vinculos-udea`);
+    expect(request.request.method).toBe('GET');
+    request.flush([{ id: 8, codigo: 'EST', nombre: 'Estudiante' }]);
+    http.verify();
+  });
+
+  it('envía el registro al endpoint y no crea una sesión de inicio de sesión', (done) => {
+    environment.datosDemostracion = false;
+    const service = createService();
+    const http = TestBed.inject(HttpTestingController);
+    const datos: AuthRegisterRequest = {
+      primerNombre: 'Ana',
+      primerApellido: 'Pérez',
+      segundoApellido: 'Gómez',
+      tipoDocumento: 'CC',
+      documento: '123ABC',
+      vinculoUdeaId: 8,
+      email: 'ana@udea.edu.co',
+      telefono: '3001234567',
+      password: 'ClaveSegura123',
+      habeasData: true
+    };
+
+    service.registrarUsuario(datos).subscribe((respuesta) => {
+      expect(respuesta.mensaje).toBe('Usuario creado exitosamente.');
+      expect(service.currentUser).toBeNull();
+      expect(localStorage.getItem('userSession')).toBeNull();
+      done();
+    });
+
+    const request = http.expectOne(`${environment.apiBaseUrl}/auth/register`);
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual(datos);
+    request.flush({ mensaje: 'Usuario creado exitosamente.', usuarioId: 23, email: datos.email });
+    http.verify();
   });
 
   it('en modo de demostración permite iniciar sesión con usuario mockeado', (done) => {

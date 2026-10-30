@@ -78,6 +78,16 @@ export const CATALOGO_MODULOS: readonly ModuloCasilda[] = [
     seccion: 'Administración'
   },
 
+  // --- Gestión de contenidos (GESTOR_CONTENIDO; Admin por la regla general) ---
+  {
+    id: 'contenidos-home',
+    nombre: 'Contenidos del inicio',
+    icono: 'web',
+    ruta: '/gestion-contenidos',
+    roles: ['GESTOR_CONTENIDO'],
+    seccion: 'Gestión de contenidos'
+  },
+
   // --- Equipo de atención ---
   {
     id: 'nueva-solicitud',

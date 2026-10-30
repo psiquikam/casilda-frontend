@@ -1,0 +1,204 @@
+<div class="editor">
+
+  <a class="editor__volver" routerLink="/gestion-contenidos">
+    <mat-icon aria-hidden="true">arrow_back</mat-icon>
+    Contenidos del inicio
+  </a>
+
+  <header class="editor__cabecera">
+    <h1 class="editor__titulo">{{ modo() === 'crear' ? 'Nuevo contenido' : 'Editar contenido' }}</h1>
+    <p class="editor__intro">
+      Complete los datos de la tarjeta. La vista previa muestra cómo quedará en la portada.
+    </p>
+  </header>
+
+  @if (cargando()) {
+    <div class="editor__esqueleto" role="status" aria-busy="true">
+      <span class="visually-hidden">Cargando el contenido…</span>
+      <span class="editor__barra"></span>
+      <span class="editor__barra editor__barra--corta"></span>
+      <span class="editor__barra"></span>
+    </div>
+  } @else if (errorCarga()) {
+    <div class="casilda-alerta casilda-alerta--peligro" role="alert">
+      <mat-icon aria-hidden="true">error_outline</mat-icon>
+      <div>
+        <p class="editor__error-texto">No pudimos cargar este contenido.</p>
+        <button type="button" class="boton boton--secundario" (click)="cargarContenido()">Intentar de nuevo</button>
+      </div>
+    </div>
+  } @else {
+    <form class="editor__cuerpo" [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+
+      <div class="editor__formulario">
+        <app-resumen-errores [errores]="errores()" />
+
+        <!-- 1. Qué dice -->
+        <fieldset class="editor__grupo">
+          <legend class="editor__leyenda">
+            <span class="editor__paso" aria-hidden="true">1</span>
+            Texto de la tarjeta
+          </legend>
+
+          <mat-form-field appearance="outline" class="editor__campo">
+            <mat-label>Título</mat-label>
+            <input matInput id="editor-titulo" formControlName="titulo" [maxlength]="limiteTitulo"
+              autocomplete="off" required>
+            <mat-hint>Breve y claro; idealmente menos de {{ tituloRecomendado }} caracteres.</mat-hint>
+            <mat-hint align="end" aria-hidden="true">{{ largoTitulo() }} / {{ limiteTitulo }}</mat-hint>
+            @if (form.controls.titulo.invalid) {
+              <mat-error>{{ mensajeError('titulo') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="editor__campo">
+            <mat-label>Texto de la tarjeta</mat-label>
+            <textarea matInput id="editor-contenido" formControlName="contenido" rows="4"
+              [maxlength]="limiteContenido" autocomplete="off" required></textarea>
+            <mat-hint>Explique en una o dos frases qué encontrará la persona. Solo texto, sin formato.</mat-hint>
+            <mat-hint align="end" aria-hidden="true">{{ largoContenido() }} / {{ limiteContenido }}</mat-hint>
+            @if (form.controls.contenido.invalid) {
+              <mat-error>{{ mensajeError('contenido') }}</mat-error>
+            }
+          </mat-form-field>
+        </fieldset>
+
+        <!-- 2. Dónde va -->
+        <fieldset class="editor__grupo">
+          <legend class="editor__leyenda">
+            <span class="editor__paso" aria-hidden="true">2</span>
+            Ubicación en la portada
+          </legend>
+
+          <p class="editor__pregunta" id="editor-seccion-etiqueta">¿En qué sección se muestra?</p>
+          <mat-radio-group class="editor__secciones" formControlName="seccion" aria-labelledby="editor-seccion-etiqueta">
+            @for (seccion of secciones; track seccion.valor) {
+              <mat-radio-button class="editor__seccion" [value]="seccion.valor"
+                [class.editor__seccion--activa]="form.controls.seccion.value === seccion.valor">
+                <span class="editor__seccion-titulo">{{ seccion.titulo }}</span>
+                <span class="editor__seccion-descripcion">{{ seccion.descripcion }}</span>
+              </mat-radio-button>
+            }
+          </mat-radio-group>
+
+          <div class="editor__fila">
+            <mat-form-field appearance="outline" class="editor__campo editor__campo--ancho">
+              <mat-label>Al hacer clic, llevar a</mat-label>
+              <mat-select id="editor-enlace" formControlName="enlace">
+                @for (destino of destinos(); track destino.ruta) {
+                  <mat-option [value]="destino.ruta">{{ destino.etiqueta }}</mat-option>
+                }
+              </mat-select>
+              <mat-hint>Solo páginas públicas de Casilda, para que nadie llegue a una página que pide iniciar sesión.</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="editor__campo editor__campo--corto">
+              <mat-label>Posición</mat-label>
+              <input matInput type="number" id="editor-orden" formControlName="orden" min="0" step="1"
+                inputmode="numeric" autocomplete="off" required>
+              <mat-hint>De menor a mayor.</mat-hint>
+              @if (form.controls.orden.invalid) {
+                <mat-error>{{ mensajeError('orden') }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </fieldset>
+
+        <!-- 3. Cuándo se ve -->
+        <fieldset class="editor__grupo">
+          <legend class="editor__leyenda">
+            <span class="editor__paso" aria-hidden="true">3</span>
+            Publicación
+          </legend>
+
+          <div class="editor__fila">
+            <mat-form-field appearance="outline" class="editor__campo">
+              <mat-label>Publicar desde</mat-label>
+              <input matInput id="editor-vigenciaInicio" [matDatepicker]="selectorInicio"
+                formControlName="vigenciaInicio" autocomplete="off" required>
+              <mat-datepicker-toggle matIconSuffix [for]="selectorInicio" aria-label="Abrir calendario: Publicar desde" />
+              <mat-datepicker #selectorInicio />
+              <mat-hint>dd/mm/aaaa</mat-hint>
+              @if (form.controls.vigenciaInicio.invalid) {
+                <mat-error>{{ mensajeError('vigenciaInicio') }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="editor__campo">
+              <mat-label>Retirar después de (opcional)</mat-label>
+              <input matInput id="editor-vigenciaFin" [matDatepicker]="selectorFin"
+                formControlName="vigenciaFin" [min]="form.controls.vigenciaInicio.value" autocomplete="off">
+              <mat-datepicker-toggle matIconSuffix [for]="selectorFin" aria-label="Abrir calendario: Retirar después de" />
+              <mat-datepicker #selectorFin />
+              <mat-hint>Vacío: sigue publicada hasta que la elimine.</mat-hint>
+              @if (form.controls.vigenciaFin.invalid) {
+                <mat-error>{{ mensajeError('vigenciaFin') }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </fieldset>
+
+        <!-- 4. Con qué imagen -->
+        <fieldset class="editor__grupo">
+          <legend class="editor__leyenda">
+            <span class="editor__paso" aria-hidden="true">4</span>
+            Imagen
+          </legend>
+
+          <app-selector-imagen
+            [idEntrada]="idImagen"
+            [imagenUrl]="imagenSelector()"
+            [nombreArchivo]="archivoImagen()?.name ?? null"
+            [tiposPermitidos]="imagenTipos"
+            [extensiones]="imagenExtensiones"
+            [tamanoMaximoBytes]="imagenTamanoMaximo"
+            [errorExterno]="errorImagen()"
+            ayudaSinImagen="Es decorativa: si no sube una, la tarjeta usa el distintivo de Casilda."
+            (seleccionar)="seleccionarImagen($event)"
+            (quitar)="quitarImagenActual()"
+          />
+        </fieldset>
+      </div>
+
+      <!-- Vista previa en vivo con la misma tarjeta de la portada -->
+      <aside class="editor__previa" aria-labelledby="editor-previa-titulo">
+        <div class="editor__previa-pegajosa">
+          <h2 class="editor__previa-titulo" id="editor-previa-titulo">Vista previa</h2>
+          <p class="editor__previa-seccion">
+            Sección «{{ seccionPrevia().titulo }}» · posición {{ form.controls.orden.value ?? 0 }}
+          </p>
+
+          <div class="editor__previa-marco">
+            <app-casilda-card [contenido]="vistaPrevia()" [vistaPrevia]="true" />
+          </div>
+
+          @if (publicacionPrevista(); as prevista) {
+            <div class="editor__previa-estado" aria-live="polite">
+              <app-estado-vigencia [estado]="prevista.estado" />
+              <p>
+                @switch (prevista.estado) {
+                  @case ('vigente') { Se verá en la portada en cuanto la guarde. }
+                  @case ('programado') { Se publicará automáticamente el {{ prevista.inicio | date:'longDate' }}. }
+                  @case ('vencido') { Con estas fechas no se mostrará: la fecha de retiro ya pasó. }
+                }
+              </p>
+            </div>
+          }
+        </div>
+      </aside>
+
+      <div class="editor__acciones">
+        <a class="boton boton--secundario" routerLink="/gestion-contenidos">Cancelar</a>
+        <button type="submit" class="boton boton--primario" [disabled]="guardando()" [attr.aria-busy]="guardando()">
+          @if (guardando()) {
+            <mat-spinner diameter="20" aria-hidden="true" />
+            Guardando…
+          } @else {
+            <mat-icon aria-hidden="true">save</mat-icon>
+            {{ modo() === 'crear' ? 'Guardar contenido' : 'Guardar cambios' }}
+          }
+        </button>
+      </div>
+    </form>
+  }
+</div>

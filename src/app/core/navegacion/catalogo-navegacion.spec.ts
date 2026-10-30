@@ -46,6 +46,12 @@ describe('catálogo de navegación', () => {
       expect(modulosVisiblesPara('ADMIN', true).map((m) => m.id)).toContain('usuarios');
     });
 
+    it('el gestor de contenidos solo ve su módulo, y el Admin también lo ve', () => {
+      expect(modulosVisiblesPara('GESTOR_CONTENIDO').map((m) => m.id)).toEqual(['contenidos-home']);
+      expect(modulosVisiblesPara('ADMIN', true).map((m) => m.id)).toContain('contenidos-home');
+      expect(modulosVisiblesPara('PROFESIONAL').map((m) => m.id)).not.toContain('contenidos-home');
+    });
+
     it('«Reportar caso» es exclusivo del rol Usuario, incluso para Admin', () => {
       // Antes aparecía en el catálogo del Admin porque el filtro tenía una
       // excepción para ese rol: ver todo no equivale a que sea su tarea

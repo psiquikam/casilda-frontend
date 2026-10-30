@@ -3,8 +3,29 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, of, tap, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
+import type { MaestroDto } from './listas.service';
 
 export const AUTH_REQUIRED_MESSAGE = 'La sesión ha expirado o no ha sido iniciada. Se requiere autenticación para continuar.';
+
+export interface AuthRegisterRequest {
+  primerNombre: string;
+  segundoNombre?: string;
+  primerApellido: string;
+  segundoApellido?: string;
+  tipoDocumento: string;
+  documento: string;
+  vinculoUdeaId: number;
+  email: string;
+  telefono: string;
+  password: string;
+  habeasData: true;
+}
+
+export interface AuthRegisterResponse {
+  mensaje?: string;
+  usuarioId?: number;
+  email?: string;
+}
 
 export interface UserSession {
   email: string;
@@ -32,11 +53,20 @@ export type UserRole =
   | 'Profesional'
   | 'Revisor'
   | 'Usuario'
+  | 'Gestor de contenidos'
   | 'ADMIN'
   | 'COORDINADOR'
   | 'PROFESIONAL'
   | 'REVISOR'
-  | 'USUARIO';
+  | 'USUARIO'
+  | 'GESTOR_CONTENIDO';
+
+/**
+ * Códigos de rol que reconoce el frontend. Coinciden con `rol.codigo` del
+ * backend (`database/initial_data.sql`), que el login devuelve en `roles`.
+ * `GESTOR_CONTENIDO` (rol_id 6) administra los contenidos de la portada.
+ */
+export const ROLES_CASILDA = ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR', 'USUARIO', 'GESTOR_CONTENIDO'] as const;
 
 export interface MockUserProfile {
   id: number;
@@ -196,7 +226,7 @@ interface JwtPayload {
   exp?: number;
 }
 
-type CodigoRol = 'ADMIN' | 'COORDINADOR' | 'PROFESIONAL' | 'REVISOR' | 'USUARIO';
+type CodigoRol = 'ADMIN' | 'COORDINADOR' | 'PROFESIONAL' | 'REVISOR' | 'USUARIO' | 'GESTOR_CONTENIDO';
 
 function normalizarCodigoRol(valor: string | null | undefined): CodigoRol | '' {
   const rol = (valor || '').toUpperCase().replace(/^ROLE_/, '');
@@ -204,6 +234,8 @@ function normalizarCodigoRol(valor: string | null | undefined): CodigoRol | '' {
   if (rol.includes('COORD')) return 'COORDINADOR';
   if (rol.includes('PROF')) return 'PROFESIONAL';
   if (rol.includes('REVIS')) return 'REVISOR';
+  // El login real trae `rol: 'Gestor de contenidos'` (nombre) y `roles: ['GESTOR_CONTENIDO']` (código).
+  if (rol.includes('GESTOR') || rol.includes('CONTENIDO')) return 'GESTOR_CONTENIDO';
   if (rol.includes('USUAR')) return 'USUARIO';
   return '';
 }
@@ -251,6 +283,8 @@ export class AuthService {
         return 'Profesional';
       case 'REVISOR':
         return 'Revisor';
+      case 'GESTOR_CONTENIDO':
+        return 'Gestor de contenidos';
       default:
         return 'Usuario';
     }
@@ -274,6 +308,10 @@ export class AuthService {
 
   isUsuario(): boolean {
     return this.hasRole('USUARIO');
+  }
+
+  isGestorContenido(): boolean {
+    return this.hasRole('GESTOR_CONTENIDO');
   }
 
   /**
@@ -319,6 +357,14 @@ export class AuthService {
 
   getDefaultRoute(): string {
     return '/inicio';
+  }
+
+  listarVinculosUdea(): Observable<MaestroDto[]> {
+    return this.http.get<MaestroDto[]>(`${this.apiUrl}/vinculos-udea`);
+  }
+
+  registrarUsuario(datos: AuthRegisterRequest): Observable<AuthRegisterResponse> {
+    return this.http.post<AuthRegisterResponse>(`${this.apiUrl}/register`, datos);
   }
 
   loginWithCredentials(email: string, password: string): Observable<AuthLoginResponse> {
@@ -440,7 +486,8 @@ export class AuthService {
   private isValidSession(value: unknown): value is UserSession {
     if (!value || typeof value !== 'object') return false;
     const session = value as Partial<UserSession>;
-    const rolesSesion = [session.rol, ...(session.roles ?? []), ...(session.authorities ?? [])];
+    // Se revisan `rol` (nombre) y `roles` (código); `authorities` no basta para validar la sesión.
+    const rolesSesion = [session.rol, ...(Array.isArray(session.roles) ? session.roles : [])];
     return (
       typeof session.email === 'string' &&
       typeof session.nombre === 'string' &&

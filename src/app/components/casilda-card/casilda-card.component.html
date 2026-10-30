@@ -1,15 +1,20 @@
 @let item = contenido();
 
-@if (esNavegable()) {
+<!-- La imagen es decorativa (contrato §5.1): el significado lo cargan título y
+     texto. Tamaño fijo declarado para que la tarjeta no salte al cargar. -->
+<ng-template #cuerpo>
+  <img class="tarjeta__imagen" [src]="imagenUrl()" alt="" aria-hidden="true"
+    width="64" height="64" loading="lazy" decoding="async" (error)="alFallarImagen()">
+  <h3 class="tarjeta__titulo">{{ item.titulo }}</h3>
+  <p class="tarjeta__contenido">{{ item.contenido }}</p>
+</ng-template>
+
+@if (esNavegable() && !vistaPrevia()) {
   <a class="tarjeta tarjeta--accion" [routerLink]="item.enlace">
-    <img class="tarjeta__imagen" [src]="item.imagen" alt="" aria-hidden="true">
-    <h3 class="tarjeta__titulo">{{ item.titulo }}</h3>
-    <p class="tarjeta__contenido">{{ item.contenido }}</p>
+    <ng-container [ngTemplateOutlet]="cuerpo" />
   </a>
 } @else {
-  <article class="tarjeta">
-    <img class="tarjeta__imagen" [src]="item.imagen" alt="" aria-hidden="true">
-    <h3 class="tarjeta__titulo">{{ item.titulo }}</h3>
-    <p class="tarjeta__contenido">{{ item.contenido }}</p>
+  <article class="tarjeta" [class.tarjeta--previa-accion]="esNavegable()">
+    <ng-container [ngTemplateOutlet]="cuerpo" />
   </article>
 }

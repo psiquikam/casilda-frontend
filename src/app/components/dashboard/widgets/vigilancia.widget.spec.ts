@@ -3,6 +3,7 @@ import { LOCALE_ID } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 import localeEsCo from '@angular/common/locales/es-CO';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { provideRouter } from '@angular/router';
 import { MatIconTestingModule } from '@angular/material/icon/testing';
 
 import { VigilanciaWidget } from './vigilancia.widget';
@@ -27,7 +28,8 @@ describe('VigilanciaWidget', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [VigilanciaWidget, MatIconTestingModule],
-      providers: [provideNoopAnimations(), { provide: LOCALE_ID, useValue: 'es-CO' }]
+      // La acción de la zona navega con routerLink: requiere router.
+      providers: [provideNoopAnimations(), provideRouter([]), { provide: LOCALE_ID, useValue: 'es-CO' }]
     }).compileComponents();
 
     fixture = TestBed.createComponent(VigilanciaWidget);

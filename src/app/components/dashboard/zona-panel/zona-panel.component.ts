@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 
 /**
@@ -11,7 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 @Component({
   selector: 'app-zona-panel',
   standalone: true,
-  imports: [MatIconModule],
+  imports: [MatIconModule, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './zona-panel.component.html',
   styleUrl: './zona-panel.component.scss'
@@ -30,9 +31,13 @@ export class ZonaPanelComponent {
   /** Mensaje del estado vacío. Amable y concreto, nunca un espacio en blanco. */
   readonly mensajeVacio = input('Por ahora no hay nada aquí.');
 
-  /** Enlace opcional de la esquina superior derecha. */
+  /**
+   * Enlace opcional de la esquina superior derecha. Navega con el router: con
+   * `href` cada clic recargaba la aplicación completa.
+   */
   readonly accionTexto = input<string>();
   readonly accionRuta = input<string>();
+  readonly accionParametros = input<Record<string, string>>();
 
   readonly reintentar = output<void>();
 }

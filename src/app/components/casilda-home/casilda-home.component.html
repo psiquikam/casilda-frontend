@@ -47,22 +47,11 @@
       </div>
     </div>
   } @else {
-    @if (acciones().length) {
-      <section class="home__seccion" aria-labelledby="titulo-acciones">
-        <h2 id="titulo-acciones" class="home__seccion-titulo">Opciones de atención y gestión</h2>
+    @for (seccion of secciones(); track seccion.valor) {
+      <section class="home__seccion" [attr.aria-labelledby]="'titulo-' + seccion.valor">
+        <h2 [id]="'titulo-' + seccion.valor" class="home__seccion-titulo">{{ seccion.titulo }}</h2>
         <ul class="home__grid">
-          @for (item of acciones(); track item.id) {
-            <li><app-casilda-card [contenido]="item"></app-casilda-card></li>
-          }
-        </ul>
-      </section>
-    }
-
-    @if (informacion().length) {
-      <section class="home__seccion" aria-labelledby="titulo-informacion">
-        <h2 id="titulo-informacion" class="home__seccion-titulo">Información de interés general</h2>
-        <ul class="home__grid">
-          @for (item of informacion(); track item.id) {
+          @for (item of seccion.items; track item.id) {
             <li><app-casilda-card [contenido]="item"></app-casilda-card></li>
           }
         </ul>

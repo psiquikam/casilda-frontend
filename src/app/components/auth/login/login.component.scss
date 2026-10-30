@@ -113,10 +113,10 @@
   color: var(--color-text-secondary);
 }
 
-.login__ayuda {
-  margin: calc(var(--space-3) * -1) 0 var(--space-5);
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
+/* Con `subscriptSizing="dynamic"` el subscript vacío no reserva alto: este margen
+   sostiene la separación entre campos y el mensaje, cuando aparece, la amplía. */
+.mat-mdc-form-field {
+  margin-bottom: var(--space-5);
 }
 
 .login__submit {

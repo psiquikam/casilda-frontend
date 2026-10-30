@@ -4,10 +4,14 @@ import { DASHBOARD_POR_ROL, WIDGETS_SIN_BACKEND, widgetsDelRol, type RolCasilda 
 describe('registro de widgets por rol', () => {
   const rolesPersonal: RolCasilda[] = ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR'];
 
-  it('cubre los cinco roles reales del código', () => {
+  it('cubre los seis roles reales del código', () => {
     expect(Object.keys(DASHBOARD_POR_ROL).sort()).toEqual(
-      ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR', 'USUARIO'].sort()
+      ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR', 'USUARIO', 'GESTOR_CONTENIDO'].sort()
     );
+  });
+
+  it('al gestor de contenidos solo le ofrece el acceso a su módulo', () => {
+    expect(widgetsDelRol('GESTOR_CONTENIDO', false)).toEqual(['accesos-frecuentes']);
   });
 
   it('pone lo accionable antes que lo informativo (DSH-P1, DSH-07-01)', () => {
