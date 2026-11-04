@@ -110,11 +110,15 @@
                 <mat-option [value]="t.id">{{ t.nombre }}</mat-option>
               }
             </mat-select>
+            @if (detalleForm.get('tipoDocumento')?.hasError('tiMayorEdad')) {
+              <mat-error>La tarjeta de identidad solo aplica a personas menores de edad.</mat-error>
+            }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Número de documento</mat-label>
-            <input matInput formControlName="numeroDocumento">
+            <input matInput formControlName="numeroDocumento" [maxlength]="maxLongitudDocumento"
+              (input)="normalizarDocumento($event)">
           </mat-form-field>
 
           <mat-form-field appearance="outline">
@@ -185,7 +189,7 @@
                 <td mat-cell *matCellDef="let element"> {{element.tipo}} </td>
               </ng-container>
               <ng-container matColumnDef="correo">
-                <th mat-header-cell scope="col" *matHeaderCellDef> Correo Electrónico </th>
+                <th mat-header-cell scope="col" *matHeaderCellDef> Correo electrónico </th>
                 <td mat-cell *matCellDef="let element"> {{element.correo}} </td>
               </ng-container>
               <ng-container matColumnDef="acciones">

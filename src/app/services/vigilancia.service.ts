@@ -80,8 +80,8 @@ const CATALOGOS: CatalogosVigilancia = {
 const BASE = [
   { etiqueta: 'Mujeres (Cis/Trans)', casos: 88 },
   { etiqueta: 'Hombres (Cis/Trans)', casos: 36 },
-  { etiqueta: 'Personas No Binarias', casos: 24 },
-  { etiqueta: 'Disidencias / Otras', casos: 8 }
+  { etiqueta: 'Personas no binarias', casos: 24 },
+  { etiqueta: 'Disidencias / otras', casos: 8 }
 ];
 
 /** Factor de reducción por filtro, para que el mock cambie de forma coherente. */

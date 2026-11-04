@@ -64,7 +64,7 @@ describe('RegisterComponent', () => {
       primerApellido: ' Pérez ',
       segundoApellido: ' Gómez ',
       tipoDocumento: 'CC',
-      documento: '123ABC'
+      documento: '1234567890'
     });
     component.step2Form.setValue({
       vinculoUdeaId: 8,
@@ -85,7 +85,7 @@ describe('RegisterComponent', () => {
       primerApellido: 'Pérez',
       segundoApellido: 'Gómez',
       tipoDocumento: 'CC',
-      documento: '123ABC',
+      documento: '1234567890',
       vinculoUdeaId: 8,
       email: 'persona@udea.edu.co',
       telefono: '3001234567',
@@ -104,7 +104,7 @@ describe('RegisterComponent', () => {
       primerApellido: 'Pérez',
       segundoApellido: '',
       tipoDocumento: 'CC',
-      documento: '123ABC'
+      documento: '1234567890'
     });
     component.step2Form.setValue({
       vinculoUdeaId: 8,
@@ -135,7 +135,7 @@ describe('RegisterComponent', () => {
       primerApellido: 'Pérez',
       segundoApellido: 'Gómez',
       tipoDocumento: 'CC',
-      documento: '123ABC'
+      documento: '1234567890'
     });
     component.step2Form.setValue({
       vinculoUdeaId: 8,
@@ -161,5 +161,16 @@ describe('RegisterComponent', () => {
 
     expect(component.errorVinculos).toContain('No fue posible cargar');
     expect(component.step2Form.get('vinculoUdeaId')?.disabled).toBeTrue();
+  });
+
+  it('acepta solo números y máximo diez caracteres para cédula de ciudadanía', () => {
+    component.step1Form.get('tipoDocumento')?.setValue('CC');
+    const input = document.createElement('input');
+    input.value = '12.ABC345678901';
+
+    component.formatoDocumento({ target: input } as unknown as Event);
+
+    expect(component.step1Form.get('documento')?.value).toBe('1234567890');
+    expect(component.maxLongitudDocumento).toBe(10);
   });
 });

@@ -1,6 +1,6 @@
 <div class="atencion-pr-container animate-fade-in">
   <div class="section-header">
-    <h1>Atención Primer Respondiente</h1>
+    <h1>Atención primer respondiente</h1>
   </div>
 
   <mat-card class="form-card">
@@ -119,17 +119,22 @@
             <div class="tab-padding">
               <div class="grid-3">
                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                  <mat-label>Tipo Documento</mat-label>
+                  <mat-label>Tipo de documento</mat-label>
                   <mat-select formControlName="tipoDocumento">
                     @for (t of tiposDocumento; track t.id) {
                       <mat-option [value]="t.id">{{t.nombre}}</mat-option>
                     }
                   </mat-select>
+                  @if (registroCasoForm.get('tipoDocumento')?.hasError('tiMayorEdad')) {
+                    <mat-error>La tarjeta de identidad solo aplica a personas menores de edad.</mat-error>
+                  }
                 </mat-form-field>
                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
                   <mat-label>Número de documento</mat-label>
-                  <input matInput formControlName="documento" inputmode="numeric" pattern="\d*"
-                    [maxlength]="maxLongitudDocumento" (input)="soloDigitos($event)"
+                  <input matInput formControlName="documento"
+                    [attr.inputmode]="documentoAlfanumerico ? 'text' : 'numeric'"
+                    [attr.pattern]="documentoAlfanumerico ? '[A-Za-z0-9]*' : '\\d*'"
+                    [maxlength]="maxLongitudDocumento" (input)="normalizarDocumento($event)"
                     (keyup.enter)="buscarPersona($event)">
                     <button matSuffix mat-icon-button aria-label="Buscar persona por documento" type="button" (click)="buscarPersona($event)"
                       [disabled]="buscandoPersona" matTooltip="Buscar persona">
@@ -142,7 +147,7 @@
                     </button>
                   </mat-form-field>
                   <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                    <mat-label>Fecha Nacimiento</mat-label>
+                    <mat-label>Fecha de nacimiento</mat-label>
                     <input matInput [matDatepicker]="pickerNacimiento"
                       formControlName="fechaNacimiento">
                       <mat-datepicker-toggle matIconSuffix
@@ -150,19 +155,19 @@
                       <mat-datepicker #pickerNacimiento></mat-datepicker>
                     </mat-form-field>
                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                      <mat-label>Primer Nombre</mat-label>
+                      <mat-label>Primer nombre</mat-label>
                       <input matInput formControlName="primerNombre">
                     </mat-form-field>
                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                      <mat-label>Segundo Nombre</mat-label>
+                      <mat-label>Segundo nombre</mat-label>
                       <input matInput formControlName="segundoNombre">
                     </mat-form-field>
                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                      <mat-label>Primer Apellido</mat-label>
+                      <mat-label>Primer apellido</mat-label>
                       <input matInput formControlName="primerApellido">
                     </mat-form-field>
                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                      <mat-label>Segundo Apellido</mat-label>
+                      <mat-label>Segundo apellido</mat-label>
                       <input matInput formControlName="segundoApellido">
                     </mat-form-field>
                     <mat-form-field appearance="outline">
@@ -242,7 +247,7 @@
                               </mat-select>
                             </mat-form-field>
                             <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                              <mat-label>Orientación Sexual</mat-label>
+                              <mat-label>Orientación sexual</mat-label>
                               <mat-select formControlName="orientacionSexual">
                                 @for (o of orientacionesSexuales; track o.id) {
                                   <mat-option [value]="o.id">{{o.nombre}}</mat-option>
@@ -347,7 +352,7 @@
                               </mat-form-field>
 
                               <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Unidad Académica, Escuela o instituto</mat-label>
+                                <mat-label>Unidad académica, escuela o instituto</mat-label>
                                 <mat-select formControlName="unidadAcademica">
                                   @for (f of unidadesAcademicas; track f.id) {
                                     <mat-option [value]="f.id">{{f.nombre}}</mat-option>
@@ -366,7 +371,7 @@
                               </mat-form-field>
 
                               <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                                <mat-label>Unidad Administrativa</mat-label>
+                                <mat-label>Unidad administrativa</mat-label>
                                 <mat-select formControlName="unidadAdministrativa">
                                   @for (f of unidadesAdministrativas; track f.id) {
                                     <mat-option [value]="f.id">{{f.nombre}}</mat-option>
@@ -388,7 +393,7 @@
                               <div class="section-header-inline">
                                 <div class="section-title">
                                   <mat-icon aria-hidden="true" color="primary">email</mat-icon>
-                                  <span>Correos Electrónicos</span>
+                                  <span>Correos electrónicos</span>
                                 </div>
 
                                 <button mat-icon-button aria-label="Agregar correo electrónico" class="btn-add-inline" type="button"
@@ -405,7 +410,7 @@
                                   </ng-container>
 
                                   <ng-container matColumnDef="correo">
-                                    <th mat-header-cell scope="col" *matHeaderCellDef> Correo Electrónico </th>
+                                    <th mat-header-cell scope="col" *matHeaderCellDef> Correo electrónico </th>
                                     <td mat-cell *matCellDef="let element"> {{element.correo}} </td>
                                   </ng-container>
 

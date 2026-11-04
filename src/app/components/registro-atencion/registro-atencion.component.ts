@@ -118,20 +118,20 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
 
   private readonly longitudesPorTipoDocumento: Record<string, number> = {
-    CC: 10, TI: 11, CE: 7, RC: 11, NUIP: 11, NIP: 11, PA: 12
+    CC: 10, TI: 11, CE: 6, RC: 11, NUIP: 10, NIP: 11, PA: 16, PAS: 16
   };
 
   get maxLongitudDocumento(): number {
     const tipo = String(this.atencionForm?.get('tipoDocumento')?.value ?? '').toUpperCase().trim();
     if (!tipo) {
-      return 12;
+      return 20;
     }
     for (const key of Object.keys(this.longitudesPorTipoDocumento)) {
       if (tipo.includes(key)) {
         return this.longitudesPorTipoDocumento[key];
       }
     }
-    return 12;
+    return 20;
   }
 
   soloDigitos(event: Event): void {
@@ -194,9 +194,9 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     { tab: 'Datos de la persona', label: 'Régimen de salud', control: 'regimenSalud' },
     { tab: 'Datos de la persona', label: 'Ciudad de nacimiento', control: 'ciudadNacimiento' },
     { tab: 'Datos complementarios', label: 'Vínculo', control: 'vinculo' },
-    { tab: 'Datos complementarios', label: 'Unidad Académica', control: 'unidadAcademica' },
+    { tab: 'Datos complementarios', label: 'Unidad académica', control: 'unidadAcademica' },
     { tab: 'Datos complementarios', label: 'Programa', control: 'programa' },
-    { tab: 'Datos complementarios', label: 'Unidad Administrativa', control: 'unidadAdministrativa' },
+    { tab: 'Datos complementarios', label: 'Unidad administrativa', control: 'unidadAdministrativa' },
     { tab: 'Datos complementarios', label: 'Campus', control: 'campus' },
     { tab: 'Documentación', label: 'Tiempo ocurrido (valor)', control: 'tiempoOcurridoValor' },
     { tab: 'Documentación', label: 'Tiempo ocurrido (unidad)', control: 'tiempoOcurridoUnidad' },
@@ -1263,10 +1263,10 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
               }
             }
 
-            let titulo = '¡Guardado Exitoso!';
+            let titulo = '¡Guardado exitoso!';
             let mensaje = 'Datos de la pestaña guardados exitosamente.';
             if (targetTabIndex === 0 && res && res.codigo) {
-              titulo = '¡Caso Registrado!';
+              titulo = '¡Caso registrado!';
               mensaje = `Se ha registrado exitosamente el caso con código: ${res.codigo}`;
             }
 

@@ -129,7 +129,7 @@ export class CasosSimuladosService {
         profesional: 'Lic. Carlos Restrepo (Profesional Psicosocial)',
         unidadAcademica: 'Facultad de Educación',
         campus: 'Seccional Oriente',
-        identidadGenero: 'Persona No Binaria',
+        identidadGenero: 'Persona no binaria',
         grupoAtencion: null
       }),
       this.crearCaso({

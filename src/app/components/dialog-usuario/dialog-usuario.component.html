@@ -6,7 +6,7 @@
   <form [formGroup]="userForm" autocomplete="off" class="form-container">
 
     <mat-form-field appearance="outline">
-      <mat-label>Nombre Completo</mat-label>
+      <mat-label>Nombre completo</mat-label>
       <input matInput formControlName="nombre" placeholder="Ej: Maria Delgado">
       @if (userForm.get('nombre')?.hasError('required')) {
         <mat-error>El nombre es obligatorio</mat-error>
@@ -14,7 +14,7 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Correo Electrónico</mat-label>
+      <mat-label>Correo electrónico</mat-label>
       <input matInput formControlName="email" type="email" placeholder="usuario@fnsp.gov.co">
       @if (userForm.get('email')?.hasError('email')) {
         <mat-error>Formato de correo inválido</mat-error>
@@ -37,7 +37,7 @@
 
     <div class="row">
       <mat-form-field appearance="outline">
-        <mat-label>Rol en el Sistema</mat-label>
+        <mat-label>Rol en el sistema</mat-label>
         <mat-select formControlName="idRol">
           @for (rol of roles; track rol.id) {
             <mat-option [value]="rol.id">{{ rol.nombre }}</mat-option>

@@ -1,22 +1,10 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap } from 'rxjs';
 import { MatTableModule } from '@angular/material/table';
-
-export function fechaNacimientoPasadaValidator(control: AbstractControl): ValidationErrors | null {
-  if (!control.value) return null;
-  const fecha = new Date(control.value);
-  if (isNaN(fecha.getTime())) return null;
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
-  if (fecha >= hoy) {
-    return { fechaFutura: true };
-  }
-  return null;
-}
 
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -41,6 +29,13 @@ import { ModalTelefonoComponent } from '../modal-telefono/modal-telefono.compone
 import { ResumenErroresComponent } from '../../core/a11y/resumen-errores.component';
 import { DescripcionCampos, ErrorFormulario, recolectarErrores } from '../../core/a11y/errores-formulario';
 import { NotificacionService } from '../../core/a11y/notificacion.service';
+import {
+  documentoEsAlfanumerico,
+  fechaNacimientoPasadaValidator,
+  limpiarDocumento,
+  longitudMaximaDocumento,
+  tarjetaIdentidadMenorEdadValidator
+} from '../../core/forms/documento-identidad';
 
 @Component({
     selector: 'app-formulario-acompanamiento',
@@ -115,6 +110,10 @@ export class FormularioAcompanamientoComponent implements OnInit {
         this.tiposDocumento = data.tiposDocumento;
         this.identidadesGenero = data.identidadesGenero;
         this.cargos = data.cargos;
+        if (this.acompanamientoForm) {
+          this.actualizarValidadoresDocumento('tipoDocumento', 'numeroDocumento', true);
+          this.actualizarValidadoresDocumento('remitenteTipoDocumento', 'remitenteNumeroDocumento', false);
+        }
       });
 
     this.listasService.obtenerMaestro('vinculos-udea')
@@ -151,10 +150,16 @@ export class FormularioAcompanamientoComponent implements OnInit {
       remitenteUnidadAdministrativa: [null],
       remitenteUnidadAcademica: [null],
       remitenteTipoDocumento: [null],
-      remitenteNumeroDocumento: [''],
+      remitenteNumeroDocumento: ['', [Validators.maxLength(20), Validators.pattern('^[0-9A-Za-z]*$')]],
 
-      tipoDocumento: [null, Validators.required],
-      numeroDocumento: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
+      tipoDocumento: [null, [
+        Validators.required,
+        tarjetaIdentidadMenorEdadValidator(
+          () => this.acompanamientoForm?.get('fechaNacimiento')?.value,
+          () => this.tiposDocumento
+        )
+      ]],
+      numeroDocumento: ['', [Validators.required, Validators.maxLength(20), Validators.pattern('^[0-9A-Za-z]+$')]],
       fechaNacimiento: [null, fechaNacimientoPasadaValidator],
       primerNombre: ['', Validators.required],
       segundoNombre: [''],
@@ -192,6 +197,16 @@ export class FormularioAcompanamientoComponent implements OnInit {
   }
 
   setupConditionalValidation(): void {
+    this.acompanamientoForm.get('tipoDocumento')?.valueChanges.subscribe(() => {
+      this.actualizarValidadoresDocumento('tipoDocumento', 'numeroDocumento', true);
+    });
+    this.acompanamientoForm.get('fechaNacimiento')?.valueChanges.subscribe(() => {
+      this.acompanamientoForm.get('tipoDocumento')?.updateValueAndValidity({ emitEvent: false });
+    });
+    this.acompanamientoForm.get('remitenteTipoDocumento')?.valueChanges.subscribe(() => {
+      this.actualizarValidadoresDocumento('remitenteTipoDocumento', 'remitenteNumeroDocumento', false);
+    });
+
     this.acompanamientoForm.get('tipoReporte')?.valueChanges.subscribe(tipo => {
       const remitenteFields = [
         'remitentePrimerNombre', 'remitentePrimerApellido',
@@ -215,6 +230,41 @@ export class FormularioAcompanamientoComponent implements OnInit {
         this.acompanamientoForm.get('agresorRemitirUad')?.setValue('no');
       }
     });
+  }
+
+  get maxLongitudDocumentoSolicitante(): number {
+    return longitudMaximaDocumento(this.acompanamientoForm?.get('tipoDocumento')?.value, this.tiposDocumento);
+  }
+
+  get maxLongitudDocumentoRemitente(): number {
+    return longitudMaximaDocumento(this.acompanamientoForm?.get('remitenteTipoDocumento')?.value, this.tiposDocumento);
+  }
+
+  formatoDocumento(event: Event, controlNombre: 'numeroDocumento' | 'remitenteNumeroDocumento', tipoControlNombre: 'tipoDocumento' | 'remitenteTipoDocumento'): void {
+    const input = event.target as HTMLInputElement;
+    const tipo = this.acompanamientoForm.get(tipoControlNombre)?.value;
+    const limpio = limpiarDocumento(input.value, tipo, this.tiposDocumento);
+    input.value = limpio;
+    this.acompanamientoForm.get(controlNombre)?.setValue(limpio, { emitEvent: false });
+  }
+
+  private actualizarValidadoresDocumento(
+    tipoControlNombre: 'tipoDocumento' | 'remitenteTipoDocumento',
+    documentoControlNombre: 'numeroDocumento' | 'remitenteNumeroDocumento',
+    requerido: boolean
+  ): void {
+    const tipo = this.acompanamientoForm.get(tipoControlNombre)?.value;
+    const documento = this.acompanamientoForm.get(documentoControlNombre);
+    const validators = [
+      Validators.maxLength(longitudMaximaDocumento(tipo, this.tiposDocumento)),
+      Validators.pattern(documentoEsAlfanumerico(tipo, this.tiposDocumento) ? '^[0-9A-Za-z]*$' : '^[0-9]*$')
+    ];
+    if (requerido) validators.unshift(Validators.required);
+    documento?.setValidators(validators);
+
+    const valorLimpio = limpiarDocumento(String(documento?.value ?? ''), tipo, this.tiposDocumento);
+    if (valorLimpio !== documento?.value) documento?.setValue(valorLimpio, { emitEvent: false });
+    documento?.updateValueAndValidity({ emitEvent: false });
   }
 
   buscarRemitente(event?: Event): void {

@@ -98,7 +98,7 @@ export const RESPALDO_MAESTROS_VBG: Record<string, MaestroDto[]> = {
     { id: 1, codigo: 'NINGUNA', nombre: 'Ninguna' },
     { id: 2, codigo: 'INDIGENA', nombre: 'Indígena' },
     { id: 3, codigo: 'AFRO', nombre: 'Negra, afrocolombiana, raizal o palenquera' },
-    { id: 4, codigo: 'ROM', nombre: 'Rrom / Gitana' }
+    { id: 4, codigo: 'ROM', nombre: 'Rrom / gitana' }
   ],
   programas: [
     { id: 1, codigo: 'DEMO-MED', nombre: 'Medicina (demostración)' },
@@ -121,7 +121,7 @@ export const RESPALDO_MAESTROS_VBG: Record<string, MaestroDto[]> = {
   regimenes: [
     { id: 1, codigo: 'CONTRIB', nombre: 'Contributivo' },
     { id: 2, codigo: 'SUBSID', nombre: 'Subsidiado' },
-    { id: 3, codigo: 'ESPECIAL', nombre: 'Especial / Exceptuado' }
+    { id: 3, codigo: 'ESPECIAL', nombre: 'Especial / exceptuado' }
   ],
   eps: [
     { id: 1, codigo: 'DEMO-EPS-1', nombre: 'EPS Demostración 1' },
@@ -157,6 +157,6 @@ export const RESPALDO_MAESTROS_VBG: Record<string, MaestroDto[]> = {
     { id: 1, codigo: 'PRESENCIAL', nombre: 'Presencial' },
     { id: 2, codigo: 'TELEFONICO', nombre: 'Telefónico' },
     { id: 3, codigo: 'VIRTUAL-SEGUIMIENTO', nombre: 'Virtual' },
-    { id: 4, codigo: 'VISITA-DOMICILIARIA', nombre: 'Visita Domiciliaria' }
+    { id: 4, codigo: 'VISITA-DOMICILIARIA', nombre: 'Visita domiciliaria' }
   ]
 };

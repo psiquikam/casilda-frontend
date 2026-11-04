@@ -231,6 +231,12 @@
   }
 }
 
+.route-selection-section {
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
 .section-title-with-tooltip {
   display: flex;
   align-items: center;

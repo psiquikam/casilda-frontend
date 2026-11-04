@@ -103,7 +103,7 @@ export class ModalAgregarCasoComponent {
   }
 
   get tituloModal(): string {
-    return this.data.titulo?.trim() || 'Agregar Caso';
+    return this.data.titulo?.trim() || 'Agregar caso';
   }
 
   get violenciaMisionalValue(): string {

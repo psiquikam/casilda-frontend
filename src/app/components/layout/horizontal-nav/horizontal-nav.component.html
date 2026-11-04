@@ -12,7 +12,7 @@
     @if (auth.isUsuario()) {
       <a routerLink="/reportar-caso" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
         <mat-icon class="hnav-icon" aria-hidden="true">add_circle_outline</mat-icon>
-        <span class="hnav-text">Reportar Caso</span>
+        <span class="hnav-text">Reportar caso</span>
       </a>
 
       <a routerLink="/seguimiento" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
@@ -69,7 +69,7 @@
       <mat-menu #atencionMenu="matMenu" class="hnav-menu">
         <a mat-menu-item routerLink="/solicitud-acompanamiento" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
           <mat-icon aria-hidden="true">add_circle_outline</mat-icon>
-          <span>Nueva Solicitud</span>
+          <span>Nueva solicitud</span>
         </a>
         <a mat-menu-item routerLink="/consulta" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
           <mat-icon aria-hidden="true">move_to_inbox</mat-icon>
@@ -117,7 +117,7 @@
         @if (features.complaintIntakePrototype) {
           <a mat-menu-item routerLink="/nueva-queja" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
             <mat-icon aria-hidden="true">post_add</mat-icon>
-            <span>Registrar Queja Disciplinaria</span>
+            <span>Registrar queja disciplinaria</span>
           </a>
         }
         @if (features.publicTrackingPrototype) {
@@ -198,7 +198,7 @@
               <a routerLink="/reportar-caso" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
                 class="hnav-mobile-item" (click)="closeMobileMenu()">
                 <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">add_circle_outline</mat-icon>
-                <span class="hnav-mobile-item__text">Reportar Caso</span>
+                <span class="hnav-mobile-item__text">Reportar caso</span>
               </a>
               <a routerLink="/seguimiento" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
                 class="hnav-mobile-item" (click)="closeMobileMenu()">
@@ -209,7 +209,7 @@
                 <a routerLink="/nueva-queja" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
                   class="hnav-mobile-item" (click)="closeMobileMenu()">
                   <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">post_add</mat-icon>
-                  <span class="hnav-mobile-item__text">Queja Disciplinaria (UAD)</span>
+                  <span class="hnav-mobile-item__text">Queja disciplinaria (UAD)</span>
                 </a>
               }
             </div>
@@ -276,7 +276,7 @@
               <a routerLink="/solicitud-acompanamiento" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
                 class="hnav-mobile-item" (click)="closeMobileMenu()">
                 <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">add_circle_outline</mat-icon>
-                <span class="hnav-mobile-item__text">Nueva Solicitud</span>
+                <span class="hnav-mobile-item__text">Nueva solicitud</span>
               </a>
               <a routerLink="/consulta" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
                 class="hnav-mobile-item" (click)="closeMobileMenu()">
@@ -337,7 +337,7 @@
                 <a routerLink="/nueva-queja" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
                   class="hnav-mobile-item" (click)="closeMobileMenu()">
                   <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">post_add</mat-icon>
-                  <span class="hnav-mobile-item__text">Registrar Queja Disciplinaria</span>
+                  <span class="hnav-mobile-item__text">Registrar queja disciplinaria</span>
                 </a>
               }
               @if (features.publicTrackingPrototype) {

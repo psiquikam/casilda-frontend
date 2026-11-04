@@ -57,7 +57,7 @@
                       </button>
                       </mat-form-field>
                       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                        <mat-label>Tipo Documento</mat-label>
+                        <mat-label>Tipo de documento</mat-label>
                         <mat-select formControlName="tipoDocumento">
                           @for (t of tiposDoc; track t) { <mat-option [value]="t">{{t}}</mat-option> }
                         </mat-select>
@@ -69,19 +69,19 @@
                         <mat-datepicker #picker2></mat-datepicker>
                       </mat-form-field>
                       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                        <mat-label>Primer Nombre</mat-label>
+                        <mat-label>Primer nombre</mat-label>
                         <input matInput formControlName="primerNombre">
                       </mat-form-field>
                       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                        <mat-label>Segundo Nombre</mat-label>
+                        <mat-label>Segundo nombre</mat-label>
                         <input matInput formControlName="segundoNombre">
                       </mat-form-field>
                       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                        <mat-label>Primer Apellido</mat-label>
+                        <mat-label>Primer apellido</mat-label>
                         <input matInput formControlName="primerApellido">
                       </mat-form-field>
                       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                        <mat-label>Segundo Apellido</mat-label>
+                        <mat-label>Segundo apellido</mat-label>
                         <input matInput formControlName="segundoApellido">
                       </mat-form-field>
                       <mat-form-field appearance="outline">
@@ -159,7 +159,7 @@
                               </mat-select>
                             </mat-form-field>
                             <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                              <mat-label>Orientación Sexual</mat-label>
+                              <mat-label>Orientación sexual</mat-label>
                               <mat-select formControlName="orientacionSexual">
                                 @for (o of listaOrientacionSexual; track o) { <mat-option
                                 [value]="o">{{o}}</mat-option> }
@@ -267,7 +267,7 @@
                               </mat-form-field>
                             }
                             <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                              <mat-label>Unidad Académica</mat-label>
+                              <mat-label>Unidad académica</mat-label>
                               <mat-select formControlName="unidadAcademica">
                                 @for (f of unidadesAcademicasM; track f) { <mat-option
                                 [value]="f">{{f}}</mat-option> }
@@ -282,7 +282,7 @@
                             </mat-select>
                           </mat-form-field>
                           <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                            <mat-label>Unidad Administrativa</mat-label>
+                            <mat-label>Unidad administrativa</mat-label>
                             <mat-select formControlName="unidadAdministrativa">
                               @for (f of listaUnidadesAdministrativas; track f) { <mat-option
                               [value]="f">{{f}}</mat-option> }
@@ -299,7 +299,7 @@
                           <div class="section-header-inline">
                             <div class="section-title">
                               <mat-icon aria-hidden="true" color="primary">email</mat-icon>
-                              <span>Correos Electrónicos</span>
+                              <span>Correos electrónicos</span>
                             </div>
                             <button mat-icon-button aria-label="Agregar correo electrónico" class="btn-add-inline" (click)="abrirModalCorreo()"
                               matTooltip="Agregar Correo">
@@ -313,7 +313,7 @@
                                 <td mat-cell *matCellDef="let element"> {{element.tipo}} </td>
                               </ng-container>
                               <ng-container matColumnDef="correo">
-                                <th mat-header-cell scope="col" *matHeaderCellDef> Correo Electrónico </th>
+                                <th mat-header-cell scope="col" *matHeaderCellDef> Correo electrónico </th>
                                 <td mat-cell *matCellDef="let element"> {{element.correo}} </td>
                               </ng-container>
                               <ng-container matColumnDef="acciones">
@@ -473,7 +473,7 @@
                               <div class="section-header-inline">
                                 <div class="section-title">
                                   <mat-icon aria-hidden="true" color="primary">assignment</mat-icon>
-                                  <span>Agregar Hecho</span>
+                                  <span>Agregar hecho</span>
                                 </div>
                                 <button mat-icon-button aria-label="Agregar hechos" class="btn-add-inline" (click)="abrirModalHechos()"
                                   matTooltip="Agregar Hechos">
@@ -523,7 +523,7 @@
                               <div class="section-header-inline">
                                 <div class="section-title">
                                   <mat-icon aria-hidden="true" color="primary">diversity_3</mat-icon>
-                                  <span>Relación Misional / Institucional</span>
+                                  <span>Relación misional / institucional</span>
                                 </div>
                                 <button type="button" class="help-tooltip-trigger" [matTooltip]="textoProtocoloRelacionMisional" matTooltipClass="casilda-help-tooltip" aria-label="Ayuda">?</button>
                               </div>
@@ -647,7 +647,7 @@
                               </div>
                               <div class="vbg-card">
                                 <div class="vbg-header">
-                                  <span>Violencia Patrimonial *</span>
+                                  <span>Violencia patrimonial *</span>
                                   <mat-radio-group formControlName="violenciaEconomica">
                                     <mat-radio-button value="SI">Sí</mat-radio-button>
                                     <mat-radio-button value="NO">No</mat-radio-button>
@@ -783,7 +783,7 @@
                             <div class="section-header-inline">
                               <div class="section-title">
                                 <mat-icon aria-hidden="true" color="primary">assignment</mat-icon>
-                                <span>Rutas Internas</span>
+                                <span>Rutas internas</span>
                               </div>
                             </div>
                             <div class="vbg-options">
@@ -803,7 +803,7 @@
                             <div class="section-header-inline">
                               <div class="section-title">
                                 <mat-icon aria-hidden="true" color="primary">assignment</mat-icon>
-                                <span>Rutas Externas</span>
+                                <span>Rutas externas</span>
                               </div>
                             </div>
                             <div class="vbg-options">

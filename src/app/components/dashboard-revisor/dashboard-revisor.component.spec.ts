@@ -29,7 +29,7 @@ describe('DashboardRevisorComponent', () => {
 
   it('debe incluir métricas de género diversas y no binarias', () => {
     const identidades = component.stats.genero.map(g => g.label);
-    expect(identidades).toContain('Personas No Binarias');
+    expect(identidades).toContain('Personas no binarias');
     expect(identidades).toContain('Mujeres (Cis/Trans)');
     expect(identidades).toContain('Hombres (Cis/Trans)');
   });
@@ -37,7 +37,7 @@ describe('DashboardRevisorComponent', () => {
   it('debe contener barritas de distribución por modalidades de violencia VBG', () => {
     expect(component.stats.modalidades.length).toBeGreaterThan(3);
     const labels = component.stats.modalidades.map(m => m.label);
-    expect(labels).toContain('Violencia Psicológica');
+    expect(labels).toContain('Violencia psicológica');
     expect(labels).toContain('Discriminación por género u orientación');
   });
 });

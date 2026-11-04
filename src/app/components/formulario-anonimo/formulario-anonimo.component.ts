@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MatStepper, MatStepperModule } from '@angular/material/stepper';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,11 +13,20 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
-import { MaestroDto } from '../../services/listas.service';
+import { ListasService, MaestroDto } from '../../services/listas.service';
 import { NotificacionService } from '../../core/a11y/notificacion.service';
 import { ResumenErroresComponent } from '../../core/a11y/resumen-errores.component';
 import { DescripcionCampos, ErrorFormulario, recolectarErrores } from '../../core/a11y/errores-formulario';
+import {
+  documentoEsAlfanumerico,
+  fechaNacimientoPasadaValidator,
+  limpiarDocumento,
+  longitudMaximaDocumento,
+  tarjetaIdentidadMenorEdadValidator
+} from '../../core/forms/documento-identidad';
 
 /**
  * Modo en que se presenta el formulario multipaso de reporte:
@@ -49,7 +59,7 @@ export const TEXTOS_REPORTE: Record<ModoReporte, TextosReporte> = {
     perfilTercero: 'Reporte anónimo en representación de un tercero o como testigo presencial.',
     botonEnviar: 'Finalizar y enviar reporte anónimo',
     claveBorrador: 'casilda_borrador_anonimo',
-    exitoTitulo: '¡Reporte Anónimo Registrado!',
+    exitoTitulo: '¡Reporte anónimo registrado!',
     exitoMensaje: 'El reporte anónimo ha sido recibido con éxito. Un profesional especializado revisará la información de forma confidencial.',
     exitoLabelCodigo: 'ID ÚNICO DE REPORTE ANÓNIMO',
     exitoInstruccion: 'Conserve este identificador (ID). Para activar una ruta de atención o acompañamiento institucional, inicie sesión en la plataforma e ingrese este ID para vincular el caso.'
@@ -61,7 +71,7 @@ export const TEXTOS_REPORTE: Record<ModoReporte, TextosReporte> = {
     perfilTercero: 'Reporte en representación de un tercero o como testigo presencial.',
     botonEnviar: 'Finalizar y enviar reporte',
     claveBorrador: 'casilda_borrador_reporte',
-    exitoTitulo: '¡Reporte Registrado!',
+    exitoTitulo: '¡Reporte registrado!',
     exitoMensaje: 'El reporte ha sido recibido con éxito. Un profesional especializado revisará la información de forma confidencial.',
     exitoLabelCodigo: 'ID ÚNICO DE REPORTE',
     exitoInstruccion: 'Conserve este identificador (ID). Se podrá consultar el avance del caso desde «Seguimiento de trámite» en Mis solicitudes.'
@@ -84,6 +94,8 @@ export const TEXTOS_REPORTE: Record<ModoReporte, TextosReporte> = {
     MatDialogModule,
     MatSelectModule,
     MatTooltipModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     ResumenErroresComponent
   ],
   templateUrl: './formulario-anonimo.component.html',
@@ -93,6 +105,7 @@ export class FormularioAnonimoComponent {
   private readonly fb = inject(FormBuilder);
   private readonly dialog = inject(MatDialog);
   private readonly notificacion = inject(NotificacionService);
+  private readonly listasService = inject(ListasService);
   // Opcional: el componente también se instancia sin router (pruebas unitarias).
   private readonly route = inject(ActivatedRoute, { optional: true });
 
@@ -111,20 +124,27 @@ export class FormularioAnonimoComponent {
   erroresRelato: ErrorFormulario[] = [];
 
   private readonly camposRelato: DescripcionCampos = {
-    sedeCampus: { etiqueta: 'Campus', mensajes: { required: 'Indique en qué campus ocurrió.' } },
-    lugarDetalleExterno: { etiqueta: 'Lugar fuera de la Universidad', mensajes: { required: 'Indique, aunque sea de forma aproximada, el lugar donde ocurrió.' } },
-    fecha: { etiqueta: 'Fecha de los hechos', mensajes: { required: 'Es posible indicar una fecha aproximada o seleccionar «Se desconoce».' } },
-    tipoVbg: { etiqueta: 'Tipos de violencia', mensajes: { required: 'Seleccione al menos un tipo o modalidad de violencia.' } },
-    descripcion: { etiqueta: 'Descripción', mensajes: { minlength: 'Si se describen los hechos, ingrese al menos 20 caracteres.' } }
+    descripcionHechos: { etiqueta: 'Descripción de los hechos', mensajes: { required: 'Describa los hechos para continuar.' } }
   };
 
+  tiposDocumento: MaestroDto[] = [];
+  campusLista: MaestroDto[] = [];
+  rutasActivacion: MaestroDto[] = [];
+
+  readonly maxFechaNacimiento: Date = (() => {
+    const fecha = new Date();
+    fecha.setDate(fecha.getDate() - 1);
+    fecha.setHours(23, 59, 59, 999);
+    return fecha;
+  })();
+
   readonly tiposVbg: MaestroDto[] = [
-    { id: 1, nombre: 'Violencia Psicológica' },
-    { id: 2, nombre: 'Violencia Física' },
-    { id: 3, nombre: 'Violencia Sexual' },
-    { id: 4, nombre: 'Violencia Institucional' },
+    { id: 1, nombre: 'Violencia psicológica' },
+    { id: 2, nombre: 'Violencia física' },
+    { id: 3, nombre: 'Violencia sexual' },
+    { id: 4, nombre: 'Violencia institucional' },
     { id: 5, nombre: 'Violencia económica o patrimonial' },
-    { id: 6, nombre: 'Violencia Digital / Informática' },
+    { id: 6, nombre: 'Violencia digital / informática' },
     { id: 7, nombre: 'Discriminación o violencia por prejuicio' },
     { id: 8, nombre: 'Otro tipo de violencia' }
   ];
@@ -188,28 +208,28 @@ export class FormularioAnonimoComponent {
   ];
 
   readonly listaDetalleMisional: string[] = [
-    'Misional Docencia',
-    'Misional Investigación',
-    'Misional Extensión',
-    'Actividades Institucionales',
+    'Misional docencia',
+    'Misional investigación',
+    'Misional extensión',
+    'Actividades institucionales',
     'En representación de la U',
     'En bienes inmuebles'
   ];
 
   readonly listaVinculosUniversidad: string[] = [
-    'Estudiante (Pregrado, Posgrado, Tecnología, Técnica)',
-    'Docente (Vinculado, Ocasional, Cátedra, Cátedra 50)',
+    'Estudiante (pregrado, posgrado, tecnología, técnica)',
+    'Docente (vinculado, ocasional, cátedra, cátedra 50)',
     'Personal no docente',
-    'Personal Directivo',
+    'Personal directivo',
     'Egresado(a)',
-    'Contratista / Proveedor',
-    'Persona Externa (Sin vínculo UdeA)',
-    'Se desconoce / No sabe',
+    'Contratista / proveedor',
+    'Persona externa (sin vínculo UdeA)',
+    'Se desconoce / no sabe',
     'Otro'
   ];
 
   readonly listaVinculosVictima: string[] = [
-    'Pareja / Expareja',
+    'Pareja / expareja',
     'Familiar',
     'Compañeros de estudio',
     'Docente',
@@ -227,10 +247,10 @@ export class FormularioAnonimoComponent {
   readonly rolesUdeaVictimario: string[] = [
     'Estudiante',
     'Docente',
-    'Personal Administrativo',
+    'Personal administrativo',
     'Personal no docente',
-    'Personal Directivo',
-    'Contratista / Proveedor'
+    'Personal directivo',
+    'Contratista / proveedor'
   ];
 
   readonly campusOptions: string[] = [
@@ -256,7 +276,7 @@ export class FormularioAnonimoComponent {
     'Otro campus o sede universitaria'
   ];
 
-  readonly REGEX_NUMEROS_IDENTIFICACION = /^[0-9]{5,15}$/;
+  readonly REGEX_NUMEROS_IDENTIFICACION = /^[0-9]{5,20}$/;
   readonly REGEX_LETRAS = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
   readonly REGEX_EMAIL = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   readonly REGEX_TELEFONO = /^[0-9]{7,12}$/;
@@ -305,7 +325,12 @@ export class FormularioAnonimoComponent {
       perfil: ['anonimo', Validators.required],
       deseaDatosVictima: ['no', Validators.required],
       victima: this.fb.group({
-        identificacion: ['', [Validators.pattern(this.REGEX_NUMEROS_IDENTIFICACION)]],
+        tipoDocumento: [null, tarjetaIdentidadMenorEdadValidator(
+          () => this.formPerfil?.get('victima.fechaNacimiento')?.value,
+          () => this.tiposDocumento
+        )],
+        identificacion: ['', [Validators.maxLength(20), Validators.pattern('^[0-9A-Za-z]*$')]],
+        fechaNacimiento: [null, fechaNacimientoPasadaValidator],
         primerNombre: [''],
         segundoNombre: ['', [Validators.pattern(this.REGEX_LETRAS)]],
         primerApellido: [''],
@@ -387,16 +412,19 @@ export class FormularioAnonimoComponent {
     });
 
     this.formRelato = this.fb.group({
-      tipoLugar: ['interno', Validators.required],
-      sedeCampus: ['', Validators.required],
+      tipoLugar: [null],
+      sedeCampus: [''],
       facultad: [''],
       bloque: [''],
       espacio: [''],
       lugarDetalleExterno: [''],
+      descripcionHechos: ['', Validators.required],
+      // Controles heredados conservados solo para compatibilidad de borradores locales.
+      // Ya no participan en la UI ni en la validez del paso «El caso».
       formaOcurrencia: [''],
       relacionMisional: ['NO'],
       detalleMisional: [''],
-      fecha: ['', Validators.required],
+      fecha: [''],
       hora: [''],
       violenciaPsicologica: ['NO'],
       violenciaFisica: ['NO'],
@@ -405,26 +433,10 @@ export class FormularioAnonimoComponent {
       violenciaEconomica: ['NO'],
       violenciaInformatica: ['NO'],
       violenciaPrejuicio: ['NO'],
-      tipoVbg: [[], Validators.required],
+      tipoVbg: [[]],
       descripcion: ['', [this.validarDescripcionOpcional]]
     });
-
     this.configurarSincronizacionViolencia();
-
-    this.formRelato.get('tipoLugar')?.valueChanges.subscribe(tipo => {
-      const sedeCtrl = this.formRelato.get('sedeCampus');
-      const extCtrl = this.formRelato.get('lugarDetalleExterno');
-      if (tipo === 'interno') {
-        sedeCtrl?.setValidators([Validators.required]);
-        extCtrl?.clearValidators();
-      } else {
-        sedeCtrl?.clearValidators();
-        extCtrl?.setValidators([Validators.required]);
-      }
-      sedeCtrl?.updateValueAndValidity();
-      extCtrl?.updateValueAndValidity();
-      this.formRelato.updateValueAndValidity();
-    });
 
     this.formVictimario = this.fb.group({
       identificacion: ['', [Validators.pattern(this.REGEX_NUMEROS_IDENTIFICACION)]],
@@ -437,7 +449,8 @@ export class FormularioAnonimoComponent {
       vinculoVictima: [''],
       otroVinculoVictima: [''],
       remitirUad: ['no'],
-      correo: ['']
+      correo: [''],
+      rutaActivacion: [null, Validators.required]
     });
 
     this.formVictimario.get('vinculoUniversidad')?.valueChanges.subscribe(() => {
@@ -449,6 +462,55 @@ export class FormularioAnonimoComponent {
     this.formEvidencias = this.fb.group({
       archivos: [null]
     });
+
+    this.formVictima.get('tipoDocumento')?.valueChanges.subscribe(() => {
+      this.actualizarValidadorDocumentoVictima();
+    });
+    this.formVictima.get('fechaNacimiento')?.valueChanges.subscribe(() => {
+      this.formVictima.get('tipoDocumento')?.updateValueAndValidity({ emitEvent: false });
+    });
+
+    this.listasService.listas$
+      .pipe(takeUntilDestroyed())
+      .subscribe((listas) => {
+        this.tiposDocumento = listas.tiposDocumento;
+        this.campusLista = listas.campus;
+        this.actualizarValidadorDocumentoVictima();
+        this.formVictima.get('tipoDocumento')?.updateValueAndValidity({ emitEvent: false });
+      });
+
+    this.listasService.obtenerMaestro('rutas-activacion')
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (rutas) => { this.rutasActivacion = rutas; },
+        error: () => { this.rutasActivacion = []; }
+      });
+  }
+
+  get maxLongitudDocumentoVictima(): number {
+    return longitudMaximaDocumento(this.formVictima?.get('tipoDocumento')?.value, this.tiposDocumento);
+  }
+
+  formatoDocumentoVictima(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const tipo = this.formVictima.get('tipoDocumento')?.value;
+    const limpio = limpiarDocumento(input.value, tipo, this.tiposDocumento);
+    input.value = limpio;
+    this.formVictima.get('identificacion')?.setValue(limpio, { emitEvent: false });
+  }
+
+  private actualizarValidadorDocumentoVictima(): void {
+    const tipo = this.formVictima?.get('tipoDocumento')?.value;
+    const identificacion = this.formVictima?.get('identificacion');
+    if (!identificacion) return;
+
+    identificacion.setValidators([
+      Validators.maxLength(longitudMaximaDocumento(tipo, this.tiposDocumento)),
+      Validators.pattern(documentoEsAlfanumerico(tipo, this.tiposDocumento) ? '^[0-9A-Za-z]*$' : '^[0-9]*$')
+    ]);
+    const limpio = limpiarDocumento(String(identificacion.value ?? ''), tipo, this.tiposDocumento);
+    if (limpio !== identificacion.value) identificacion.setValue(limpio, { emitEvent: false });
+    identificacion.updateValueAndValidity({ emitEvent: false });
   }
 
   private validarMedioContacto(group: FormGroup): ValidationErrors | null {
@@ -508,19 +570,9 @@ export class FormularioAnonimoComponent {
   }
 
   avanzarPasoRelato(stepper: MatStepper): void {
-    this.intentoAvanzarRelato = true;
     this.formRelato.markAllAsTouched();
-    const tieneVbg = this.tieneViolenciaSeleccionada;
-    const tipoVbgCtrl = this.formRelato.get('tipoVbg');
-
-    if (!tieneVbg) {
-      tipoVbgCtrl?.setErrors({ required: true });
-      tipoVbgCtrl?.markAsTouched();
-    }
-
-    if (this.formRelato.valid && tieneVbg) {
+    if (this.formRelato.valid) {
       this.erroresRelato = [];
-      this.intentoAvanzarRelato = false;
       stepper.next();
     } else {
       // Nueva referencia en cada intento para que el resumen recupere el foco.
@@ -618,12 +670,12 @@ export class FormularioAnonimoComponent {
 
   private configurarSincronizacionViolencia(): void {
     const mapeo = [
-      { control: 'violenciaPsicologica', sel: 'psicologicaSel', label: 'Violencia Psicológica' },
-      { control: 'violenciaFisica', sel: 'fisicaSel', label: 'Violencia Física' },
-      { control: 'violenciaSexual', sel: 'sexualSel', label: 'Violencia Sexual' },
-      { control: 'violenciaInstitucional', sel: 'institucionalSel', label: 'Violencia Institucional' },
+      { control: 'violenciaPsicologica', sel: 'psicologicaSel', label: 'Violencia psicológica' },
+      { control: 'violenciaFisica', sel: 'fisicaSel', label: 'Violencia física' },
+      { control: 'violenciaSexual', sel: 'sexualSel', label: 'Violencia sexual' },
+      { control: 'violenciaInstitucional', sel: 'institucionalSel', label: 'Violencia institucional' },
       { control: 'violenciaEconomica', sel: 'economicaSel', label: 'Violencia económica o patrimonial' },
-      { control: 'violenciaInformatica', sel: 'informaticaSel', label: 'Violencia Digital / Informática' },
+      { control: 'violenciaInformatica', sel: 'informaticaSel', label: 'Violencia digital / informática' },
       { control: 'violenciaPrejuicio', sel: 'prejuicioSel', label: 'Discriminación o violencia por prejuicio' },
     ];
 
@@ -645,12 +697,12 @@ export class FormularioAnonimoComponent {
 
   private actualizarEstadosViolenciaDesdeChips(): void {
     const categorias = [
-      { control: 'violenciaPsicologica', sel: this.psicologicaSel, label: 'Violencia Psicológica' },
-      { control: 'violenciaFisica', sel: this.fisicaSel, label: 'Violencia Física' },
-      { control: 'violenciaSexual', sel: this.sexualSel, label: 'Violencia Sexual' },
-      { control: 'violenciaInstitucional', sel: this.institucionalSel, label: 'Violencia Institucional' },
+      { control: 'violenciaPsicologica', sel: this.psicologicaSel, label: 'Violencia psicológica' },
+      { control: 'violenciaFisica', sel: this.fisicaSel, label: 'Violencia física' },
+      { control: 'violenciaSexual', sel: this.sexualSel, label: 'Violencia sexual' },
+      { control: 'violenciaInstitucional', sel: this.institucionalSel, label: 'Violencia institucional' },
       { control: 'violenciaEconomica', sel: this.economicaSel, label: 'Violencia económica o patrimonial' },
-      { control: 'violenciaInformatica', sel: this.informaticaSel, label: 'Violencia Digital / Informática' },
+      { control: 'violenciaInformatica', sel: this.informaticaSel, label: 'Violencia digital / informática' },
       { control: 'violenciaPrejuicio', sel: this.prejuicioSel, label: 'Discriminación o violencia por prejuicio' },
     ];
 
@@ -677,12 +729,12 @@ export class FormularioAnonimoComponent {
 
   private actualizarTipoVbgDesdeRadios(): void {
     const tiposActivos: string[] = [];
-    if (this.formRelato.get('violenciaPsicologica')?.value === 'SI') tiposActivos.push('Violencia Psicológica');
-    if (this.formRelato.get('violenciaFisica')?.value === 'SI') tiposActivos.push('Violencia Física');
-    if (this.formRelato.get('violenciaSexual')?.value === 'SI') tiposActivos.push('Violencia Sexual');
-    if (this.formRelato.get('violenciaInstitucional')?.value === 'SI') tiposActivos.push('Violencia Institucional');
+    if (this.formRelato.get('violenciaPsicologica')?.value === 'SI') tiposActivos.push('Violencia psicológica');
+    if (this.formRelato.get('violenciaFisica')?.value === 'SI') tiposActivos.push('Violencia física');
+    if (this.formRelato.get('violenciaSexual')?.value === 'SI') tiposActivos.push('Violencia sexual');
+    if (this.formRelato.get('violenciaInstitucional')?.value === 'SI') tiposActivos.push('Violencia institucional');
     if (this.formRelato.get('violenciaEconomica')?.value === 'SI') tiposActivos.push('Violencia económica o patrimonial');
-    if (this.formRelato.get('violenciaInformatica')?.value === 'SI') tiposActivos.push('Violencia Digital / Informática');
+    if (this.formRelato.get('violenciaInformatica')?.value === 'SI') tiposActivos.push('Violencia digital / informática');
     if (this.formRelato.get('violenciaPrejuicio')?.value === 'SI') tiposActivos.push('Discriminación o violencia por prejuicio');
 
     const control = this.formRelato.get('tipoVbg');
@@ -699,12 +751,12 @@ export class FormularioAnonimoComponent {
 
   private sincronizarRadiosDesdeTipoVbg(val: string[]): void {
     const mapa = [
-      { control: 'violenciaPsicologica', label: 'Violencia Psicológica' },
-      { control: 'violenciaFisica', label: 'Violencia Física' },
-      { control: 'violenciaSexual', label: 'Violencia Sexual' },
-      { control: 'violenciaInstitucional', label: 'Violencia Institucional' },
+      { control: 'violenciaPsicologica', label: 'Violencia psicológica' },
+      { control: 'violenciaFisica', label: 'Violencia física' },
+      { control: 'violenciaSexual', label: 'Violencia sexual' },
+      { control: 'violenciaInstitucional', label: 'Violencia institucional' },
       { control: 'violenciaEconomica', label: 'Violencia económica o patrimonial' },
-      { control: 'violenciaInformatica', label: 'Violencia Digital / Informática' },
+      { control: 'violenciaInformatica', label: 'Violencia digital / informática' },
       { control: 'violenciaPrejuicio', label: 'Discriminación o violencia por prejuicio' },
     ];
 

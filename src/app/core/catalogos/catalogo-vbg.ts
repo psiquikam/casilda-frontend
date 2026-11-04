@@ -70,7 +70,7 @@ export const AYUDA_LUGAR_OCURRENCIA =
 
 export const RELACION_MISIONAL: readonly OpcionCatalogoVbg[] = [
   { codigo: 'misional', etiqueta: 'Misional' },
-  { codigo: 'actividades-institucionales', etiqueta: 'Actividades Institucionales' },
+  { codigo: 'actividades-institucionales', etiqueta: 'Actividades institucionales' },
   { codigo: 'representacion-u', etiqueta: 'En representación de la U' },
   { codigo: 'bienes-inmuebles', etiqueta: 'En bienes inmuebles' },
   // Nivel 2, obligatorio (al menos uno) solo si se marca "misional".
@@ -162,7 +162,7 @@ export const VINCULO_UNIVERSIDAD: readonly OpcionCatalogoVbg[] = [
 ];
 
 export const VINCULO_VICTIMA: readonly OpcionCatalogoVbg[] = [
-  { codigo: 'pareja-expareja-victima', etiqueta: 'Pareja / Expareja' },
+  { codigo: 'pareja-expareja-victima', etiqueta: 'Pareja / expareja' },
   { codigo: 'familiar-victima', etiqueta: 'Familiar' },
   { codigo: 'companeros-estudio', etiqueta: 'Compañeros de estudio' },
   { codigo: 'docente-victima', etiqueta: 'Docente' },

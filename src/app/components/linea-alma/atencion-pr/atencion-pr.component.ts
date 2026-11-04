@@ -40,6 +40,12 @@ import { GrupoProfesionalDto, SolicitudService, VinculoUdeAEnum } from '../../..
 import { environment } from '../../../../environments/environment';
 import { TipoReporteAlma } from '../../../enums/tipo-reporte-alma.enum';
 import { CustomDateAdapter, CUSTOM_DATE_FORMATS } from '../../../custom-date-adapter';
+import {
+  documentoEsAlfanumerico,
+  limpiarDocumento,
+  longitudMaximaDocumento,
+  tarjetaIdentidadMenorEdadValidator
+} from '../../../core/forms/documento-identidad';
 
 @Component({
     selector: 'app-atencion-pr',
@@ -175,6 +181,19 @@ export class AtencionPrComponent implements OnInit {
       observacionesTelefono: ['']
     });
 
+    const tipoDocumentoControl = this.registroCasoForm.get('tipoDocumento');
+    tipoDocumentoControl?.setValidators(
+      tarjetaIdentidadMenorEdadValidator(
+        () => this.registroCasoForm.get('fechaNacimiento')?.value,
+        () => this.tiposDocumento
+      )
+    );
+    this.registroCasoForm.get('fechaNacimiento')?.valueChanges.subscribe(() => {
+      tipoDocumentoControl?.updateValueAndValidity({ emitEvent: false });
+    });
+    tipoDocumentoControl?.valueChanges.subscribe(() => this.actualizarValidadorDocumento());
+    this.actualizarValidadorDocumento();
+
     this.cargarCatalogos();
     this.configurarValidadoresTriage();
     this.configurarUnidadAdministrativaCamposPorVinculo();
@@ -283,6 +302,7 @@ export class AtencionPrComponent implements OnInit {
         this.tiposReporteAlma = catalogos.tiposReporteAlma;
         this.canalesContacto = catalogos.canalesContacto;
         this.tiposDocumento = catalogos.tiposDocumento;
+        this.actualizarValidadorDocumento();
         this.regimenes = catalogos.regimenes;
         this.eps = catalogos.eps;
         this.departamentos = catalogos.departamentos;
@@ -613,31 +633,44 @@ export class AtencionPrComponent implements OnInit {
     return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
   }
 
-  private readonly longitudesPorTipoDocumento: Record<string, number> = {
-    CC: 10, TI: 11, CE: 7, RC: 11, NUIP: 11, NIP: 11, PA: 12
-  };
-
   get maxLongitudDocumento(): number {
-    const tipoId = this.registroCasoForm?.get('tipoDocumento')?.value;
-    if (!tipoId) {
-      return 12;
-    }
-    const tipo = this.tiposDocumento.find((t) => t.id === Number(tipoId));
-    const clave = (tipo?.codigo || tipo?.nombre || '').toUpperCase().trim();
-    for (const key of Object.keys(this.longitudesPorTipoDocumento)) {
-      if (clave.includes(key)) {
-        return this.longitudesPorTipoDocumento[key];
-      }
-    }
-    return 12;
+    return longitudMaximaDocumento(
+      this.registroCasoForm?.get('tipoDocumento')?.value,
+      this.tiposDocumento
+    );
   }
 
-  soloDigitos(event: Event): void {
+  get documentoAlfanumerico(): boolean {
+    return documentoEsAlfanumerico(
+      this.registroCasoForm?.get('tipoDocumento')?.value,
+      this.tiposDocumento
+    );
+  }
+
+  normalizarDocumento(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const limpio = input.value.replace(/\D/g, '').slice(0, this.maxLongitudDocumento);
+    const limpio = limpiarDocumento(
+      input.value,
+      this.registroCasoForm.get('tipoDocumento')?.value,
+      this.tiposDocumento
+    );
     if (input.value !== limpio) {
       input.value = limpio;
       this.registroCasoForm.get('documento')?.setValue(limpio, { emitEvent: false });
+    }
+  }
+
+  private actualizarValidadorDocumento(): void {
+    const control = this.registroCasoForm?.get('documento');
+    control?.setValidators(Validators.maxLength(this.maxLongitudDocumento));
+    control?.updateValueAndValidity({ emitEvent: false });
+
+    const valor = String(control?.value ?? '');
+    if (valor) {
+      control?.setValue(
+        limpiarDocumento(valor, this.registroCasoForm.get('tipoDocumento')?.value, this.tiposDocumento),
+        { emitEvent: false }
+      );
     }
   }
 
@@ -818,7 +851,7 @@ export class AtencionPrComponent implements OnInit {
           this.dialog.open(DialogoExitoComponent, {
             width: '400px',
             data: {
-              titulo: '¡Guardado Exitoso!',
+              titulo: '¡Guardado exitoso!',
               mensaje: 'Los datos de la pestaña se guardaron correctamente.'
             }
           });

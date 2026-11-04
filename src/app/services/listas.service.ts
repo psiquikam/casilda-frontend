@@ -31,9 +31,9 @@ type ListaKey =
 
 export const DEFAULT_MAESTROS: Record<ListaKey, MaestroDto[]> = {
   tiposSolicitud: [
-    { id: 1, codigo: 'ACOMP', nombre: 'Acompañamiento Psicosocial' },
-    { id: 2, codigo: 'JURID', nombre: 'Asesoría Jurídica' },
-    { id: 3, codigo: 'INTEG', nombre: 'Atención Integral VBG' }
+    { id: 1, codigo: 'ACOMP', nombre: 'Acompañamiento psicosocial' },
+    { id: 2, codigo: 'JURID', nombre: 'Asesoría jurídica' },
+    { id: 3, codigo: 'INTEG', nombre: 'Atención integral VBG' }
   ],
   campus: [
     { id: 1, codigo: 'CU', nombre: 'Medellín - Ciudad Universitaria' },
@@ -61,20 +61,20 @@ export const DEFAULT_MAESTROS: Record<ListaKey, MaestroDto[]> = {
   identidadesGenero: [
     { id: 1, codigo: 'MUJ', nombre: 'Mujer (Cisgénero / Trans)' },
     { id: 2, codigo: 'HOM', nombre: 'Hombre (Cisgénero / Trans)' },
-    { id: 3, codigo: 'NB', nombre: 'Persona No Binaria' },
-    { id: 4, codigo: 'DIV', nombre: 'Disidencias / Otras' }
+    { id: 3, codigo: 'NB', nombre: 'Persona no binaria' },
+    { id: 4, codigo: 'DIV', nombre: 'Disidencias / otras' }
   ],
   cargos: [
     { id: 1, codigo: 'EST', nombre: 'Estudiante' },
     { id: 2, codigo: 'DOC', nombre: 'Docente' },
-    { id: 3, codigo: 'ADM', nombre: 'Empleado Administrativo' },
-    { id: 4, codigo: 'CON', nombre: 'Contratista / Egresado' }
+    { id: 3, codigo: 'ADM', nombre: 'Empleado administrativo' },
+    { id: 4, codigo: 'CON', nombre: 'Contratista / egresado' }
   ],
   medioSolicitud: [
     { id: 1, codigo: 'PRES', nombre: 'Presencial en punto de atención' },
-    { id: 2, codigo: 'TEL', nombre: 'Línea Telefónica Institucional' },
-    { id: 3, codigo: 'WEB', nombre: 'Portal Web CASILDA' },
-    { id: 4, codigo: 'REM', nombre: 'Remisión Interna UdeA' }
+    { id: 2, codigo: 'TEL', nombre: 'Línea telefónica institucional' },
+    { id: 3, codigo: 'WEB', nombre: 'Portal web CASILDA' },
+    { id: 4, codigo: 'REM', nombre: 'Remisión interna UdeA' }
   ]
 };
 

@@ -22,17 +22,17 @@ export class SeguimientoTramiteComponent {
   // Etapas específicas para Quejas
   private flujoQueja = [
     { id: 1, nombre: 'Recibido', icon: 'assignment' },
-    { id: 2, nombre: 'En Revisión Jurídica', icon: 'gavel' },
+    { id: 2, nombre: 'En revisión jurídica', icon: 'gavel' },
     { id: 3, nombre: 'Investigación', icon: 'search' },
-    { id: 4, nombre: 'Respuesta Emitida', icon: 'mark_email_read' }
+    { id: 4, nombre: 'Respuesta emitida', icon: 'mark_email_read' }
   ];
 
   // Etapas específicas para Acompañamiento
   private flujoAcompanamiento = [
-    { id: 1, nombre: 'Solicitud Recibida', icon: 'pending_actions' },
+    { id: 1, nombre: 'Solicitud recibida', icon: 'pending_actions' },
     { id: 2, nombre: 'Asignación de profesional', icon: 'person_add' },
-    { id: 3, nombre: 'En Intervención/Citas', icon: 'record_voice_over' },
-    { id: 4, nombre: 'Caso Cerrado', icon: 'verified' }
+    { id: 3, nombre: 'En intervención/citas', icon: 'record_voice_over' },
+    { id: 4, nombre: 'Caso cerrado', icon: 'verified' }
   ];
 
   buscarCaso() {
@@ -45,7 +45,7 @@ export class SeguimientoTramiteComponent {
       this.simularResultado(codigo, 'Acompañamiento', 2, 'Se ha asignado al Psicólogo clínico de la sede.');
     } else if (codigo.startsWith('CAS-')) {
       this.etapas = this.flujoQueja;
-      this.simularResultado(codigo, 'Queja / Reclamo', 1, 'Su reporte ha sido recibido y está en turno de revisión.');
+      this.simularResultado(codigo, 'Queja / reclamo', 1, 'Su reporte ha sido recibido y está en turno de revisión.');
     } else {
       this.casoEncontrado = null;
     }

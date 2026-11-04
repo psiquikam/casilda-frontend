@@ -19,7 +19,7 @@
       <span class="label">GESTIONAR FASE:</span>
       @if (caso.estadoActual === 1) {
         <button mat-flat-button color="primary" (click)="cambiarEstado(2)">
-          <mat-icon aria-hidden="true">play_arrow</mat-icon> Iniciar Indagación
+          <mat-icon aria-hidden="true">play_arrow</mat-icon> Iniciar indagación
         </button>
       }
       @if (caso.estadoActual === 2) {
@@ -111,7 +111,7 @@
             <div class="line"></div>
             <div class="step" [class.done]="caso.estadoActual >= 2">
               <mat-icon aria-hidden="true">{{ caso.estadoActual >= 2 ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
-              <span>Indagación Previa<span class="visually-hidden">{{ caso.estadoActual >= 2 ? ' (completada)' : ' (pendiente)' }}</span></span>
+              <span>Indagación previa<span class="visually-hidden">{{ caso.estadoActual >= 2 ? ' (completada)' : ' (pendiente)' }}</span></span>
             </div>
             <div class="line"></div>
             <div class="step" [class.done]="caso.estadoActual >= 3">
