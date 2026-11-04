@@ -60,6 +60,21 @@ describe('FormularioAcompanamientoComponent', () => {
     expect(component.acompanamientoForm.get('telefonos')?.valid).toBeTrue();
   });
 
+  it('should enforce document maximum length and reject TI for an adult applicant', () => {
+    component.tiposDocumento = [
+      { id: 1, codigo: 'CC', nombre: 'Cédula de ciudadanía' },
+      { id: 2, codigo: 'TI', nombre: 'Tarjeta de identidad' }
+    ];
+    component.acompanamientoForm.patchValue({
+      tipoDocumento: 2,
+      numeroDocumento: '12345678901',
+      fechaNacimiento: new Date(2000, 0, 1)
+    });
+
+    expect(component.maxLongitudDocumentoSolicitante).toBe(11);
+    expect(component.acompanamientoForm.get('tipoDocumento')?.hasError('tiMayorEdad')).toBeTrue();
+  });
+
   it('should show field-level errors after an invalid submission', () => {
     component.acompanamientoForm.patchValue({
       tipoReporte: 'directa',

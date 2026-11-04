@@ -9,7 +9,7 @@
 
     <!-- Vía -->
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Vía Principal</mat-label>
+      <mat-label>Vía principal</mat-label>
       <mat-select formControlName="viaPrincipal">
         @for (v of vias; track v) {
         <mat-option [value]="v">{{ v }}</mat-option>
@@ -18,22 +18,22 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Número / Nombre Vía</mat-label>
+      <mat-label>Número / nombre de vía</mat-label>
       <input matInput formControlName="numeroVia" placeholder="Ej: 45">
     </mat-form-field>
 
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Letra / Sufijo</mat-label>
+      <mat-label>Letra / sufijo</mat-label>
       <input matInput formControlName="letraVia" placeholder="Ej: A Sur">
     </mat-form-field>
 
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Número Cruce</mat-label>
+      <mat-label>Número de cruce</mat-label>
       <input matInput formControlName="numeroCruce" placeholder="Ej: 72">
     </mat-form-field>
 
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
-      <mat-label>Placa / Número</mat-label>
+      <mat-label>Placa / número</mat-label>
       <input matInput formControlName="placa" placeholder="Ej: 10">
     </mat-form-field>
 

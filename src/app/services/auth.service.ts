@@ -120,7 +120,7 @@ function cuentasPruebaHabilitadas(): boolean {
 export const MOCK_USERS: Record<string, MockUserProfile> = {
   admin: {
     id: 1,
-    nombre: 'Super Administrador CASILDA',
+    nombre: 'Super administrador CASILDA',
     email: 'admin@udea.edu.co',
     password: 'Admin123*',
     rol: 'Admin',

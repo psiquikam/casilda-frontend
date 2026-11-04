@@ -94,7 +94,7 @@ export class FormularioQuejaComponent {
 
     this.dialog.open(DialogoExitoComponent, {
       data: {
-        titulo: '¡Queja Registrada!',
+        titulo: '¡Queja registrada!',
         mensaje: 'La queja ha sido recibida. Un profesional se pondrá en contacto a la brevedad.',
         codigo: codigoGenerado
       },

@@ -120,22 +120,19 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
 
 
   private readonly longitudesPorTipoDocumento: Record<string, number> = {
-    CC: 10, TI: 11, CE: 15, RC: 11, NUIP: 11, NIP: 11, PA: 20
+    CC: 10, TI: 11, CE: 6, RC: 11, NUIP: 10, NIP: 11, PA: 16, PAS: 16
   };
 
   get maxLongitudDocumento(): number {
     const tipo = String(this.casoForm?.get('tipoDocumento')?.value ?? '').toUpperCase().trim();
     const docActual = String(this.casoForm?.get('documento')?.value ?? '').trim();
-    if (/[A-Z]/i.test(docActual) || tipo.includes('PA') || tipo.includes('CE') || tipo.includes('PASAPORTE') || tipo.includes('EXTRANJER')) {
-      return 20;
-    }
-    if (!tipo) {
-      return 20;
-    }
     for (const key of Object.keys(this.longitudesPorTipoDocumento)) {
       if (tipo.includes(key)) {
         return this.longitudesPorTipoDocumento[key];
       }
+    }
+    if (/[A-Z]/i.test(docActual) || !tipo) {
+      return 20;
     }
     return 20;
   }
@@ -207,9 +204,9 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
     { tab: 'Datos de la persona', label: 'Régimen de salud', control: 'regimenSalud' },
     { tab: 'Datos de la persona', label: 'Ciudad de nacimiento', control: 'ciudadNacimiento' },
     { tab: 'Datos complementarios', label: 'Vínculo', control: 'vinculo' },
-    { tab: 'Datos complementarios', label: 'Unidad Académica', control: 'unidadAcademica' },
+    { tab: 'Datos complementarios', label: 'Unidad académica', control: 'unidadAcademica' },
     { tab: 'Datos complementarios', label: 'Programa', control: 'programa' },
-    { tab: 'Datos complementarios', label: 'Unidad Administrativa', control: 'unidadAdministrativa' },
+    { tab: 'Datos complementarios', label: 'Unidad administrativa', control: 'unidadAdministrativa' },
     { tab: 'Datos complementarios', label: 'Campus', control: 'campus' },
     { tab: 'Documentación', label: 'Tiempo ocurrido (valor)', control: 'tiempoOcurridoValor' },
     { tab: 'Documentación', label: 'Tiempo ocurrido (unidad)', control: 'tiempoOcurridoUnidad' },
@@ -1274,10 +1271,10 @@ export class RegistroCasoComponent implements OnInit, AfterViewInit {
               }
             }
 
-            let titulo = '¡Guardado Exitoso!';
+            let titulo = '¡Guardado exitoso!';
             let mensaje = 'Datos de la pestaña guardados exitosamente.';
             if (targetTabIndex === 0 && res && res.codigo) {
-              titulo = '¡Caso Registrado!';
+              titulo = '¡Caso registrado!';
               mensaje = `Se ha registrado exitosamente el caso con código: ${res.codigo}`;
             }
 

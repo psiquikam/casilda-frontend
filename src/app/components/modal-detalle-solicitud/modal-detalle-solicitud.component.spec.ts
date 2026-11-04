@@ -31,4 +31,21 @@ describe('ModalDetalleSolicitudComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('rechaza tarjeta de identidad para una persona mayor de edad', () => {
+    component.tiposDocumento = [{ id: 2, codigo: 'TI', nombre: 'Tarjeta de identidad' }];
+    component.detalleForm.patchValue({
+      tipoDocumento: 2,
+      fechaNacimiento: new Date(1990, 0, 1)
+    });
+
+    expect(component.detalleForm.get('tipoDocumento')?.hasError('tiMayorEdad')).toBeTrue();
+  });
+
+  it('aplica la longitud máxima del tipo de documento', () => {
+    component.tiposDocumento = [{ id: 2, codigo: 'TI', nombre: 'Tarjeta de identidad' }];
+    component.detalleForm.get('tipoDocumento')?.setValue(2);
+
+    expect(component.maxLongitudDocumento).toBe(11);
+  });
 });

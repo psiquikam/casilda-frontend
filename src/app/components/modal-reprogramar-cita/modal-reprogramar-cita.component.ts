@@ -110,7 +110,7 @@ export class ReprogramarCitaModalComponent implements OnInit {
   }
 
   get titulo(): string {
-    return this.data.accion === 'cancelar' ? 'Cancelar Cita' : 'Reprogramar Cita';
+    return this.data.accion === 'cancelar' ? 'Cancelar cita' : 'Reprogramar cita';
   }
 
   get icono(): string {

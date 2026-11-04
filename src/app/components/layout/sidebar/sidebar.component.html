@@ -20,7 +20,7 @@
           [attr.aria-expanded]="isExpanded('usuario')" aria-controls="section-usuario">
           <span class="section-toggle__title">
             <mat-icon class="section-toggle__icon" aria-hidden="true">volunteer_activism</mat-icon>
-            <span>Mis Solicitudes</span>
+            <span>Mis solicitudes</span>
           </span>
           <mat-icon class="section-toggle__chevron" [class.is-expanded]="isExpanded('usuario')" aria-hidden="true">
             expand_more
@@ -30,7 +30,7 @@
           <div id="section-usuario" class="section-content" role="region" aria-labelledby="toggle-usuario">
             <a routerLink="/reportar-caso" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
               <mat-icon class="nav-item__icon" aria-hidden="true">add_circle_outline</mat-icon>
-              <span class="nav-item__text">Reportar Caso</span>
+              <span class="nav-item__text">Reportar caso</span>
             </a>
             <a routerLink="/seguimiento" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
               <mat-icon class="nav-item__icon" aria-hidden="true">track_changes</mat-icon>
@@ -39,7 +39,7 @@
             @if (features.complaintIntakePrototype) {
               <a routerLink="/nueva-queja" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
                 <mat-icon class="nav-item__icon" aria-hidden="true">post_add</mat-icon>
-                <span class="nav-item__text">Queja Disciplinaria (UAD)</span>
+                <span class="nav-item__text">Queja disciplinaria (UAD)</span>
               </a>
             }
           </div>
@@ -119,7 +119,7 @@
           <div id="section-atencion" class="section-content" role="region" aria-labelledby="toggle-atencion">
             <a routerLink="/solicitud-acompanamiento" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
               <mat-icon class="nav-item__icon" aria-hidden="true">add_circle_outline</mat-icon>
-              <span class="nav-item__text">Nueva Solicitud</span>
+              <span class="nav-item__text">Nueva solicitud</span>
             </a>
             <a routerLink="/consulta" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
               <mat-icon class="nav-item__icon" aria-hidden="true">move_to_inbox</mat-icon>
@@ -166,7 +166,7 @@
           <div id="section-alma" class="section-content" role="region" aria-labelledby="toggle-alma">
             <a routerLink="/linea-alma/atencion-pr" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
               <mat-icon class="nav-item__icon" aria-hidden="true">ring_volume</mat-icon>
-              <span class="nav-item__text">Primer Respondiente</span>
+              <span class="nav-item__text">Primer respondiente</span>
             </a>
           </div>
         }
@@ -192,7 +192,7 @@
             @if (features.complaintIntakePrototype) {
               <a routerLink="/nueva-queja" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
                 <mat-icon class="nav-item__icon" aria-hidden="true">post_add</mat-icon>
-                <span class="nav-item__text">Registrar Queja</span>
+                <span class="nav-item__text">Registrar queja</span>
               </a>
             }
             @if (features.publicTrackingPrototype) {

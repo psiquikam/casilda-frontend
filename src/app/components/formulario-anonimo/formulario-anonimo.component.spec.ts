@@ -3,6 +3,8 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatStepper } from '@angular/material/stepper';
 import { ActivatedRoute } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { FormularioAnonimoComponent, TEXTOS_REPORTE } from './formulario-anonimo.component';
 
@@ -15,7 +17,9 @@ describe('FormularioAnonimoComponent', () => {
     await TestBed.configureTestingModule({
       imports: [FormularioAnonimoComponent],
       providers: [
-        provideNoopAnimations()
+        provideNoopAnimations(),
+        provideHttpClient(),
+        provideHttpClientTesting()
       ]
     })
     .compileComponents();
@@ -143,14 +147,35 @@ describe('FormularioAnonimoComponent', () => {
     expect(component.formPerfil.get('whatsappContacto')?.valid).toBeTrue();
   });
 
-  it('should toggle location validation between interno and externo in formRelato (Paso 3: El Caso)', () => {
-    expect(component.formRelato.get('tipoLugar')?.value).toBe('interno');
-    expect(component.formRelato.get('sedeCampus')?.hasError('required')).toBeTrue();
+  it('should apply document maximum length and reject TI for an adult victim', () => {
+    component.tiposDocumento = [
+      { id: 1, codigo: 'CC', nombre: 'Cédula de ciudadanía' },
+      { id: 2, codigo: 'TI', nombre: 'Tarjeta de identidad' }
+    ];
+    component.formVictima.patchValue({
+      tipoDocumento: 2,
+      identificacion: '12345678901',
+      fechaNacimiento: new Date(2000, 0, 1)
+    });
+
+    expect(component.maxLongitudDocumentoVictima).toBe(11);
+    expect(component.formVictima.get('tipoDocumento')?.hasError('tiMayorEdad')).toBeTrue();
+  });
+
+  it('should require selecting a route before leaving the victimario step', () => {
+    expect(component.formVictimario.get('rutaActivacion')?.hasError('required')).toBeTrue();
+    component.formVictimario.get('rutaActivacion')?.setValue(3);
+    expect(component.formVictimario.get('rutaActivacion')?.valid).toBeTrue();
+  });
+
+  it('should keep location optional in formRelato, matching solicitud-acompanamiento', () => {
+    expect(component.formRelato.get('tipoLugar')?.value).toBeNull();
+    expect(component.formRelato.get('sedeCampus')?.hasError('required')).toBeFalse();
     expect(component.formRelato.get('lugarDetalleExterno')?.hasError('required')).toBeFalse();
 
     component.formRelato.get('tipoLugar')?.setValue('externo');
     expect(component.formRelato.get('sedeCampus')?.hasError('required')).toBeFalse();
-    expect(component.formRelato.get('lugarDetalleExterno')?.hasError('required')).toBeTrue();
+    expect(component.formRelato.get('lugarDetalleExterno')?.hasError('required')).toBeFalse();
 
     component.formRelato.get('lugarDetalleExterno')?.setValue('Entorno virtual');
     expect(component.formRelato.get('lugarDetalleExterno')?.valid).toBeTrue();
@@ -176,8 +201,9 @@ describe('FormularioAnonimoComponent', () => {
       espacio: 'Aula 101',
       fecha: '15/08/2026',
       hora: '', // Opcional
-      tipoVbg: ['Violencia Psicológica', 'Violencia Digital / Informática'],
-      descripcion: 'Esta es una descripción detallada que cumple con más de 20 caracteres.'
+      tipoVbg: ['Violencia psicológica', 'Violencia digital / informática'],
+      descripcion: 'Esta es una descripción detallada que cumple con más de 20 caracteres.',
+      descripcionHechos: 'Relato requerido, igual que en la solicitud de acompañamiento.'
     });
 
     expect(component.formRelato.valid).toBeTrue();
@@ -225,7 +251,7 @@ describe('FormularioAnonimoComponent', () => {
   it('should toggle violence to SI, synchronize tipoVbg, and select modalities with onCheckboxChange', () => {
     component.formRelato.get('violenciaPsicologica')?.setValue('SI');
     expect(component.tieneViolenciaSeleccionada).toBeTrue();
-    expect(component.formRelato.get('tipoVbg')?.value).toContain('Violencia Psicológica');
+    expect(component.formRelato.get('tipoVbg')?.value).toContain('Violencia psicológica');
 
     // Add modality
     component.onCheckboxChange({ checked: true }, 1, 'psicologicaSel');
@@ -239,7 +265,7 @@ describe('FormularioAnonimoComponent', () => {
     // Switch radio back to NO - clears selections and removes from tipoVbg
     component.formRelato.get('violenciaPsicologica')?.setValue('NO');
     expect(component.psicologicaSel).toEqual([]);
-    expect(component.formRelato.get('tipoVbg')?.value).not.toContain('Violencia Psicológica');
+    expect(component.formRelato.get('tipoVbg')?.value).not.toContain('Violencia psicológica');
     expect(component.tieneViolenciaSeleccionada).toBeFalse();
   });
 
@@ -269,8 +295,8 @@ describe('FormularioAnonimoComponent', () => {
     expect(component.listaPrejuicio[0].nombre).toBe('Discriminación por género u orientación sexual o identidad de género');
 
     expect(component.listaFormasOcurrencia).toContain('Presencial');
-    expect(component.listaDetalleMisional).toContain('Misional Docencia');
-    expect(component.listaVinculosVictima).toContain('Pareja / Expareja');
+    expect(component.listaDetalleMisional).toContain('Misional docencia');
+    expect(component.listaVinculosVictima).toContain('Pareja / expareja');
   });
 
   it('should contain new controls for forma, misionalidad and victimario vinculos', () => {
@@ -312,27 +338,14 @@ describe('FormularioAnonimoComponent', () => {
     );
   });
 
-  it('should require at least one violence type to advance and show error when attempting to advance without selection', () => {
+  it('should require only the case description to advance', () => {
     const mockStepper = { next: jasmine.createSpy('next') } as unknown as MatStepper;
 
-    expect(component.mostrarErrorTipoVbg).toBeFalse();
-
-    // Intentar avanzar sin haber seleccionado ninguna violencia
     component.avanzarPasoRelato(mockStepper);
-
-    expect(component.mostrarErrorTipoVbg).toBeTrue();
     expect(mockStepper.next).not.toHaveBeenCalled();
+    expect(component.formRelato.get('descripcionHechos')?.hasError('required')).toBeTrue();
 
-    // Seleccionar un chip de violencia
-    component.toggleModalidad(1, 'psicologicaSel');
-    expect(component.mostrarErrorTipoVbg).toBeFalse();
-
-    // Completar el resto de campos obligatorios del relato
-    component.formRelato.patchValue({
-      tipoLugar: 'interno',
-      sedeCampus: 'Campus Apartadó (Seccional Urabá)',
-      fecha: '15/08/2026'
-    });
+    component.formRelato.get('descripcionHechos')?.setValue('Descripción suficiente de los hechos.');
 
     component.avanzarPasoRelato(mockStepper);
     expect(mockStepper.next).toHaveBeenCalled();
@@ -371,6 +384,8 @@ describe('FormularioAnonimoComponent en modo autenticado', () => {
       imports: [FormularioAnonimoComponent],
       providers: [
         provideNoopAnimations(),
+        provideHttpClient(),
+        provideHttpClientTesting(),
         { provide: ActivatedRoute, useValue: { snapshot: { data: { modoReporte: 'autenticado' } } } }
       ]
     })

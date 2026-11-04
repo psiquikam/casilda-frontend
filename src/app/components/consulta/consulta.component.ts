@@ -226,7 +226,7 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
       tipoAsignacionDisplay,
       // Datos de Caso / Hechos del reporte y formulario
       descripcionHechos: r.descripcionHechos || r.descripcion || r.hechos?.[0]?.descripcion || datosLocales?.descripcionHechos || r.observaciones || 'No se registró descripción detallada.',
-      lugarOcurrencia: r.lugarOcurrencia || r.lugar || datosLocales?.lugarOcurrencia || (r.tipoLugar === 'interno' ? 'Campus / Espacio Universitario' : r.tipoLugar === 'externo' ? 'Externo a la Universidad' : (r.remitenteCampus || 'No especificado')),
+      lugarOcurrencia: r.lugarOcurrencia || r.lugar || datosLocales?.lugarOcurrencia || (r.tipoLugar === 'interno' ? 'Campus / espacio universitario' : r.tipoLugar === 'externo' ? 'Externo a la universidad' : (r.remitenteCampus || 'No especificado')),
       relacionMisional: r.relacionMisional || datosLocales?.relacionMisional || (r.actividadMisional ? 'Sí' : 'No especificada'),
       fechaOcurrencia: r.fechaOcurrencia || r.fechaOcurrenciaRapida || r.fechaHechos || datosLocales?.fechaOcurrencia || 'No especificada',
       tiposVbg: (Array.isArray(r.tiposVbg) && r.tiposVbg.length) ? r.tiposVbg : (datosLocales?.tiposVbg?.length ? datosLocales.tiposVbg : (r.tipoViolencia ? [r.tipoViolencia] : [])),

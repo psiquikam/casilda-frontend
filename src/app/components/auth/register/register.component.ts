@@ -14,6 +14,11 @@ import { MatSelectModule } from '@angular/material/select';
 import { AuthService } from '../../../services/auth.service';
 import type { AuthRegisterRequest } from '../../../services/auth.service';
 import type { MaestroDto } from '../../../services/listas.service';
+import {
+  documentoEsAlfanumerico,
+  limpiarDocumento,
+  longitudMaximaDocumento
+} from '../../../core/forms/documento-identidad';
 
 @Component({
   selector: 'app-register',
@@ -56,8 +61,10 @@ export class RegisterComponent implements OnInit {
       primerApellido: ['', [Validators.required, Validators.pattern(/\S/), Validators.minLength(2), Validators.maxLength(50)]],
       segundoApellido: ['', [Validators.pattern(/\S/), Validators.minLength(2), Validators.maxLength(50)]],
       tipoDocumento: ['', [Validators.required]],
-      documento: ['', [Validators.required, Validators.maxLength(50), Validators.pattern('^[0-9A-Za-z]+$')]]
+      documento: ['', [Validators.required, Validators.maxLength(20), Validators.pattern('^[0-9A-Za-z]+$')]]
     });
+
+    this.step1Form.get('tipoDocumento')?.valueChanges.subscribe(() => this.actualizarValidadorDocumento());
 
     this.step2Form = this.fb.group({
       vinculoUdeaId: [{ value: null, disabled: true }, [Validators.required]],
@@ -82,6 +89,35 @@ export class RegisterComponent implements OnInit {
     this.step3Form.get('password')?.valueChanges.subscribe(() => {
       this.step3Form.get('confirmPassword')?.updateValueAndValidity({ emitEvent: false });
     });
+  }
+
+  get maxLongitudDocumento(): number {
+    return longitudMaximaDocumento(this.step1Form.get('tipoDocumento')?.value);
+  }
+
+  get documentoAlfanumerico(): boolean {
+    return documentoEsAlfanumerico(this.step1Form.get('tipoDocumento')?.value);
+  }
+
+  formatoDocumento(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const tipo = this.step1Form.get('tipoDocumento')?.value;
+    const limpio = limpiarDocumento(input.value, tipo);
+    input.value = limpio;
+    this.step1Form.get('documento')?.setValue(limpio, { emitEvent: false });
+  }
+
+  private actualizarValidadorDocumento(): void {
+    const tipo = this.step1Form.get('tipoDocumento')?.value;
+    const documento = this.step1Form.get('documento');
+    documento?.setValidators([
+      Validators.required,
+      Validators.maxLength(longitudMaximaDocumento(tipo)),
+      Validators.pattern(documentoEsAlfanumerico(tipo) ? '^[0-9A-Za-z]+$' : '^[0-9]+$')
+    ]);
+    const limpio = limpiarDocumento(String(documento?.value ?? ''), tipo);
+    if (limpio !== documento?.value) documento?.setValue(limpio, { emitEvent: false });
+    documento?.updateValueAndValidity({ emitEvent: false });
   }
 
   ngOnInit(): void {

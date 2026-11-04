@@ -26,7 +26,7 @@
         <ng-template matStepLabel>Identidad</ng-template>
         
         <div class="section-title-with-tooltip">
-          <h2>Información Personal</h2>
+          <h2>Información personal</h2>
         </div>
         <p class="vbg-section-subtitle">Información de identificación para el registro personal.</p>
 
@@ -77,7 +77,9 @@
 
             <mat-form-field appearance="outline">
               <mat-label>Documento identidad *</mat-label>
-              <input matInput formControlName="documento" autocomplete="off" inputmode="text">
+              <input matInput formControlName="documento" autocomplete="off"
+                [attr.inputmode]="documentoAlfanumerico ? 'text' : 'numeric'"
+                [maxlength]="maxLongitudDocumento" (input)="formatoDocumento($event)">
               @if (controlInvalido(step1Form, 'documento')) {
                 <mat-error>Ingrese un documento válido</mat-error>
               }
@@ -94,7 +96,7 @@
     <!-- Paso 2: Contacto e Institución -->
     <mat-step [stepControl]="step2Form">
       <form [formGroup]="step2Form" class="step-body">
-        <ng-template matStepLabel>Contacto e Institución</ng-template>
+        <ng-template matStepLabel>Contacto e institución</ng-template>
         
         <div class="section-title-with-tooltip">
           <h2>Datos de contacto e institución</h2>
@@ -196,7 +198,7 @@
         </div>
 
         <div class="policy-box">
-          <h2>Tratamiento de Información (Habeas Data)</h2>
+          <h2>Tratamiento de información (Habeas Data)</h2>
           <p>La información recopilada a través de este canal se gestiona bajo estrictos protocolos de confidencialidad institucional. No se almacenará ningún dato que comprometa su identidad sin su consentimiento expreso, de acuerdo a la
             <a
               href="https://www.udea.edu.co/wps/wcm/connect/udea/998902b9-aa42-43bc-9d5c-995030fc88e7/manual.pdf?MOD=AJPERES&CVID=l67xpp8"

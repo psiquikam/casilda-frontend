@@ -39,30 +39,30 @@ export class DashboardRevisorComponent {
     // Identidad de género inclusiva (no binaria, mujeres, hombres, disidencias)
     genero: [
       { label: 'Mujeres (Cis/Trans)', count: 88, porcentaje: 56.4, icon: 'female', colorKey: 'female' },
-      { label: 'Personas No Binarias', count: 24, porcentaje: 15.4, icon: 'diversity_1', colorKey: 'nonbinary' },
+      { label: 'Personas no binarias', count: 24, porcentaje: 15.4, icon: 'diversity_1', colorKey: 'nonbinary' },
       { label: 'Hombres (Cis/Trans)', count: 36, porcentaje: 23.1, icon: 'male', colorKey: 'male' },
-      { label: 'Disidencias / Otras Identidades', count: 8, porcentaje: 5.1, icon: 'transgender', colorKey: 'diverse' }
+      { label: 'Disidencias / otras identidades', count: 8, porcentaje: 5.1, icon: 'transgender', colorKey: 'diverse' }
     ],
     // Vínculo institucional UdeA
     vinculo: [
       { label: 'Estudiantes', count: 85, porcentaje: 54.5, icon: 'school', colorClass: 'student' },
       { label: 'Docentes', count: 42, porcentaje: 26.9, icon: 'history_edu', colorClass: 'teacher' },
-      { label: 'Personal Administrativo', count: 21, porcentaje: 13.5, icon: 'badge', colorClass: 'admin' },
+      { label: 'Personal administrativo', count: 21, porcentaje: 13.5, icon: 'badge', colorClass: 'admin' },
       { label: 'Egresados y contratistas', count: 8, porcentaje: 5.1, icon: 'engineering', colorClass: 'contractor' }
     ],
     // Modalidades de violencia VBG
     modalidades: [
-      { label: 'Violencia Psicológica', count: 72, porcentaje: 46.2, icon: 'psychology' },
+      { label: 'Violencia psicológica', count: 72, porcentaje: 46.2, icon: 'psychology' },
       { label: 'Discriminación por género u orientación', count: 44, porcentaje: 28.2, icon: 'diversity_3' },
       { label: 'Violencia y acoso sexual', count: 31, porcentaje: 19.9, icon: 'shield' },
-      { label: 'Violencia Física', count: 18, porcentaje: 11.5, icon: 'healing' },
+      { label: 'Violencia física', count: 18, porcentaje: 11.5, icon: 'healing' },
       { label: 'Violencia económica y patrimonial', count: 12, porcentaje: 7.7, icon: 'account_balance' }
     ],
     // Estado del trámite
     estados: [
       { label: 'Citas asignadas (psicología / derecho)', count: 52, porcentaje: 33.3, colorClass: 'progress-citas' },
-      { label: 'En Recepción e Indagación Inicial', count: 48, porcentaje: 30.8, colorClass: 'progress-recepcion' },
-      { label: 'En Acompañamiento Activo (Expediente)', count: 41, porcentaje: 26.3, colorClass: 'progress-activo' },
+      { label: 'En recepción e indagación inicial', count: 48, porcentaje: 30.8, colorClass: 'progress-recepcion' },
+      { label: 'En acompañamiento activo (expediente)', count: 41, porcentaje: 26.3, colorClass: 'progress-activo' },
       { label: 'Cierre con acuerdos y remisión', count: 15, porcentaje: 9.6, colorClass: 'progress-cierre' }
     ],
     // Sedes y Campus UdeA
@@ -82,17 +82,17 @@ export class DashboardRevisorComponent {
   };
 
   dataSourceQuejas = [
-    { id: 'CAS-1029', fecha: '2026-02-18', victima: 'Estudiante', identidad: 'Persona No Binaria', estado: 'Indagación' },
+    { id: 'CAS-1029', fecha: '2026-02-18', victima: 'Estudiante', identidad: 'Persona no binaria', estado: 'Indagación' },
     { id: 'CAS-0982', fecha: '2026-02-17', victima: 'Docente', identidad: 'Mujer', estado: 'Investigación' },
-    { id: 'CAS-1105', fecha: '2026-02-19', victima: 'Administrativo', identidad: 'Hombre Trans', estado: 'Recepción' },
-    { id: 'CAS-1120', fecha: '2026-02-20', victima: 'Estudiante', identidad: 'Mujer Trans', estado: 'Atención Activa' }
+    { id: 'CAS-1105', fecha: '2026-02-19', victima: 'Administrativo', identidad: 'Hombre trans', estado: 'Recepción' },
+    { id: 'CAS-1120', fecha: '2026-02-20', victima: 'Estudiante', identidad: 'Mujer trans', estado: 'Atención activa' }
   ];
 
   dataSourceAcompanamiento = [
-    { id: 'ACO-1029', fecha: '2026-02-18', tipo: 'Psicosocial', identidad: 'Persona No Binaria', estado: 'Cita Agendada' },
+    { id: 'ACO-1029', fecha: '2026-02-18', tipo: 'Psicosocial', identidad: 'Persona no binaria', estado: 'Cita agendada' },
     { id: 'ACO-0982', fecha: '2026-02-17', tipo: 'Jurídico', identidad: 'Mujer', estado: 'Sin agendar' },
     { id: 'ACO-1105', fecha: '2026-02-19', tipo: 'Integral', identidad: 'Hombre', estado: 'En seguimiento' },
-    { id: 'ACO-1142', fecha: '2026-02-21', tipo: 'Psicosocial', identidad: 'Género Fluido', estado: 'Cita Agendada' }
+    { id: 'ACO-1142', fecha: '2026-02-21', tipo: 'Psicosocial', identidad: 'Género fluido', estado: 'Cita agendada' }
   ];
 
   displayedColumnsQuejas: string[] = ['id', 'fecha', 'victima', 'identidad', 'estado', 'accion'];

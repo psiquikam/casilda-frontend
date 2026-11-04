@@ -20,6 +20,11 @@ import { ModalTelefonoComponent } from '../modal-telefono/modal-telefono.compone
 import { ListasService, MaestroDto } from '../../services/listas.service';
 import { SolicitudService, UpdateSolicitudDto } from '../../services/solicitud.service';
 import { NotificacionService } from '../../core/a11y/notificacion.service';
+import {
+  limpiarDocumento,
+  longitudMaximaDocumento,
+  tarjetaIdentidadMenorEdadValidator
+} from '../../core/forms/documento-identidad';
 
 interface CorreoRegistrado {
   tipoId?: number | null;
@@ -98,6 +103,10 @@ export class ModalDetalleSolicitudComponent implements OnInit {
         this.unidadesAdministrativas = data.unidadesAdministrativas;
         this.unidadesAcademicas = data.unidadesAcademicas;
         this.mediosSolicitud = data.medioSolicitud;
+        if (this.detalleForm) {
+          this.actualizarValidadorDocumento();
+          this.detalleForm.get('tipoDocumento')?.updateValueAndValidity({ emitEvent: false });
+        }
       });
   }
 
@@ -218,6 +227,19 @@ export class ModalDetalleSolicitudComponent implements OnInit {
       agresorRemitirUad: [agresorRemitirUad]
     });
 
+    const tipoDocumentoControl = this.detalleForm.get('tipoDocumento');
+    tipoDocumentoControl?.setValidators(
+      tarjetaIdentidadMenorEdadValidator(
+        () => this.detalleForm.get('fechaNacimiento')?.value,
+        () => this.tiposDocumento
+      )
+    );
+    this.detalleForm.get('fechaNacimiento')?.valueChanges.subscribe(() => {
+      tipoDocumentoControl?.updateValueAndValidity({ emitEvent: false });
+    });
+    tipoDocumentoControl?.valueChanges.subscribe(() => this.actualizarValidadorDocumento());
+    this.actualizarValidadorDocumento();
+
     const correosInfo = Array.isArray(info?.correos) ? (info.correos as ContactoInfo[]) : [];
     this.correoRegistrados = correosInfo
       .filter((correo) => this.normalizarTexto(correo?.correo).length > 0)
@@ -239,6 +261,27 @@ export class ModalDetalleSolicitudComponent implements OnInit {
     if (this.data.modo === 'visualizar') {
       this.detalleForm.disable();
     }
+  }
+
+  get maxLongitudDocumento(): number {
+    return longitudMaximaDocumento(this.detalleForm?.get('tipoDocumento')?.value, this.tiposDocumento);
+  }
+
+  normalizarDocumento(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const limpio = limpiarDocumento(
+      input.value,
+      this.detalleForm.get('tipoDocumento')?.value,
+      this.tiposDocumento
+    );
+    input.value = limpio;
+    this.detalleForm.get('numeroDocumento')?.setValue(limpio, { emitEvent: false });
+  }
+
+  private actualizarValidadorDocumento(): void {
+    const control = this.detalleForm?.get('numeroDocumento');
+    control?.setValidators(Validators.maxLength(this.maxLongitudDocumento));
+    control?.updateValueAndValidity({ emitEvent: false });
   }
 
   get tieneRemitente(): boolean {

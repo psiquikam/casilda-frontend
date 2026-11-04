@@ -73,7 +73,10 @@
                   </mat-form-field>
                   <mat-form-field appearance="outline">
                     <mat-label>Número de documento</mat-label>
-                    <input matInput formControlName="remitenteNumeroDocumento" (keyup.enter)="buscarRemitente($event)">
+                    <input matInput formControlName="remitenteNumeroDocumento"
+                      [maxlength]="maxLongitudDocumentoRemitente"
+                      (input)="formatoDocumento($event, 'remitenteNumeroDocumento', 'remitenteTipoDocumento')"
+                      (keyup.enter)="buscarRemitente($event)">
                     <button matSuffix mat-icon-button aria-label="Buscar funcionario por documento" class="btn-search-doc" type="button"
                       (click)="buscarRemitente($event)" [disabled]="buscandoRemitente" matTooltip="Buscar funcionario">
                       @if (!buscandoRemitente) {
@@ -183,11 +186,16 @@
               </mat-select>
               @if (acompanamientoForm.get('tipoDocumento')?.hasError('required')) {
                 <mat-error>Seleccione el tipo de documento</mat-error>
+              } @else if (acompanamientoForm.get('tipoDocumento')?.hasError('tiMayorEdad')) {
+                <mat-error>Una persona mayor de edad no puede registrarse con tarjeta de identidad</mat-error>
               }
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Número de documento</mat-label>
-              <input matInput formControlName="numeroDocumento" id="acomp-numeroDocumento" (keyup.enter)="buscarSolicitante($event)">
+              <input matInput formControlName="numeroDocumento" id="acomp-numeroDocumento"
+                [maxlength]="maxLongitudDocumentoSolicitante"
+                (input)="formatoDocumento($event, 'numeroDocumento', 'tipoDocumento')"
+                (keyup.enter)="buscarSolicitante($event)">
               <button matSuffix mat-icon-button aria-label="Buscar solicitante por documento" class="btn-search-doc" type="button" (click)="buscarSolicitante($event)"
                 [disabled]="buscandoSolicitante" matTooltip="Buscar solicitante">
                 @if (!buscandoSolicitante) {
@@ -200,7 +208,9 @@
               @if (acompanamientoForm.get('numeroDocumento')?.hasError('required')) {
                 <mat-error>Ingrese el número de documento</mat-error>
               } @else if (acompanamientoForm.get('numeroDocumento')?.hasError('pattern')) {
-                <mat-error>Ingrese únicamente números, sin puntos ni espacios</mat-error>
+                <mat-error>Ingrese un documento válido, sin puntos ni espacios</mat-error>
+              } @else if (acompanamientoForm.get('numeroDocumento')?.hasError('maxlength')) {
+                <mat-error>El documento admite máximo {{ maxLongitudDocumentoSolicitante }} caracteres</mat-error>
               }
             </mat-form-field>
             <mat-form-field appearance="outline">
@@ -728,7 +738,7 @@
         <button mat-button color="warn" type="button" (click)="cancelar()">Limpiar</button>
         <button mat-raised-button color="primary" [disabled]="enviando"
           (click)="enviarSolicitud()">
-          <mat-icon aria-hidden="true">send</mat-icon> Enviar Solicitud
+          <mat-icon aria-hidden="true">send</mat-icon> Enviar solicitud
         </button>
       </mat-card-actions>
     }

@@ -236,8 +236,8 @@ const DISTRIBUCION_MOCK: DistribucionIdentidadDto = {
   grupos: [
     { etiqueta: 'Mujeres (Cis/Trans)', casos: 88, proporcion: 88 / TOTAL_CASOS },
     { etiqueta: 'Hombres (Cis/Trans)', casos: 36, proporcion: 36 / TOTAL_CASOS },
-    { etiqueta: 'Personas No Binarias', casos: 24, proporcion: 24 / TOTAL_CASOS },
-    { etiqueta: 'Disidencias / Otras', casos: 8, proporcion: 8 / TOTAL_CASOS }
+    { etiqueta: 'Personas no binarias', casos: 24, proporcion: 24 / TOTAL_CASOS },
+    { etiqueta: 'Disidencias / otras', casos: 8, proporcion: 8 / TOTAL_CASOS }
   ]
 };
 
@@ -245,7 +245,7 @@ const CARGA_EQUIPO_MOCK: readonly CargaProfesionalDto[] = [
   { profesional: 'Lic. Carlos Restrepo (Psicología)', casos: 12, citasHoy: 4, ocupacion: 0.8, nivel: 'normal' },
   { profesional: 'Dra. María Carmona (Derecho)', casos: 15, citasHoy: 5, ocupacion: 0.95, nivel: 'alto' },
   { profesional: 'Psic. Laura Valencia (Línea ALMA)', casos: 11, citasHoy: 3, ocupacion: 0.7, nivel: 'normal' },
-  { profesional: 'Dupla Psicosocial 1 (Territorial)', casos: 8, citasHoy: 2, ocupacion: 0.55, nivel: 'bajo' }
+  { profesional: 'Dupla psicosocial 1 (territorial)', casos: 8, citasHoy: 2, ocupacion: 0.55, nivel: 'bajo' }
 ];
 
 @Injectable({ providedIn: 'root' })
