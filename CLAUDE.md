@@ -31,6 +31,8 @@ Documentos de referencia, en orden de precedencia para decisiones de diseño:
 | `docs/contratos/GLOSARIO_VBG.md` | Glosario de términos del módulo Equipo de Atención, con la columna del rol Usuario. |
 | `docs/contratos/DECISIONES_PROVISIONALES_VBG.md` | 19 decisiones de contenido/comportamiento pendientes de validar con el equipo clínico/legal; permiten demostrar el módulo mientras se confirma la versión oficial. |
 | `docs/contratos/contrato-contenidos-home.md` | Contrato del endpoint público `GET {apiBaseUrl}/contenidos/home` y del CRUD de administración del gestor de contenidos del home. |
+| `docs/contratos/contrato-reportar-caso.md` | Contrato pendiente con Backend para crear reportes desde `/reportar-caso` y el reporte anónimo (DTO, código CAS, validaciones, maestros, decisiones D1–D7). Hoy el front no consume endpoint. |
+| `.claude/skills/contrato-backend/SKILL.md` | Skill para redactar contratos de API para Backend a partir del código del front. ⚠️ **Solo local**: misma regla `skills/` de `.gitignore` (ver pendiente 11). |
 
 ## 2. Stack y comandos
 
