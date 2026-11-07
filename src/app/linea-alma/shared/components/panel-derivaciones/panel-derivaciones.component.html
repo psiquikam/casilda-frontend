@@ -1,0 +1,184 @@
+<section class="panel" aria-labelledby="panel-der-titulo">
+  <h3 id="panel-der-titulo" class="panel__titulo">Rutas y derivaciones</h3>
+
+  @if (cargando()) {
+    <p role="status" aria-busy="true">Cargando las rutas y derivaciones…</p>
+  } @else if (errorCarga()) {
+    <div class="casilda-alerta casilda-alerta--peligro" role="alert">
+      <mat-icon aria-hidden="true">error_outline</mat-icon>
+      <div>
+        <p>No pudimos cargar las rutas y derivaciones. Lo que ya registró no se perdió.</p>
+        <button type="button" class="boton boton--secundario" (click)="cargar()">Intentar de nuevo</button>
+      </div>
+    </div>
+  } @else {
+    <!-- ───────── Rutas internas ───────── -->
+    <div class="panel__bloque">
+      <div class="panel__cabecera">
+        <h4>Rutas internas de la Universidad</h4>
+        @if (!soloLectura() && formularioAbierto() !== 'interna') {
+          <button type="button" class="boton boton--secundario" (click)="abrir('interna')">
+            <mat-icon aria-hidden="true">add</mat-icon> Derivar a una dependencia
+          </button>
+        }
+      </div>
+
+      @if (internas().length === 0) {
+        <p class="panel__vacio">Todavía no se ha derivado a ninguna dependencia.</p>
+      } @else {
+        <ul class="panel__lista">
+          @for (d of internas(); track d.idDerivacion) {
+            <li class="panel__item">
+              <strong>{{ etiquetaDestino(d.destino) }}</strong>
+              <span class="panel__meta">{{ d.fechaEnvio | date: 'd MMM y, h:mm a' }} · {{ d.estado === 'ENVIADA' ? 'Enviada' : d.estado === 'RECIBIDA' ? 'Recibida' : 'Rechazada' }}</span>
+              <span>{{ d.motivo }}</span>
+              @if (d.peligroInminente) {
+                <span class="panel__etiqueta"><mat-icon aria-hidden="true">priority_high</mat-icon> Peligro inminente: se activó sin consentimiento previo</span>
+              }
+            </li>
+          }
+        </ul>
+      }
+
+      @if (formularioAbierto() === 'interna') {
+        <form class="panel__form" [formGroup]="formInterna" (ngSubmit)="guardarInterna()" novalidate aria-label="Nueva derivación interna">
+          <mat-form-field appearance="outline">
+            <mat-label>Dependencia</mat-label>
+            <mat-select formControlName="destino" id="der-destino">
+              @for (d of destinos(); track d.codigo) {
+                <mat-option [value]="d.codigo">{{ d.etiqueta }}</mat-option>
+              }
+            </mat-select>
+            @if (error('interna', 'destino', 'la dependencia'); as e) { <mat-error>{{ e }}</mat-error> }
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Motivo de la derivación</mat-label>
+            <textarea matInput formControlName="motivo" id="der-motivo" rows="3" autocomplete="off"></textarea>
+            <mat-hint>Escriba solo lo necesario para que la dependencia pueda actuar.</mat-hint>
+            @if (error('interna', 'motivo', 'el motivo'); as e) { <mat-error>{{ e }}</mat-error> }
+          </mat-form-field>
+
+          @if (admitePeligro(formInterna.controls.destino.value)) {
+            <mat-checkbox formControlName="peligro">
+              Hay peligro inminente: activar sin esperar el consentimiento.
+            </mat-checkbox>
+          }
+          @if (!(formInterna.controls.peligro.value && admitePeligro(formInterna.controls.destino.value)) && !consentimiento()) {
+            <app-consentimiento-informado [(valor)]="consentimientoLocal" />
+          }
+          @if (formInterna.touched && faltaConsentimiento(formInterna.controls.peligro.value, formInterna.controls.destino.value)) {
+            <p class="panel__aviso" role="alert">Falta registrar el consentimiento de la persona para esta derivación.</p>
+          }
+          <div class="panel__acciones">
+            <button type="submit" class="boton boton--primario" [disabled]="enviando()">Registrar derivación</button>
+            <button type="button" class="boton boton--secundario" (click)="cancelar()">Cancelar</button>
+          </div>
+        </form>
+      }
+    </div>
+
+    <!-- ───────── Rutas externas ───────── -->
+    <div class="panel__bloque">
+      <div class="panel__cabecera">
+        <h4>Rutas externas</h4>
+        @if (!soloLectura() && formularioAbierto() !== 'externa') {
+          <button type="button" class="boton boton--secundario" (click)="abrir('externa')">
+            <mat-icon aria-hidden="true">add</mat-icon> Activar una ruta externa
+          </button>
+        }
+      </div>
+
+      @if (externas().length === 0) {
+        <p class="panel__vacio">Todavía no se ha activado ninguna ruta externa.</p>
+      } @else {
+        <ul class="panel__lista">
+          @for (r of externas(); track r.idRuta) {
+            <li class="panel__item">
+              <strong>{{ etiquetaEntidad(r.entidad) }}</strong>
+              <span class="panel__meta">Activada el {{ r.fechaActivacion | date: 'd MMM y' }} · {{ estadosRuta[r.estado] }}</span>
+              <span>{{ r.motivo }}</span>
+              @if (r.resultado) { <span><em>Resultado:</em> {{ etiquetaResultado(r.resultado) }}</span> }
+              @if (r.peligroInminente) {
+                <span class="panel__etiqueta"><mat-icon aria-hidden="true">priority_high</mat-icon> Peligro inminente: se activó sin consentimiento previo</span>
+              }
+
+              @if (!soloLectura() && r.estado !== 'CERRADA') {
+                @if (rutaEnEdicion() === r.idRuta) {
+                  <form class="panel__form panel__form--ruta" [formGroup]="formRuta" (ngSubmit)="guardarRuta(r)" novalidate [attr.aria-label]="'Actualizar la ruta ' + etiquetaEntidad(r.entidad)">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Estado</mat-label>
+                      <mat-select formControlName="estado">
+                        @for (e of estadosRutaLista; track e) {
+                          <mat-option [value]="e">{{ estadosRuta[e] }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                      <mat-label>Resultado</mat-label>
+                      <mat-select formControlName="resultado">
+                        <mat-option value="">Sin resultado todavía</mat-option>
+                        @for (res of resultados(); track res.codigo) {
+                          <mat-option [value]="res.codigo">{{ res.etiqueta }}</mat-option>
+                        }
+                      </mat-select>
+                      @if (error('ruta', 'resultado', 'el resultado'); as e) { <mat-error>{{ e }}</mat-error> }
+                    </mat-form-field>
+                    <div class="panel__acciones">
+                      <button type="submit" class="boton boton--primario" [disabled]="enviando()">Guardar</button>
+                      <button type="button" class="boton boton--secundario" (click)="rutaEnEdicion.set(null)">Cancelar</button>
+                    </div>
+                  </form>
+                } @else {
+                  <button type="button" class="boton boton--secundario panel__editar" (click)="editarRuta(r)">
+                    Registrar seguimiento
+                    <span class="visually-hidden">de la ruta {{ etiquetaEntidad(r.entidad) }}</span>
+                  </button>
+                }
+              }
+            </li>
+          }
+        </ul>
+      }
+
+      @if (formularioAbierto() === 'externa') {
+        <form class="panel__form" [formGroup]="formExterna" (ngSubmit)="guardarExterna()" novalidate aria-label="Nueva ruta externa">
+          <mat-form-field appearance="outline">
+            <mat-label>Entidad</mat-label>
+            <mat-select formControlName="entidad" id="ext-entidad">
+              @for (e of entidades(); track e.codigo) {
+                <mat-option [value]="e.codigo">{{ e.etiqueta }}</mat-option>
+              }
+            </mat-select>
+            @if (error('externa', 'entidad', 'la entidad'); as e) { <mat-error>{{ e }}</mat-error> }
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de activación</mat-label>
+            <input matInput type="date" formControlName="fechaActivacion" id="ext-fecha" />
+            @if (error('externa', 'fechaActivacion', 'la fecha'); as e) { <mat-error>{{ e }}</mat-error> }
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Motivo de la activación</mat-label>
+            <textarea matInput formControlName="motivo" id="ext-motivo" rows="3" autocomplete="off"></textarea>
+            @if (error('externa', 'motivo', 'el motivo'); as e) { <mat-error>{{ e }}</mat-error> }
+          </mat-form-field>
+
+          @if (admitePeligro(formExterna.controls.entidad.value)) {
+            <mat-checkbox formControlName="peligro">
+              Hay peligro inminente: activar sin esperar el consentimiento.
+            </mat-checkbox>
+          }
+          @if (!(formExterna.controls.peligro.value && admitePeligro(formExterna.controls.entidad.value)) && !consentimiento()) {
+            <app-consentimiento-informado [(valor)]="consentimientoLocal" />
+          }
+          @if (formExterna.touched && faltaConsentimiento(formExterna.controls.peligro.value, formExterna.controls.entidad.value)) {
+            <p class="panel__aviso" role="alert">Falta registrar el consentimiento de la persona para esta ruta.</p>
+          }
+          <div class="panel__acciones">
+            <button type="submit" class="boton boton--primario" [disabled]="enviando()">Registrar ruta</button>
+            <button type="button" class="boton boton--secundario" (click)="cancelar()">Cancelar</button>
+          </div>
+        </form>
+      }
+    </div>
+  }
+</section>

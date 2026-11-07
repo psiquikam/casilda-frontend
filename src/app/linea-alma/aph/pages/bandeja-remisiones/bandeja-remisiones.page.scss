@@ -1,0 +1,129 @@
+.bandeja {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6);
+}
+
+.bandeja__cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.bandeja__titulo {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-size-2xl);
+}
+
+.bandeja__intro {
+  margin: 0;
+  max-width: 64ch;
+  color: var(--color-text-secondary);
+}
+
+.bandeja__vistas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.bandeja__vista {
+  min-height: var(--touch-target-min);
+  padding: 0 var(--space-4);
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+
+  &--activa {
+    color: var(--color-text-on-primary);
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+}
+
+.bandeja__filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.bandeja__vacio {
+  margin: 0;
+  padding: var(--space-8) 0;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.bandeja__tabla-contenedor {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface);
+}
+
+.bandeja__tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+
+  th,
+  td {
+    padding: var(--space-3);
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  thead th {
+    background: var(--color-bg-subtle);
+    white-space: nowrap;
+  }
+}
+
+.bandeja__codigo {
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+.bandeja__sub {
+  display: block;
+  color: var(--color-text-secondary);
+}
+
+.bandeja__resumen {
+  max-width: 28ch;
+}
+
+.bandeja__sla {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
+  color: var(--color-text-secondary);
+
+  mat-icon {
+    font-size: var(--font-size-md);
+    width: var(--font-size-md);
+    height: var(--font-size-md);
+  }
+
+  &--vencido {
+    color: var(--color-danger-text);
+    font-weight: 700;
+  }
+}
+
+@media (max-width: 600px) {
+  .bandeja {
+    padding: var(--space-5) var(--space-4);
+  }
+}

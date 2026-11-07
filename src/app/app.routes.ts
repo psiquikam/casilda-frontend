@@ -185,6 +185,20 @@ export const routes: Routes = [
     loadComponent: () => import('./components/linea-alma/atencion-pr/atencion-pr.component').then((m) => m.AtencionPrComponent)
   },
   {
+    // Módulo Línea Alma, submódulos APH (Hinara) y Psicología (Jonathan): cada uno con su `routes.ts`.
+    // El permiso fino por pantalla lo impone `almaPermisoGuard`; `roleGuard` solo exige sesión.
+    path: 'linea-alma/aph',
+    canActivate: [roleGuard],
+    data: { roles: ['COORDINADOR', 'PROFESIONAL', 'TECNICO_APH', 'REVISOR'] },
+    loadChildren: () => import('./linea-alma/aph/routes').then((m) => m.APH_ROUTES)
+  },
+  {
+    path: 'linea-alma/psicologia',
+    canActivate: [roleGuard],
+    data: { roles: ['COORDINADOR', 'PROFESIONAL', 'TECNICO_APH', 'REVISOR'] },
+    loadChildren: () => import('./linea-alma/psicologia/routes').then((m) => m.PSICOLOGIA_ROUTES)
+  },
+  {
     path: 'acceso-denegado',
     title: 'Acceso denegado',
     loadComponent: () => import('./components/acceso-denegado/acceso-denegado.component').then((m) => m.AccesoDenegadoComponent)

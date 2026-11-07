@@ -54,19 +54,24 @@ export type UserRole =
   | 'Revisor'
   | 'Usuario'
   | 'Gestor de contenidos'
+  | 'Técnico APH'
   | 'ADMIN'
   | 'COORDINADOR'
   | 'PROFESIONAL'
   | 'REVISOR'
   | 'USUARIO'
-  | 'GESTOR_CONTENIDO';
+  | 'GESTOR_CONTENIDO'
+  | 'TECNICO_APH';
 
 /**
  * Códigos de rol que reconoce el frontend. Coinciden con `rol.codigo` del
  * backend (`database/initial_data.sql`), que el login devuelve en `roles`.
  * `GESTOR_CONTENIDO` (rol_id 6) administra los contenidos de la portada.
+ * `TECNICO_APH` es el primer respondiente de Línea Alma (RNF-ALMA-002).
+ * **[PENDIENTE Backend]** el código exacto del rol no está confirmado: se asume
+ * `TECNICO_APH` (ver `docs/contratos/linea-alma/README.md`, decisión D-ALMA-01).
  */
-export const ROLES_CASILDA = ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR', 'USUARIO', 'GESTOR_CONTENIDO'] as const;
+export const ROLES_CASILDA = ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR', 'USUARIO', 'GESTOR_CONTENIDO', 'TECNICO_APH'] as const;
 
 export interface MockUserProfile {
   id: number;
@@ -226,11 +231,13 @@ interface JwtPayload {
   exp?: number;
 }
 
-type CodigoRol = 'ADMIN' | 'COORDINADOR' | 'PROFESIONAL' | 'REVISOR' | 'USUARIO' | 'GESTOR_CONTENIDO';
+type CodigoRol = 'ADMIN' | 'COORDINADOR' | 'PROFESIONAL' | 'REVISOR' | 'USUARIO' | 'GESTOR_CONTENIDO' | 'TECNICO_APH';
 
 function normalizarCodigoRol(valor: string | null | undefined): CodigoRol | '' {
   const rol = (valor || '').toUpperCase().replace(/^ROLE_/, '');
   if (rol.includes('ADMIN')) return 'ADMIN';
+  // Técnico APH (primer respondiente de Línea Alma). Va antes que PROF/REVIS por si el nombre trae «técnico».
+  if (rol.includes('APH')) return 'TECNICO_APH';
   if (rol.includes('COORD')) return 'COORDINADOR';
   if (rol.includes('PROF')) return 'PROFESIONAL';
   if (rol.includes('REVIS')) return 'REVISOR';
@@ -285,6 +292,8 @@ export class AuthService {
         return 'Revisor';
       case 'GESTOR_CONTENIDO':
         return 'Gestor de contenidos';
+      case 'TECNICO_APH':
+        return 'Técnico APH';
       default:
         return 'Usuario';
     }
@@ -312,6 +321,10 @@ export class AuthService {
 
   isGestorContenido(): boolean {
     return this.hasRole('GESTOR_CONTENIDO');
+  }
+
+  isTecnicoAph(): boolean {
+    return this.hasRole('TECNICO_APH');
   }
 
   /**
