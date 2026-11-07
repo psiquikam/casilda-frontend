@@ -31,7 +31,7 @@ Documentos de referencia, en orden de precedencia para decisiones de diseño:
 | `docs/contratos/GLOSARIO_VBG.md` | Glosario de términos del módulo Equipo de Atención, con la columna del rol Usuario. |
 | `docs/contratos/DECISIONES_PROVISIONALES_VBG.md` | 19 decisiones de contenido/comportamiento pendientes de validar con el equipo clínico/legal; permiten demostrar el módulo mientras se confirma la versión oficial. |
 | `docs/contratos/contrato-contenidos-home.md` | Contrato del endpoint público `GET {apiBaseUrl}/contenidos/home` y del CRUD de administración del gestor de contenidos del home. |
-| `docs/contratos/contrato-reportar-caso.md` | Contrato pendiente con Backend para crear reportes desde `/reportar-caso` y el reporte anónimo (DTO, código CAS, validaciones, maestros, decisiones D1–D7). Hoy el front no consume endpoint. |
+| `docs/contratos/contrato-reportar-caso.md` | Contrato pendiente con Backend para crear reportes desde `/reportar-caso` y el reporte anónimo (DTO, código CAS, validaciones, maestros, decisiones D1–D7). Conectado desde el 2026-11-06 (`ReporteCasoService`); D5 sigue abierta. |
 | `.claude/skills/contrato-backend/SKILL.md` | Skill para redactar contratos de API para Backend a partir del código del front. ⚠️ **Solo local**: misma regla `skills/` de `.gitignore` (ver pendiente 11). |
 
 ## 2. Stack y comandos
@@ -370,6 +370,20 @@ OpenAPI de QA y el `ContenidoController` de `origin/main` del backend).
 `GestionContenidosComponent`, `EditorContenidoComponent`, `ContenidoItemComponent`,
 `EstadoVigenciaComponent`, `SelectorImagenComponent`, `cambiosSinGuardarGuard`.
 
+### 2026-11-06 — Reporte anónimo conectado a `POST /reportes`
+Hallazgo de pruebas: «Finalizar y enviar reporte anónimo» no hacía ninguna petición. `enviarReporte()`
+inventaba el código con `Math.random()` y abría el diálogo de éxito; el reporte no se guardaba. El backend
+ya tenía el endpoint público en `main` y desplegado en QA.
+
+- **`ReporteCasoService`** (`src/app/services/reporte-caso.service.ts`): `crear()`, el mapeo puro
+  `construirReporteCasoRequest()` (víctima solo si se eligió darla, campos del lugar contrario en `null`,
+  fecha `YYYY-MM-DD`) y `interpretarErrorReporte()` (400 por campo, 401, 429, sin conexión).
+- **El código CAS lo da el servidor.** El diálogo solo se abre con `201`; el botón queda deshabilitado
+  mientras espera. Tras el envío los formularios se deshabilitan, los pasos dejan de ser editables y se
+  borra el borrador local. Al pulsar «Entendido» se navega a `RUTA_TRAS_REPORTE` (`/home` en anónimo,
+  `/inicio` en autenticado). Los `validationErrors` se marcan en su control y llevan al paso afectado.
+- **Colateral:** el selector de campus guardaba el `nombre`; ahora guarda el `id` que espera `campusId`.
+
 ### Pendiente
 1. Accesibilidad — tareas abiertas priorizadas en
    `docs/evidencias/accesibilidad/plan_accesibilidad.md` §6: fases 0.1/0.2/0.4 (axe,
@@ -462,6 +476,11 @@ OpenAPI de QA y el `ContenidoController` de `origin/main` del backend).
     - **Deuda:** `PagedResponseDto<T>` está declarado tres veces (`listas.service.ts`,
       `solicitud.service.ts`, `usuario.service.ts`); el módulo reutiliza el de `listas.service.ts`. Unificarlo
       en un solo archivo de tipos compartidos.
+15. **Reporte de caso — D5 sin resolver:** `POST /reportes` solo recibe documento y fecha de nacimiento
+    de la víctima, lugar, relato y ruta. **Se pierden al enviar:** nombres, correo, género y cargo de la
+    víctima, medio de contacto (`correoContacto`, `whatsappContacto`), datos del presunto agresor, tipos de
+    violencia y evidencias (el `<input type="file">` ni siquiera está enlazado). Decidir con Backend y el
+    equipo si se amplía el contrato o se retiran esos pasos del formulario.
 
 ## 6. Reglas que no se deben romper
 
