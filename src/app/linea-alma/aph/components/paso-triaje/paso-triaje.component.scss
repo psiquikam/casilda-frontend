@@ -1,0 +1,55 @@
+.triaje {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.triaje__titulo {
+  margin: 0;
+  font-size: var(--font-size-xl);
+}
+
+.triaje__intro {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.triaje__opciones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.triaje__opcion {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  min-height: var(--touch-target-min);
+
+  &--peligro {
+    border-color: var(--color-danger);
+  }
+}
+
+.triaje__nivel {
+  display: block;
+  font-weight: 700;
+}
+
+.triaje__ayuda {
+  display: block;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  white-space: normal;
+}
+
+.triaje__error {
+  margin: 0;
+  color: var(--color-danger-text);
+  font-weight: 600;
+}
+
+.triaje__justificacion {
+  width: 100%;
+  margin-top: var(--space-3);
+}

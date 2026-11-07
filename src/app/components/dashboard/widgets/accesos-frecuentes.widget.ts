@@ -40,7 +40,8 @@ export class AccesosFrecuentesWidget {
     COORDINADOR: ['consulta', 'citas', 'nueva-solicitud'],
     PROFESIONAL: ['registro-atencion', 'citas', 'mis-asignaciones'],
     REVISOR: ['indicadores', 'consulta', 'seguimiento'],
-    GESTOR_CONTENIDO: ['contenidos-home']
+    GESTOR_CONTENIDO: ['contenidos-home'],
+    TECNICO_APH: ['alma-aph-nueva', 'alma-aph-remisiones']
   };
 
   readonly accesos = computed(() => {

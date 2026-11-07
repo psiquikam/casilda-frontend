@@ -149,8 +149,8 @@
       <hr class="nav-divider">
     }
 
-    <!-- 3. LÍNEA ALMA (Admin, Coordinador y Profesional) -->
-    @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional()) {
+    <!-- 3. LÍNEA ALMA (Admin, Coordinador, Profesional, Técnico APH y Revisor; cada enlace según su permiso) -->
+    @if (alma.tieneAlguno(['alma.aph.crear', 'alma.aph.bandeja', 'alma.psicologia.consultar']) || auth.isProfesional()) {
       <div class="nav-section">
         <button type="button" id="toggle-alma" class="section-toggle" (click)="toggleSection('alma')"
           [attr.aria-expanded]="isExpanded('alma')" aria-controls="section-alma">
@@ -164,10 +164,30 @@
         </button>
         @if (isExpanded('alma')) {
           <div id="section-alma" class="section-content" role="region" aria-labelledby="toggle-alma">
-            <a routerLink="/linea-alma/atencion-pr" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
-              <mat-icon class="nav-item__icon" aria-hidden="true">ring_volume</mat-icon>
-              <span class="nav-item__text">Primer respondiente</span>
-            </a>
+            @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional()) {
+              <a routerLink="/linea-alma/atencion-pr" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
+                <mat-icon class="nav-item__icon" aria-hidden="true">ring_volume</mat-icon>
+                <span class="nav-item__text">Primer respondiente</span>
+              </a>
+            }
+            @if (alma.tiene('alma.aph.crear')) {
+              <a routerLink="/linea-alma/aph/nueva" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
+                <mat-icon class="nav-item__icon" aria-hidden="true">add_ic_call</mat-icon>
+                <span class="nav-item__text">Nueva atención</span>
+              </a>
+            }
+            @if (alma.tiene('alma.aph.bandeja')) {
+              <a routerLink="/linea-alma/aph/remisiones" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
+                <mat-icon class="nav-item__icon" aria-hidden="true">forward_to_inbox</mat-icon>
+                <span class="nav-item__text">Remisiones recibidas</span>
+              </a>
+            }
+            @if (alma.tiene('alma.psicologia.consultar')) {
+              <a routerLink="/linea-alma/psicologia/bandeja" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
+                <mat-icon class="nav-item__icon" aria-hidden="true">psychology</mat-icon>
+                <span class="nav-item__text">Bandeja de Psicología</span>
+              </a>
+            }
           </div>
         }
       </div>
@@ -175,7 +195,7 @@
     }
 
     <!-- 4. UAD EQUIPO 3 Y 4 (Funcionarios) -->
-    @if (!auth.isUsuario() && !auth.isGestorContenido()) {
+    @if (!auth.isUsuario() && !auth.isGestorContenido() && !auth.isTecnicoAph()) {
       <div class="nav-section">
         <button type="button" id="toggle-uad" class="section-toggle" (click)="toggleSection('uad')"
           [attr.aria-expanded]="isExpanded('uad')" aria-controls="section-uad">
@@ -234,7 +254,7 @@
 
     <!-- 6. RUTA VIOLETA (Funcionalidad transversal institucional) -->
     <!-- El gestor de contenidos no gestiona casos: la ruta no le corresponde. -->
-    @if (features.publicTrackingPrototype && !auth.isUsuario() && !auth.isGestorContenido()) {
+    @if (features.publicTrackingPrototype && !auth.isUsuario() && !auth.isGestorContenido() && !auth.isTecnicoAph()) {
       <div class="nav-section">
         <button type="button" id="toggle-violeta" class="section-toggle" (click)="toggleSection('violeta')"
           [attr.aria-expanded]="isExpanded('violeta')" aria-controls="section-violeta">
