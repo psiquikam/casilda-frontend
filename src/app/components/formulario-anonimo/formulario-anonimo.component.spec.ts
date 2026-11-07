@@ -2,16 +2,34 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatStepper } from '@angular/material/stepper';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { of } from 'rxjs';
 
-import { FormularioAnonimoComponent, TEXTOS_REPORTE } from './formulario-anonimo.component';
+import { FormularioAnonimoComponent, RUTA_TRAS_REPORTE, TEXTOS_REPORTE } from './formulario-anonimo.component';
+import { NotificacionService } from '../../core/a11y/notificacion.service';
+
+/** Completa los únicos campos obligatorios del flujo para poder enviar. */
+function completarObligatorios(component: FormularioAnonimoComponent): void {
+  component.formConsentimiento.get('aceptaPolitica')?.setValue(true);
+  component.formRelato.get('descripcionHechos')?.setValue('Relato de prueba de los hechos ocurridos.');
+  component.formVictimario.get('rutaActivacion')?.setValue(2);
+}
+
+const RESPUESTA_201 = {
+  id: 481,
+  codigo: 'CAS-7Q4M2XABCD',
+  fechaRegistro: '2026-11-06T15:20:31Z',
+  rutaActivacion: { id: 2, codigo: 'RUTA_X', nombre: 'Asesoría jurídica', estado: 'SOLICITADA' }
+};
 
 describe('FormularioAnonimoComponent', () => {
   let component: FormularioAnonimoComponent;
   let fixture: ComponentFixture<FormularioAnonimoComponent>;
   let dialog: MatDialog;
+  let httpMock: HttpTestingController;
+  let router: Router;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -27,7 +45,10 @@ describe('FormularioAnonimoComponent', () => {
     fixture = TestBed.createComponent(FormularioAnonimoComponent);
     component = fixture.componentInstance;
     dialog = fixture.debugElement.injector.get(MatDialog);
-    spyOn(dialog, 'open').and.returnValue({} as unknown as MatDialogRef<unknown>);
+    spyOn(dialog, 'open').and.returnValue({ afterClosed: () => of(undefined) } as unknown as MatDialogRef<unknown>);
+    httpMock = TestBed.inject(HttpTestingController);
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigateByUrl').and.resolveTo(true);
     fixture.detectChanges();
   });
 
@@ -224,9 +245,80 @@ describe('FormularioAnonimoComponent', () => {
     expect(component.formVictimario.get('remitirUad')?.value).toBe('no');
   });
 
-  it('should open success dialog when submitting report', () => {
+  it('should POST the report and open the success dialog with the server code', () => {
+    completarObligatorios(component);
     component.enviarReporte();
-    expect(dialog.open).toHaveBeenCalled();
+
+    const req = httpMock.expectOne((r) => r.method === 'POST' && r.url.endsWith('/reportes'));
+    expect(req.request.body).toEqual(jasmine.objectContaining({
+      descripcionHechos: 'Relato de prueba de los hechos ocurridos.',
+      rutaActivacionId: 2,
+      tipoDocumentoId: null,
+      tipoLugar: null,
+      campusId: null
+    }));
+    req.flush(RESPUESTA_201, { status: 201, statusText: 'Created' });
+
+    expect(dialog.open).toHaveBeenCalledWith(jasmine.any(Function), jasmine.objectContaining({
+      data: jasmine.objectContaining({ codigo: 'CAS-7Q4M2XABCD' })
+    }));
+  });
+
+  it('should not open the dialog nor send anything when required data is missing', () => {
+    component.enviarReporte();
+    httpMock.expectNone((r) => r.url.endsWith('/reportes'));
+    expect(dialog.open).not.toHaveBeenCalled();
+  });
+
+  it('should send only one request while the first is pending', () => {
+    completarObligatorios(component);
+    component.enviarReporte();
+    component.enviarReporte();
+    const reqs = httpMock.match((r) => r.method === 'POST' && r.url.endsWith('/reportes'));
+    expect(reqs.length).toBe(1);
+    expect(component.enviando).toBeTrue();
+  });
+
+  it('should lock the form and clear the draft after a successful submission', () => {
+    spyOn(localStorage, 'removeItem');
+    completarObligatorios(component);
+    component.enviarReporte();
+    httpMock.expectOne((r) => r.url.endsWith('/reportes')).flush(RESPUESTA_201, { status: 201, statusText: 'Created' });
+
+    expect(component.reporteEnviado).toBeTrue();
+    expect(component.formPerfil.disabled).toBeTrue();
+    expect(component.formRelato.disabled).toBeTrue();
+    expect(component.formVictimario.disabled).toBeTrue();
+    expect(localStorage.removeItem).toHaveBeenCalledWith(TEXTOS_REPORTE.anonimo.claveBorrador);
+
+    component.enviarReporte();
+    httpMock.expectNone((r) => r.url.endsWith('/reportes'));
+  });
+
+  it('should navigate to the public home when the success dialog closes', () => {
+    completarObligatorios(component);
+    component.enviarReporte();
+    httpMock.expectOne((r) => r.url.endsWith('/reportes')).flush(RESPUESTA_201, { status: 201, statusText: 'Created' });
+    expect(router.navigateByUrl).toHaveBeenCalledWith(RUTA_TRAS_REPORTE.anonimo);
+    expect(RUTA_TRAS_REPORTE.anonimo).toBe('/home');
+  });
+
+  it('should keep the form editable and map server field errors when the API rejects the report', () => {
+    const notificacion = TestBed.inject(NotificacionService);
+    spyOn(notificacion, 'error');
+    completarObligatorios(component);
+    component.enviarReporte();
+    httpMock.expectOne((r) => r.url.endsWith('/reportes')).flush(
+      { status: 400, message: 'Error de validación en los campos', validationErrors: { campusId: 'Seleccione el campus' } },
+      { status: 400, statusText: 'Bad Request' }
+    );
+
+    expect(dialog.open).not.toHaveBeenCalled();
+    expect(component.reporteEnviado).toBeFalse();
+    expect(component.enviando).toBeFalse();
+    expect(component.formRelato.enabled).toBeTrue();
+    expect(component.formRelato.get('sedeCampus')?.hasError('servidor')).toBeTrue();
+    expect(notificacion.error).toHaveBeenCalled();
   });
 
   it('should initialize all 7 violence category radios to NO and selection arrays empty', () => {
@@ -378,6 +470,8 @@ describe('FormularioAnonimoComponent en modo autenticado', () => {
   let component: FormularioAnonimoComponent;
   let fixture: ComponentFixture<FormularioAnonimoComponent>;
   let dialog: MatDialog;
+  let httpMock: HttpTestingController;
+  let router: Router;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -394,7 +488,10 @@ describe('FormularioAnonimoComponent en modo autenticado', () => {
     fixture = TestBed.createComponent(FormularioAnonimoComponent);
     component = fixture.componentInstance;
     dialog = fixture.debugElement.injector.get(MatDialog);
-    spyOn(dialog, 'open').and.returnValue({} as unknown as MatDialogRef<unknown>);
+    spyOn(dialog, 'open').and.returnValue({ afterClosed: () => of(undefined) } as unknown as MatDialogRef<unknown>);
+    httpMock = TestBed.inject(HttpTestingController);
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigateByUrl').and.resolveTo(true);
     fixture.detectChanges();
   });
 
@@ -414,7 +511,10 @@ describe('FormularioAnonimoComponent en modo autenticado', () => {
   });
 
   it('should open the success dialog with the authenticated wording', () => {
+    completarObligatorios(component);
     component.enviarReporte();
+    httpMock.expectOne((r) => r.url.endsWith('/reportes')).flush(RESPUESTA_201, { status: 201, statusText: 'Created' });
+    expect(router.navigateByUrl).toHaveBeenCalledWith(RUTA_TRAS_REPORTE.autenticado);
     expect(dialog.open).toHaveBeenCalledWith(jasmine.any(Function), jasmine.objectContaining({
       data: jasmine.objectContaining({
         titulo: TEXTOS_REPORTE.autenticado.exitoTitulo,
