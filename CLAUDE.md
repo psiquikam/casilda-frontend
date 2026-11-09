@@ -3,8 +3,8 @@
 > Archivo vivo. Se actualiza al cerrar cada fase de trabajo para que cualquier
 > sesión posterior (humana o asistida) retome sin repetir el análisis.
 >
-> **Última actualización:** 27 de octubre de 2026 (módulo «Contenidos del inicio» para el rol
-> `GESTOR_CONTENIDO` y portada conectada a las imágenes del backend; antes, conexión al backend QA)
+> **Última actualización:** 9 de noviembre de 2026 (Línea Alma, submódulo Psicología: tareas de Jonathan del plan;
+> antes, submódulo APH y reporte anónimo conectado a `POST /reportes`)
 
 ---
 
@@ -32,7 +32,7 @@ Documentos de referencia, en orden de precedencia para decisiones de diseño:
 | `docs/contratos/DECISIONES_PROVISIONALES_VBG.md` | 19 decisiones de contenido/comportamiento pendientes de validar con el equipo clínico/legal; permiten demostrar el módulo mientras se confirma la versión oficial. |
 | `docs/contratos/contrato-contenidos-home.md` | Contrato del endpoint público `GET {apiBaseUrl}/contenidos/home` y del CRUD de administración del gestor de contenidos del home. |
 | `docs/contratos/contrato-reportar-caso.md` | Contrato pendiente con Backend para crear reportes desde `/reportar-caso` y el reporte anónimo (DTO, código CAS, validaciones, maestros, decisiones D1–D7). Conectado desde el 2026-11-06 (`ReporteCasoService`); D5 sigue abierta. |
-| `docs/contratos/linea-alma/` | Contratos para Backend del submódulo APH de Línea Alma (`README.md` con guía, plantilla y decisiones D-ALMA-01…13; atenciones/triaje/derivación; derivaciones, bandeja, contención y auditoría). Plan: `docs/plan-implementacion-front-linea-alma.md`. |
+| `docs/contratos/linea-alma/` | Contratos para Backend de Línea Alma: APH (`README.md` con guía, plantilla y decisiones D-ALMA-01…13; atenciones/triaje/derivación; derivaciones, bandeja, contención y auditoría) y **Psicología** (`contrato-psicologia-bandeja-novedades.md`, `contrato-psicologia-casos-seguimientos-recontactos.md`, decisiones D-PSI-01…19). Plan: `docs/plan-implementacion-front-linea-alma.md`. |
 | `.claude/skills/contrato-backend/SKILL.md` | Skill para redactar contratos de API para Backend a partir del código del front. ⚠️ **Solo local**: misma regla `skills/` de `.gitignore` (ver pendiente 11). |
 
 ## 2. Stack y comandos
@@ -113,6 +113,15 @@ espaciados ni radios literales**: siempre `var(--token)`.
 | `GestionContenidosComponent` · `EditorContenidoComponent` | `src/app/components/gestion-contenidos/` | Módulo «Contenidos del inicio» (`/gestion-contenidos`): listado por sección con filtro por estado, y editor con vista previa en vivo hecha con `CasildaCardComponent`. |
 | `SelectorImagenComponent` | `src/app/components/selector-imagen/` | Carga de una imagen con vista previa, arrastrar y soltar, y validación de tipo y peso en el cliente. Controlado: el padre es dueño del archivo y de la URL temporal. |
 | `cambiosSinGuardarGuard` | `src/app/core/navegacion/cambios-sin-guardar.guard.ts` | `canDeactivate` reutilizable: confirma antes de abandonar un formulario con cambios (`ConCambiosPendientes`). |
+| `alma.types.ts` · `alma-dto.ts` · `alma-psicologia-dto.ts` | `src/app/linea-alma/shared/types/` | **Único lugar** de estados, enums, validadores `ALMA-`/`CAS-` y DTO de Línea Alma (Q1/Q2). Dueño: Jonathan; APH solicita cambios. |
+| `CatalogosAlmaService` (`etiquetaDe`, `etiquetasDe`) | `src/app/linea-alma/shared/catalogos/` | `GET /catalogos/{nombre}` con caché por sesión; único lector de catálogos del módulo (equivale a `useCatalogo`). |
+| `SlaBadgeComponent` · `RelojServidorService` · `sla.ts` | `src/app/linea-alma/shared/sla/`, `shared/components/sla-badge/` | Semáforo SLA (RN-ALMA-01, F3) con ícono y texto; el reloj se ancla a `ahoraServidor` y avanza con el tiempo transcurrido local (R6). Umbrales en `UMBRALES_SLA_POR_DEFECTO` (Q3). |
+| `BorradorLocal` (`crearBorrador`) | `src/app/linea-alma/shared/borrador/` | «Guardar progreso» local en `sessionStorage` con prefijo `casilda_` (lo borra la Salida rápida). Equivale a `useBorrador`. |
+| `BloqueoOptimista` | `src/app/linea-alma/shared/concurrencia/` | `version` en cada acción; ante 409 avisa, recarga y relanza; nunca reintenta solo (RNF-ALMA-001, F7). Equivale a `useBloqueoOptimista`. |
+| `AlertaGestionSimultaneaComponent` | `src/app/linea-alma/shared/components/alerta-gestion-simultanea/` | Caso con actuaciones activas en Equipo de Atención y Línea Alma (Q15). La usan APH y Psicología. |
+| `ROLES_HABILITADOS_PSICOLOGIA` · `psicologiaHabilitadaGuard` · `AlmaPermisosService.psicologiaHabilitada()` | `src/app/linea-alma/psicologia/psicologia-habilitacion.ts` | Despliegue controlado del submódulo Psicología: **hoy solo ADMIN** ve y entra; para abrirlo a otro rol basta añadirlo a la lista (menú, catálogo y guard la leen). |
+| `NotificacionesPsicologiaService` | `src/app/linea-alma/psicologia/services/` | Polling cada 30 s de `GET /psicologia/notificaciones` detrás de una abstracción intercambiable por SSE/WebSocket (Q7). |
+| `protocolo-intentos.ts` · `seguimientos.ts` | `src/app/linea-alma/psicologia/dominio/` | Reglas puras con pruebas: protocolo de 9 intentos (RN-ALMA-03), contador de controles que no bloquea (RN-ALMA-05), fecha futura, conversión `datetime-local` ↔ ISO. |
 
 ## 5. Bitácora de avances
 
@@ -401,7 +410,37 @@ Plan: `docs/plan-implementacion-front-linea-alma.md`; contratos: `docs/contratos
 - **Sin hacer:** H-2.2 (integración con Psicología), H-3.3 (revisión de textos con el equipo) y H-3.4 (cambio a
   servicios reales) dependen de otras personas o de Backend. La ruta antigua `/linea-alma/atencion-pr` no se tocó.
 
+### 2026-11-09 — Línea Alma, submódulo Psicología (tareas de Jonathan del plan)
+Plan: `docs/plan-implementacion-front-linea-alma.md` §5 y §7; contratos: `docs/contratos/linea-alma/contrato-psicologia-*.md`
+(decisiones D-PSI-01…19). Rama `feature/06/018/casilda/submodulo-psicologia`. Código en `src/app/linea-alma/psicologia/`
+(páginas, componentes, servicios, `dominio/`), `shared/` (tipos, catálogos, SLA, borrador, concurrencia) y `mocks/psicologia.*`.
+
+- **Fase 0 (J-0.1…0.4):** `alma.types.ts` deja de ser provisional y centraliza estados de atención **y** de caso, prioridad,
+  protocolo de intentos, seguimientos, recordatorios, decisiones de recontacto y formateadores `ALMA-`/`CAS-` (Q1/Q2);
+  `alma-psicologia-dto.ts`; `CatalogosAlmaService` con catálogos placeholder de Psicología («Dimensión 1…15», Q6);
+  `SlaBadge` + `RelojServidorService` (umbrales 50 %/20 %, Q3); `BorradorLocal` y `BloqueoOptimista`, con pruebas.
+- **Psicología (J-1.1…J-1.8, J-2.1):** bandeja compartida con semáforo, filtros, paginación, refresco cada 30 s y «Tomar»
+  con 409; novedad con notas APH de solo lectura, triaje no editable (RN-ALMA-04), tomar/liberar, protocolo de hasta 9
+  intentos (justificación desde el 4.º, advertencias de día/horario, cierre automático por «No contacto»), primer contacto
+  por pasos (consentimiento verbal → caracterización → valoración → 15 dimensiones → presunto agresor → acuerdos) con
+  borrador local y decisión explícita ante caso activo (RN-ALMA-06); expediente consolidado en una llamada, seguimientos
+  con contador que no bloquea y recordatorio por correo, cierre por motivo + PDF, «Mi agenda» y resolución de recontactos
+  (vincular / caso nuevo / contención puntual). `PanelDerivaciones`, `ConsentimientoInformado`, `CaracterizacionForm`,
+  `NotasTimeline` y `AuditTrail` se reutilizan sin cambios; `AlertaGestionSimultanea` reemplaza el provisional de APH.
+- **Mocks:** `psicologia.handlers.ts` + `psicologia-mock-seed.ts` sobre el **store compartido** (lo que APH deriva aparece en
+  la bandeja; el primer contacto deja a la persona con «seguimiento activo» y el cierre con «caso cerrado» para F2).
+  Interruptores nuevos en `environment.lineaAlma.mocks`: `bandejaPsicologia`, `novedades`, `casos`, `agenda`, `recontactos`.
+- **Acceso:** la matriz §11 no cambia, pero el submódulo queda en **despliegue controlado**: solo ADMIN lo ve y entra
+  (`ROLES_HABILITADOS_PSICOLOGIA`) hasta que el equipo defina a quién más habilitar. COORD sigue la matriz (edita, no
+  cierra): el plan es inconsistente en J-3.2 (D-PSI-11).
+- **Sin hacer:** J-2.2 (demo E2E con Hinara), J-3.3 (cambio a servicios reales) dependen de Backend/otra persona; pruebas
+  de componentes de página (hay pruebas de dominio, mocks, SLA, borrador, bloqueo, habilitación y componentes compartidos).
+
 ### Pendiente
+0. **Línea Alma Psicología:** Backend debe revisar D-PSI-01…19 (entidad de la novedad antes del caso, `tomadaPorMi`,
+   SLA, PDF síncrono, contención puntual); el equipo debe decidir qué roles se habilitan además de ADMIN
+   (`ROLES_HABILITADOS_PSICOLOGIA`) y resolver la inconsistencia COORD (matriz §11 vs J-3.2); validar textos y
+   catálogos placeholder (Q6) y los umbrales del semáforo (Q3) con Laura Murillo.
 0. **Línea Alma APH:** Backend debe revisar los contratos (decisiones D-ALMA-01…13, p. ej. código del rol
    `TECNICO_APH`); validar textos y catálogos placeholder (Q6, Q9); decidir si se retira `atencion-pr`.
 1. Accesibilidad — tareas abiertas priorizadas en
