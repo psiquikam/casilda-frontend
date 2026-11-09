@@ -1,0 +1,152 @@
+<div class="nov">
+  <a class="nov__volver" routerLink="/linea-alma/psicologia/bandeja">
+    <mat-icon aria-hidden="true">arrow_back</mat-icon>
+    Volver a la bandeja
+  </a>
+
+  @if (demo) {
+    <p class="casilda-alerta casilda-alerta--precaucion" role="note">
+      <mat-icon aria-hidden="true">science</mat-icon>
+      <span><strong>Datos de demostración.</strong> Los servicios de Línea Alma están simulados.</span>
+    </p>
+  }
+
+  @if (cargando()) {
+    <p role="status" aria-busy="true">Cargando la novedad…</p>
+  } @else if (error(); as e) {
+    <div class="casilda-alerta casilda-alerta--peligro" role="alert">
+      <mat-icon aria-hidden="true">error_outline</mat-icon>
+      <div>
+        <h1 class="nov__titulo nov__titulo--error">No pudimos abrir la novedad</h1>
+        <p>{{ e.mensaje }}</p>
+        @if (e.tipo !== 'no-encontrado' && e.tipo !== 'sin-permiso') {
+          <button type="button" class="boton boton--secundario" (click)="cargar()">Intentar de nuevo</button>
+        }
+      </div>
+    </div>
+  } @else if (novedad(); as n) {
+    <header class="nov__cabecera">
+      <div>
+        <h1 class="nov__titulo">Novedad {{ n.idAtencion }}</h1>
+        <p class="nov__sub">{{ n.nombreCompleto }} · {{ n.persona.tipoIdentificacion }} {{ n.persona.numeroIdentificacion }}</p>
+      </div>
+      <div class="nov__estado">
+        <span class="nov__chip"><mat-icon aria-hidden="true">flag</mat-icon> {{ n.estado === 'CERRADO' && n.cerradaPorNoContacto ? 'Cerrada por no contacto' : etiquetaEstado[n.estado] }}</span>
+        @if (n.triaje; as t) {
+          <span class="nov__chip" [class]="'nov__chip nov__chip--' + t.toLowerCase()" title="Triaje de APH, no editable">
+            <mat-icon aria-hidden="true">lock</mat-icon> Triaje {{ etiquetaTriaje[t] }}
+          </span>
+        } @else {
+          <span class="nov__chip"><mat-icon aria-hidden="true">lock</mat-icon> Triaje omitido por peligro inminente</span>
+        }
+        @if (n.pendiente) {
+          <app-sla-badge [sla]="n.sla" />
+        }
+        @if (n.recontacto) {
+          <span class="nov__chip nov__chip--recontacto"><mat-icon aria-hidden="true">event_repeat</mat-icon> Recontacto</span>
+        }
+      </div>
+    </header>
+
+    <div class="nov__toma" role="group" aria-label="Toma de la novedad">
+      @if (n.tomadaPor; as t) {
+        <p class="nov__toma-texto">
+          <mat-icon aria-hidden="true">person</mat-icon>
+          Tomada por <strong>{{ n.tomadaPorMi ? 'usted' : t }}</strong>.
+          @if (!n.tomadaPorMi && n.pendiente) { Otra profesional la está gestionando; puede consultarla, no editarla. }
+        </p>
+      } @else if (n.pendiente) {
+        <p class="nov__toma-texto"><mat-icon aria-hidden="true">group</mat-icon> En la cola compartida, sin tomar.</p>
+      }
+      @if (puedeTomar()) {
+        <button type="button" class="boton boton--primario" [disabled]="bloqueo.ocupado()" (click)="tomar()">
+          {{ bloqueo.ocupado() ? 'Tomando…' : 'Tomar esta novedad' }}
+        </button>
+      }
+      @if (puedeLiberar()) {
+        <button type="button" class="boton boton--secundario" [disabled]="bloqueo.ocupado()" (click)="liberar()">Liberar</button>
+      }
+    </div>
+
+    <app-alerta-gestion-simultanea [activa]="n.gestionSimultanea" [numeroCaso]="n.numeroCaso ?? n.casoActivo?.numeroCaso ?? null" />
+
+    @if (n.recontacto && n.casoActivo; as caso) {
+      <div class="casilda-alerta" role="status">
+        <mat-icon aria-hidden="true">event_repeat</mat-icon>
+        <div>
+          <p class="nov__fuerte">La persona ya tiene el caso {{ caso.numeroCaso }} activo{{ caso.profesional ? ', a cargo de ' + caso.profesional : '' }}.</p>
+          <p>
+            El sistema no la vincula por su cuenta (RN-ALMA-06). Puede resolverlo en
+            <a routerLink="/linea-alma/psicologia/recontactos">Recontactos</a>
+            o decidirlo al registrar el primer contacto efectivo.
+          </p>
+        </div>
+      </div>
+    }
+
+    @if (n.numeroCaso; as numeroCaso) {
+      <p class="casilda-alerta casilda-alerta--exito" role="status">
+        <mat-icon aria-hidden="true">folder_shared</mat-icon>
+        <span>
+          Esta atención pertenece al caso <strong>{{ numeroCaso }}</strong>.
+          @if (puedeVerClinico()) { <a [routerLink]="['/linea-alma/psicologia/casos', numeroCaso]">Abrir el expediente</a>. }
+        </span>
+      </p>
+    }
+
+    <section class="nov__bloque" aria-labelledby="nov-datos">
+      <h2 id="nov-datos">Lo que registró APH</h2>
+      <dl class="nov__datos">
+        <div><dt>Canal de ingreso</dt><dd>{{ etiquetaCanal[n.canalIngreso] }}</dd></div>
+        @if (n.origenRemision; as o) { <div><dt>Origen de la remisión</dt><dd>{{ etiquetaOrigen[o] }}</dd></div> }
+        <div><dt>Derivada</dt><dd>{{ n.fechaDerivacion | date: 'd MMM y, h:mm a' }}</dd></div>
+        <div><dt>Plazo de primer contacto</dt><dd>{{ n.sla.horasLimite }} horas (hasta {{ n.sla.venceEn | date: 'd MMM, h:mm a' }})</dd></div>
+        <div><dt>Teléfono</dt><dd>{{ n.persona.telefonoPrincipal ?? 'Sin dato' }}</dd></div>
+        <div><dt>Correo</dt><dd>{{ n.persona.correoPersonal ?? 'Sin dato' }}</dd></div>
+        <div>
+          <dt>Consentimiento para derivar</dt>
+          <dd>
+            @if (n.consentimientoAph; as c) { {{ c.medio === 'VERBAL' ? 'Verbal' : 'Digital' }}, {{ c.fechaRegistro | date: 'd MMM y, h:mm a' }} } @else { Sin registro }
+          </dd>
+        </div>
+        @if (n.omisionTriaje; as o) { <div class="nov__ancho"><dt>Justificación de la omisión del triaje</dt><dd>{{ o.justificacion }}</dd></div> }
+        <div class="nov__ancho"><dt>Motivo de consulta</dt><dd>{{ n.motivoConsulta ?? 'Sin registrar' }}</dd></div>
+      </dl>
+      <h3 class="nov__subtitulo">Notas de APH</h3>
+      <app-notas-timeline [notas]="n.notasAph" />
+    </section>
+
+    @if (mostrarPrimerContacto() && gestionando()) {
+      <section class="nov__bloque nov__bloque--destacado" aria-labelledby="pc-titulo">
+        <app-primer-contacto [novedad]="n" (casoCreado)="casoCreado($event)" (conflicto)="tras409()" (cancelado)="mostrarPrimerContacto.set(false)" />
+      </section>
+    } @else {
+      <section class="nov__bloque" aria-labelledby="int-titulo">
+        <app-intentos-contacto
+          [novedad]="n"
+          [soloLectura]="!puedeEditar()"
+          (actualizada)="actualizada($event)"
+          (conflicto)="tras409()"
+          (contactoEfectivo)="abrirPrimerContacto()"
+        />
+      </section>
+    }
+
+    @if (n.cierre && !n.cerradaPorNoContacto) {
+      <section class="nov__bloque" aria-labelledby="nov-cierre">
+        <h2 id="nov-cierre">Cierre</h2>
+        <p>Cerrada el {{ n.cierre.fecha | date: 'd MMM y, h:mm a' }} ({{ n.cierre.motivo }}).</p>
+        @if (n.cierre.observacion) { <p>{{ n.cierre.observacion }}</p> }
+      </section>
+    }
+
+    <section class="nov__bloque" aria-labelledby="nov-rutas">
+      <h2 id="nov-rutas" class="visually-hidden">Derivaciones y rutas previas</h2>
+      <app-panel-derivaciones [contexto]="contexto()" [consentimiento]="n.consentimientoAph" [peligroInminente]="!!n.omisionTriaje" [soloLectura]="!gestionando()" />
+    </section>
+
+    <section class="nov__bloque" aria-labelledby="audit-titulo">
+      <app-audit-trail [contexto]="contexto()" [version]="versionAuditoria()" />
+    </section>
+  }
+</div>

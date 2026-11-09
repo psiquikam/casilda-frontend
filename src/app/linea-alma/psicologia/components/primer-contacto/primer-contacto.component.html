@@ -1,0 +1,206 @@
+<section class="pc" aria-labelledby="pc-titulo">
+  <header class="pc__cabecera">
+    <div>
+      <h2 id="pc-titulo" class="pc__titulo">Primer contacto efectivo</h2>
+      <p class="pc__intro">Al guardar se genera el código de caso <strong>CAS-AAAA-NNNNNN</strong>. Puede guardar un borrador en cualquier paso.</p>
+    </div>
+    @if (!soloLectura()) {
+      <div class="pc__acciones">
+        <button type="button" class="boton boton--secundario" (click)="guardarBorrador()">
+          <mat-icon aria-hidden="true">save</mat-icon>
+          Guardar borrador
+        </button>
+        <button type="button" class="boton boton--secundario" (click)="cancelado.emit()">Volver a los intentos</button>
+      </div>
+    }
+  </header>
+
+  @if (borradorRestauradoEn(); as fecha) {
+    <p class="casilda-alerta" role="status">
+      <mat-icon aria-hidden="true">history</mat-icon>
+      <span>
+        Retomamos el borrador guardado el {{ fecha | date: 'd MMM, h:mm a' }}.
+        <button type="button" class="pc__enlace" (click)="descartarBorrador()">Descartar borrador</button>
+      </span>
+    </p>
+  }
+
+  <app-resumen-errores [errores]="erroresResumen()" />
+
+  <mat-stepper class="pc__stepper" [selectedIndex]="paso()" (selectionChange)="irA($event.selectedIndex)" [linear]="false" labelPosition="bottom">
+    <!-- 1. Consentimiento verbal -->
+    <mat-step label="Consentimiento">
+      <div class="pc__paso">
+        <p id="pc-consentimiento" tabindex="-1">
+          Lea el texto a la persona y registre su aceptación <strong>verbal</strong>. Sin consentimiento no se inicia la atención psicológica (RN-ALMA-02).
+        </p>
+        <app-consentimiento-informado [(valor)]="consentimiento" medio="VERBAL" [permitirCambiarMedio]="false" [deshabilitado]="soloLectura()" />
+        @if (novedad().consentimientoAph; as c) {
+          <p class="pc__nota">APH ya registró un consentimiento {{ c.medio === 'VERBAL' ? 'verbal' : 'digital' }} el {{ c.fechaRegistro | date: 'd MMM y, h:mm a' }} para la derivación. El de la atención psicológica se registra aparte.</p>
+        }
+        <div class="pc__botones">
+          <button type="button" class="boton boton--primario" (click)="irA(1)">Siguiente</button>
+        </div>
+      </div>
+    </mat-step>
+
+    <!-- 2. Caracterización -->
+    <mat-step label="Caracterización">
+      <div class="pc__paso">
+        <p>Variables homologadas con Equipo de Atención. Complete o corrija lo que APH alcanzó a registrar.</p>
+        <app-caracterizacion-form [grupo]="caracterizacion" prefijoId="pc-car" />
+        <div class="pc__botones">
+          <button type="button" class="boton boton--secundario" (click)="irA(0)">Anterior</button>
+          <button type="button" class="boton boton--primario" (click)="irA(2)">Siguiente</button>
+        </div>
+      </div>
+    </mat-step>
+
+    <!-- 3. Valoración clínica de riesgo -->
+    <mat-step label="Valoración de riesgo">
+      <div class="pc__paso" [formGroup]="valoracion">
+        <div class="pc__triaje" role="note">
+          <mat-icon aria-hidden="true">lock</mat-icon>
+          <span>
+            Triaje registrado por APH:
+            @if (novedad().triaje; as t) { <strong>{{ etiquetaTriaje[t] }}</strong> } @else { <strong>omitido por peligro inminente</strong> }.
+            Se conserva tal cual: la valoración clínica es un campo propio y no lo modifica (RN-ALMA-04).
+          </span>
+        </div>
+        <fieldset class="pc__fieldset">
+          <legend>Nivel de riesgo valorado por Psicología</legend>
+          <mat-radio-group formControlName="nivel" id="pc-val-nivel" aria-label="Nivel de riesgo valorado por Psicología">
+            @for (r of riesgos; track r) {
+              <mat-radio-button [value]="r">{{ etiquetaRiesgo[r] }}</mat-radio-button>
+            }
+          </mat-radio-group>
+          @if (error('valoracion', 'nivel', 'El nivel de riesgo'); as e) { <p class="pc__error" role="alert">{{ e }}</p> }
+        </fieldset>
+        <mat-form-field appearance="outline">
+          <mat-label>Valoración clínica</mat-label>
+          <textarea matInput id="pc-val-descripcion" formControlName="descripcion" rows="5" autocomplete="off"></textarea>
+          <mat-hint>Factores de riesgo y de protección observados, en lenguaje neutro.</mat-hint>
+          @if (error('valoracion', 'descripcion', 'La valoración'); as e) { <mat-error>{{ e }}</mat-error> }
+        </mat-form-field>
+        <div class="pc__botones">
+          <button type="button" class="boton boton--secundario" (click)="irA(1)">Anterior</button>
+          <button type="button" class="boton boton--primario" (click)="irA(3)">Siguiente</button>
+        </div>
+      </div>
+    </mat-step>
+
+    <!-- 4. Dimensiones -->
+    <mat-step label="Dimensiones">
+      <div class="pc__paso">
+        <fieldset class="pc__fieldset">
+          <legend>Clasificación por dimensiones de salud mental</legend>
+          <p class="pc__nota">Catálogo provisional («Dimensión 1…15») hasta recibir el oficial. Marque las que apliquen.</p>
+          @if (errorCatalogos()) {
+            <div class="casilda-alerta casilda-alerta--peligro" role="alert">
+              <mat-icon aria-hidden="true">error_outline</mat-icon>
+              <div>
+                <p>No pudimos cargar las dimensiones.</p>
+                <button type="button" class="boton boton--secundario" (click)="cargarCatalogos()">Intentar de nuevo</button>
+              </div>
+            </div>
+          }
+          <div class="pc__dimensiones">
+            @for (d of dimensionesCatalogo(); track d.codigo) {
+              <mat-checkbox [checked]="tieneDimension(d.codigo)" [disabled]="soloLectura()" (change)="alternarDimension(d.codigo, $event.checked)">{{ d.etiqueta }}</mat-checkbox>
+            }
+          </div>
+        </fieldset>
+        <div class="pc__botones">
+          <button type="button" class="boton boton--secundario" (click)="irA(2)">Anterior</button>
+          <button type="button" class="boton boton--primario" (click)="irA(4)">Siguiente</button>
+        </div>
+      </div>
+    </mat-step>
+
+    <!-- 5. Presunto agresor (opcional) -->
+    <mat-step label="Presunto agresor">
+      <div class="pc__paso" [formGroup]="agresor">
+        <p class="pc__nota">Opcional. Registre solo lo que la persona quiera contar; ningún campo bloquea el guardado.</p>
+        <div class="pc__fila">
+          <mat-form-field appearance="outline">
+            <mat-label>Nombres</mat-label>
+            <input matInput id="pc-agr-nombres" formControlName="nombres" autocomplete="off" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Apellidos</mat-label>
+            <input matInput id="pc-agr-apellidos" formControlName="apellidos" autocomplete="off" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Vínculo con la persona</mat-label>
+            <mat-select id="pc-agr-vinculo" formControlName="vinculo">
+              <mat-option value="">Sin dato</mat-option>
+              @for (v of vinculosCatalogo(); track v.codigo) {
+                <mat-option [value]="v.codigo">{{ v.etiqueta }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>¿Conviven?</mat-label>
+            <mat-select id="pc-agr-convivencia" formControlName="convivencia">
+              <mat-option value="">Sin dato</mat-option>
+              <mat-option value="SI">Sí</mat-option>
+              <mat-option value="NO">No</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <mat-form-field appearance="outline">
+          <mat-label>Observaciones</mat-label>
+          <textarea matInput id="pc-agr-observaciones" formControlName="observaciones" rows="3" autocomplete="off"></textarea>
+          @if (error('agresor', 'observaciones', 'Las observaciones'); as e) { <mat-error>{{ e }}</mat-error> }
+        </mat-form-field>
+        <div class="pc__botones">
+          <button type="button" class="boton boton--secundario" (click)="irA(3)">Anterior</button>
+          <button type="button" class="boton boton--primario" (click)="irA(5)">Siguiente</button>
+        </div>
+      </div>
+    </mat-step>
+
+    <!-- 6. Acuerdos y próximo control -->
+    <mat-step label="Acuerdos y control">
+      <div class="pc__paso" [formGroup]="acuerdos">
+        <mat-form-field appearance="outline">
+          <mat-label>Acuerdos con la persona</mat-label>
+          <textarea matInput id="pc-acu-acuerdos" formControlName="acuerdos" rows="4" autocomplete="off"></textarea>
+          <mat-hint>Lo que la persona decidió hacer y lo que ofrece Línea Alma.</mat-hint>
+          @if (error('acuerdos', 'acuerdos', 'Los acuerdos'); as e) { <mat-error>{{ e }}</mat-error> }
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="pc__fecha">
+          <mat-label>Próximo control</mat-label>
+          <input matInput type="datetime-local" id="pc-acu-proximoControl" formControlName="proximoControl" />
+          <mat-hint>Fecha y hora acordadas. El sistema enviará el recordatorio por correo si hay uno registrado.</mat-hint>
+          @if (error('acuerdos', 'proximoControl', 'El próximo control'); as e) { <mat-error>{{ e }}</mat-error> }
+        </mat-form-field>
+
+        @if (requiereDecision() && casoActivo(); as caso) {
+          <fieldset class="pc__fieldset pc__decision">
+            <legend>La persona ya tiene un caso activo</legend>
+            <p>
+              Caso <strong>{{ caso.numeroCaso }}</strong>
+              @if (caso.profesional) { · a cargo de {{ caso.profesional }} }
+              @if (caso.proximoControl) { · próximo control {{ caso.proximoControl | date: 'd MMM, h:mm a' }} }.
+              El sistema no vincula por su cuenta (RN-ALMA-06): decida qué hacer con esta atención.
+            </p>
+            <mat-radio-group [value]="decisionCaso()" (change)="decisionCaso.set($event.value)" [disabled]="soloLectura()" aria-label="Qué hacer con el caso activo">
+              <mat-radio-button value="VINCULAR">Vincular esta atención al caso {{ caso.numeroCaso }} (mismos hechos)</mat-radio-button>
+              <mat-radio-button value="CASO_NUEVO">Abrir un caso nuevo (hechos distintos)</mat-radio-button>
+            </mat-radio-group>
+          </fieldset>
+        }
+
+        <div class="pc__botones">
+          <button type="button" class="boton boton--secundario" (click)="irA(4)">Anterior</button>
+          @if (!soloLectura()) {
+            <button type="button" class="boton boton--primario" [disabled]="enviando()" (click)="guardar()">
+              {{ enviando() ? 'Guardando…' : 'Guardar y crear el caso' }}
+            </button>
+          }
+        </div>
+      </div>
+    </mat-step>
+  </mat-stepper>
+</section>
