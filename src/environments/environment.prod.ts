@@ -28,7 +28,7 @@ export const environment = {
    */
   datosDemostracion: false,
   /**
-   * Módulo Línea Alma (submódulo APH): servicios simulados mientras Backend
+   * Módulo Línea Alma (submódulos APH y Psicología): servicios simulados mientras Backend
    * publica los contratos de `docs/contratos/linea-alma/`. Un interruptor por
    * grupo de endpoints (`mocks/alma-mock.interceptor.ts`): al publicarse uno,
    * se pone en `false` **sin tocar componentes** (H-3.4). Los datos son
@@ -43,7 +43,13 @@ export const environment = {
       derivaciones: false,
       bandejaAph: false,
       contenciones: false,
-      auditoria: false
+      auditoria: false,
+      // Psicología (contratos en `docs/contratos/linea-alma/contrato-psicologia-*.md`).
+      bandejaPsicologia: false,
+      novedades: false,
+      casos: false,
+      agenda: false,
+      recontactos: false
     }
   },
   features: {

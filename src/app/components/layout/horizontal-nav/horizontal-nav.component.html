@@ -114,6 +114,13 @@
         <span class="hnav-text">Remisiones recibidas</span>
       </a>
     }
+    <!-- Psicología: despliegue controlado por rol (`ROLES_HABILITADOS_PSICOLOGIA`, hoy solo ADMIN) -->
+    @if (alma.psicologiaHabilitada()) {
+      <a mat-button routerLink="/linea-alma/psicologia/bandeja" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
+        <mat-icon class="hnav-icon" aria-hidden="true">psychology</mat-icon>
+        <span class="hnav-text">Bandeja de Psicología</span>
+      </a>
+    }
 
     <!-- 4. UAD (Equipos 3 y 4 - Funcionarios) -->
     @if (!auth.isUsuario() && !auth.isGestorContenido() && !auth.isTecnicoAph()) {
@@ -341,6 +348,13 @@
           class="hnav-mobile-item" (click)="closeMobileMenu()">
           <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">forward_to_inbox</mat-icon>
           <span class="hnav-mobile-item__text">Remisiones recibidas</span>
+        </a>
+      }
+      @if (alma.psicologiaHabilitada()) {
+        <a routerLink="/linea-alma/psicologia/bandeja" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+          class="hnav-mobile-item" (click)="closeMobileMenu()">
+          <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">psychology</mat-icon>
+          <span class="hnav-mobile-item__text">Bandeja de Psicología</span>
         </a>
       }
 

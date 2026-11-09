@@ -40,7 +40,17 @@ const MENSAJES_POR_CODIGO: Record<string, string> = {
   ATENCION_INCOMPLETA: 'Faltan datos para continuar. Revise los campos marcados.',
   RUTAS_PENDIENTES: 'Aún hay rutas externas en curso. Ciérrelas o registre su resultado antes de cerrar la atención.',
   PSICOLOGIA_PENDIENTE: 'La atención está en la cola de Psicología, por eso no se puede cerrar desde aquí.',
-  PERSONA_SIN_CASO_CERRADO: 'No encontramos un caso cerrado para esta persona, por eso no se puede registrar la contención.'
+  PERSONA_SIN_CASO_CERRADO: 'No encontramos un caso cerrado para esta persona, por eso no se puede registrar la contención.',
+  // Psicología (J-1.x; contrato `contrato-psicologia-*.md`).
+  NOVEDAD_NO_TOMADA: 'Para registrar acciones sobre esta novedad primero debe tomarla desde la bandeja.',
+  NOVEDAD_CERRADA: 'Esta novedad ya no está pendiente: no admite nuevas acciones.',
+  INTENTOS_AGOTADOS: 'Ya se registraron los 9 intentos del protocolo. El sistema cerró la novedad por «No contacto».',
+  CASO_ACTIVO_EXISTENTE: 'La persona ya tiene un caso activo. Confirme si desea vincular esta atención o abrir un caso nuevo.',
+  CASO_CERRADO: 'El caso está cerrado y no admite cambios. Si la persona vuelve a comunicarse, registre una contención después del cierre.',
+  CASO_NO_ENCONTRADO: 'No encontramos el caso. Revise el número o vuelva a la bandeja.',
+  NOVEDAD_NO_ENCONTRADA: 'No encontramos la novedad. Es posible que todavía no haya sido derivada a Psicología.',
+  RECONTACTO_YA_RESUELTO: 'Este recontacto ya fue resuelto. Actualizamos la lista.',
+  PDF_NO_DISPONIBLE: 'El PDF del caso todavía no está disponible. Intente de nuevo en unos minutos.'
 };
 
 const MENSAJES_POR_ESTADO: Record<number, string> = {

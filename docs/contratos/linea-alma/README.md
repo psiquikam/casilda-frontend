@@ -18,6 +18,8 @@
 | `README.md` (este) | Guía para proponer contratos (H-0.4), plantilla, convenciones, permisos, interruptores, decisiones. |
 | `contrato-aph-atenciones.md` | `GET /personas/consulta` (F2), `/atenciones-aph` (crear, leer, actualizar, triaje, derivar a Psicología F1/F3, cierre). |
 | `contrato-aph-derivaciones-bandeja-contencion.md` | Derivaciones internas, rutas externas (F6), bandeja APH, tomar remisión, contención post-cierre, auditoría, catálogos. |
+| `contrato-psicologia-bandeja-novedades.md` | **Psicología (Jonathan):** bandeja con SLA, notificaciones, tomar/liberar, detalle de la novedad, intentos (1–9), primer contacto (`CAS-…`). Decisiones D-PSI-01…11. |
+| `contrato-psicologia-casos-seguimientos-recontactos.md` | **Psicología (Jonathan):** expediente, seguimientos, cierre, PDF, agenda y recontactos. Decisiones D-PSI-12…19. |
 
 Fuentes: `docs/plan-implementacion-front-linea-alma.md` (plan, Anexo A) y
 `docs/levantamiento-requerimientos-linea-alma.md`. Skill aplicado: `.claude/skills/contrato-backend/SKILL.md`.
@@ -79,7 +81,9 @@ Verificado en `shared/http/alma-error.ts` (`MENSAJES_POR_CODIGO`): `CONSENTIMIEN
 `RUTAS_PENDIENTES`, `PSICOLOGIA_PENDIENTE`, `PERSONA_SIN_CASO_CERRADO`. Para `400`/`422` con otro código se muestra el
 `mensaje` del servidor (por eso debe estar en español y no culpabilizar). `5xx` muestra un texto genérico.
 **Los códigos `VALIDACION`, `ATENCION_INCOMPLETA`, `ATENCION_NO_ENCONTRADA`, `RUTA_NO_ENCONTRADA`,
-`CATALOGO_NO_ENCONTRADO` los usa el mock** (`mocks/aph.handlers.ts`) y se proponen como estándar.
+`CATALOGO_NO_ENCONTRADO` los usa el mock** (`mocks/aph.handlers.ts`) y se proponen como estándar. Psicología añade
+`NOVEDAD_NO_TOMADA`, `NOVEDAD_CERRADA`, `NOVEDAD_NO_ENCONTRADA`, `INTENTOS_AGOTADOS`, `CASO_ACTIVO_EXISTENTE`,
+`CASO_CERRADO`, `CASO_NO_ENCONTRADO`, `RECONTACTO_YA_RESUELTO` y `PDF_NO_DISPONIBLE` (ya traducidos).
 
 ## 4. Matriz de roles y permisos (verificado en `shared/permisos/alma-permisos.ts`)
 
@@ -115,6 +119,11 @@ Rutas del front: `/linea-alma/aph/{nueva, remisiones, atenciones/:idAtencion}` (
 | `bandejaAph` | `/bandeja/aph`, `…/tomar` | derivaciones-bandeja-contencion |
 | `contenciones` | `/contenciones-post-cierre` | derivaciones-bandeja-contencion |
 | `auditoria` | `GET /auditoria` | derivaciones-bandeja-contencion |
+| `bandejaPsicologia` | `GET /bandeja/psicologia`, `/psicologia/notificaciones`, `…/tomar`, `…/liberar` | psicologia-bandeja-novedades |
+| `novedades` | `GET /psicologia/novedades/{id}`, `…/intentos`, `…/primer-contacto` | psicologia-bandeja-novedades |
+| `casos` | `/casos/{n}`, `…/seguimientos`, `…/cierre`, `…/pdf` | psicologia-casos-seguimientos-recontactos |
+| `agenda` | `GET /psicologia/agenda` | psicologia-casos-seguimientos-recontactos |
+| `recontactos` | `GET /psicologia/recontactos`, `…/resolucion` | psicologia-casos-seguimientos-recontactos |
 
 ## 6. Fronteras con Psicología
 
@@ -126,6 +135,11 @@ Rutas del front: `/linea-alma/aph/{nueva, remisiones, atenciones/:idAtencion}` (
 | F5 | Consentimiento (`otorgado`, `medio`, `fechaRegistro`; **+ `versionTexto`**) | atenciones §4, derivaciones |
 | F6 | Derivaciones/rutas y contención reutilizables con `contexto = { tipo, id }` | derivaciones-bandeja-contencion |
 | F7 | Concurrencia y errores (`version`, 409) | este README §3 |
+
+Desde Psicología (consumidor): F1 y F3 en la bandeja (`bandeja-psicologia`), F2 en recontactos
+(`contrato-psicologia-casos-seguimientos-recontactos.md` §3.6), F4/F5 en el primer contacto, F6 en el expediente
+(`PanelDerivaciones` con contexto `CASO`). Los códigos de error de Psicología que el front traduce están en
+`alma-error.ts` y se listan en §6 de cada contrato de Psicología.
 
 ## 7. Registro de decisiones y pendientes (D-ALMA-*)
 

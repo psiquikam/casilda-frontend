@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment';
 import { AuthService } from '../../services/auth.service';
 import { AlmaApiClient } from '../shared/http/alma-api.client';
 import { RUTAS_MOCK_APH } from './aph.handlers';
+import { RUTAS_MOCK_PSICOLOGIA } from './psicologia.handlers';
 import { almaMockStore } from './alma-mock-store';
 import { GrupoMockAlma, PeticionMock, RutaMock } from './alma-mock-tipos';
 
@@ -16,10 +17,10 @@ import { GrupoMockAlma, PeticionMock, RutaMock } from './alma-mock-tipos';
  * normalmente (H-3.4: pasar APH a «real» es cambiar banderas, no código). Lo que ningún
  * manejador conoce también sale a red, para no esconder un endpoint real con un 404 inventado.
  *
- * Cada submódulo suma sus rutas aquí: `RUTAS_MOCK_APH` (Hinara) y, cuando exista,
+ * Cada submódulo suma sus rutas aquí: `RUTAS_MOCK_APH` (Hinara, `aph.handlers.ts`) y
  * `RUTAS_MOCK_PSICOLOGIA` (Jonathan, `psicologia.handlers.ts`).
  */
-const TODAS_LAS_RUTAS: readonly RutaMock[] = [...RUTAS_MOCK_APH];
+const TODAS_LAS_RUTAS: readonly RutaMock[] = [...RUTAS_MOCK_APH, ...RUTAS_MOCK_PSICOLOGIA];
 
 const LATENCIA_MS = 250;
 

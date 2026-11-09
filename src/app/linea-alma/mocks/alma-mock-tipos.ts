@@ -2,13 +2,20 @@ import { AlmaMockStore } from './alma-mock-store';
 
 /** Grupos de endpoints con interruptor mock/real propio (`environment.lineaAlma.mocks`). */
 export type GrupoMockAlma =
+  // APH (Hinara)
   | 'catalogos'
   | 'personas'
   | 'atencionesAph'
   | 'derivaciones'
   | 'bandejaAph'
   | 'contenciones'
-  | 'auditoria';
+  | 'auditoria'
+  // Psicología (Jonathan)
+  | 'bandejaPsicologia'
+  | 'novedades'
+  | 'casos'
+  | 'agenda'
+  | 'recontactos';
 
 export interface PeticionMock {
   readonly metodo: string;

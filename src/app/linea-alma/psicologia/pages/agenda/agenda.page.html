@@ -1,0 +1,76 @@
+<div class="agenda">
+  <header class="agenda__cabecera">
+    <div>
+      <h1 class="agenda__titulo">Mi agenda — Línea Alma</h1>
+      <p class="agenda__intro">Controles programados con las personas de sus casos activos.</p>
+    </div>
+    <a class="boton boton--secundario" routerLink="/linea-alma/psicologia/bandeja">
+      <mat-icon aria-hidden="true">inbox</mat-icon>
+      Ir a la bandeja
+    </a>
+  </header>
+
+  @if (demo) {
+    <p class="casilda-alerta casilda-alerta--precaucion" role="note">
+      <mat-icon aria-hidden="true">science</mat-icon>
+      <span><strong>Datos de demostración.</strong> Los servicios de Línea Alma están simulados.</span>
+    </p>
+  }
+
+  <form class="agenda__filtros" (ngSubmit)="cargar()" aria-label="Rango de la agenda">
+    <mat-form-field appearance="outline">
+      <mat-label>Desde</mat-label>
+      <input matInput type="date" name="desde" [ngModel]="desde()" (ngModelChange)="desde.set($event)" />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Hasta</mat-label>
+      <input matInput type="date" name="hasta" [ngModel]="hasta()" (ngModelChange)="hasta.set($event)" />
+    </mat-form-field>
+    @if (puedeVerTodos()) {
+      <mat-form-field appearance="outline">
+        <mat-label>Alcance</mat-label>
+        <mat-select name="alcance" [ngModel]="alcance()" (ngModelChange)="alcance.set($event)">
+          <mat-option value="mios">Mis casos</mat-option>
+          <mat-option value="todos">Todo el equipo</mat-option>
+        </mat-select>
+      </mat-form-field>
+    }
+    <div class="agenda__botones">
+      <button type="submit" class="boton boton--primario">Consultar</button>
+    </div>
+  </form>
+
+  @if (cargando()) {
+    <p role="status" aria-busy="true">Cargando la agenda…</p>
+  } @else if (error()) {
+    <div class="casilda-alerta casilda-alerta--peligro" role="alert">
+      <mat-icon aria-hidden="true">error_outline</mat-icon>
+      <div>
+        <p>No pudimos cargar la agenda.</p>
+        <button type="button" class="boton boton--secundario" (click)="cargar()">Intentar de nuevo</button>
+      </div>
+    </div>
+  } @else if (vacio()) {
+    <p class="agenda__vacio">No hay controles programados en este rango.</p>
+  } @else {
+    <ol class="agenda__lista" aria-label="Controles programados, del más próximo al más lejano">
+      @for (item of items(); track item.numeroCaso + item.proximoControl) {
+        <li class="agenda__item" [class.agenda__item--hoy]="esHoy(item.proximoControl)" [class.agenda__item--vencido]="vencido(item.proximoControl)">
+          <p class="agenda__fecha">
+            <mat-icon aria-hidden="true">{{ vencido(item.proximoControl) ? 'event_busy' : 'event' }}</mat-icon>
+            <strong>{{ item.proximoControl | date: "EEEE d 'de' MMMM, h:mm a" }}</strong>
+            @if (esHoy(item.proximoControl)) { <span class="agenda__hoy">Hoy</span> }
+            @if (vencido(item.proximoControl)) { <span class="agenda__hoy">Pendiente de registrar</span> }
+          </p>
+          <p class="agenda__persona">{{ item.nombreCompleto }} · control {{ controles(item) }}@if (item.profesional) { · {{ item.profesional }} }</p>
+          @if (item.recordatorio; as r) {
+            <p class="agenda__recordatorio">{{ etiquetaRecordatorio[r.estado] }}</p>
+          }
+          <a class="boton boton--secundario" [routerLink]="['/linea-alma/psicologia/casos', item.numeroCaso]">
+            Abrir el caso {{ item.numeroCaso }}
+          </a>
+        </li>
+      }
+    </ol>
+  }
+</div>

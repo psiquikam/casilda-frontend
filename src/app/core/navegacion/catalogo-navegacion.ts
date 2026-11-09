@@ -164,6 +164,32 @@ export const CATALOGO_MODULOS: readonly ModuloCasilda[] = [
     roles: ['COORDINADOR', 'TECNICO_APH', 'REVISOR'],
     seccion: 'Línea Alma'
   },
+  // Psicología (Línea Alma): despliegue controlado. Los roles deben coincidir con
+  // `ROLES_HABILITADOS_PSICOLOGIA` (`linea-alma/psicologia/psicologia-habilitacion.ts`), hoy solo ADMIN.
+  {
+    id: 'alma-psicologia-bandeja',
+    nombre: 'Bandeja de Psicología',
+    icono: 'psychology',
+    ruta: '/linea-alma/psicologia/bandeja',
+    roles: ['ADMIN'],
+    seccion: 'Línea Alma'
+  },
+  {
+    id: 'alma-psicologia-recontactos',
+    nombre: 'Recontactos',
+    icono: 'event_repeat',
+    ruta: '/linea-alma/psicologia/recontactos',
+    roles: ['ADMIN'],
+    seccion: 'Línea Alma'
+  },
+  {
+    id: 'alma-psicologia-agenda',
+    nombre: 'Mi agenda',
+    icono: 'event_note',
+    ruta: '/linea-alma/psicologia/agenda',
+    roles: ['ADMIN'],
+    seccion: 'Línea Alma'
+  },
 
   // --- Reportes y métricas ---
   {

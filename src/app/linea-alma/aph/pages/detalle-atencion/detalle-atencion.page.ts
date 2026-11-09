@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { environment } from '../../../../../environments/environment';
 import { NotificacionService } from '../../../../core/a11y/notificacion.service';
+import { AlertaGestionSimultaneaComponent } from '../../../shared/components/alerta-gestion-simultanea/alerta-gestion-simultanea.component';
 import { AuditTrailComponent } from '../../../shared/components/audit-trail/audit-trail.component';
 import { ContencionPostCierreFormComponent } from '../../../shared/components/contencion-post-cierre-form/contencion-post-cierre-form.component';
 import { NotasTimelineComponent } from '../../../shared/components/notas-timeline/notas-timeline.component';
@@ -34,6 +35,7 @@ import { PersonasAlmaService } from '../../services/personas-alma.service';
     DatePipe,
     RouterLink,
     MatIconModule,
+    AlertaGestionSimultaneaComponent,
     AuditTrailComponent,
     CierreAtencionComponent,
     ContencionPostCierreFormComponent,
