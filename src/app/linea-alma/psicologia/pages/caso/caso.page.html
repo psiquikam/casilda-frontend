@@ -1,0 +1,173 @@
+<div class="caso">
+  <a class="caso__volver" routerLink="/linea-alma/psicologia/bandeja">
+    <mat-icon aria-hidden="true">arrow_back</mat-icon>
+    Volver a la bandeja
+  </a>
+
+  @if (demo) {
+    <p class="casilda-alerta casilda-alerta--precaucion" role="note">
+      <mat-icon aria-hidden="true">science</mat-icon>
+      <span><strong>Datos de demostración.</strong> Los servicios de Línea Alma están simulados.</span>
+    </p>
+  }
+
+  @if (cargando()) {
+    <p role="status" aria-busy="true">Cargando el expediente…</p>
+  } @else if (error(); as e) {
+    <div class="casilda-alerta casilda-alerta--peligro" role="alert">
+      <mat-icon aria-hidden="true">error_outline</mat-icon>
+      <div>
+        <h1 class="caso__titulo caso__titulo--error">No pudimos abrir el expediente</h1>
+        <p>{{ e.mensaje }}</p>
+        @if (e.tipo !== 'no-encontrado' && e.tipo !== 'sin-permiso') {
+          <button type="button" class="boton boton--secundario" (click)="cargar()">Intentar de nuevo</button>
+        }
+      </div>
+    </div>
+  } @else if (caso(); as c) {
+    <header class="caso__cabecera">
+      <div>
+        <h1 class="caso__titulo">Caso {{ c.numeroCaso }}</h1>
+        <p class="caso__sub">{{ c.nombreCompleto }} · {{ c.persona.tipoIdentificacion }} {{ c.persona.numeroIdentificacion }}</p>
+      </div>
+      <div class="caso__estado">
+        <span class="caso__chip" [class.caso__chip--cerrado]="c.estado === 'CERRADO'">
+          <mat-icon aria-hidden="true">{{ c.estado === 'CERRADO' ? 'lock' : 'flag' }}</mat-icon> {{ etiquetaEstado[c.estado] }}
+        </span>
+        <span class="caso__chip">Prioridad {{ etiquetaPrioridad[c.prioridad] }}</span>
+        @if (puedeExportarPdf()) {
+          <button type="button" class="boton boton--secundario" [disabled]="descargandoPdf() || !c.pdfDisponible" (click)="descargarPdf()">
+            <mat-icon aria-hidden="true">picture_as_pdf</mat-icon>
+            {{ descargandoPdf() ? 'Generando PDF…' : 'Descargar PDF' }}
+          </button>
+        }
+        @if (puedeCerrar()) {
+          <button type="button" class="boton boton--emergencia" [disabled]="bloqueo.ocupado()" (click)="abrirCierre()">
+            <mat-icon aria-hidden="true">lock</mat-icon>
+            Cerrar el caso
+          </button>
+        }
+      </div>
+    </header>
+
+    <app-alerta-gestion-simultanea [activa]="c.gestionSimultanea" [numeroCaso]="c.numeroCaso" />
+
+    @if (c.cierre; as cierre) {
+      <div class="casilda-alerta" role="status">
+        <mat-icon aria-hidden="true">lock</mat-icon>
+        <div>
+          <p class="caso__fuerte">Caso cerrado el {{ cierre.fecha | date: "d 'de' MMMM 'de' y, h:mm a" }} por {{ cierre.autor }}.</p>
+          <p>Motivo: {{ etiquetaMotivoCierre() ?? cierre.motivo }}.@if (cierre.observacion) { {{ ' ' + cierre.observacion }} }</p>
+          <p>El expediente es de solo lectura. Si la persona vuelve a comunicarse, se registra una contención después del cierre sin reabrirlo.</p>
+        </div>
+      </div>
+    } @else if (c.estado === 'EN_CIERRE') {
+      <p class="casilda-alerta casilda-alerta--precaucion" role="status">
+        <mat-icon aria-hidden="true">info</mat-icon>
+        <span>En el último seguimiento la persona indicó que no desea continuar. Puede cerrar el caso con un motivo del catálogo o seguir registrando seguimientos si vuelve a comunicarse.</span>
+      </p>
+    }
+
+    <section class="caso__bloque" aria-labelledby="caso-datos">
+      <h2 id="caso-datos">Datos del caso</h2>
+      <dl class="caso__datos">
+        <div><dt>Apertura</dt><dd>{{ c.fechaApertura | date: 'd MMM y, h:mm a' }}</dd></div>
+        <div><dt>Profesional a cargo</dt><dd>{{ c.profesional ?? 'Sin asignar' }}</dd></div>
+        <div><dt>Próximo control</dt><dd>{{ c.proximoControl ? (c.proximoControl | date: 'd MMM y, h:mm a') : 'Sin programar' }}</dd></div>
+        <div><dt>Teléfono</dt><dd>{{ c.persona.telefonoPrincipal ?? 'Sin dato' }}</dd></div>
+        <div><dt>Correo</dt><dd>{{ c.persona.correoPersonal ?? 'Sin dato' }}</dd></div>
+        <div><dt>Ciudad</dt><dd>{{ c.persona.ciudad ?? 'Sin dato' }}</dd></div>
+        <div>
+          <dt>Consentimiento verbal</dt>
+          <dd>@if (c.consentimiento; as con) { Registrado el {{ con.fechaRegistro | date: 'd MMM y, h:mm a' }} } @else { Sin registro }</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="caso__bloque" aria-labelledby="caso-riesgo">
+      <h2 id="caso-riesgo">Riesgo</h2>
+      <p class="caso__nota">Se conservan las dos valoraciones: la clínica de Psicología no modifica el triaje de APH (RN-ALMA-04).</p>
+      <dl class="caso__datos">
+        <div><dt>Triaje de APH</dt><dd>{{ c.triajeAph ? etiquetaTriaje[c.triajeAph] : 'Omitido por peligro inminente' }}</dd></div>
+        <div><dt>Valoración clínica de Psicología</dt><dd>{{ c.valoracionRiesgo ? etiquetaRiesgo[c.valoracionRiesgo.nivel] : 'Sin valoración' }}</dd></div>
+        @if (c.valoracionRiesgo?.descripcion; as d) { <div class="caso__ancho"><dt>Descripción</dt><dd>{{ d }}</dd></div> }
+        <div class="caso__ancho">
+          <dt>Dimensiones de salud mental</dt>
+          <dd>
+            @if (etiquetasDimensiones().length === 0) { Sin clasificar } @else {
+              <ul class="caso__lista-inline">
+                @for (d of etiquetasDimensiones(); track d) { <li>{{ d }}</li> }
+              </ul>
+            }
+          </dd>
+        </div>
+        @if (c.acuerdos; as a) { <div class="caso__ancho"><dt>Acuerdos</dt><dd>{{ a }}</dd></div> }
+      </dl>
+    </section>
+
+    <section class="caso__bloque" aria-labelledby="caso-agresor">
+      <h2 id="caso-agresor">Presunto agresor</h2>
+      @if (c.presuntoAgresor; as a) {
+        <dl class="caso__datos">
+          <div><dt>Nombres</dt><dd>{{ a.nombres ?? 'Sin dato' }}</dd></div>
+          <div><dt>Apellidos</dt><dd>{{ a.apellidos ?? 'Sin dato' }}</dd></div>
+          <div><dt>Vínculo</dt><dd>{{ etiquetaVinculo() ?? 'Sin dato' }}</dd></div>
+          <div><dt>Conviven</dt><dd>{{ a.convivencia === null ? 'Sin dato' : a.convivencia ? 'Sí' : 'No' }}</dd></div>
+          @if (a.observaciones) { <div class="caso__ancho"><dt>Observaciones</dt><dd>{{ a.observaciones }}</dd></div> }
+        </dl>
+      } @else {
+        <p class="caso__nota">No se registró información del presunto agresor.</p>
+      }
+    </section>
+
+    <section class="caso__bloque" aria-labelledby="caso-atenciones">
+      <h2 id="caso-atenciones">Atenciones APH vinculadas</h2>
+      <div class="caso__tabla-contenedor">
+        <table class="caso__tabla" aria-label="Atenciones APH vinculadas al caso">
+          <thead>
+            <tr>
+              <th scope="col">Código</th>
+              <th scope="col">Registrada</th>
+              <th scope="col">Triaje</th>
+              <th scope="col">Estado</th>
+              <th scope="col">Motivo de consulta</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (a of c.atenciones; track a.idAtencion) {
+              <tr>
+                <th scope="row" class="caso__codigo">
+                  @if (puedeVerAph()) {
+                    <a [routerLink]="['/linea-alma/aph/atenciones', a.idAtencion]">{{ a.idAtencion }}</a>
+                  } @else { {{ a.idAtencion }} }
+                </th>
+                <td>{{ a.fechaCreacion | date: 'd MMM y, h:mm a' }}</td>
+                <td>{{ a.triaje ? etiquetaTriaje[a.triaje] : 'Omitido' }}</td>
+                <td>{{ etiquetaEstadoAtencion[a.estado] }}</td>
+                <td>{{ a.motivoConsulta ?? 'Sin registrar' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="caso__bloque" aria-labelledby="seg-titulo">
+      <app-seguimientos [caso]="c" [soloLectura]="!puedeEditar()" (actualizado)="actualizado($event)" (conflicto)="tras409()" (solicitarCierre)="puedeCerrar() && abrirCierre()" />
+    </section>
+
+    <section class="caso__bloque" aria-labelledby="caso-notas">
+      <h2 id="caso-notas">Línea de tiempo</h2>
+      <app-notas-timeline [notas]="c.notas" [tiposVisibles]="tiposNota" />
+    </section>
+
+    <section class="caso__bloque" aria-labelledby="caso-rutas">
+      <h2 id="caso-rutas" class="visually-hidden">Derivaciones y rutas del caso</h2>
+      <app-panel-derivaciones [contexto]="contexto()" [consentimiento]="c.consentimiento" [soloLectura]="!puedeEditar()" (cambio)="versionAuditoria.set(versionAuditoria() + 1)" />
+    </section>
+
+    <section class="caso__bloque" aria-labelledby="audit-titulo">
+      <app-audit-trail [contexto]="contexto()" [version]="versionAuditoria()" />
+    </section>
+  }
+</div>

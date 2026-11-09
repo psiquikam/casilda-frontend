@@ -150,7 +150,7 @@
     }
 
     <!-- 3. LÍNEA ALMA (Admin, Coordinador, Profesional, Técnico APH y Revisor; cada enlace según su permiso) -->
-    @if (alma.tieneAlguno(['alma.aph.crear', 'alma.aph.bandeja', 'alma.psicologia.consultar']) || auth.isProfesional()) {
+    @if (alma.tieneAlguno(['alma.aph.crear', 'alma.aph.bandeja']) || alma.psicologiaHabilitada() || auth.isProfesional()) {
       <div class="nav-section">
         <button type="button" id="toggle-alma" class="section-toggle" (click)="toggleSection('alma')"
           [attr.aria-expanded]="isExpanded('alma')" aria-controls="section-alma">
@@ -182,10 +182,21 @@
                 <span class="nav-item__text">Remisiones recibidas</span>
               </a>
             }
-            @if (alma.tiene('alma.psicologia.consultar')) {
+            <!-- Psicología: despliegue controlado por rol (`ROLES_HABILITADOS_PSICOLOGIA`, hoy solo ADMIN) -->
+            @if (alma.psicologiaHabilitada()) {
               <a routerLink="/linea-alma/psicologia/bandeja" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
                 <mat-icon class="nav-item__icon" aria-hidden="true">psychology</mat-icon>
                 <span class="nav-item__text">Bandeja de Psicología</span>
+              </a>
+              @if (alma.tiene('alma.notasClinicas.consultar')) {
+                <a routerLink="/linea-alma/psicologia/recontactos" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
+                  <mat-icon class="nav-item__icon" aria-hidden="true">event_repeat</mat-icon>
+                  <span class="nav-item__text">Recontactos</span>
+                </a>
+              }
+              <a routerLink="/linea-alma/psicologia/agenda" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
+                <mat-icon class="nav-item__icon" aria-hidden="true">event_note</mat-icon>
+                <span class="nav-item__text">Mi agenda</span>
               </a>
             }
           </div>

@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { AuthService, ROLES_CASILDA } from '../../../services/auth.service';
+import { psicologiaHabilitadaPara } from '../../psicologia/psicologia-habilitacion';
 import { PermisoAlma, permisosDeRoles } from './alma-permisos';
 
 /**
@@ -21,5 +22,13 @@ export class AlmaPermisosService {
   tieneAlguno(permisos: readonly PermisoAlma[]): boolean {
     const efectivos = permisosDeRoles(this.rolesActivos());
     return permisos.some((permiso) => efectivos.has(permiso));
+  }
+
+  /**
+   * El submódulo Psicología está en despliegue controlado (`ROLES_HABILITADOS_PSICOLOGIA`): menú y
+   * guard lo muestran solo a los roles habilitados **y** con permiso de consulta.
+   */
+  psicologiaHabilitada(): boolean {
+    return psicologiaHabilitadaPara(this.rolesActivos()) && this.tiene('alma.psicologia.consultar');
   }
 }

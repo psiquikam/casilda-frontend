@@ -1,0 +1,111 @@
+<div class="rec">
+  <header class="rec__cabecera">
+    <div>
+      <h1 class="rec__titulo">Recontactos por resolver — Línea Alma</h1>
+      <p class="rec__intro">
+        Personas con un caso activo que volvieron a comunicarse con APH. Cada llamada genera una atención nueva y el sistema nunca la vincula
+        por su cuenta: la decisión es de Psicología.
+      </p>
+    </div>
+    <a class="boton boton--secundario" routerLink="/linea-alma/psicologia/bandeja">
+      <mat-icon aria-hidden="true">inbox</mat-icon>
+      Ir a la bandeja
+    </a>
+  </header>
+
+  @if (demo) {
+    <p class="casilda-alerta casilda-alerta--precaucion" role="note">
+      <mat-icon aria-hidden="true">science</mat-icon>
+      <span><strong>Datos de demostración.</strong> Los servicios de Línea Alma están simulados.</span>
+    </p>
+  }
+
+  @if (cargando()) {
+    <p role="status" aria-busy="true">Cargando los recontactos…</p>
+  } @else if (error()) {
+    <div class="casilda-alerta casilda-alerta--peligro" role="alert">
+      <mat-icon aria-hidden="true">error_outline</mat-icon>
+      <div>
+        <p>No pudimos cargar los recontactos.</p>
+        <button type="button" class="boton boton--secundario" (click)="cargar()">Intentar de nuevo</button>
+      </div>
+    </div>
+  } @else if (vacio()) {
+    <p class="rec__vacio">No hay recontactos pendientes de decisión.</p>
+  } @else {
+    <div class="rec__cuerpo">
+      <nav class="rec__lista" aria-label="Recontactos pendientes">
+        <ul>
+          @for (r of items(); track r.idAtencion) {
+            <li>
+              <button type="button" class="rec__item" [class.rec__item--activo]="r.idAtencion === seleccionadoId()" [attr.aria-current]="r.idAtencion === seleccionadoId() ? 'true' : null" (click)="seleccionar(r.idAtencion)">
+                <span class="rec__item-codigo">{{ r.idAtencion }}</span>
+                <span class="rec__item-persona">{{ r.persona.nombreCompleto }}</span>
+                <span class="rec__item-sub">{{ r.fechaCreacion | date: 'd MMM, h:mm a' }} · caso {{ r.casoActivo.numeroCaso }}</span>
+              </button>
+            </li>
+          }
+        </ul>
+      </nav>
+
+      @if (seleccionado(); as r) {
+        <section class="rec__detalle" aria-labelledby="rec-detalle-titulo">
+          <h2 id="rec-detalle-titulo" class="rec__subtitulo">{{ r.persona.nombreCompleto }} · {{ r.persona.tipoIdentificacion }} {{ r.persona.numeroIdentificacion }}</h2>
+
+          <div class="rec__comparativa">
+            <article class="rec__columna" aria-labelledby="rec-nueva">
+              <h3 id="rec-nueva"><mat-icon aria-hidden="true">add_ic_call</mat-icon> Atención nueva {{ r.idAtencion }}</h3>
+              <dl>
+                <div><dt>Registrada</dt><dd>{{ r.fechaCreacion | date: 'd MMM y, h:mm a' }}</dd></div>
+                <div><dt>Canal</dt><dd>{{ etiquetaCanal[r.canalIngreso] }}</dd></div>
+                <div><dt>Triaje de APH</dt><dd>{{ r.triaje ? etiquetaTriaje[r.triaje] : 'Omitido por peligro inminente' }}</dd></div>
+                <div><dt>Motivo de consulta</dt><dd>{{ r.motivoConsulta ?? 'Sin registrar' }}</dd></div>
+                <div><dt>Nota de APH</dt><dd>{{ r.notaAph ?? 'Sin nota' }}</dd></div>
+              </dl>
+            </article>
+            <article class="rec__columna rec__columna--caso" aria-labelledby="rec-caso">
+              <h3 id="rec-caso"><mat-icon aria-hidden="true">folder_shared</mat-icon> Caso activo {{ r.casoActivo.numeroCaso }}</h3>
+              <dl>
+                <div><dt>Abierto</dt><dd>{{ r.casoActivo.fechaApertura | date: 'd MMM y' }}</dd></div>
+                <div><dt>Estado</dt><dd>{{ etiquetaEstadoCaso[r.casoActivo.estado] }}</dd></div>
+                <div><dt>Profesional a cargo</dt><dd>{{ r.casoActivo.profesional ?? 'Sin asignar' }}</dd></div>
+                <div><dt>Controles</dt><dd>{{ controles(r.casoActivo.numeroSeguimientos) }}</dd></div>
+                <div><dt>Próximo control</dt><dd>{{ r.casoActivo.proximoControl ? (r.casoActivo.proximoControl | date: 'd MMM y, h:mm a') : 'Sin programar' }}</dd></div>
+                <div><dt>Última nota</dt><dd>{{ r.casoActivo.ultimaNota ?? 'Sin notas' }}</dd></div>
+              </dl>
+              <a class="boton boton--secundario" [routerLink]="['/linea-alma/psicologia/casos', r.casoActivo.numeroCaso]">Abrir el expediente</a>
+            </article>
+          </div>
+
+          @if (puedeResolver()) {
+            <form class="rec__form" [formGroup]="form" (ngSubmit)="resolver()" novalidate aria-labelledby="rec-decision-titulo">
+              <h3 id="rec-decision-titulo">¿Qué hacer con esta atención?</h3>
+              <mat-radio-group class="rec__decisiones" formControlName="decision" aria-label="Decisión sobre el recontacto">
+                @for (d of decisiones; track d) {
+                  <mat-radio-button [value]="d">
+                    <span class="rec__decision-titulo">{{ etiquetaDecision[d] }}</span>
+                    <span class="rec__decision-texto">{{ explicacion[d] }}</span>
+                  </mat-radio-button>
+                }
+              </mat-radio-group>
+              @if (error_('decision', 'La decisión'); as e) { <p class="rec__error" role="alert">{{ e }}</p> }
+
+              <mat-form-field appearance="outline">
+                <mat-label>Nota de la decisión</mat-label>
+                <textarea matInput id="rec-nota" formControlName="nota" rows="3" autocomplete="off"></textarea>
+                <mat-hint>Por qué se toma esta decisión. Queda en el historial del caso y de la atención.</mat-hint>
+                @if (error_('nota', 'La nota'); as e) { <mat-error>{{ e }}</mat-error> }
+              </mat-form-field>
+
+              <div>
+                <button type="submit" class="boton boton--primario" [disabled]="enviando()">{{ enviando() ? 'Guardando…' : 'Confirmar decisión' }}</button>
+              </div>
+            </form>
+          } @else {
+            <p class="rec__vacio">Su perfil puede consultar los recontactos, pero la decisión corresponde a Psicología.</p>
+          }
+        </section>
+      }
+    </div>
+  }
+</div>
