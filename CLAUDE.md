@@ -32,6 +32,7 @@ Documentos de referencia, en orden de precedencia para decisiones de diseño:
 | `docs/contratos/DECISIONES_PROVISIONALES_VBG.md` | 19 decisiones de contenido/comportamiento pendientes de validar con el equipo clínico/legal; permiten demostrar el módulo mientras se confirma la versión oficial. |
 | `docs/contratos/contrato-contenidos-home.md` | Contrato del endpoint público `GET {apiBaseUrl}/contenidos/home` y del CRUD de administración del gestor de contenidos del home. |
 | `docs/contratos/contrato-reportar-caso.md` | Contrato pendiente con Backend para crear reportes desde `/reportar-caso` y el reporte anónimo (DTO, código CAS, validaciones, maestros, decisiones D1–D7). Conectado desde el 2026-11-06 (`ReporteCasoService`); D5 sigue abierta. |
+| `docs/contratos/linea-alma/` | Contratos para Backend del submódulo APH de Línea Alma (`README.md` con guía, plantilla y decisiones D-ALMA-01…13; atenciones/triaje/derivación; derivaciones, bandeja, contención y auditoría). Plan: `docs/plan-implementacion-front-linea-alma.md`. |
 | `.claude/skills/contrato-backend/SKILL.md` | Skill para redactar contratos de API para Backend a partir del código del front. ⚠️ **Solo local**: misma regla `skills/` de `.gitignore` (ver pendiente 11). |
 
 ## 2. Stack y comandos
@@ -384,7 +385,25 @@ ya tenía el endpoint público en `main` y desplegado en QA.
   `/inicio` en autenticado). Los `validationErrors` se marcan en su control y llevan al paso afectado.
 - **Colateral:** el selector de campus guardaba el `nombre`; ahora guarda el `id` que espera `campusId`.
 
+### 2026-11-06 — Línea Alma, submódulo APH (tareas de Hinara del plan)
+Plan: `docs/plan-implementacion-front-linea-alma.md`; contratos: `docs/contratos/linea-alma/`. Rama
+`feature/alma-aph/H-aph-linea-alma`. Código en `src/app/linea-alma/` (`aph/`, `psicologia/` stubs, `shared/`, `mocks/`).
+
+- **Fase 0 (H-0.1…0.4):** rol `TECNICO_APH` en `AuthService`; matriz de permisos pura (`shared/permisos/`) con
+  `almaPermisoGuard` y menús; `AlmaApiClient` + `interpretarErrorAlma` (mensajes no revictimizantes); servidor
+  simulado como interceptor (`mocks/`), con **interruptor por grupo** en `environment.lineaAlma.mocks` (`true` en
+  desarrollo, `false` en prod) y seed del Anexo B; rutas `/linea-alma/aph/*` y stubs de `/linea-alma/psicologia/*`.
+- **APH (H-1.1…H-3.1):** registro por pasos con consulta por documento y alerta de seguimiento (F2), triaje manual u
+  omisión por peligro inminente, consentimiento y derivación a Psicología (F1/F5), `PanelDerivaciones` (F6),
+  bandeja de remisiones con toma y 409, cierre, contención post-cierre, detalle y `AuditTrail`.
+- **Provisionales de Jonathan** (marcados en su cabecera): `shared/types/alma.types.ts`, `CatalogosAlmaService`,
+  `NotasTimelineComponent`. Su versión prevalece al llegar.
+- **Sin hacer:** H-2.2 (integración con Psicología), H-3.3 (revisión de textos con el equipo) y H-3.4 (cambio a
+  servicios reales) dependen de otras personas o de Backend. La ruta antigua `/linea-alma/atencion-pr` no se tocó.
+
 ### Pendiente
+0. **Línea Alma APH:** Backend debe revisar los contratos (decisiones D-ALMA-01…13, p. ej. código del rol
+   `TECNICO_APH`); validar textos y catálogos placeholder (Q6, Q9); decidir si se retira `atencion-pr`.
 1. Accesibilidad — tareas abiertas priorizadas en
    `docs/evidencias/accesibilidad/plan_accesibilidad.md` §6: fases 0.1/0.2/0.4 (axe,
    Lighthouse, recorrido con teclado), 2.4 (conectar `ResumenErroresComponent` a

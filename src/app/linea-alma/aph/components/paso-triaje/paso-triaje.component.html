@@ -1,0 +1,54 @@
+<section class="triaje" aria-labelledby="triaje-titulo">
+  <h3 id="triaje-titulo" class="triaje__titulo">Triaje</h3>
+  <p class="triaje__intro">
+    Seleccione el nivel que le dio la herramienta de triaje. Aquí no se calcula ni se sugiere: solo se registra.
+  </p>
+
+  <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+    <mat-radio-group formControlName="opcion" class="triaje__opciones" aria-labelledby="triaje-titulo" [disabled]="soloLectura()">
+      @for (t of triajes; track t) {
+        <mat-radio-button [value]="t" class="triaje__opcion">
+          <span class="triaje__nivel">{{ etiquetas[t] }}</span>
+          <span class="triaje__ayuda">Psicología debe hacer el primer contacto en un máximo de {{ horas[t] }} horas.</span>
+        </mat-radio-button>
+      }
+      <mat-radio-button value="OMITIR" class="triaje__opcion triaje__opcion--peligro">
+        <span class="triaje__nivel">Peligro inminente para la vida</span>
+        <span class="triaje__ayuda">Permite omitir el triaje. Exige explicar el motivo y habilita activar a SPyB o a la Línea 123 de inmediato.</span>
+      </mat-radio-button>
+    </mat-radio-group>
+    @if (error('opcion', 'el triaje'); as e) {
+      <p class="triaje__error" role="alert">Seleccione el triaje o registre el peligro inminente para continuar.</p>
+    }
+
+    @if (omitiendo()) {
+      <mat-form-field appearance="outline" class="triaje__justificacion">
+        <mat-label>Justificación de la omisión</mat-label>
+        <textarea matInput id="triaje-justificacion" formControlName="justificacion" rows="4" autocomplete="off"></textarea>
+        <mat-hint>Describa la situación que obliga a actuar sin triaje (mínimo 10 caracteres).</mat-hint>
+        @if (error('justificacion', 'la justificación'); as e) { <mat-error>{{ e }}</mat-error> }
+      </mat-form-field>
+    }
+
+    @if (!soloLectura()) {
+      <button type="submit" class="boton boton--primario" [disabled]="enviando()">
+        {{ omitiendo() ? 'Registrar omisión del triaje' : 'Guardar triaje' }}
+      </button>
+    }
+  </form>
+
+  @if (peligroRegistrado()) {
+    <div class="casilda-alerta casilda-alerta--precaucion" role="status">
+      <mat-icon aria-hidden="true">priority_high</mat-icon>
+      <span>
+        El triaje quedó omitido por peligro inminente. Active ahora la ruta que corresponda. Para derivar a
+        Psicología deberá registrar el triaje después.
+      </span>
+    </div>
+    <app-panel-derivaciones
+      [contexto]="{ tipo: 'ATENCION_APH', id: atencion().idAtencion }"
+      [peligroInminente]="true"
+      [soloLectura]="soloLectura()"
+    />
+  }
+</section>

@@ -1,0 +1,140 @@
+<div class="detalle">
+  <a class="detalle__volver" routerLink="/linea-alma/aph/remisiones">
+    <mat-icon aria-hidden="true">arrow_back</mat-icon>
+    Volver a la bandeja
+  </a>
+
+  @if (demo) {
+    <p class="casilda-alerta casilda-alerta--precaucion" role="note">
+      <mat-icon aria-hidden="true">science</mat-icon>
+      <span><strong>Datos de demostración.</strong> Los servicios de Línea Alma están simulados.</span>
+    </p>
+  }
+
+  @if (cargando()) {
+    <p role="status" aria-busy="true">Cargando la atención…</p>
+  } @else if (error(); as e) {
+    <div class="casilda-alerta casilda-alerta--peligro" role="alert">
+      <mat-icon aria-hidden="true">error_outline</mat-icon>
+      <div>
+        <h1 class="detalle__titulo detalle__titulo--error">No pudimos abrir la atención</h1>
+        <p>{{ e.mensaje }}</p>
+        @if (e.tipo !== 'no-encontrado' && e.tipo !== 'sin-permiso') {
+          <button type="button" class="boton boton--secundario" (click)="cargar()">Intentar de nuevo</button>
+        }
+      </div>
+    </div>
+  } @else if (atencion(); as a) {
+    <header class="detalle__cabecera">
+      <div>
+        <h1 class="detalle__titulo">Atención {{ a.idAtencion }}</h1>
+        <p class="detalle__sub">{{ nombreCompleto(a) }} · {{ a.persona.tipoIdentificacion }} {{ a.persona.numeroIdentificacion }}</p>
+      </div>
+      <div class="detalle__estado">
+        <span class="detalle__chip"><mat-icon aria-hidden="true">flag</mat-icon> {{ etiquetaEstado[a.estado] }}</span>
+        @if (puedeEditar()) {
+          <a class="boton boton--primario" routerLink="/linea-alma/aph/nueva" [queryParams]="{ atencion: a.idAtencion }">Continuar el registro</a>
+        }
+      </div>
+    </header>
+
+    @if (a.gestionSimultanea) {
+      <!-- Provisional: la reemplaza AlertaGestionSimultanea (J-1.8, dueño: Jonathan). -->
+      <p class="casilda-alerta casilda-alerta--precaucion" role="status">
+        <mat-icon aria-hidden="true">sync_alt</mat-icon>
+        <span><strong>Gestión en simultáneo.</strong> Este caso tiene actuaciones activas en Equipo de Atención y en Línea Alma.</span>
+      </p>
+    }
+
+    @if (a.estado === 'PENDIENTE_PSICOLOGIA' && a.sla; as sla) {
+      <p class="casilda-alerta" [class.casilda-alerta--peligro]="vencido()" role="status">
+        <mat-icon aria-hidden="true">{{ vencido() ? 'alarm_off' : 'schedule' }}</mat-icon>
+        <span>
+          @if (vencido()) {
+            El plazo de primer contacto de {{ sla.horasLimite }} horas ya venció. Psicología sigue sin tomarla.
+          } @else {
+            Psicología debe hacer el primer contacto antes del {{ sla.venceEn | date: "EEEE d 'de' MMMM, h:mm a" }} ({{ sla.horasLimite }} horas).
+          }
+        </span>
+      </p>
+    }
+
+    <section class="detalle__bloque" aria-labelledby="det-datos">
+      <h2 id="det-datos">Datos de la atención</h2>
+      <dl class="detalle__datos">
+        <div><dt>Canal de ingreso</dt><dd>{{ etiquetaCanal[a.canalIngreso] }}</dd></div>
+        @if (a.origenRemision; as o) { <div><dt>Origen de la remisión</dt><dd>{{ etiquetaOrigen[o] }}</dd></div> }
+        <div><dt>Registrada</dt><dd>{{ a.fechaCreacion | date: 'd MMM y, h:mm a' }}</dd></div>
+        <div><dt>Atiende</dt><dd>{{ a.tomadaPor ?? 'Sin asignar' }}</dd></div>
+        <div><dt>Teléfono</dt><dd>{{ a.persona.telefonoPrincipal ?? 'Sin dato' }}</dd></div>
+        <div><dt>Correo</dt><dd>{{ a.persona.correoPersonal ?? 'Sin dato' }}</dd></div>
+        <div><dt>Ciudad</dt><dd>{{ a.persona.ciudad ?? 'Sin dato' }}</dd></div>
+        <div><dt>Estrato</dt><dd>{{ a.persona.estrato ?? 'Sin dato' }}</dd></div>
+        @if (a.solicitante?.esTercero) {
+          <div><dt>Quien se comunicó</dt><dd>{{ a.solicitante?.nombres }} {{ a.solicitante?.apellidos }} (otra persona)</dd></div>
+        }
+        <div class="detalle__ancho"><dt>Motivo de consulta</dt><dd>{{ a.motivoConsulta ?? 'Sin registrar' }}</dd></div>
+      </dl>
+    </section>
+
+    <section class="detalle__bloque" aria-labelledby="det-triaje">
+      <h2 id="det-triaje">Triaje</h2>
+      @if (a.triaje; as t) {
+        <p>Triaje <strong>{{ etiquetaTriaje[t] }}</strong>.</p>
+      } @else if (a.omisionTriaje; as o) {
+        <p><strong>Triaje omitido por peligro inminente.</strong> {{ o.justificacion }}</p>
+      } @else {
+        <p class="detalle__vacio">Todavía no se ha registrado el triaje.</p>
+      }
+      @if (a.consentimiento; as c) {
+        <p class="detalle__vacio">
+          Consentimiento {{ c.medio === 'VERBAL' ? 'verbal' : 'digital' }} registrado el {{ c.fechaRegistro | date: 'd MMM y, h:mm a' }}.
+        </p>
+      }
+    </section>
+
+    <section class="detalle__bloque" aria-labelledby="det-notas">
+      <h2 id="det-notas">Notas de APH</h2>
+      <app-notas-timeline [notas]="a.notas" />
+    </section>
+
+    @if (casoCerrado(); as numeroCaso) {
+      <section class="detalle__bloque" aria-labelledby="det-contencion">
+        <app-contencion-post-cierre-form
+          [idAtencion]="a.idAtencion"
+          [numeroCaso]="numeroCaso"
+          [deshabilitado]="!puedeEditar()"
+          (contencionRegistrada)="cargar()"
+        />
+      </section>
+    }
+
+    <section class="detalle__bloque" aria-labelledby="det-rutas">
+      <app-panel-derivaciones
+        [contexto]="contexto()"
+        [consentimiento]="a.consentimiento"
+        [peligroInminente]="!!a.omisionTriaje"
+        [soloLectura]="!puedeEditar()"
+        (cambio)="alCambiarRutas($event)"
+      />
+    </section>
+
+    @if (puedeCerrar()) {
+      <section class="detalle__bloque" aria-labelledby="det-cierre">
+        <app-cierre-atencion [atencion]="a" [bloqueo]="bloqueoCierre()" (cerrada)="tras($event)" (conflicto)="tras409()" />
+      </section>
+    } @else if (a.cierre; as cierre) {
+      <section class="detalle__bloque" aria-labelledby="det-cierre-info">
+        <h2 id="det-cierre-info">Cierre</h2>
+        <p>La atención se cerró el {{ cierre.fecha | date: 'd MMM y, h:mm a' }}.</p>
+        @if (cierre.observacion) { <p>{{ cierre.observacion }}</p> }
+      </section>
+    }
+
+    @if (permisos.tiene('alma.aph.consultar')) {
+      <section class="detalle__bloque" aria-labelledby="audit-titulo">
+        <app-audit-trail [contexto]="contexto()" [version]="versionAuditoria()" />
+      </section>
+    }
+  }
+</div>

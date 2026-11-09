@@ -96,16 +96,27 @@
       </mat-menu>
     }
 
-    <!-- 3. Línea Alma (Admin, Coordinador y Profesional) -->
+    <!-- 3. Línea Alma: Admin, Coordinador y Profesional entran por «Primer respondiente»; el Técnico APH y el Revisor por su propia pantalla -->
     @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional()) {
       <a mat-button routerLink="/linea-alma/atencion-pr" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
         <mat-icon class="hnav-icon" aria-hidden="true">ring_volume</mat-icon>
         <span class="hnav-text">Línea Alma</span>
       </a>
+    } @else if (alma.tiene('alma.aph.crear')) {
+      <a mat-button routerLink="/linea-alma/aph/nueva" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
+        <mat-icon class="hnav-icon" aria-hidden="true">add_ic_call</mat-icon>
+        <span class="hnav-text">Nueva atención</span>
+      </a>
+    }
+    @if (alma.tiene('alma.aph.bandeja')) {
+      <a mat-button routerLink="/linea-alma/aph/remisiones" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
+        <mat-icon class="hnav-icon" aria-hidden="true">forward_to_inbox</mat-icon>
+        <span class="hnav-text">Remisiones recibidas</span>
+      </a>
     }
 
     <!-- 4. UAD (Equipos 3 y 4 - Funcionarios) -->
-    @if (!auth.isUsuario() && !auth.isGestorContenido()) {
+    @if (!auth.isUsuario() && !auth.isGestorContenido() && !auth.isTecnicoAph()) {
       <button type="button" class="hnav-dropdown-btn" [matMenuTriggerFor]="uadMenu"
         aria-label="Abrir menú de UAD">
         <mat-icon class="hnav-icon" aria-hidden="true">balance</mat-icon>
@@ -138,7 +149,7 @@
     }
 
     <!-- 6. Ruta Violeta (Transversal para funcionarios) -->
-    @if (features.publicTrackingPrototype && !auth.isUsuario() && !auth.isGestorContenido()) {
+    @if (features.publicTrackingPrototype && !auth.isUsuario() && !auth.isGestorContenido() && !auth.isTecnicoAph()) {
       <a routerLink="/seguimiento" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
         <mat-icon class="hnav-icon" aria-hidden="true">diversity_1</mat-icon>
         <span class="hnav-text">Ruta Violeta</span>
@@ -317,8 +328,24 @@
         </a>
       }
 
+      <!-- Línea Alma (Técnico APH y Revisor; los demás roles la ven arriba) -->
+      @if (alma.tiene('alma.aph.crear')) {
+        <a routerLink="/linea-alma/aph/nueva" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+          class="hnav-mobile-item" (click)="closeMobileMenu()">
+          <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">add_ic_call</mat-icon>
+          <span class="hnav-mobile-item__text">Nueva atención</span>
+        </a>
+      }
+      @if (alma.tiene('alma.aph.bandeja')) {
+        <a routerLink="/linea-alma/aph/remisiones" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+          class="hnav-mobile-item" (click)="closeMobileMenu()">
+          <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">forward_to_inbox</mat-icon>
+          <span class="hnav-mobile-item__text">Remisiones recibidas</span>
+        </a>
+      }
+
       <!-- 4. UAD (Funcionarios) -->
-      @if (!auth.isUsuario() && !auth.isGestorContenido()) {
+      @if (!auth.isUsuario() && !auth.isGestorContenido() && !auth.isTecnicoAph()) {
         <div class="hnav-mobile-group">
           <button type="button" class="hnav-mobile-group-header" (click)="toggleSection('uad')"
             [attr.aria-expanded]="isSectionExpanded('uad')">
@@ -362,7 +389,7 @@
       }
 
       <!-- 6. Ruta Violeta -->
-      @if (features.publicTrackingPrototype && !auth.isUsuario() && !auth.isGestorContenido()) {
+      @if (features.publicTrackingPrototype && !auth.isUsuario() && !auth.isGestorContenido() && !auth.isTecnicoAph()) {
         <a routerLink="/seguimiento" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
           class="hnav-mobile-item" (click)="closeMobileMenu()">
           <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">diversity_1</mat-icon>

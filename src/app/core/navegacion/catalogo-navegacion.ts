@@ -148,6 +148,22 @@ export const CATALOGO_MODULOS: readonly ModuloCasilda[] = [
     roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL'],
     seccion: 'Línea Alma'
   },
+  {
+    id: 'alma-aph-nueva',
+    nombre: 'Nueva atención',
+    icono: 'add_ic_call',
+    ruta: '/linea-alma/aph/nueva',
+    roles: ['COORDINADOR', 'TECNICO_APH'],
+    seccion: 'Línea Alma'
+  },
+  {
+    id: 'alma-aph-remisiones',
+    nombre: 'Remisiones recibidas',
+    icono: 'forward_to_inbox',
+    ruta: '/linea-alma/aph/remisiones',
+    roles: ['COORDINADOR', 'TECNICO_APH', 'REVISOR'],
+    seccion: 'Línea Alma'
+  },
 
   // --- Reportes y métricas ---
   {

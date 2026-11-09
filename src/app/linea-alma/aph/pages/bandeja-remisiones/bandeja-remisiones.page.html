@@ -1,0 +1,169 @@
+<div class="bandeja">
+  <header class="bandeja__cabecera">
+    <div>
+      <h1 class="bandeja__titulo">Remisiones recibidas — Línea Alma</h1>
+      <p class="bandeja__intro">
+        Solicitudes que llegan del Equipo de Atención, de Seguridad a Personas y Bienes y de la Unidad de Asuntos Disciplinarios,
+        y el estado de sus atenciones.
+      </p>
+    </div>
+    @if (permisos.tiene('alma.aph.crear')) {
+      <a class="boton boton--primario" routerLink="/linea-alma/aph/nueva">
+        <mat-icon aria-hidden="true">add_ic_call</mat-icon>
+        Nueva atención
+      </a>
+    }
+  </header>
+
+  @if (demo) {
+    <p class="casilda-alerta casilda-alerta--precaucion" role="note">
+      <mat-icon aria-hidden="true">science</mat-icon>
+      <span><strong>Datos de demostración.</strong> Los servicios de Línea Alma están simulados.</span>
+    </p>
+  }
+
+  <div class="bandeja__vistas" role="group" aria-label="Vista de la bandeja">
+    <button
+      type="button"
+      class="bandeja__vista"
+      [class.bandeja__vista--activa]="vista() === 'remisiones'"
+      [attr.aria-pressed]="vista() === 'remisiones'"
+      (click)="cambiarVista('remisiones')"
+    >
+      Remisiones recibidas
+    </button>
+    <button
+      type="button"
+      class="bandeja__vista"
+      [class.bandeja__vista--activa]="vista() === 'mias'"
+      [attr.aria-pressed]="vista() === 'mias'"
+      (click)="cambiarVista('mias')"
+    >
+      Mis atenciones
+    </button>
+  </div>
+
+  <div class="bandeja__filtros">
+    @if (vista() === 'remisiones') {
+      <mat-form-field appearance="outline">
+        <mat-label>Origen</mat-label>
+        <mat-select [ngModel]="origen()" (ngModelChange)="origen.set($event); filtrar()">
+          <mat-option value="">Todos los orígenes</mat-option>
+          @for (o of origenes; track o) {
+            <mat-option [value]="o">{{ etiquetaOrigen[o] }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    } @else {
+      <mat-form-field appearance="outline">
+        <mat-label>Estado</mat-label>
+        <mat-select [ngModel]="estado()" (ngModelChange)="estado.set($event); filtrar()">
+          <mat-option value="">Todos los estados</mat-option>
+          @for (e of estadosFiltro; track e) {
+            <mat-option [value]="e">{{ etiquetaEstado[e] }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    }
+  </div>
+
+  <div aria-live="polite" class="visually-hidden">
+    @if (!cargando() && !error()) { {{ total() }} resultados. }
+  </div>
+
+  @if (cargando()) {
+    <p role="status" aria-busy="true">Cargando…</p>
+  } @else if (error()) {
+    <div class="casilda-alerta casilda-alerta--peligro" role="alert">
+      <mat-icon aria-hidden="true">error_outline</mat-icon>
+      <div>
+        <p>No pudimos cargar la bandeja.</p>
+        <button type="button" class="boton boton--secundario" (click)="cargar()">Intentar de nuevo</button>
+      </div>
+    </div>
+  } @else if (vacio()) {
+    <p class="bandeja__vacio">
+      @if (vista() === 'remisiones') { No hay remisiones pendientes por ahora. } @else { Todavía no hay atenciones para mostrar con estos filtros. }
+    </p>
+  } @else {
+    <div class="bandeja__tabla-contenedor">
+      <table class="bandeja__tabla" [attr.aria-label]="vista() === 'remisiones' ? 'Remisiones recibidas' : 'Mis atenciones'">
+        <thead>
+          <tr>
+            <th scope="col">Código</th>
+            <th scope="col">Persona</th>
+            <th scope="col">{{ vista() === 'remisiones' ? 'Origen' : 'Canal' }}</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Resumen</th>
+            <th scope="col">Estado</th>
+            <th scope="col"><span class="visually-hidden">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of items(); track item.idAtencion) {
+            <tr>
+              <th scope="row" class="bandeja__codigo">{{ item.idAtencion }}</th>
+              <td>
+                {{ item.persona.nombreCompleto }}
+                <span class="bandeja__sub">{{ item.persona.tipoIdentificacion }} {{ item.persona.numeroIdentificacion }}</span>
+              </td>
+              <td>
+                @if (item.origenRemision; as o) { {{ etiquetaOrigen[o] }} } @else { {{ etiquetaCanal[item.canalIngreso] }} }
+              </td>
+              <td>{{ item.fechaRemision | date: 'd MMM y, h:mm a' }}</td>
+              <td class="bandeja__resumen">{{ item.resumen || 'Sin resumen' }}</td>
+              <td>
+                {{ etiquetaEstado[item.estado] }}
+                @if (item.triaje) { <span class="bandeja__sub">Triaje {{ etiquetaTriaje[item.triaje] }}</span> }
+                @if (item.sla; as sla) {
+                  <span class="bandeja__sla" [class.bandeja__sla--vencido]="vencido(item)">
+                    <mat-icon aria-hidden="true">{{ vencido(item) ? 'alarm_off' : 'schedule' }}</mat-icon>
+                    @if (vencido(item)) { Plazo de primer contacto vencido } @else { Primer contacto hasta {{ sla.venceEn | date: 'd MMM, h:mm a' }} }
+                  </span>
+                }
+              </td>
+              <td>
+                @if (vista() === 'remisiones') {
+                  @if (permisos.tiene('alma.aph.editar')) {
+                    <button
+                      type="button"
+                      class="boton boton--primario"
+                      [disabled]="tomando() !== null"
+                      (click)="tomar(item)"
+                    >
+                      {{ tomando() === item.idAtencion ? 'Tomando…' : 'Tomar remisión' }}
+                      <span class="visually-hidden"> {{ item.idAtencion }}</span>
+                    </button>
+                  } @else {
+                    <a class="boton boton--secundario" [routerLink]="['/linea-alma/aph/atenciones', item.idAtencion]">
+                      Ver <span class="visually-hidden"> {{ item.idAtencion }}</span>
+                    </a>
+                  }
+                } @else {
+                  @if (retomable(item) && permisos.tiene('alma.aph.editar')) {
+                    <a class="boton boton--secundario" routerLink="/linea-alma/aph/nueva" [queryParams]="{ atencion: item.idAtencion }">
+                      Retomar <span class="visually-hidden"> {{ item.idAtencion }}</span>
+                    </a>
+                  } @else {
+                    <a class="boton boton--secundario" [routerLink]="['/linea-alma/aph/atenciones', item.idAtencion]">
+                      Ver detalle <span class="visually-hidden"> de {{ item.idAtencion }}</span>
+                    </a>
+                  }
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <mat-paginator
+      [length]="total()"
+      [pageSize]="tamano"
+      [pageIndex]="pagina()"
+      [hidePageSize]="true"
+      (page)="cambiarPagina($event)"
+      aria-label="Páginas de la bandeja"
+    />
+  }
+</div>
