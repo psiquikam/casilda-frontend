@@ -38,13 +38,7 @@
       </div>
     </header>
 
-    @if (a.gestionSimultanea) {
-      <!-- Provisional: la reemplaza AlertaGestionSimultanea (J-1.8, dueño: Jonathan). -->
-      <p class="casilda-alerta casilda-alerta--precaucion" role="status">
-        <mat-icon aria-hidden="true">sync_alt</mat-icon>
-        <span><strong>Gestión en simultáneo.</strong> Este caso tiene actuaciones activas en Equipo de Atención y en Línea Alma.</span>
-      </p>
-    }
+    <app-alerta-gestion-simultanea [activa]="a.gestionSimultanea" [numeroCaso]="a.numeroCaso" />
 
     @if (a.estado === 'PENDIENTE_PSICOLOGIA' && a.sla; as sla) {
       <p class="casilda-alerta" [class.casilda-alerta--peligro]="vencido()" role="status">
