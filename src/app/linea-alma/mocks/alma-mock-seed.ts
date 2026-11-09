@@ -32,7 +32,7 @@ export const PERSONAS_SEMILLA: PersonaSemilla[] = [
 
 const HORA = 3_600_000;
 
-interface ParametrosAtencion {
+export interface ParametrosAtencion {
   numero: number;
   documento: string;
   nombres: string;
@@ -49,7 +49,8 @@ interface ParametrosAtencion {
   numeroCaso?: string | null;
 }
 
-function atencion(ahora: Date, p: ParametrosAtencion): AtencionAphDto {
+/** Fábrica de atenciones de prueba. La reutiliza el seed de Psicología (`psicologia-mock-seed.ts`). */
+export function atencion(ahora: Date, p: ParametrosAtencion): AtencionAphDto {
   const creada = new Date(ahora.getTime() - (p.horasDesdeCreacion ?? p.horasDesdeDerivacion ?? 2) * HORA).toISOString();
   const derivada =
     p.horasDesdeDerivacion !== undefined

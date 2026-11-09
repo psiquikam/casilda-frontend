@@ -58,8 +58,8 @@ describe('almaMockInterceptor (interruptor mock/real por grupo)', () => {
   }));
 
   it('una ruta que ningún manejador conoce sale a red (no se esconde con un 404 inventado)', () => {
-    api.get('/bandeja/psicologia').subscribe();
-    http.expectOne(`${AlmaApiClient.PREFIJO}/bandeja/psicologia`).flush({});
+    api.get('/psicologia/telepsiquiatria').subscribe();
+    http.expectOne(`${AlmaApiClient.PREFIJO}/psicologia/telepsiquiatria`).flush({});
   });
 
   it('los errores del mock llegan traducidos al modelo estándar', fakeAsync(() => {
@@ -82,7 +82,10 @@ describe('almaMockInterceptor (interruptor mock/real por grupo)', () => {
   it('no se declara ningún interruptor en `true` en el entorno de producción por defecto', () => {
     // El archivo `environment.ts` es de desarrollo; esta prueba documenta que todos los grupos existen.
     expect(Object.keys(original).sort()).toEqual(
-      ['atencionesAph', 'auditoria', 'bandejaAph', 'catalogos', 'contenciones', 'derivaciones', 'personas'].sort()
+      [
+        'atencionesAph', 'auditoria', 'bandejaAph', 'catalogos', 'contenciones', 'derivaciones', 'personas',
+        'bandejaPsicologia', 'novedades', 'casos', 'agenda', 'recontactos'
+      ].sort()
     );
   });
 
