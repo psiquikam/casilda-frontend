@@ -5,12 +5,14 @@ import { ItemCatalogo, NombreCatalogo } from '../types/alma.types';
 
 /**
  * Lectura de catálogos de Línea Alma por nombre, con caché por sesión (`GET /catalogos/{nombre}`).
+ * Equivale al `useCatalogo(nombre)` del plan (J-0.2, dueño: Jonathan). **Único punto** por el que
+ * APH y Psicología leen catálogos (plan §10.2): así dos pantallas nunca ven valores distintos
+ * para el mismo catálogo.
  *
- * **PROVISIONAL — dueño: Jonathan (J-0.2, `useCatalogo`).** Este servicio cubre lo que APH
- * necesita (destinos, rutas, motivos de cierre, consentimiento) con la misma forma de
- * contrato; cuando J-0.2 llegue, su versión lo reemplaza sin cambiar a los consumidores
- * (`obtener(nombre)`). Solo se leen **activos**: un catálogo caído no se enmascara con una
- * lista inventada (el error llega a la pantalla, que lo muestra con reintento).
+ * Solo se exponen los ítems **activos**. Un catálogo caído no se enmascara con una lista
+ * inventada: el error llega a la pantalla, que lo muestra con reintento (`invalidar()` antes).
+ * Los catálogos placeholder (Q6, p. ej. «Dimensión 1…15») viven en el mock; reemplazarlos por los
+ * oficiales del Backend es transparente para los consumidores.
  */
 @Injectable({ providedIn: 'root' })
 export class CatalogosAlmaService {
@@ -42,4 +44,11 @@ export class CatalogosAlmaService {
 export function etiquetaDe(items: readonly ItemCatalogo[] | null | undefined, codigo: string | null | undefined): string {
   if (!codigo) return '';
   return items?.find((item) => item.codigo === codigo)?.etiqueta ?? codigo;
+}
+
+/** Etiquetas de varios códigos, en el orden del catálogo (los desconocidos van al final con su código). */
+export function etiquetasDe(items: readonly ItemCatalogo[] | null | undefined, codigos: readonly string[]): string[] {
+  const conocidos = (items ?? []).filter((item) => codigos.includes(item.codigo)).map((item) => item.etiqueta);
+  const desconocidos = codigos.filter((codigo) => !(items ?? []).some((item) => item.codigo === codigo));
+  return [...conocidos, ...desconocidos];
 }

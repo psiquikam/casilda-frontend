@@ -33,6 +33,11 @@ export class AlmaApiClient {
     return this.http.patch<T>(this.url(ruta), cuerpo).pipe(this.traducir());
   }
 
+  /** Descarga binaria (p. ej. `GET /casos/{n}/pdf`, J-1.6). El servidor responde el archivo; la UI lo ofrece para guardar. */
+  descargar(ruta: string, parametros?: ParametrosAlma): Observable<Blob> {
+    return this.http.get(this.url(ruta), { params: this.params(parametros), responseType: 'blob' }).pipe(this.traducir<Blob>());
+  }
+
   private url(ruta: string): string {
     return `${AlmaApiClient.PREFIJO}${ruta.startsWith('/') ? ruta : `/${ruta}`}`;
   }
