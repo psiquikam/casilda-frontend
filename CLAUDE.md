@@ -3,8 +3,8 @@
 > Archivo vivo. Se actualiza al cerrar cada fase de trabajo para que cualquier
 > sesión posterior (humana o asistida) retome sin repetir el análisis.
 >
-> **Última actualización:** 9 de noviembre de 2026 (Línea Alma, submódulo Psicología: tareas de Jonathan del plan;
-> antes, submódulo APH y reporte anónimo conectado a `POST /reportes`)
+> **Última actualización:** 11 de noviembre de 2026 (reporte de caso: contrato v2 completo, evidencias y catálogos;
+> antes, Línea Alma Psicología y APH)
 
 ---
 
@@ -31,7 +31,8 @@ Documentos de referencia, en orden de precedencia para decisiones de diseño:
 | `docs/contratos/GLOSARIO_VBG.md` | Glosario de términos del módulo Equipo de Atención, con la columna del rol Usuario. |
 | `docs/contratos/DECISIONES_PROVISIONALES_VBG.md` | 19 decisiones de contenido/comportamiento pendientes de validar con el equipo clínico/legal; permiten demostrar el módulo mientras se confirma la versión oficial. |
 | `docs/contratos/contrato-contenidos-home.md` | Contrato del endpoint público `GET {apiBaseUrl}/contenidos/home` y del CRUD de administración del gestor de contenidos del home. |
-| `docs/contratos/contrato-reportar-caso.md` | Contrato pendiente con Backend para crear reportes desde `/reportar-caso` y el reporte anónimo (DTO, código CAS, validaciones, maestros, decisiones D1–D7). Conectado desde el 2026-11-06 (`ReporteCasoService`); D5 sigue abierta. |
+| `docs/contratos/contrato-reportar-caso.md` | Contrato con Backend para crear reportes desde `/reportar-caso` y el reporte anónimo. El §0 (2026-11-11) recoge el contrato v2 implementado (víctima, contacto, presunto agresor, evidencias multipart, maestros) y los pendientes P-REP-01…05. |
+| `docs/contratos/contrato-consultar-reporte.md` | Propuesta de `GET /reportes/{codigo}` para «Seguimiento de trámite». Hoy no existe ningún endpoint de consulta por código. |
 | `docs/contratos/linea-alma/` | Contratos para Backend de Línea Alma: APH (`README.md` con guía, plantilla y decisiones D-ALMA-01…13; atenciones/triaje/derivación; derivaciones, bandeja, contención y auditoría) y **Psicología** (`contrato-psicologia-bandeja-novedades.md`, `contrato-psicologia-casos-seguimientos-recontactos.md`, decisiones D-PSI-01…19). Plan: `docs/plan-implementacion-front-linea-alma.md`. |
 | `.claude/skills/contrato-backend/SKILL.md` | Skill para redactar contratos de API para Backend a partir del código del front. ⚠️ **Solo local**: misma regla `skills/` de `.gitignore` (ver pendiente 11). |
 
@@ -436,6 +437,28 @@ Plan: `docs/plan-implementacion-front-linea-alma.md` §5 y §7; contratos: `docs
 - **Sin hacer:** J-2.2 (demo E2E con Hinara), J-3.3 (cambio a servicios reales) dependen de Backend/otra persona; pruebas
   de componentes de página (hay pruebas de dominio, mocks, SLA, borrador, bloqueo, habilitación y componentes compartidos).
 
+### 2026-11-11 — Reporte de caso: contrato v2 completo, evidencias y catálogos del servidor
+Rama `fix/06/019/casilda/ajustes-reportar-caso`. Backend ya expone en `main` y en QA el contrato v2 de
+`POST /reportes` (bloques `tipoReportante`, `victima`, `contacto`, `presuntoAgresor` y `multipart/form-data`
+con parte `evidencias`); el front solo enviaba documento, fecha de nacimiento, lugar, relato y ruta (pendiente 15).
+
+- **`ReporteCasoService`:** DTO v2, `crear(dto, evidencias)` (JSON sin archivos, multipart con ellos),
+  `validarEvidencias()` con los límites del servidor (5 archivos, 10 MB c/u, 25 MB, PDF/JPG/PNG/MP4/MOV/3GP),
+  y las reglas compartidas con el servidor `esOpcionOtro()` («¿Cuál?» solo si el vínculo se llama «Otro») y
+  `esVinculoComunidadUdea()` (la UAD solo se pregunta a miembros de la comunidad). Los vacíos siempre van en
+  `null` porque el servidor valida `@Pattern` sobre cadenas presentes.
+- **Formulario:** género, cargo y vínculos del agresor consumen `identidades-genero`, `cargos`,
+  `vinculos-udea` y `vinculos-agresor-victima` y guardan el `id`; «¿Cuál?» es obligatorio solo con «Otro»;
+  el paso «Evidencias» tiene el `<input type="file">` enlazado, acumula archivos, valida y permite quitarlos
+  con botón accesible; los `validationErrors` anidados (`victima.cargoId`, `presuntoAgresor.*`, `contacto`)
+  vuelven a su control y paso.
+- **Hallazgos para Backend** (detalle en el §0.5 del contrato): `vinculos-udea` y `vinculos-agresor-victima`
+  responden `403` sin sesión en QA, así que el canal anónimo ve esos selectores vacíos (P-REP-01);
+  `victima.cargoId` apunta a la tabla `cargo` (Psicóloga, Abogada…), no al vínculo con la Universidad
+  (P-REP-02); «Otro» no existe en `vinculos-udea`, de modo que `otroVinculoUniversidad` nunca es válido
+  (P-REP-03); no hay consulta por código para «Seguimiento de trámite» (P-REP-04, contrato propuesto en
+  `docs/contratos/contrato-consultar-reporte.md`).
+
 ### Pendiente
 0. **Línea Alma Psicología:** Backend debe revisar D-PSI-01…19 (entidad de la novedad antes del caso, `tomadaPorMi`,
    SLA, PDF síncrono, contención puntual); el equipo debe decidir qué roles se habilitan además de ADMIN
@@ -534,11 +557,15 @@ Plan: `docs/plan-implementacion-front-linea-alma.md` §5 y §7; contratos: `docs
     - **Deuda:** `PagedResponseDto<T>` está declarado tres veces (`listas.service.ts`,
       `solicitud.service.ts`, `usuario.service.ts`); el módulo reutiliza el de `listas.service.ts`. Unificarlo
       en un solo archivo de tipos compartidos.
-15. **Reporte de caso — D5 sin resolver:** `POST /reportes` solo recibe documento y fecha de nacimiento
-    de la víctima, lugar, relato y ruta. **Se pierden al enviar:** nombres, correo, género y cargo de la
-    víctima, medio de contacto (`correoContacto`, `whatsappContacto`), datos del presunto agresor, tipos de
-    violencia y evidencias (el `<input type="file">` ni siquiera está enlazado). Decidir con Backend y el
-    equipo si se amplía el contrato o se retiran esos pasos del formulario.
+15. ~~**Reporte de caso — D5 sin resolver**~~ **Resuelto el 2026-11-11** con el contrato v2 (ver bitácora).
+    Quedan en manos de Backend P-REP-01…05 (`docs/contratos/contrato-reportar-caso.md` §0.5), y del equipo:
+    - decidir el catálogo correcto para «Vínculo con la universidad» de la víctima (P-REP-02);
+    - validar con el equipo de atención los textos de ayuda del paso «Evidencias» y del selector vacío;
+    - probar de punta a punta en QA con una cuenta `USUARIO` real desde `/reportar-caso` y sin sesión desde
+      el home, incluido un envío con evidencias (las pruebas unitarias cubren el contrato, no el servidor).
+16. **Seguimiento de trámite sin endpoint:** `/seguimiento` sigue simulando resultados y los diálogos de
+    éxito prometen una consulta que no existe. Contrato propuesto en
+    `docs/contratos/contrato-consultar-reporte.md`; hasta que exista, mantener el flag `publicTrackingPrototype`.
 
 ## 6. Reglas que no se deben romper
 
