@@ -179,13 +179,15 @@
               <div class="form-field-group">
                 <label class="form-field-label" for="victima-genero">Género</label>
                 <mat-form-field appearance="outline" class="full-width">
+                  <!-- Catálogo `GET /maestros/identidades-genero`; se envía el `id` como `victima.identidadGeneroId`. -->
                   <mat-select formControlName="genero" id="victima-genero" placeholder="Seleccione el género">
-                    <mat-option value="Femenino">Femenino</mat-option>
-                    <mat-option value="Masculino">Masculino</mat-option>
-                    <mat-option value="No binario">No binario</mat-option>
-                    <mat-option value="Otro">Otro</mat-option>
-                    <mat-option value="Prefiero no decir">Prefiero no decir</mat-option>
+                    @for (genero of identidadesGenero; track genero.id) {
+                      <mat-option [value]="genero.id">{{ genero.nombre }}</mat-option>
+                    }
                   </mat-select>
+                  @if (formVictima.get('genero')?.hasError('servidor')) {
+                    <mat-error>{{ formVictima.get('genero')?.getError('servidor') }}</mat-error>
+                  }
                 </mat-form-field>
               </div>
 
@@ -194,16 +196,16 @@
                   Vínculo con la universidad <span class="required-star">*</span>
                 </label>
                 <mat-form-field appearance="outline" class="full-width">
+                  <!-- Catálogo `GET /maestros/cargos`; se envía el `id` como `victima.cargoId` (obligatorio en el servidor). -->
                   <mat-select formControlName="cargo" id="victima-cargo" placeholder="Seleccione el vínculo">
-                    <mat-option value="Estudiante">Estudiante</mat-option>
-                    <mat-option value="Docente">Docente</mat-option>
-                    <mat-option value="Administrativo">Administrativo</mat-option>
-                    <mat-option value="Egresado">Egresado(a)</mat-option>
-                    <mat-option value="Contratista">Contratista</mat-option>
-                    <mat-option value="Otro">Otro</mat-option>
+                    @for (cargo of cargos; track cargo.id) {
+                      <mat-option [value]="cargo.id">{{ cargo.nombre }}</mat-option>
+                    }
                   </mat-select>
                   @if (formVictima.get('cargo')?.hasError('required')) {
                     <mat-error>El vínculo con la universidad es obligatorio</mat-error>
+                  } @else if (formVictima.get('cargo')?.hasError('servidor')) {
+                    <mat-error>{{ formVictima.get('cargo')?.getError('servidor') }}</mat-error>
                   }
                 </mat-form-field>
               </div>
@@ -964,19 +966,32 @@
                       aria-label="Ayuda sobre vínculo con la universidad">?</button>
             </label>
             <mat-form-field appearance="outline" class="full-width">
+              <!-- Catálogo `GET /maestros/vinculos-udea`; se envía el `id` como `presuntoAgresor.vinculoUniversidadId`. -->
               <mat-select formControlName="vinculoUniversidad" id="victimario-vinculoUniversidad" placeholder="Seleccione el vínculo">
-                @for (rol of listaVinculosUniversidad; track rol) {
-                  <mat-option [value]="rol">{{ rol }}</mat-option>
+                <mat-option [value]="null">Sin seleccionar</mat-option>
+                @for (vinculo of vinculosUniversidad; track vinculo.id) {
+                  <mat-option [value]="vinculo.id">{{ vinculo.nombre }}</mat-option>
                 }
               </mat-select>
+              @if (!vinculosUniversidad.length) {
+                <mat-hint>El catálogo de vínculos no está disponible en este momento; puede continuar sin este dato.</mat-hint>
+              }
+              @if (formVictimario.get('vinculoUniversidad')?.hasError('servidor')) {
+                <mat-error>{{ formVictimario.get('vinculoUniversidad')?.getError('servidor') }}</mat-error>
+              }
             </mat-form-field>
           </div>
 
-          @if (formVictimario.get('vinculoUniversidad')?.value === 'Otro') {
+          @if (esOtroVinculoUniversidad) {
             <div class="form-field-group full-width-cell">
-              <label class="form-field-label" for="victimario-otroVinculoUniversidad">¿Cuál vínculo con la universidad?</label>
+              <label class="form-field-label" for="victimario-otroVinculoUniversidad">¿Cuál vínculo con la universidad? <span class="required-star">*</span></label>
               <mat-form-field appearance="outline" class="full-width">
-                <input matInput formControlName="otroVinculoUniversidad" id="victimario-otroVinculoUniversidad" placeholder="Especifique el vínculo con la Universidad">
+                <input matInput formControlName="otroVinculoUniversidad" id="victimario-otroVinculoUniversidad" maxlength="255" autocomplete="off" placeholder="Especifique el vínculo con la Universidad">
+                @if (formVictimario.get('otroVinculoUniversidad')?.hasError('required')) {
+                  <mat-error>Describa el vínculo con la Universidad</mat-error>
+                } @else if (formVictimario.get('otroVinculoUniversidad')?.hasError('servidor')) {
+                  <mat-error>{{ formVictimario.get('otroVinculoUniversidad')?.getError('servidor') }}</mat-error>
+                }
               </mat-form-field>
             </div>
           }
@@ -992,19 +1007,32 @@
                       aria-label="Ayuda sobre vínculo con la víctima">?</button>
             </label>
             <mat-form-field appearance="outline" class="full-width">
+              <!-- Catálogo `GET /maestros/vinculos-agresor-victima`; se envía el `id` como `presuntoAgresor.vinculoVictimaId`. -->
               <mat-select formControlName="vinculoVictima" id="victimario-vinculoVictima" placeholder="Seleccione el vínculo">
-                @for (vinc of listaVinculosVictima; track vinc) {
-                  <mat-option [value]="vinc">{{ vinc }}</mat-option>
+                <mat-option [value]="null">Sin seleccionar</mat-option>
+                @for (vinculo of vinculosVictima; track vinculo.id) {
+                  <mat-option [value]="vinculo.id">{{ vinculo.nombre }}</mat-option>
                 }
               </mat-select>
+              @if (!vinculosVictima.length) {
+                <mat-hint>El catálogo de vínculos no está disponible en este momento; puede continuar sin este dato.</mat-hint>
+              }
+              @if (formVictimario.get('vinculoVictima')?.hasError('servidor')) {
+                <mat-error>{{ formVictimario.get('vinculoVictima')?.getError('servidor') }}</mat-error>
+              }
             </mat-form-field>
           </div>
 
-          @if (formVictimario.get('vinculoVictima')?.value === 'Otro') {
+          @if (esOtroVinculoVictima) {
             <div class="form-field-group full-width-cell">
-              <label class="form-field-label" for="victimario-otroVinculoVictima">¿Cuál vínculo con la víctima?</label>
+              <label class="form-field-label" for="victimario-otroVinculoVictima">¿Cuál vínculo con la víctima? <span class="required-star">*</span></label>
               <mat-form-field appearance="outline" class="full-width">
-                <input matInput formControlName="otroVinculoVictima" id="victimario-otroVinculoVictima" placeholder="Especifique la relación con la víctima">
+                <input matInput formControlName="otroVinculoVictima" id="victimario-otroVinculoVictima" maxlength="255" autocomplete="off" placeholder="Especifique la relación con la víctima">
+                @if (formVictimario.get('otroVinculoVictima')?.hasError('required')) {
+                  <mat-error>Describa el vínculo con la víctima</mat-error>
+                } @else if (formVictimario.get('otroVinculoVictima')?.hasError('servidor')) {
+                  <mat-error>{{ formVictimario.get('otroVinculoVictima')?.getError('servidor') }}</mat-error>
+                }
               </mat-form-field>
             </div>
           }
@@ -1083,9 +1111,45 @@
         <ng-template matStepLabel>Evidencias</ng-template>
         <div class="upload-zone">
           <mat-icon aria-hidden="true">cloud_upload</mat-icon>
-          <p>Arrastre o seleccione archivos de evidencia (capturas, documentos, fotos)</p>
-          <input type="file" multiple [disabled]="enviando || reporteEnviado">
+          <p>Seleccione archivos de evidencia (capturas, documentos, fotos o videos). Este paso es opcional.</p>
+          <label class="upload-zone__label" for="evidencias-archivos">Archivos de evidencia</label>
+          <!-- Las evidencias viajan con el reporte en `multipart/form-data` (parte `evidencias`). -->
+          <input type="file" multiple id="evidencias-archivos"
+                 [accept]="aceptaEvidencias"
+                 [disabled]="enviando || reporteEnviado"
+                 [attr.aria-describedby]="'evidencias-ayuda' + (errorEvidencias ? ' evidencias-error' : '')"
+                 [attr.aria-invalid]="errorEvidencias ? true : null"
+                 (change)="onEvidenciasSeleccionadas($event)">
+          <p class="upload-zone__hint" id="evidencias-ayuda">
+            Hasta {{ limitesEvidencias.maxArchivos }} archivos en {{ limitesEvidencias.descripcionFormatos }},
+            máximo {{ tamanoLegible(limitesEvidencias.maxBytesPorArchivo) }} cada uno y
+            {{ tamanoLegible(limitesEvidencias.maxBytesTotal) }} en total.
+          </p>
+          @if (errorEvidencias) {
+            <p class="upload-zone__error" id="evidencias-error" role="alert">
+              <mat-icon aria-hidden="true">error_outline</mat-icon>
+              <span>{{ errorEvidencias }}</span>
+            </p>
+          }
         </div>
+
+        @if (archivosEvidencia.length) {
+          <ul class="evidencias-lista" aria-label="Evidencias seleccionadas">
+            @for (archivo of archivosEvidencia; track archivo.name + archivo.size; let i = $index) {
+              <li class="evidencias-lista__item">
+                <mat-icon aria-hidden="true">attach_file</mat-icon>
+                <span class="evidencias-lista__nombre">{{ archivo.name }}</span>
+                <span class="evidencias-lista__tamano">{{ tamanoLegible(archivo.size) }}</span>
+                <button type="button" mat-icon-button
+                        [attr.aria-label]="'Quitar la evidencia ' + archivo.name"
+                        [disabled]="enviando || reporteEnviado"
+                        (click)="quitarEvidencia(i)">
+                  <mat-icon aria-hidden="true">close</mat-icon>
+                </button>
+              </li>
+            }
+          </ul>
+        }
         <div class="actions">
           <button type="button" mat-button matStepperPrevious [disabled]="enviando || reporteEnviado">Atrás</button>
           <button type="button" mat-raised-button color="warn"

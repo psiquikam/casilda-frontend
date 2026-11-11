@@ -233,16 +233,106 @@ describe('FormularioAnonimoComponent', () => {
   it('should handle UAD referral option when victimario belongs to UdeA', () => {
     expect(component.formVictimario.contains('vinculoUniversidad')).toBeTrue();
     expect(component.formVictimario.contains('remitirUad')).toBeTrue();
+    component.vinculosUniversidad = [{ id: 1, nombre: 'Estudiante de Pregrado' }, { id: 14, nombre: 'Externo' }];
 
-    component.formVictimario.get('vinculoUniversidad')?.setValue('Estudiante');
+    component.formVictimario.get('vinculoUniversidad')?.setValue(1);
     expect(component.esVictimarioUdea).toBeTrue();
 
     component.formVictimario.get('remitirUad')?.setValue('si');
     expect(component.formVictimario.get('remitirUad')?.value).toBe('si');
 
-    component.formVictimario.get('vinculoUniversidad')?.setValue('Persona Externa');
+    component.formVictimario.get('vinculoUniversidad')?.setValue(14);
     expect(component.esVictimarioUdea).toBeFalse();
     expect(component.formVictimario.get('remitirUad')?.value).toBe('no');
+  });
+
+  it('should require «¿Cuál?» only while the chosen link is «Otro» and clear it afterwards', () => {
+    component.vinculosVictima = [{ id: 1, nombre: 'Familiar' }, { id: 13, nombre: 'Otro' }];
+    const otro = component.formVictimario.get('otroVinculoVictima');
+
+    component.formVictimario.get('vinculoVictima')?.setValue(13);
+    expect(component.esOtroVinculoVictima).toBeTrue();
+    expect(otro?.hasError('required')).toBeTrue();
+    otro?.setValue('Vecino');
+    expect(otro?.valid).toBeTrue();
+
+    component.formVictimario.get('vinculoVictima')?.setValue(1);
+    expect(component.esOtroVinculoVictima).toBeFalse();
+    expect(otro?.value).toBe('');
+    expect(otro?.valid).toBeTrue();
+  });
+
+  it('should send the whole v2 contract: reporter, victim, contact and aggressor blocks', () => {
+    completarObligatorios(component);
+    component.vinculosUniversidad = [{ id: 1, nombre: 'Estudiante de Pregrado' }];
+    component.vinculosVictima = [{ id: 13, nombre: 'Otro' }];
+    component.formPerfil.patchValue({
+      perfil: 'anonimo_tercero',
+      deseaDatosVictima: 'si',
+      victima: { primerNombre: 'Ana', primerApellido: 'Prueba', correo: 'ana@correo.com', genero: 3, cargo: 7 },
+      deseaContacto: 'si',
+      correoContacto: 'testigo@correo.com'
+    });
+    component.formVictimario.patchValue({
+      identificacion: '98765432', primerNombre: 'Carlos', vinculoUniversidad: 1, vinculoVictima: 13,
+      otroVinculoVictima: 'Vecino', remitirUad: 'si', correo: 'Trabaja en la biblioteca'
+    });
+
+    component.enviarReporte();
+
+    const req = httpMock.expectOne((r) => r.method === 'POST' && r.url.endsWith('/reportes'));
+    expect(req.request.body).toEqual(jasmine.objectContaining({
+      tipoReportante: 'TERCERO',
+      victima: jasmine.objectContaining({ primerNombre: 'Ana', primerApellido: 'Prueba', identidadGeneroId: 3, cargoId: 7 }),
+      contacto: { deseaContacto: true, correo: 'testigo@correo.com', whatsapp: null },
+      presuntoAgresor: jasmine.objectContaining({
+        numeroDocumento: '98765432', primerNombre: 'Carlos', vinculoUniversidadId: 1, vinculoVictimaId: 13,
+        otroVinculoVictima: 'Vecino', informacionAdicional: 'Trabaja en la biblioteca', remitirUad: true
+      })
+    }));
+    req.flush(RESPUESTA_201, { status: 201, statusText: 'Created' });
+  });
+
+  it('should keep selected evidence files, reject invalid ones and send them as multipart', () => {
+    const notificacion = TestBed.inject(NotificacionService);
+    spyOn(notificacion, 'error');
+    const evento = (archivos: File[]) => ({ target: { files: archivos, value: 'x' } } as unknown as Event);
+
+    component.onEvidenciasSeleccionadas(evento([new File(['%PDF-'], 'a.pdf', { type: 'application/pdf' })]));
+    expect(component.archivosEvidencia.length).toBe(1);
+    expect(component.errorEvidencias).toBeNull();
+
+    component.onEvidenciasSeleccionadas(evento([new File(['x'], 'nota.txt', { type: 'text/plain' })]));
+    expect(component.archivosEvidencia.length).toBe(1);
+    expect(component.errorEvidencias).toContain('formato');
+    expect(notificacion.error).toHaveBeenCalled();
+
+    component.quitarEvidencia(0);
+    expect(component.archivosEvidencia.length).toBe(0);
+    expect(component.errorEvidencias).toBeNull();
+
+    component.onEvidenciasSeleccionadas(evento([new File(['%PDF-'], 'a.pdf', { type: 'application/pdf' })]));
+    completarObligatorios(component);
+    component.enviarReporte();
+    const req = httpMock.expectOne((r) => r.method === 'POST' && r.url.endsWith('/reportes'));
+    expect(req.request.body instanceof FormData).toBeTrue();
+    expect((req.request.body as FormData).getAll('evidencias').length).toBe(1);
+    req.flush(RESPUESTA_201, { status: 201, statusText: 'Created' });
+    expect(dialog.open).toHaveBeenCalled();
+  });
+
+  it('should map nested server errors (victima.*, presuntoAgresor.*) to their controls', () => {
+    completarObligatorios(component);
+    component.enviarReporte();
+    httpMock.expectOne((r) => r.url.endsWith('/reportes')).flush(
+      { status: 400, message: 'Datos inválidos', validationErrors: {
+        'victima.cargoId': 'El cargo de la víctima es obligatorio',
+        'presuntoAgresor.remitirUad': 'Requiere un vínculo con la Universidad'
+      } },
+      { status: 400, statusText: 'Bad Request' }
+    );
+    expect(component.formPerfil.get('victima.cargo')?.getError('servidor')).toContain('obligatorio');
+    expect(component.formVictimario.get('remitirUad')?.getError('servidor')).toContain('vínculo');
   });
 
   it('should POST the report and open the success dialog with the server code', () => {
@@ -388,7 +478,17 @@ describe('FormularioAnonimoComponent', () => {
 
     expect(component.listaFormasOcurrencia).toContain('Presencial');
     expect(component.listaDetalleMisional).toContain('Misional docencia');
-    expect(component.listaVinculosVictima).toContain('Pareja / expareja');
+  });
+
+  it('should load the aggressor link catalogs from the server and flag them when unavailable', () => {
+    const udea = httpMock.expectOne((r) => r.url.endsWith('/maestros/vinculos-udea'));
+    const victima = httpMock.expectOne((r) => r.url.endsWith('/maestros/vinculos-agresor-victima'));
+    udea.flush([{ id: 1, nombre: 'Estudiante de Pregrado' }]);
+    victima.flush({ status: 403 }, { status: 403, statusText: 'Forbidden' });
+
+    expect(component.vinculosUniversidad.map((v) => v.nombre)).toEqual(['Estudiante de Pregrado']);
+    expect(component.vinculosVictima).toEqual([]);
+    expect(component.vinculosNoDisponibles).toBeTrue();
   });
 
   it('should contain new controls for forma, misionalidad and victimario vinculos', () => {
