@@ -12,6 +12,110 @@
 > **Convención de este documento:** lo marcado **[Front]** está verificado en el código
 > citado. Lo marcado **[Propuesta]** es una recomendación del frontend que Backend debe
 > aceptar o corregir. Ninguna propuesta describe algo que ya exista en el servidor.
+>
+> **Actualización 2026-11-11:** el §0 recoge el estado real tras la implementación de
+> Backend (contrato v2). Donde el §0 difiera de los §3–§11 originales, prevalece el §0.
+
+---
+
+## 0. Estado al 2026-11-11 — contrato v2 implementado por Backend
+
+Verificado contra `casilda-backend` `main` (PR #14 «datos», #16 «evidencias», #17 «catálogos»)
+y contra el OpenAPI desplegado en QA (`{apiBaseUrl}/api-docs`). El frontend lo consume desde
+la rama `fix/06/019/casilda/ajustes-reportar-caso`.
+
+### 0.1 Decisiones D1–D7, como quedaron
+
+| Decisión | Resultado en Backend |
+|---|---|
+| D1 | **A.** La ruta queda `SOLICITADA` (`EstadoReporteRutaEnum`); nada se activa al crear. |
+| D2 | `POST /reportes`. |
+| D3 | Un solo endpoint, público. El modo lo decide el JWT; token inválido → `401`, nunca anónimo. |
+| D4 | `CAS-` + 10 caracteres aleatorios (alfabeto sin `0/O/1/I`), `UNIQUE`, 5 reintentos. |
+| D5 | **Se amplió el contrato** (v2): bloques `victima`, `contacto`, `presuntoAgresor`, `tipoReportante` y evidencias por `multipart/form-data`. Los tipos y modalidades de violencia **no** entran: el paso ya no existe en la UI (`@if (false)` en la plantilla). |
+| D6 | Sin obligatoriedad por modo. En el servidor solo son obligatorios `descripcionHechos` y `rutaActivacionId`; dentro de `victima`, `primerNombre`, `primerApellido` y `cargoId`. |
+| D7 | 4 000 caracteres. |
+
+### 0.2 Cuerpo v2 (`ReporteCasoRequest`) y mapeo con el formulario
+
+Los campos del §4.1 se mantienen tal cual. Se agregan:
+
+| Campo | Tipo | Obligatorio | Validación en servidor | Control del formulario |
+|---|---|---:|---|---|
+| `tipoReportante` | `"AFECTADA"` \| `"TERCERO"` \| `null` | No | Valor del enum | `formPerfil.perfil` (`anonimo` → AFECTADA, `anonimo_tercero` → TERCERO) |
+| `victima` | objeto \| `null` | No | Si viene, exige `primerNombre`, `primerApellido` y `cargoId` | Solo si `deseaDatosVictima === 'si'` |
+| `victima.primerNombre`, `primerApellido` | string | Sí (en el bloque) | 2–60, solo letras y espacios | `victima.primerNombre`, `victima.primerApellido` |
+| `victima.segundoNombre`, `segundoApellido` | string \| null | No | ≤ 60, solo letras y espacios | ídem |
+| `victima.correo` | string \| null | No | formato email, ≤ 254 | `victima.correo` |
+| `victima.identidadGeneroId` | number \| null | No | debe existir en `identidadgenero` | `victima.genero` (ahora guarda el `id`) |
+| `victima.cargoId` | number | Sí (en el bloque) | debe existir en `cargo` | `victima.cargo` (ahora guarda el `id`) — **ver P-REP-02** |
+| `contacto.deseaContacto` | boolean | No | Si `true`, exige `correo` o `whatsapp` (clave de error `contacto`) | `deseaContacto` |
+| `contacto.correo` | string \| null | No | email, ≤ 254 | `correoContacto`, o `victima.correo` si la persona afectada ya lo dio |
+| `contacto.whatsapp` | string \| null | No | `^\d{7,12}$` | `whatsappContacto` |
+| `presuntoAgresor` | objeto \| `null` | No | — | `formVictimario`; va en `null` si no se diligenció nada |
+| `presuntoAgresor.numeroDocumento` | string \| null | No | `^\d{5,20}$` | `victimario.identificacion` |
+| `presuntoAgresor.*Nombre`, `*Apellido` | string \| null | No | ≤ 60 | ídem |
+| `presuntoAgresor.vinculoUniversidadId` | number \| null | No | debe existir en `vinculoudea` | `vinculoUniversidad` (ahora guarda el `id`) |
+| `presuntoAgresor.vinculoVictimaId` | number \| null | No | debe existir en `vinculoagresorvictima` | `vinculoVictima` (ahora guarda el `id`) |
+| `presuntoAgresor.otroVinculoUniversidad`, `otroVinculoVictima` | string \| null | Condicional | **Solo** si el nombre del vínculo elegido es exactamente «Otro»; en cualquier otro caso debe ir `null` (`validarOtroVinculo`) | `otroVinculo*` — **ver P-REP-03** |
+| `presuntoAgresor.informacionAdicional` | string \| null | No | ≤ 1 000 | `victimario.correo` (etiqueta «Información adicional») |
+| `presuntoAgresor.remitirUad` | boolean \| null | No | Si no es `null`, exige `vinculoUniversidadId`; el servidor guarda fecha y versión del consentimiento | `remitirUad` solo cuando el vínculo es de la comunidad universitaria; si no, `null` |
+
+**Regla de nulos:** todo opcional vacío viaja como `null`. Una cadena vacía (`""`) fallaría los
+`@Pattern` del servidor (`whatsapp`, `numeroDocumento`, nombres de la víctima).
+
+**Claves de `validationErrors`:** anidadas con punto (`victima.cargoId`,
+`presuntoAgresor.remitirUad`), más la clave `contacto` para el error de medio de contacto.
+El front las mapea a su control y lleva al paso correspondiente (`CAMPOS_SERVIDOR`).
+
+### 0.3 Evidencias (`multipart/form-data`)
+
+`POST /reportes` acepta también `multipart/form-data` con la parte `reporte` (JSON del cuerpo
+v2, `Content-Type: application/json`) y cero o más partes `evidencias`.
+
+| Regla | Valor en servidor (`ReporteEvidenciaStorageService`) |
+|---|---|
+| Archivos | máximo 5 |
+| Tamaño | 10 MB por archivo, 25 MB en total (`spring.servlet.multipart`) |
+| Tipos | `application/pdf`, `image/jpeg`, `image/png`, `video/mp4`, `video/quicktime`, `video/3gpp` |
+| Firma | se comprueba la cabecera binaria; un PDF que no empieza por `%PDF-` se rechaza |
+| Errores | `400` con `message` y **sin** `validationErrors` (`IllegalArgumentException`) |
+
+El front repite las reglas antes de enviar (`validarEvidencias`), infiere el tipo por extensión
+cuando el navegador no lo da (`.mov`, `.3gp`) y envía JSON plano cuando no hay archivos.
+
+### 0.4 Maestros que usa el formulario y su visibilidad sin sesión (QA, 2026-11-11)
+
+| Maestro | Ruta | Sin token |
+|---|---|---|
+| Tipos de documento | `GET /maestros/tipos-identificacion` | `200` |
+| Campus | `GET /maestros/campus` | `200` |
+| Rutas de activación | `GET /maestros/rutas-activacion` | `200` |
+| Identidades de género | `GET /maestros/identidades-genero` | `200` |
+| Cargos (vínculo de la víctima) | `GET /maestros/cargos` | `200` |
+| Vínculos del agresor con la UdeA | `GET /maestros/vinculos-udea` | **`403`** |
+| Vínculos agresor–víctima | `GET /maestros/vinculos-agresor-victima` | **`403`** |
+
+Con `403` el front deja el selector vacío con una ayuda visible y envía `null`; el reporte se
+crea igual. Para el canal anónimo esos dos catálogos deben ser públicos (P-REP-01).
+
+### 0.5 Pendientes para Backend (prioridad)
+
+| Id | Pendiente | Prioridad |
+|---|---|---|
+| P-REP-01 | Publicar `GET /maestros/vinculos-udea` y `GET /maestros/vinculos-agresor-victima` para el canal anónimo: filas `publico = true` en la tabla `endpoint` (`database/initial_data.sql`) y cubrirlos en `catalogosDelFormularioAnonimoSonPublicos`. | P0 |
+| P-REP-02 | `victima.cargoId` referencia la tabla `cargo` (Psicóloga, Abogada, Psicoorientadora, Coordinadora…), que describe cargos del equipo de atención, no el vínculo de la víctima con la Universidad. El formulario pregunta «Vínculo con la universidad» y no existe «Estudiante». Propuesta: `victima.vinculoUniversidadId` con FK a `vinculoudea`, o un catálogo propio para la víctima. Mientras tanto el front muestra `cargos` tal cual llega. | P0 |
+| P-REP-03 | `validarOtroVinculo` solo acepta «¿Cuál?» cuando el vínculo se llama exactamente «Otro». En QA `vinculos-udea` no tiene «Otro» y el seed lo llama «Otro tipo de vínculo», así que `otroVinculoUniversidad` nunca puede enviarse. Decidir: renombrar la opción a «Otro» o comparar por prefijo. | P1 |
+| P-REP-04 | No existe consulta del reporte por `codigo` para «Seguimiento de trámite». Contrato propuesto en `contrato-consultar-reporte.md`. | P1 |
+| P-REP-05 | `MaxUploadSizeExceededException` (más de 25 MB en total) no tiene handler explícito en `GlobalExceptionHandler`; conviene responder `413` o `400` con mensaje. El front lo evita validando antes. | P2 |
+
+### 0.6 Qué hace el frontend desde esta versión
+
+`ReporteCasoService.crear(dto, evidencias)` envía JSON o multipart según haya archivos;
+`construirReporteCasoRequest()` arma los bloques v2 con las mismas reglas del servidor
+(`esOpcionOtro`, `esVinculoComunidadUdea`); los selectores de género, cargo y vínculos consumen
+los maestros del servidor y guardan `id`; el paso «Evidencias» acumula archivos, valida en el
+cliente (`validarEvidencias`) y permite quitarlos; los errores anidados vuelven a su control.
 
 ---
 
