@@ -14,6 +14,7 @@
         </div>
       }
 
+
       <div class="form-grid">
         <mat-form-field appearance="outline">
           <mat-label>Tipo de reparto</mat-label>
@@ -36,10 +37,10 @@
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Profesional o dupla</mat-label>
           <mat-select formControlName="grupoProfesionalId" placeholder="Seleccione un profesional o dupla">
-            @if (gruposProfesionales.length === 0 && !cargandoCatalogos) {
-              <mat-option disabled>No hay profesionales o duplas disponibles</mat-option>
+            @if (gruposProfesionalesDisponibles.length === 0 && repartoForm.get('idTipoServicio')?.value) {
+              <mat-option disabled>No hay profesionales o duplas activos para este servicio</mat-option>
             }
-            @for (grupo of gruposProfesionales; track grupo.id) {
+            @for (grupo of gruposProfesionalesDisponibles; track grupo.id) {
               <mat-option [value]="grupo.id">
                 {{ grupo.nombre }}
               </mat-option>
@@ -50,7 +51,10 @@
 
       <mat-form-field appearance="outline" class="full-width desc-field">
         <mat-label>Observaciones del reparto</mat-label>
-        <textarea matInput rows="4" formControlName="observaciones" placeholder="Ingrese las observaciones del reparto..."></textarea>
+        <textarea matInput rows="4" maxlength="500" formControlName="observaciones" placeholder="Ingrese las observaciones del reparto..."></textarea>
+        @if (repartoForm.get('observaciones')?.hasError('required') || repartoForm.get('observaciones')?.hasError('pattern')) {
+          <mat-error>Ingrese una observación; no puede contener solo espacios.</mat-error>
+        }
       </mat-form-field>
 
     </form>

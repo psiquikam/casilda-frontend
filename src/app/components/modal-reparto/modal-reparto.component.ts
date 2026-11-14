@@ -39,6 +39,19 @@ export class RepartoModalComponent implements OnInit {
   cargandoCatalogos = false;
   guardando = false;
 
+  get gruposProfesionalesDisponibles(): GrupoProfesionalDto[] {
+    const idServicio = this.repartoForm.get('idTipoServicio')?.value;
+    return this.gruposProfesionales.filter((grupo) => {
+      if (grupo.activo === false) return false;
+      // Si el backend ya indica el tipo de servicio, filtramos por él;
+      // si no viene el campo (compatibilidad), mostramos todos los activos.
+      if (idServicio != null && grupo.idTipoServicio != null) {
+        return grupo.idTipoServicio === idServicio;
+      }
+      return true;
+    });
+  }
+
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<RepartoModalComponent>,
@@ -49,8 +62,17 @@ export class RepartoModalComponent implements OnInit {
       idTipoAsignacion: [null, Validators.required],
       fechaReparto: [new Date().toISOString().substring(0, 10)],
       idTipoServicio: [null, Validators.required],
-      grupoProfesionalId: [null, Validators.required],
-      observaciones: ['', [Validators.required, Validators.minLength(10)]]
+      grupoProfesionalId: [{ value: null, disabled: true }, Validators.required],
+      observaciones: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(500)]]
+    });
+    this.repartoForm.get('idTipoServicio')?.valueChanges.subscribe((idTipoServicio) => {
+      const grupoControl = this.repartoForm.get('grupoProfesionalId');
+      grupoControl?.reset(null, { emitEvent: false });
+      if (idTipoServicio == null) {
+        grupoControl?.disable({ emitEvent: false });
+      } else {
+        grupoControl?.enable({ emitEvent: false });
+      }
     });
   }
 
@@ -80,10 +102,11 @@ export class RepartoModalComponent implements OnInit {
       next: ({ tiposAsignacion, tiposServicio, grupos }) => {
         this.tiposAsignacion = tiposAsignacion;
         this.tiposServicio = tiposServicio;
-        this.gruposProfesionales = grupos.filter((grupo) => grupo.activo !== false);
+        this.gruposProfesionales = grupos;
         this.cargandoCatalogos = false;
-        if (tiposAsignacion.length && tiposServicio.length && this.gruposProfesionales.length) {
+        if (tiposAsignacion.length && tiposServicio.length && this.gruposProfesionalesDisponibles.length) {
           this.repartoForm.enable({ emitEvent: false });
+          this.repartoForm.get('grupoProfesionalId')?.disable({ emitEvent: false });
         } else {
           this.notificacion.error('El reparto está bloqueado porque faltan catálogos o profesionales activos.');
         }
@@ -132,4 +155,3 @@ export class RepartoModalComponent implements OnInit {
     this.dialogRef.close();
   }
 }
-
