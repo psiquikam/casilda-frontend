@@ -86,7 +86,7 @@ export class ModalGestionComponent implements OnInit {
       hora: [this.getHoraActual(), Validators.required],
       jornada: [{ value: '', disabled: true }],
       resultado: ['', Validators.required],
-      observacion: ['', [Validators.required, Validators.minLength(5)]],
+      observacion: ['', [Validators.required, Validators.pattern(/\S/)]],
       fechaCita: [''],
       horaCita: ['']
     });
