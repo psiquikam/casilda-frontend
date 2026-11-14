@@ -4,10 +4,14 @@ import { DASHBOARD_POR_ROL, WIDGETS_SIN_BACKEND, widgetsDelRol, type RolCasilda 
 describe('registro de widgets por rol', () => {
   const rolesPersonal: RolCasilda[] = ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR'];
 
-  it('cubre los seis roles reales del código', () => {
+  it('cubre los siete roles reales del código', () => {
     expect(Object.keys(DASHBOARD_POR_ROL).sort()).toEqual(
-      ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR', 'USUARIO', 'GESTOR_CONTENIDO'].sort()
+      ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR', 'USUARIO', 'GESTOR_CONTENIDO', 'TECNICO_APH'].sort()
     );
+  });
+
+  it('al Técnico APH solo le ofrece accesos a su módulo', () => {
+    expect(widgetsDelRol('TECNICO_APH', false)).toEqual(['accesos-frecuentes']);
   });
 
   it('al gestor de contenidos solo le ofrece el acceso a su módulo', () => {

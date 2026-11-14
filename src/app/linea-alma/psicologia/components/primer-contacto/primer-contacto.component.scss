@@ -1,0 +1,128 @@
+.pc {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.pc__cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.pc__titulo {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-size-xl);
+}
+
+.pc__intro,
+.pc__nota {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.pc__acciones,
+.pc__botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.pc__botones {
+  margin-top: var(--space-2);
+}
+
+.pc__enlace {
+  padding: 0;
+  font: inherit;
+  color: var(--color-secondary);
+  text-decoration: underline;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.pc__paso {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+
+  > p {
+    margin: 0;
+  }
+}
+
+.pc__triaje {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-subtle);
+}
+
+.pc__fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+
+  legend {
+    padding: 0 var(--space-2);
+    font-weight: 700;
+  }
+
+  mat-radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.pc__decision {
+  border-color: var(--color-comp-purple-border);
+  background: var(--color-comp-purple-light);
+
+  mat-radio-group {
+    flex-direction: column;
+  }
+}
+
+.pc__error {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-danger-text);
+}
+
+.pc__dimensiones {
+  display: grid;
+  gap: var(--space-1) var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+.pc__fila {
+  display: grid;
+  gap: var(--space-2) var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.pc__fecha {
+  max-width: 360px;
+}
+
+@media (max-width: 768px) {
+  .pc__stepper ::ng-deep .mat-horizontal-stepper-header-container {
+    overflow-x: auto;
+  }
+}

@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../../services/auth.service';
+import { AlmaPermisosService } from '../../../linea-alma/shared/permisos/alma-permisos.service';
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -17,6 +18,7 @@ import { environment } from '../../../../environments/environment';
 })
 export class HorizontalNavComponent {
   readonly auth = inject(AuthService);
+  readonly alma = inject(AlmaPermisosService);
   readonly features = environment.features;
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);

@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MatStepper, MatStepperModule } from '@angular/material/stepper';
@@ -17,6 +17,16 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
 import { ListasService, MaestroDto } from '../../services/listas.service';
+import {
+  ACEPTA_EVIDENCIAS,
+  LIMITES_EVIDENCIAS,
+  ReporteCasoService,
+  construirReporteCasoRequest,
+  esOpcionOtro,
+  esVinculoComunidadUdea,
+  interpretarErrorReporte,
+  validarEvidencias
+} from '../../services/reporte-caso.service';
 import { NotificacionService } from '../../core/a11y/notificacion.service';
 import { ResumenErroresComponent } from '../../core/a11y/resumen-errores.component';
 import { DescripcionCampos, ErrorFormulario, recolectarErrores } from '../../core/a11y/errores-formulario';
@@ -50,6 +60,52 @@ export interface TextosReporte {
   exitoLabelCodigo: string;
   exitoInstruccion: string;
 }
+
+/** Ruta a la que se vuelve al cerrar el diálogo de éxito, según el modo. */
+export const RUTA_TRAS_REPORTE: Record<ModoReporte, string> = {
+  anonimo: '/home',
+  autenticado: '/inicio'
+};
+
+/**
+ * Campo del DTO de `POST /reportes` → control del formulario y paso del stepper donde se
+ * corrige, para llevar a la persona al error que devuelva el servidor (`validationErrors`).
+ */
+const CAMPOS_SERVIDOR: Record<string, { paso: number; control: string }> = {
+  tipoReportante: { paso: 1, control: 'perfil' },
+  tipoDocumentoId: { paso: 1, control: 'victima.tipoDocumento' },
+  numeroDocumento: { paso: 1, control: 'victima.identificacion' },
+  fechaNacimiento: { paso: 1, control: 'victima.fechaNacimiento' },
+  'victima.primerNombre': { paso: 1, control: 'victima.primerNombre' },
+  'victima.segundoNombre': { paso: 1, control: 'victima.segundoNombre' },
+  'victima.primerApellido': { paso: 1, control: 'victima.primerApellido' },
+  'victima.segundoApellido': { paso: 1, control: 'victima.segundoApellido' },
+  'victima.correo': { paso: 1, control: 'victima.correo' },
+  'victima.identidadGeneroId': { paso: 1, control: 'victima.genero' },
+  'victima.cargoId': { paso: 1, control: 'victima.cargo' },
+  contacto: { paso: 1, control: 'correoContacto' },
+  'contacto.correo': { paso: 1, control: 'correoContacto' },
+  'contacto.whatsapp': { paso: 1, control: 'whatsappContacto' },
+  tipoLugar: { paso: 2, control: 'tipoLugar' },
+  campusId: { paso: 2, control: 'sedeCampus' },
+  facultad: { paso: 2, control: 'facultad' },
+  bloque: { paso: 2, control: 'bloque' },
+  espacio: { paso: 2, control: 'espacio' },
+  lugarDetalleExterno: { paso: 2, control: 'lugarDetalleExterno' },
+  descripcionHechos: { paso: 2, control: 'descripcionHechos' },
+  'presuntoAgresor.numeroDocumento': { paso: 3, control: 'identificacion' },
+  'presuntoAgresor.primerNombre': { paso: 3, control: 'primerNombre' },
+  'presuntoAgresor.segundoNombre': { paso: 3, control: 'segundoNombre' },
+  'presuntoAgresor.primerApellido': { paso: 3, control: 'primerApellido' },
+  'presuntoAgresor.segundoApellido': { paso: 3, control: 'segundoApellido' },
+  'presuntoAgresor.vinculoUniversidadId': { paso: 3, control: 'vinculoUniversidad' },
+  'presuntoAgresor.vinculoVictimaId': { paso: 3, control: 'vinculoVictima' },
+  'presuntoAgresor.otroVinculoUniversidad': { paso: 3, control: 'otroVinculoUniversidad' },
+  'presuntoAgresor.otroVinculoVictima': { paso: 3, control: 'otroVinculoVictima' },
+  'presuntoAgresor.informacionAdicional': { paso: 3, control: 'correo' },
+  'presuntoAgresor.remitirUad': { paso: 3, control: 'remitirUad' },
+  rutaActivacionId: { paso: 3, control: 'rutaActivacion' }
+};
 
 export const TEXTOS_REPORTE: Record<ModoReporte, TextosReporte> = {
   anonimo: {
@@ -106,6 +162,8 @@ export class FormularioAnonimoComponent {
   private readonly dialog = inject(MatDialog);
   private readonly notificacion = inject(NotificacionService);
   private readonly listasService = inject(ListasService);
+  private readonly reporteCasoService = inject(ReporteCasoService);
+  private readonly router = inject(Router);
   // Opcional: el componente también se instancia sin router (pruebas unitarias).
   private readonly route = inject(ActivatedRoute, { optional: true });
 
@@ -114,6 +172,15 @@ export class FormularioAnonimoComponent {
   readonly textos: TextosReporte = TEXTOS_REPORTE[this.modo];
 
   tipoUsuario: 'anonimo' | 'anonimo_tercero' = 'anonimo';
+
+  /** Petición de creación en curso: evita reportes duplicados por clics repetidos. */
+  enviando = false;
+  /** Código CAS confirmado por el servidor. Desde ese momento el formulario es de solo lectura. */
+  codigoReporte: string | null = null;
+
+  get reporteEnviado(): boolean {
+    return this.codigoReporte !== null;
+  }
   formConsentimiento: FormGroup;
   formPerfil: FormGroup;
   formRelato: FormGroup;
@@ -216,25 +283,19 @@ export class FormularioAnonimoComponent {
     'En bienes inmuebles'
   ];
 
-  readonly listaVinculosUniversidad: string[] = [
-    'Estudiante (pregrado, posgrado, tecnología, técnica)',
-    'Docente (vinculado, ocasional, cátedra, cátedra 50)',
-    'Personal no docente',
-    'Personal directivo',
-    'Egresado(a)',
-    'Contratista / proveedor',
-    'Persona externa (sin vínculo UdeA)',
-    'Se desconoce / no sabe',
-    'Otro'
-  ];
+  /** Catálogos del servidor para la víctima (`identidades-genero`, `cargos`) y el presunto agresor (`vinculos-*`). */
+  identidadesGenero: MaestroDto[] = [];
+  cargos: MaestroDto[] = [];
+  vinculosUniversidad: MaestroDto[] = [];
+  vinculosVictima: MaestroDto[] = [];
+  /** `true` si los catálogos de vínculos no pudieron cargarse (p. ej. no son públicos en el servidor). */
+  vinculosNoDisponibles = false;
 
-  readonly listaVinculosVictima: string[] = [
-    'Pareja / expareja',
-    'Familiar',
-    'Compañeros de estudio',
-    'Docente',
-    'Otro'
-  ];
+  /** Evidencias elegidas en el último paso; viajan como `multipart/form-data` (`ReporteCasoService`). */
+  archivosEvidencia: File[] = [];
+  errorEvidencias: string | null = null;
+  readonly aceptaEvidencias = ACEPTA_EVIDENCIAS;
+  readonly limitesEvidencias = LIMITES_EVIDENCIAS;
 
   psicologicaSel: number[] = [];
   fisicaSel: number[] = [];
@@ -243,15 +304,6 @@ export class FormularioAnonimoComponent {
   economicaSel: number[] = [];
   informaticaSel: number[] = [];
   prejuicioSel: number[] = [];
-
-  readonly rolesUdeaVictimario: string[] = [
-    'Estudiante',
-    'Docente',
-    'Personal administrativo',
-    'Personal no docente',
-    'Personal directivo',
-    'Contratista / proveedor'
-  ];
 
   readonly campusOptions: string[] = [
     'Campus Apartadó (Seccional Urabá)',
@@ -297,18 +349,23 @@ export class FormularioAnonimoComponent {
            !!correoCtrl?.valid;
   }
 
+  private nombreVinculo(catalogo: MaestroDto[], control: string): string | null {
+    const id = Number(this.formVictimario?.get(control)?.value);
+    if (!Number.isFinite(id)) return null;
+    return catalogo.find((item) => item.id === id)?.nombre ?? null;
+  }
+
+  /** La pregunta de la UAD solo aplica si la persona señalada pertenece a la comunidad universitaria. */
   get esVictimarioUdea(): boolean {
-    const vinculo = this.formVictimario?.get('vinculoUniversidad')?.value;
-    if (!vinculo) {
-      return false;
-    }
-    return this.rolesUdeaVictimario.some(r => vinculo.toLowerCase().includes(r.toLowerCase())) ||
-           vinculo.includes('Estudiante') ||
-           vinculo.includes('Docente') ||
-           vinculo.includes('Personal no docente') ||
-           vinculo.includes('Personal Administrativo') ||
-           vinculo.includes('Personal Directivo') ||
-           vinculo.includes('Contratista');
+    return esVinculoComunidadUdea(this.nombreVinculo(this.vinculosUniversidad, 'vinculoUniversidad'));
+  }
+
+  get esOtroVinculoUniversidad(): boolean {
+    return esOpcionOtro(this.nombreVinculo(this.vinculosUniversidad, 'vinculoUniversidad'));
+  }
+
+  get esOtroVinculoVictima(): boolean {
+    return esOpcionOtro(this.nombreVinculo(this.vinculosVictima, 'vinculoVictima'));
   }
 
   get contactoRequeridoInvalido(): boolean {
@@ -440,16 +497,18 @@ export class FormularioAnonimoComponent {
 
     this.formVictimario = this.fb.group({
       identificacion: ['', [Validators.pattern(this.REGEX_NUMEROS_IDENTIFICACION)]],
-      primerNombre: ['', [Validators.pattern(this.REGEX_LETRAS)]],
-      segundoNombre: ['', [Validators.pattern(this.REGEX_LETRAS)]],
-      primerApellido: ['', [Validators.pattern(this.REGEX_LETRAS)]],
-      segundoApellido: ['', [Validators.pattern(this.REGEX_LETRAS)]],
-      vinculoUniversidad: [''],
-      otroVinculoUniversidad: [''],
-      vinculoVictima: [''],
-      otroVinculoVictima: [''],
+      primerNombre: ['', [Validators.maxLength(60), Validators.pattern(this.REGEX_LETRAS)]],
+      segundoNombre: ['', [Validators.maxLength(60), Validators.pattern(this.REGEX_LETRAS)]],
+      primerApellido: ['', [Validators.maxLength(60), Validators.pattern(this.REGEX_LETRAS)]],
+      segundoApellido: ['', [Validators.maxLength(60), Validators.pattern(this.REGEX_LETRAS)]],
+      // Los vínculos guardan el `id` del catálogo del servidor (`vinculoUniversidadId`, `vinculoVictimaId`).
+      vinculoUniversidad: [null],
+      otroVinculoUniversidad: ['', [Validators.maxLength(255)]],
+      vinculoVictima: [null],
+      otroVinculoVictima: ['', [Validators.maxLength(255)]],
       remitirUad: ['no'],
-      correo: [''],
+      // «Información adicional» del presunto agresor (correo, dependencia o apodo) → `informacionAdicional`.
+      correo: ['', [Validators.maxLength(1000)]],
       rutaActivacion: [null, Validators.required]
     });
 
@@ -457,6 +516,10 @@ export class FormularioAnonimoComponent {
       if (!this.esVictimarioUdea) {
         this.formVictimario.get('remitirUad')?.setValue('no');
       }
+      this.actualizarValidadorOtroVinculo('otroVinculoUniversidad', this.esOtroVinculoUniversidad);
+    });
+    this.formVictimario.get('vinculoVictima')?.valueChanges.subscribe(() => {
+      this.actualizarValidadorOtroVinculo('otroVinculoVictima', this.esOtroVinculoVictima);
     });
 
     this.formEvidencias = this.fb.group({
@@ -475,6 +538,8 @@ export class FormularioAnonimoComponent {
       .subscribe((listas) => {
         this.tiposDocumento = listas.tiposDocumento;
         this.campusLista = listas.campus;
+        this.identidadesGenero = listas.identidadesGenero;
+        this.cargos = listas.cargos;
         this.actualizarValidadorDocumentoVictima();
         this.formVictima.get('tipoDocumento')?.updateValueAndValidity({ emitEvent: false });
       });
@@ -485,6 +550,72 @@ export class FormularioAnonimoComponent {
         next: (rutas) => { this.rutasActivacion = rutas; },
         error: () => { this.rutasActivacion = []; }
       });
+
+    // `obtenerMaestro` ya convierte el fallo HTTP en `[]`; sin catálogo el selector queda vacío y se avisa.
+    this.listasService.obtenerMaestro('vinculos-udea')
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (vinculos) => {
+          this.vinculosUniversidad = vinculos;
+          this.vinculosNoDisponibles = this.vinculosNoDisponibles || vinculos.length === 0;
+          this.actualizarValidadorOtroVinculo('otroVinculoUniversidad', this.esOtroVinculoUniversidad);
+        },
+        error: () => { this.vinculosUniversidad = []; this.vinculosNoDisponibles = true; }
+      });
+    this.listasService.obtenerMaestro('vinculos-agresor-victima')
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (vinculos) => {
+          this.vinculosVictima = vinculos;
+          this.vinculosNoDisponibles = this.vinculosNoDisponibles || vinculos.length === 0;
+          this.actualizarValidadorOtroVinculo('otroVinculoVictima', this.esOtroVinculoVictima);
+        },
+        error: () => { this.vinculosVictima = []; this.vinculosNoDisponibles = true; }
+      });
+  }
+
+  /** «¿Cuál?» es obligatorio solo cuando el vínculo elegido es «Otro»; en otro caso se limpia. */
+  private actualizarValidadorOtroVinculo(control: string, esOtro: boolean): void {
+    const ctrl = this.formVictimario.get(control);
+    if (!ctrl) return;
+    if (esOtro) {
+      ctrl.setValidators([Validators.required, Validators.maxLength(255)]);
+    } else {
+      ctrl.setValidators([Validators.maxLength(255)]);
+      if (ctrl.value) ctrl.setValue('', { emitEvent: false });
+    }
+    ctrl.updateValueAndValidity({ emitEvent: false });
+  }
+
+  /** Acumula los archivos elegidos, valida con las reglas del servidor y deja re-seleccionar el mismo archivo. */
+  onEvidenciasSeleccionadas(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const nuevos = Array.from(input.files ?? []);
+    input.value = '';
+    if (!nuevos.length) return;
+
+    const yaElegido = (archivo: File) => this.archivosEvidencia.some(
+      (actual) => actual.name === archivo.name && actual.size === archivo.size && actual.lastModified === archivo.lastModified
+    );
+    const candidatos = [...this.archivosEvidencia, ...nuevos.filter((archivo) => !yaElegido(archivo))];
+    const error = validarEvidencias(candidatos);
+    if (error) {
+      this.errorEvidencias = error;
+      this.notificacion.error(error);
+      return;
+    }
+    this.errorEvidencias = null;
+    this.archivosEvidencia = candidatos;
+  }
+
+  quitarEvidencia(indice: number): void {
+    this.archivosEvidencia = this.archivosEvidencia.filter((_, i) => i !== indice);
+    this.errorEvidencias = validarEvidencias(this.archivosEvidencia);
+  }
+
+  tamanoLegible(bytes: number): string {
+    if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 
   get maxLongitudDocumentoVictima(): number {
@@ -789,20 +920,127 @@ export class FormularioAnonimoComponent {
     this.formRelato.get('hora')?.markAsDirty();
   }
 
-  enviarReporte(): void {
-    const codigoGenerado = 'CAS-' + Math.floor(1000 + Math.random() * 9000);
+  /**
+   * Envía el reporte a `POST /reportes`. El código CAS lo genera y persiste el servidor;
+   * el diálogo de éxito solo se abre con un `201`. Tras el envío el formulario queda
+   * bloqueado y, al cerrar el diálogo, se vuelve al inicio.
+   */
+  enviarReporte(stepper?: MatStepper): void {
+    if (this.enviando) return;
+    if (this.reporteEnviado) {
+      this.abrirDialogoExito();
+      return;
+    }
 
-    this.dialog.open(DialogoExitoComponent, {
+    const formularios = [this.formConsentimiento, this.formPerfil, this.formRelato, this.formVictimario];
+    const pasoInvalido = formularios.findIndex((form) => form.invalid);
+    if (pasoInvalido >= 0) {
+      formularios[pasoInvalido].markAllAsTouched();
+      if (stepper) stepper.selectedIndex = pasoInvalido;
+      this.notificacion.error('Faltan datos obligatorios. Revise el paso señalado antes de enviar el reporte.');
+      return;
+    }
+
+    this.errorEvidencias = validarEvidencias(this.archivosEvidencia);
+    if (this.errorEvidencias) {
+      if (stepper) stepper.selectedIndex = 4;
+      this.notificacion.error(this.errorEvidencias);
+      return;
+    }
+
+    const perfil = this.formPerfil.getRawValue();
+    const dto = construirReporteCasoRequest({
+      perfil: perfil.perfil,
+      deseaDatosVictima: perfil.deseaDatosVictima,
+      victima: this.formVictima.getRawValue(),
+      deseaContacto: perfil.deseaContacto,
+      correoContacto: perfil.correoContacto,
+      whatsappContacto: perfil.whatsappContacto,
+      relato: this.formRelato.getRawValue(),
+      victimario: this.formVictimario.getRawValue(),
+      vinculosUniversidad: this.vinculosUniversidad,
+      vinculosVictima: this.vinculosVictima,
+      rutaActivacion: this.formVictimario.get('rutaActivacion')?.value
+    });
+
+    this.enviando = true;
+    this.reporteCasoService.crear(dto, this.archivosEvidencia).subscribe({
+      next: (respuesta) => {
+        this.enviando = false;
+        this.codigoReporte = respuesta.codigo;
+        this.bloquearFormulario();
+        this.eliminarBorrador();
+        this.abrirDialogoExito();
+      },
+      error: (error: unknown) => {
+        this.enviando = false;
+        const detalle = interpretarErrorReporte(error);
+        this.aplicarErroresServidor(detalle.campos, stepper);
+        const mensajesCampos = Object.values(detalle.campos);
+        this.notificacion.error(
+          mensajesCampos.length ? `${detalle.mensaje} ${mensajesCampos.join(' ')}` : detalle.mensaje,
+          error
+        );
+      }
+    });
+  }
+
+  private abrirDialogoExito(): void {
+    const dialogo = this.dialog.open(DialogoExitoComponent, {
       data: {
         titulo: this.textos.exitoTitulo,
         mensaje: this.textos.exitoMensaje,
-        codigo: codigoGenerado,
+        codigo: this.codigoReporte ?? undefined,
         labelCodigo: this.textos.exitoLabelCodigo,
         instruccion: this.textos.exitoInstruccion
       },
       width: '480px',
       disableClose: true
     });
+
+    dialogo.afterClosed().subscribe({
+      next: () => { void this.router.navigateByUrl(RUTA_TRAS_REPORTE[this.modo]); },
+      error: () => { void this.router.navigateByUrl(RUTA_TRAS_REPORTE[this.modo]); }
+    });
+  }
+
+  /** Deja el reporte enviado en solo lectura para que no parezca editable ni reenviable. */
+  private bloquearFormulario(): void {
+    [this.formConsentimiento, this.formPerfil, this.formRelato, this.formVictimario, this.formEvidencias]
+      .forEach((form) => form.disable({ emitEvent: false }));
+  }
+
+  /** El borrador local solo se borra tras un `201` (contrato §11.4). */
+  private eliminarBorrador(): void {
+    try {
+      localStorage.removeItem(this.textos.claveBorrador);
+    } catch {
+      // localStorage puede no estar disponible (modo privado o bloqueado).
+    }
+  }
+
+  /** Marca en su control cada error de `validationErrors` y lleva al primer paso afectado. */
+  private aplicarErroresServidor(campos: Record<string, string>, stepper?: MatStepper): void {
+    const formularioPorPaso: Record<number, FormGroup> = {
+      1: this.formPerfil,
+      2: this.formRelato,
+      3: this.formVictimario
+    };
+    let primerPaso: number | null = null;
+
+    for (const [campo, mensaje] of Object.entries(campos)) {
+      const destino = CAMPOS_SERVIDOR[campo];
+      if (!destino) continue;
+      const control = formularioPorPaso[destino.paso].get(destino.control);
+      if (!control) continue;
+      control.setErrors({ ...(control.errors ?? {}), servidor: mensaje });
+      control.markAsTouched();
+      primerPaso = primerPaso === null ? destino.paso : Math.min(primerPaso, destino.paso);
+    }
+
+    if (primerPaso !== null && stepper) {
+      stepper.selectedIndex = primerPaso;
+    }
   }
 
   enviarQueja(): void {

@@ -3,8 +3,8 @@
 > Archivo vivo. Se actualiza al cerrar cada fase de trabajo para que cualquier
 > sesión posterior (humana o asistida) retome sin repetir el análisis.
 >
-> **Última actualización:** 27 de octubre de 2026 (módulo «Contenidos del inicio» para el rol
-> `GESTOR_CONTENIDO` y portada conectada a las imágenes del backend; antes, conexión al backend QA)
+> **Última actualización:** 11 de noviembre de 2026 (reporte de caso: contrato v2 completo, evidencias y catálogos;
+> antes, Línea Alma Psicología y APH)
 
 ---
 
@@ -31,7 +31,9 @@ Documentos de referencia, en orden de precedencia para decisiones de diseño:
 | `docs/contratos/GLOSARIO_VBG.md` | Glosario de términos del módulo Equipo de Atención, con la columna del rol Usuario. |
 | `docs/contratos/DECISIONES_PROVISIONALES_VBG.md` | 19 decisiones de contenido/comportamiento pendientes de validar con el equipo clínico/legal; permiten demostrar el módulo mientras se confirma la versión oficial. |
 | `docs/contratos/contrato-contenidos-home.md` | Contrato del endpoint público `GET {apiBaseUrl}/contenidos/home` y del CRUD de administración del gestor de contenidos del home. |
-| `docs/contratos/contrato-reportar-caso.md` | Contrato pendiente con Backend para crear reportes desde `/reportar-caso` y el reporte anónimo (DTO, código CAS, validaciones, maestros, decisiones D1–D7). Hoy el front no consume endpoint. |
+| `docs/contratos/contrato-reportar-caso.md` | Contrato con Backend para crear reportes desde `/reportar-caso` y el reporte anónimo. El §0 (2026-11-11) recoge el contrato v2 implementado (víctima, contacto, presunto agresor, evidencias multipart, maestros) y los pendientes P-REP-01…05. |
+| `docs/contratos/contrato-consultar-reporte.md` | Propuesta de `GET /reportes/{codigo}` para «Seguimiento de trámite». Hoy no existe ningún endpoint de consulta por código. |
+| `docs/contratos/linea-alma/` | Contratos para Backend de Línea Alma: APH (`README.md` con guía, plantilla y decisiones D-ALMA-01…13; atenciones/triaje/derivación; derivaciones, bandeja, contención y auditoría) y **Psicología** (`contrato-psicologia-bandeja-novedades.md`, `contrato-psicologia-casos-seguimientos-recontactos.md`, decisiones D-PSI-01…19). Plan: `docs/plan-implementacion-front-linea-alma.md`. |
 | `.claude/skills/contrato-backend/SKILL.md` | Skill para redactar contratos de API para Backend a partir del código del front. ⚠️ **Solo local**: misma regla `skills/` de `.gitignore` (ver pendiente 11). |
 
 ## 2. Stack y comandos
@@ -112,6 +114,15 @@ espaciados ni radios literales**: siempre `var(--token)`.
 | `GestionContenidosComponent` · `EditorContenidoComponent` | `src/app/components/gestion-contenidos/` | Módulo «Contenidos del inicio» (`/gestion-contenidos`): listado por sección con filtro por estado, y editor con vista previa en vivo hecha con `CasildaCardComponent`. |
 | `SelectorImagenComponent` | `src/app/components/selector-imagen/` | Carga de una imagen con vista previa, arrastrar y soltar, y validación de tipo y peso en el cliente. Controlado: el padre es dueño del archivo y de la URL temporal. |
 | `cambiosSinGuardarGuard` | `src/app/core/navegacion/cambios-sin-guardar.guard.ts` | `canDeactivate` reutilizable: confirma antes de abandonar un formulario con cambios (`ConCambiosPendientes`). |
+| `alma.types.ts` · `alma-dto.ts` · `alma-psicologia-dto.ts` | `src/app/linea-alma/shared/types/` | **Único lugar** de estados, enums, validadores `ALMA-`/`CAS-` y DTO de Línea Alma (Q1/Q2). Dueño: Jonathan; APH solicita cambios. |
+| `CatalogosAlmaService` (`etiquetaDe`, `etiquetasDe`) | `src/app/linea-alma/shared/catalogos/` | `GET /catalogos/{nombre}` con caché por sesión; único lector de catálogos del módulo (equivale a `useCatalogo`). |
+| `SlaBadgeComponent` · `RelojServidorService` · `sla.ts` | `src/app/linea-alma/shared/sla/`, `shared/components/sla-badge/` | Semáforo SLA (RN-ALMA-01, F3) con ícono y texto; el reloj se ancla a `ahoraServidor` y avanza con el tiempo transcurrido local (R6). Umbrales en `UMBRALES_SLA_POR_DEFECTO` (Q3). |
+| `BorradorLocal` (`crearBorrador`) | `src/app/linea-alma/shared/borrador/` | «Guardar progreso» local en `sessionStorage` con prefijo `casilda_` (lo borra la Salida rápida). Equivale a `useBorrador`. |
+| `BloqueoOptimista` | `src/app/linea-alma/shared/concurrencia/` | `version` en cada acción; ante 409 avisa, recarga y relanza; nunca reintenta solo (RNF-ALMA-001, F7). Equivale a `useBloqueoOptimista`. |
+| `AlertaGestionSimultaneaComponent` | `src/app/linea-alma/shared/components/alerta-gestion-simultanea/` | Caso con actuaciones activas en Equipo de Atención y Línea Alma (Q15). La usan APH y Psicología. |
+| `ROLES_HABILITADOS_PSICOLOGIA` · `psicologiaHabilitadaGuard` · `AlmaPermisosService.psicologiaHabilitada()` | `src/app/linea-alma/psicologia/psicologia-habilitacion.ts` | Despliegue controlado del submódulo Psicología: **hoy solo ADMIN** ve y entra; para abrirlo a otro rol basta añadirlo a la lista (menú, catálogo y guard la leen). |
+| `NotificacionesPsicologiaService` | `src/app/linea-alma/psicologia/services/` | Polling cada 30 s de `GET /psicologia/notificaciones` detrás de una abstracción intercambiable por SSE/WebSocket (Q7). |
+| `protocolo-intentos.ts` · `seguimientos.ts` | `src/app/linea-alma/psicologia/dominio/` | Reglas puras con pruebas: protocolo de 9 intentos (RN-ALMA-03), contador de controles que no bloquea (RN-ALMA-05), fecha futura, conversión `datetime-local` ↔ ISO. |
 
 ## 5. Bitácora de avances
 
@@ -370,7 +381,91 @@ OpenAPI de QA y el `ContenidoController` de `origin/main` del backend).
 `GestionContenidosComponent`, `EditorContenidoComponent`, `ContenidoItemComponent`,
 `EstadoVigenciaComponent`, `SelectorImagenComponent`, `cambiosSinGuardarGuard`.
 
+### 2026-11-06 — Reporte anónimo conectado a `POST /reportes`
+Hallazgo de pruebas: «Finalizar y enviar reporte anónimo» no hacía ninguna petición. `enviarReporte()`
+inventaba el código con `Math.random()` y abría el diálogo de éxito; el reporte no se guardaba. El backend
+ya tenía el endpoint público en `main` y desplegado en QA.
+
+- **`ReporteCasoService`** (`src/app/services/reporte-caso.service.ts`): `crear()`, el mapeo puro
+  `construirReporteCasoRequest()` (víctima solo si se eligió darla, campos del lugar contrario en `null`,
+  fecha `YYYY-MM-DD`) y `interpretarErrorReporte()` (400 por campo, 401, 429, sin conexión).
+- **El código CAS lo da el servidor.** El diálogo solo se abre con `201`; el botón queda deshabilitado
+  mientras espera. Tras el envío los formularios se deshabilitan, los pasos dejan de ser editables y se
+  borra el borrador local. Al pulsar «Entendido» se navega a `RUTA_TRAS_REPORTE` (`/home` en anónimo,
+  `/inicio` en autenticado). Los `validationErrors` se marcan en su control y llevan al paso afectado.
+- **Colateral:** el selector de campus guardaba el `nombre`; ahora guarda el `id` que espera `campusId`.
+
+### 2026-11-06 — Línea Alma, submódulo APH (tareas de Hinara del plan)
+Plan: `docs/plan-implementacion-front-linea-alma.md`; contratos: `docs/contratos/linea-alma/`. Rama
+`feature/alma-aph/H-aph-linea-alma`. Código en `src/app/linea-alma/` (`aph/`, `psicologia/` stubs, `shared/`, `mocks/`).
+
+- **Fase 0 (H-0.1…0.4):** rol `TECNICO_APH` en `AuthService`; matriz de permisos pura (`shared/permisos/`) con
+  `almaPermisoGuard` y menús; `AlmaApiClient` + `interpretarErrorAlma` (mensajes no revictimizantes); servidor
+  simulado como interceptor (`mocks/`), con **interruptor por grupo** en `environment.lineaAlma.mocks` (`true` en
+  desarrollo, `false` en prod) y seed del Anexo B; rutas `/linea-alma/aph/*` y stubs de `/linea-alma/psicologia/*`.
+- **APH (H-1.1…H-3.1):** registro por pasos con consulta por documento y alerta de seguimiento (F2), triaje manual u
+  omisión por peligro inminente, consentimiento y derivación a Psicología (F1/F5), `PanelDerivaciones` (F6),
+  bandeja de remisiones con toma y 409, cierre, contención post-cierre, detalle y `AuditTrail`.
+- **Provisionales de Jonathan** (marcados en su cabecera): `shared/types/alma.types.ts`, `CatalogosAlmaService`,
+  `NotasTimelineComponent`. Su versión prevalece al llegar.
+- **Sin hacer:** H-2.2 (integración con Psicología), H-3.3 (revisión de textos con el equipo) y H-3.4 (cambio a
+  servicios reales) dependen de otras personas o de Backend. La ruta antigua `/linea-alma/atencion-pr` no se tocó.
+
+### 2026-11-09 — Línea Alma, submódulo Psicología (tareas de Jonathan del plan)
+Plan: `docs/plan-implementacion-front-linea-alma.md` §5 y §7; contratos: `docs/contratos/linea-alma/contrato-psicologia-*.md`
+(decisiones D-PSI-01…19). Rama `feature/06/018/casilda/submodulo-psicologia`. Código en `src/app/linea-alma/psicologia/`
+(páginas, componentes, servicios, `dominio/`), `shared/` (tipos, catálogos, SLA, borrador, concurrencia) y `mocks/psicologia.*`.
+
+- **Fase 0 (J-0.1…0.4):** `alma.types.ts` deja de ser provisional y centraliza estados de atención **y** de caso, prioridad,
+  protocolo de intentos, seguimientos, recordatorios, decisiones de recontacto y formateadores `ALMA-`/`CAS-` (Q1/Q2);
+  `alma-psicologia-dto.ts`; `CatalogosAlmaService` con catálogos placeholder de Psicología («Dimensión 1…15», Q6);
+  `SlaBadge` + `RelojServidorService` (umbrales 50 %/20 %, Q3); `BorradorLocal` y `BloqueoOptimista`, con pruebas.
+- **Psicología (J-1.1…J-1.8, J-2.1):** bandeja compartida con semáforo, filtros, paginación, refresco cada 30 s y «Tomar»
+  con 409; novedad con notas APH de solo lectura, triaje no editable (RN-ALMA-04), tomar/liberar, protocolo de hasta 9
+  intentos (justificación desde el 4.º, advertencias de día/horario, cierre automático por «No contacto»), primer contacto
+  por pasos (consentimiento verbal → caracterización → valoración → 15 dimensiones → presunto agresor → acuerdos) con
+  borrador local y decisión explícita ante caso activo (RN-ALMA-06); expediente consolidado en una llamada, seguimientos
+  con contador que no bloquea y recordatorio por correo, cierre por motivo + PDF, «Mi agenda» y resolución de recontactos
+  (vincular / caso nuevo / contención puntual). `PanelDerivaciones`, `ConsentimientoInformado`, `CaracterizacionForm`,
+  `NotasTimeline` y `AuditTrail` se reutilizan sin cambios; `AlertaGestionSimultanea` reemplaza el provisional de APH.
+- **Mocks:** `psicologia.handlers.ts` + `psicologia-mock-seed.ts` sobre el **store compartido** (lo que APH deriva aparece en
+  la bandeja; el primer contacto deja a la persona con «seguimiento activo» y el cierre con «caso cerrado» para F2).
+  Interruptores nuevos en `environment.lineaAlma.mocks`: `bandejaPsicologia`, `novedades`, `casos`, `agenda`, `recontactos`.
+- **Acceso:** la matriz §11 no cambia, pero el submódulo queda en **despliegue controlado**: solo ADMIN lo ve y entra
+  (`ROLES_HABILITADOS_PSICOLOGIA`) hasta que el equipo defina a quién más habilitar. COORD sigue la matriz (edita, no
+  cierra): el plan es inconsistente en J-3.2 (D-PSI-11).
+- **Sin hacer:** J-2.2 (demo E2E con Hinara), J-3.3 (cambio a servicios reales) dependen de Backend/otra persona; pruebas
+  de componentes de página (hay pruebas de dominio, mocks, SLA, borrador, bloqueo, habilitación y componentes compartidos).
+
+### 2026-11-11 — Reporte de caso: contrato v2 completo, evidencias y catálogos del servidor
+Rama `fix/06/019/casilda/ajustes-reportar-caso`. Backend ya expone en `main` y en QA el contrato v2 de
+`POST /reportes` (bloques `tipoReportante`, `victima`, `contacto`, `presuntoAgresor` y `multipart/form-data`
+con parte `evidencias`); el front solo enviaba documento, fecha de nacimiento, lugar, relato y ruta (pendiente 15).
+
+- **`ReporteCasoService`:** DTO v2, `crear(dto, evidencias)` (JSON sin archivos, multipart con ellos),
+  `validarEvidencias()` con los límites del servidor (5 archivos, 10 MB c/u, 25 MB, PDF/JPG/PNG/MP4/MOV/3GP),
+  y las reglas compartidas con el servidor `esOpcionOtro()` («¿Cuál?» solo si el vínculo se llama «Otro») y
+  `esVinculoComunidadUdea()` (la UAD solo se pregunta a miembros de la comunidad). Los vacíos siempre van en
+  `null` porque el servidor valida `@Pattern` sobre cadenas presentes.
+- **Formulario:** género, cargo y vínculos del agresor consumen `identidades-genero`, `cargos`,
+  `vinculos-udea` y `vinculos-agresor-victima` y guardan el `id`; «¿Cuál?» es obligatorio solo con «Otro»;
+  el paso «Evidencias» tiene el `<input type="file">` enlazado, acumula archivos, valida y permite quitarlos
+  con botón accesible; los `validationErrors` anidados (`victima.cargoId`, `presuntoAgresor.*`, `contacto`)
+  vuelven a su control y paso.
+- **Hallazgos para Backend** (detalle en el §0.5 del contrato): `vinculos-udea` y `vinculos-agresor-victima`
+  responden `403` sin sesión en QA, así que el canal anónimo ve esos selectores vacíos (P-REP-01);
+  `victima.cargoId` apunta a la tabla `cargo` (Psicóloga, Abogada…), no al vínculo con la Universidad
+  (P-REP-02); «Otro» no existe en `vinculos-udea`, de modo que `otroVinculoUniversidad` nunca es válido
+  (P-REP-03); no hay consulta por código para «Seguimiento de trámite» (P-REP-04, contrato propuesto en
+  `docs/contratos/contrato-consultar-reporte.md`).
+
 ### Pendiente
+0. **Línea Alma Psicología:** Backend debe revisar D-PSI-01…19 (entidad de la novedad antes del caso, `tomadaPorMi`,
+   SLA, PDF síncrono, contención puntual); el equipo debe decidir qué roles se habilitan además de ADMIN
+   (`ROLES_HABILITADOS_PSICOLOGIA`) y resolver la inconsistencia COORD (matriz §11 vs J-3.2); validar textos y
+   catálogos placeholder (Q6) y los umbrales del semáforo (Q3) con Laura Murillo.
+0. **Línea Alma APH:** Backend debe revisar los contratos (decisiones D-ALMA-01…13, p. ej. código del rol
+   `TECNICO_APH`); validar textos y catálogos placeholder (Q6, Q9); decidir si se retira `atencion-pr`.
 1. Accesibilidad — tareas abiertas priorizadas en
    `docs/evidencias/accesibilidad/plan_accesibilidad.md` §6: fases 0.1/0.2/0.4 (axe,
    Lighthouse, recorrido con teclado), 2.4 (conectar `ResumenErroresComponent` a
@@ -462,6 +557,15 @@ OpenAPI de QA y el `ContenidoController` de `origin/main` del backend).
     - **Deuda:** `PagedResponseDto<T>` está declarado tres veces (`listas.service.ts`,
       `solicitud.service.ts`, `usuario.service.ts`); el módulo reutiliza el de `listas.service.ts`. Unificarlo
       en un solo archivo de tipos compartidos.
+15. ~~**Reporte de caso — D5 sin resolver**~~ **Resuelto el 2026-11-11** con el contrato v2 (ver bitácora).
+    Quedan en manos de Backend P-REP-01…05 (`docs/contratos/contrato-reportar-caso.md` §0.5), y del equipo:
+    - decidir el catálogo correcto para «Vínculo con la universidad» de la víctima (P-REP-02);
+    - validar con el equipo de atención los textos de ayuda del paso «Evidencias» y del selector vacío;
+    - probar de punta a punta en QA con una cuenta `USUARIO` real desde `/reportar-caso` y sin sesión desde
+      el home, incluido un envío con evidencias (las pruebas unitarias cubren el contrato, no el servidor).
+16. **Seguimiento de trámite sin endpoint:** `/seguimiento` sigue simulando resultados y los diálogos de
+    éxito prometen una consulta que no existe. Contrato propuesto en
+    `docs/contratos/contrato-consultar-reporte.md`; hasta que exista, mantener el flag `publicTrackingPrototype`.
 
 ## 6. Reglas que no se deben romper
 

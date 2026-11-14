@@ -1,0 +1,228 @@
+<div class="pagina">
+  <header class="pagina__cabecera">
+    <div>
+      <h1 class="pagina__titulo">Nueva atención — Línea Alma</h1>
+      <p class="pagina__intro">
+        Registre la llamada o el mensaje de WhatsApp. Puede guardar un borrador en cualquier momento y retomarlo después.
+      </p>
+    </div>
+    @if (idAtencion(); as id) {
+      <div class="pagina__id" role="status">
+        <span class="pagina__id-etiqueta">Código de la atención</span>
+        <strong class="pagina__id-valor">{{ id }}</strong>
+        <button type="button" class="boton boton--secundario" (click)="copiarId()">
+          <mat-icon aria-hidden="true">content_copy</mat-icon>
+          Copiar código
+        </button>
+      </div>
+    }
+  </header>
+
+  @if (demo) {
+    <p class="casilda-alerta casilda-alerta--precaucion" role="note">
+      <mat-icon aria-hidden="true">science</mat-icon>
+      <span><strong>Datos de demostración.</strong> Los servicios de Línea Alma están simulados: nada de lo que registre llega al sistema real.</span>
+    </p>
+  }
+
+  @if (cargandoInicial()) {
+    <p role="status" aria-busy="true">Cargando la atención…</p>
+  } @else if (errorCarga(); as mensaje) {
+    <div class="casilda-alerta casilda-alerta--peligro" role="alert">
+      <mat-icon aria-hidden="true">error_outline</mat-icon>
+      <div>
+        <p>{{ mensaje }}</p>
+        <button type="button" class="boton boton--secundario" (click)="reintentarCarga()">Intentar de nuevo</button>
+        <a class="boton boton--secundario" routerLink="/linea-alma/aph/remisiones">Volver a las remisiones</a>
+      </div>
+    </div>
+  } @else {
+    <app-resumen-errores [errores]="erroresResumen()" />
+
+    <form [formGroup]="form" novalidate (ngSubmit)="guardarBorrador()">
+      <mat-stepper
+        class="pagina__stepper"
+        [selectedIndex]="paso()"
+        (selectionChange)="paso.set($event.selectedIndex)"
+        [linear]="false"
+        labelPosition="bottom"
+      >
+        <!-- ───────── 1. Identificación ───────── -->
+        <mat-step label="Identificación">
+          <section class="paso" formGroupName="identificacion" aria-labelledby="paso1-titulo">
+            <h2 id="paso1-titulo" class="paso__titulo">Identificación</h2>
+
+            <div class="paso__fila">
+              <mat-form-field appearance="outline">
+                <mat-label>Tipo de documento</mat-label>
+                <mat-select formControlName="tipoIdentificacion" id="nueva-ident-tipoIdentificacion" (selectionChange)="soloDigitos()">
+                  @for (t of tiposDocumento(); track t.codigo) {
+                    <mat-option [value]="t.codigo">{{ t.etiqueta }}</mat-option>
+                  }
+                </mat-select>
+                @if (errorCampo('identificacion', 'tipoIdentificacion', 'el tipo de documento'); as e) { <mat-error>{{ e }}</mat-error> }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Número de documento</mat-label>
+                <input
+                  matInput
+                  id="nueva-ident-numeroIdentificacion"
+                  formControlName="numeroIdentificacion"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  [maxlength]="longitudMaxima()"
+                  (input)="soloDigitos()"
+                  (keydown.enter)="$event.preventDefault(); consultar()"
+                />
+                <mat-hint>Escríbalo sin puntos ni espacios.</mat-hint>
+                @if (errorCampo('identificacion', 'numeroIdentificacion', 'el número de documento'); as e) { <mat-error>{{ e }}</mat-error> }
+              </mat-form-field>
+
+              <button
+                type="button"
+                class="boton boton--secundario paso__consultar"
+                [disabled]="consultando() || !!idAtencion()"
+                (click)="consultar()"
+              >
+                <mat-icon aria-hidden="true">person_search</mat-icon>
+                {{ consultando() ? 'Consultando…' : 'Consultar documento' }}
+              </button>
+            </div>
+
+            @if (consulta(); as c) {
+              @if (consultaVigente() || idAtencion()) {
+                <app-alerta-seguimiento [consulta]="c" [permitirContencion]="permisos.tiene('alma.aph.editar')" (contencion)="abrirContencion($event)" />
+              }
+            }
+
+            <mat-form-field appearance="outline" class="paso__canal">
+              <mat-label>Canal de ingreso</mat-label>
+              <mat-select formControlName="canalIngreso" id="nueva-ident-canalIngreso">
+                @for (canal of canales(); track canal) {
+                  <mat-option [value]="canal">{{ etiquetaCanal(canal) }}</mat-option>
+                }
+              </mat-select>
+              @if (esRemision()) { <mat-hint>La atención llegó por remisión; el canal no se cambia.</mat-hint> }
+              @if (errorCampo('identificacion', 'canalIngreso', 'el canal de ingreso'); as e) { <mat-error>{{ e }}</mat-error> }
+            </mat-form-field>
+
+            <div class="paso__acciones">
+              <button type="button" class="boton boton--primario" [disabled]="guardando()" (click)="continuar(0)">Guardar y continuar</button>
+            </div>
+          </section>
+        </mat-step>
+
+        <!-- ───────── 2. Caracterización ───────── -->
+        <mat-step label="Caracterización">
+          <section class="paso" aria-labelledby="paso2-titulo">
+            <h2 id="paso2-titulo" class="paso__titulo">Caracterización</h2>
+            <p class="paso__ayuda">Todos los datos son opcionales: pregunte solo lo que la persona quiera compartir.</p>
+            <app-caracterizacion-form [grupo]="form.controls.caracterizacion" prefijoId="nueva-car" />
+            <div class="paso__acciones">
+              <button type="button" class="boton boton--secundario" (click)="paso.set(0)">Atrás</button>
+              <button type="button" class="boton boton--secundario" [disabled]="guardando()" (click)="guardarBorrador()">Guardar borrador</button>
+              <button type="button" class="boton boton--primario" [disabled]="guardando()" (click)="continuar(1)">Guardar y continuar</button>
+            </div>
+          </section>
+        </mat-step>
+
+        <!-- ───────── 3. Motivo y solicitante ───────── -->
+        <mat-step label="Motivo y solicitante">
+          <section class="paso" formGroupName="solicitud" aria-labelledby="paso3-titulo">
+            <h2 id="paso3-titulo" class="paso__titulo">Motivo y solicitante</h2>
+
+            <mat-checkbox formControlName="esTercero" id="nueva-sol-esTercero">
+              Quien se comunica es otra persona, no la persona afectada.
+            </mat-checkbox>
+
+            @if (esTercero()) {
+              <div class="paso__fila">
+                <mat-form-field appearance="outline">
+                  <mat-label>Nombres de quien llama</mat-label>
+                  <input matInput id="nueva-sol-solNombres" formControlName="solNombres" autocomplete="off" />
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Apellidos de quien llama</mat-label>
+                  <input matInput id="nueva-sol-solApellidos" formControlName="solApellidos" autocomplete="off" />
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Teléfono de quien llama</mat-label>
+                  <input matInput id="nueva-sol-solTelefono" formControlName="solTelefono" type="tel" inputmode="tel" autocomplete="off" />
+                  @if (errorCampo('solicitud', 'solTelefono', 'el teléfono'); as e) { <mat-error>{{ e }}</mat-error> }
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Relación con la persona afectada</mat-label>
+                  <mat-select id="nueva-sol-solParentesco" formControlName="solParentesco">
+                    <mat-option value="">Sin dato</mat-option>
+                    @for (p of parentescos(); track p.codigo) {
+                      <mat-option [value]="p.codigo">{{ p.etiqueta }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            }
+
+            <mat-form-field appearance="outline" class="paso__ancho">
+              <mat-label>Motivo de consulta</mat-label>
+              <textarea matInput id="nueva-sol-motivoConsulta" formControlName="motivoConsulta" rows="4" autocomplete="off"></textarea>
+              <mat-hint>Con las palabras de la persona, sin juicios.</mat-hint>
+              @if (errorCampo('solicitud', 'motivoConsulta', 'el motivo de consulta'); as e) { <mat-error>{{ e }}</mat-error> }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="paso__ancho">
+              <mat-label>Nota de valoración APH (opcional)</mat-label>
+              <textarea matInput id="nueva-sol-notaAph" formControlName="notaAph" rows="4" autocomplete="off"></textarea>
+              <mat-hint>Psicología la verá como la nota de APH.</mat-hint>
+            </mat-form-field>
+
+            <div class="paso__acciones">
+              <button type="button" class="boton boton--secundario" (click)="paso.set(1)">Atrás</button>
+              <button type="button" class="boton boton--secundario" [disabled]="guardando()" (click)="guardarBorrador()">Guardar borrador</button>
+              <button type="button" class="boton boton--primario" [disabled]="guardando()" (click)="continuar(2)">Guardar y continuar</button>
+            </div>
+          </section>
+        </mat-step>
+
+        <!-- ───────── 4. Triaje y derivación ───────── -->
+        <mat-step label="Triaje y derivación">
+          <section class="paso" aria-labelledby="paso4-titulo">
+            <h2 id="paso4-titulo" class="paso__titulo">Triaje y derivación</h2>
+
+            @if (atencion(); as a) {
+              @if (mostrarContencion(); as numeroCaso) {
+                <app-contencion-post-cierre-form [idAtencion]="a.idAtencion" [numeroCaso]="numeroCaso" />
+              }
+
+              <app-paso-triaje [atencion]="a" [soloLectura]="!a.editable" (actualizada)="actualizarAtencion($event)" (conflicto)="recargarTrasConflicto()" />
+
+              @if (a.estado !== 'BORRADOR') {
+                <app-paso-derivacion
+                  [atencion]="a"
+                  [soloLectura]="!a.editable && a.estado !== 'PENDIENTE_PSICOLOGIA'"
+                  (actualizada)="actualizarAtencion($event)"
+                  (conflicto)="recargarTrasConflicto()"
+                />
+              }
+
+              <p class="paso__ayuda">
+                Las rutas internas y externas, el cierre y el historial se gestionan desde
+                <a [routerLink]="['/linea-alma/aph/atenciones', a.idAtencion]">el detalle de la atención</a>.
+              </p>
+            } @else {
+              <p class="casilda-alerta casilda-alerta--precaucion" role="status">
+                <mat-icon aria-hidden="true">info</mat-icon>
+                <span>Complete y guarde los pasos anteriores para registrar el triaje.</span>
+              </p>
+            }
+
+            <div class="paso__acciones">
+              <button type="button" class="boton boton--secundario" (click)="paso.set(2)">Atrás</button>
+              <button type="submit" class="boton boton--secundario" [disabled]="guardando()">Guardar borrador</button>
+            </div>
+          </section>
+        </mat-step>
+      </mat-stepper>
+    </form>
+  }
+</div>

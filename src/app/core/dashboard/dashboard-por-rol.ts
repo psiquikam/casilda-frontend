@@ -24,7 +24,7 @@ export type WidgetId =
   | 'accesos-frecuentes'
   | 'ayuda-protocolos';
 
-export type RolCasilda = 'ADMIN' | 'COORDINADOR' | 'PROFESIONAL' | 'REVISOR' | 'USUARIO' | 'GESTOR_CONTENIDO';
+export type RolCasilda = 'ADMIN' | 'COORDINADOR' | 'PROFESIONAL' | 'REVISOR' | 'USUARIO' | 'GESTOR_CONTENIDO' | 'TECNICO_APH';
 
 export const DASHBOARD_POR_ROL: Record<RolCasilda, readonly WidgetId[]> = {
   // ¿La plataforma está bien configurada y funcionando? (§4.1)
@@ -45,6 +45,9 @@ export const DASHBOARD_POR_ROL: Record<RolCasilda, readonly WidgetId[]> = {
   // solo módulo, así que el panel se limita a llevarlo allí: los indicadores y
   // protocolos del equipo de atención no le corresponden.
   GESTOR_CONTENIDO: ['accesos-frecuentes'],
+
+  // Técnico APH (Línea Alma): su trabajo vive en el módulo; el panel solo lo lleva allí.
+  TECNICO_APH: ['accesos-frecuentes'],
 
   // El dashboard del rol Usuario se rediseña completo en la Subfase 4 con
   // enfoque informado en trauma (§5). Hasta entonces conserva su vista actual:

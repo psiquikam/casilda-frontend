@@ -1,0 +1,142 @@
+.seg {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.seg__cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.seg__titulo {
+  margin: 0;
+  font-size: var(--font-size-xl);
+}
+
+.seg__subtitulo {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+
+.seg__contador {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-subtle);
+}
+
+.seg__proximo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.seg__nota {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.seg__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-subtle);
+}
+
+.seg__fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+
+  legend {
+    padding: 0 var(--space-2);
+    font-weight: 700;
+  }
+
+  mat-radio-group {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.seg__error {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-danger-text);
+}
+
+.seg__fecha {
+  max-width: 360px;
+}
+
+.seg__botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.seg__lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.seg__item {
+  padding: var(--space-3) var(--space-4);
+  border-left: 4px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-subtle);
+
+  p {
+    margin: 0 0 var(--space-1);
+  }
+}
+
+.seg__item-cabecera,
+.seg__item-pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+
+  strong {
+    color: var(--color-text-primary);
+  }
+
+  mat-icon {
+    font-size: var(--font-size-md);
+    width: var(--font-size-md);
+    height: var(--font-size-md);
+  }
+}
+
+.seg__item-texto {
+  white-space: pre-wrap;
+}
+
+.seg__recordatorio--fallido {
+  color: var(--color-danger-text);
+  font-weight: 600;
+}

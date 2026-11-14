@@ -3,6 +3,7 @@ import { Router, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/ro
 import { MatIconModule } from '@angular/material/icon';
 import { filter } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
+import { AlmaPermisosService } from '../../../linea-alma/shared/permisos/alma-permisos.service';
 import { environment } from '../../../../environments/environment';
 
 export type MenuSectionKey = 'admin' | 'contenidos' | 'atencion' | 'alma' | 'uad' | 'reportes' | 'violeta' | 'usuario';
@@ -17,6 +18,7 @@ export type MenuSectionKey = 'admin' | 'contenidos' | 'atencion' | 'alma' | 'uad
 export class SidebarComponent implements OnInit {
   private readonly router = inject(Router);
   readonly auth = inject(AuthService);
+  readonly alma = inject(AlmaPermisosService);
   readonly features = environment.features;
 
   expandedSections: Record<MenuSectionKey, boolean> = {

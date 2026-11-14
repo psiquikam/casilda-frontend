@@ -148,6 +148,48 @@ export const CATALOGO_MODULOS: readonly ModuloCasilda[] = [
     roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL'],
     seccion: 'Línea Alma'
   },
+  {
+    id: 'alma-aph-nueva',
+    nombre: 'Nueva atención',
+    icono: 'add_ic_call',
+    ruta: '/linea-alma/aph/nueva',
+    roles: ['COORDINADOR', 'TECNICO_APH'],
+    seccion: 'Línea Alma'
+  },
+  {
+    id: 'alma-aph-remisiones',
+    nombre: 'Remisiones recibidas',
+    icono: 'forward_to_inbox',
+    ruta: '/linea-alma/aph/remisiones',
+    roles: ['COORDINADOR', 'TECNICO_APH', 'REVISOR'],
+    seccion: 'Línea Alma'
+  },
+  // Psicología (Línea Alma): despliegue controlado. Los roles deben coincidir con
+  // `ROLES_HABILITADOS_PSICOLOGIA` (`linea-alma/psicologia/psicologia-habilitacion.ts`), hoy solo ADMIN.
+  {
+    id: 'alma-psicologia-bandeja',
+    nombre: 'Bandeja de Psicología',
+    icono: 'psychology',
+    ruta: '/linea-alma/psicologia/bandeja',
+    roles: ['ADMIN'],
+    seccion: 'Línea Alma'
+  },
+  {
+    id: 'alma-psicologia-recontactos',
+    nombre: 'Recontactos',
+    icono: 'event_repeat',
+    ruta: '/linea-alma/psicologia/recontactos',
+    roles: ['ADMIN'],
+    seccion: 'Línea Alma'
+  },
+  {
+    id: 'alma-psicologia-agenda',
+    nombre: 'Mi agenda',
+    icono: 'event_note',
+    ruta: '/linea-alma/psicologia/agenda',
+    roles: ['ADMIN'],
+    seccion: 'Línea Alma'
+  },
 
   // --- Reportes y métricas ---
   {

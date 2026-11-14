@@ -27,6 +27,31 @@ export const environment = {
    * sesión ADMIN con un clic (pendiente 6 de `CLAUDE.md`).
    */
   datosDemostracion: false,
+  /**
+   * Módulo Línea Alma (submódulos APH y Psicología): servicios simulados mientras Backend
+   * publica los contratos de `docs/contratos/linea-alma/`. Un interruptor por
+   * grupo de endpoints (`mocks/alma-mock.interceptor.ts`): al publicarse uno,
+   * se pone en `false` **sin tocar componentes** (H-3.4). Los datos son
+   * ficticios (Anexo B del plan) y no se mezclan con `datosDemostracion`.
+   * **Nunca `true` en un entorno desplegado.**
+   */
+  lineaAlma: {
+    mocks: {
+      catalogos: false,
+      personas: false,
+      atencionesAph: false,
+      derivaciones: false,
+      bandejaAph: false,
+      contenciones: false,
+      auditoria: false,
+      // Psicología (contratos en `docs/contratos/linea-alma/contrato-psicologia-*.md`).
+      bandejaPsicologia: false,
+      novedades: false,
+      casos: false,
+      agenda: false,
+      recontactos: false
+    }
+  },
   features: {
     complaintIntakePrototype: false,
     publicTrackingPrototype: false,

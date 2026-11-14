@@ -1,0 +1,126 @@
+<section class="int" aria-labelledby="int-titulo">
+  <header class="int__cabecera">
+    <h2 id="int-titulo" class="int__titulo">Intentos de contacto</h2>
+    <p class="int__contador" role="status">
+      <mat-icon aria-hidden="true">call</mat-icon>
+      <strong>{{ resumen().texto }}</strong> intentos registrados
+      @if (resumen().protocoloSiguiente; as p) {
+        · siguiente: {{ etiquetaProtocolo[p] }}
+      }
+    </p>
+  </header>
+
+  @if (novedad().cerradaPorNoContacto) {
+    <div class="casilda-alerta casilda-alerta--peligro" role="status">
+      <mat-icon aria-hidden="true">phone_disabled</mat-icon>
+      <span><strong>Cerrada por «No contacto».</strong> Se agotaron los 9 intentos del protocolo sin lograr comunicación; el sistema cerró la novedad automáticamente.</span>
+    </div>
+  }
+
+  @if (puedeRegistrar()) {
+    <div class="int__acciones">
+      @if (!formularioAbierto()) {
+        <button type="button" class="boton boton--secundario" (click)="abrir()">
+          <mat-icon aria-hidden="true">add_call</mat-icon>
+          Registrar intento {{ siguiente() }} de {{ maximo }}
+        </button>
+      }
+      <button type="button" class="boton boton--primario" (click)="contactoEfectivo.emit()">
+        <mat-icon aria-hidden="true">check_circle</mat-icon>
+        La persona contestó: registrar contacto efectivo
+      </button>
+    </div>
+  } @else if (bloqueo().motivo; as motivo) {
+    @if (!novedad().cerradaPorNoContacto) {
+      <p class="int__nota">{{ motivo }}</p>
+    }
+  }
+
+  @if (formularioAbierto() && puedeRegistrar()) {
+    <form class="int__form" [formGroup]="form" (ngSubmit)="registrar()" novalidate aria-labelledby="int-form-titulo">
+      <h3 id="int-form-titulo" class="int__subtitulo">Intento {{ siguiente() }} · {{ resumen().protocoloSiguiente ? etiquetaProtocolo[resumen().protocoloSiguiente!] : '' }}</h3>
+
+      @if (esElUltimo()) {
+        <p class="casilda-alerta casilda-alerta--precaucion" role="status">
+          <mat-icon aria-hidden="true">warning</mat-icon>
+          <span>Es el último intento del protocolo. Si no hay contacto, el sistema cerrará la novedad por «No contacto».</span>
+        </p>
+      }
+
+      @for (aviso of advertencias(); track aviso) {
+        <p class="casilda-alerta casilda-alerta--precaucion" role="status">
+          <mat-icon aria-hidden="true">info</mat-icon>
+          <span>{{ aviso }} Puede continuar si así lo decide.</span>
+        </p>
+      }
+
+      <div class="int__fila">
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha y hora del intento</mat-label>
+          <input matInput type="datetime-local" id="int-fechaHora" formControlName="fechaHora" />
+          <mat-hint>No puede ser una fecha futura.</mat-hint>
+          @if (error('fechaHora', 'La fecha y hora'); as e) { <mat-error>{{ e }}</mat-error> }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Resultado</mat-label>
+          <mat-select id="int-resultado" formControlName="resultado">
+            @for (r of resultados(); track r.codigo) {
+              <mat-option [value]="r.codigo">{{ r.etiqueta }}</mat-option>
+            }
+          </mat-select>
+          @if (errorCatalogo()) {
+            <mat-hint>
+              No pudimos cargar los resultados.
+              <button type="button" class="int__enlace" (click)="cargarCatalogo()">Intentar de nuevo</button>
+            </mat-hint>
+          }
+          @if (error('resultado', 'El resultado'); as e) { <mat-error>{{ e }}</mat-error> }
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Nota del intento</mat-label>
+        <textarea matInput id="int-nota" formControlName="nota" rows="3" autocomplete="off"></textarea>
+        <mat-hint>Qué pasó en este intento. Es una nota independiente: no se mezcla con las anteriores.</mat-hint>
+        @if (error('nota', 'La nota'); as e) { <mat-error>{{ e }}</mat-error> }
+      </mat-form-field>
+
+      @if (exigeJustificacion()) {
+        <mat-form-field appearance="outline">
+          <mat-label>Justificación del intento adicional</mat-label>
+          <textarea matInput id="int-justificacion" formControlName="justificacion" rows="2" autocomplete="off"></textarea>
+          <mat-hint>El protocolo prevé 3 intentos; explique por qué se hace uno adicional.</mat-hint>
+          @if (error('justificacion', 'La justificación'); as e) { <mat-error>{{ e }}</mat-error> }
+        </mat-form-field>
+      }
+
+      <div class="int__botones">
+        <button type="submit" class="boton boton--primario" [disabled]="enviando()">{{ enviando() ? 'Guardando…' : 'Guardar intento' }}</button>
+        <button type="button" class="boton boton--secundario" [disabled]="enviando()" (click)="cancelar()">Cancelar</button>
+      </div>
+    </form>
+  }
+
+  @if (intentosOrdenados().length === 0) {
+    <p class="int__nota">Todavía no hay intentos registrados.</p>
+  } @else {
+    <ol class="int__lista" aria-label="Intentos de contacto, del más reciente al más antiguo">
+      @for (i of intentosOrdenados(); track i.idIntento) {
+        <li class="int__item">
+          <p class="int__item-cabecera">
+            <strong>Intento {{ i.numeroIntento }}</strong>
+            <span>{{ etiquetaProtocolo[i.protocolo] }}</span>
+            <span>{{ i.fechaHora | date: 'EEEE d MMM y, h:mm a' }}</span>
+            <span>{{ i.autor }}</span>
+          </p>
+          <p class="int__item-resultado">Resultado: <strong>{{ etiquetaResultado(i.resultado) }}</strong></p>
+          <p class="int__item-texto">{{ i.nota }}</p>
+          @if (i.justificacion) {
+            <p class="int__item-texto"><em>Justificación:</em> {{ i.justificacion }}</p>
+          }
+        </li>
+      }
+    </ol>
+  }
+</section>

@@ -1,0 +1,171 @@
+<div class="bandeja">
+  <header class="bandeja__cabecera">
+    <div>
+      <h1 class="bandeja__titulo">Bandeja de Psicología — Línea Alma</h1>
+      <p class="bandeja__intro">
+        Novedades derivadas por APH, ordenadas por el plazo de primer contacto. La cola es compartida: tome la que va a gestionar y
+        libérela si no puede continuar.
+      </p>
+    </div>
+    <div class="bandeja__acciones">
+      @if (notificaciones.resumen(); as r) {
+        @if (r.recontactosPendientes > 0) {
+          <a class="boton boton--secundario" routerLink="/linea-alma/psicologia/recontactos">
+            <mat-icon aria-hidden="true">event_repeat</mat-icon>
+            {{ r.recontactosPendientes === 1 ? '1 recontacto por resolver' : r.recontactosPendientes + ' recontactos por resolver' }}
+          </a>
+        }
+      }
+      <a class="boton boton--secundario" routerLink="/linea-alma/psicologia/agenda">
+        <mat-icon aria-hidden="true">event_note</mat-icon>
+        Mi agenda
+      </a>
+    </div>
+  </header>
+
+  @if (demo) {
+    <p class="casilda-alerta casilda-alerta--precaucion" role="note">
+      <mat-icon aria-hidden="true">science</mat-icon>
+      <span><strong>Datos de demostración.</strong> Los servicios de Línea Alma están simulados.</span>
+    </p>
+  }
+
+  <form class="bandeja__filtros" (ngSubmit)="filtrar()" aria-label="Filtros de la bandeja">
+    <mat-form-field appearance="outline">
+      <mat-label>Triaje</mat-label>
+      <mat-select [ngModel]="triaje()" name="triaje" (ngModelChange)="triaje.set($event); filtrar()">
+        <mat-option value="">Todos</mat-option>
+        @for (t of triajes; track t) {
+          <mat-option [value]="t">{{ etiquetaTriaje[t] }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Semáforo</mat-label>
+      <mat-select [ngModel]="semaforo()" name="semaforo" (ngModelChange)="semaforo.set($event); filtrar()">
+        <mat-option value="">Todos</mat-option>
+        @for (s of semaforos; track s) {
+          <mat-option [value]="s">{{ etiquetaSemaforo[s] }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Estado</mat-label>
+      <mat-select [ngModel]="estado()" name="estado" (ngModelChange)="estado.set($event); filtrar()">
+        <mat-option value="">Todos</mat-option>
+        @for (e of estados; track e) {
+          <mat-option [value]="e">{{ e === 'CERRADO' ? 'Cerrada por no contacto' : etiquetaEstado[e] }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Número de documento</mat-label>
+      <input matInput type="search" name="documento" inputmode="numeric" autocomplete="off" [ngModel]="documento()" (ngModelChange)="documento.set($event)" />
+      <mat-hint>Escriba el número y pulse Buscar.</mat-hint>
+    </mat-form-field>
+    <div class="bandeja__botones-filtro">
+      <button type="submit" class="boton boton--secundario">Buscar</button>
+      <button type="button" class="boton boton--secundario" (click)="limpiarFiltros()">Limpiar</button>
+    </div>
+  </form>
+
+  <div aria-live="polite" class="visually-hidden">
+    @if (!cargando() && !error()) { {{ total() }} resultados. }
+  </div>
+
+  @if (cargando()) {
+    <p role="status" aria-busy="true">Cargando la bandeja…</p>
+  } @else if (error()) {
+    <div class="casilda-alerta casilda-alerta--peligro" role="alert">
+      <mat-icon aria-hidden="true">error_outline</mat-icon>
+      <div>
+        <p>No pudimos cargar la bandeja.</p>
+        <button type="button" class="boton boton--secundario" (click)="cargar()">Intentar de nuevo</button>
+      </div>
+    </div>
+  } @else if (vacio()) {
+    <p class="bandeja__vacio">No hay novedades con estos filtros. Cuando APH derive una atención aparecerá aquí.</p>
+  } @else {
+    <p class="bandeja__meta">
+      {{ total() }} {{ total() === 1 ? 'novedad' : 'novedades' }} · se actualiza cada 30 segundos
+      @if (ultimaActualizacion(); as u) { (última vez {{ u | date: 'h:mm:ss a' }}) }
+    </p>
+    <div class="bandeja__tabla-contenedor">
+      <table class="bandeja__tabla" aria-label="Novedades pendientes de Psicología, de menor a mayor tiempo restante">
+        <thead>
+          <tr>
+            <th scope="col">Código</th>
+            <th scope="col">Persona</th>
+            <th scope="col">Triaje</th>
+            <th scope="col">Canal</th>
+            <th scope="col">Derivada</th>
+            <th scope="col">Plazo de primer contacto</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Tomada por</th>
+            <th scope="col"><span class="visually-hidden">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of items(); track item.idAtencion) {
+            <tr>
+              <th scope="row" class="bandeja__codigo">
+                {{ item.idAtencion }}
+                @if (item.recontacto) {
+                  <span class="bandeja__chip bandeja__chip--recontacto">
+                    <mat-icon aria-hidden="true">event_repeat</mat-icon> Recontacto
+                  </span>
+                }
+              </th>
+              <td>
+                {{ item.persona.nombreCompleto }}
+                <span class="bandeja__sub">{{ item.persona.tipoIdentificacion }} {{ item.persona.numeroIdentificacion }}</span>
+              </td>
+              <td><span class="bandeja__chip" [class]="'bandeja__chip bandeja__chip--' + item.triaje.toLowerCase()">{{ etiquetaTriaje[item.triaje] }}</span></td>
+              <td>{{ etiquetaCanal[item.canalIngreso] }}</td>
+              <td>{{ item.fechaDerivacion | date: 'd MMM, h:mm a' }}</td>
+              <td>
+                @if (item.estado === 'PENDIENTE_PSICOLOGIA') {
+                  <app-sla-badge [sla]="item.sla" [compacto]="true" />
+                } @else {
+                  <span class="bandeja__sub">Sin plazo activo</span>
+                }
+              </td>
+              <td>
+                {{ item.estado === 'CERRADO' ? 'Cerrada por no contacto' : etiquetaEstado[item.estado] }}
+                <span class="bandeja__sub">Intentos {{ item.intentosRealizados }}/9</span>
+              </td>
+              <td>
+                @if (item.tomadaPor; as t) {
+                  {{ item.tomadaPorMi ? 'Usted' : t }}
+                } @else {
+                  <span class="bandeja__sub">Libre</span>
+                }
+              </td>
+              <td>
+                @if (item.estado === 'PENDIENTE_PSICOLOGIA' && !item.tomadaPor && puedeTomar()) {
+                  <button type="button" class="boton boton--primario" [disabled]="tomando() !== null" (click)="tomar(item)">
+                    {{ tomando() === item.idAtencion ? 'Tomando…' : 'Tomar' }}
+                    <span class="visually-hidden"> la novedad {{ item.idAtencion }}</span>
+                  </button>
+                } @else {
+                  <a class="boton boton--secundario" [routerLink]="['/linea-alma/psicologia/novedades', item.idAtencion]">
+                    {{ item.tomadaPorMi ? 'Continuar' : 'Ver' }} <span class="visually-hidden"> la novedad {{ item.idAtencion }}</span>
+                  </a>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <mat-paginator
+      [length]="total()"
+      [pageSize]="tamano"
+      [pageIndex]="pagina()"
+      [hidePageSize]="true"
+      (page)="cambiarPagina($event)"
+      aria-label="Páginas de la bandeja"
+    />
+  }
+</div>

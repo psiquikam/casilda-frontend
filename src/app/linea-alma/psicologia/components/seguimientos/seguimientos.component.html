@@ -1,0 +1,103 @@
+<section class="seg" aria-labelledby="seg-titulo">
+  <header class="seg__cabecera">
+    <h2 id="seg-titulo" class="seg__titulo">Seguimientos</h2>
+    <p class="seg__contador" role="status">
+      <mat-icon aria-hidden="true">event_available</mat-icon>
+      <strong>{{ contador().texto }}</strong> controles
+      @if (contador().excedeReglamentarios) {
+        <span class="seg__nota">· más de los 3 reglamentarios; el expediente sigue abierto</span>
+      } @else if (contador().faltanParaReglamentarios > 0) {
+        <span class="seg__nota">· faltan {{ contador().faltanParaReglamentarios }} para completar los 3 reglamentarios</span>
+      }
+    </p>
+  </header>
+
+  @if (caso().proximoControl; as p) {
+    <p class="seg__proximo">
+      <mat-icon aria-hidden="true">schedule</mat-icon>
+      Próximo control: <strong>{{ p | date: "EEEE d 'de' MMMM, h:mm a" }}</strong>
+    </p>
+  }
+
+  @if (puedeRegistrar()) {
+    @if (!formularioAbierto()) {
+      <div>
+        <button type="button" class="boton boton--primario" (click)="abrir()">
+          <mat-icon aria-hidden="true">add</mat-icon>
+          Registrar seguimiento
+        </button>
+      </div>
+    } @else {
+      <form class="seg__form" [formGroup]="form" (ngSubmit)="registrar()" novalidate aria-labelledby="seg-form-titulo">
+        <h3 id="seg-form-titulo" class="seg__subtitulo">Control {{ contador().realizados + 1 }}</h3>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Nota del seguimiento</mat-label>
+          <textarea matInput id="seg-nota" formControlName="nota" rows="4" autocomplete="off"></textarea>
+          <mat-hint>Cómo está la persona, qué se trabajó y qué se acordó.</mat-hint>
+          @if (error('nota', 'La nota'); as e) { <mat-error>{{ e }}</mat-error> }
+        </mat-form-field>
+
+        <fieldset class="seg__fieldset">
+          <legend>¿La persona desea continuar con el seguimiento?</legend>
+          <mat-radio-group formControlName="deseaContinuar" aria-label="¿La persona desea continuar con el seguimiento?">
+            <mat-radio-button value="SI">Sí, programar el próximo control</mat-radio-button>
+            <mat-radio-button value="NO">No, por ahora no desea continuar</mat-radio-button>
+          </mat-radio-group>
+          @if (error('deseaContinuar', 'La respuesta'); as e) { <p class="seg__error" role="alert">{{ e }}</p> }
+        </fieldset>
+
+        @if (continua()) {
+          <mat-form-field appearance="outline" class="seg__fecha">
+            <mat-label>Próximo control</mat-label>
+            <input matInput type="datetime-local" id="seg-proximoControl" formControlName="proximoControl" />
+            <mat-hint>El sistema envía el recordatorio por correo si la persona tiene uno registrado.</mat-hint>
+            @if (error('proximoControl', 'El próximo control'); as e) { <mat-error>{{ e }}</mat-error> }
+          </mat-form-field>
+        } @else if (valoresDeseaNo()) {
+          <p class="casilda-alerta" role="status">
+            <mat-icon aria-hidden="true">info</mat-icon>
+            <span>Al guardar, se le ofrecerá cerrar el caso con un motivo del catálogo. Si la persona vuelve a comunicarse, el expediente puede seguir registrando seguimientos.</span>
+          </p>
+        }
+
+        <div class="seg__botones">
+          <button type="submit" class="boton boton--primario" [disabled]="enviando()">{{ enviando() ? 'Guardando…' : 'Guardar seguimiento' }}</button>
+          <button type="button" class="boton boton--secundario" [disabled]="enviando()" (click)="cancelar()">Cancelar</button>
+        </div>
+      </form>
+    }
+  } @else if (!caso().activo) {
+    <p class="seg__nota">El caso está cerrado. Si la persona vuelve a comunicarse, APH o Psicología registran una contención después del cierre sin reabrirlo.</p>
+  }
+
+  @if (ordenados().length === 0) {
+    <p class="seg__nota">Todavía no hay seguimientos. El primer contacto efectivo cuenta como el control 1.</p>
+  } @else {
+    <ol class="seg__lista" aria-label="Seguimientos, del más reciente al más antiguo">
+      @for (s of ordenados(); track s.idSeguimiento) {
+        <li class="seg__item">
+          <p class="seg__item-cabecera">
+            <strong>Seguimiento {{ s.numeroSeguimiento }}</strong>
+            <span>{{ etiquetaTipo[s.tipo] }}</span>
+            <span>{{ s.fecha | date: 'd MMM y, h:mm a' }}</span>
+            <span>{{ s.autor }}</span>
+          </p>
+          <p class="seg__item-texto">{{ s.nota }}</p>
+          <p class="seg__item-pie">
+            @if (s.deseaContinuar) {
+              <mat-icon aria-hidden="true">event</mat-icon>
+              Próximo control {{ s.proximoControl | date: 'd MMM y, h:mm a' }}
+              @if (s.recordatorio; as r) {
+                · <span [class.seg__recordatorio--fallido]="r.estado === 'FALLIDO'">{{ etiquetaRecordatorio[r.estado] }}{{ r.correo ? ' (' + r.correo + ')' : '' }}</span>
+              }
+            } @else {
+              <mat-icon aria-hidden="true">do_not_disturb_on</mat-icon>
+              La persona no deseaba continuar en ese momento.
+            }
+          </p>
+        </li>
+      }
+    </ol>
+  }
+</section>
