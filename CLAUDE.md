@@ -126,6 +126,8 @@ espaciados ni radios literales**: siempre `var(--token)`.
 | `UadApiPort` · `UadHttpAdapter` · `UadMockAdapter` · `provideUadApi()` | `src/app/uad/` | Puerto del módulo UAD y sus dos adaptadores; `environment.uad.adaptador` elige (`'mock'` en desarrollo, `'http'` en prod). Se provee en las rutas `/uad`, no en la raíz. |
 | `UadFacade` · `interpretarErrorUad()` | `src/app/uad/servicios/`, `infraestructura/uad-error.ts` | Lo único que inyectan las páginas UAD; errores del `ErrorResponse` real del backend traducidos a `ErrorUad`, igual en mock y HTTP. |
 | `competencia.ts` · `decision-evaluacion.ts` · `etiquetas.ts` | `src/app/uad/dominio/` | Reglas puras de reparto Equipo 3/4 y de la decisión de evaluación; **único lugar** de etiquetas de los enums UAD. |
+| `SIN_CREDENCIALES` | `src/app/services/auth.interceptor.ts` | `HttpContextToken` opt-in: la petición marcada sale sin `Authorization` y un 401 no cierra la sesión. Lo usa la queja anónima UAD; el servidor igual debe ignorar tokens en esa ruta. |
+| `UadRadicacionPort` · `provideUadRadicacion()` | `src/app/uad/` | Radicación **pública** UAD (queja anónima NDA), separada de `UadApiPort`; ruta `/uad/queja-anonima` fuera de `roleGuard`, flag `uadQuejaAnonima`. |
 | `ROLES_UAD` · `AuthService.puedeVerUad()` | `src/app/services/auth.service.ts` | Roles `UAD_COORDINACION`/`UAD_EQUIPO_3`/`UAD_EQUIPO_4` (catálogo propuesto; **aún no existen en el backend**). |
 | `protocolo-intentos.ts` · `seguimientos.ts` | `src/app/linea-alma/psicologia/dominio/` | Reglas puras con pruebas: protocolo de 9 intentos (RN-ALMA-03), contador de controles que no bloquea (RN-ALMA-05), fecha futura, conversión `datetime-local` ↔ ISO. |
 
@@ -497,6 +499,18 @@ Contrato `openapi-uad.yaml` v0.2.0 con las 9 operaciones de casos (`x-entrega: 2
 - **Regla de incompatibilidad (D-UAD-20):** ordinarias y permanentes van en operaciones distintas.
 - `dominio/catalogo-actuaciones.ts` concentra el catálogo; el mock y la documentación lo comparten.
 
+### 2026-11-15 — Módulo UAD, Entrega 3 (parte transversal que no depende de decisiones)
+Contrato `openapi-uad.yaml` v0.3.0; decisiones nuevas D-UAD-26…30.
+
+- **Queja anónima NDA** (`/uad/queja-anonima`, pública, carga diferida, flag `uadQuejaAnonima`: `false` en producción porque
+  el backend no tiene el endpoint, `true` en desarrollo y en la demo). No pide identidad ni contacto, no precarga la sesión,
+  `autocomplete="off"`, no guarda nada en el navegador y no promete anonimato técnico absoluto. Muestra solo el consecutivo
+  NDA del servidor. En mock aparece en la pestaña NDA de ambos equipos: `UadMockStore` pasó a `providedIn: 'root'`.
+- **`SIN_CREDENCIALES`** en `authInterceptor` para que la NDA no viaje con el token de quien tenga sesión abierta.
+- **Formulario general:** enlace visible a la queja anónima junto a la selección de ruta (UAD-FOR-12), detrás del mismo flag.
+  La pregunta de vinculación de 10 opciones **no** se cambió (bloqueada por D-UAD-05).
+- **«Mis reportes»** y la respuesta a la subsanación: solo contrato en borrador, bloqueados por D-UAD-16.
+
 ### Pendiente
 0. **Línea Alma Psicología:** Backend debe revisar D-PSI-01…19 (entidad de la novedad antes del caso, `tomadaPorMi`,
    SLA, PDF síncrono, contención puntual); el equipo debe decidir qué roles se habilitan además de ADMIN
@@ -604,8 +618,8 @@ Contrato `openapi-uad.yaml` v0.2.0 con las 9 operaciones de casos (`x-entrega: 2
 16. **Seguimiento de trámite sin endpoint:** `/seguimiento` sigue simulando resultados y los diálogos de
     éxito prometen una consulta que no existe. Contrato propuesto en
     `docs/contratos/contrato-consultar-reporte.md`; hasta que exista, mantener el flag `publicTrackingPrototype`.
-17. **UAD:** Backend debe implementar `openapi-uad.yaml` (Entregas 1 y 2) y crear los roles `UAD_*` (D-UAD-01, 03, 14); el
-    equipo jurídico debe validar D-UAD-02…13 y 18–25; riesgo de privacidad fuera del módulo en `/solicitudes` (D-UAD-16). Hasta entonces, solo ADMIN
+17. **UAD:** Backend debe implementar `openapi-uad.yaml` (Entregas 1, 2 y `POST /uad/noticias-anonimas`) y crear los roles `UAD_*` (D-UAD-01, 03, 14); el
+    equipo jurídico debe validar D-UAD-02…13 y 18–30; riesgo de privacidad fuera del módulo en `/solicitudes` (D-UAD-16). Hasta entonces, solo ADMIN
     entra a `/uad` y lo hace con datos simulados.
 
 ## 6. Reglas que no se deben romper
