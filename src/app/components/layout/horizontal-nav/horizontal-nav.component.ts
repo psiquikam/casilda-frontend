@@ -23,6 +23,9 @@ export class HorizontalNavComponent {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
+  /** URL vigente: marca como activo el desplegable de Línea Alma cuando se está dentro del módulo. */
+  private readonly urlActual = signal(this.router.url);
+
   /** Controla la apertura del menú desplegable colapsable en pantallas móviles/tablets */
   readonly mobileMenuOpen = signal<boolean>(false);
 
@@ -31,6 +34,7 @@ export class HorizontalNavComponent {
     usuario: true,
     admin: true,
     atencion: true,
+    alma: true,
     uad: true
   });
 
@@ -41,9 +45,29 @@ export class HorizontalNavComponent {
         filter((event): event is NavigationEnd => event instanceof NavigationEnd),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe(() => {
+      .subscribe((evento) => {
         this.mobileMenuOpen.set(false);
+        this.urlActual.set(evento.urlAfterRedirects);
       });
+  }
+
+  /**
+   * Línea Alma se muestra si la persona puede ver al menos una de sus opciones. Mismas reglas que el
+   * menú lateral: Primer respondiente (Admin, Coordinador, Profesional) y cada opción APH o de
+   * Psicología según su permiso.
+   */
+  muestraLineaAlma(): boolean {
+    return (
+      this.auth.isAdmin() ||
+      this.auth.isCoordinador() ||
+      this.auth.isProfesional() ||
+      this.alma.tieneAlguno(['alma.aph.crear', 'alma.aph.bandeja']) ||
+      this.alma.psicologiaHabilitada()
+    );
+  }
+
+  enLineaAlma(): boolean {
+    return this.urlActual().startsWith('/linea-alma');
   }
 
   toggleMobileMenu(): void {
