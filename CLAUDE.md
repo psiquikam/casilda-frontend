@@ -478,6 +478,13 @@ Rama `feature/06/20/casilda/modulo-uad`. Contratos y auditoría en `docs/contrat
 - **No se tocó** el formulario de reporte: su pregunta `remitirUad` (sí/no, solo para comunidad UdeA) no es la de
   UAD-FOR-10/11 (D-UAD-05); queda para la Entrega 3.
 
+### 2026-11-15 — Configuración de demostración para Vercel
+`environment.demo.ts` hereda de `environment.prod.ts` y solo simula los módulos sin backend: UAD (`uad.adaptador = 'mock'`)
+y todos los grupos de `lineaAlma.mocks` (generados desde las claves de producción). Se compila con
+`npm run build:demo` (`--configuration production,demo`) y se publica como vista previa con `npm run deploy:vercel:demo`.
+`npm run build`, `deploy:vercel:preview` y `deploy:vercel` no cambian. `environments.spec.ts` impide que producción simule.
+Se entra con un usuario ADMIN real de QA; las cuentas de prueba siguen apagadas (`datosDemostracion: false`).
+
 ### Pendiente
 0. **Línea Alma Psicología:** Backend debe revisar D-PSI-01…19 (entidad de la novedad antes del caso, `tomadaPorMi`,
    SLA, PDF síncrono, contención puntual); el equipo debe decidir qué roles se habilitan además de ADMIN

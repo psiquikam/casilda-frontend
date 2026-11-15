@@ -63,7 +63,7 @@ uad: { adaptador: 'http' }   // producción: {apiBaseUrl}/uad/... según openapi
 ```
 
 **Vista previa de demostración en Vercel:** `npm run deploy:vercel:demo` compila con `--configuration production,demo`
-(`environment.demo.ts`, que hereda de producción y solo pone la UAD en `'mock'`) y sube una vista previa al proyecto
+(`environment.demo.ts`, que hereda de producción y solo simula la UAD y Línea Alma) y sube una vista previa al proyecto
 `casilda-preview`. Se entra con un usuario ADMIN real de QA. `npm run build`, `deploy:vercel:preview` y `deploy:vercel` no cambian.
 
 No hay que tocar componentes. Con `'http'`, hasta que Backend implemente el contrato y registre las rutas en `endpoint` / `endpointrole`, el servidor responderá 403 o 404 y la UI mostrará sus estados de error.
