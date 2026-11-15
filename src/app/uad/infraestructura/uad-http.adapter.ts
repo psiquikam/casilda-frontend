@@ -4,7 +4,9 @@ import { Observable, catchError, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { UadApiPort } from '../contratos/uad-api.port';
 import {
+  ActuacionDisponible,
   CasoAsociado,
+  CasoUadDetalle,
   CasoUadResumen,
   CatalogoUad,
   ClasificacionRequest,
@@ -13,12 +15,18 @@ import {
   DecisionEvaluacionRequest,
   DecisionEvaluacionResponse,
   EventoHistorial,
+  EvidenciaMetadato,
+  ExpedienteRequest,
   FiltroCasosUad,
   FiltroNoticias,
   MaestroUad,
   NoticiaDetalle,
   NoticiaResumen,
-  Pagina
+  Pagina,
+  RegistrarActuacionesRequest,
+  RemisionCompetenciaCasoRequest,
+  ResultadoAccionCaso,
+  TrasladoRequest
 } from '../contratos/uad-api.types';
 import { interpretarErrorUad } from './uad-error';
 
@@ -93,6 +101,42 @@ export class UadHttpAdapter extends UadApiPort {
   listarCasos(filtro: FiltroCasosUad): Observable<Pagina<CasoUadResumen>> {
     const params = parametros({ fase: filtro.fase, page: filtro.page, size: filtro.size });
     return this.http.get<Pagina<CasoUadResumen>>(`${this.base}/casos`, { params }).pipe(this.traducir());
+  }
+
+  obtenerCaso(casoUadId: string): Observable<CasoUadDetalle> {
+    return this.http.get<CasoUadDetalle>(this.caso(casoUadId)).pipe(this.traducir());
+  }
+
+  catalogoActuaciones(casoUadId: string): Observable<readonly ActuacionDisponible[]> {
+    return this.http.get<ActuacionDisponible[]>(`${this.caso(casoUadId)}/actuaciones/catalogo`).pipe(this.traducir());
+  }
+
+  registrarActuaciones(casoUadId: string, cuerpo: RegistrarActuacionesRequest): Observable<ResultadoAccionCaso> {
+    return this.http.post<ResultadoAccionCaso>(`${this.caso(casoUadId)}/actuaciones`, cuerpo).pipe(this.traducir());
+  }
+
+  historialCaso(casoUadId: string): Observable<readonly EventoHistorial[]> {
+    return this.http.get<EventoHistorial[]>(`${this.caso(casoUadId)}/historial`).pipe(this.traducir());
+  }
+
+  evidenciasCaso(casoUadId: string): Observable<readonly EvidenciaMetadato[]> {
+    return this.http.get<EvidenciaMetadato[]>(`${this.caso(casoUadId)}/evidencias`).pipe(this.traducir());
+  }
+
+  registrarExpediente(casoUadId: string, cuerpo: ExpedienteRequest): Observable<ResultadoAccionCaso> {
+    return this.http.patch<ResultadoAccionCaso>(`${this.caso(casoUadId)}/expediente`, cuerpo).pipe(this.traducir());
+  }
+
+  finalizarInstruccion(casoUadId: string, cuerpo: TrasladoRequest): Observable<ResultadoAccionCaso> {
+    return this.http.post<ResultadoAccionCaso>(`${this.caso(casoUadId)}/traslado-decision`, cuerpo).pipe(this.traducir());
+  }
+
+  remitirCasoPorCompetencia(casoUadId: string, cuerpo: RemisionCompetenciaCasoRequest): Observable<ResultadoAccionCaso> {
+    return this.http.post<ResultadoAccionCaso>(`${this.caso(casoUadId)}/remisiones-competencia`, cuerpo).pipe(this.traducir());
+  }
+
+  private caso(casoUadId: string): string {
+    return `${this.base}/casos/${encodeURIComponent(casoUadId)}`;
   }
 
   private traducir<T>() {

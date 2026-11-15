@@ -12,6 +12,7 @@ import {
   TipoNoticia,
   VinculacionInvestigado,
   EquipoUad,
+  EstadoGestionUad,
   FaseUad
 } from '../../contratos/uad-api.types';
 
@@ -61,7 +62,22 @@ export interface CasoUadMock {
   fechaAdmision: string;
   faseActual: FaseUad;
   equipoResponsable: EquipoUad;
+  estadoGestion: EstadoGestionUad;
+  motivoFinGestion: 'REMITIDA_POR_COMPETENCIA' | null;
+  fechaUltimoTraslado: string | null;
+  /** Pruebas del caso (UAD-PRU-01): se conservan en cada cambio de equipo o fase. */
+  evidencias: EvidenciaMetadato[];
   version: number;
+}
+
+/** Evento sembrado del historial de un caso (el store lo completa con id y campos vacíos). */
+export interface EventoCasoSemilla {
+  readonly tipo: 'ACTUACION' | 'TRASLADO_FASE' | 'CASO_CREADO';
+  readonly descripcion: string;
+  readonly fecha: string;
+  readonly equipo: EquipoUad;
+  readonly fase: FaseUad;
+  readonly observaciones?: string;
 }
 
 function reportanteFicticio(n: string, tipoSolicitud: 'DIRECTA' | 'INDIRECTA'): Reportante {
@@ -307,9 +323,34 @@ export function sembrarCasosPorPersona(): Map<string, CasoAsociado[]> {
   ]);
 }
 
+function caso(
+  parcial: Partial<CasoUadMock> & Pick<CasoUadMock, 'casoUadId' | 'casoId' | 'vinculacionInvestigado' | 'faseActual' | 'equipoResponsable'>
+): CasoUadMock {
+  return {
+    expedienteUad: null,
+    consecutivosNoticia: [],
+    victimaNombre: null,
+    fechaAdmision: '2026-10-01T14:00:00Z',
+    estadoGestion: 'ACTIVA',
+    motivoFinGestion: null,
+    fechaUltimoTraslado: null,
+    evidencias: [],
+    version: 1,
+    ...parcial
+  };
+}
+
+/**
+ * Casos sembrados (prompt §9, Entrega 2): una combinación por equipo y fase, más una gestión finalizada.
+ * - `mock-cuad-139`: estudiante, instrucción, Equipo 4.
+ * - `mock-cuad-201`: docente, instrucción, Equipo 3, sin expediente UAD (se registra después).
+ * - `mock-cuad-202`: administrativo instruido por Equipo 3, hoy en decisión con Equipo 4.
+ * - `mock-cuad-203`: estudiante instruido por Equipo 4, hoy en decisión con Equipo 3.
+ * - `mock-cuad-204`: remitido por competencia: gestión UAD finalizada, fuera de la bandeja activa.
+ */
 export function sembrarCasosUad(): CasoUadMock[] {
   return [
-    {
+    caso({
       casoUadId: 'mock-cuad-139',
       casoId: 'CAS-2026-000248',
       expedienteUad: 'EXP-FICTICIO-0041',
@@ -319,9 +360,107 @@ export function sembrarCasosUad(): CasoUadMock[] {
       fechaAdmision: '2026-10-09T14:00:00Z',
       faseActual: 'INSTRUCCION',
       equipoResponsable: 'EQUIPO_4',
-      version: 1
-    }
+      evidencias: [evidencia('mock-ev-1391', 'denuncia_ficticia.pdf', 'application/pdf', '2026-10-08T15:50:00Z')]
+    }),
+    caso({
+      casoUadId: 'mock-cuad-201',
+      casoId: 'CAS-2026-000301',
+      consecutivosNoticia: ['NDI-2026-000101'],
+      victimaNombre: 'Persona Afectada Ficticia 201',
+      vinculacionInvestigado: 'DOCENTE_VINCULADO',
+      fechaAdmision: '2026-10-06T16:00:00Z',
+      faseActual: 'INSTRUCCION',
+      equipoResponsable: 'EQUIPO_3',
+      version: 3,
+      evidencias: [
+        evidencia('mock-ev-2011', 'relato_inicial_ficticio.pdf', 'application/pdf', '2026-10-05T14:00:00Z'),
+        evidencia('mock-ev-2012', 'captura_chat_ficticia.png', 'image/png', '2026-10-09T10:20:00Z')
+      ]
+    }),
+    caso({
+      casoUadId: 'mock-cuad-202',
+      casoId: 'CAS-2026-000302',
+      expedienteUad: 'EXP-FICTICIO-0029',
+      consecutivosNoticia: ['NDI-2026-000102'],
+      victimaNombre: 'Persona Afectada Ficticia 202',
+      vinculacionInvestigado: 'ADMINISTRATIVO',
+      fechaAdmision: '2026-09-15T15:00:00Z',
+      faseActual: 'DECISION',
+      equipoResponsable: 'EQUIPO_4',
+      fechaUltimoTraslado: '2026-10-28T19:00:00Z',
+      version: 6,
+      evidencias: [evidencia('mock-ev-2021', 'testimonio_ficticio.pdf', 'application/pdf', '2026-09-20T13:00:00Z')]
+    }),
+    caso({
+      casoUadId: 'mock-cuad-203',
+      casoId: 'CAS-2026-000303',
+      consecutivosNoticia: ['NDI-2026-000103'],
+      victimaNombre: 'Persona Afectada Ficticia 203',
+      vinculacionInvestigado: 'ESTUDIANTE_POSGRADO',
+      fechaAdmision: '2026-09-02T15:00:00Z',
+      faseActual: 'DECISION',
+      equipoResponsable: 'EQUIPO_3',
+      fechaUltimoTraslado: '2026-10-20T15:00:00Z',
+      version: 5
+    }),
+    caso({
+      casoUadId: 'mock-cuad-204',
+      casoId: 'CAS-2026-000304',
+      consecutivosNoticia: ['NDI-2026-000104'],
+      victimaNombre: 'Persona Afectada Ficticia 204',
+      vinculacionInvestigado: 'DIRECTIVO',
+      fechaAdmision: '2026-08-20T15:00:00Z',
+      faseActual: 'INSTRUCCION',
+      equipoResponsable: 'EQUIPO_3',
+      estadoGestion: 'FINALIZADA',
+      motivoFinGestion: 'REMITIDA_POR_COMPETENCIA',
+      version: 4
+    })
   ];
+}
+
+/** Historial sembrado por caso (append-only; el traslado no borra lo anterior, UAD-HIS-06). */
+export function sembrarHistorialCasos(): Map<string, EventoCasoSemilla[]> {
+  return new Map<string, EventoCasoSemilla[]>([
+    [
+      'mock-cuad-201',
+      [
+        { tipo: 'CASO_CREADO', descripcion: 'Caso admitido para trámite en la UAD.', fecha: '2026-10-06T16:00:00Z', equipo: 'EQUIPO_3', fase: 'INSTRUCCION' },
+        { tipo: 'ACTUACION', descripcion: 'Indagación previa.', fecha: '2026-10-10T13:20:00Z', equipo: 'EQUIPO_3', fase: 'INSTRUCCION' }
+      ]
+    ],
+    [
+      'mock-cuad-202',
+      [
+        { tipo: 'CASO_CREADO', descripcion: 'Caso admitido para trámite en la UAD.', fecha: '2026-09-15T15:00:00Z', equipo: 'EQUIPO_3', fase: 'INSTRUCCION' },
+        { tipo: 'ACTUACION', descripcion: 'Investigación disciplinaria.', fecha: '2026-09-22T14:00:00Z', equipo: 'EQUIPO_3', fase: 'INSTRUCCION' },
+        { tipo: 'ACTUACION', descripcion: 'Práctica de pruebas.', fecha: '2026-10-02T19:45:00Z', equipo: 'EQUIPO_3', fase: 'INSTRUCCION' },
+        { tipo: 'ACTUACION', descripcion: 'Pliego de cargos.', fecha: '2026-10-20T14:05:00Z', equipo: 'EQUIPO_3', fase: 'INSTRUCCION' },
+        {
+          tipo: 'TRASLADO_FASE',
+          descripcion: 'Finalizó la etapa de instrucción. El caso pasó de Equipo 3 (instrucción) a Equipo 4 (decisión).',
+          fecha: '2026-10-28T19:00:00Z',
+          equipo: 'EQUIPO_3',
+          fase: 'INSTRUCCION'
+        }
+      ]
+    ],
+    [
+      'mock-cuad-203',
+      [
+        { tipo: 'CASO_CREADO', descripcion: 'Caso admitido para trámite en la UAD.', fecha: '2026-09-02T15:00:00Z', equipo: 'EQUIPO_4', fase: 'INSTRUCCION' },
+        { tipo: 'ACTUACION', descripcion: 'Averiguaciones preliminares.', fecha: '2026-09-10T15:00:00Z', equipo: 'EQUIPO_4', fase: 'INSTRUCCION' },
+        {
+          tipo: 'TRASLADO_FASE',
+          descripcion: 'Finalizó la etapa de instrucción. El caso pasó de Equipo 4 (instrucción) a Equipo 3 (decisión).',
+          fecha: '2026-10-20T15:00:00Z',
+          equipo: 'EQUIPO_4',
+          fase: 'INSTRUCCION'
+        },
+        { tipo: 'ACTUACION', descripcion: 'Audiencias.', fecha: '2026-11-04T15:00:00Z', equipo: 'EQUIPO_3', fase: 'DECISION' }
+      ]
+    ]
+  ]);
 }
 
 /**

@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { CasoAsociado, EquipoUad, EventoHistorial, TipoEventoHistorial } from '../../contratos/uad-api.types';
-import { CasoUadMock, NoticiaMock, sembrarCasosPorPersona, sembrarCasosUad, sembrarNoticias } from './uad-mock-seed';
+import { CasoAsociado, EquipoUad, EventoHistorial, FaseUad, TipoEventoHistorial } from '../../contratos/uad-api.types';
+import { CasoUadMock, NoticiaMock, sembrarCasosPorPersona, sembrarCasosUad, sembrarHistorialCasos, sembrarNoticias } from './uad-mock-seed';
 
 /**
  * Estado en memoria del «servidor» simulado UAD. Vive mientras viva el inyector de las rutas UAD
@@ -13,6 +13,8 @@ export class UadMockStore {
   casosPorPersona: Map<string, CasoAsociado[]> = sembrarCasosPorPersona();
   casosUad: CasoUadMock[] = sembrarCasosUad();
   historial = new Map<string, EventoHistorial[]>();
+  /** Historial de actuaciones por caso UAD (append-only, UAD-HIS-02). */
+  historialCasos = new Map<string, EventoHistorial[]>();
   /** Últimos `casoId` devueltos por la consulta de casos asociados, por noticia (para validar vínculos). */
   casosConsultados = new Map<string, string[]>();
   private secuenciaCaso = 700;
@@ -25,6 +27,46 @@ export class UadMockStore {
         estadoNuevo: 'RECIBIDA'
       });
     }
+    for (const [casoUadId, eventos] of sembrarHistorialCasos()) {
+      for (const e of eventos) {
+        this.registrarEventoCaso(casoUadId, e.tipo, e.descripcion, {
+          fecha: e.fecha,
+          equipo: e.equipo,
+          fase: e.fase,
+          profesional: 'Profesional ficticio',
+          observaciones: e.observaciones ?? null
+        });
+      }
+    }
+  }
+
+  buscarCaso(casoUadId: string): CasoUadMock | undefined {
+    return this.casosUad.find((c) => c.casoUadId === casoUadId);
+  }
+
+  /** Agrega un evento al historial del caso y lo devuelve. Nunca reemplaza ni borra (UAD-HIS-02/06). */
+  registrarEventoCaso(
+    casoUadId: string,
+    tipo: TipoEventoHistorial,
+    descripcion: string,
+    extra: Partial<Pick<EventoHistorial, 'fecha' | 'profesional' | 'equipo' | 'estadoAnterior' | 'estadoNuevo' | 'observaciones'>> & {
+      fase?: FaseUad | null;
+    } = {}
+  ): EventoHistorial {
+    const evento: EventoHistorial = {
+      eventoId: this.siguienteId('evc'),
+      tipo,
+      fecha: extra.fecha ?? new Date().toISOString(),
+      descripcion,
+      profesional: extra.profesional ?? null,
+      equipo: extra.equipo ?? null,
+      fase: extra.fase ?? null,
+      estadoAnterior: extra.estadoAnterior ?? null,
+      estadoNuevo: extra.estadoNuevo ?? null,
+      observaciones: extra.observaciones ?? null
+    };
+    this.historialCasos.set(casoUadId, [...(this.historialCasos.get(casoUadId) ?? []), evento]);
+    return evento;
   }
 
   buscar(noticiaId: string): NoticiaMock | undefined {

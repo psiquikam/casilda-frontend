@@ -26,14 +26,17 @@ const MENSAJES_POR_CODIGO: Record<string, string> = {
   NOTICIA_RECLASIFICADA: 'La noticia fue reclasificada y ya no corresponde a su equipo.',
   NOTICIA_NO_EVALUABLE: 'Esta noticia ya no está en evaluación preliminar, por eso no admite esta acción.',
   DECISION_INCOMPATIBLE: 'Registre una sola decisión por vez.',
-  SIN_EQUIPO_UAD: 'Su usuario no tiene un equipo UAD asignado. Pida a la administración que revise su perfil.'
+  SIN_EQUIPO_UAD: 'Su usuario no tiene un equipo UAD asignado. Pida a la administración que revise su perfil.',
+  FASE_NO_PERMITE: 'Esta acción no corresponde a la fase actual del caso. Cargamos su estado más reciente.',
+  CASO_NO_ACTIVO: 'La gestión de la UAD sobre este caso ya terminó, por eso no admite nuevas actuaciones.',
+  ACTUACION_NO_DISPONIBLE: 'Alguna actuación marcada no está disponible para esta fase o equipo. Revise la selección.'
 };
 
 const MENSAJES_POR_ESTADO: Record<number, string> = {
   0: 'No pudimos conectar con el servidor. Revise su conexión; lo que escribió sigue en pantalla.',
   401: 'Su sesión terminó. Inicie sesión de nuevo para continuar.',
   403: 'Su perfil no tiene permiso para esta información o acción.',
-  404: 'No encontramos la noticia. Es posible que ya no esté en su bandeja.',
+  404: 'No encontramos lo que buscaba en su bandeja. Es posible que haya pasado a otro equipo o fase.',
   409: 'La información cambió mientras trabajaba. Cargamos la versión más reciente.'
 };
 

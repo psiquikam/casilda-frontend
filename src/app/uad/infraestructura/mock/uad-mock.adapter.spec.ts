@@ -302,4 +302,165 @@ describe('UAD · adaptador mock (servidor simulado)', () => {
       expect(blob.type).toBe('text/plain');
     });
   });
+
+  describe('casos UAD (Entrega 2)', () => {
+    const CASOS = { page: 0, size: 50 };
+    const ids = (api: UadMockAdapter) => valor(api.listarCasos(CASOS)).content.map((c) => c.casoUadId);
+
+    it('la bandeja muestra solo casos activos del equipo en su fase actual', () => {
+      const e3 = crear(['UAD_EQUIPO_3']).api;
+      expect(ids(e3)).toEqual(jasmine.arrayWithExactContents(['mock-cuad-201', 'mock-cuad-203']));
+      const e4 = crear(['UAD_EQUIPO_4']).api;
+      expect(ids(e4)).toEqual(jasmine.arrayWithExactContents(['mock-cuad-139', 'mock-cuad-202']));
+    });
+
+    it('la gestión finalizada no aparece en la bandeja activa', () => {
+      expect(ids(crear(['UAD_EQUIPO_3']).api)).not.toContain('mock-cuad-204');
+    });
+
+    it('un caso de otro equipo o fase responde 404', () => {
+      expect(fallo(crear(['UAD_EQUIPO_4']).api.obtenerCaso('mock-cuad-201')).estado).toBe(404);
+    });
+
+    it('el catálogo depende de fase y equipo', () => {
+      const e3 = crear(['UAD_EQUIPO_3']).api;
+      const instruccion = valor(e3.catalogoActuaciones('mock-cuad-201')).filter((a) => !a.permanente).map((a) => a.codigo);
+      expect(instruccion).toContain('INDAGACION_PREVIA');
+      expect(instruccion).not.toContain('FALLO');
+      const decision = valor(e3.catalogoActuaciones('mock-cuad-203')).filter((a) => !a.permanente).map((a) => a.codigo);
+      expect(decision).toContain('FALLO');
+      expect(decision).not.toContain('PLIEGO_CARGOS');
+    });
+
+    it('una actuación ordinaria se agrega al historial y no cambia la fase ni el equipo', () => {
+      const { api } = crear(['UAD_EQUIPO_3']);
+      const caso = valor(api.obtenerCaso('mock-cuad-201'));
+      const antes = valor(api.historialCaso(caso.casoUadId));
+      const r = valor(api.registrarActuaciones(caso.casoUadId, { actuaciones: ['PLIEGO_CARGOS'], observaciones: null, version: caso.version }));
+      expect(r.caso?.faseActual).toBe('INSTRUCCION');
+      expect(r.caso?.equipoResponsable).toBe('EQUIPO_3');
+      expect(r.notificaciones).toEqual([]);
+      expect(r.eventos[0]).toEqual(jasmine.objectContaining({ tipo: 'ACTUACION', fase: 'INSTRUCCION', equipo: 'EQUIPO_3' }));
+      const despues = valor(api.historialCaso(caso.casoUadId));
+      expect(despues.length).toBe(antes.length + 1);
+      expect(despues.slice(0, antes.length)).toEqual(antes);
+    });
+
+    it('«Reposición y/o apelación» no cierra el caso', () => {
+      const { api } = crear(['UAD_EQUIPO_3']);
+      const caso = valor(api.obtenerCaso('mock-cuad-203'));
+      const r = valor(api.registrarActuaciones(caso.casoUadId, { actuaciones: ['REPOSICION_APELACION'], observaciones: 'Texto ficticio', version: caso.version }));
+      expect(r.caso?.estadoGestion).toBe('ACTIVA');
+    });
+
+    it('rechaza permanentes, actuaciones de otra fase y la mediación pendiente', () => {
+      const { api } = crear(['UAD_EQUIPO_3']);
+      const c201 = valor(api.obtenerCaso('mock-cuad-201'));
+      expect(fallo(api.registrarActuaciones(c201.casoUadId, { actuaciones: ['FINALIZAR_INSTRUCCION'], observaciones: null, version: c201.version })).codigo).toBe('ACTUACION_NO_DISPONIBLE');
+      expect(fallo(api.registrarActuaciones(c201.casoUadId, { actuaciones: ['FALLO'], observaciones: null, version: c201.version })).codigo).toBe('ACTUACION_NO_DISPONIBLE');
+      const c203 = valor(api.obtenerCaso('mock-cuad-203'));
+      expect(fallo(api.registrarActuaciones(c203.casoUadId, { actuaciones: ['MEDIACION'], observaciones: null, version: c203.version })).codigo).toBe('ACTUACION_NO_DISPONIBLE');
+    });
+
+    it('una versión vieja recibe 409', () => {
+      const { api } = crear(['UAD_EQUIPO_3']);
+      const caso = valor(api.obtenerCaso('mock-cuad-201'));
+      valor(api.registrarActuaciones(caso.casoUadId, { actuaciones: ['PRACTICA_PRUEBAS'], observaciones: null, version: caso.version }));
+      expect(fallo(api.registrarActuaciones(caso.casoUadId, { actuaciones: ['PRACTICA_PRUEBAS'], observaciones: null, version: caso.version })).codigo).toBe('CONFLICTO_VERSION');
+    });
+
+    it('el expediente UAD se registra después y el cambio queda en el historial', () => {
+      const { api } = crear(['UAD_EQUIPO_3']);
+      const caso = valor(api.obtenerCaso('mock-cuad-201'));
+      expect(caso.expedienteUad).toBeNull();
+      const r = valor(api.registrarExpediente(caso.casoUadId, { expedienteUad: ' EXP-FICTICIO-0100 ', version: caso.version }));
+      expect(r.caso?.expedienteUad).toBe('EXP-FICTICIO-0100');
+      expect(r.eventos[0]).toEqual(jasmine.objectContaining({ tipo: 'EXPEDIENTE_ACTUALIZADO', estadoAnterior: null, estadoNuevo: 'EXP-FICTICIO-0100' }));
+    });
+
+    describe('traslado instrucción → decisión', () => {
+      it('exige confirmación explícita', () => {
+        const { api } = crear(['UAD_EQUIPO_3']);
+        const caso = valor(api.obtenerCaso('mock-cuad-201'));
+        expect(fallo(api.finalizarInstruccion(caso.casoUadId, { confirmaTraslado: false, observaciones: null, version: caso.version })).camposInvalidos['confirmaTraslado']).toBeTruthy();
+      });
+
+      it('docente: pasa de Equipo 3 a Equipo 4, conserva identificadores, evidencias e historial', () => {
+        const e3 = crear(['UAD_EQUIPO_3']);
+        const caso = valor(e3.api.obtenerCaso('mock-cuad-201'));
+        const evidencias = valor(e3.api.evidenciasCaso(caso.casoUadId));
+        const historial = valor(e3.api.historialCaso(caso.casoUadId));
+        const r = valor(e3.api.finalizarInstruccion(caso.casoUadId, { confirmaTraslado: true, observaciones: null, version: caso.version }));
+        expect(r.visibleParaUsuario).toBeFalse();
+        expect(r.caso).toBeNull();
+        expect(r.notificaciones[0]).toEqual(jasmine.objectContaining({ evento: 'CAMBIO_FASE', destinatario: 'VICTIMA' }));
+        expect(r.notificaciones[0].estado).not.toBe('ENVIADA');
+        // Sale de la bandeja del instructor.
+        expect(ids(e3.api)).not.toContain('mock-cuad-201');
+        expect(fallo(e3.api.obtenerCaso('mock-cuad-201')).estado).toBe(404);
+
+        // Aparece en la del decisor, con todo conservado. El store es otro TestBed: se simula sobre el mismo.
+        const store = TestBed.inject(UadMockStore);
+        const trasladado = store.buscarCaso('mock-cuad-201')!;
+        expect(trasladado.faseActual).toBe('DECISION');
+        expect(trasladado.equipoResponsable).toBe('EQUIPO_4');
+        expect(trasladado.casoId).toBe(caso.casoId);
+        expect(trasladado.fechaAdmision).toBe(caso.fechaAdmision);
+        expect(trasladado.evidencias.map((e) => e.evidenciaId)).toEqual(evidencias.map((e) => e.evidenciaId));
+        const historialNuevo = store.historialCasos.get('mock-cuad-201')!;
+        expect(historialNuevo.slice(0, historial.length)).toEqual(historial);
+        expect(historialNuevo[historialNuevo.length - 1].tipo).toBe('TRASLADO_FASE');
+      });
+
+      it('el decisor lo ve en su bandeja tras el traslado (ADMIN cambiando de equipo simulado)', () => {
+        const { api, simulacion } = crear(['ADMIN']);
+        simulacion.equipoSimulado.set('EQUIPO_4');
+        const caso = valor(api.obtenerCaso('mock-cuad-139'));
+        valor(api.finalizarInstruccion(caso.casoUadId, { confirmaTraslado: true, observaciones: null, version: caso.version }));
+        expect(ids(api)).not.toContain('mock-cuad-139');
+        simulacion.equipoSimulado.set('EQUIPO_3');
+        expect(ids(api)).toContain('mock-cuad-139');
+        expect(valor(api.obtenerCaso('mock-cuad-139')).faseActual).toBe('DECISION');
+      });
+
+      it('en decisión responde 409 FASE_NO_PERMITE', () => {
+        const { api } = crear(['UAD_EQUIPO_3']);
+        const caso = valor(api.obtenerCaso('mock-cuad-203'));
+        expect(fallo(api.finalizarInstruccion(caso.casoUadId, { confirmaTraslado: true, observaciones: null, version: caso.version })).codigo).toBe('FASE_NO_PERMITE');
+      });
+    });
+
+    it('la remisión por competencia finaliza la gestión UAD sin enviar nada y sin cerrar el caso CASILDA', () => {
+      const { api } = crear(['UAD_EQUIPO_3']);
+      const caso = valor(api.obtenerCaso('mock-cuad-201'));
+      const futura = fallo(api.remitirCasoPorCompetencia(caso.casoUadId, { entidadDestinatariaCodigo: 'FISCALIA', fechaRemision: LEJANA, justificacion: null, version: caso.version }));
+      expect(futura.camposInvalidos['fechaRemision']).toBeTruthy();
+      const r = valor(
+        api.remitirCasoPorCompetencia(caso.casoUadId, { entidadDestinatariaCodigo: 'FISCALIA', fechaRemision: fechaCalendario(new Date()), justificacion: null, version: caso.version })
+      );
+      expect(r.caso?.estadoGestion).toBe('FINALIZADA');
+      expect(r.caso?.motivoFinGestion).toBe('REMITIDA_POR_COMPETENCIA');
+      expect(r.caso?.casoId).toBe(caso.casoId);
+      expect(r.notificaciones).toEqual([]);
+      expect(ids(api)).not.toContain('mock-cuad-201');
+      expect(fallo(api.registrarActuaciones(caso.casoUadId, { actuaciones: ['PRACTICA_PRUEBAS'], observaciones: null, version: r.caso!.version })).codigo).toBe('CASO_NO_ACTIVO');
+    });
+
+    it('la admisión crea un caso activo en instrucción con las evidencias de la noticia', () => {
+      const { api } = crear(['UAD_EQUIPO_3']);
+      const n = valor(api.obtenerNoticia('mock-ndi-141'));
+      const r = valor(
+        api.registrarDecision(n.noticiaId, { tipo: 'CONTINUAR_TRAMITE', version: n.version, continuarTramite: { modoCaso: 'CREAR_NUEVO', casoIdVincular: null, confirmaMismosHechos: false, expedienteUad: null } })
+      );
+      const caso = valor(api.obtenerCaso(r.casoUad!.casoUadId));
+      expect(caso.estadoGestion).toBe('ACTIVA');
+      expect(valor(api.evidenciasCaso(caso.casoUadId)).length).toBe(n.evidencias.length);
+      expect(valor(api.historialCaso(caso.casoUadId))[0].tipo).toBe('CASO_CREADO');
+    });
+
+    it('descarga evidencias del caso para el equipo responsable', () => {
+      expect(valor(crear(['UAD_EQUIPO_3']).api.descargarEvidencia('mock-ev-2011')).type).toBe('text/plain');
+      expect(fallo(crear(['UAD_EQUIPO_4']).api.descargarEvidencia('mock-ev-2011')).estado).toBe(404);
+    });
+  });
 });

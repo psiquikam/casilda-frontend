@@ -75,4 +75,41 @@ describe('UAD · adaptador HTTP (contrato)', () => {
     expect(error?.tipo).toBe('validacion');
     expect(error?.camposInvalidos['inhibitorio.causalCodigo']).toBe('Requerido');
   });
+
+  it('Entrega 2: rutas y verbos de casos según el contrato', () => {
+    const casos = `${base}/casos/c1`;
+    api.obtenerCaso('c1').subscribe();
+    http.expectOne({ method: 'GET', url: casos }).flush({});
+    api.catalogoActuaciones('c1').subscribe();
+    http.expectOne({ method: 'GET', url: `${casos}/actuaciones/catalogo` }).flush([]);
+    api.historialCaso('c1').subscribe();
+    http.expectOne({ method: 'GET', url: `${casos}/historial` }).flush([]);
+    api.evidenciasCaso('c1').subscribe();
+    http.expectOne({ method: 'GET', url: `${casos}/evidencias` }).flush([]);
+
+    const actuaciones = { actuaciones: ['PLIEGO_CARGOS' as const], observaciones: null, version: 2 };
+    api.registrarActuaciones('c1', actuaciones).subscribe();
+    const reqAct = http.expectOne({ method: 'POST', url: `${casos}/actuaciones` });
+    expect(reqAct.request.body).toEqual(actuaciones);
+    reqAct.flush({ visibleParaUsuario: true, caso: null, eventos: [], notificaciones: [] });
+
+    api.registrarExpediente('c1', { expedienteUad: 'X', version: 2 }).subscribe();
+    http.expectOne({ method: 'PATCH', url: `${casos}/expediente` }).flush({ visibleParaUsuario: true, caso: null, eventos: [], notificaciones: [] });
+
+    api.finalizarInstruccion('c1', { confirmaTraslado: true, observaciones: null, version: 2 }).subscribe();
+    const reqTraslado = http.expectOne({ method: 'POST', url: `${casos}/traslado-decision` });
+    expect(reqTraslado.request.body.confirmaTraslado).toBeTrue();
+    reqTraslado.flush({ visibleParaUsuario: false, caso: null, eventos: [], notificaciones: [] });
+
+    api.remitirCasoPorCompetencia('c1', { entidadDestinatariaCodigo: 'E', fechaRemision: '2026-11-01', justificacion: null, version: 2 }).subscribe();
+    http.expectOne({ method: 'POST', url: `${casos}/remisiones-competencia` }).flush({ visibleParaUsuario: true, caso: null, eventos: [], notificaciones: [] });
+  });
+
+  it('traduce el 409 FASE_NO_PERMITE del traslado', () => {
+    let error: ErrorUad | undefined;
+    api.finalizarInstruccion('c1', { confirmaTraslado: true, observaciones: null, version: 1 }).subscribe({ error: (e: ErrorUad) => (error = e) });
+    http.expectOne(`${base}/casos/c1/traslado-decision`).flush({ status: 409, message: 'x', codigo: 'FASE_NO_PERMITE' }, { status: 409, statusText: 'Conflict' });
+    expect(error?.tipo).toBe('conflicto');
+    expect(error?.codigo).toBe('FASE_NO_PERMITE');
+  });
 });

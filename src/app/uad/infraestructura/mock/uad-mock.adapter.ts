@@ -5,6 +5,8 @@ import { AuthService } from '../../../services/auth.service';
 import { UadApiPort } from '../../contratos/uad-api.port';
 import {
   AccionNoticia,
+  ActuacionDisponible,
+  CasoUadDetalle,
   CapacidadUad,
   CasoAsociado,
   CasoUadResumen,
@@ -23,13 +25,20 @@ import {
   NoticiaDetalle,
   NoticiaResumen,
   NotificacionEstado,
-  Pagina
+  Pagina,
+  EvidenciaMetadato,
+  ExpedienteRequest,
+  RegistrarActuacionesRequest,
+  RemisionCompetenciaCasoRequest,
+  ResultadoAccionCaso,
+  TrasladoRequest
 } from '../../contratos/uad-api.types';
-import { equipoInstructor, equiposConVisibilidad, esVinculacionDeterminada, esVisiblePara } from '../../dominio/competencia';
-import { fechaCalendario, validarDecision } from '../../dominio/decision-evaluacion';
-import { ETIQUETA_DECISION, ETIQUETA_ESTADO_NOTICIA, ETIQUETA_VINCULACION, VINCULACIONES } from '../../dominio/etiquetas';
+import { equipoDecisor, equipoInstructor, equiposConVisibilidad, esVinculacionDeterminada, esVisiblePara } from '../../dominio/competencia';
+import { catalogoParaCaso, nombreActuacion, validarActuaciones } from '../../dominio/catalogo-actuaciones';
+import { LIMITE_EXPEDIENTE_UAD, LIMITE_TEXTO_DECISION, fechaCalendario, validarDecision } from '../../dominio/decision-evaluacion';
+import { ETIQUETA_DECISION, ETIQUETA_EQUIPO, ETIQUETA_ESTADO_NOTICIA, ETIQUETA_VINCULACION, VINCULACIONES } from '../../dominio/etiquetas';
 import { interpretarErrorUad } from '../uad-error';
-import { CATALOGOS_MOCK, NoticiaMock } from './uad-mock-seed';
+import { CATALOGOS_MOCK, CasoUadMock, NoticiaMock } from './uad-mock-seed';
 import { UadMockStore, UadSimulacionService } from './uad-mock-store';
 
 /** Latencia simulada (ms). Las pruebas la ponen en 0. */
@@ -195,11 +204,21 @@ export class UadMockAdapter extends UadApiPort {
             fechaAdmision: new Date().toISOString(),
             faseActual: 'INSTRUCCION' as const,
             equipoResponsable: equipoInstructor(vinculacion)!,
+            estadoGestion: 'ACTIVA' as const,
+            motivoFinGestion: null,
+            fechaUltimoTraslado: null,
+            // Las pruebas de la noticia pasan al caso y se conservan en adelante (UAD-PRU-04).
+            evidencias: n.evidencias.map((e) => ({ ...e })),
             version: 1
           };
           this.store.casosUad.push(caso);
+          this.store.registrarEventoCaso(caso.casoUadId, 'CASO_CREADO', `Caso admitido para trámite desde ${n.consecutivo}.`, {
+            profesional: actor.nombre,
+            equipo: caso.equipoResponsable,
+            fase: 'INSTRUCCION'
+          });
           n.casoUadId = caso.casoUadId;
-          casoUad = { ...caso };
+          casoUad = this.resumenCaso(caso);
           notificaciones.push(
             n.tipo === 'NDA' || !n.personaAfectada
               ? { evento: 'ADMISION', destinatario: 'VICTIMA', estado: 'NO_APLICA', motivo: 'Sin contacto autorizado de la víctima.' }
@@ -259,8 +278,18 @@ export class UadMockAdapter extends UadApiPort {
     return this.responder(() => {
       const actor = this.exigirEquipo();
       const n = this.store.noticias.find((x) => x.evidencias.some((e) => e.evidenciaId === evidenciaId));
-      if (!n || !this.visible(n, actor)) throw this.error(404, 'No encontrado.');
-      this.store.registrarEvento(n.noticiaId, 'NOTIFICACION', 'Descarga de evidencia registrada (simulado).', { profesional: actor.nombre, equipo: actor.equipo });
+      const c = this.store.casosUad.find((x) => x.evidencias.some((e) => e.evidenciaId === evidenciaId));
+      if (n && this.visible(n, actor)) {
+        this.store.registrarEvento(n.noticiaId, 'NOTIFICACION', 'Descarga de evidencia registrada (simulado).', { profesional: actor.nombre, equipo: actor.equipo });
+      } else if (c && this.casoVisible(c, actor)) {
+        this.store.registrarEventoCaso(c.casoUadId, 'NOTIFICACION', 'Descarga de evidencia registrada (simulado).', {
+          profesional: actor.nombre,
+          equipo: actor.equipo,
+          fase: c.faseActual
+        });
+      } else {
+        throw this.error(404, 'No encontrado.');
+      }
       // Archivo sintético: el mock nunca entrega contenido real.
       return new Blob(['Archivo simulado de demostración. No contiene evidencia real.'], { type: 'text/plain' });
     });
@@ -273,12 +302,153 @@ export class UadMockAdapter extends UadApiPort {
   listarCasos(filtro: FiltroCasosUad): Observable<Pagina<CasoUadResumen>> {
     return this.responder(() => {
       const actor = this.exigirEquipo();
+      // Bandeja activa (UAD-CAS-12): gestión activa y equipo responsable en la fase actual.
       const visibles = this.store.casosUad
-        .filter((c) => actor.contexto.equipos.includes(c.equipoResponsable))
+        .filter((c) => c.estadoGestion === 'ACTIVA' && this.casoVisible(c, actor))
         .filter((c) => !filtro.fase || c.faseActual === filtro.fase)
         .sort((a, b) => b.fechaAdmision.localeCompare(a.fechaAdmision))
-        .map((c) => ({ ...c, consecutivosNoticia: [...c.consecutivosNoticia] }));
+        .map((c) => this.resumenCaso(c));
       return paginar(visibles, filtro.page, filtro.size);
+    });
+  }
+
+  obtenerCaso(casoUadId: string): Observable<CasoUadDetalle> {
+    return this.responder(() => this.detalleCaso(this.casoVisibleOError(casoUadId, this.exigirEquipo())));
+  }
+
+  catalogoActuaciones(casoUadId: string): Observable<readonly ActuacionDisponible[]> {
+    return this.responder(() => {
+      const c = this.casoVisibleOError(casoUadId, this.exigirEquipo());
+      return catalogoParaCaso(c.faseActual, c.equipoResponsable, c.estadoGestion);
+    });
+  }
+
+  registrarActuaciones(casoUadId: string, cuerpo: RegistrarActuacionesRequest): Observable<ResultadoAccionCaso> {
+    return this.responder(() => {
+      const actor = this.exigirEquipo();
+      const c = this.casoVisibleOError(casoUadId, actor);
+      this.exigirCasoActivo(c);
+      this.exigirVersionCaso(c, cuerpo.version);
+      const catalogo = catalogoParaCaso(c.faseActual, c.equipoResponsable, c.estadoGestion);
+      const errores = validarActuaciones(cuerpo.actuaciones ?? [], cuerpo.observaciones, catalogo, LIMITE_TEXTO_DECISION);
+      if (Object.keys(errores).length > 0) {
+        const codigo = errores['actuaciones'] ? 'ACTUACION_NO_DISPONIBLE' : 'VALIDACION';
+        throw this.error(400, 'Revise los datos marcados.', codigo, errores);
+      }
+      // Ordinarias: no cambian la fase ni disparan correo de cambio de etapa (UAD-HIS-01 a 07, bitácora §13).
+      const eventos = cuerpo.actuaciones.map((codigo) =>
+        this.store.registrarEventoCaso(c.casoUadId, 'ACTUACION', `${nombreActuacion(codigo)}.`, {
+          profesional: actor.nombre,
+          equipo: actor.equipo,
+          fase: c.faseActual,
+          observaciones: cuerpo.observaciones
+        })
+      );
+      c.version += 1;
+      return { visibleParaUsuario: true, caso: this.detalleCaso(c), eventos, notificaciones: [] };
+    });
+  }
+
+  historialCaso(casoUadId: string): Observable<readonly EventoHistorial[]> {
+    return this.responder(() => {
+      const c = this.casoVisibleOError(casoUadId, this.exigirEquipo());
+      return (this.store.historialCasos.get(c.casoUadId) ?? []).map((e) => ({ ...e }));
+    });
+  }
+
+  evidenciasCaso(casoUadId: string): Observable<readonly EvidenciaMetadato[]> {
+    return this.responder(() => this.casoVisibleOError(casoUadId, this.exigirEquipo()).evidencias.map((e) => ({ ...e })));
+  }
+
+  registrarExpediente(casoUadId: string, cuerpo: ExpedienteRequest): Observable<ResultadoAccionCaso> {
+    return this.responder(() => {
+      const actor = this.exigirEquipo();
+      const c = this.casoVisibleOError(casoUadId, actor);
+      this.exigirCasoActivo(c);
+      this.exigirVersionCaso(c, cuerpo.version);
+      const nuevo = (cuerpo.expedienteUad ?? '').trim() || null;
+      if ((nuevo ?? '').length > LIMITE_EXPEDIENTE_UAD) {
+        throw this.error(400, 'Revise los datos marcados.', 'VALIDACION', { expedienteUad: `Máximo ${LIMITE_EXPEDIENTE_UAD} caracteres.` });
+      }
+      if (nuevo === c.expedienteUad) {
+        throw this.error(400, 'Revise los datos marcados.', 'VALIDACION', { expedienteUad: 'Es el mismo número que ya está registrado.' });
+      }
+      const anterior = c.expedienteUad;
+      c.expedienteUad = nuevo;
+      c.version += 1;
+      // Se conserva el valor anterior en el historial: corrección auditada, no sobrescritura silenciosa.
+      const evento = this.store.registrarEventoCaso(
+        c.casoUadId,
+        'EXPEDIENTE_ACTUALIZADO',
+        `Expediente UAD: ${anterior ?? 'sin registrar'} → ${nuevo ?? 'sin registrar'}.`,
+        { profesional: actor.nombre, equipo: actor.equipo, fase: c.faseActual, estadoAnterior: anterior, estadoNuevo: nuevo }
+      );
+      return { visibleParaUsuario: true, caso: this.detalleCaso(c), eventos: [evento], notificaciones: [] };
+    });
+  }
+
+  finalizarInstruccion(casoUadId: string, cuerpo: TrasladoRequest): Observable<ResultadoAccionCaso> {
+    return this.responder(() => {
+      const actor = this.exigirEquipo();
+      const c = this.casoVisibleOError(casoUadId, actor);
+      this.exigirCasoActivo(c);
+      if (c.faseActual !== 'INSTRUCCION') throw this.error(409, 'El caso no está en instrucción.', 'FASE_NO_PERMITE');
+      this.exigirVersionCaso(c, cuerpo.version);
+      if (cuerpo.confirmaTraslado !== true) {
+        throw this.error(400, 'Revise los datos marcados.', 'VALIDACION', { confirmaTraslado: 'Confirme expresamente el paso a la etapa de decisión.' });
+      }
+      if ((cuerpo.observaciones ?? '').length > LIMITE_TEXTO_DECISION) {
+        throw this.error(400, 'Revise los datos marcados.', 'VALIDACION', { observaciones: `Máximo ${LIMITE_TEXTO_DECISION} caracteres.` });
+      }
+      const instructor = c.equipoResponsable;
+      const decisor = equipoDecisor(c.vinculacionInvestigado)!;
+      // Conserva casoId, expediente, admisión, evidencias e historial (UAD-CAS-09).
+      c.faseActual = 'DECISION';
+      c.equipoResponsable = decisor;
+      c.fechaUltimoTraslado = new Date().toISOString();
+      c.version += 1;
+      const evento = this.store.registrarEventoCaso(
+        c.casoUadId,
+        'TRASLADO_FASE',
+        `Finalizó la etapa de instrucción. El caso pasó de ${ETIQUETA_EQUIPO[instructor]} (instrucción) a ${ETIQUETA_EQUIPO[decisor]} (decisión).`,
+        { profesional: actor.nombre, equipo: actor.equipo, fase: 'INSTRUCCION', estadoAnterior: 'INSTRUCCION', estadoNuevo: 'DECISION', observaciones: cuerpo.observaciones }
+      );
+      const notificaciones: NotificacionEstado[] = [
+        c.victimaNombre
+          ? { evento: 'CAMBIO_FASE', destinatario: 'VICTIMA', estado: 'PENDIENTE', motivo: 'Simulado: no se envía ningún correo.' }
+          : { evento: 'CAMBIO_FASE', destinatario: 'VICTIMA', estado: 'NO_APLICA', motivo: 'Sin contacto autorizado de la víctima.' }
+      ];
+      const visible = this.casoVisible(c, actor);
+      return { visibleParaUsuario: visible, caso: visible ? this.detalleCaso(c) : null, eventos: [evento], notificaciones };
+    });
+  }
+
+  remitirCasoPorCompetencia(casoUadId: string, cuerpo: RemisionCompetenciaCasoRequest): Observable<ResultadoAccionCaso> {
+    return this.responder(() => {
+      const actor = this.exigirEquipo();
+      const c = this.casoVisibleOError(casoUadId, actor);
+      this.exigirCasoActivo(c);
+      this.exigirVersionCaso(c, cuerpo.version);
+      const errores: Record<string, string> = {};
+      if (!cuerpo.entidadDestinatariaCodigo) errores['entidadDestinatariaCodigo'] = 'Seleccione la entidad destinataria.';
+      if (!cuerpo.fechaRemision) errores['fechaRemision'] = 'Indique la fecha de remisión.';
+      else if (cuerpo.fechaRemision > fechaCalendario(new Date())) errores['fechaRemision'] = 'La fecha de remisión no puede ser futura.';
+      if ((cuerpo.justificacion ?? '').length > LIMITE_TEXTO_DECISION) errores['justificacion'] = `Máximo ${LIMITE_TEXTO_DECISION} caracteres.`;
+      if (Object.keys(errores).length > 0) throw this.error(400, 'Revise los datos marcados.', 'VALIDACION', errores);
+      const entidad = CATALOGOS_MOCK['uad-entidades-remision'].find((e) => e.codigo === cuerpo.entidadDestinatariaCodigo)?.nombre ?? cuerpo.entidadDestinatariaCodigo;
+      // Solo se registra: no se envía nada a la entidad. El caso CASILDA sigue activo para otros actores.
+      c.estadoGestion = 'FINALIZADA';
+      c.motivoFinGestion = 'REMITIDA_POR_COMPETENCIA';
+      c.version += 1;
+      const evento = this.store.registrarEventoCaso(c.casoUadId, 'REMISION_COMPETENCIA', `Remisión por competencia a ${entidad} (${cuerpo.fechaRemision}).`, {
+        profesional: actor.nombre,
+        equipo: actor.equipo,
+        fase: c.faseActual,
+        estadoAnterior: 'ACTIVA',
+        estadoNuevo: 'FINALIZADA',
+        observaciones: cuerpo.justificacion
+      });
+      return { visibleParaUsuario: true, caso: this.detalleCaso(c), eventos: [evento], notificaciones: [] };
     });
   }
 
@@ -342,6 +512,52 @@ export class UadMockAdapter extends UadApiPort {
     else if (n.estado === 'PENDIENTE_SUBSANACION') motivos.SOLICITAR_INFORMACION = 'Ya hay una solicitud de información en curso.';
     else acciones.push('SOLICITAR_INFORMACION');
     return { acciones, motivos };
+  }
+
+  /** El caso es del equipo del usuario en su fase actual (instructor en instrucción, decisor en decisión). */
+  private casoVisible(c: CasoUadMock, actor: Actor): boolean {
+    return actor.contexto.equipos.includes(c.equipoResponsable);
+  }
+
+  /** 404 si no existe o no es del equipo y la fase del usuario (no revela cuál de los dos). */
+  private casoVisibleOError(casoUadId: string, actor: Actor): CasoUadMock {
+    const c = this.store.buscarCaso(casoUadId);
+    if (!c || !this.casoVisible(c, actor)) throw this.error(404, 'No encontrado.');
+    return c;
+  }
+
+  private exigirCasoActivo(c: CasoUadMock): void {
+    if (c.estadoGestion !== 'ACTIVA') throw this.error(409, 'La gestión UAD terminó.', 'CASO_NO_ACTIVO');
+  }
+
+  private exigirVersionCaso(c: CasoUadMock, version: number): void {
+    if (version !== c.version) throw this.error(409, 'El caso cambió.', 'CONFLICTO_VERSION');
+  }
+
+  private resumenCaso(c: CasoUadMock): CasoUadResumen {
+    return {
+      casoUadId: c.casoUadId,
+      casoId: c.casoId,
+      expedienteUad: c.expedienteUad,
+      consecutivosNoticia: [...c.consecutivosNoticia],
+      victimaNombre: c.victimaNombre,
+      vinculacionInvestigado: c.vinculacionInvestigado,
+      fechaAdmision: c.fechaAdmision,
+      faseActual: c.faseActual,
+      equipoResponsable: c.equipoResponsable,
+      estadoGestion: c.estadoGestion,
+      version: c.version
+    };
+  }
+
+  private detalleCaso(c: CasoUadMock): CasoUadDetalle {
+    return {
+      ...this.resumenCaso(c),
+      motivoFinGestion: c.motivoFinGestion,
+      fechaUltimoTraslado: c.fechaUltimoTraslado,
+      equipoInstructor: equipoInstructor(c.vinculacionInvestigado)!,
+      equipoDecisor: equipoDecisor(c.vinculacionInvestigado)!
+    };
   }
 
   private resumen(n: NoticiaMock): NoticiaResumen {

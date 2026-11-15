@@ -1,6 +1,8 @@
 import { Observable } from 'rxjs';
 import {
+  ActuacionDisponible,
   CasoAsociado,
+  CasoUadDetalle,
   CasoUadResumen,
   CatalogoUad,
   ClasificacionRequest,
@@ -9,12 +11,18 @@ import {
   DecisionEvaluacionRequest,
   DecisionEvaluacionResponse,
   EventoHistorial,
+  EvidenciaMetadato,
+  ExpedienteRequest,
   FiltroCasosUad,
   FiltroNoticias,
   MaestroUad,
   NoticiaDetalle,
   NoticiaResumen,
-  Pagina
+  Pagina,
+  RegistrarActuacionesRequest,
+  RemisionCompetenciaCasoRequest,
+  ResultadoAccionCaso,
+  TrasladoRequest
 } from './uad-api.types';
 
 /**
@@ -58,6 +66,32 @@ export abstract class UadApiPort {
   /** `GET /maestros/{catalogo}` — catálogos propuestos con la forma real de `MaestroDTO`. */
   abstract catalogo(nombre: CatalogoUad): Observable<readonly MaestroUad[]>;
 
-  /** `GET /uad/casos` — listarCasosUad (Entrega 2; hoy solo lectura para verificar la admisión). */
+  // ------------------------------------------------------------------ Entrega 2: casos UAD
+
+  /** `GET /uad/casos` — listarCasosUad. Solo casos activos del equipo y la fase del usuario. */
   abstract listarCasos(filtro: FiltroCasosUad): Observable<Pagina<CasoUadResumen>>;
+
+  /** `GET /uad/casos/{casoUadId}` — obtenerCasoUad. Operación segura. */
+  abstract obtenerCaso(casoUadId: string): Observable<CasoUadDetalle>;
+
+  /** `GET /uad/casos/{casoUadId}/actuaciones/catalogo` — catalogoActuaciones. */
+  abstract catalogoActuaciones(casoUadId: string): Observable<readonly ActuacionDisponible[]>;
+
+  /** `POST /uad/casos/{casoUadId}/actuaciones` — registrarActuaciones (solo ordinarias; no cambian la fase). */
+  abstract registrarActuaciones(casoUadId: string, cuerpo: RegistrarActuacionesRequest): Observable<ResultadoAccionCaso>;
+
+  /** `GET /uad/casos/{casoUadId}/historial` — historialCaso. */
+  abstract historialCaso(casoUadId: string): Observable<readonly EventoHistorial[]>;
+
+  /** `GET /uad/casos/{casoUadId}/evidencias` — evidenciasCaso (metadatos; la carga está deshabilitada). */
+  abstract evidenciasCaso(casoUadId: string): Observable<readonly EvidenciaMetadato[]>;
+
+  /** `PATCH /uad/casos/{casoUadId}/expediente` — registrarExpedienteUad. */
+  abstract registrarExpediente(casoUadId: string, cuerpo: ExpedienteRequest): Observable<ResultadoAccionCaso>;
+
+  /** `POST /uad/casos/{casoUadId}/traslado-decision` — finalizarInstruccion. */
+  abstract finalizarInstruccion(casoUadId: string, cuerpo: TrasladoRequest): Observable<ResultadoAccionCaso>;
+
+  /** `POST /uad/casos/{casoUadId}/remisiones-competencia` — remitirCasoPorCompetencia (solo registra). */
+  abstract remitirCasoPorCompetencia(casoUadId: string, cuerpo: RemisionCompetenciaCasoRequest): Observable<ResultadoAccionCaso>;
 }

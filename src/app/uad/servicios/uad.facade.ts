@@ -2,19 +2,24 @@ import { Injectable, inject, signal } from '@angular/core';
 import { Observable, forkJoin, shareReplay, tap } from 'rxjs';
 import { UadApiPort } from '../contratos/uad-api.port';
 import {
+  ActuacionDisponible,
   CasoAsociado,
+  CasoUadDetalle,
   CasoUadResumen,
+  CodigoActuacion,
   ClasificacionResponse,
   ContextoUsuarioUad,
   DecisionEvaluacionRequest,
   DecisionEvaluacionResponse,
   EventoHistorial,
+  EvidenciaMetadato,
   FiltroCasosUad,
   FiltroNoticias,
   MaestroUad,
   NoticiaDetalle,
   NoticiaResumen,
   Pagina,
+  ResultadoAccionCaso,
   VinculacionInvestigado
 } from '../contratos/uad-api.types';
 
@@ -73,6 +78,44 @@ export class UadFacade {
 
   listarCasos(filtro: FiltroCasosUad): Observable<Pagina<CasoUadResumen>> {
     return this.api.listarCasos(filtro);
+  }
+
+  // ------------------------------------------------------------------ Entrega 2: Gestionar caso
+
+  obtenerCaso(casoUadId: string): Observable<CasoUadDetalle> {
+    return this.api.obtenerCaso(casoUadId);
+  }
+
+  catalogoActuaciones(casoUadId: string): Observable<readonly ActuacionDisponible[]> {
+    return this.api.catalogoActuaciones(casoUadId);
+  }
+
+  historialCaso(casoUadId: string): Observable<readonly EventoHistorial[]> {
+    return this.api.historialCaso(casoUadId);
+  }
+
+  evidenciasCaso(casoUadId: string): Observable<readonly EvidenciaMetadato[]> {
+    return this.api.evidenciasCaso(casoUadId);
+  }
+
+  /** Cada acción lleva la `version` leída del caso: si otra persona lo cambió, el servidor responde 409. */
+  registrarActuaciones(caso: CasoUadDetalle, actuaciones: readonly CodigoActuacion[], observaciones: string | null): Observable<ResultadoAccionCaso> {
+    return this.api.registrarActuaciones(caso.casoUadId, { actuaciones, observaciones, version: caso.version });
+  }
+
+  registrarExpediente(caso: CasoUadDetalle, expedienteUad: string | null): Observable<ResultadoAccionCaso> {
+    return this.api.registrarExpediente(caso.casoUadId, { expedienteUad, version: caso.version });
+  }
+
+  finalizarInstruccion(caso: CasoUadDetalle, observaciones: string | null): Observable<ResultadoAccionCaso> {
+    return this.api.finalizarInstruccion(caso.casoUadId, { confirmaTraslado: true, observaciones, version: caso.version });
+  }
+
+  remitirCasoPorCompetencia(
+    caso: CasoUadDetalle,
+    datos: { entidadDestinatariaCodigo: string; fechaRemision: string; justificacion: string | null }
+  ): Observable<ResultadoAccionCaso> {
+    return this.api.remitirCasoPorCompetencia(caso.casoUadId, { ...datos, version: caso.version });
   }
 
   /** Catálogos de la evaluación, una vez por sesión del módulo. Si fallan, se vuelven a pedir la próxima vez. */

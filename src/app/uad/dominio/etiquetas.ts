@@ -151,6 +151,8 @@ export const ETIQUETA_EVENTO: Record<TipoEventoHistorial, string> = {
   NOTIFICACION: 'Notificación',
   ACTUACION: 'Actuación',
   TRASLADO_FASE: 'Traslado de fase',
+  EXPEDIENTE_ACTUALIZADO: 'Expediente UAD actualizado',
+  REMISION_COMPETENCIA: 'Remisión por competencia',
   RECTIFICACION: 'Rectificación'
 };
 

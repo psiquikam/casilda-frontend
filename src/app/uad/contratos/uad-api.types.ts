@@ -254,7 +254,80 @@ export interface CasoUadResumen {
   readonly fechaAdmision: string;
   readonly faseActual: FaseUad;
   readonly equipoResponsable: EquipoUad;
+  readonly estadoGestion: EstadoGestionUad;
   readonly version: number;
+}
+
+/** Estado de la **gestión UAD** (UAD-SEG-04): no es el de la noticia ni el del caso CASILDA global. */
+export type EstadoGestionUad = 'ACTIVA' | 'FINALIZADA';
+
+export interface CasoUadDetalle extends CasoUadResumen {
+  /** Otros motivos (inhibitoria posterior, terminación, fallo en firme): PENDIENTES DE VALIDACIÓN. */
+  readonly motivoFinGestion: 'REMITIDA_POR_COMPETENCIA' | null;
+  readonly fechaUltimoTraslado: string | null;
+  readonly equipoInstructor: EquipoUad;
+  readonly equipoDecisor: EquipoUad;
+}
+
+/** Catálogo definitivo de la bitácora §7 (ordinarias) y §8 (permanentes). */
+export type CodigoActuacion =
+  | 'INDAGACION_PREVIA'
+  | 'INVESTIGACION_DISCIPLINARIA'
+  | 'AVERIGUACIONES_PRELIMINARES'
+  | 'PRACTICA_PRUEBAS'
+  | 'PLIEGO_CARGOS'
+  | 'AUDIENCIAS'
+  | 'MEDIACION'
+  | 'FALLO'
+  | 'REPOSICION_APELACION'
+  | 'REMISION_COMPETENCIA'
+  | 'INHIBITORIO'
+  | 'TERMINACION'
+  | 'FINALIZAR_INSTRUCCION'
+  | 'REMISION_RUTA';
+
+export interface ActuacionDisponible {
+  readonly codigo: CodigoActuacion;
+  readonly nombre: string;
+  /** Acción permanente (§8): visible siempre; se ejecuta por su propia operación. */
+  readonly permanente: boolean;
+  readonly ejecutable: boolean;
+  readonly motivoNoEjecutable: string | null;
+  /** Sujeta a validación jurídica (§16): se muestra deshabilitada. */
+  readonly pendienteValidacion: boolean;
+}
+
+export interface ExpedienteRequest {
+  readonly expedienteUad: string | null;
+  readonly version: number;
+}
+
+export interface RegistrarActuacionesRequest {
+  readonly actuaciones: readonly CodigoActuacion[];
+  readonly observaciones: string | null;
+  readonly version: number;
+}
+
+export interface TrasladoRequest {
+  readonly confirmaTraslado: boolean;
+  readonly observaciones: string | null;
+  readonly version: number;
+}
+
+/** La fase la toma el servidor de la fase actual del caso. Sin oficio ni radicado de salida (UAD-REM-03). */
+export interface RemisionCompetenciaCasoRequest {
+  readonly entidadDestinatariaCodigo: string;
+  readonly fechaRemision: string;
+  readonly justificacion: string | null;
+  readonly version: number;
+}
+
+export interface ResultadoAccionCaso {
+  /** `false` si tras la acción el caso dejó de ser del equipo y fase del usuario (p. ej. tras el traslado). */
+  readonly visibleParaUsuario: boolean;
+  readonly caso: CasoUadDetalle | null;
+  readonly eventos: readonly EventoHistorial[];
+  readonly notificaciones: readonly NotificacionEstado[];
 }
 
 export interface DecisionEvaluacionResponse {
@@ -276,6 +349,8 @@ export type TipoEventoHistorial =
   | 'NOTIFICACION'
   | 'ACTUACION'
   | 'TRASLADO_FASE'
+  | 'EXPEDIENTE_ACTUALIZADO'
+  | 'REMISION_COMPETENCIA'
   | 'RECTIFICACION';
 
 export interface EventoHistorial {
