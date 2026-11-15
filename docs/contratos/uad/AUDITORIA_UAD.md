@@ -99,10 +99,10 @@ Hoy no hay un único "ID de caso Casilda" transversal. El contrato UAD trata `ca
 | P-UAD-05 Casos asociados (UAD-EVA-06 a 09) | **Sí (nuevo, mock)** | No | `componentes/casos-asociados/` | `GET /uad/noticias/{id}/casos-asociados` | PROPUESTO + UI MOCK |
 | Reclasificación y concurrencia (UAD-NOT-07/08) | **Sí (nuevo, mock)** | No | `POST …/clasificacion`, `version` + 409 | Requiere `@Version` o equivalente en backend | PROPUESTO + UI MOCK |
 | Subsanación desde "Mis reportes" (UAD-EVA-04/05) | No ("Mis reportes" no existe) | No | — | `POST /reportes/{codigo}/solicitudes-informacion/{id}/respuesta` | NO ENCONTRADO |
-| P-UAD-06 Bandeja de casos (UAD-CAS-01 a 12) | Solo lectura (andamiaje) | No | `paginas/bandeja-casos/` | `GET /uad/casos` | PROPUESTO (E2) |
-| P-UAD-07 Gestionar caso (bitácora §7–8) | No | No | — | `…/actuaciones/catalogo`, `POST …/actuaciones`, `…/traslado-decision` | PROPUESTO (E2) |
-| P-UAD-08 Historial (UAD-HIS-01 a 08) | Historial de la noticia (mock) | No | — | `GET /uad/casos/{id}/historial`; rectificación pendiente | PROPUESTO / PENDIENTE DE VALIDACIÓN |
-| P-UAD-09 Pruebas del caso (UAD-PRU-01 a 05) | Metadatos y descarga en evaluación (mock) | No | — | `GET /uad/evidencias/{id}/descarga`; carga deshabilitada | PROPUESTO / PENDIENTE DE VALIDACIÓN (carga) |
+| P-UAD-06 Bandeja de casos (UAD-CAS-01 a 12) | **Sí (E2, mock)** | No | `paginas/bandeja-casos/` | `GET /uad/casos` | PROPUESTO + UI MOCK |
+| P-UAD-07 Gestionar caso (bitácora §7–8) | **Sí (E2, mock)** | No | `paginas/gestionar-caso/` | `…/actuaciones/catalogo`, `POST …/actuaciones`, `…/traslado-decision`, `…/remisiones-competencia` | PROPUESTO + UI MOCK |
+| P-UAD-08 Historial (UAD-HIS-01 a 08) | **Sí (noticia y caso, mock)** | No | `paginas/gestionar-caso/` | `GET /uad/casos/{id}/historial`; rectificación pendiente | PROPUESTO + UI MOCK / PENDIENTE DE VALIDACIÓN (rectificación) |
+| P-UAD-09 Pruebas del caso (UAD-PRU-01 a 05) | **Sí (E2, mock): consulta y descarga** | No | `paginas/gestionar-caso/` | `GET /uad/casos/{id}/evidencias`, `GET /uad/evidencias/{id}/descarga`; carga deshabilitada | PROPUESTO + UI MOCK / PENDIENTE DE VALIDACIÓN (carga) |
 | P-UAD-10 Remisión por competencia (UAD-REM-01 a 06) | **Sí, en evaluación (mock)** | No | `decisiones` tipo `REMISION_COMPETENCIA` | Sin radicado de salida; sin envío externo | PROPUESTO + UI MOCK |
 | P-UAD-11 Remisión a actor de la Ruta (UAD-RUT-01 a 05) | No | No | — | `POST /uad/casos/{id}/remisiones-ruta` (borrador) | PENDIENTE DE VALIDACIÓN |
 | Notificaciones (bitácora §13) | Estado simulado en el resultado | No | — | `NotificacionEstado` como efecto del servidor | PENDIENTE DE VALIDACIÓN |

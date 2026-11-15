@@ -1,13 +1,13 @@
 # Módulo UAD Equipos 3 y 4: contratos y guía técnica
 
-**Estado (2026-11-14):** la Entrega 1 del frontend funciona con el adaptador mock. **El backend no tiene ninguna operación UAD**: todos los contratos están propuestos y ninguno implementado.
+**Estado (2026-11-15):** las Entregas 1 (bandejas NDI/NDA y evaluación) y 2 (bandeja de casos, Gestionar caso, historial, pruebas y traslado) funcionan con el adaptador mock. **El backend no tiene ninguna operación UAD**: todos los contratos están propuestos y ninguno implementado.
 
 | Documento | Para qué |
 |---|---|
 | [`openapi-uad.yaml`](openapi-uad.yaml) | **Fuente de verdad** de los contratos (OpenAPI 3.0.3). Cada operación lleva `x-estado` y `x-entrega`. |
 | [`AUDITORIA_UAD.md`](AUDITORIA_UAD.md) | Diagnóstico de los dos repositorios con evidencia, inventario de endpoints y tabla requisito → estado. |
 | [`MATRIZ_CONTRATOS_UAD.md`](MATRIZ_CONTRATOS_UAD.md) | Requisito → UI → tipo/schema → endpoint → estado, y mapeo contrato → TS → puerto → adaptadores. |
-| [`DECISIONES_PENDIENTES_UAD.md`](DECISIONES_PENDIENTES_UAD.md) | D-UAD-01…19: impacto, fuente, decisión provisional y quién valida. |
+| [`DECISIONES_PENDIENTES_UAD.md`](DECISIONES_PENDIENTES_UAD.md) | D-UAD-01…25: impacto, fuente, decisión provisional y quién valida. |
 
 ## 1. Arquitectura
 
@@ -52,6 +52,17 @@ npm start          # http://localhost:4200
 | `NDA-2026-000020` a `000022` | Anónimas, visibles a ambos equipos. |
 
 5. En la evaluación, **"Simular que otra persona modifica la noticia"** hace que la siguiente acción reciba el aviso de conflicto (409).
+6. Casos sembrados (menú **Casos UAD**, `/uad/casos`):
+
+| ID de caso | Escenario |
+|---|---|
+| `CAS-2026-000301` | Docente, instrucción con Equipo 3, sin expediente UAD: pruebe registrarlo, guardar actuaciones y "Finalizar etapa de instrucción". |
+| `CAS-2026-000248` | Estudiante, instrucción con Equipo 4. |
+| `CAS-2026-000302` | Administrativo, ya trasladado: decisión con Equipo 4. Su historial conserva lo hecho por Equipo 3. |
+| `CAS-2026-000303` | Estudiante, ya trasladado: decisión con Equipo 3. |
+| `CAS-2026-000304` | Gestión finalizada por remisión: no aparece en la bandeja activa. |
+
+   Para ver el traslado completo: con Equipo 3 finalice la instrucción de `CAS-2026-000301`, que sale de su bandeja; cambie el equipo simulado a Equipo 4 y aparece en decisión.
 
 ## 3. Alternar mock ↔ HTTP
 
@@ -98,14 +109,7 @@ Qué cubren:
 
 ## 6. Plan de las siguientes entregas
 
-**Entrega 2: casos.** Depende de que Backend implemente la Entrega 1 y de D-UAD-15.
-- Gestionar caso con catálogo por fase y equipo (bitácora §7).
-- Acciones permanentes con confirmación.
-- Observaciones opcionales.
-- Historial del caso.
-- Pruebas del caso (solo consulta).
-- Traslado instrucción → decisión con confirmación explícita.
-- Pruebas: catálogo, acciones permanentes, traslado y conservación del historial.
+**Entrega 2: casos. Hecha en el frontend (mock).** Para pasar a HTTP depende de que Backend implemente las operaciones `x-entrega: 2` y de D-UAD-15, 20 a 25.
 
 **Entrega 3: transversal.** Depende de D-UAD-02, 04, 05, 16 y 17.
 - Pregunta de vinculación en el formulario general.
