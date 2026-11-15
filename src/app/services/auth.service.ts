@@ -358,9 +358,13 @@ export class AuthService {
     return this.hasRole('TECNICO_APH');
   }
 
-  /** Algún rol del módulo UAD (o ADMIN, por la regla general de `hasAnyRole`). */
+  /**
+   * Algún rol del módulo UAD, o ADMIN (misma regla general que `hasAnyRole`). Sin efectos secundarios:
+   * no pasa por `isAuthenticated()`, que cierra la sesión si el token expiró, porque se evalúa en las
+   * plantillas del menú en cada ciclo de detección de cambios. La sesión la validan los guards.
+   */
   puedeVerUad(): boolean {
-    return this.hasAnyRole([...ROLES_UAD]);
+    return this.isAdmin() || ROLES_UAD.some((rol) => this.hasRole(rol));
   }
 
   /**
