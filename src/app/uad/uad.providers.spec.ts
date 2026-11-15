@@ -8,7 +8,11 @@ import { UadHttpAdapter } from './infraestructura/uad-http.adapter';
 import { UadMockAdapter } from './infraestructura/mock/uad-mock.adapter';
 import { UadSimulacionService } from './infraestructura/mock/uad-mock-store';
 import { UAD_ROUTES } from './routes';
-import { provideUadApi } from './uad.providers';
+import { UAD_RADICACION_SIMULADA, provideUadApi, provideUadRadicacion } from './uad.providers';
+import { UadRadicacionPort } from './contratos/uad-radicacion.port';
+import { UadRadicacionHttpAdapter } from './infraestructura/uad-radicacion-http.adapter';
+import { UadRadicacionMockAdapter } from './infraestructura/mock/uad-radicacion-mock.adapter';
+import { featureCapabilityGuard } from '../core/features/feature-capability.guard';
 
 describe('UAD · selección de adaptador y rutas', () => {
   function inyector(adaptador: 'mock' | 'http'): EnvironmentInjector {
@@ -39,5 +43,27 @@ describe('UAD · selección de adaptador y rutas', () => {
     for (const h of hijas.filter((r) => !r.redirectTo)) {
       expect(h.title).withContext(h.path ?? '').toBeTruthy();
     }
+  });
+
+  it('radicación pública: mock declara la simulación; http no', () => {
+    TestBed.configureTestingModule({ providers: [provideHttpClient()] });
+    const padre = TestBed.inject(EnvironmentInjector);
+    const mock = createEnvironmentInjector([provideUadRadicacion('mock')], padre);
+    expect(mock.get(UadRadicacionPort)).toBeInstanceOf(UadRadicacionMockAdapter);
+    expect(mock.get(UAD_RADICACION_SIMULADA)).toBeTrue();
+    const http = createEnvironmentInjector([provideUadRadicacion('http')], padre);
+    expect(http.get(UadRadicacionPort)).toBeInstanceOf(UadRadicacionHttpAdapter);
+    expect(http.get(UAD_RADICACION_SIMULADA)).toBeFalse();
+  });
+
+  it('/uad/queja-anonima es pública, va antes de /uad y depende del flag uadQuejaAnonima', () => {
+    const indicePublica = routes.findIndex((r) => r.path === 'uad/queja-anonima');
+    const indiceUad = routes.findIndex((r) => r.path === 'uad');
+    expect(indicePublica).toBeGreaterThanOrEqual(0);
+    expect(indicePublica).toBeLessThan(indiceUad);
+    const publica = routes[indicePublica];
+    expect(publica.canActivate ?? []).not.toContain(roleGuard);
+    expect(publica.canMatch).toContain(featureCapabilityGuard);
+    expect(publica.data?.['feature']).toBe('uadQuejaAnonima');
   });
 });

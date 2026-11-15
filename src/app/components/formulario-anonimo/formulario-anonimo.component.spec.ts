@@ -628,4 +628,14 @@ describe('FormularioAnonimoComponent en modo autenticado', () => {
     component.guardarBorrador();
     expect(localStorage.setItem).toHaveBeenCalledWith('casilda_borrador_reporte', jasmine.any(String));
   });
+
+  describe('acceso a la queja anónima de la UAD (UAD-FOR-12)', () => {
+    it('muestra el enlace con el flag encendido y navega dentro de la aplicación', () => {
+      const enlace = fixture.nativeElement.querySelector('.queja-anonima-uad a') as HTMLAnchorElement | null;
+      expect(enlace).withContext('enlace visible con uadQuejaAnonima = true').not.toBeNull();
+      expect(enlace!.getAttribute('href')).toBe('/uad/queja-anonima');
+      enlace!.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 }));
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/uad/queja-anonima');
+    });
+  });
 });

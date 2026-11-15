@@ -1,0 +1,116 @@
+// Solo tokens: sin colores, tipografías ni espaciados literales (CLAUDE.md §3).
+.nda {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6);
+
+  @media (max-width: 600px) {
+    padding: var(--space-6) var(--space-4);
+  }
+}
+
+.nda__titulo {
+  margin: 0;
+  font-size: var(--font-size-2xl);
+}
+
+.nda__intro {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.tarjeta__titulo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--font-size-md);
+  color: var(--color-primary);
+}
+
+.privacidad {
+  background: var(--color-primary-tint);
+  border-color: var(--color-primary-border);
+}
+
+.privacidad__lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding-left: var(--space-5);
+
+  a {
+    color: var(--color-secondary);
+    font-weight: 600;
+  }
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.campo {
+  width: 100%;
+}
+
+.sub {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.confirmacion {
+  align-items: center;
+  text-align: center;
+
+  p {
+    margin: 0;
+  }
+}
+
+.confirmacion__icono {
+  width: 40px;
+  height: 40px;
+  font-size: 40px;
+  color: var(--color-success);
+}
+
+.confirmacion__titulo {
+  margin: 0;
+  font-size: var(--font-size-xl);
+}
+
+.confirmacion__etiqueta {
+  color: var(--color-text-secondary);
+}
+
+.confirmacion__consecutivo {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+}

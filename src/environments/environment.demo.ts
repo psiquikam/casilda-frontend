@@ -9,6 +9,7 @@ import { environment as produccion } from './environment.prod';
  *
  * - UAD Equipos 3 y 4: adaptador mock (el backend no tiene rutas `/uad`; ver
  *   `docs/contratos/uad/AUDITORIA_UAD.md`). Las pantallas muestran la franja «Datos de demostración».
+ * - Queja anónima UAD (`features.uadQuejaAnonima`): visible, con la radicación simulada.
  * - Línea Alma (APH y Psicología): todos los grupos del servidor simulado encendidos. El interceptor
  *   solo atiende `{apiBaseUrl}/alma/...`, así que no oculta endpoints reales del backend. Se generan
  *   a partir de las claves de producción: un grupo nuevo queda simulado sin tocar este archivo.
@@ -30,5 +31,9 @@ export const environment = {
   },
   uad: {
     adaptador: 'mock' as 'mock' | 'http'
+  },
+  features: {
+    ...produccion.features,
+    uadQuejaAnonima: true
   }
 };

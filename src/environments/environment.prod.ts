@@ -65,6 +65,8 @@ export const environment = {
     complaintIntakePrototype: false,
     publicTrackingPrototype: false,
     reviewerDashboardPrototype: false,
-    assignmentsPrototype: false
+    assignmentsPrototype: false,
+    /** Apagada hasta que exista `POST /uad/noticias-anonimas`: un formulario público que falla no se publica. */
+    uadQuejaAnonima: false
   }
 };

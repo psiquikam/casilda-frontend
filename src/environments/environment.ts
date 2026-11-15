@@ -65,6 +65,8 @@ export const environment = {
     complaintIntakePrototype: true,
     publicTrackingPrototype: true,
     reviewerDashboardPrototype: true,
-    assignmentsPrototype: true
+    assignmentsPrototype: true,
+    /** Queja anónima ante la UAD (`/uad/queja-anonima`). El backend aún no tiene `POST /uad/noticias-anonimas`. */
+    uadQuejaAnonima: true
   }
 };
