@@ -28,6 +28,12 @@ export const UAD_ROUTES: Routes = [
         path: 'casos',
         title: 'Bandeja de casos — UAD',
         loadComponent: () => import('./paginas/bandeja-casos/bandeja-casos.page').then((m) => m.BandejaCasosPage)
+      },
+      {
+        path: 'casos/:casoUadId',
+        title: 'Gestionar caso — UAD',
+        canDeactivate: [cambiosSinGuardarGuard],
+        loadComponent: () => import('./paginas/gestionar-caso/gestionar-caso.page').then((m) => m.GestionarCasoPage)
       }
     ]
   }

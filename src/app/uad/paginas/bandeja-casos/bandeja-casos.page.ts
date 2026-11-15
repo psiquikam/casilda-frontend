@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -12,15 +12,17 @@ import { PanelSimulacionComponent } from '../../componentes/panel-simulacion/pan
 import { ETIQUETA_EQUIPO, ETIQUETA_FASE, ETIQUETA_VINCULACION } from '../../dominio/etiquetas';
 import { ErrorUad } from '../../infraestructura/uad-error';
 import { UadFacade } from '../../servicios/uad.facade';
+import { AvisoBandeja } from '../bandeja-noticias/bandeja-noticias.page';
 
 const TAMANO_PAGINA = 10;
 
 /**
- * Bandeja de casos UAD — `/uad/casos` (P-UAD-06; UAD-CAS-01 a 03). **Andamiaje de la Entrega 2.**
+ * Bandeja de casos UAD — `/uad/casos` (P-UAD-06; UAD-CAS-01 a 07, 12).
  *
- * Hoy solo lista (lectura) para comprobar que «Continuar trámite» deja el caso en la bandeja del
- * equipo instructor con su ID y expediente. «Gestionar caso», actuaciones, historial del caso y el
- * traslado instrucción → decisión llegan en la Entrega 2 (contratos ya propuestos en el OpenAPI).
+ * Tercera bandeja, separada de NDI y NDA. Muestra los casos con gestión UAD activa del equipo del
+ * usuario **en la fase actual** (lo filtra el servidor): tras «Finalizar etapa de instrucción» el
+ * caso sale de la bandeja del instructor y aparece en la del decisor. Acción: «Gestionar caso».
+ * El acceso histórico autorizado (casos trasladados o finalizados) está pendiente (D-UAD-03).
  */
 @Component({
   selector: 'app-uad-bandeja-casos-page',
@@ -35,13 +37,15 @@ const TAMANO_PAGINA = 10;
 
       <app-uad-panel-simulacion (equipoCambiado)="cargar()" />
 
-      <div class="casilda-alerta" role="note">
-        <mat-icon aria-hidden="true">construction</mat-icon>
-        <p>
-          Vista de solo lectura. «Gestionar caso», el registro de actuaciones y el paso de instrucción a decisión se habilitan en la siguiente
-          entrega.
-        </p>
-      </div>
+      @if (aviso(); as a) {
+        <div class="casilda-alerta casilda-alerta--precaucion" role="status">
+          <mat-icon aria-hidden="true">info</mat-icon>
+          <div>
+            <p>{{ a }}</p>
+            <button type="button" class="boton boton--secundario" (click)="aviso.set(null)">Entendido</button>
+          </div>
+        </div>
+      }
 
       <form class="bandeja__filtros" (ngSubmit)="filtrar()" aria-label="Filtros de la bandeja de casos">
         <mat-form-field appearance="outline">
@@ -95,16 +99,15 @@ const TAMANO_PAGINA = 10;
                   <td>{{ etiquetaFase[c.faseActual] }}</td>
                   <td>{{ etiquetaEquipo[c.equipoResponsable] }}</td>
                   <td>
-                    <button type="button" class="boton boton--secundario boton--compacto" disabled aria-describedby="uad-gestionar-nota">
+                    <a class="boton boton--primario boton--compacto" [routerLink]="['/uad/casos', c.casoUadId]">
                       Gestionar caso <span class="visually-hidden">{{ c.casoId }}</span>
-                    </button>
+                    </a>
                   </td>
                 </tr>
               }
             </tbody>
           </table>
         </div>
-        <p id="uad-gestionar-nota" class="bandeja__meta">«Gestionar caso» estará disponible en la siguiente entrega.</p>
         <mat-paginator [length]="total()" [pageSize]="tamano" [pageIndex]="pagina()" [hidePageSize]="true" (page)="cambiarPagina($event)" aria-label="Páginas de casos" />
       }
 
@@ -116,6 +119,7 @@ const TAMANO_PAGINA = 10;
 export class BandejaCasosPage implements OnInit {
   private readonly facade = inject(UadFacade);
   private readonly notificacion = inject(NotificacionService);
+  private readonly router = inject(Router);
 
   protected readonly fase = signal<FaseUad | ''>('');
   protected readonly pagina = signal(0);
@@ -128,7 +132,12 @@ export class BandejaCasosPage implements OnInit {
   protected readonly etiquetaEquipo = ETIQUETA_EQUIPO;
   protected readonly etiquetaVinculacion = ETIQUETA_VINCULACION;
 
+  /** Aviso que deja «Gestionar caso» al volver (p. ej. tras el traslado a decisión). Solo texto. */
+  protected readonly aviso = signal<string | null>(null);
+
   ngOnInit(): void {
+    const aviso = (this.router.lastSuccessfulNavigation()?.extras.state as AvisoBandeja | undefined)?.aviso;
+    if (aviso) this.aviso.set(aviso);
     this.cargar();
   }
 
