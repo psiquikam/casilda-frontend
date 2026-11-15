@@ -485,6 +485,18 @@ y todos los grupos de `lineaAlma.mocks` (generados desde las claves de producci�
 `npm run build`, `deploy:vercel:preview` y `deploy:vercel` no cambian. `environments.spec.ts` impide que producción simule.
 Se entra con un usuario ADMIN real de QA; las cuentas de prueba siguen apagadas (`datosDemostracion: false`).
 
+### 2026-11-15 — Módulo UAD, Entrega 2 (casos, adaptador mock)
+Contrato `openapi-uad.yaml` v0.2.0 con las 9 operaciones de casos (`x-entrega: 2`); decisiones nuevas D-UAD-20…25.
+
+- **`/uad/casos`**: bandeja activa por equipo y fase con «Gestionar caso». **`/uad/casos/:casoUadId`**: cabecera con
+  identificadores y expediente UAD editable con auditoría; actuaciones ordinarias por fase/equipo (bitácora §7) con
+  confirmación y observaciones opcionales; acciones permanentes siempre visibles (§8), con inhibitorio, terminación,
+  remisión a la Ruta y mediación deshabilitadas por validación jurídica; «Finalizar etapa de instrucción» con casilla y
+  diálogo (el caso sale de la bandeja del instructor y llega a la del decisor con su historial); remisión por competencia
+  que finaliza la gestión UAD sin cerrar el caso CASILDA; historial del caso y pruebas con descarga (carga deshabilitada).
+- **Regla de incompatibilidad (D-UAD-20):** ordinarias y permanentes van en operaciones distintas.
+- `dominio/catalogo-actuaciones.ts` concentra el catálogo; el mock y la documentación lo comparten.
+
 ### Pendiente
 0. **Línea Alma Psicología:** Backend debe revisar D-PSI-01…19 (entidad de la novedad antes del caso, `tomadaPorMi`,
    SLA, PDF síncrono, contención puntual); el equipo debe decidir qué roles se habilitan además de ADMIN
@@ -592,8 +604,8 @@ Se entra con un usuario ADMIN real de QA; las cuentas de prueba siguen apagadas 
 16. **Seguimiento de trámite sin endpoint:** `/seguimiento` sigue simulando resultados y los diálogos de
     éxito prometen una consulta que no existe. Contrato propuesto en
     `docs/contratos/contrato-consultar-reporte.md`; hasta que exista, mantener el flag `publicTrackingPrototype`.
-17. **UAD:** Backend debe implementar `openapi-uad.yaml` y crear los roles `UAD_*` (D-UAD-01, 03, 14); el equipo jurídico debe
-    validar D-UAD-02…13 y 18–19; riesgo de privacidad fuera del módulo en `/solicitudes` (D-UAD-16). Hasta entonces, solo ADMIN
+17. **UAD:** Backend debe implementar `openapi-uad.yaml` (Entregas 1 y 2) y crear los roles `UAD_*` (D-UAD-01, 03, 14); el
+    equipo jurídico debe validar D-UAD-02…13 y 18–25; riesgo de privacidad fuera del módulo en `/solicitudes` (D-UAD-16). Hasta entonces, solo ADMIN
     entra a `/uad` y lo hace con datos simulados.
 
 ## 6. Reglas que no se deben romper
