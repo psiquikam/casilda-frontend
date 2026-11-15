@@ -9,6 +9,8 @@
  *    los encabezados de seguridad.
  *
  * Uso: npm run deploy:vercel:preview   (compila y sube una vista previa)
+ *      npm run deploy:vercel:demo      (compila con `environment.demo.ts` y sube una vista previa:
+ *                                       módulos sin backend con datos simulados)
  *      npm run deploy:vercel           (compila y sube a producción)
  */
 import { spawnSync } from 'node:child_process';

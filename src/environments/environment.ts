@@ -52,10 +52,21 @@ export const environment = {
       recontactos: true
     }
   },
+  /**
+   * Módulo UAD Equipos 3 y 4: adaptador del puerto `UadApiPort` (`src/app/uad/uad.providers.ts`).
+   * `'mock'`: datos sintéticos en memoria, sin red. `'http'`: `{apiBaseUrl}/uad/...` según
+   * `docs/contratos/uad/openapi-uad.yaml`, **que aún no existe en el backend** (auditoría 2026-11-14).
+   * **Nunca `'mock'` en un entorno desplegado.**
+   */
+  uad: {
+    adaptador: 'mock' as 'mock' | 'http'
+  },
   features: {
     complaintIntakePrototype: true,
     publicTrackingPrototype: true,
     reviewerDashboardPrototype: true,
-    assignmentsPrototype: true
+    assignmentsPrototype: true,
+    /** Queja anónima ante la UAD (`/uad/queja-anonima`). El backend aún no tiene `POST /uad/noticias-anonimas`. */
+    uadQuejaAnonima: true
   }
 };

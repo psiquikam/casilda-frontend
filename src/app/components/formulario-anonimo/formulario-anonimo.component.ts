@@ -16,6 +16,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
+import { environment } from '../../../environments/environment';
 import { ListasService, MaestroDto } from '../../services/listas.service';
 import {
   ACEPTA_EVIDENCIAS,
@@ -170,6 +171,16 @@ export class FormularioAnonimoComponent {
   /** Modo declarado en `data.modoReporte` de la ruta; por defecto, reporte anónimo. */
   readonly modo: ModoReporte = this.route?.snapshot?.data?.['modoReporte'] === 'autenticado' ? 'autenticado' : 'anonimo';
   readonly textos: TextosReporte = TEXTOS_REPORTE[this.modo];
+
+  /** Acceso visible a la queja anónima de la UAD (UAD-FOR-12), detrás del flag `uadQuejaAnonima`. */
+  readonly rutaQuejaAnonimaUad = environment.features.uadQuejaAnonima ? '/uad/queja-anonima' : null;
+
+  /** Navega dentro de la SPA sin perder el `href` real (abrir en otra pestaña sigue funcionando). */
+  irAQuejaAnonimaUad(evento: MouseEvent): void {
+    if (!this.rutaQuejaAnonimaUad || evento.ctrlKey || evento.metaKey || evento.shiftKey || evento.button !== 0) return;
+    evento.preventDefault();
+    void this.router.navigateByUrl(this.rutaQuejaAnonimaUad);
+  }
 
   tipoUsuario: 'anonimo' | 'anonimo_tercero' = 'anonimo';
 

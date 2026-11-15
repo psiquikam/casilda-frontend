@@ -1096,6 +1096,15 @@
               <mat-error>Seleccione la ruta que desea activar</mat-error>
             }
           </mat-form-field>
+          @if (rutaQuejaAnonimaUad) {
+            <p class="queja-anonima-uad">
+              <mat-icon aria-hidden="true">shield</mat-icon>
+              <span>
+                ¿Prefiere presentar una queja anónima, dirigida solo a la UAD?
+                <a [href]="rutaQuejaAnonimaUad" (click)="irAQuejaAnonimaUad($event)">Ir al formulario de queja anónima</a>
+              </span>
+            </p>
+          }
         </div>
 
         <div class="actions">

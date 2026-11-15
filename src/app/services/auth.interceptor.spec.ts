@@ -1,8 +1,8 @@
-import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { HttpClient, HttpContext, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
-import { authInterceptor } from './auth.interceptor';
+import { SIN_CREDENCIALES, authInterceptor } from './auth.interceptor';
 import { AuthService } from './auth.service';
 import { DialogoService } from '../core/a11y/dialogo.service';
 
@@ -54,5 +54,37 @@ describe('authInterceptor', () => {
 
     expect(auth.logout).not.toHaveBeenCalled();
     expect(dialogo.aviso).not.toHaveBeenCalled();
+  });
+
+  describe('SIN_CREDENCIALES (queja anónima UAD)', () => {
+    const anonima = { context: new HttpContext().set(SIN_CREDENCIALES, true) };
+
+    it('no agrega el token aunque haya sesión', () => {
+      http.post('/uad/noticias-anonimas', {}, anonima).subscribe();
+      const request = controller.expectOne('/uad/noticias-anonimas');
+      expect(request.request.headers.has('Authorization')).toBeFalse();
+      request.flush({});
+    });
+
+    it('quita un Authorization puesto a mano', () => {
+      http.post('/uad/noticias-anonimas', {}, { ...anonima, headers: { Authorization: 'Bearer otro' } }).subscribe();
+      const request = controller.expectOne('/uad/noticias-anonimas');
+      expect(request.request.headers.has('Authorization')).toBeFalse();
+      request.flush({});
+    });
+
+    it('un 401 en una petición anónima no cierra la sesión', () => {
+      http.post('/uad/noticias-anonimas', {}, anonima).subscribe({ error: () => undefined });
+      controller.expectOne('/uad/noticias-anonimas').flush({}, { status: 401, statusText: 'Unauthorized' });
+      expect(auth.logout).not.toHaveBeenCalled();
+      expect(dialogo.aviso).not.toHaveBeenCalled();
+    });
+
+    it('las demás peticiones siguen llevando el token', () => {
+      http.get('/recurso-protegido').subscribe();
+      const request = controller.expectOne('/recurso-protegido');
+      expect(request.request.headers.get('Authorization')).toBe('Bearer token-vigente');
+      request.flush({});
+    });
   });
 });

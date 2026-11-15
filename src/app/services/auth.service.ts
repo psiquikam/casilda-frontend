@@ -61,7 +61,10 @@ export type UserRole =
   | 'REVISOR'
   | 'USUARIO'
   | 'GESTOR_CONTENIDO'
-  | 'TECNICO_APH';
+  | 'TECNICO_APH'
+  | 'UAD_COORDINACION'
+  | 'UAD_EQUIPO_3'
+  | 'UAD_EQUIPO_4';
 
 /**
  * Códigos de rol que reconoce el frontend. Coinciden con `rol.codigo` del
@@ -70,8 +73,25 @@ export type UserRole =
  * `TECNICO_APH` es el primer respondiente de Línea Alma (RNF-ALMA-002).
  * **[PENDIENTE Backend]** el código exacto del rol no está confirmado: se asume
  * `TECNICO_APH` (ver `docs/contratos/linea-alma/README.md`, decisión D-ALMA-01).
+ * `UAD_COORDINACION`, `UAD_EQUIPO_3`, `UAD_EQUIPO_4`: códigos del catálogo de roles (propuesta del
+ * 2026-11-11). **[PENDIENTE Backend]** no existen todavía en la tabla `rol` (ver
+ * `docs/contratos/uad/DECISIONES_PENDIENTES_UAD.md`, D-UAD-03 y D-UAD-14).
  */
-export const ROLES_CASILDA = ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR', 'USUARIO', 'GESTOR_CONTENIDO', 'TECNICO_APH'] as const;
+export const ROLES_CASILDA = [
+  'ADMIN',
+  'COORDINADOR',
+  'PROFESIONAL',
+  'REVISOR',
+  'USUARIO',
+  'GESTOR_CONTENIDO',
+  'TECNICO_APH',
+  'UAD_COORDINACION',
+  'UAD_EQUIPO_3',
+  'UAD_EQUIPO_4'
+] as const;
+
+/** Roles del módulo UAD Equipos 3 y 4 (rutas `/uad/*`). */
+export const ROLES_UAD = ['UAD_COORDINACION', 'UAD_EQUIPO_3', 'UAD_EQUIPO_4'] as const;
 
 export interface MockUserProfile {
   id: number;
@@ -231,11 +251,16 @@ interface JwtPayload {
   exp?: number;
 }
 
-type CodigoRol = 'ADMIN' | 'COORDINADOR' | 'PROFESIONAL' | 'REVISOR' | 'USUARIO' | 'GESTOR_CONTENIDO' | 'TECNICO_APH';
+type CodigoRol = (typeof ROLES_CASILDA)[number];
 
 function normalizarCodigoRol(valor: string | null | undefined): CodigoRol | '' {
   const rol = (valor || '').toUpperCase().replace(/^ROLE_/, '');
   if (rol.includes('ADMIN')) return 'ADMIN';
+  // UAD va antes que COORD/PROF: «UAD_COORDINACION» contenía «COORD» y se confundía con la
+  // coordinación del Equipo de Atención, y el nombre «Profesional Equipo 3» con PROFESIONAL.
+  if (rol === 'UAD_COORDINACION' || rol === 'UAD_EQUIPO_3' || rol === 'UAD_EQUIPO_4') return rol;
+  if (/EQUIPO[\s_]*3/.test(rol)) return 'UAD_EQUIPO_3';
+  if (/EQUIPO[\s_]*4/.test(rol)) return 'UAD_EQUIPO_4';
   // Técnico APH (primer respondiente de Línea Alma). Va antes que PROF/REVIS por si el nombre trae «técnico».
   if (rol.includes('APH')) return 'TECNICO_APH';
   if (rol.includes('COORD')) return 'COORDINADOR';
@@ -294,6 +319,12 @@ export class AuthService {
         return 'Gestor de contenidos';
       case 'TECNICO_APH':
         return 'Técnico APH';
+      case 'UAD_COORDINACION':
+        return 'Coordinación UAD';
+      case 'UAD_EQUIPO_3':
+        return 'UAD – Equipo 3';
+      case 'UAD_EQUIPO_4':
+        return 'UAD – Equipo 4';
       default:
         return 'Usuario';
     }
@@ -325,6 +356,11 @@ export class AuthService {
 
   isTecnicoAph(): boolean {
     return this.hasRole('TECNICO_APH');
+  }
+
+  /** Algún rol del módulo UAD (o ADMIN, por la regla general de `hasAnyRole`). */
+  puedeVerUad(): boolean {
+    return this.hasAnyRole([...ROLES_UAD]);
   }
 
   /**

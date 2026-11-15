@@ -1,0 +1,119 @@
+// Estilos compartidos de las bandejas UAD (noticias y casos). Solo tokens: sin literales (CLAUDE.md §3).
+@mixin bandeja {
+  .bandeja {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: var(--space-8) var(--space-6);
+
+    @media (max-width: 600px) {
+      padding: var(--space-6) var(--space-4);
+    }
+  }
+
+  .bandeja__titulo {
+    margin: 0 0 var(--space-1);
+    font-size: var(--font-size-2xl);
+  }
+
+  .bandeja__intro {
+    margin: 0;
+    max-width: 72ch;
+    color: var(--color-text-secondary);
+  }
+
+  .bandeja__filtros {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--space-3);
+
+    mat-form-field {
+      min-width: 180px;
+    }
+  }
+
+  .bandeja__botones-filtro {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding-top: var(--space-2);
+  }
+
+  .bandeja__meta,
+  .bandeja__vacio {
+    margin: 0;
+    color: var(--color-text-secondary);
+  }
+
+  .bandeja__vacio {
+    padding: var(--space-8) 0;
+    text-align: center;
+  }
+
+  .bandeja__tabla-contenedor {
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-surface);
+  }
+
+  .bandeja__tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size-sm);
+
+    th,
+    td {
+      padding: var(--space-3);
+      text-align: left;
+      vertical-align: middle;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    thead th {
+      background: var(--color-bg-subtle);
+      color: var(--color-text-secondary);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+  }
+
+  .bandeja__codigo {
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .bandeja__sub {
+    display: block;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-xs);
+    font-weight: 400;
+  }
+
+  .bandeja__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin-top: var(--space-1);
+    padding: 0 var(--space-2);
+    border: 1px solid var(--color-warning);
+    border-radius: var(--radius-full);
+    background: var(--color-bg-warning-light);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+
+    mat-icon {
+      width: 16px;
+      height: 16px;
+      font-size: 16px;
+    }
+  }
+
+  .boton--compacto {
+    min-height: 44px;
+    white-space: nowrap;
+  }
+}

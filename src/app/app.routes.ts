@@ -3,6 +3,7 @@ import { featureCapabilityGuard } from './core/features/feature-capability.guard
 import { authGuard } from './services/auth.guard';
 import { roleGuard } from './services/role.guard';
 import { cambiosSinGuardarGuard } from './core/navegacion/cambios-sin-guardar.guard';
+import { ROLES_UAD } from './services/auth.service';
 
 export const routes: Routes = [
   {
@@ -197,6 +198,23 @@ export const routes: Routes = [
     canActivate: [roleGuard],
     data: { roles: ['COORDINADOR', 'PROFESIONAL', 'TECNICO_APH', 'REVISOR'] },
     loadChildren: () => import('./linea-alma/psicologia/routes').then((m) => m.PSICOLOGIA_ROUTES)
+  },
+  {
+    // Queja anónima ante la UAD (NDA): ruta PÚBLICA, declarada antes de `uad` para no pasar por su
+    // `roleGuard`. Detrás del flag `uadQuejaAnonima` (apagado en producción hasta que exista el endpoint).
+    path: 'uad/queja-anonima',
+    canMatch: [featureCapabilityGuard],
+    data: { feature: 'uadQuejaAnonima' },
+    loadChildren: () => import('./uad/queja-anonima.routes').then((m) => m.QUEJA_ANONIMA_ROUTES)
+  },
+  {
+    // Módulo UAD Equipos 3 y 4 (bandejas NDI/NDA, evaluación preliminar y casos). Roles del catálogo
+    // propuesto (aún no creados en el backend); ADMIN entra por la regla general de `roleGuard`.
+    // Contrato: docs/contratos/uad/openapi-uad.yaml.
+    path: 'uad',
+    canActivate: [roleGuard],
+    data: { roles: [...ROLES_UAD] },
+    loadChildren: () => import('./uad/routes').then((m) => m.UAD_ROUTES)
   },
   {
     path: 'acceso-denegado',

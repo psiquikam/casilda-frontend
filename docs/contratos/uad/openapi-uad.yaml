@@ -1,0 +1,1339 @@
+openapi: 3.0.3
+info:
+  title: CASILDA — Módulo UAD (Equipos 3 y 4)
+  version: 0.3.0-propuesta
+  description: |
+    Contrato **Contract First** del módulo Unidad de Asuntos Disciplinarios (UAD), Equipos 3 y 4.
+
+    **Estado: PROPUESTO — NO IMPLEMENTADO.** Ninguna operación de este archivo existe en
+    `casilda-backend` (rama `feature/06/20/casilda/modulo-uad-back`, HEAD `08d83a6`, auditada en
+    solo lectura el 2026-11-14). Ver `AUDITORIA_UAD.md`.
+
+    Convenciones heredadas del backend real (no inventadas aquí):
+    - Base del servidor: `/api/v1` (`application.yml`). El frontend llama a `{apiBaseUrl}/uad/...`.
+    - Sin wrapper de respuesta: el DTO va en el cuerpo.
+    - Errores con `ErrorResponse` / `ValidationErrorResponse` de `exception/GlobalExceptionHandler.java`.
+      Validación = **400** (el backend no usa 422). Se propone **añadir** el campo opcional `codigo`
+      para que la interfaz distinga casos de negocio sin parsear `message` (extensión compatible).
+    - Paginación: `org.springframework.data.domain.Page` serializada, parámetros `page` (0) y `size` (10).
+    - JSON camelCase. Instantes en ISO-8601 UTC (`Instant`); fechas de calendario `YYYY-MM-DD`.
+    - Autorización: el `DynamicEndpointAuthorizationManager` exige registrar cada ruta en `endpoint`
+      / `endpointrole`. Los roles `UAD_COORDINACION`, `UAD_EQUIPO_3`, `UAD_EQUIPO_4` **no existen**
+      todavía (tabla `rol` solo tiene ids 1–6). El filtro por **equipo + fase + recurso** es
+      obligatorio en el servicio, no solo por ruta: la ruta autoriza el rol, el servicio autoriza el registro.
+
+    Reglas de dominio que el servidor debe garantizar (fuente: Bitácora Maestra UAD):
+    - Persona, noticia NDI/NDA, caso institucional CASILDA y expediente UAD son entidades distintas (UAD-ID-01).
+    - `consecutivo` NDI/NDA lo asigna el servidor con secuencias separadas al radicar (UAD-ID-02, UAD-NOT-02).
+    - Consultar o evaluar no crea `casoId` (UAD-EVA-03). Solo «Continuar trámite» crea o vincula (UAD-ID-05/06).
+    - `expedienteUad` es opcional, editable y registrable después (UAD-ID-07).
+    - Una decisión de la UAD no cierra el caso CASILDA global (UAD-ID-10, UAD-SEG-04).
+    - Ninguna operación de este contrato envía correo ni documentos a autoridades externas (UAD-REM-04/05).
+
+    Entregas: las operaciones con `x-entrega: 1` (noticias y evaluación) y `x-entrega: 2` (casos) respaldan la
+    interfaz ya construida con el adaptador mock. De la `x-entrega: 3`, `radicarNoticiaAnonima` ya tiene interfaz
+    con mock; «Mis reportes», la respuesta a la subsanación y la remisión a la Ruta son borradores sin interfaz.
+  contact:
+    name: Frontend CASILDA
+servers:
+  - url: /api/v1
+    description: Ruta base del backend (context path real).
+tags:
+  - name: uad-contexto
+  - name: uad-noticias
+    description: Bandejas NDI/NDA y evaluación preliminar (Entrega 1).
+  - name: uad-casos
+    description: Bandeja de casos, gestión, actuaciones e historial (Entrega 2).
+  - name: uad-radicacion
+    description: Formulario transversal, queja anónima y subsanación (Entrega 3).
+  - name: uad-catalogos
+security:
+  - bearerAuth: []
+
+paths:
+  /uad/contexto:
+    get:
+      tags: [uad-contexto]
+      operationId: obtenerContextoUad
+      summary: Equipos y capacidades UAD del usuario autenticado
+      description: |
+        El servidor deriva equipos y capacidades del usuario (tabla `usuariorol`), no del cliente.
+        La interfaz solo los usa para mostrar u ocultar; **no** sustituyen la autorización del servidor.
+        Coordinación: sus capacidades exactas están PENDIENTE DE VALIDACIÓN (D-UAD-03); mientras tanto
+        el servidor no debe concederle lectura global.
+      x-estado: PROPUESTO — NO IMPLEMENTADO
+      x-entrega: 1
+      x-roles: [UAD_COORDINACION, UAD_EQUIPO_3, UAD_EQUIPO_4]
+      responses:
+        '200':
+          description: Contexto del usuario
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ContextoUsuarioUad' }
+              example:
+                equipos: [EQUIPO_3]
+                coordinacion: false
+                capacidades: [VER_NDI, VER_NDA, EVALUAR_NOTICIA, VER_CASOS]
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+
+  /uad/noticias:
+    get:
+      tags: [uad-noticias]
+      operationId: listarNoticias
+      summary: Bandeja NDI o NDA (paginada y filtrada por competencia)
+      description: |
+        UAD-NOT-01, 05 a 11. El servidor solo devuelve las noticias visibles para el equipo del usuario:
+        - NDI estudiante pregrado/posgrado → Equipo 4. NDI docente, administrativo, directivo, trabajador oficial → Equipo 3.
+        - NDI con vinculación «No sé» → ambos equipos hasta su clasificación (UAD-NOT-07).
+        - NDI con «No tiene vínculo» → ambos equipos (PROVISIONAL, D-UAD-12).
+        - NDA → ambos equipos siempre (UAD-NOT-09).
+        Una vez clasificada, la noticia deja de aparecer al equipo no competente (UAD-NOT-08).
+        `detalleExpandible` solo trae los datos que el usuario puede ver; en NDA nunca trae identidad.
+      x-estado: PROPUESTO — NO IMPLEMENTADO
+      x-entrega: 1
+      x-roles: [UAD_EQUIPO_3, UAD_EQUIPO_4]
+      parameters:
+        - name: tipo
+          in: query
+          required: true
+          schema: { $ref: '#/components/schemas/TipoNoticia' }
+        - name: estado
+          in: query
+          schema: { $ref: '#/components/schemas/EstadoNoticia' }
+        - name: fechaRecepcionDesde
+          in: query
+          schema: { type: string, format: date }
+        - name: fechaRecepcionHasta
+          in: query
+          schema: { type: string, format: date }
+        - name: consecutivo
+          in: query
+          description: Coincidencia parcial sobre el consecutivo NDI/NDA.
+          schema: { type: string, maxLength: 20 }
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - name: sort
+          in: query
+          description: 'Orden Spring (`campo,dir`). Por defecto `fechaRecepcion,desc`.'
+          schema: { type: string, example: 'fechaRecepcion,desc' }
+      responses:
+        '200':
+          description: Página de noticias
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PaginaNoticiaResumen' }
+              example:
+                content:
+                  - noticiaId: 'b3a1c9e0-0000-4000-8000-000000000148'
+                    consecutivo: NDI-2026-000148
+                    tipo: NDI
+                    casoId: null
+                    origen: { tipo: FORMULARIO_WEB_CASILDA, actorRemitente: null }
+                    fechaRecepcion: '2026-11-02T15:24:00Z'
+                    estado: EN_EVALUACION_PRELIMINAR
+                    vinculacionDeclarada: ESTUDIANTE_PREGRADO
+                    clasificada: true
+                    version: 3
+                    revisionConcurrente: null
+                    detalleExpandible:
+                      telefono: '300 000 0148'
+                      correo: reportante.ficticio@example.org
+                      descripcionHechos: Relato ficticio de prueba sobre hechos en un espacio académico.
+                totalElements: 1
+                totalPages: 1
+                number: 0
+                size: 10
+                first: true
+                last: true
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+
+  /uad/noticias/{noticiaId}:
+    get:
+      tags: [uad-noticias]
+      operationId: obtenerNoticia
+      summary: Detalle para evaluación preliminar
+      description: |
+        UAD-EVA-01. **Operación segura**: abrir la evaluación no cambia el estado ni crea `casoId`
+        (UAD-EVA-03). El servidor registra el acceso en auditoría (UAD-SEG-03).
+        `reportante` y `personaAfectada` llegan en `null` si el usuario no tiene permiso o si la noticia es NDA.
+        `accionesDisponibles` lo calcula el servidor (estado + equipo + fase + vinculación).
+      x-estado: PROPUESTO — NO IMPLEMENTADO
+      x-entrega: 1
+      x-roles: [UAD_EQUIPO_3, UAD_EQUIPO_4]
+      parameters:
+        - $ref: '#/components/parameters/NoticiaId'
+      responses:
+        '200':
+          description: Noticia
+          headers:
+            Cache-Control:
+              schema: { type: string, example: 'no-store, private' }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/NoticiaDetalle' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /uad/noticias/{noticiaId}/clasificacion:
+    post:
+      tags: [uad-noticias]
+      operationId: clasificarVinculacion
+      summary: Clasificar o reclasificar la vinculación del presunto responsable
+      description: |
+        UAD-NOT-07/08. Fija la vinculación y, con ella, el equipo competente. Si la noticia pasa al otro
+        equipo, el servidor responde 200 con `visibleParaUsuario: false` y deja de listarla al equipo
+        no competente. Si otra persona modificó la noticia, responde **409** `CONFLICTO_VERSION`.
+      x-estado: PROPUESTO — NO IMPLEMENTADO
+      x-entrega: 1
+      x-roles: [UAD_EQUIPO_3, UAD_EQUIPO_4]
+      parameters:
+        - $ref: '#/components/parameters/NoticiaId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ClasificacionRequest' }
+            example: { vinculacionInvestigado: DOCENTE_VINCULADO, version: 2 }
+      responses:
+        '200':
+          description: Clasificación aplicada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ClasificacionResponse' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/Conflicto' }
+
+  /uad/noticias/{noticiaId}/casos-asociados:
+    get:
+      tags: [uad-noticias]
+      operationId: consultarCasosAsociados
+      summary: Consultar posibles casos CASILDA de la persona en otros actores
+      description: |
+        UAD-EVA-06 a 09. Solo disponible mientras la noticia está en evaluación preliminar (no en
+        «Gestionar caso – Decisión»). Devuelve **datos mínimos**: sin notas psicosociales ni evidencias
+        de otros actores (UAD-SEG-02). Consultar **no vincula** ni crea caso: la vinculación solo ocurre
+        con una decisión «Continuar trámite» explícita. El servidor registra quién consultó y cuándo.
+        La coincidencia la decide el servidor; la interfaz no compara documentos.
+      x-estado: PROPUESTO — NO IMPLEMENTADO
+      x-entrega: 1
+      x-roles: [UAD_EQUIPO_3, UAD_EQUIPO_4]
+      parameters:
+        - $ref: '#/components/parameters/NoticiaId'
+      responses:
+        '200':
+          description: Casos posibles (puede ser vacío)
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/CasoAsociado' }
+              example:
+                - casoId: CAS-2026-000500
+                  actor: EQUIPO_ATENCION
+                  fechaApertura: '2026-10-01'
+                  estadoGestionActor: ACTIVO
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409':
+          description: La noticia ya no está en evaluación (`NOTICIA_NO_EVALUABLE`).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  /uad/noticias/{noticiaId}/decisiones:
+    post:
+      tags: [uad-noticias]
+      operationId: registrarDecisionEvaluacion
+      summary: Registrar la decisión de la evaluación preliminar
+      description: |
+        UAD-EVA-02 a 12, UAD-REM-01 a 06. **Una sola decisión por operación**: el cuerpo trae `tipo` y
+        únicamente el bloque correspondiente; cualquier otro bloque presente → 400 `DECISION_INCOMPATIBLE`.
+
+        Responde **200** (no 201): la operación actúa sobre una noticia existente; si se crea un caso, su
+        identificador viene en `casoUad`.
+
+        Efectos por tipo:
+        - `CONTINUAR_TRAMITE` → estado `PROCEDE_TRAMITE`. Exige vinculación clasificada en un estamento
+          concreto (PROVISIONAL, D-UAD-12). `modoCaso`:
+          - `CONSERVAR_ASIGNADO`: la noticia ya trae `casoId` de otro actor (UAD-NOT-03); se conserva.
+          - `VINCULAR_EXISTENTE`: `casoIdVincular` debe estar entre los casos devueltos por
+            `consultarCasosAsociados` y `confirmaMismosHechos = true` (UAD-EVA-08/09).
+          - `CREAR_NUEVO`: solo si la noticia no tiene `casoId`; el servidor genera el ID (UAD-ID-05).
+          `expedienteUad` es opcional (UAD-ID-07). Notifica a la víctima solo por contacto autorizado
+          (UAD-EVA-11); el resultado llega en `notificaciones`.
+        - `SOLICITAR_INFORMACION` → `PENDIENTE_SUBSANACION`. Solo NDI con reportante identificado
+          (UAD-EVA-04). El vencimiento **no** cierra la noticia (UAD-EVA-05). No crea `casoId`.
+        - `INHIBITORIO` → `INHIBITORIA`. PENDIENTE DE VALIDACIÓN jurídica (bitácora §16): causales y
+          obligatoriedad de la justificación provisionales.
+        - `REMISION_COMPETENCIA` → `REMITIDA_POR_COMPETENCIA`. Sin «número de oficio o radicado de
+          salida» (UAD-REM-03); justificación opcional (UAD-REM-02); **no envía nada** a la entidad (UAD-REM-05).
+
+        Concurrencia: `version` obligatoria. Si cambió → **409** `CONFLICTO_VERSION`; si otra persona ya
+        decidió → **409** `NOTICIA_YA_DECIDIDA`. Doble envío con la misma versión → el segundo recibe 409.
+        Idempotencia por clave: no se asume (no existe en el backend); ver D-UAD-07.
+      x-estado: PROPUESTO — NO IMPLEMENTADO
+      x-entrega: 1
+      x-roles: [UAD_EQUIPO_3, UAD_EQUIPO_4]
+      parameters:
+        - $ref: '#/components/parameters/NoticiaId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DecisionEvaluacionRequest' }
+            examples:
+              continuarCasoNuevo:
+                value:
+                  tipo: CONTINUAR_TRAMITE
+                  version: 3
+                  observaciones: null
+                  continuarTramite: { modoCaso: CREAR_NUEVO, casoIdVincular: null, confirmaMismosHechos: false, expedienteUad: null }
+              continuarVinculando:
+                value:
+                  tipo: CONTINUAR_TRAMITE
+                  version: 3
+                  continuarTramite: { modoCaso: VINCULAR_EXISTENTE, casoIdVincular: CAS-2026-000500, confirmaMismosHechos: true, expedienteUad: UAD-2026-0317 }
+              solicitarInformacion:
+                value:
+                  tipo: SOLICITAR_INFORMACION
+                  version: 3
+                  solicitudInformacion: { tipoSolicitudCodigo: ACLARACION_HECHOS, informacionRequerida: 'Texto ficticio de la información requerida.', fechaLimite: '2026-11-20' }
+              remision:
+                value:
+                  tipo: REMISION_COMPETENCIA
+                  version: 3
+                  remisionCompetencia: { faseProceso: EVALUACION_PRELIMINAR, entidadDestinatariaCodigo: PROCURADURIA_REGIONAL, fechaRemision: '2026-11-04', justificacion: null }
+      responses:
+        '200':
+          description: Decisión registrada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DecisionEvaluacionResponse' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/Conflicto' }
+
+  /uad/noticias/{noticiaId}/historial:
+    get:
+      tags: [uad-noticias]
+      operationId: historialNoticia
+      summary: Historial de ingreso, cambios de estado y responsables (append-only)
+      description: UAD-NOT-12, UAD-SEG-03. Orden cronológico ascendente. Nunca se reescribe un evento.
+      x-estado: PROPUESTO — NO IMPLEMENTADO
+      x-entrega: 1
+      x-roles: [UAD_EQUIPO_3, UAD_EQUIPO_4]
+      parameters:
+        - $ref: '#/components/parameters/NoticiaId'
+      responses:
+        '200':
+          description: Eventos
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/EventoHistorial' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /uad/evidencias/{evidenciaId}/descarga:
+    get:
+      tags: [uad-noticias, uad-casos]
+      operationId: descargarEvidencia
+      summary: Descarga autorizada y auditada de una evidencia
+      description: |
+        UAD-PRU-03/05, UAD-SEG-08. El servidor valida usuario + equipo + recurso en cada descarga y la
+        registra. **No** se exponen URL públicas ni permanentes. Responde el binario con
+        `Content-Disposition: attachment` y `Cache-Control: no-store`.
+      x-estado: PROPUESTO — NO IMPLEMENTADO
+      x-entrega: 1
+      x-roles: [UAD_EQUIPO_3, UAD_EQUIPO_4]
+      parameters:
+        - name: evidenciaId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Archivo
+          content:
+            application/octet-stream:
+              schema: { type: string, format: binary }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /maestros/uad-causales-inhibitorio:
+    get:
+      tags: [uad-catalogos]
+      operationId: catalogoCausalesInhibitorio
+      summary: Causales de decisión inhibitoria
+      description: Sigue el patrón real de `MaestroController` (`List<MaestroDTO>`). Valores PENDIENTE DE VALIDACIÓN jurídica.
+      x-estado: PROPUESTO — NO IMPLEMENTADO
+      x-entrega: 1
+      responses:
+        '200':
+          description: Catálogo
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/MaestroDTO' } }
+  /maestros/uad-entidades-remision:
+    get:
+      tags: [uad-catalogos]
+      operationId: catalogoEntidadesRemision
+      summary: Entidades destinatarias de la remisión por competencia
+      x-estado: PROPUESTO — NO IMPLEMENTADO
+      x-entrega: 1
+      responses:
+        '200':
+          description: Catálogo
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/MaestroDTO' } }
+  /maestros/uad-tipos-solicitud-informacion:
+    get:
+      tags: [uad-catalogos]
+      operationId: catalogoTiposSolicitudInformacion
+      summary: Tipos de solicitud de información adicional
+      x-estado: PROPUESTO — NO IMPLEMENTADO
+      x-entrega: 1
+      responses:
+        '200':
+          description: Catálogo
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/MaestroDTO' } }
+
+  # ---------------------------------------------------------------- Entrega 2 (casos UAD)
+  /uad/casos:
+    get:
+      tags: [uad-casos]
+      operationId: listarCasosUad
+      summary: Bandeja de casos UAD (tercera bandeja)
+      description: |
+        UAD-CAS-01 a 07, 12. Solo casos cuya **gestión UAD está activa** y que corresponden al equipo del
+        usuario **en la fase actual**: el instructor los ve en instrucción y el decisor en decisión. Tras el
+        traslado, el caso sale de la bandeja del instructor (UAD-CAS-08). El acceso histórico autorizado
+        (casos ya trasladados o finalizados) es otra capacidad, PENDIENTE DE VALIDACIÓN (D-UAD-03).
+      x-estado: PROPUESTO — NO IMPLEMENTADO
+      x-entrega: 2
+      x-roles: [UAD_EQUIPO_3, UAD_EQUIPO_4]
+      parameters:
+        - name: fase
+          in: query
+          schema: { $ref: '#/components/schemas/FaseUad' }
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: Página de casos activos
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PaginaCasoUadResumen' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+
+  /uad/casos/{casoUadId}:
+    get:
+      tags: [uad-casos]
+      operationId: obtenerCasoUad
+      summary: Detalle del caso para «Gestionar caso»
+      description: |
+        Operación segura: no cambia fase ni estado. 404 si el caso no existe o no es del equipo y fase del
+        usuario. **No** incluye «Casos asociados de la persona» (UAD-EVA-06: solo en evaluación preliminar).
+      x-estado: PROPUESTO — NO IMPLEMENTADO
+      x-entrega: 2
+      x-roles: [UAD_EQUIPO_3, UAD_EQUIPO_4]
+      parameters: [{ $ref: '#/components/parameters/CasoUadId' }]
+      responses:
+        '200': { description: Caso, content: { application/json: { schema: { $ref: '#/components/schemas/CasoUadDetalle' } } } }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /uad/casos/{casoUadId}/expediente:
+    patch:
+      tags: [uad-casos]
+      operationId: registrarExpedienteUad
+      summary: Registrar o corregir el número de expediente UAD
+      description: |
+        UAD-ID-07. Opcional y editable por la profesional. El cambio queda en el historial con valor anterior
+        y nuevo (`EXPEDIENTE_ACTUALIZADO`). Enviar `null` lo deja sin registrar.
+      x-estado: PROPUESTO — NO IMPLEMENTADO
+      x-entrega: 2
+      x-roles: [UAD_EQUIPO_3, UAD_EQUIPO_4]
+      parameters: [{ $ref: '#/components/parameters/CasoUadId' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ExpedienteRequest' }
+            example: { expedienteUad: UAD-2026-0317, version: 2 }
+      responses:
+        '200': { description: Actualizado, content: { application/json: { schema: { $ref: '#/components/schemas/ResultadoAccionCaso' } } } }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/Conflicto' }
+
+  /uad/casos/{casoUadId}/actuaciones/catalogo:
+    get:
+      tags: [uad-casos]
+      operationId: catalogoActuaciones
+      summary: Actuaciones ordinarias y acciones permanentes para la fase y el equipo actuales
+      description: |
+        Catálogo definitivo de la bitácora §7 (ordinarias por fase y equipo) y §8 (permanentes, siempre
+        visibles). El servidor decide `ejecutable`; la interfaz solo muestra y deshabilita.
+        Acciones con `pendienteValidacion: true` se muestran deshabilitadas con su motivo (bitácora §16).
+      x-estado: PROPUESTO — NO IMPLEMENTADO
+      x-entrega: 2
+      x-roles: [UAD_EQUIPO_3, UAD_EQUIPO_4]
+      parameters: [{ $ref: '#/components/parameters/CasoUadId' }]
+      responses:
+        '200':
+          description: Actuaciones
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/ActuacionDisponible' } }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /uad/casos/{casoUadId}/actuaciones:
+    post:
+      tags: [uad-casos]
+      operationId: registrarActuaciones
+      summary: Guardar actuaciones ordinarias (con confirmación explícita en la interfaz)
+      description: |
+        UAD-HIS-01 a 07. Solo actuaciones **ordinarias** del catálogo vigente; varias a la vez si son de la
+        fase actual. Las acciones permanentes van por su propia operación, de modo que una ordinaria y una
+        permanente nunca se confirman juntas (bitácora §8, D-UAD-20).
+        Una actuación ordinaria **no cambia la fase** ni dispara correo de cambio de etapa: ni «Pliego de
+        cargos» traslada (UAD-CAS-11) ni «Reposición y/o apelación» cierra el caso (UAD-HIS-07).
+        Cada actuación genera un evento de historial con fase, fecha, hora, profesional, equipo y observaciones.
+      x-estado: PROPUESTO — NO IMPLEMENTADO
+      x-entrega: 2
+      x-roles: [UAD_EQUIPO_3, UAD_EQUIPO_4]
+      parameters: [{ $ref: '#/components/parameters/CasoUadId' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegistrarActuacionesRequest' }
+            example: { actuaciones: [PRACTICA_PRUEBAS], observaciones: null, version: 3 }
+      responses:
+        '200': { description: Registradas, content: { application/json: { schema: { $ref: '#/components/schemas/ResultadoAccionCaso' } } } }
+        '400':
+          description: '`ACTUACION_NO_DISPONIBLE` (no es de la fase/equipo, es permanente o está pendiente de validación) o validación.'
+          content: { application/json: { schema: { $ref: '#/components/schemas/ValidationErrorResponse' } } }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/Conflicto' }
+
+  /uad/casos/{casoUadId}/historial:
+    get:
+      tags: [uad-casos]
+      operationId: historialCaso
+      summary: Historial de actuaciones del caso
+      description: |
+        UAD-HIS-02/06/08. Orden cronológico ascendente, append-only lógico. El traslado entre equipos y los
+        cambios de fase no eliminan ni reemplazan eventos. La rectificación auditada que preserva el original
+        está PENDIENTE DE VALIDACIÓN (tipo reservado `RECTIFICACION`, D-UAD-06).
+      x-estado: PROPUESTO — NO IMPLEMENTADO
+      x-entrega: 2
+      x-roles: [UAD_EQUIPO_3, UAD_EQUIPO_4]
+      parameters: [{ $ref: '#/components/parameters/CasoUadId' }]
+      responses:
+        '200': { description: Eventos, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/EventoHistorial' } } } } }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /uad/casos/{casoUadId}/traslado-decision:
+    post:
+      tags: [uad-casos]
+      operationId: finalizarInstruccion
+      summary: Finalizar etapa de instrucción y trasladar al equipo decisor
+      description: |
+        UAD-CAS-08 a 10. Solo en fase `INSTRUCCION` y con `confirmaTraslado = true`. El caso pasa a
+        `DECISION` con el equipo decisor (estudiantes → Equipo 3; personal → Equipo 4) y sale de la bandeja
+        activa del instructor. Conserva `casoId`, expediente, fecha de admisión, evidencias e historial y
+        registra fecha, hora y responsables. Notifica el cambio de fase a la víctima por contacto autorizado.
+        Requisitos jurídicos adicionales para el paso (p. ej. actuaciones previas): PENDIENTE (D-UAD-21).
+      x-estado: PROPUESTO — NO IMPLEMENTADO
+      x-entrega: 2
+      x-roles: [UAD_EQUIPO_3, UAD_EQUIPO_4]
+      parameters: [{ $ref: '#/components/parameters/CasoUadId' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/TrasladoRequest' }
+            example: { confirmaTraslado: true, observaciones: null, version: 4 }
+      responses:
+        '200':
+          description: Trasladado. `visibleParaUsuario` es `false` si el usuario deja de ser competente.
+          content: { application/json: { schema: { $ref: '#/components/schemas/ResultadoAccionCaso' } } }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409':
+          description: '`FASE_NO_PERMITE` (no está en instrucción), `CASO_NO_ACTIVO` o `CONFLICTO_VERSION`.'
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+
+  /uad/casos/{casoUadId}/remisiones-competencia:
+    post:
+      tags: [uad-casos]
+      operationId: remitirCasoPorCompetencia
+      summary: Acción permanente «Remisión por competencia» desde Gestionar caso
+      description: |
+        UAD-REM-01 a 06. Mismo formulario aprobado que en la evaluación (sin número de oficio ni radicado de
+        salida; justificación opcional). Casilda solo registra: no envía correos ni documentos a la entidad.
+        La gestión UAD queda `FINALIZADA` con motivo `REMITIDA_POR_COMPETENCIA`; el caso CASILDA **no** se
+        cierra si otros actores siguen activos (UAD-REM-06, UAD-SEG-04).
+      x-estado: PROPUESTO — NO IMPLEMENTADO
+      x-entrega: 2
+      x-roles: [UAD_EQUIPO_3, UAD_EQUIPO_4]
+      parameters: [{ $ref: '#/components/parameters/CasoUadId' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RemisionCompetenciaCasoRequest' }
+      responses:
+        '200': { description: Registrada, content: { application/json: { schema: { $ref: '#/components/schemas/ResultadoAccionCaso' } } } }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/Conflicto' }
+
+  /uad/casos/{casoUadId}/evidencias:
+    get:
+      tags: [uad-casos]
+      operationId: evidenciasCaso
+      summary: Pruebas del caso (metadatos)
+      description: |
+        UAD-PRU-01 a 05. Evidencias asociadas al caso, conservadas a través de cambios de equipo y fase. La
+        descarga va por `descargarEvidencia` (autorizada y registrada). **Carga deshabilitada** hasta definir
+        tipos, tamaños, versiones y custodia (bitácora §10, D-UAD-09).
+      x-estado: PROPUESTO — NO IMPLEMENTADO
+      x-entrega: 2
+      x-roles: [UAD_EQUIPO_3, UAD_EQUIPO_4]
+      parameters: [{ $ref: '#/components/parameters/CasoUadId' }]
+      responses:
+        '200': { description: Evidencias, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/EvidenciaMetadato' } } } } }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  # ---------------------------------------------------------------- Entrega 3 (propuesta inicial)
+  /uad/casos/{casoUadId}/remisiones-ruta:
+    post:
+      tags: [uad-casos]
+      operationId: remitirActorRuta
+      summary: 'BORRADOR — Remisión a otro actor de la Ruta (campos pendientes de aprobación, UAD-RUT)'
+      x-estado: PROPUESTO — NO IMPLEMENTADO — PENDIENTE DE VALIDACIÓN
+      x-entrega: 3
+      parameters: [{ $ref: '#/components/parameters/CasoUadId' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [actorDestino, version]
+              properties:
+                actorDestino: { type: string, enum: [EQUIPO_ATENCION, LINEA_ALMA, SEGURIDAD] }
+                motivo: { type: string, nullable: true }
+                version: { type: integer }
+      responses:
+        '200': { description: Remisión registrada; no cierra caso ni gestión UAD (UAD-RUT-03) }
+  /uad/noticias-anonimas:
+    post:
+      tags: [uad-radicacion]
+      operationId: radicarNoticiaAnonima
+      summary: Radicar una queja anónima (NDA)
+      description: |
+        UAD-FOR-12, UAD-NOT-01/02/04/09, UAD-SEG-06. Endpoint **público** (`publico=true` en `endpoint`).
+
+        Garantías que debe dar el **servidor** (el frontend no puede darlas):
+        - No asocia identidad aunque llegue un `Authorization`: lo ignora en esta ruta. El frontend ya envía
+          la petición sin credenciales (`SIN_CREDENCIALES` en `auth.interceptor.ts`).
+        - No registra en la noticia IP, user-agent ni identificadores de sesión. Retención en logs de Tomcat,
+          proxies y balanceador: política de infraestructura (D-UAD-02).
+        - Asigna el consecutivo `NDA-AAAA-NNNNNN` de una secuencia propia, distinta de la NDI (UAD-ID-02).
+        - Crea la noticia en estado `RECIBIDA`, origen `FORMULARIO_ANONIMO`, visible a ambos equipos (UAD-NOT-09).
+        - No la descarta por ser anónima (UAD-NOT-04).
+        - Limita la tasa de envíos por origen para evitar abuso (**429**), sin guardar el origen en la noticia (D-UAD-29).
+
+        Sin datos de contacto ni evidencias por ahora (D-UAD-27, D-UAD-28). Responde **201**: crea un recurso nuevo.
+      security: []
+      x-estado: PROPUESTO — NO IMPLEMENTADO
+      x-entrega: 3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RadicacionNdaRequest' }
+            example:
+              descripcionHechos: Relato ficticio de prueba sobre una situación en un espacio académico.
+              lugarOcurrencia: null
+              presuntoResponsable: Descripción ficticia
+              vinculacionDeclarada: NO_SE
+      responses:
+        '201':
+          description: Radicada. Solo devuelve el consecutivo y la fecha; nunca datos de quien envía.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RadicacionNdaResponse' }
+              example: { consecutivo: NDA-2026-000023, fechaRecepcion: '2026-11-15T20:00:00Z' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '429':
+          description: Demasiados envíos desde el mismo origen en poco tiempo (`codigo` `DEMASIADOS_ENVIOS`).
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+
+  /mis-reportes:
+    get:
+      tags: [uad-radicacion]
+      operationId: listarMisReportes
+      summary: 'BORRADOR — «Mis reportes» del usuario autenticado'
+      description: |
+        UAD-NOT-02, UAD-EVA-04; catálogo de roles §3.e (usuario general). Solo los reportes **del usuario
+        autenticado**, filtrados en el servidor por dueño. Estado operativo autorizado, sin notas
+        reservadas ni datos de otros actores. Indica si hay una solicitud de información pendiente.
+        Bloqueado por D-UAD-16: hoy `/solicitudes` no filtra por dueño; el mismo error aquí expondría
+        reportes ajenos. Las NDA no aparecen: no tienen dueño (UAD-NOT-04).
+      x-estado: PROPUESTO — NO IMPLEMENTADO — PENDIENTE DE VALIDACIÓN
+      x-entrega: 3
+      x-roles: [USUARIO]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: Página de reportes propios
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content: { type: array, items: { $ref: '#/components/schemas/MiReporteResumen' } }
+                  totalElements: { type: integer }
+                  totalPages: { type: integer }
+                  number: { type: integer }
+                  size: { type: integer }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+
+  /mis-reportes/{codigo}:
+    get:
+      tags: [uad-radicacion]
+      operationId: obtenerMiReporte
+      summary: 'BORRADOR — Detalle de un reporte propio con su solicitud de información vigente'
+      description: |
+        404 si el reporte no es del usuario (no revela que existe). Incluye la solicitud de información de la
+        UAD pendiente, para responderla con `responderSolicitudInformacion`.
+      x-estado: PROPUESTO — NO IMPLEMENTADO — PENDIENTE DE VALIDACIÓN
+      x-entrega: 3
+      x-roles: [USUARIO]
+      parameters:
+        - { name: codigo, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Reporte, content: { application/json: { schema: { $ref: '#/components/schemas/MiReporteDetalle' } } } }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /reportes/{codigo}/solicitudes-informacion/{solicitudId}/respuesta:
+    post:
+      tags: [uad-radicacion]
+      operationId: responderSolicitudInformacion
+      summary: Responder desde «Mis reportes» una solicitud de información (texto + evidencias)
+      description: |
+        UAD-EVA-04/05. Pasa la noticia a `SUBSANACION_RECIBIDA`. Solo el reportante identificado dueño del
+        reporte. Depende de «Mis reportes» (`listarMisReportes`), bloqueado por D-UAD-16. Límites de
+        archivos: los del reporte real (`ReporteEvidenciaStorageService`), PENDIENTES de confirmar para UAD.
+      x-estado: PROPUESTO — NO IMPLEMENTADO — PENDIENTE DE VALIDACIÓN
+      x-entrega: 3
+      parameters:
+        - { name: codigo, in: path, required: true, schema: { type: string } }
+        - { name: solicitudId, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [respuesta]
+              properties:
+                respuesta: { type: string, maxLength: 4000 }
+                evidencias: { type: array, items: { type: string, format: binary } }
+      responses:
+        '200': { description: Respuesta registrada }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '409': { $ref: '#/components/responses/Conflicto' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    NoticiaId:
+      name: noticiaId
+      in: path
+      required: true
+      description: Identificador técnico interno (no el consecutivo NDI/NDA).
+      schema: { type: string, format: uuid }
+    CasoUadId:
+      name: casoUadId
+      in: path
+      required: true
+      description: Identificador técnico de la gestión UAD (no el `casoId` CASILDA ni el expediente).
+      schema: { type: string, format: uuid }
+    Page:
+      name: page
+      in: query
+      schema: { type: integer, minimum: 0, default: 0 }
+    Size:
+      name: size
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 50, default: 10 }
+
+  responses:
+    Validacion:
+      description: Error de validación (400, convención real del backend).
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ValidationErrorResponse' }
+          example:
+            timestamp: '2026-11-14T10:00:00'
+            status: 400
+            error: Bad Request
+            message: Revise los datos marcados.
+            path: /api/v1/uad/noticias/b3a1/decisiones
+            codigo: VALIDACION
+            validationErrors: { 'solicitudInformacion.fechaLimite': 'Debe ser una fecha futura.' }
+    NoAutenticado:
+      description: Sin sesión o token inválido.
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+    SinPermiso:
+      description: El rol, equipo o fase no autoriza el recurso.
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+    NoEncontrado:
+      description: No existe o no es visible para el usuario (el servidor no revela cuál de los dos).
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+    Conflicto:
+      description: |
+        Concurrencia o regla de estado. `codigo`: `CONFLICTO_VERSION`, `NOTICIA_YA_DECIDIDA`,
+        `NOTICIA_RECLASIFICADA`, `NOTICIA_NO_EVALUABLE`, `FASE_NO_PERMITE`, `CASO_NO_ACTIVO`.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+          example:
+            timestamp: '2026-11-14T10:00:00'
+            status: 409
+            error: Conflict
+            message: Otra persona modificó la noticia mientras usted la evaluaba.
+            path: /api/v1/uad/noticias/b3a1/decisiones
+            codigo: CONFLICTO_VERSION
+
+  schemas:
+    ErrorResponse:
+      type: object
+      description: Formato real de `exception/ErrorResponse.java` + `codigo` (extensión propuesta).
+      required: [timestamp, status, error, message]
+      properties:
+        timestamp: { type: string, description: 'LocalDateTime ISO sin zona (formato actual del backend).' }
+        status: { type: integer }
+        error: { type: string }
+        message: { type: string }
+        path: { type: string, nullable: true }
+        codigo: { type: string, nullable: true, description: 'PROPUESTO: código estable de negocio.' }
+    ValidationErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - type: object
+          properties:
+            validationErrors:
+              type: object
+              description: Campo (ruta con punto) → mensaje.
+              additionalProperties: { type: string }
+
+    MaestroDTO:
+      type: object
+      required: [id, nombre]
+      properties:
+        id: { type: integer }
+        codigo: { type: string, nullable: true }
+        nombre: { type: string }
+
+    TipoNoticia:
+      type: string
+      enum: [NDI, NDA]
+    EstadoNoticia:
+      type: string
+      description: |
+        Estado de la **noticia** (no de la gestión UAD ni del caso CASILDA). Lista no exhaustiva:
+        reactivaciones y recursos están PENDIENTES DE VALIDACIÓN (bitácora §16).
+        `PENDIENTE_CLASIFICACION` aparece en el prototipo (p. 3), no en la bitácora: PROVISIONAL.
+      enum:
+        - RECIBIDA
+        - PENDIENTE_CLASIFICACION
+        - EN_EVALUACION_PRELIMINAR
+        - PENDIENTE_SUBSANACION
+        - SUBSANACION_RECIBIDA
+        - EN_REEVALUACION
+        - INHIBITORIA
+        - REMITIDA_POR_COMPETENCIA
+        - PROCEDE_TRAMITE
+    OrigenNoticia:
+      type: object
+      required: [tipo]
+      properties:
+        tipo: { type: string, enum: [FORMULARIO_WEB_CASILDA, FORMULARIO_ANONIMO, REMISION_ACTOR] }
+        actorRemitente:
+          type: string
+          nullable: true
+          enum: [EQUIPO_ATENCION, LINEA_ALMA, SEGURIDAD, null]
+    VinculacionInvestigado:
+      type: string
+      description: |
+        Lista de UAD-FOR-10. **No coincide** con `VinculoUdeAEnum` del backend (14 valores, sin trabajador
+        oficial, directivo, «no tiene vínculo» ni «no sé»): homologación PENDIENTE (D-UAD-05).
+      enum:
+        - ESTUDIANTE_PREGRADO
+        - ESTUDIANTE_POSGRADO
+        - DOCENTE_VINCULADO
+        - DOCENTE_OCASIONAL
+        - DOCENTE_CATEDRA
+        - ADMINISTRATIVO
+        - TRABAJADOR_OFICIAL
+        - DIRECTIVO
+        - NO_TIENE_VINCULO
+        - NO_SE
+    EquipoUad:
+      type: string
+      enum: [EQUIPO_3, EQUIPO_4]
+    FaseUad:
+      type: string
+      enum: [INSTRUCCION, DECISION]
+    AccionNoticia:
+      type: string
+      enum:
+        - CLASIFICAR_VINCULACION
+        - CONSULTAR_CASOS_ASOCIADOS
+        - CONTINUAR_TRAMITE
+        - SOLICITAR_INFORMACION
+        - INHIBITORIO
+        - REMISION_COMPETENCIA
+        - DESCARGAR_EVIDENCIAS
+    CapacidadUad:
+      type: string
+      enum: [VER_NDI, VER_NDA, EVALUAR_NOTICIA, VER_CASOS, GESTIONAR_CASO]
+
+    ContextoUsuarioUad:
+      type: object
+      required: [equipos, coordinacion, capacidades]
+      properties:
+        equipos: { type: array, items: { $ref: '#/components/schemas/EquipoUad' } }
+        coordinacion: { type: boolean }
+        capacidades: { type: array, items: { $ref: '#/components/schemas/CapacidadUad' } }
+
+    DetalleExpandible:
+      type: object
+      description: UAD-NOT-11. En NDA, teléfono y correo solo si la persona los dio voluntariamente; nunca identidad.
+      properties:
+        telefono: { type: string, nullable: true }
+        correo: { type: string, nullable: true }
+        descripcionHechos: { type: string, nullable: true, maxLength: 400, description: Resumen recortado. }
+    RevisionConcurrente:
+      type: object
+      nullable: true
+      description: UAD-NOT-08. Otra persona tiene abierta la evaluación. No expone su nombre en la bandeja.
+      properties:
+        desde: { type: string, format: date-time }
+        equipo: { $ref: '#/components/schemas/EquipoUad' }
+
+    NoticiaResumen:
+      type: object
+      required: [noticiaId, consecutivo, tipo, origen, fechaRecepcion, estado, clasificada, version]
+      properties:
+        noticiaId: { type: string, format: uuid }
+        consecutivo: { type: string, pattern: '^(NDI|NDA)-\d{4}-\d{6}$', example: NDI-2026-000148 }
+        tipo: { $ref: '#/components/schemas/TipoNoticia' }
+        casoId: { type: string, nullable: true, description: 'ID de caso CASILDA si ya existe (formato definido por el servidor).' }
+        origen: { $ref: '#/components/schemas/OrigenNoticia' }
+        fechaRecepcion: { type: string, format: date-time }
+        estado: { $ref: '#/components/schemas/EstadoNoticia' }
+        vinculacionDeclarada: { allOf: [{ $ref: '#/components/schemas/VinculacionInvestigado' }], nullable: true }
+        clasificada: { type: boolean }
+        version: { type: integer }
+        revisionConcurrente: { $ref: '#/components/schemas/RevisionConcurrente' }
+        detalleExpandible: { $ref: '#/components/schemas/DetalleExpandible' }
+
+    PaginaNoticiaResumen:
+      type: object
+      description: Subconjunto de `org.springframework.data.domain.Page` que consume la interfaz.
+      required: [content, totalElements, totalPages, number, size]
+      properties:
+        content: { type: array, items: { $ref: '#/components/schemas/NoticiaResumen' } }
+        totalElements: { type: integer }
+        totalPages: { type: integer }
+        number: { type: integer }
+        size: { type: integer }
+        first: { type: boolean }
+        last: { type: boolean }
+
+    Reportante:
+      type: object
+      nullable: true
+      properties:
+        tipoSolicitud: { type: string, enum: [DIRECTA, INDIRECTA] }
+        primerNombre: { type: string, nullable: true }
+        segundoNombre: { type: string, nullable: true }
+        primerApellido: { type: string, nullable: true }
+        segundoApellido: { type: string, nullable: true }
+        tipoDocumento: { type: string, nullable: true }
+        numeroDocumento: { type: string, nullable: true }
+        celular: { type: string, nullable: true }
+        correoInstitucional: { type: string, nullable: true }
+        correoPersonal: { type: string, nullable: true }
+    PersonaAfectada:
+      type: object
+      nullable: true
+      description: En solicitud directa coincide con el reportante y llega `null` (UAD-FOR-03).
+      properties:
+        nombreCompleto: { type: string, nullable: true }
+        vinculoUniversidad: { type: string, nullable: true }
+    Hechos:
+      type: object
+      required: [descripcion]
+      properties:
+        descripcion: { type: string }
+        lugarOcurrencia: { type: string, nullable: true }
+        presuntoResponsable: { type: string, nullable: true }
+
+    EvidenciaMetadato:
+      type: object
+      required: [evidenciaId, nombreArchivo, tipoMime, fechaCarga]
+      properties:
+        evidenciaId: { type: string, format: uuid }
+        nombreArchivo: { type: string }
+        tipoMime: { type: string }
+        tamanoBytes: { type: integer, nullable: true }
+        fechaCarga: { type: string, format: date-time }
+
+    SolicitudInformacionVigente:
+      type: object
+      nullable: true
+      properties:
+        solicitudId: { type: string, format: uuid }
+        tipoSolicitudCodigo: { type: string }
+        informacionRequerida: { type: string }
+        fechaSolicitud: { type: string, format: date-time }
+        fechaLimite: { type: string, format: date }
+        vencida: { type: boolean, description: 'Informativo: el vencimiento no cierra la noticia (UAD-EVA-05).' }
+        respondida: { type: boolean }
+
+    NoticiaDetalle:
+      type: object
+      required: [noticiaId, consecutivo, tipo, origen, fechaRecepcion, estado, version, hechos, evidencias, accionesDisponibles]
+      properties:
+        noticiaId: { type: string, format: uuid }
+        consecutivo: { type: string }
+        tipo: { $ref: '#/components/schemas/TipoNoticia' }
+        casoId: { type: string, nullable: true }
+        expedienteUad: { type: string, nullable: true }
+        casoUadId: { type: string, format: uuid, nullable: true }
+        origen: { $ref: '#/components/schemas/OrigenNoticia' }
+        fechaRecepcion: { type: string, format: date-time }
+        estado: { $ref: '#/components/schemas/EstadoNoticia' }
+        version: { type: integer }
+        vinculacionDeclarada: { allOf: [{ $ref: '#/components/schemas/VinculacionInvestigado' }], nullable: true }
+        vinculacionClasificada: { allOf: [{ $ref: '#/components/schemas/VinculacionInvestigado' }], nullable: true }
+        equiposCompetentes: { type: array, items: { $ref: '#/components/schemas/EquipoUad' } }
+        reportante: { $ref: '#/components/schemas/Reportante' }
+        personaAfectada: { $ref: '#/components/schemas/PersonaAfectada' }
+        hechos: { $ref: '#/components/schemas/Hechos' }
+        evidencias: { type: array, items: { $ref: '#/components/schemas/EvidenciaMetadato' } }
+        solicitudInformacion: { $ref: '#/components/schemas/SolicitudInformacionVigente' }
+        revisionConcurrente: { $ref: '#/components/schemas/RevisionConcurrente' }
+        accionesDisponibles: { type: array, items: { $ref: '#/components/schemas/AccionNoticia' } }
+        motivosNoDisponible:
+          type: object
+          description: Acción → explicación para la interfaz (p. ej. por qué no se puede continuar).
+          additionalProperties: { type: string }
+
+    ClasificacionRequest:
+      type: object
+      required: [vinculacionInvestigado, version]
+      properties:
+        vinculacionInvestigado: { $ref: '#/components/schemas/VinculacionInvestigado' }
+        version: { type: integer }
+    ClasificacionResponse:
+      type: object
+      required: [visibleParaUsuario]
+      properties:
+        visibleParaUsuario: { type: boolean, description: 'false si la noticia pasó al otro equipo.' }
+        noticia: { allOf: [{ $ref: '#/components/schemas/NoticiaDetalle' }], nullable: true }
+
+    CasoAsociado:
+      type: object
+      required: [casoId, actor, estadoGestionActor]
+      properties:
+        casoId: { type: string }
+        actor: { type: string, enum: [EQUIPO_ATENCION, LINEA_ALMA, SEGURIDAD, UAD] }
+        fechaApertura: { type: string, format: date, nullable: true }
+        estadoGestionActor: { type: string, enum: [ACTIVO, CERRADO] }
+
+    TipoDecision:
+      type: string
+      enum: [CONTINUAR_TRAMITE, SOLICITAR_INFORMACION, INHIBITORIO, REMISION_COMPETENCIA]
+    DecisionEvaluacionRequest:
+      type: object
+      description: Exactamente un bloque, el que corresponde a `tipo`.
+      required: [tipo, version]
+      properties:
+        tipo: { $ref: '#/components/schemas/TipoDecision' }
+        version: { type: integer }
+        observaciones: { type: string, nullable: true, maxLength: 2000, description: Opcional (UAD-HIS-04). }
+        continuarTramite:
+          type: object
+          required: [modoCaso]
+          properties:
+            modoCaso: { type: string, enum: [CONSERVAR_ASIGNADO, VINCULAR_EXISTENTE, CREAR_NUEVO] }
+            casoIdVincular: { type: string, nullable: true }
+            confirmaMismosHechos: { type: boolean, default: false }
+            expedienteUad: { type: string, nullable: true, maxLength: 40 }
+        solicitudInformacion:
+          type: object
+          required: [tipoSolicitudCodigo, informacionRequerida, fechaLimite]
+          properties:
+            tipoSolicitudCodigo: { type: string }
+            informacionRequerida: { type: string, minLength: 10, maxLength: 2000 }
+            fechaLimite: { type: string, format: date, description: Fecha futura. }
+        inhibitorio:
+          type: object
+          required: [causalCodigo]
+          properties:
+            causalCodigo: { type: string }
+            justificacion: { type: string, nullable: true, maxLength: 2000, description: 'Obligatoriedad PENDIENTE (D-UAD-13).' }
+        remisionCompetencia:
+          type: object
+          required: [faseProceso, entidadDestinatariaCodigo, fechaRemision]
+          description: Sin número de oficio ni radicado de salida (UAD-REM-03).
+          properties:
+            faseProceso: { type: string, enum: [EVALUACION_PRELIMINAR, INSTRUCCION, DECISION] }
+            entidadDestinatariaCodigo: { type: string }
+            fechaRemision: { type: string, format: date }
+            justificacion: { type: string, nullable: true, maxLength: 2000 }
+
+    NotificacionEstado:
+      type: object
+      description: Efecto que ejecuta el servidor con contactos autorizados. El cliente nunca decide destinatarios.
+      required: [evento, destinatario, estado]
+      properties:
+        evento: { type: string, enum: [NOTICIA_RADICADA, SOLICITUD_INFORMACION, ADMISION, CAMBIO_FASE, TRASLADO, REMISION_INTERNA] }
+        destinatario: { type: string, enum: [REPORTANTE, VICTIMA, ACTOR_DESTINO] }
+        estado: { type: string, enum: [PENDIENTE, ENVIADA, FALLIDA, NO_APLICA] }
+        motivo: { type: string, nullable: true }
+
+    CasoUadResumen:
+      type: object
+      required: [casoUadId, casoId, fechaAdmision, faseActual, equipoResponsable, version]
+      properties:
+        casoUadId: { type: string, format: uuid }
+        casoId: { type: string }
+        expedienteUad: { type: string, nullable: true }
+        consecutivosNoticia: { type: array, items: { type: string } }
+        victimaNombre: { type: string, nullable: true }
+        vinculacionInvestigado: { $ref: '#/components/schemas/VinculacionInvestigado' }
+        fechaAdmision: { type: string, format: date-time }
+        faseActual: { $ref: '#/components/schemas/FaseUad' }
+        equipoResponsable: { $ref: '#/components/schemas/EquipoUad' }
+        estadoGestion: { $ref: '#/components/schemas/EstadoGestionUad' }
+        version: { type: integer }
+    EstadoGestionUad:
+      type: string
+      description: |
+        Estado de la **gestión UAD** (UAD-SEG-04). No es el estado de la noticia ni el estado global del caso
+        CASILDA: una gestión UAD finalizada no cierra el caso institucional si otros actores siguen activos.
+      enum: [ACTIVA, FINALIZADA]
+    CasoUadDetalle:
+      allOf:
+        - $ref: '#/components/schemas/CasoUadResumen'
+        - type: object
+          required: [estadoGestion]
+          properties:
+            motivoFinGestion:
+              type: string
+              nullable: true
+              enum: [REMITIDA_POR_COMPETENCIA, null]
+              description: 'Otros motivos (inhibitoria posterior, terminación, fallo en firme): PENDIENTES DE VALIDACIÓN.'
+            fechaUltimoTraslado: { type: string, format: date-time, nullable: true }
+            equipoInstructor: { $ref: '#/components/schemas/EquipoUad' }
+            equipoDecisor: { $ref: '#/components/schemas/EquipoUad' }
+    CodigoActuacion:
+      type: string
+      description: Catálogo definitivo de la bitácora §7 (ordinarias) y §8 (permanentes).
+      enum:
+        - INDAGACION_PREVIA
+        - INVESTIGACION_DISCIPLINARIA
+        - AVERIGUACIONES_PRELIMINARES
+        - PRACTICA_PRUEBAS
+        - PLIEGO_CARGOS
+        - AUDIENCIAS
+        - MEDIACION
+        - FALLO
+        - REPOSICION_APELACION
+        - REMISION_COMPETENCIA
+        - INHIBITORIO
+        - TERMINACION
+        - FINALIZAR_INSTRUCCION
+        - REMISION_RUTA
+    ExpedienteRequest:
+      type: object
+      required: [version]
+      properties:
+        expedienteUad: { type: string, nullable: true, maxLength: 40 }
+        version: { type: integer }
+    RegistrarActuacionesRequest:
+      type: object
+      required: [actuaciones, version]
+      properties:
+        actuaciones:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: { $ref: '#/components/schemas/CodigoActuacion' }
+        observaciones: { type: string, nullable: true, maxLength: 2000, description: Siempre opcionales (UAD-HIS-04). }
+        version: { type: integer }
+    TrasladoRequest:
+      type: object
+      required: [confirmaTraslado, version]
+      properties:
+        confirmaTraslado: { type: boolean, description: 'Debe ser `true`: confirmación explícita (UAD-CAS-10).' }
+        observaciones: { type: string, nullable: true, maxLength: 2000 }
+        version: { type: integer }
+    RemisionCompetenciaCasoRequest:
+      type: object
+      required: [entidadDestinatariaCodigo, fechaRemision, version]
+      description: 'La fase la toma el servidor de la fase actual del caso. Sin número de oficio ni radicado de salida (UAD-REM-03).'
+      properties:
+        entidadDestinatariaCodigo: { type: string }
+        fechaRemision: { type: string, format: date, description: No futura. }
+        justificacion: { type: string, nullable: true, maxLength: 2000 }
+        version: { type: integer }
+    ResultadoAccionCaso:
+      type: object
+      required: [visibleParaUsuario, eventos, notificaciones]
+      properties:
+        visibleParaUsuario: { type: boolean, description: '`false` si tras la acción el caso dejó de ser del equipo y fase del usuario.' }
+        caso: { allOf: [{ $ref: '#/components/schemas/CasoUadDetalle' }], nullable: true }
+        eventos: { type: array, items: { $ref: '#/components/schemas/EventoHistorial' }, description: Eventos creados por la acción. }
+        notificaciones: { type: array, items: { $ref: '#/components/schemas/NotificacionEstado' } }
+    PaginaCasoUadResumen:
+      type: object
+      required: [content, totalElements, totalPages, number, size]
+      properties:
+        content: { type: array, items: { $ref: '#/components/schemas/CasoUadResumen' } }
+        totalElements: { type: integer }
+        totalPages: { type: integer }
+        number: { type: integer }
+        size: { type: integer }
+
+    DecisionEvaluacionResponse:
+      type: object
+      required: [noticia, notificaciones]
+      properties:
+        noticia: { $ref: '#/components/schemas/NoticiaDetalle' }
+        casoUad: { allOf: [{ $ref: '#/components/schemas/CasoUadResumen' }], nullable: true }
+        notificaciones: { type: array, items: { $ref: '#/components/schemas/NotificacionEstado' } }
+
+    EventoHistorial:
+      type: object
+      required: [eventoId, tipo, fecha, descripcion]
+      properties:
+        eventoId: { type: string }
+        tipo:
+          type: string
+          enum:
+            - NOTICIA_RECIBIDA
+            - ASIGNADA_EQUIPO
+            - CLASIFICACION_VINCULACION
+            - CASOS_ASOCIADOS_CONSULTADOS
+            - SOLICITUD_INFORMACION
+            - SUBSANACION_RECIBIDA
+            - DECISION_REGISTRADA
+            - CASO_VINCULADO
+            - CASO_CREADO
+            - NOTIFICACION
+            - ACTUACION
+            - TRASLADO_FASE
+            - EXPEDIENTE_ACTUALIZADO
+            - REMISION_COMPETENCIA
+            - RECTIFICACION
+        fecha: { type: string, format: date-time }
+        descripcion: { type: string }
+        profesional: { type: string, nullable: true }
+        equipo: { allOf: [{ $ref: '#/components/schemas/EquipoUad' }], nullable: true }
+        fase: { allOf: [{ $ref: '#/components/schemas/FaseUad' }], nullable: true }
+        estadoAnterior: { type: string, nullable: true }
+        estadoNuevo: { type: string, nullable: true }
+        observaciones: { type: string, nullable: true }
+
+    RadicacionNdaRequest:
+      type: object
+      description: Sin identidad ni contacto de quien envía (UAD-NOT-04). Ningún campo se precarga desde la sesión.
+      required: [descripcionHechos]
+      properties:
+        descripcionHechos: { type: string, minLength: 20, maxLength: 4000 }
+        lugarOcurrencia: { type: string, nullable: true, maxLength: 300 }
+        presuntoResponsable: { type: string, nullable: true, maxLength: 300, description: Nombre o descripción de la persona señalada. }
+        vinculacionDeclarada:
+          allOf: [{ $ref: '#/components/schemas/VinculacionInvestigado' }]
+          nullable: true
+          description: Opcional. Orienta la competencia; las NDA son visibles a ambos equipos de todos modos.
+    RadicacionNdaResponse:
+      type: object
+      required: [consecutivo, fechaRecepcion]
+      properties:
+        consecutivo: { type: string, pattern: '^NDA-\d{4}-\d{6}$' }
+        fechaRecepcion: { type: string, format: date-time }
+    MiReporteResumen:
+      type: object
+      description: BORRADOR. Solo información autorizada para la persona usuaria (catálogo de roles §3.e).
+      required: [codigo, actor, estado, fechaRegistro]
+      properties:
+        codigo: { type: string, description: 'Consecutivo visible (p. ej. NDI-2026-000148).' }
+        actor: { type: string, enum: [EQUIPO_ATENCION, LINEA_ALMA, SEGURIDAD, UAD] }
+        asunto: { type: string, nullable: true }
+        estado: { type: string, description: Estado operativo autorizado, en lenguaje para la persona usuaria. }
+        fechaRegistro: { type: string, format: date-time }
+        fechaUltimaActuacion: { type: string, format: date-time, nullable: true }
+        solicitudPendiente: { type: boolean }
+    MiReporteDetalle:
+      allOf:
+        - $ref: '#/components/schemas/MiReporteResumen'
+        - type: object
+          properties:
+            solicitudInformacion: { $ref: '#/components/schemas/SolicitudInformacionVigente' }
+    ActuacionDisponible:
+      type: object
+      required: [codigo, nombre, permanente, ejecutable, pendienteValidacion]
+      properties:
+        codigo: { $ref: '#/components/schemas/CodigoActuacion' }
+        nombre: { type: string }
+        permanente: { type: boolean, description: 'Acción permanente (§8): visible siempre, se ejecuta por su propia operación.' }
+        ejecutable: { type: boolean }
+        motivoNoEjecutable: { type: string, nullable: true }
+        pendienteValidacion: { type: boolean, description: 'Sujeta a validación jurídica (§16): se muestra deshabilitada.' }

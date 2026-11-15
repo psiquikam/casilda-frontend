@@ -100,6 +100,49 @@ describe('AuthService', () => {
     expect(service.getRoleCode()).toBe('ADMIN');
   });
 
+  describe('roles UAD Equipos 3 y 4 (catálogo propuesto)', () => {
+    const uad = (codigo: string, nombre: string): UserSession => ({
+      email: 'uad@udea.edu.co',
+      nombre: 'Profesional UAD de prueba',
+      rol: nombre,
+      roles: [codigo],
+      authorities: [`ROLE_${codigo}`],
+      token: jwt(Math.floor(Date.now() / 1000) + 3600)
+    });
+
+    it('UAD_COORDINACION no se confunde con la coordinación del Equipo de Atención', () => {
+      const service = createService();
+      service.currentUser = uad('UAD_COORDINACION', 'UAD_COORDINACION');
+      expect(service.hasRole('UAD_COORDINACION')).toBeTrue();
+      expect(service.isCoordinador()).toBeFalse();
+      expect(service.puedeVerUad()).toBeTrue();
+    });
+
+    it('el nombre «Profesional Equipo 3» no da permisos de PROFESIONAL', () => {
+      const service = createService();
+      service.currentUser = uad('UAD_EQUIPO_3', 'Profesional Equipo 3');
+      expect(service.hasRole('UAD_EQUIPO_3')).toBeTrue();
+      expect(service.isProfesional()).toBeFalse();
+      expect(service.getRoleCode()).toBe('UAD_EQUIPO_3');
+      expect(service.getRoleName()).toBe('UAD – Equipo 3');
+    });
+
+    it('conserva la sesión de un usuario UAD al recargar', () => {
+      localStorage.setItem('userSession', JSON.stringify(uad('UAD_EQUIPO_4', 'Profesional Equipo 4')));
+      const service = createService();
+      expect(service.isAuthenticated()).toBeTrue();
+      expect(service.hasRole('UAD_EQUIPO_4')).toBeTrue();
+    });
+
+    it('un PROFESIONAL del Equipo de Atención no ve la UAD; ADMIN sí', () => {
+      const service = createService();
+      service.currentUser = session(Math.floor(Date.now() / 1000) + 3600, 'Profesional');
+      expect(service.puedeVerUad()).toBeFalse();
+      service.currentUser = session(Math.floor(Date.now() / 1000) + 3600, 'Admin');
+      expect(service.puedeVerUad()).toBeTrue();
+    });
+  });
+
   describe('rol Gestor de contenidos (rol_id 6)', () => {
     // Forma real del login: `rol` trae el nombre y `roles` el código.
     const sesionGestor = (): UserSession => ({
