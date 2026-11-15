@@ -1,0 +1,78 @@
+@use '../../estilos/bandeja' as b;
+
+@include b.bandeja;
+
+.pestanas {
+  display: flex;
+  gap: var(--space-1);
+  border-bottom: 2px solid var(--color-border);
+}
+
+.pestanas__pestana {
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-bottom: none;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  background: var(--color-bg-subtle);
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pestanas__pestana--activa {
+  background: var(--color-bg-surface);
+  color: var(--color-primary);
+  border-color: var(--color-primary-border);
+  box-shadow: inset 0 -3px 0 var(--color-primary);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.bandeja__expandir {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--color-primary-border);
+  border-radius: var(--radius-md);
+  background: var(--color-primary-tint);
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.fila--abierta > td,
+.fila--abierta > th {
+  border-bottom-color: transparent;
+}
+
+.bandeja__detalle > td {
+  background: var(--color-bg-main);
+}
+
+.detalle {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-3) var(--space-6);
+  margin: 0;
+
+  dt {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+  }
+
+  dd {
+    margin: var(--space-1) 0 0;
+  }
+}
+
+.detalle__ancho {
+  grid-column: 1 / -1;
+}

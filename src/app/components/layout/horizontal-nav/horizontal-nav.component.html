@@ -132,6 +132,16 @@
       </button>
 
       <mat-menu #uadMenu="matMenu" class="hnav-menu">
+        @if (auth.puedeVerUad()) {
+          <a mat-menu-item routerLink="/uad/noticias" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
+            <mat-icon aria-hidden="true">inbox</mat-icon>
+            <span>Noticias disciplinarias</span>
+          </a>
+          <a mat-menu-item routerLink="/uad/casos" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
+            <mat-icon aria-hidden="true">folder_shared</mat-icon>
+            <span>Casos UAD</span>
+          </a>
+        }
         @if (features.complaintIntakePrototype) {
           <a mat-menu-item routerLink="/nueva-queja" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
             <mat-icon aria-hidden="true">post_add</mat-icon>

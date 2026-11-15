@@ -220,6 +220,16 @@
         </button>
         @if (isExpanded('uad')) {
           <div id="section-uad" class="section-content" role="region" aria-labelledby="toggle-uad">
+            @if (auth.puedeVerUad()) {
+              <a routerLink="/uad/noticias" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
+                <mat-icon class="nav-item__icon" aria-hidden="true">inbox</mat-icon>
+                <span class="nav-item__text">Noticias disciplinarias</span>
+              </a>
+              <a routerLink="/uad/casos" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
+                <mat-icon class="nav-item__icon" aria-hidden="true">folder_shared</mat-icon>
+                <span class="nav-item__text">Casos UAD</span>
+              </a>
+            }
             @if (features.complaintIntakePrototype) {
               <a routerLink="/nueva-queja" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
                 <mat-icon class="nav-item__icon" aria-hidden="true">post_add</mat-icon>

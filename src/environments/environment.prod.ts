@@ -52,6 +52,15 @@ export const environment = {
       recontactos: false
     }
   },
+  /**
+   * Módulo UAD Equipos 3 y 4: adaptador del puerto `UadApiPort` (`src/app/uad/uad.providers.ts`).
+   * `'mock'`: datos sintéticos en memoria, sin red. `'http'`: `{apiBaseUrl}/uad/...` según
+   * `docs/contratos/uad/openapi-uad.yaml`, **que aún no existe en el backend** (auditoría 2026-11-14).
+   * **Nunca `'mock'` en un entorno desplegado.**
+   */
+  uad: {
+    adaptador: 'http' as 'mock' | 'http'
+  },
   features: {
     complaintIntakePrototype: false,
     publicTrackingPrototype: false,

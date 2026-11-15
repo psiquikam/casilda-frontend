@@ -1,0 +1,518 @@
+<div class="evaluacion">
+  <nav class="evaluacion__migas" aria-label="Ruta de navegación">
+    <a routerLink="/uad/noticias" [queryParams]="noticia() ? { tipo: noticia()!.tipo } : null">Noticias disciplinarias</a>
+    <mat-icon aria-hidden="true">chevron_right</mat-icon>
+    <span aria-current="page">Evaluación preliminar</span>
+  </nav>
+
+  <h1 class="evaluacion__titulo">
+    Evaluación preliminar de noticia disciplinaria
+    @if (noticia(); as n) {
+      {{ n.tipo === 'NDI' ? 'identificada' : 'anónima' }}
+    }
+  </h1>
+  <p class="evaluacion__intro">Unidad de Asuntos Disciplinarios (UAD)</p>
+
+  <app-uad-panel-simulacion (equipoCambiado)="cargar()">
+    @if (vista() === 'listo') {
+      <button type="button" class="boton boton--secundario" (click)="simularCambioConcurrente()">Simular que otra persona modifica la noticia</button>
+      @if (noticia()?.estado === 'PENDIENTE_SUBSANACION') {
+        <button type="button" class="boton boton--secundario" (click)="simularRespuesta()">Simular respuesta del reportante</button>
+      }
+    }
+  </app-uad-panel-simulacion>
+
+  @switch (vista()) {
+    @case ('cargando') {
+      <p role="status" aria-busy="true">Cargando la noticia…</p>
+    }
+    @case ('no-encontrado') {
+      <div class="casilda-alerta casilda-alerta--precaucion" role="alert">
+        <mat-icon aria-hidden="true">search_off</mat-icon>
+        <div>
+          <p>No encontramos esta noticia en su bandeja. Es posible que se haya reclasificado al otro equipo.</p>
+          <a class="boton boton--secundario" routerLink="/uad/noticias">Volver a la bandeja</a>
+        </div>
+      </div>
+    }
+    @case ('sin-permiso') {
+      <div class="casilda-alerta casilda-alerta--peligro" role="alert">
+        <mat-icon aria-hidden="true">lock</mat-icon>
+        <div>
+          <p>Su perfil no tiene permiso para evaluar esta noticia.</p>
+          <a class="boton boton--secundario" routerLink="/uad/noticias">Volver a la bandeja</a>
+        </div>
+      </div>
+    }
+    @case ('error') {
+      <div class="casilda-alerta casilda-alerta--peligro" role="alert">
+        <mat-icon aria-hidden="true">error_outline</mat-icon>
+        <div>
+          <p>No pudimos cargar la noticia.</p>
+          <button type="button" class="boton boton--secundario" (click)="cargar()">Intentar de nuevo</button>
+        </div>
+      </div>
+    }
+    @case ('listo') {
+      @if (noticia(); as n) {
+        <!-- Identificadores diferenciados (UAD-ID-01/07). Ninguno lo genera la interfaz. -->
+        <section class="tarjeta identificadores" aria-labelledby="uad-ids-titulo">
+          <h2 id="uad-ids-titulo" class="visually-hidden">Identificadores de la noticia</h2>
+          <dl class="identificadores__lista">
+            <div>
+              <dt>Consecutivo {{ n.tipo }}</dt>
+              <dd class="identificadores__fuerte">{{ n.consecutivo }}</dd>
+            </div>
+            <div>
+              <dt>Origen</dt>
+              <dd>
+                {{ etiquetaOrigen[n.origen.tipo] }}
+                @if (n.origen.actorRemitente) {
+                  <span class="sub">{{ etiquetaActor[n.origen.actorRemitente] }}</span>
+                }
+              </dd>
+            </div>
+            <div>
+              <dt>Estado de la noticia</dt>
+              <dd><app-uad-estado-noticia [estado]="n.estado" /></dd>
+            </div>
+            <div>
+              <dt>Fecha de recepción</dt>
+              <dd>{{ n.fechaRecepcion | date: 'd MMM y, h:mm a' }}</dd>
+            </div>
+            <div>
+              <dt>ID de caso Casilda</dt>
+              <dd>{{ n.casoId ?? 'Sin asignar' }}</dd>
+            </div>
+            <div>
+              <dt>Expediente UAD</dt>
+              <dd>{{ n.expedienteUad ?? 'Sin registrar' }}</dd>
+            </div>
+          </dl>
+          <p class="sub">
+            Identificadores independientes: el consecutivo no cambia; el ID de caso Casilda identifica el caso institucional y el expediente
+            corresponde a la nomenclatura propia de la UAD.
+          </p>
+        </section>
+
+        @if (n.revisionConcurrente; as r) {
+          <div class="casilda-alerta casilda-alerta--precaucion" role="status">
+            <mat-icon aria-hidden="true">group</mat-icon>
+            <p>
+              Otra persona de {{ etiquetaEquipo[r.equipo] }} tiene abierta esta evaluación desde {{ r.desde | date: 'h:mm a' }}. Si registra una
+              decisión y la otra persona ya decidió, el sistema se lo avisará antes de guardar nada.
+            </p>
+          </div>
+        }
+
+        @if (resultado(); as r) {
+          <section id="uad-resultado" class="casilda-alerta casilda-alerta--exito resultado" tabindex="-1" role="status" aria-labelledby="uad-resultado-titulo">
+            <mat-icon aria-hidden="true">task_alt</mat-icon>
+            <div>
+              <h2 id="uad-resultado-titulo" class="resultado__titulo">Decisión registrada</h2>
+              <p>La noticia {{ r.noticia.consecutivo }} quedó en estado «{{ etiquetaEstado[r.noticia.estado] }}».</p>
+              @if (r.casoUad; as c) {
+                <p>
+                  Caso Casilda <strong>{{ c.casoId }}</strong> en la bandeja de casos UAD: {{ etiquetaEquipo[c.equipoResponsable] }},
+                  {{ etiquetaFase[c.faseActual] | lowercase }}.
+                  @if (!c.expedienteUad) {
+                    Puede registrar el expediente UAD más adelante.
+                  }
+                </p>
+              }
+              @for (no of r.notificaciones; track no.evento + no.destinatario) {
+                <p class="sub">
+                  Aviso a {{ etiquetaDestinatario[no.destinatario] | lowercase }}: {{ etiquetaNotificacion[no.estado] }}.
+                  {{ no.motivo ?? '' }}
+                </p>
+              }
+              @if (n.estado === 'INHIBITORIA' || n.estado === 'REMITIDA_POR_COMPETENCIA') {
+                <p class="sub">La gestión de la UAD terminó. El caso institucional, si existe, sigue activo para los demás actores.</p>
+              }
+              <div class="resultado__acciones">
+                <a class="boton boton--secundario" routerLink="/uad/noticias" [queryParams]="{ tipo: n.tipo }">Volver a la bandeja</a>
+                @if (r.casoUad) {
+                  <a class="boton boton--secundario" routerLink="/uad/casos">Ver bandeja de casos</a>
+                }
+              </div>
+            </div>
+          </section>
+        }
+
+        <div class="evaluacion__rejilla">
+          <!-- Columna de información -->
+          <div class="evaluacion__columna">
+            <section class="tarjeta" aria-labelledby="uad-reportante-titulo">
+              <h2 id="uad-reportante-titulo" class="tarjeta__titulo">
+                <mat-icon aria-hidden="true">person</mat-icon> Información del reportante
+              </h2>
+              @if (n.tipo === 'NDA') {
+                <p class="sub">Noticia anónima: no se muestra ni se registra la identidad de quien la presentó.</p>
+              } @else if (n.reportante; as rp) {
+                <dl class="datos">
+                  <div><dt>Tipo de solicitud</dt><dd>{{ rp.tipoSolicitud === 'DIRECTA' ? 'Directa (para sí)' : 'Indirecta (sobre otra persona)' }}</dd></div>
+                  <div><dt>Nombre</dt><dd>{{ nombreReportante(rp) }}</dd></div>
+                  <div><dt>Documento</dt><dd>{{ rp.tipoDocumento ?? '' }} {{ rp.numeroDocumento ?? 'Sin dato' }}</dd></div>
+                  <div><dt>Celular</dt><dd>{{ rp.celular ?? 'Sin dato' }}</dd></div>
+                  <div><dt>Correo institucional</dt><dd>{{ rp.correoInstitucional ?? 'Sin dato' }}</dd></div>
+                  <div><dt>Correo personal</dt><dd>{{ rp.correoPersonal ?? 'Sin dato' }}</dd></div>
+                </dl>
+              } @else {
+                <p class="sub">Su perfil no tiene acceso a los datos del reportante.</p>
+              }
+            </section>
+
+            @if (n.personaAfectada; as pa) {
+              <section class="tarjeta" aria-labelledby="uad-afectada-titulo">
+                <h2 id="uad-afectada-titulo" class="tarjeta__titulo"><mat-icon aria-hidden="true">diversity_3</mat-icon> Persona afectada</h2>
+                <dl class="datos">
+                  <div><dt>Nombre</dt><dd>{{ pa.nombreCompleto ?? 'Sin dato' }}</dd></div>
+                  <div><dt>Vínculo con la Universidad</dt><dd>{{ pa.vinculoUniversidad ?? 'Sin dato' }}</dd></div>
+                </dl>
+              </section>
+            }
+
+            <section class="tarjeta" aria-labelledby="uad-hechos-titulo">
+              <h2 id="uad-hechos-titulo" class="tarjeta__titulo"><mat-icon aria-hidden="true">description</mat-icon> Información de los hechos</h2>
+              <dl class="datos datos--apilado">
+                <div><dt>Lugar de ocurrencia</dt><dd>{{ n.hechos.lugarOcurrencia ?? 'Sin dato' }}</dd></div>
+                <div><dt>Descripción de los hechos</dt><dd class="texto-largo">{{ n.hechos.descripcion }}</dd></div>
+                <div><dt>Presunta persona responsable</dt><dd>{{ n.hechos.presuntoResponsable ?? 'Sin dato' }}</dd></div>
+              </dl>
+            </section>
+
+            <section class="tarjeta" aria-labelledby="uad-vinculacion-titulo">
+              <h2 id="uad-vinculacion-titulo" class="tarjeta__titulo"><mat-icon aria-hidden="true">badge</mat-icon> Vinculación y competencia</h2>
+              <dl class="datos">
+                <div><dt>Declarada al radicar</dt><dd>{{ n.vinculacionDeclarada ? etiquetaVinculacion[n.vinculacionDeclarada] : 'Sin dato' }}</dd></div>
+                <div><dt>Clasificada por la UAD</dt><dd>{{ n.vinculacionClasificada ? etiquetaVinculacion[n.vinculacionClasificada] : 'Sin clasificar' }}</dd></div>
+                <div>
+                  <dt>Equipo que instruye</dt>
+                  <dd>{{ equipoInstructor() ? etiquetaEquipo[equipoInstructor()!] : 'Por definir (visible a ambos equipos)' }}</dd>
+                </div>
+              </dl>
+              @if (acciones().has('CLASIFICAR_VINCULACION')) {
+                <div class="clasificar">
+                  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label>Vinculación del presunto responsable</mat-label>
+                    <mat-select id="uad-vinculacion" [value]="vinculacionElegida()" (valueChange)="vinculacionElegida.set($event)">
+                      @for (v of vinculaciones; track v) {
+                        <mat-option [value]="v">{{ etiquetaVinculacion[v] }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                  <button
+                    type="button"
+                    class="boton boton--secundario"
+                    [disabled]="clasificando() || !vinculacionElegida() || vinculacionElegida() === (n.vinculacionClasificada ?? n.vinculacionDeclarada)"
+                    (click)="clasificar()"
+                  >
+                    {{ clasificando() ? 'Guardando…' : 'Guardar clasificación' }}
+                  </button>
+                </div>
+                @if (error('continuarTramite.vinculacion'); as m) {
+                  <p class="campo-error" role="alert">{{ m }}</p>
+                }
+              }
+            </section>
+
+            <section class="tarjeta" aria-labelledby="uad-evidencias-titulo">
+              <h2 id="uad-evidencias-titulo" class="tarjeta__titulo"><mat-icon aria-hidden="true">attach_file</mat-icon> Evidencias y documentos adjuntos</h2>
+              @if (n.evidencias.length === 0) {
+                <p class="sub">La noticia no tiene evidencias adjuntas.</p>
+              } @else {
+                <table class="tabla" aria-label="Evidencias adjuntas">
+                  <thead>
+                    <tr>
+                      <th scope="col">Archivo</th>
+                      <th scope="col">Tipo</th>
+                      <th scope="col">Fecha de carga</th>
+                      <th scope="col"><span class="visually-hidden">Acciones</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (e of n.evidencias; track e.evidenciaId) {
+                      <tr>
+                        <th scope="row">{{ e.nombreArchivo }}</th>
+                        <td>{{ e.tipoMime }}</td>
+                        <td>{{ e.fechaCarga | date: 'd MMM y, h:mm a' }}</td>
+                        <td>
+                          @if (acciones().has('DESCARGAR_EVIDENCIAS')) {
+                            <button type="button" class="boton boton--secundario boton--compacto" (click)="descargar(e.evidenciaId, e.nombreArchivo)">
+                              <mat-icon aria-hidden="true">download</mat-icon>
+                              Descargar <span class="visually-hidden">{{ e.nombreArchivo }}</span>
+                            </button>
+                          }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+                <p class="sub">Cada descarga queda registrada.</p>
+              }
+            </section>
+          </div>
+
+          <!-- Columna de decisión -->
+          <div class="evaluacion__columna evaluacion__columna--principal">
+            @if (n.solicitudInformacion; as s) {
+              <section class="tarjeta" aria-labelledby="uad-solicitud-titulo">
+                <h2 id="uad-solicitud-titulo" class="tarjeta__titulo"><mat-icon aria-hidden="true">mark_email_unread</mat-icon> Solicitud de información adicional</h2>
+                <p class="texto-largo">{{ s.informacionRequerida }}</p>
+                <p class="sub">Enviada el {{ s.fechaSolicitud | date: 'd MMM y' }} · Fecha límite: {{ s.fechaLimite | date: 'd MMM y' }}</p>
+                @if (s.respondida) {
+                  <p>El reportante respondió desde «Mis reportes». Puede continuar la evaluación.</p>
+                } @else if (s.vencida) {
+                  <div class="casilda-alerta casilda-alerta--precaucion">
+                    <mat-icon aria-hidden="true">schedule</mat-icon>
+                    <p>El plazo venció sin respuesta. La noticia no se cierra automáticamente: decida si continúa con la información disponible.</p>
+                  </div>
+                } @else {
+                  <p class="sub">Esperando respuesta del reportante.</p>
+                }
+              </section>
+            }
+
+            @if (puedeDecidir()) {
+              <section class="tarjeta" aria-labelledby="uad-decision-titulo">
+                <h2 id="uad-decision-titulo" class="tarjeta__titulo"><mat-icon aria-hidden="true">balance</mat-icon> Evaluación preliminar de la UAD</h2>
+
+                <app-resumen-errores [errores]="resumenErrores()" />
+
+                <form [formGroup]="form" (ngSubmit)="registrar()" novalidate aria-labelledby="uad-decision-titulo">
+                  <fieldset id="uad-decision" class="decisiones" tabindex="-1">
+                    <legend class="decisiones__leyenda">Decisión de la evaluación preliminar <span aria-hidden="true">*</span></legend>
+                    @for (d of decisiones; track d) {
+                      <label class="decision" [class.decision--activa]="decision() === d" [class.decision--inactiva]="!acciones().has(d)">
+                        <input
+                          type="radio"
+                          name="uad-tipo-decision"
+                          [value]="d"
+                          [checked]="decision() === d"
+                          [disabled]="!acciones().has(d)"
+                          (change)="elegirDecision(d)"
+                          [attr.aria-describedby]="'uad-desc-' + d"
+                        />
+                        <span class="decision__texto">
+                          <strong>{{ etiquetaDecision[d] }}</strong>
+                          <span [id]="'uad-desc-' + d" class="sub">
+                            {{ acciones().has(d) ? descripcionDecision[d] : (motivoNoDisponible(d) ?? 'No disponible en este momento.') }}
+                          </span>
+                        </span>
+                      </label>
+                    }
+                  </fieldset>
+
+                  @switch (decision()) {
+                    @case ('CONTINUAR_TRAMITE') {
+                      <fieldset class="subformulario">
+                        <legend class="subformulario__titulo">Continuar trámite disciplinario</legend>
+                        <p class="sub">
+                          Ingresa la noticia a la bandeja de casos UAD. Admisión operativa en Casilda: no equivale al inicio jurídico formal de cada etapa.
+                        </p>
+
+                        @if (n.casoId) {
+                          <div class="casilda-alerta" id="uad-modo-caso">
+                            <mat-icon aria-hidden="true">link</mat-icon>
+                            <p>Estos hechos ya tienen el ID de caso Casilda <strong>{{ n.casoId }}</strong> asignado por otro actor. Se conserva el mismo; no se crea un duplicado.</p>
+                          </div>
+                        } @else {
+                          <div id="uad-modo-caso" class="opciones" role="radiogroup" aria-labelledby="uad-modo-caso-pregunta">
+                            <p id="uad-modo-caso-pregunta" class="opciones__pregunta">¿Estos mismos hechos ya tienen un caso Casilda en otro actor?</p>
+                            <label class="opcion">
+                              <input type="radio" formControlName="modoCaso" value="CREAR_NUEVO" />
+                              No: el sistema generará un nuevo ID de caso Casilda al guardar.
+                            </label>
+                            <label class="opcion">
+                              <input type="radio" formControlName="modoCaso" value="VINCULAR_EXISTENTE" [attr.disabled]="acciones().has('CONSULTAR_CASOS_ASOCIADOS') ? null : true" />
+                              Sí: vincular a un caso existente de los mismos hechos.
+                            </label>
+                          </div>
+                          @if (error('continuarTramite.modoCaso'); as m) {
+                            <p class="campo-error" role="alert">{{ m }}</p>
+                          }
+                        }
+
+                        @if (!n.casoId) {
+                          <div id="uad-casos-asociados" tabindex="-1">
+                            <app-uad-casos-asociados
+                              [noticiaId]="n.noticiaId"
+                              [disponible]="acciones().has('CONSULTAR_CASOS_ASOCIADOS')"
+                              [motivo]="motivoNoDisponible('CONSULTAR_CASOS_ASOCIADOS')"
+                              [seleccionable]="modoCaso() === 'VINCULAR_EXISTENTE'"
+                              [(seleccionado)]="casoIdVincular"
+                              (consultados)="alConsultarCasos($event)"
+                            />
+                          </div>
+                          @if (error('continuarTramite.casoIdVincular'); as m) {
+                            <p class="campo-error" role="alert">{{ m }}</p>
+                          }
+                          @if (modoCaso() === 'VINCULAR_EXISTENTE') {
+                            <label class="opcion opcion--confirmacion">
+                              <input id="uad-confirma-hechos" type="checkbox" formControlName="confirmaMismosHechos" />
+                              Confirmo que el caso seleccionado corresponde a los mismos hechos. Una coincidencia de nombre o documento no basta para vincular.
+                            </label>
+                            @if (error('continuarTramite.confirmaMismosHechos'); as m) {
+                              <p class="campo-error" role="alert">{{ m }}</p>
+                            }
+                          }
+                        }
+
+                        <mat-form-field appearance="outline" class="campo">
+                          <mat-label>Número de expediente interno UAD (opcional)</mat-label>
+                          <input matInput id="uad-expediente" formControlName="expedienteUad" autocomplete="off" [maxlength]="limiteExpediente" />
+                          <mat-hint>Puede registrarlo después; no bloquea el trámite.</mat-hint>
+                          <mat-error>{{ error('continuarTramite.expedienteUad') }}</mat-error>
+                        </mat-form-field>
+                      </fieldset>
+                    }
+
+                    @case ('SOLICITAR_INFORMACION') {
+                      <fieldset class="subformulario">
+                        <legend class="subformulario__titulo">Solicitud de información adicional</legend>
+                        <p class="sub">Dirigida a: reportante identificado. Canal: Casilda («Mis reportes»); el aviso por correo lo envía el sistema al contacto autorizado.</p>
+                        <mat-form-field appearance="outline" class="campo">
+                          <mat-label>Tipo de solicitud</mat-label>
+                          <mat-select id="uad-tipo-solicitud" formControlName="tipoSolicitudCodigo">
+                            @for (t of catalogos()?.tiposSolicitud ?? []; track t.id) {
+                              <mat-option [value]="t.codigo">{{ t.nombre }}</mat-option>
+                            }
+                          </mat-select>
+                          <mat-error>{{ error('solicitudInformacion.tipoSolicitudCodigo') }}</mat-error>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="campo">
+                          <mat-label>Información requerida</mat-label>
+                          <textarea matInput id="uad-informacion" formControlName="informacionRequerida" rows="4" autocomplete="off" [maxlength]="limiteTexto"></textarea>
+                          <mat-hint align="end">{{ form.controls.informacionRequerida.value.length }} / {{ limiteTexto }}</mat-hint>
+                          <mat-error>{{ error('solicitudInformacion.informacionRequerida') }}</mat-error>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="campo campo--corto">
+                          <mat-label>Fecha límite para responder</mat-label>
+                          <input matInput id="uad-fecha-limite" type="date" formControlName="fechaLimite" [min]="manana" />
+                          <mat-error>{{ error('solicitudInformacion.fechaLimite') }}</mat-error>
+                        </mat-form-field>
+                        <div class="casilda-alerta">
+                          <mat-icon aria-hidden="true">info</mat-icon>
+                          <p>La noticia quedará «Pendiente de subsanación». Si vence el plazo sin respuesta, no se cierra sola.</p>
+                        </div>
+                      </fieldset>
+                    }
+
+                    @case ('INHIBITORIO') {
+                      <fieldset class="subformulario">
+                        <legend class="subformulario__titulo">Registrar decisión inhibitoria</legend>
+                        <div class="casilda-alerta casilda-alerta--precaucion">
+                          <mat-icon aria-hidden="true">pending_actions</mat-icon>
+                          <p>Pendiente de validación jurídica: las causales y la obligatoriedad de la justificación son provisionales.</p>
+                        </div>
+                        <mat-form-field appearance="outline" class="campo">
+                          <mat-label>Causal de inhibitorio</mat-label>
+                          <mat-select id="uad-causal" formControlName="causalCodigo">
+                            @for (c of catalogos()?.causalesInhibitorio ?? []; track c.id) {
+                              <mat-option [value]="c.codigo">{{ c.nombre }}</mat-option>
+                            }
+                          </mat-select>
+                          <mat-error>{{ error('inhibitorio.causalCodigo') }}</mat-error>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="campo">
+                          <mat-label>Justificación de la decisión{{ justificacionInhibitorioObligatoria ? '' : ' (opcional)' }}</mat-label>
+                          <textarea matInput id="uad-justificacion-inhibitorio" formControlName="justificacionInhibitorio" rows="4" autocomplete="off" [maxlength]="limiteTexto"></textarea>
+                          <mat-hint align="end">{{ form.controls.justificacionInhibitorio.value.length }} / {{ limiteTexto }}</mat-hint>
+                          <mat-error>{{ error('inhibitorio.justificacion') }}</mat-error>
+                        </mat-form-field>
+                      </fieldset>
+                    }
+
+                    @case ('REMISION_COMPETENCIA') {
+                      <fieldset class="subformulario">
+                        <legend class="subformulario__titulo">Remisión por competencia</legend>
+                        <div class="casilda-alerta">
+                          <mat-icon aria-hidden="true">info</mat-icon>
+                          <p>Casilda solo deja constancia de la remisión. No envía correos ni documentos a la entidad: el envío oficial se hace por los canales institucionales.</p>
+                        </div>
+                        <dl class="datos">
+                          <div id="uad-fase-remision"><dt>Fase del proceso</dt><dd>Evaluación preliminar</dd></div>
+                        </dl>
+                        <mat-form-field appearance="outline" class="campo">
+                          <mat-label>Entidad destinataria</mat-label>
+                          <mat-select id="uad-entidad" formControlName="entidadDestinatariaCodigo">
+                            @for (e of catalogos()?.entidadesRemision ?? []; track e.id) {
+                              <mat-option [value]="e.codigo">{{ e.nombre }}</mat-option>
+                            }
+                          </mat-select>
+                          <mat-error>{{ error('remisionCompetencia.entidadDestinatariaCodigo') }}</mat-error>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="campo campo--corto">
+                          <mat-label>Fecha de remisión</mat-label>
+                          <input matInput id="uad-fecha-remision" type="date" formControlName="fechaRemision" [max]="hoy" />
+                          <mat-error>{{ error('remisionCompetencia.fechaRemision') }}</mat-error>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="campo">
+                          <mat-label>Justificación de la remisión (opcional)</mat-label>
+                          <textarea matInput id="uad-justificacion-remision" formControlName="justificacionRemision" rows="3" autocomplete="off" [maxlength]="limiteTexto"></textarea>
+                          <mat-hint align="end">{{ form.controls.justificacionRemision.value.length }} / {{ limiteTexto }}</mat-hint>
+                          <mat-error>{{ error('remisionCompetencia.justificacion') }}</mat-error>
+                        </mat-form-field>
+                      </fieldset>
+                    }
+                  }
+
+                  @if (decision()) {
+                    <mat-form-field appearance="outline" class="campo">
+                      <mat-label>Observaciones de la evaluación (opcional)</mat-label>
+                      <textarea matInput id="uad-observaciones" formControlName="observaciones" rows="3" autocomplete="off" [maxlength]="limiteTexto"></textarea>
+                      <mat-error>{{ error('observaciones') }}</mat-error>
+                    </mat-form-field>
+                  }
+
+                  <div class="acciones">
+                    <a class="boton boton--secundario" routerLink="/uad/noticias" [queryParams]="{ tipo: n.tipo }">
+                      <mat-icon aria-hidden="true">arrow_back</mat-icon>
+                      Volver a la bandeja
+                    </a>
+                    <button type="submit" class="boton boton--primario" [disabled]="enviando() || !decision()" [attr.aria-busy]="enviando()">
+                      <mat-icon aria-hidden="true">save</mat-icon>
+                      {{ enviando() ? 'Registrando…' : decision() ? 'Registrar: ' + etiquetaDecision[decision()!] : 'Registrar decisión' }}
+                    </button>
+                  </div>
+                </form>
+              </section>
+            } @else if (!resultado()) {
+              <section class="tarjeta" aria-labelledby="uad-sin-decision-titulo">
+                <h2 id="uad-sin-decision-titulo" class="tarjeta__titulo"><mat-icon aria-hidden="true">balance</mat-icon> Evaluación preliminar de la UAD</h2>
+                <p>Esta noticia está en estado «{{ etiquetaEstado[n.estado] }}». No admite nuevas decisiones de evaluación.</p>
+                <a class="boton boton--secundario" routerLink="/uad/noticias" [queryParams]="{ tipo: n.tipo }">Volver a la bandeja</a>
+              </section>
+            }
+          </div>
+
+          <!-- Historial (UAD-NOT-12) -->
+          <aside class="evaluacion__columna" aria-labelledby="uad-historial-titulo">
+            <section class="tarjeta">
+              <h2 id="uad-historial-titulo" class="tarjeta__titulo"><mat-icon aria-hidden="true">history</mat-icon> Historial de actuaciones</h2>
+              @if (historial().length === 0) {
+                <p class="sub">Sin eventos registrados.</p>
+              } @else {
+                <ol class="historial">
+                  @for (ev of historial(); track ev.eventoId) {
+                    <li class="historial__evento">
+                      <strong>{{ etiquetaEvento[ev.tipo] }}</strong>
+                      <span class="sub">{{ ev.fecha | date: 'd MMM y, h:mm a' }}</span>
+                      <span>{{ ev.descripcion }}</span>
+                      @if (ev.profesional || ev.equipo) {
+                        <span class="sub">{{ ev.profesional ?? '' }}{{ ev.profesional && ev.equipo ? ' · ' : '' }}{{ ev.equipo ? etiquetaEquipo[ev.equipo] : '' }}</span>
+                      }
+                      @if (ev.observaciones) {
+                        <span class="sub">Observaciones: {{ ev.observaciones }}</span>
+                      }
+                    </li>
+                  }
+                </ol>
+              }
+            </section>
+          </aside>
+        </div>
+      }
+    }
+  }
+</div>
