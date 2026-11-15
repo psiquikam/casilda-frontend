@@ -1,13 +1,13 @@
 # Módulo UAD Equipos 3 y 4: contratos y guía técnica
 
-**Estado (2026-11-15):** las Entregas 1 (bandejas NDI/NDA y evaluación) y 2 (bandeja de casos, Gestionar caso, historial, pruebas y traslado) funcionan con el adaptador mock. **El backend no tiene ninguna operación UAD**: todos los contratos están propuestos y ninguno implementado.
+**Estado (2026-11-15):** las Entregas 1 (bandejas NDI/NDA y evaluación) y 2 (bandeja de casos, Gestionar caso, historial, pruebas y traslado) y la queja anónima de la Entrega 3 funcionan con el adaptador mock. **El backend no tiene ninguna operación UAD**: todos los contratos están propuestos y ninguno implementado.
 
 | Documento | Para qué |
 |---|---|
 | [`openapi-uad.yaml`](openapi-uad.yaml) | **Fuente de verdad** de los contratos (OpenAPI 3.0.3). Cada operación lleva `x-estado` y `x-entrega`. |
 | [`AUDITORIA_UAD.md`](AUDITORIA_UAD.md) | Diagnóstico de los dos repositorios con evidencia, inventario de endpoints y tabla requisito → estado. |
 | [`MATRIZ_CONTRATOS_UAD.md`](MATRIZ_CONTRATOS_UAD.md) | Requisito → UI → tipo/schema → endpoint → estado, y mapeo contrato → TS → puerto → adaptadores. |
-| [`DECISIONES_PENDIENTES_UAD.md`](DECISIONES_PENDIENTES_UAD.md) | D-UAD-01…25: impacto, fuente, decisión provisional y quién valida. |
+| [`DECISIONES_PENDIENTES_UAD.md`](DECISIONES_PENDIENTES_UAD.md) | D-UAD-01…30: impacto, fuente, decisión provisional y quién valida. |
 
 ## 1. Arquitectura
 
@@ -63,6 +63,7 @@ npm start          # http://localhost:4200
 | `CAS-2026-000304` | Gestión finalizada por remisión: no aparece en la bandeja activa. |
 
    Para ver el traslado completo: con Equipo 3 finalice la instrucción de `CAS-2026-000301`, que sale de su bandeja; cambie el equipo simulado a Equipo 4 y aparece en decisión.
+7. Queja anónima (`/uad/queja-anonima`, **sin iniciar sesión**). También se llega desde el formulario general, paso del presunto agresor, junto a la selección de ruta. Al enviarla aparece un consecutivo `NDA-…`; inicie sesión como ADMIN y la verá en la pestaña NDA de la bandeja. El store del mock es único en la aplicación para que esto funcione. Se reinicia al recargar.
 
 ## 3. Alternar mock ↔ HTTP
 
@@ -111,9 +112,8 @@ Qué cubren:
 
 **Entrega 2: casos. Hecha en el frontend (mock).** Para pasar a HTTP depende de que Backend implemente las operaciones `x-entrega: 2` y de D-UAD-15, 20 a 25.
 
-**Entrega 3: transversal.** Depende de D-UAD-02, 04, 05, 16 y 17.
-- Pregunta de vinculación en el formulario general.
-- Queja anónima NDA.
-- "Mis reportes" con respuesta a la subsanación.
-- Remisión interna (cuando se aprueben sus campos) y notificaciones.
-- Cambio a HTTP real.
+**Entrega 3: transversal.**
+- **Hecho en el frontend (mock):** queja anónima NDA con envío sin credenciales y acceso desde el formulario general.
+- **Contrato en borrador, sin interfaz:** "Mis reportes" y la respuesta a la subsanación (bloqueados por D-UAD-16), y la remisión a otro actor de la Ruta (campos sin aprobar).
+- **Bloqueado por decisiones:** pregunta de vinculación de 10 opciones en el formulario general (D-UAD-05) y nacimiento de la NDI al radicar con ruta UAD (D-UAD-17).
+- **Pendiente de Backend:** cambio a HTTP real de las tres entregas.

@@ -37,11 +37,17 @@ Las fuentes usan siglas:
 | **D-UAD-23** | **Consulta de casos trasladados o finalizados.** | Medio. | BIT UAD-CAS-12 ("sin impedir acceso histórico autorizado"); ROL §3 | La bandeja muestra solo gestión activa del equipo en su fase. El equipo responsable puede abrir en solo lectura un caso que finalizó con él. El instructor pierde el acceso tras el traslado. El acceso histórico autorizado es una capacidad aparte, por definir con la matriz de permisos. | JUR, SEG |
 | **D-UAD-24** | **Mediación.** | Medio. | BIT §7 ("sujeto a procedencia"), §16 | Se muestra en el catálogo de decisión, deshabilitada, con el motivo "pendiente de validación jurídica" (VBG/VS). | JUR |
 | **D-UAD-25** | **Corrección del expediente UAD.** | Bajo. | BIT UAD-ID-07, UAD-HIS-08 | Editable mientras la gestión está activa. Cada cambio deja un evento con valor anterior y nuevo; no hay sobrescritura silenciosa. | JUR, DEV |
+| **D-UAD-26** | **Seguimiento de una NDA.** | Medio. | BIT UAD-NOT-02 (la consulta en "Mis reportes" es para el reportante identificado); §13 | La NDA no tiene dueño, así que no aparece en "Mis reportes". La confirmación entrega el consecutivo como referencia y dice que la UAD no podrá contactar ni informar el resultado. Una consulta pública por consecutivo exigiría otra decisión de seguridad (enumeración, fuerza bruta). | JUR, SEG |
+| **D-UAD-27** | **Evidencias en la NDA.** | Medio. | BIT UAD-FOR-08 (adjuntos en el formulario general), §10 | El formulario NDA no recibe archivos por ahora y lo dice. Los archivos pueden revelar identidad (metadatos EXIF, autoría de PDF), así que antes hay que definir la política de carga y la limpieza de metadatos. | SEG, JUR |
+| **D-UAD-28** | **Contacto voluntario en la NDA.** | Bajo. | BIT §13 ("una denuncia anónima sin contacto no permite aviso personal") | No se pide contacto. La frase de la bitácora sugiere que podría ofrecerse uno opcional; queda para decisión de la UAD, porque un contacto convierte la queja en parcialmente identificada. | JUR, PROD |
+| **D-UAD-29** | **Abuso del canal público.** | Medio. | Seguridad del endpoint público | El contrato propone 429 por tasa de envíos sin guardar el origen en la noticia. No se agregó captcha: requiere un proveedor externo y su análisis de privacidad. | SEG, DEV |
+| **D-UAD-30** | **Peticiones sin credenciales.** | Bajo. | `auth.interceptor.ts` | Nuevo `SIN_CREDENCIALES` (`HttpContextToken`): la petición marcada sale sin `Authorization` y un 401 no cierra la sesión. Es opt-in; el resto de peticiones no cambia. El servidor igual debe ignorar tokens en `POST /uad/noticias-anonimas`. | DEV, SEG |
 
 ## Supuestos reversibles adoptados en la UI (no bloqueantes)
 
 - Pestañas NDI y NDA en la misma vista, con estado en `?tipo=` (sin datos sensibles en la URL).
 - El `noticiaId` técnico va en la ruta (`/uad/noticias/:noticiaId`); el consecutivo no se usa como clave. Lo mismo con `casoUadId` en `/uad/casos/:casoUadId`.
+- La queja anónima es una ruta pública aparte (`/uad/queja-anonima`), detrás del flag `uadQuejaAnonima`: apagada en producción hasta que exista el endpoint, encendida en desarrollo y en la demo.
 - En "Gestionar caso" la fase se muestra, pero no se elige: solo cambia con "Finalizar etapa de instrucción". El prototipo (p. 10–11) la mostraba como lista desplegable.
 - No se guarda nada en `localStorage` ni `sessionStorage`. El mock vive en memoria y se reinicia al recargar.
 - La interfaz deshabilita y explica las acciones según `accionesDisponibles` y `motivosNoDisponible` del servidor. **No es un control de seguridad.**

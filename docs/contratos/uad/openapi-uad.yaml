@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: CASILDA — Módulo UAD (Equipos 3 y 4)
-  version: 0.2.0-propuesta
+  version: 0.3.0-propuesta
   description: |
     Contrato **Contract First** del módulo Unidad de Asuntos Disciplinarios (UAD), Equipos 3 y 4.
 
@@ -31,7 +31,8 @@ info:
     - Ninguna operación de este contrato envía correo ni documentos a autoridades externas (UAD-REM-04/05).
 
     Entregas: las operaciones con `x-entrega: 1` (noticias y evaluación) y `x-entrega: 2` (casos) respaldan la
-    interfaz ya construida con el adaptador mock. Las de `x-entrega: 3` son propuesta inicial, sin interfaz todavía.
+    interfaz ya construida con el adaptador mock. De la `x-entrega: 3`, `radicarNoticiaAnonima` ya tiene interfaz
+    con mock; «Mis reportes», la respuesta a la subsanación y la remisión a la Ruta son borradores sin interfaz.
   contact:
     name: Frontend CASILDA
 servers:
@@ -660,9 +661,19 @@ paths:
       operationId: radicarNoticiaAnonima
       summary: Radicar una queja anónima (NDA)
       description: |
-        UAD-FOR-12, UAD-NOT-04, UAD-SEG-06. Endpoint **público** (`publico=true` en `endpoint`). El servidor
-        **no** asocia la identidad aunque llegue un JWT: debe ignorarlo para esta ruta. Retención de IP en
-        logs/proxies es política de infraestructura (D-UAD-02), no garantía del frontend.
+        UAD-FOR-12, UAD-NOT-01/02/04/09, UAD-SEG-06. Endpoint **público** (`publico=true` en `endpoint`).
+
+        Garantías que debe dar el **servidor** (el frontend no puede darlas):
+        - No asocia identidad aunque llegue un `Authorization`: lo ignora en esta ruta. El frontend ya envía
+          la petición sin credenciales (`SIN_CREDENCIALES` en `auth.interceptor.ts`).
+        - No registra en la noticia IP, user-agent ni identificadores de sesión. Retención en logs de Tomcat,
+          proxies y balanceador: política de infraestructura (D-UAD-02).
+        - Asigna el consecutivo `NDA-AAAA-NNNNNN` de una secuencia propia, distinta de la NDI (UAD-ID-02).
+        - Crea la noticia en estado `RECIBIDA`, origen `FORMULARIO_ANONIMO`, visible a ambos equipos (UAD-NOT-09).
+        - No la descarta por ser anónima (UAD-NOT-04).
+        - Limita la tasa de envíos por origen para evitar abuso (**429**), sin guardar el origen en la noticia (D-UAD-29).
+
+        Sin datos de contacto ni evidencias por ahora (D-UAD-27, D-UAD-28). Responde **201**: crea un recurso nuevo.
       security: []
       x-estado: PROPUESTO — NO IMPLEMENTADO
       x-entrega: 3
@@ -670,24 +681,74 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              type: object
-              required: [descripcionHechos]
-              properties:
-                descripcionHechos: { type: string, maxLength: 4000 }
-                lugarOcurrencia: { type: string, nullable: true }
-                vinculacionDeclarada: { $ref: '#/components/schemas/VinculacionInvestigado' }
-                presuntoResponsable: { type: string, nullable: true, maxLength: 300 }
+            schema: { $ref: '#/components/schemas/RadicacionNdaRequest' }
+            example:
+              descripcionHechos: Relato ficticio de prueba sobre una situación en un espacio académico.
+              lugarOcurrencia: null
+              presuntoResponsable: Descripción ficticia
+              vinculacionDeclarada: NO_SE
       responses:
         '201':
-          description: Radicada (crea un recurso nuevo); devuelve solo el consecutivo NDA.
+          description: Radicada. Solo devuelve el consecutivo y la fecha; nunca datos de quien envía.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RadicacionNdaResponse' }
+              example: { consecutivo: NDA-2026-000023, fechaRecepcion: '2026-11-15T20:00:00Z' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '429':
+          description: Demasiados envíos desde el mismo origen en poco tiempo (`codigo` `DEMASIADOS_ENVIOS`).
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+
+  /mis-reportes:
+    get:
+      tags: [uad-radicacion]
+      operationId: listarMisReportes
+      summary: 'BORRADOR — «Mis reportes» del usuario autenticado'
+      description: |
+        UAD-NOT-02, UAD-EVA-04; catálogo de roles §3.e (usuario general). Solo los reportes **del usuario
+        autenticado**, filtrados en el servidor por dueño. Estado operativo autorizado, sin notas
+        reservadas ni datos de otros actores. Indica si hay una solicitud de información pendiente.
+        Bloqueado por D-UAD-16: hoy `/solicitudes` no filtra por dueño; el mismo error aquí expondría
+        reportes ajenos. Las NDA no aparecen: no tienen dueño (UAD-NOT-04).
+      x-estado: PROPUESTO — NO IMPLEMENTADO — PENDIENTE DE VALIDACIÓN
+      x-entrega: 3
+      x-roles: [USUARIO]
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: Página de reportes propios
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  consecutivo: { type: string, example: NDA-2026-000001 }
-                  fechaRecepcion: { type: string, format: date-time }
+                  content: { type: array, items: { $ref: '#/components/schemas/MiReporteResumen' } }
+                  totalElements: { type: integer }
+                  totalPages: { type: integer }
+                  number: { type: integer }
+                  size: { type: integer }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+
+  /mis-reportes/{codigo}:
+    get:
+      tags: [uad-radicacion]
+      operationId: obtenerMiReporte
+      summary: 'BORRADOR — Detalle de un reporte propio con su solicitud de información vigente'
+      description: |
+        404 si el reporte no es del usuario (no revela que existe). Incluye la solicitud de información de la
+        UAD pendiente, para responderla con `responderSolicitudInformacion`.
+      x-estado: PROPUESTO — NO IMPLEMENTADO — PENDIENTE DE VALIDACIÓN
+      x-entrega: 3
+      x-roles: [USUARIO]
+      parameters:
+        - { name: codigo, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Reporte, content: { application/json: { schema: { $ref: '#/components/schemas/MiReporteDetalle' } } } }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
   /reportes/{codigo}/solicitudes-informacion/{solicitudId}/respuesta:
     post:
       tags: [uad-radicacion]
@@ -695,8 +756,9 @@ paths:
       summary: Responder desde «Mis reportes» una solicitud de información (texto + evidencias)
       description: |
         UAD-EVA-04/05. Pasa la noticia a `SUBSANACION_RECIBIDA`. Solo el reportante identificado dueño del
-        reporte. Depende de que exista «Mis reportes» (hoy no existe `GET /reportes`, ver auditoría).
-      x-estado: PROPUESTO — NO IMPLEMENTADO
+        reporte. Depende de «Mis reportes» (`listarMisReportes`), bloqueado por D-UAD-16. Límites de
+        archivos: los del reporte real (`ReporteEvidenciaStorageService`), PENDIENTES de confirmar para UAD.
+      x-estado: PROPUESTO — NO IMPLEMENTADO — PENDIENTE DE VALIDACIÓN
       x-entrega: 3
       parameters:
         - { name: codigo, in: path, required: true, schema: { type: string } }
@@ -713,6 +775,9 @@ paths:
                 evidencias: { type: array, items: { type: string, format: binary } }
       responses:
         '200': { description: Respuesta registrada }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
         '409': { $ref: '#/components/responses/Conflicto' }
 
 components:
@@ -1226,6 +1291,42 @@ components:
         estadoNuevo: { type: string, nullable: true }
         observaciones: { type: string, nullable: true }
 
+    RadicacionNdaRequest:
+      type: object
+      description: Sin identidad ni contacto de quien envía (UAD-NOT-04). Ningún campo se precarga desde la sesión.
+      required: [descripcionHechos]
+      properties:
+        descripcionHechos: { type: string, minLength: 20, maxLength: 4000 }
+        lugarOcurrencia: { type: string, nullable: true, maxLength: 300 }
+        presuntoResponsable: { type: string, nullable: true, maxLength: 300, description: Nombre o descripción de la persona señalada. }
+        vinculacionDeclarada:
+          allOf: [{ $ref: '#/components/schemas/VinculacionInvestigado' }]
+          nullable: true
+          description: Opcional. Orienta la competencia; las NDA son visibles a ambos equipos de todos modos.
+    RadicacionNdaResponse:
+      type: object
+      required: [consecutivo, fechaRecepcion]
+      properties:
+        consecutivo: { type: string, pattern: '^NDA-\d{4}-\d{6}$' }
+        fechaRecepcion: { type: string, format: date-time }
+    MiReporteResumen:
+      type: object
+      description: BORRADOR. Solo información autorizada para la persona usuaria (catálogo de roles §3.e).
+      required: [codigo, actor, estado, fechaRegistro]
+      properties:
+        codigo: { type: string, description: 'Consecutivo visible (p. ej. NDI-2026-000148).' }
+        actor: { type: string, enum: [EQUIPO_ATENCION, LINEA_ALMA, SEGURIDAD, UAD] }
+        asunto: { type: string, nullable: true }
+        estado: { type: string, description: Estado operativo autorizado, en lenguaje para la persona usuaria. }
+        fechaRegistro: { type: string, format: date-time }
+        fechaUltimaActuacion: { type: string, format: date-time, nullable: true }
+        solicitudPendiente: { type: boolean }
+    MiReporteDetalle:
+      allOf:
+        - $ref: '#/components/schemas/MiReporteResumen'
+        - type: object
+          properties:
+            solicitudInformacion: { $ref: '#/components/schemas/SolicitudInformacionVigente' }
     ActuacionDisponible:
       type: object
       required: [codigo, nombre, permanente, ejecutable, pendienteValidacion]

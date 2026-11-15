@@ -92,13 +92,13 @@ Hoy no hay un único "ID de caso Casilda" transversal. El contrato UAD trata `ca
 | Requisito / capacidad | UI existente | Endpoint real | Evidencia | Ajuste / contrato propuesto | Estado |
 |---|---|---|---|---|---|
 | Roles UAD (catálogo) | No | No | `initial_data.sql` (roles 1–6) | Crear `UAD_COORDINACION/EQUIPO_3/EQUIPO_4` por SQL y registrar rutas en `endpoint` | NO ENCONTRADO |
-| P-UAD-01 Activación general → UAD (UAD-FOR-01 a 11) | Formulario de reporte con `remitirUad` | `POST /reportes` | `ReporteCasoController`, `reporte-caso.service.ts` | Reemplazar `remitirUad` por vinculación (10 valores) y crear NDI al radicar con ruta UAD | ADAPTACIÓN |
-| P-UAD-02 Queja anónima NDA (UAD-FOR-12, SEG-06) | `/nueva-queja` (prototipo) | No | `formulario-queja.component.ts` | `POST /uad/noticias-anonimas` (público, ignora JWT) | NO ENCONTRADO |
+| P-UAD-01 Activación general → UAD (UAD-FOR-01 a 11) | Formulario de reporte con `remitirUad`; desde la E3, enlace a la queja anónima | `POST /reportes` | `ReporteCasoController`, `reporte-caso.service.ts` | Reemplazar `remitirUad` por vinculación (10 valores) y crear NDI al radicar con ruta UAD | ADAPTACIÓN |
+| P-UAD-02 Queja anónima NDA (UAD-FOR-12, SEG-06) | **Sí (E3, mock):** `/uad/queja-anonima`. El prototipo `/nueva-queja` sigue aparte, sin tocar | No | `paginas/queja-anonima/` | `POST /uad/noticias-anonimas` (público, ignora JWT; el front envía sin credenciales) | PROPUESTO + UI MOCK |
 | P-UAD-03 Bandejas NDI/NDA (UAD-NOT-01 a 12) | **Sí (nuevo, mock)** | No | `src/app/uad/paginas/bandeja-noticias/` | `GET /uad/noticias` | PROPUESTO + UI MOCK |
 | P-UAD-04 Evaluación preliminar (UAD-EVA-01 a 12) | **Sí (nuevo, mock)** | No | `src/app/uad/paginas/evaluacion-noticia/` | `GET /uad/noticias/{id}`, `POST …/decisiones`, `GET …/historial` | PROPUESTO + UI MOCK |
 | P-UAD-05 Casos asociados (UAD-EVA-06 a 09) | **Sí (nuevo, mock)** | No | `componentes/casos-asociados/` | `GET /uad/noticias/{id}/casos-asociados` | PROPUESTO + UI MOCK |
 | Reclasificación y concurrencia (UAD-NOT-07/08) | **Sí (nuevo, mock)** | No | `POST …/clasificacion`, `version` + 409 | Requiere `@Version` o equivalente en backend | PROPUESTO + UI MOCK |
-| Subsanación desde "Mis reportes" (UAD-EVA-04/05) | No ("Mis reportes" no existe) | No | — | `POST /reportes/{codigo}/solicitudes-informacion/{id}/respuesta` | NO ENCONTRADO |
+| Subsanación desde "Mis reportes" (UAD-EVA-04/05) | No ("Mis reportes" no existe) | No | — | `GET /mis-reportes` (borrador) y `POST /reportes/{codigo}/solicitudes-informacion/{id}/respuesta` | NO ENCONTRADO; bloqueado por D-UAD-16 |
 | P-UAD-06 Bandeja de casos (UAD-CAS-01 a 12) | **Sí (E2, mock)** | No | `paginas/bandeja-casos/` | `GET /uad/casos` | PROPUESTO + UI MOCK |
 | P-UAD-07 Gestionar caso (bitácora §7–8) | **Sí (E2, mock)** | No | `paginas/gestionar-caso/` | `…/actuaciones/catalogo`, `POST …/actuaciones`, `…/traslado-decision`, `…/remisiones-competencia` | PROPUESTO + UI MOCK |
 | P-UAD-08 Historial (UAD-HIS-01 a 08) | **Sí (noticia y caso, mock)** | No | `paginas/gestionar-caso/` | `GET /uad/casos/{id}/historial`; rectificación pendiente | PROPUESTO + UI MOCK / PENDIENTE DE VALIDACIÓN (rectificación) |

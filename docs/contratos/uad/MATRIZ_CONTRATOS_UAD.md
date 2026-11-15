@@ -57,14 +57,16 @@ Cuando una fila dice **PROPUESTO**, el endpoint no existe en el backend (ver `AU
 | UAD-REM-01 a 06 Remisión desde Gestionar caso | Acción permanente con formulario | `RemisionCompetenciaCasoRequest` | `POST …/remisiones-competencia` (`remitirCasoPorCompetencia`) | PROPUESTO, UI mock |
 | Inhibitorio, Terminación, Remisión a la Ruta | Visibles y deshabilitadas con motivo | `pendienteValidacion` | — | PENDIENTE DE VALIDACIÓN |
 
-## Entrega 3 (solo contrato inicial)
+## Entrega 3 (transversal: queja anónima implementada; el resto en borrador)
 
 | Requisito | UI | Schema | Endpoint propuesto | Estado |
 |---|---|---|---|---|
 | UAD-RUT-01 a 05 Remisión a actor de la Ruta | — | (borrador) | `POST /uad/casos/{id}/remisiones-ruta` | PENDIENTE DE VALIDACIÓN |
-| UAD-FOR-01 a 11 Formulario general | Formulario de reporte existente | `ReporteCasoRequest` (real) | `POST /reportes` (real) | ADAPTACIÓN (E3) |
-| UAD-FOR-12, UAD-SEG-06 Queja anónima NDA | `/nueva-queja` (prototipo, no conectado) | — | `POST /uad/noticias-anonimas` | NO ENCONTRADO → PROPUESTO (E3) |
-| UAD-EVA-04 Respuesta desde "Mis reportes" | No existe "Mis reportes" | — | `POST /reportes/{codigo}/solicitudes-informacion/{id}/respuesta` | NO ENCONTRADO → PROPUESTO (E3) |
+| UAD-FOR-01 a 11 Formulario general | Formulario de reporte existente; **solo se agregó el acceso a la queja anónima** | `ReporteCasoRequest` (real) | `POST /reportes` (real) | ADAPTACIÓN, bloqueado por D-UAD-05 y D-UAD-17 |
+| UAD-FOR-12 Acceso visible a la queja anónima | Enlace junto a la selección de ruta en `formulario-anonimo` (flag `uadQuejaAnonima`) | — | — | Hecho (UI) |
+| UAD-FOR-12, UAD-NOT-02/04, UAD-SEG-06 Queja anónima NDA | `paginas/queja-anonima` (`/uad/queja-anonima`, pública, flag `uadQuejaAnonima`) | `RadicacionNdaRequest/Response` | `POST /uad/noticias-anonimas` (`radicarNoticiaAnonima`), sin credenciales | PROPUESTO, UI mock |
+| UAD-NOT-02, UAD-EVA-04 "Mis reportes" | No existe "Mis reportes" | `MiReporteResumen`, `MiReporteDetalle` | `GET /mis-reportes`, `GET /mis-reportes/{codigo}` | BORRADOR, bloqueado por D-UAD-16 |
+| UAD-EVA-04/05 Respuesta a la subsanación | — | multipart `respuesta` + `evidencias` | `POST /reportes/{codigo}/solicitudes-informacion/{id}/respuesta` | BORRADOR, depende de "Mis reportes" |
 
 ## Mapeo contrato → TypeScript → puerto → adaptadores
 
@@ -88,4 +90,5 @@ Cuando una fila dice **PROPUESTO**, el endpoint no existe en el backend (ver `AU
 | `ExpedienteRequest` → `ResultadoAccionCaso` | ídem | `registrarExpediente(id, cuerpo)` | `PATCH …/expediente` | Guarda valor anterior y nuevo en el historial. |
 | `TrasladoRequest` → `ResultadoAccionCaso` | ídem | `finalizarInstruccion(id, cuerpo)` | `POST …/traslado-decision` | Cambia fase y equipo; `visibleParaUsuario: false` para el instructor. |
 | `RemisionCompetenciaCasoRequest` → `ResultadoAccionCaso` | ídem | `remitirCasoPorCompetencia(id, cuerpo)` | `POST …/remisiones-competencia` | Gestión UAD `FINALIZADA`; no envía nada. |
+| `RadicacionNdaRequest` → `RadicacionNdaResponse` | ídem | `UadRadicacionPort.radicarNoticiaAnonima(cuerpo)` | `POST /uad/noticias-anonimas` con `SIN_CREDENCIALES` | `UadMockStore.radicarNda()`: consecutivo NDA, sin reportante ni contacto; aparece en la bandeja NDA. |
 | `ErrorResponse` / `ValidationErrorResponse` | `ErrorResponseUad` → `ErrorUad` | (errores de todos) | `interpretarErrorUad` | Mismo intérprete, desde `HttpErrorResponse` simulado. |
