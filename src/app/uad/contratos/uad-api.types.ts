@@ -381,6 +381,23 @@ export interface FiltroCasosUad {
   readonly size: number;
 }
 
+/**
+ * Queja anónima (NDA), `POST /uad/noticias-anonimas`. Sin identidad ni contacto de quien envía
+ * (UAD-NOT-04); ningún campo se precarga desde la sesión.
+ */
+export interface RadicacionNdaRequest {
+  readonly descripcionHechos: string;
+  readonly lugarOcurrencia: string | null;
+  readonly presuntoResponsable: string | null;
+  readonly vinculacionDeclarada: VinculacionInvestigado | null;
+}
+
+/** Solo el consecutivo y la fecha: nunca datos de quien envía. */
+export interface RadicacionNdaResponse {
+  readonly consecutivo: string;
+  readonly fechaRecepcion: string;
+}
+
 /** Cuerpo de error real del backend (`ErrorResponse`/`ValidationErrorResponse`) + `codigo` propuesto. */
 export interface ErrorResponseUad {
   readonly timestamp?: string;

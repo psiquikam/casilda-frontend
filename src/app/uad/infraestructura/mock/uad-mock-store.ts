@@ -3,11 +3,12 @@ import { CasoAsociado, EquipoUad, EventoHistorial, FaseUad, TipoEventoHistorial 
 import { CasoUadMock, NoticiaMock, sembrarCasosPorPersona, sembrarCasosUad, sembrarHistorialCasos, sembrarNoticias } from './uad-mock-seed';
 
 /**
- * Estado en memoria del «servidor» simulado UAD. Vive mientras viva el inyector de las rutas UAD
- * (se reinicia al recargar la página). **No** escribe en `localStorage`/`sessionStorage`: los datos,
- * aunque ficticios, tienen forma de información reservada.
+ * Estado en memoria del «servidor» simulado UAD. Es único en la aplicación (`providedIn: 'root'`) para
+ * que la queja anónima radicada en la ruta pública aparezca en la bandeja NDA, como pasaría con el
+ * servidor real. Solo se instancia si algún adaptador mock lo pide: con `'http'` nunca se crea.
+ * Se reinicia al recargar la página. **No** escribe en `localStorage`/`sessionStorage`.
  */
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class UadMockStore {
   noticias: NoticiaMock[] = sembrarNoticias();
   casosPorPersona: Map<string, CasoAsociado[]> = sembrarCasosPorPersona();
@@ -67,6 +68,45 @@ export class UadMockStore {
     };
     this.historialCasos.set(casoUadId, [...(this.historialCasos.get(casoUadId) ?? []), evento]);
     return evento;
+  }
+
+  /**
+   * Radica una NDA como lo haría el servidor: consecutivo de la secuencia NDA (UAD-ID-02), estado
+   * `RECIBIDA`, origen `FORMULARIO_ANONIMO`, sin reportante, contacto ni clave de persona (UAD-NOT-04).
+   */
+  radicarNda(datos: { descripcionHechos: string; lugarOcurrencia: string | null; presuntoResponsable: string | null; vinculacionDeclarada: NoticiaMock['vinculacionDeclarada'] }): NoticiaMock {
+    const anio = new Date().getFullYear();
+    const siguiente =
+      Math.max(0, ...this.noticias.filter((n) => n.tipo === 'NDA').map((n) => Number(n.consecutivo.slice(-6)) || 0)) + 1;
+    const noticia: NoticiaMock = {
+      noticiaId: this.siguienteId('mock-nda'),
+      consecutivo: `NDA-${anio}-${String(siguiente).padStart(6, '0')}`,
+      tipo: 'NDA',
+      casoId: null,
+      expedienteUad: null,
+      casoUadId: null,
+      origen: { tipo: 'FORMULARIO_ANONIMO', actorRemitente: null },
+      fechaRecepcion: new Date().toISOString(),
+      estado: 'RECIBIDA',
+      version: 1,
+      vinculacionDeclarada: datos.vinculacionDeclarada,
+      vinculacionClasificada: null,
+      reportante: null,
+      personaAfectada: null,
+      hechos: { descripcion: datos.descripcionHechos, lugarOcurrencia: datos.lugarOcurrencia, presuntoResponsable: datos.presuntoResponsable },
+      evidencias: [],
+      solicitudInformacion: null,
+      revisionConcurrente: null,
+      telefono: null,
+      correo: null,
+      personaClave: null
+    };
+    this.noticias.push(noticia);
+    this.registrarEvento(noticia.noticiaId, 'NOTICIA_RECIBIDA', `Se registró la noticia ${noticia.consecutivo} (formulario de queja anónima).`, {
+      fecha: noticia.fechaRecepcion,
+      estadoNuevo: 'RECIBIDA'
+    });
+    return noticia;
   }
 
   buscar(noticiaId: string): NoticiaMock | undefined {
