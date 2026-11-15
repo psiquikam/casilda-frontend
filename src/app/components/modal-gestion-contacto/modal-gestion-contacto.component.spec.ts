@@ -33,4 +33,14 @@ describe('ModalGestionComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('acepta observaciones cortas y rechaza vacías o solo espacios', () => {
+    const observacion = component.contactoForm.get('observacion')!;
+    observacion.setValue('Sí');
+    expect(observacion.valid).toBeTrue();
+    observacion.setValue('   ');
+    expect(observacion.invalid).toBeTrue();
+    observacion.setValue('');
+    expect(observacion.invalid).toBeTrue();
+  });
 });
