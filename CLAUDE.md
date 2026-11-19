@@ -3,8 +3,8 @@
 > Archivo vivo. Se actualiza al cerrar cada fase de trabajo para que cualquier
 > sesión posterior (humana o asistida) retome sin repetir el análisis.
 >
-> **Última actualización:** 11 de noviembre de 2026 (reporte de caso: contrato v2 completo, evidencias y catálogos;
-> antes, Línea Alma Psicología y APH)
+> **Última actualización:** 14 de noviembre de 2026 (módulo UAD Equipos 3 y 4, Entrega 1 contract-first con adaptador
+> mock; antes, reporte de caso v2 y Línea Alma)
 
 ---
 
@@ -34,6 +34,7 @@ Documentos de referencia, en orden de precedencia para decisiones de diseño:
 | `docs/contratos/contrato-reportar-caso.md` | Contrato con Backend para crear reportes desde `/reportar-caso` y el reporte anónimo. El §0 (2026-11-11) recoge el contrato v2 implementado (víctima, contacto, presunto agresor, evidencias multipart, maestros) y los pendientes P-REP-01…05. |
 | `docs/contratos/contrato-consultar-reporte.md` | Propuesta de `GET /reportes/{codigo}` para «Seguimiento de trámite». Hoy no existe ningún endpoint de consulta por código. |
 | `docs/contratos/linea-alma/` | Contratos para Backend de Línea Alma: APH (`README.md` con guía, plantilla y decisiones D-ALMA-01…13; atenciones/triaje/derivación; derivaciones, bandeja, contención y auditoría) y **Psicología** (`contrato-psicologia-bandeja-novedades.md`, `contrato-psicologia-casos-seguimientos-recontactos.md`, decisiones D-PSI-01…19). Plan: `docs/plan-implementacion-front-linea-alma.md`. |
+| `docs/contratos/uad/` | Módulo UAD Equipos 3 y 4: `openapi-uad.yaml` (**fuente de verdad** de los contratos, todos `PROPUESTO — NO IMPLEMENTADO`), auditoría de ambos repos, matriz requisito→contrato y `DECISIONES_PENDIENTES_UAD.md` (D-UAD-01…19). |
 | `.claude/skills/contrato-backend/SKILL.md` | Skill para redactar contratos de API para Backend a partir del código del front. ⚠️ **Solo local**: misma regla `skills/` de `.gitignore` (ver pendiente 11). |
 
 ## 2. Stack y comandos
@@ -122,6 +123,12 @@ espaciados ni radios literales**: siempre `var(--token)`.
 | `AlertaGestionSimultaneaComponent` | `src/app/linea-alma/shared/components/alerta-gestion-simultanea/` | Caso con actuaciones activas en Equipo de Atención y Línea Alma (Q15). La usan APH y Psicología. |
 | `ROLES_HABILITADOS_PSICOLOGIA` · `psicologiaHabilitadaGuard` · `AlmaPermisosService.psicologiaHabilitada()` | `src/app/linea-alma/psicologia/psicologia-habilitacion.ts` | Despliegue controlado del submódulo Psicología: **hoy solo ADMIN** ve y entra; para abrirlo a otro rol basta añadirlo a la lista (menú, catálogo y guard la leen). |
 | `NotificacionesPsicologiaService` | `src/app/linea-alma/psicologia/services/` | Polling cada 30 s de `GET /psicologia/notificaciones` detrás de una abstracción intercambiable por SSE/WebSocket (Q7). |
+| `UadApiPort` · `UadHttpAdapter` · `UadMockAdapter` · `provideUadApi()` | `src/app/uad/` | Puerto del módulo UAD y sus dos adaptadores; `environment.uad.adaptador` elige (`'mock'` en desarrollo, `'http'` en prod). Se provee en las rutas `/uad`, no en la raíz. |
+| `UadFacade` · `interpretarErrorUad()` | `src/app/uad/servicios/`, `infraestructura/uad-error.ts` | Lo único que inyectan las páginas UAD; errores del `ErrorResponse` real del backend traducidos a `ErrorUad`, igual en mock y HTTP. |
+| `competencia.ts` · `decision-evaluacion.ts` · `etiquetas.ts` | `src/app/uad/dominio/` | Reglas puras de reparto Equipo 3/4 y de la decisión de evaluación; **único lugar** de etiquetas de los enums UAD. |
+| `SIN_CREDENCIALES` | `src/app/services/auth.interceptor.ts` | `HttpContextToken` opt-in: la petición marcada sale sin `Authorization` y un 401 no cierra la sesión. Lo usa la queja anónima UAD; el servidor igual debe ignorar tokens en esa ruta. |
+| `UadRadicacionPort` · `provideUadRadicacion()` | `src/app/uad/` | Radicación **pública** UAD (queja anónima NDA), separada de `UadApiPort`; ruta `/uad/queja-anonima` fuera de `roleGuard`, flag `uadQuejaAnonima`. |
+| `ROLES_UAD` · `AuthService.puedeVerUad()` | `src/app/services/auth.service.ts` | Roles `UAD_COORDINACION`/`UAD_EQUIPO_3`/`UAD_EQUIPO_4` (catálogo propuesto; **aún no existen en el backend**). |
 | `protocolo-intentos.ts` · `seguimientos.ts` | `src/app/linea-alma/psicologia/dominio/` | Reglas puras con pruebas: protocolo de 9 intentos (RN-ALMA-03), contador de controles que no bloquea (RN-ALMA-05), fecha futura, conversión `datetime-local` ↔ ISO. |
 
 ## 5. Bitácora de avances
@@ -459,6 +466,51 @@ con parte `evidencias`); el front solo enviaba documento, fecha de nacimiento, l
   (P-REP-03); no hay consulta por código para «Seguimiento de trámite» (P-REP-04, contrato propuesto en
   `docs/contratos/contrato-consultar-reporte.md`).
 
+### 2026-11-14 — Módulo UAD Equipos 3 y 4, Entrega 1 (contract-first, adaptador mock)
+Rama `feature/06/20/casilda/modulo-uad`. Contratos y auditoría en `docs/contratos/uad/`. Backend auditado en solo lectura
+(`feature/06/20/casilda/modulo-uad-back`): **no hay nada UAD** (ni rutas, ni entidades, ni roles).
+
+- **Contrato primero:** `openapi-uad.yaml` con las convenciones reales del backend (`/api/v1`, `ErrorResponse`, 400 para
+  validación, `Page` de Spring, `MaestroDTO`) y `version` + 409 para concurrencia. Entrega 1 detallada; E2/E3 como propuesta.
+- **Código** en `src/app/uad/`: tipos espejo del OpenAPI, puerto, adaptadores HTTP y mock (escenarios sintéticos de la bitácora),
+  `UadFacade`, bandejas NDI/NDA (`/uad/noticias`), evaluación preliminar con las cuatro decisiones y casos asociados
+  (`/uad/noticias/:id`) y bandeja de casos de solo lectura (`/uad/casos`). Menú: sección «UAD Equipos 3 y 4».
+- **`AuthService`:** roles UAD. `normalizarCodigoRol('UAD_COORDINACION')` devolvía `COORDINADOR` (contiene «COORD») y el
+  nombre «Profesional Equipo 3» daba `PROFESIONAL`: corregido con pruebas.
+- **No se tocó** el formulario de reporte: su pregunta `remitirUad` (sí/no, solo para comunidad UdeA) no es la de
+  UAD-FOR-10/11 (D-UAD-05); queda para la Entrega 3.
+
+### 2026-11-15 — Configuración de demostración para Vercel
+`environment.demo.ts` hereda de `environment.prod.ts` y solo simula los módulos sin backend: UAD (`uad.adaptador = 'mock'`)
+y todos los grupos de `lineaAlma.mocks` (generados desde las claves de producción). Se compila con
+`npm run build:demo` (`--configuration production,demo`) y se publica como vista previa con `npm run deploy:vercel:demo`.
+`npm run build`, `deploy:vercel:preview` y `deploy:vercel` no cambian. `environments.spec.ts` impide que producción simule.
+Se entra con un usuario ADMIN real de QA; las cuentas de prueba siguen apagadas (`datosDemostracion: false`).
+
+### 2026-11-15 — Módulo UAD, Entrega 2 (casos, adaptador mock)
+Contrato `openapi-uad.yaml` v0.2.0 con las 9 operaciones de casos (`x-entrega: 2`); decisiones nuevas D-UAD-20…25.
+
+- **`/uad/casos`**: bandeja activa por equipo y fase con «Gestionar caso». **`/uad/casos/:casoUadId`**: cabecera con
+  identificadores y expediente UAD editable con auditoría; actuaciones ordinarias por fase/equipo (bitácora §7) con
+  confirmación y observaciones opcionales; acciones permanentes siempre visibles (§8), con inhibitorio, terminación,
+  remisión a la Ruta y mediación deshabilitadas por validación jurídica; «Finalizar etapa de instrucción» con casilla y
+  diálogo (el caso sale de la bandeja del instructor y llega a la del decisor con su historial); remisión por competencia
+  que finaliza la gestión UAD sin cerrar el caso CASILDA; historial del caso y pruebas con descarga (carga deshabilitada).
+- **Regla de incompatibilidad (D-UAD-20):** ordinarias y permanentes van en operaciones distintas.
+- `dominio/catalogo-actuaciones.ts` concentra el catálogo; el mock y la documentación lo comparten.
+
+### 2026-11-15 — Módulo UAD, Entrega 3 (parte transversal que no depende de decisiones)
+Contrato `openapi-uad.yaml` v0.3.0; decisiones nuevas D-UAD-26…30.
+
+- **Queja anónima NDA** (`/uad/queja-anonima`, pública, carga diferida, flag `uadQuejaAnonima`: `false` en producción porque
+  el backend no tiene el endpoint, `true` en desarrollo y en la demo). No pide identidad ni contacto, no precarga la sesión,
+  `autocomplete="off"`, no guarda nada en el navegador y no promete anonimato técnico absoluto. Muestra solo el consecutivo
+  NDA del servidor. En mock aparece en la pestaña NDA de ambos equipos: `UadMockStore` pasó a `providedIn: 'root'`.
+- **`SIN_CREDENCIALES`** en `authInterceptor` para que la NDA no viaje con el token de quien tenga sesión abierta.
+- **Formulario general:** enlace visible a la queja anónima junto a la selección de ruta (UAD-FOR-12), detrás del mismo flag.
+  La pregunta de vinculación de 10 opciones **no** se cambió (bloqueada por D-UAD-05).
+- **«Mis reportes»** y la respuesta a la subsanación: solo contrato en borrador, bloqueados por D-UAD-16.
+
 ### Pendiente
 0. **Línea Alma Psicología:** Backend debe revisar D-PSI-01…19 (entidad de la novedad antes del caso, `tomadaPorMi`,
    SLA, PDF síncrono, contención puntual); el equipo debe decidir qué roles se habilitan además de ADMIN
@@ -566,6 +618,9 @@ con parte `evidencias`); el front solo enviaba documento, fecha de nacimiento, l
 16. **Seguimiento de trámite sin endpoint:** `/seguimiento` sigue simulando resultados y los diálogos de
     éxito prometen una consulta que no existe. Contrato propuesto en
     `docs/contratos/contrato-consultar-reporte.md`; hasta que exista, mantener el flag `publicTrackingPrototype`.
+17. **UAD:** Backend debe implementar `openapi-uad.yaml` (Entregas 1, 2 y `POST /uad/noticias-anonimas`) y crear los roles `UAD_*` (D-UAD-01, 03, 14); el
+    equipo jurídico debe validar D-UAD-02…13 y 18–30; riesgo de privacidad fuera del módulo en `/solicitudes` (D-UAD-16). Hasta entonces, solo ADMIN
+    entra a `/uad` y lo hace con datos simulados.
 
 ## 6. Reglas que no se deben romper
 

@@ -96,30 +96,52 @@
       </mat-menu>
     }
 
-    <!-- 3. Línea Alma: Admin, Coordinador y Profesional entran por «Primer respondiente»; el Técnico APH y el Revisor por su propia pantalla -->
-    @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional()) {
-      <a mat-button routerLink="/linea-alma/atencion-pr" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
-        <mat-icon class="hnav-icon" aria-hidden="true">ring_volume</mat-icon>
+    <!-- 3. Línea Alma: un solo desplegable, con las mismas opciones y reglas del menú lateral (cada opción según su permiso) -->
+    @if (muestraLineaAlma()) {
+      <button type="button" class="hnav-dropdown-btn" [class.hnav-item--active]="enLineaAlma()" [matMenuTriggerFor]="almaMenu"
+        aria-label="Abrir menú de Línea Alma">
+        <mat-icon class="hnav-icon" aria-hidden="true">health_and_safety</mat-icon>
         <span class="hnav-text">Línea Alma</span>
-      </a>
-    } @else if (alma.tiene('alma.aph.crear')) {
-      <a mat-button routerLink="/linea-alma/aph/nueva" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
-        <mat-icon class="hnav-icon" aria-hidden="true">add_ic_call</mat-icon>
-        <span class="hnav-text">Nueva atención</span>
-      </a>
-    }
-    @if (alma.tiene('alma.aph.bandeja')) {
-      <a mat-button routerLink="/linea-alma/aph/remisiones" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
-        <mat-icon class="hnav-icon" aria-hidden="true">forward_to_inbox</mat-icon>
-        <span class="hnav-text">Remisiones recibidas</span>
-      </a>
-    }
-    <!-- Psicología: despliegue controlado por rol (`ROLES_HABILITADOS_PSICOLOGIA`, hoy solo ADMIN) -->
-    @if (alma.psicologiaHabilitada()) {
-      <a mat-button routerLink="/linea-alma/psicologia/bandeja" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
-        <mat-icon class="hnav-icon" aria-hidden="true">psychology</mat-icon>
-        <span class="hnav-text">Bandeja de Psicología</span>
-      </a>
+        <mat-icon class="hnav-chevron" aria-hidden="true">arrow_drop_down</mat-icon>
+      </button>
+
+      <mat-menu #almaMenu="matMenu" class="hnav-menu">
+        @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional()) {
+          <a mat-menu-item routerLink="/linea-alma/atencion-pr" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
+            <mat-icon aria-hidden="true">ring_volume</mat-icon>
+            <span>Primer respondiente</span>
+          </a>
+        }
+        @if (alma.tiene('alma.aph.crear')) {
+          <a mat-menu-item routerLink="/linea-alma/aph/nueva" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
+            <mat-icon aria-hidden="true">add_ic_call</mat-icon>
+            <span>Nueva atención</span>
+          </a>
+        }
+        @if (alma.tiene('alma.aph.bandeja')) {
+          <a mat-menu-item routerLink="/linea-alma/aph/remisiones" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
+            <mat-icon aria-hidden="true">forward_to_inbox</mat-icon>
+            <span>Remisiones recibidas</span>
+          </a>
+        }
+        <!-- Psicología: despliegue controlado por rol (`ROLES_HABILITADOS_PSICOLOGIA`, hoy solo ADMIN) -->
+        @if (alma.psicologiaHabilitada()) {
+          <a mat-menu-item routerLink="/linea-alma/psicologia/bandeja" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
+            <mat-icon aria-hidden="true">psychology</mat-icon>
+            <span>Bandeja de Psicología</span>
+          </a>
+          @if (alma.tiene('alma.notasClinicas.consultar')) {
+            <a mat-menu-item routerLink="/linea-alma/psicologia/recontactos" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
+              <mat-icon aria-hidden="true">event_repeat</mat-icon>
+              <span>Recontactos</span>
+            </a>
+          }
+          <a mat-menu-item routerLink="/linea-alma/psicologia/agenda" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
+            <mat-icon aria-hidden="true">event_note</mat-icon>
+            <span>Mi agenda</span>
+          </a>
+        }
+      </mat-menu>
     }
 
     <!-- 4. UAD (Equipos 3 y 4 - Funcionarios) -->
@@ -132,6 +154,16 @@
       </button>
 
       <mat-menu #uadMenu="matMenu" class="hnav-menu">
+        @if (auth.puedeVerUad()) {
+          <a mat-menu-item routerLink="/uad/noticias" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
+            <mat-icon aria-hidden="true">inbox</mat-icon>
+            <span>Noticias disciplinarias</span>
+          </a>
+          <a mat-menu-item routerLink="/uad/casos" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
+            <mat-icon aria-hidden="true">folder_shared</mat-icon>
+            <span>Casos UAD</span>
+          </a>
+        }
         @if (features.complaintIntakePrototype) {
           <a mat-menu-item routerLink="/nueva-queja" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
             <mat-icon aria-hidden="true">post_add</mat-icon>
@@ -326,36 +358,67 @@
             </div>
           }
         </div>
-
-        <!-- Línea Alma -->
-        <a routerLink="/linea-alma/atencion-pr" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
-          class="hnav-mobile-item" (click)="closeMobileMenu()">
-          <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">ring_volume</mat-icon>
-          <span class="hnav-mobile-item__text">Línea Alma</span>
-        </a>
       }
 
-      <!-- Línea Alma (Técnico APH y Revisor; los demás roles la ven arriba) -->
-      @if (alma.tiene('alma.aph.crear')) {
-        <a routerLink="/linea-alma/aph/nueva" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
-          class="hnav-mobile-item" (click)="closeMobileMenu()">
-          <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">add_ic_call</mat-icon>
-          <span class="hnav-mobile-item__text">Nueva atención</span>
-        </a>
-      }
-      @if (alma.tiene('alma.aph.bandeja')) {
-        <a routerLink="/linea-alma/aph/remisiones" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
-          class="hnav-mobile-item" (click)="closeMobileMenu()">
-          <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">forward_to_inbox</mat-icon>
-          <span class="hnav-mobile-item__text">Remisiones recibidas</span>
-        </a>
-      }
-      @if (alma.psicologiaHabilitada()) {
-        <a routerLink="/linea-alma/psicologia/bandeja" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
-          class="hnav-mobile-item" (click)="closeMobileMenu()">
-          <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">psychology</mat-icon>
-          <span class="hnav-mobile-item__text">Bandeja de Psicología</span>
-        </a>
+      <!-- 3. LÍNEA ALMA: grupo plegable, mismas opciones y reglas que el menú lateral -->
+      @if (muestraLineaAlma()) {
+        <div class="hnav-mobile-group">
+          <button type="button" class="hnav-mobile-group-header" (click)="toggleSection('alma')"
+            [attr.aria-expanded]="isSectionExpanded('alma')">
+            <span class="hnav-mobile-group-title">
+              <mat-icon class="hnav-mobile-group-icon" aria-hidden="true">health_and_safety</mat-icon>
+              <span>Línea Alma</span>
+            </span>
+            <mat-icon class="hnav-mobile-group-chevron" [class.is-expanded]="isSectionExpanded('alma')" aria-hidden="true">
+              expand_more
+            </mat-icon>
+          </button>
+
+          @if (isSectionExpanded('alma')) {
+            <div class="hnav-mobile-group-content">
+              @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional()) {
+                <a routerLink="/linea-alma/atencion-pr" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+                  class="hnav-mobile-item" (click)="closeMobileMenu()">
+                  <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">ring_volume</mat-icon>
+                  <span class="hnav-mobile-item__text">Primer respondiente</span>
+                </a>
+              }
+              @if (alma.tiene('alma.aph.crear')) {
+                <a routerLink="/linea-alma/aph/nueva" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+                  class="hnav-mobile-item" (click)="closeMobileMenu()">
+                  <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">add_ic_call</mat-icon>
+                  <span class="hnav-mobile-item__text">Nueva atención</span>
+                </a>
+              }
+              @if (alma.tiene('alma.aph.bandeja')) {
+                <a routerLink="/linea-alma/aph/remisiones" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+                  class="hnav-mobile-item" (click)="closeMobileMenu()">
+                  <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">forward_to_inbox</mat-icon>
+                  <span class="hnav-mobile-item__text">Remisiones recibidas</span>
+                </a>
+              }
+              @if (alma.psicologiaHabilitada()) {
+                <a routerLink="/linea-alma/psicologia/bandeja" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+                  class="hnav-mobile-item" (click)="closeMobileMenu()">
+                  <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">psychology</mat-icon>
+                  <span class="hnav-mobile-item__text">Bandeja de Psicología</span>
+                </a>
+                @if (alma.tiene('alma.notasClinicas.consultar')) {
+                  <a routerLink="/linea-alma/psicologia/recontactos" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+                    class="hnav-mobile-item" (click)="closeMobileMenu()">
+                    <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">event_repeat</mat-icon>
+                    <span class="hnav-mobile-item__text">Recontactos</span>
+                  </a>
+                }
+                <a routerLink="/linea-alma/psicologia/agenda" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+                  class="hnav-mobile-item" (click)="closeMobileMenu()">
+                  <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">event_note</mat-icon>
+                  <span class="hnav-mobile-item__text">Mi agenda</span>
+                </a>
+              }
+            </div>
+          }
+        </div>
       }
 
       <!-- 4. UAD (Funcionarios) -->

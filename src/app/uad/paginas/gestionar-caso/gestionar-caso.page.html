@@ -1,0 +1,400 @@
+<div class="gestion">
+  <nav class="gestion__migas" aria-label="Ruta de navegación">
+    <a routerLink="/uad/casos">Bandeja de casos</a>
+    <mat-icon aria-hidden="true">chevron_right</mat-icon>
+    <span aria-current="page">Gestionar caso</span>
+  </nav>
+
+  <h1 class="gestion__titulo">
+    Gestionar caso disciplinario
+    @if (caso(); as c) {
+      – UAD {{ etiquetaEquipo[c.equipoResponsable] }}
+    }
+  </h1>
+
+  <app-uad-panel-simulacion (equipoCambiado)="cargar()" />
+
+  @switch (vista()) {
+    @case ('cargando') {
+      <p role="status" aria-busy="true">Cargando el caso…</p>
+    }
+    @case ('no-encontrado') {
+      <div class="casilda-alerta casilda-alerta--precaucion" role="alert">
+        <mat-icon aria-hidden="true">search_off</mat-icon>
+        <div>
+          <p>Este caso no está en su bandeja. Es posible que haya pasado a otro equipo o fase.</p>
+          <a class="boton boton--secundario" routerLink="/uad/casos">Volver a la bandeja de casos</a>
+        </div>
+      </div>
+    }
+    @case ('sin-permiso') {
+      <div class="casilda-alerta casilda-alerta--peligro" role="alert">
+        <mat-icon aria-hidden="true">lock</mat-icon>
+        <div>
+          <p>Su perfil no tiene permiso para gestionar este caso.</p>
+          <a class="boton boton--secundario" routerLink="/uad/casos">Volver a la bandeja de casos</a>
+        </div>
+      </div>
+    }
+    @case ('error') {
+      <div class="casilda-alerta casilda-alerta--peligro" role="alert">
+        <mat-icon aria-hidden="true">error_outline</mat-icon>
+        <div>
+          <p>No pudimos cargar el caso.</p>
+          <button type="button" class="boton boton--secundario" (click)="cargar()">Intentar de nuevo</button>
+        </div>
+      </div>
+    }
+    @case ('listo') {
+      @if (caso(); as c) {
+        <!-- Cabecera con identificadores diferenciados (UAD-CAS-02, UAD-ID-01/07) -->
+        <section class="tarjeta" aria-labelledby="uad-caso-ids">
+          <h2 id="uad-caso-ids" class="visually-hidden">Datos del caso</h2>
+          <dl class="cabecera">
+            <div>
+              <dt>ID de caso Casilda</dt>
+              <dd class="cabecera__fuerte">{{ c.casoId }}</dd>
+            </div>
+            <div>
+              <dt>Expediente UAD</dt>
+              <dd>
+                @if (editandoExpediente()) {
+                  <div class="expediente">
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                      <mat-label>Número de expediente UAD</mat-label>
+                      <input
+                        matInput
+                        id="uad-expediente-caso"
+                        autocomplete="off"
+                        [maxlength]="limiteExpediente"
+                        [ngModel]="expediente()"
+                        (ngModelChange)="expediente.set($event)"
+                        (keydown.enter)="guardarExpediente()"
+                        (keydown.escape)="cancelarExpediente()"
+                      />
+                      <mat-hint>Déjelo vacío para retirarlo.</mat-hint>
+                    </mat-form-field>
+                    <button type="button" class="boton boton--primario boton--compacto" [disabled]="ocupado()" (click)="guardarExpediente()">Guardar</button>
+                    <button type="button" class="boton boton--secundario boton--compacto" (click)="cancelarExpediente()">Cancelar</button>
+                  </div>
+                  @if (errorExpediente(); as m) {
+                    <p class="campo-error" role="alert">{{ m }}</p>
+                  }
+                } @else {
+                  {{ c.expedienteUad ?? 'Sin registrar' }}
+                  @if (activa()) {
+                    <button type="button" class="enlace" (click)="editarExpediente()">
+                      {{ c.expedienteUad ? 'Corregir' : 'Registrar' }}<span class="visually-hidden"> número de expediente UAD</span>
+                    </button>
+                  }
+                }
+              </dd>
+            </div>
+            <div>
+              <dt>Víctima</dt>
+              <dd>{{ c.victimaNombre ?? 'Sin dato' }}</dd>
+            </div>
+            <div>
+              <dt>Vínculo del investigado con la UdeA</dt>
+              <dd>{{ etiquetaVinculacion[c.vinculacionInvestigado] }}</dd>
+            </div>
+            <div>
+              <dt>Fecha de admisión</dt>
+              <dd>{{ c.fechaAdmision | date: 'd MMM y' }}</dd>
+            </div>
+            <div>
+              <dt>Fase actual en la UAD</dt>
+              <dd class="cabecera__fuerte">{{ etiquetaFase[c.faseActual] }}</dd>
+            </div>
+            <div>
+              <dt>Equipo responsable</dt>
+              <dd>{{ etiquetaEquipo[c.equipoResponsable] }}</dd>
+            </div>
+            <div>
+              <dt>Gestión UAD</dt>
+              <dd>{{ c.estadoGestion === 'ACTIVA' ? 'Activa' : 'Finalizada' }}</dd>
+            </div>
+          </dl>
+          <p class="sub">
+            Instruye {{ etiquetaEquipo[c.equipoInstructor] }} y decide {{ etiquetaEquipo[c.equipoDecisor] }}. El caso institucional Casilda no se cierra
+            por la gestión de la UAD.
+          </p>
+        </section>
+
+        @if (!activa()) {
+          <div class="casilda-alerta casilda-alerta--precaucion" role="status">
+            <mat-icon aria-hidden="true">inventory_2</mat-icon>
+            <p>
+              La gestión de la UAD sobre este caso terminó{{ c.motivoFinGestion === 'REMITIDA_POR_COMPETENCIA' ? ' por remisión por competencia' : '' }}. Puede
+              consultar el historial y las pruebas. El caso institucional sigue activo si otros actores continúan con atención, acompañamiento o
+              medidas de protección.
+            </p>
+          </div>
+        }
+
+        @if (ultimoResultado(); as r) {
+          @if (r.notificaciones.length > 0) {
+            <div class="casilda-alerta" role="status">
+              <mat-icon aria-hidden="true">mail</mat-icon>
+              <div>
+                @for (no of r.notificaciones; track no.evento + no.destinatario) {
+                  <p>Aviso a {{ etiquetaDestinatario[no.destinatario].toLowerCase() }}: {{ etiquetaNotificacion[no.estado] }}. {{ no.motivo ?? '' }}</p>
+                }
+              </div>
+            </div>
+          }
+        }
+
+        <div class="gestion__rejilla">
+          <div class="gestion__columna">
+            <!-- Registrar actuación ordinaria (bitácora §7) -->
+            <section class="tarjeta" aria-labelledby="uad-registrar-titulo">
+              <h2 id="uad-registrar-titulo" class="tarjeta__titulo"><mat-icon aria-hidden="true">edit_note</mat-icon> Registrar actuación</h2>
+              <p class="fase">Fase del proceso: <strong>{{ etiquetaFase[c.faseActual] }}</strong></p>
+              <p class="sub">Registrar una actuación no cambia la fase. El paso a decisión solo ocurre con «Finalizar etapa de instrucción».</p>
+
+              <form (ngSubmit)="guardarActuacion()" novalidate aria-labelledby="uad-registrar-titulo">
+                <fieldset id="uad-actuaciones" class="actuaciones" tabindex="-1" [attr.aria-describedby]="errorActuaciones() ? 'uad-actuaciones-error' : null">
+                  <legend class="actuaciones__leyenda">Actuaciones de {{ etiquetaFase[c.faseActual].toLowerCase() }}</legend>
+                  @for (a of ordinarias(); track a.codigo) {
+                    <label class="opcion" [class.opcion--inactiva]="!a.ejecutable">
+                      <input
+                        type="checkbox"
+                        [checked]="seleccion().has(a.codigo)"
+                        [disabled]="!a.ejecutable || ocupado()"
+                        (change)="alternar(a.codigo, $any($event.target).checked)"
+                        [attr.aria-describedby]="a.motivoNoEjecutable ? 'uad-motivo-' + a.codigo : null"
+                      />
+                      <span>
+                        {{ a.nombre }}
+                        @if (a.motivoNoEjecutable) {
+                          <span class="sub" [id]="'uad-motivo-' + a.codigo">
+                            @if (a.pendienteValidacion) {
+                              <mat-icon class="icono-pequeno" aria-hidden="true">pending_actions</mat-icon>
+                            }
+                            {{ a.motivoNoEjecutable }}
+                          </span>
+                        }
+                      </span>
+                    </label>
+                  }
+                </fieldset>
+                @if (errorActuaciones(); as m) {
+                  <p id="uad-actuaciones-error" class="campo-error" role="alert">{{ m }}</p>
+                }
+
+                <mat-form-field appearance="outline" class="campo">
+                  <mat-label>Observaciones (opcional)</mat-label>
+                  <textarea
+                    matInput
+                    rows="3"
+                    autocomplete="off"
+                    [maxlength]="limiteTexto"
+                    [disabled]="!activa()"
+                    [ngModel]="observaciones()"
+                    (ngModelChange)="observaciones.set($event)"
+                    name="observaciones"
+                  ></textarea>
+                  <mat-hint align="end">{{ observaciones().length }} / {{ limiteTexto }}</mat-hint>
+                </mat-form-field>
+
+                <div class="acciones">
+                  <button type="button" class="boton boton--secundario" [disabled]="ocupado()" (click)="limpiarActuaciones()">Cancelar</button>
+                  <button type="submit" class="boton boton--primario" [disabled]="ocupado() || !activa()" [attr.aria-busy]="ocupado()">
+                    <mat-icon aria-hidden="true">save</mat-icon>
+                    {{ ocupado() ? 'Guardando…' : 'Guardar actuación' }}
+                  </button>
+                </div>
+              </form>
+            </section>
+
+            <!-- Acciones permanentes (bitácora §8): visibles siempre -->
+            <section class="tarjeta" aria-labelledby="uad-permanentes-titulo">
+              <h2 id="uad-permanentes-titulo" class="tarjeta__titulo"><mat-icon aria-hidden="true">push_pin</mat-icon> Acciones permanentes</h2>
+              <p class="sub">Se registran por separado de las actuaciones ordinarias, una por vez.</p>
+              <ul class="permanentes">
+                @for (a of permanentes(); track a.codigo) {
+                  <li class="permanente" [class.permanente--abierta]="permanente() === a.codigo">
+                    <button
+                      type="button"
+                      class="boton boton--secundario permanente__boton"
+                      [disabled]="!a.ejecutable || ocupado()"
+                      [attr.aria-expanded]="a.ejecutable ? permanente() === a.codigo : null"
+                      [attr.aria-describedby]="a.motivoNoEjecutable ? 'uad-motivo-perm-' + a.codigo : null"
+                      (click)="abrirPermanente(a)"
+                    >
+                      {{ a.nombre }}
+                    </button>
+                    @if (a.motivoNoEjecutable) {
+                      <span class="sub" [id]="'uad-motivo-perm-' + a.codigo">
+                        @if (a.pendienteValidacion) {
+                          <mat-icon class="icono-pequeno" aria-hidden="true">pending_actions</mat-icon>
+                        }
+                        {{ a.motivoNoEjecutable }}
+                      </span>
+                    }
+                  </li>
+                }
+              </ul>
+
+              @switch (permanente()) {
+                @case ('FINALIZAR_INSTRUCCION') {
+                  <div id="uad-panel-permanente" class="subformulario" tabindex="-1" role="group" aria-labelledby="uad-traslado-titulo">
+                    <h3 id="uad-traslado-titulo" class="subformulario__titulo">Finalizar etapa de instrucción</h3>
+                    <p>
+                      El caso pasará de {{ etiquetaEquipo[c.equipoInstructor] }} (instrucción) a {{ etiquetaEquipo[c.equipoDecisor] }} (decisión) y saldrá de su
+                      bandeja activa. Se conservan el ID de caso, el expediente, la fecha de admisión, las pruebas y el historial.
+                    </p>
+                    <label class="opcion opcion--confirmacion">
+                      <input id="uad-confirma-traslado" type="checkbox" [checked]="confirmaTraslado()" (change)="confirmaTraslado.set($any($event.target).checked)" />
+                      Confirmo que se validó el paso a la etapa de decisión.
+                    </label>
+                    @if (erroresPermanente()['confirmaTraslado']; as m) {
+                      <p class="campo-error" role="alert">{{ m }}</p>
+                    }
+                    <mat-form-field appearance="outline" class="campo">
+                      <mat-label>Observaciones (opcional)</mat-label>
+                      <textarea matInput rows="2" autocomplete="off" [maxlength]="limiteTexto" [ngModel]="observacionesTraslado()" (ngModelChange)="observacionesTraslado.set($event)" name="observacionesTraslado"></textarea>
+                    </mat-form-field>
+                    <div class="acciones">
+                      <button type="button" class="boton boton--secundario" (click)="cerrarPermanente()">Cancelar</button>
+                      <button type="button" class="boton boton--primario" [disabled]="ocupado()" (click)="finalizarInstruccion()">
+                        <mat-icon aria-hidden="true">move_up</mat-icon>
+                        Trasladar a decisión
+                      </button>
+                    </div>
+                  </div>
+                }
+                @case ('REMISION_COMPETENCIA') {
+                  <div id="uad-panel-permanente" class="subformulario" tabindex="-1" role="group" aria-labelledby="uad-remision-titulo">
+                    <h3 id="uad-remision-titulo" class="subformulario__titulo">Remisión por competencia</h3>
+                    <p class="sub">Casilda solo deja constancia. No envía correos ni documentos a la entidad: el envío oficial va por los canales institucionales.</p>
+                    <p class="fase">Fase del proceso: <strong>{{ etiquetaFase[c.faseActual] }}</strong></p>
+                    <mat-form-field appearance="outline" class="campo">
+                      <mat-label>Entidad destinataria</mat-label>
+                      <mat-select id="uad-entidad-caso" [value]="entidad()" (valueChange)="entidad.set($event)">
+                        @for (e of entidades(); track e.id) {
+                          <mat-option [value]="e.codigo">{{ e.nombre }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                    @if (erroresPermanente()['entidadDestinatariaCodigo']; as m) {
+                      <p class="campo-error" role="alert">{{ m }}</p>
+                    }
+                    <mat-form-field appearance="outline" class="campo campo--corto">
+                      <mat-label>Fecha de remisión</mat-label>
+                      <input matInput type="date" [max]="hoy" [ngModel]="fechaRemision()" (ngModelChange)="fechaRemision.set($event)" name="fechaRemisionCaso" />
+                    </mat-form-field>
+                    @if (erroresPermanente()['fechaRemision']; as m) {
+                      <p class="campo-error" role="alert">{{ m }}</p>
+                    }
+                    <mat-form-field appearance="outline" class="campo">
+                      <mat-label>Justificación de la remisión (opcional)</mat-label>
+                      <textarea matInput rows="3" autocomplete="off" [maxlength]="limiteTexto" [ngModel]="justificacion()" (ngModelChange)="justificacion.set($event)" name="justificacionCaso"></textarea>
+                      <mat-hint align="end">{{ justificacion().length }} / {{ limiteTexto }}</mat-hint>
+                    </mat-form-field>
+                    <div class="acciones">
+                      <button type="button" class="boton boton--secundario" (click)="cerrarPermanente()">Cancelar</button>
+                      <button type="button" class="boton boton--primario" [disabled]="ocupado()" (click)="remitirPorCompetencia()">
+                        <mat-icon aria-hidden="true">forward_to_inbox</mat-icon>
+                        Registrar remisión
+                      </button>
+                    </div>
+                  </div>
+                }
+              }
+            </section>
+          </div>
+
+          <div class="gestion__columna">
+            <!-- Pruebas del caso (bitácora §10) -->
+            <section class="tarjeta" aria-labelledby="uad-pruebas-titulo">
+              <div class="tarjeta__cabecera">
+                <h2 id="uad-pruebas-titulo" class="tarjeta__titulo"><mat-icon aria-hidden="true">attach_file</mat-icon> Pruebas del caso ({{ evidencias().length }})</h2>
+                <button type="button" class="boton boton--secundario boton--compacto" disabled aria-describedby="uad-carga-nota">
+                  <mat-icon aria-hidden="true">upload_file</mat-icon>
+                  Cargar prueba
+                </button>
+              </div>
+              <p id="uad-carga-nota" class="sub">La carga de pruebas se habilitará cuando se definan tipos, tamaños, versiones y custodia.</p>
+              @if (evidencias().length === 0) {
+                <p class="sub">El caso no tiene pruebas registradas.</p>
+              } @else {
+                <table class="tabla" aria-label="Pruebas del caso">
+                  <thead>
+                    <tr>
+                      <th scope="col">Archivo</th>
+                      <th scope="col">Tipo</th>
+                      <th scope="col">Fecha de carga</th>
+                      <th scope="col">Tamaño</th>
+                      <th scope="col"><span class="visually-hidden">Acciones</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (e of evidencias(); track e.evidenciaId) {
+                      <tr>
+                        <th scope="row">{{ e.nombreArchivo }}</th>
+                        <td>{{ e.tipoMime }}</td>
+                        <td>{{ e.fechaCarga | date: 'd MMM y' }}</td>
+                        <td>{{ tamano(e.tamanoBytes) }}</td>
+                        <td>
+                          <button type="button" class="boton boton--secundario boton--compacto" (click)="descargar(e)">
+                            <mat-icon aria-hidden="true">download</mat-icon>
+                            Descargar <span class="visually-hidden">{{ e.nombreArchivo }}</span>
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+                <p class="sub">Cada descarga queda registrada.</p>
+              }
+            </section>
+
+            <!-- Historial de actuaciones (UAD-HIS-01 a 08) -->
+            <section class="tarjeta" aria-labelledby="uad-historial-caso-titulo">
+              <h2 id="uad-historial-caso-titulo" class="tarjeta__titulo"><mat-icon aria-hidden="true">history</mat-icon> Historial de actuaciones</h2>
+              <p class="sub">Las actuaciones registradas quedan guardadas y no se sobrescriben.</p>
+              @if (historial().length === 0) {
+                <p class="sub">Aún no hay actuaciones registradas.</p>
+              } @else {
+                <div class="tabla-contenedor">
+                  <table class="tabla" aria-label="Historial de actuaciones del caso, en orden cronológico">
+                    <thead>
+                      <tr>
+                        <th scope="col">Fecha y hora</th>
+                        <th scope="col">Fase</th>
+                        <th scope="col">Equipo</th>
+                        <th scope="col">Actuación</th>
+                        <th scope="col">Profesional</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (ev of historial(); track ev.eventoId) {
+                        <tr>
+                          <td class="nowrap">{{ ev.fecha | date: 'd MMM y' }}<span class="sub">{{ ev.fecha | date: 'h:mm a' }}</span></td>
+                          <td>{{ ev.fase ? etiquetaFase[ev.fase] : 'Sin dato' }}</td>
+                          <td>{{ ev.equipo ? etiquetaEquipo[ev.equipo] : 'Sin dato' }}</td>
+                          <th scope="row">
+                            {{ ev.tipo === 'ACTUACION' ? ev.descripcion : etiquetaEvento[ev.tipo] }}
+                            @if (ev.tipo !== 'ACTUACION') {
+                              <span class="sub">{{ ev.descripcion }}</span>
+                            }
+                            @if (ev.observaciones) {
+                              <span class="sub">Observaciones: {{ ev.observaciones }}</span>
+                            }
+                          </th>
+                          <td>{{ ev.profesional ?? 'Sin dato' }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+            </section>
+          </div>
+        </div>
+      }
+    }
+  }
+</div>

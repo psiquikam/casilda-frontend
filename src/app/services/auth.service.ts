@@ -61,7 +61,10 @@ export type UserRole =
   | 'REVISOR'
   | 'USUARIO'
   | 'GESTOR_CONTENIDO'
-  | 'TECNICO_APH';
+  | 'TECNICO_APH'
+  | 'UAD_COORDINACION'
+  | 'UAD_EQUIPO_3'
+  | 'UAD_EQUIPO_4';
 
 /**
  * Códigos de rol que reconoce el frontend. Coinciden con `rol.codigo` del
@@ -70,6 +73,9 @@ export type UserRole =
  * `TECNICO_APH` es el primer respondiente de Línea Alma (RNF-ALMA-002).
  * **[PENDIENTE Backend]** el código exacto del rol no está confirmado: se asume
  * `TECNICO_APH` (ver `docs/contratos/linea-alma/README.md`, decisión D-ALMA-01).
+ * `UAD_COORDINACION`, `UAD_EQUIPO_3`, `UAD_EQUIPO_4`: códigos del catálogo de roles (propuesta del
+ * 2026-11-11). **[PENDIENTE Backend]** no existen todavía en la tabla `rol` (ver
+ * `docs/contratos/uad/DECISIONES_PENDIENTES_UAD.md`, D-UAD-03 y D-UAD-14).
  */
 export const ROLES_CASILDA = [
   'ADMIN',
@@ -82,8 +88,14 @@ export const ROLES_CASILDA = [
   'SPB_COORDINACION',
   'SPB_ANALISTA',
   'SPB_CENTRAL',
-  'SPB_VIGILANTE'
+  'SPB_VIGILANTE',
+  'UAD_COORDINACION',
+  'UAD_EQUIPO_3',
+  'UAD_EQUIPO_4'
 ] as const;
+
+/** Roles del módulo UAD Equipos 3 y 4 (rutas `/uad/*`). */
+export const ROLES_UAD = ['UAD_COORDINACION', 'UAD_EQUIPO_3', 'UAD_EQUIPO_4'] as const;
 
 export interface MockUserProfile {
   id: number;
@@ -279,22 +291,16 @@ interface JwtPayload {
   exp?: number;
 }
 
-type CodigoRol =
-  | 'ADMIN'
-  | 'COORDINADOR'
-  | 'PROFESIONAL'
-  | 'REVISOR'
-  | 'USUARIO'
-  | 'GESTOR_CONTENIDO'
-  | 'TECNICO_APH'
-  | 'SPB_COORDINACION'
-  | 'SPB_ANALISTA'
-  | 'SPB_CENTRAL'
-  | 'SPB_VIGILANTE';
+type CodigoRol = (typeof ROLES_CASILDA)[number];
 
 function normalizarCodigoRol(valor: string | null | undefined): CodigoRol | '' {
   const rol = (valor || '').toUpperCase().replace(/^ROLE_/, '');
   if (rol.includes('ADMIN')) return 'ADMIN';
+  // UAD va antes que COORD/PROF: «UAD_COORDINACION» contenía «COORD» y se confundía con la
+  // coordinación del Equipo de Atención, y el nombre «Profesional Equipo 3» con PROFESIONAL.
+  if (rol === 'UAD_COORDINACION' || rol === 'UAD_EQUIPO_3' || rol === 'UAD_EQUIPO_4') return rol;
+  if (/EQUIPO[\s_]*3/.test(rol)) return 'UAD_EQUIPO_3';
+  if (/EQUIPO[\s_]*4/.test(rol)) return 'UAD_EQUIPO_4';
   // SPyB (Seguridad a Personas y Bienes)
   if (rol.includes('SPB_ANALISTA') || rol.includes('ANALISTA')) return 'SPB_ANALISTA';
   if (rol.includes('SPB_CENTRAL') || rol.includes('CENTRAL')) return 'SPB_CENTRAL';
@@ -358,6 +364,12 @@ export class AuthService {
         return 'Gestor de contenidos';
       case 'TECNICO_APH':
         return 'Técnico APH';
+      case 'UAD_COORDINACION':
+        return 'Coordinación UAD';
+      case 'UAD_EQUIPO_3':
+        return 'UAD – Equipo 3';
+      case 'UAD_EQUIPO_4':
+        return 'UAD – Equipo 4';
       default:
         return 'Usuario';
     }
@@ -409,6 +421,15 @@ export class AuthService {
 
   isSeguridadPyB(): boolean {
     return this.hasAnyRole(['ADMIN', 'SPB_ANALISTA', 'SPB_CENTRAL', 'SPB_VIGILANTE', 'SPB_COORDINACION']);
+  }
+
+  /**
+   * Algún rol del módulo UAD, o ADMIN (misma regla general que `hasAnyRole`). Sin efectos secundarios:
+   * no pasa por `isAuthenticated()`, que cierra la sesión si el token expiró, porque se evalúa en las
+   * plantillas del menú en cada ciclo de detección de cambios. La sesión la validan los guards.
+   */
+  puedeVerUad(): boolean {
+    return this.isAdmin() || ROLES_UAD.some((rol) => this.hasRole(rol));
   }
 
   /**

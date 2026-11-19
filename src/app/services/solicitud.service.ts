@@ -288,6 +288,7 @@ export interface GrupoProfesionalDto {
   id: number;
   nombre: string;
   activo?: boolean;
+  idTipoServicio?: number | null;
 }
 
 export interface ContactoTelefonicoDto {

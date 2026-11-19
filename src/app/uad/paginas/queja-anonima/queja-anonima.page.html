@@ -1,0 +1,102 @@
+<div class="nda">
+  <h1 class="nda__titulo">Queja anónima ante la UAD</h1>
+  <p class="nda__intro">
+    Este formulario llega solo a la Unidad de Asuntos Disciplinarios (UAD), Equipos 3 y 4. No le pedimos nombre, documento ni datos de
+    contacto.
+  </p>
+
+  @if (simulada) {
+    <p class="casilda-alerta casilda-alerta--precaucion" role="note">
+      <mat-icon aria-hidden="true">science</mat-icon>
+      <span><strong>Datos de demostración.</strong> Esta queja no se envía a ningún servidor.</span>
+    </p>
+  }
+
+  @if (resultado(); as r) {
+    <section id="nda-confirmacion" class="tarjeta confirmacion" tabindex="-1" role="status" aria-labelledby="nda-confirmacion-titulo">
+      <mat-icon class="confirmacion__icono" aria-hidden="true">check_circle</mat-icon>
+      <h2 id="nda-confirmacion-titulo" class="confirmacion__titulo">Su queja fue recibida</h2>
+      <p>La Unidad de Asuntos Disciplinarios evaluará la información.</p>
+      <p class="confirmacion__etiqueta">Consecutivo de la queja</p>
+      <p class="confirmacion__consecutivo">{{ r.consecutivo }}</p>
+      <p class="sub">Recibida el {{ r.fechaRecepcion | date: "d 'de' MMMM 'de' y, h:mm a" }}</p>
+      <button type="button" class="boton boton--secundario" (click)="copiarConsecutivo()">
+        <mat-icon aria-hidden="true">content_copy</mat-icon>
+        Copiar consecutivo
+      </button>
+      <p class="sub">
+        Puede guardarlo como referencia. Como la queja es anónima, la UAD no podrá contactarle para pedir más información ni para contarle el
+        resultado.
+      </p>
+      <div class="acciones">
+        <button type="button" class="boton boton--secundario" (click)="nuevaQueja()">Presentar otra queja</button>
+        <a class="boton boton--primario" routerLink="/home">Volver al inicio</a>
+      </div>
+    </section>
+  } @else {
+    <section class="tarjeta privacidad" aria-labelledby="nda-privacidad-titulo">
+      <h2 id="nda-privacidad-titulo" class="tarjeta__titulo"><mat-icon aria-hidden="true">shield</mat-icon> Antes de escribir</h2>
+      <ul class="privacidad__lista">
+        <li>El formulario no envía los datos de su sesión, aunque la tenga abierta, ni guarda lo que escribe en este navegador.</li>
+        <li>Si en el relato incluye datos que le identifican, la UAD podrá verlos. Escriba solo lo que quiera compartir.</li>
+        <li>Como no deja contacto, la UAD no podrá pedirle más información ni avisarle del resultado.</li>
+        <li>
+          Si quiere acompañamiento, seguimiento o que le contacten, use el
+          <a routerLink="/formulario-anonimo">formulario general de la Ruta Violeta</a>.
+        </li>
+      </ul>
+    </section>
+
+    <section class="tarjeta" aria-labelledby="nda-form-titulo">
+      <h2 id="nda-form-titulo" class="tarjeta__titulo"><mat-icon aria-hidden="true">description</mat-icon> Información de los hechos</h2>
+
+      <app-resumen-errores [errores]="errores()" />
+
+      <form [formGroup]="form" (ngSubmit)="enviar()" novalidate aria-labelledby="nda-form-titulo" class="formulario">
+        <mat-form-field appearance="outline" class="campo">
+          <mat-label>Descripción de los hechos</mat-label>
+          <textarea matInput id="nda-descripcion" formControlName="descripcionHechos" rows="7" autocomplete="off" [maxlength]="limiteRelato" required></textarea>
+          <mat-hint>Cuente qué pasó, cuándo y dónde, con el detalle que considere.</mat-hint>
+          <mat-hint align="end">{{ form.controls.descripcionHechos.value.length }} / {{ limiteRelato }}</mat-hint>
+          <mat-error>{{ error('descripcionHechos') }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="campo">
+          <mat-label>Lugar de ocurrencia (opcional)</mat-label>
+          <input matInput id="nda-lugar" formControlName="lugarOcurrencia" autocomplete="off" [maxlength]="limiteCorto" />
+          <mat-hint>Por ejemplo, la sede, el bloque o un espacio fuera de la Universidad.</mat-hint>
+          <mat-error>{{ error('lugarOcurrencia') }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="campo">
+          <mat-label>Persona presuntamente responsable (opcional)</mat-label>
+          <input matInput id="nda-responsable" formControlName="presuntoResponsable" autocomplete="off" [maxlength]="limiteCorto" />
+          <mat-hint>Nombre u otra información que permita identificarla.</mat-hint>
+          <mat-error>{{ error('presuntoResponsable') }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="campo">
+          <mat-label>Vinculación de esa persona con la UdeA (opcional)</mat-label>
+          <mat-select id="nda-vinculacion" formControlName="vinculacionDeclarada">
+            <mat-option value="">Prefiero no indicarlo</mat-option>
+            @for (v of vinculaciones; track v) {
+              <mat-option [value]="v">{{ etiquetaVinculacion[v] }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>Si no sabe o no tiene vínculo, la UAD evaluará igual la queja.</mat-hint>
+          <mat-error>{{ error('vinculacionDeclarada') }}</mat-error>
+        </mat-form-field>
+
+        <p class="sub">Por ahora este formulario no recibe archivos adjuntos.</p>
+
+        <div class="acciones">
+          <a class="boton boton--secundario" routerLink="/home">Cancelar</a>
+          <button type="submit" class="boton boton--primario" [disabled]="enviando()" [attr.aria-busy]="enviando()">
+            <mat-icon aria-hidden="true">send</mat-icon>
+            {{ enviando() ? 'Enviando…' : 'Enviar queja anónima' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+</div>

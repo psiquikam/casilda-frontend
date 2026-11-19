@@ -42,6 +42,9 @@
               <mat-form-field appearance="outline" class="full-width desc-field">
                 <mat-label>{{ esDesistimiento ? 'Motivo del desistimiento' : 'Observaciones detalladas' }}</mat-label>
                 <textarea matInput rows="4" formControlName="observacion"></textarea>
+                @if (contactoForm.get('observacion')?.hasError('required') || contactoForm.get('observacion')?.hasError('pattern')) {
+                  <mat-error>Ingrese una observación; no puede contener solo espacios.</mat-error>
+                }
               </mat-form-field>
               @if (mostrarCamposCita) {
                 <div class="form-grid">

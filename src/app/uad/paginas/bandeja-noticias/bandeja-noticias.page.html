@@ -1,0 +1,243 @@
+<div class="bandeja">
+  <header class="bandeja__cabecera">
+    <h1 class="bandeja__titulo">Noticias disciplinarias – Bandeja de entrada</h1>
+    <p class="bandeja__intro">
+      Unidad de Asuntos Disciplinarios (UAD).
+      @if (equiposTexto()) {
+        Ve las noticias que corresponden a <strong>{{ equiposTexto() }}</strong>, las de vinculación desconocida y todas las anónimas.
+      }
+    </p>
+  </header>
+
+  <app-uad-panel-simulacion (equipoCambiado)="iniciar()" />
+
+  @if (aviso(); as a) {
+    <div class="casilda-alerta casilda-alerta--precaucion" role="status">
+      <mat-icon aria-hidden="true">info</mat-icon>
+      <div>
+        <p>{{ a }}</p>
+        <button type="button" class="boton boton--secundario" (click)="aviso.set(null)">Entendido</button>
+      </div>
+    </div>
+  }
+
+  @switch (vista()) {
+    @case ('sin-equipo') {
+      <div class="casilda-alerta casilda-alerta--precaucion" role="alert">
+        <mat-icon aria-hidden="true">lock</mat-icon>
+        <div>
+          <p><strong>Acceso restringido.</strong> Su perfil no tiene un equipo UAD (3 o 4) asignado.</p>
+          @if (contexto()?.coordinacion) {
+            <p>
+              Los permisos de la coordinación sobre las bandejas están pendientes de aprobación. Mientras tanto no se muestra información
+              reservada.
+            </p>
+          }
+        </div>
+      </div>
+    }
+    @case ('sin-permiso') {
+      <div class="casilda-alerta casilda-alerta--peligro" role="alert">
+        <mat-icon aria-hidden="true">block</mat-icon>
+        <p>Su perfil no tiene permiso para consultar las bandejas de la UAD.</p>
+      </div>
+    }
+    @default {
+      <div class="pestanas" role="tablist" aria-label="Tipo de noticia disciplinaria">
+        <button
+          type="button"
+          role="tab"
+          id="uad-pestana-NDI"
+          class="pestanas__pestana"
+          [class.pestanas__pestana--activa]="tipo() === 'NDI'"
+          [attr.aria-selected]="tipo() === 'NDI'"
+          [attr.tabindex]="tipo() === 'NDI' ? 0 : -1"
+          aria-controls="uad-panel-noticias"
+          (click)="cambiarTipo('NDI')"
+          (keydown)="teclaPestana($event)"
+        >
+          NDI – Identificadas
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="uad-pestana-NDA"
+          class="pestanas__pestana"
+          [class.pestanas__pestana--activa]="tipo() === 'NDA'"
+          [attr.aria-selected]="tipo() === 'NDA'"
+          [attr.tabindex]="tipo() === 'NDA' ? 0 : -1"
+          aria-controls="uad-panel-noticias"
+          (click)="cambiarTipo('NDA')"
+          (keydown)="teclaPestana($event)"
+        >
+          NDA – Anónimas
+        </button>
+      </div>
+
+      <div id="uad-panel-noticias" role="tabpanel" [attr.aria-labelledby]="'uad-pestana-' + tipo()" class="panel">
+        <form class="bandeja__filtros" (ngSubmit)="filtrar()" aria-label="Filtros de la bandeja">
+          <mat-form-field appearance="outline">
+            <mat-label>Estado</mat-label>
+            <mat-select [ngModel]="estado()" name="estado" (ngModelChange)="estado.set($event)">
+              <mat-option value="">Todos</mat-option>
+              @for (e of estados; track e) {
+                <mat-option [value]="e">{{ etiquetaEstado[e] }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Recibida desde</mat-label>
+            <input matInput type="date" name="desde" [ngModel]="desde()" (ngModelChange)="desde.set($event)" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Recibida hasta</mat-label>
+            <input matInput type="date" name="hasta" [ngModel]="hasta()" (ngModelChange)="hasta.set($event)" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Consecutivo</mat-label>
+            <input
+              matInput
+              type="search"
+              name="consecutivo"
+              autocomplete="off"
+              maxlength="20"
+              [ngModel]="consecutivo()"
+              (ngModelChange)="consecutivo.set($event)"
+            />
+            <mat-hint>Por ejemplo, {{ tipo() }}-2026-000141</mat-hint>
+          </mat-form-field>
+          <div class="bandeja__botones-filtro">
+            <button type="submit" class="boton boton--primario">
+              <mat-icon aria-hidden="true">search</mat-icon>
+              Buscar
+            </button>
+            <button type="button" class="boton boton--secundario" (click)="limpiarFiltros()">Limpiar filtros</button>
+          </div>
+        </form>
+
+        <div aria-live="polite" class="visually-hidden">
+          @if (vista() === 'listo') {
+            {{ total() }} {{ total() === 1 ? 'noticia' : 'noticias' }}.
+          }
+        </div>
+
+        @if (vista() === 'cargando') {
+          <p role="status" aria-busy="true" class="bandeja__meta">Cargando la bandeja…</p>
+        } @else if (vista() === 'error') {
+          <div class="casilda-alerta casilda-alerta--peligro" role="alert">
+            <mat-icon aria-hidden="true">error_outline</mat-icon>
+            <div>
+              <p>No pudimos cargar la bandeja.</p>
+              <button type="button" class="boton boton--secundario" (click)="cargar()">Intentar de nuevo</button>
+            </div>
+          </div>
+        } @else if (vacio()) {
+          <p class="bandeja__vacio">No hay noticias con estos filtros.</p>
+        } @else {
+          <div class="bandeja__tabla-contenedor">
+            <table class="bandeja__tabla" [attr.aria-label]="tipo() === 'NDI' ? 'Noticias disciplinarias identificadas' : 'Noticias disciplinarias anónimas'">
+              <thead>
+                <tr>
+                  <th scope="col"><span class="visually-hidden">Ver detalle</span></th>
+                  <th scope="col">{{ tipo() }} (consecutivo)</th>
+                  <th scope="col">ID de caso Casilda</th>
+                  <th scope="col">Origen</th>
+                  <th scope="col">Fecha de recepción</th>
+                  <th scope="col">Estado</th>
+                  <th scope="col"><span class="visually-hidden">Acciones</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of items(); track item.noticiaId) {
+                  <tr [class.fila--abierta]="expandida() === item.noticiaId">
+                    <td>
+                      <button
+                        type="button"
+                        class="bandeja__expandir"
+                        [attr.aria-expanded]="expandida() === item.noticiaId"
+                        [attr.aria-controls]="'uad-detalle-' + item.noticiaId"
+                        [attr.aria-label]="(expandida() === item.noticiaId ? 'Ocultar' : 'Ver') + ' detalle de ' + item.consecutivo"
+                        (click)="alternar(item)"
+                      >
+                        <mat-icon aria-hidden="true">{{ expandida() === item.noticiaId ? 'remove' : 'add' }}</mat-icon>
+                      </button>
+                    </td>
+                    <th scope="row" class="bandeja__codigo">
+                      {{ item.consecutivo }}
+                      @if (item.revisionConcurrente) {
+                        <span class="bandeja__chip">
+                          <mat-icon aria-hidden="true">group</mat-icon>
+                          En revisión por otra persona
+                        </span>
+                      }
+                    </th>
+                    <td>
+                      @if (item.casoId) {
+                        {{ item.casoId }}
+                      } @else {
+                        <span class="bandeja__sub">Sin asignar</span>
+                      }
+                    </td>
+                    <td>
+                      {{ etiquetaOrigen[item.origen.tipo] }}
+                      @if (item.origen.actorRemitente) {
+                        <span class="bandeja__sub">{{ etiquetaActor[item.origen.actorRemitente] }}</span>
+                      }
+                    </td>
+                    <td>{{ item.fechaRecepcion | date: 'd MMM y, h:mm a' }}</td>
+                    <td><app-uad-estado-noticia [estado]="item.estado" /></td>
+                    <td>
+                      <a class="boton boton--primario boton--compacto" [routerLink]="['/uad/noticias', item.noticiaId]">
+                        Evaluar noticia disciplinaria
+                        <span class="visually-hidden"> {{ item.consecutivo }}</span>
+                      </a>
+                    </td>
+                  </tr>
+                  @if (expandida() === item.noticiaId) {
+                    <tr class="bandeja__detalle" [id]="'uad-detalle-' + item.noticiaId">
+                      <td></td>
+                      <td colspan="6">
+                        <dl class="detalle">
+                          <div>
+                            <dt>Teléfono</dt>
+                            <dd>{{ item.detalleExpandible.telefono ?? (item.tipo === 'NDA' ? 'No aplica (anónima)' : 'Sin dato') }}</dd>
+                          </div>
+                          <div>
+                            <dt>Correo</dt>
+                            <dd>{{ item.detalleExpandible.correo ?? (item.tipo === 'NDA' ? 'No aplica (anónima)' : 'Sin dato') }}</dd>
+                          </div>
+                          <div>
+                            <dt>Vinculación del presunto responsable</dt>
+                            <dd>
+                              {{ item.vinculacionDeclarada ? etiquetaVinculacion[item.vinculacionDeclarada] : 'Sin dato' }}
+                              @if (!item.clasificada) {
+                                <span class="bandeja__sub">Visible a ambos equipos hasta su clasificación.</span>
+                              }
+                            </dd>
+                          </div>
+                          <div class="detalle__ancho">
+                            <dt>Descripción de los hechos</dt>
+                            <dd>{{ item.detalleExpandible.descripcionHechos ?? 'Sin dato' }}</dd>
+                          </div>
+                        </dl>
+                      </td>
+                    </tr>
+                  }
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <mat-paginator
+            [length]="total()"
+            [pageSize]="tamano"
+            [pageIndex]="pagina()"
+            [hidePageSize]="true"
+            (page)="cambiarPagina($event)"
+            aria-label="Páginas de la bandeja"
+          />
+        }
+      </div>
+    }
+  }
+</div>

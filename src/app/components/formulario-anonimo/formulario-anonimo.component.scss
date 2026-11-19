@@ -237,6 +237,29 @@
   border-top: 1px solid var(--color-border);
 }
 
+/* Acceso visible a la queja anónima de la UAD (UAD-FOR-12). */
+.queja-anonima-uad {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-primary-tint);
+
+  mat-icon {
+    color: var(--color-primary);
+    flex-shrink: 0;
+  }
+
+  a {
+    display: inline-block;
+    min-height: 24px;
+    color: var(--color-secondary);
+    font-weight: 600;
+  }
+}
+
 .section-title-with-tooltip {
   display: flex;
   align-items: center;
