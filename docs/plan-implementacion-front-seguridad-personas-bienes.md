@@ -104,3 +104,4 @@ src/app/features/seguridad-personas-bienes/
 * Compatibilidad total con la paleta y diseño institucional de CASILDA (UdeA).
 * Mocks intercambiables por servicios HTTP mediante un único flag de configuración sin tocar componentes.
 * 0 warnings críticos en consola.
+

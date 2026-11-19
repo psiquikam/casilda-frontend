@@ -52,6 +52,18 @@ export const environment = {
       recontactos: false
     }
   },
+  seguridadPyB: {
+    mocks: {
+      catalogos: false,
+      registros: false,
+      bandejaAnalista: false,
+      medidas: false,
+      ordenes: false,
+      camaras: false,
+      remisiones: false,
+      indicadores: false
+    }
+  },
   features: {
     complaintIntakePrototype: false,
     publicTrackingPrototype: false,

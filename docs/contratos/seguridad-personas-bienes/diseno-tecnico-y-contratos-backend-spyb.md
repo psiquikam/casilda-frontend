@@ -59,17 +59,17 @@
 
 ## 2. Modelo de Autorización, Roles y Acceso Restringido
 
-### 2.1 Nuevos Roles Requeridos en Backend
+### 2.1 Roles Oficiales del Módulo (según Catálogo Roles CASILDA - 11 nov 2026)
 
-Siguiendo la convención de `casilda-backend/database/crear_rol_con_permisos.sql`:
+De acuerdo con el documento oficial `docs/Catalogo Roles CASILDA.pdf`:
 
-| ID Rol | Código Rol | Nombre | Descripción y Alcance |
-|---|---|---|---|
-| 7 | `ANALISTA_RIESGOS` | Analista de Riesgos | Responsable central del módulo (Yeison). Bandeja central, revisión, subsanación, vinculación a casos, reparto a EA/UAD/Línea Alma, gestión de cámaras, métricas completas. |
-| 8 | `CENTRAL_MONITOREO` | Central de Monitoreo | Operador telefónico (`219-64-19`) y presencial. Registra solicitudes y novedades iniciales, consulta medidas de protección activas por CC, genera órdenes de acompañamiento iniciales. |
-| 9 | `SUPERVISOR_SEGURIDAD` | Supervisor de Seguridad | Supervisores de vigilancia y operadores de medios. Registra novedades, alertas tempranas, rondas e informes de acompañamiento. Acceso a formulario restringido. |
-
-> **Nota:** El rol `ADMIN` de CASILDA (ID 1) hereda permisos completos de lectura y supervisión sobre el módulo.
+| Código de Rol | Nombre del Rol | Función Principal y Alcance en SPyB |
+|---|---|---|
+| `SPB_COORDINACION` | Coordinador/a de Seguridad | Supervisa y realiza seguimiento de la gestión global de seguridad y métricas del módulo. |
+| `SPB_ANALISTA` | Analista de Riesgos | Realiza reporte de casos, recibe y efectúa remisiones; analiza, clasifica, distribuye y hace seguimiento de solicitudes de protección y acompañamiento (Yeison). |
+| `SPB_CENTRAL` | Operador/a de Central | Recibe solicitudes de acompañamiento (línea telefónica `219-64-19`, presencial, correo), reparte solicitudes de acompañamientos específicos, reporta y registra alertas y novedades; consulta medidas activas. |
+| `SPB_VIGILANTE` | Personal de Vigilancia | Registra de forma restringida novedades y resultados/ejecución de acompañamientos, recibe solicitudes de acompañamiento (vía enlace/código QR restringido, sin consultar expedientes confidenciales). |
+| `ADMIN` | Administrador General | Administración técnica, supervisión global y auditoría. |
 
 ### 2.2 Acceso Restringido para Vigilancia (QR / Token de Orden)
 Para cumplir con RF-SPB-004 y RF-SPB-005 (vigilantes sin cuenta completa en CASILDA):
@@ -601,7 +601,7 @@ Formato de transporte: `application/json;charset=UTF-8`
 
 ### 6.1 Recepción y Registro de Actuaciones de Seguridad
 * **POST `/api/v1/seguridad/registros`**
-* **Roles:** `ANALISTA_RIESGOS`, `CENTRAL_MONITOREO`, `SUPERVISOR_SEGURIDAD`, `ADMIN`
+* **Roles:** `SPB_ANALISTA`, `SPB_CENTRAL`, `SPB_VIGILANTE`, `SPB_COORDINACION`, `ADMIN`
 * **Descripción:** Crea una actuación de Seguridad asignando automáticamente consecutivo `SPB-YYYY-XXXXX`.
 
 **Request Body JSON:**
@@ -651,7 +651,7 @@ Formato de transporte: `application/json;charset=UTF-8`
 
 ### 6.2 Registro Restringido para Vigilantes / Supervisores (QR / Enlace)
 * **POST `/api/v1/seguridad/registros/restringido`**
-* **Roles:** Público o token de sesión rápida de supervisor (`SUPERVISOR_SEGURIDAD` / Bearer temporal / validación cédula).
+* **Roles:** Público o token de sesión rápida de supervisor (`SPB_VIGILANTE` / Bearer temporal / validación cédula).
 * **Descripción:** Permite a supervisores en campo registrar novedades sin acceso al expediente institucional.
 * **Validaciones:** Exige número de cédula del supervisor para trazabilidad histórica indeleble (RF-SPB-006, RF-SPB-009).
 
@@ -659,7 +659,7 @@ Formato de transporte: `application/json;charset=UTF-8`
 
 ### 6.3 Consulta de Medidas Activas (Central de Monitoreo)
 * **GET `/api/v1/seguridad/consultas/medida-activa/{numeroDocumento}`**
-* **Roles:** `CENTRAL_MONITOREO`, `ANALISTA_RIESGOS`, `ADMIN`
+* **Roles:** `SPB_CENTRAL`, `SPB_ANALISTA`, `SPB_COORDINACION`, `ADMIN`
 * **Descripción:** Verifica en tiempo real si una persona que llama o llega tiene una medida de protección vigente en CASILDA (RF-SPB-012).
 
 **Response JSON (200 OK):**
@@ -687,7 +687,7 @@ Formato de transporte: `application/json;charset=UTF-8`
 
 ### 6.4 Bandeja Central del Analista de Riesgos (Yeison)
 * **GET `/api/v1/seguridad/analista/bandeja?pestana={pestana}&page=0&size=10`**
-* **Roles:** `ANALISTA_RIESGOS`, `ADMIN`
+* **Roles:** `SPB_ANALISTA`, `SPB_COORDINACION`, `ADMIN`
 * **Parámetros de pestaña:** `NUEVOS`, `REVISION`, `PENDIENTE_VINCULACION`, `ACOMPANAMIENTOS`, `CAMARAS`, `REMISIONES`, `UAD`.
 
 **Response JSON (200 OK):**
@@ -811,3 +811,4 @@ Toda notificación genera un registro en la tabla `notificacionseguridad` con es
 - [ ] **CA-08:** La gestión de cámaras almacena la referencia de custodia institucional sin aceptar archivos de video binarios en CASILDA.
 - [ ] **CA-09:** Las remisiones a la UAD permiten registrar el consecutivo de recibido UAD y posteriormente el radicado disciplinario.
 - [ ] **CA-10:** Los correos de notificación no exponen en su texto plano nombres de víctimas, relatos de violencia ni datos confidenciales del presunto agresor.
+

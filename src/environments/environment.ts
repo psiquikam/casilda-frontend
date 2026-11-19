@@ -52,6 +52,22 @@ export const environment = {
       recontactos: true
     }
   },
+  /**
+   * Módulo Seguridad a Personas y Bienes (SPyB): mocks activos para desarrollo y pruebas
+   * independientes. Al desplegarse en backend, se apagan los interruptores sin tocar código.
+   */
+  seguridadPyB: {
+    mocks: {
+      catalogos: true,
+      registros: true,
+      bandejaAnalista: true,
+      medidas: true,
+      ordenes: true,
+      camaras: true,
+      remisiones: true,
+      indicadores: true
+    }
+  },
   features: {
     complaintIntakePrototype: true,
     publicTrackingPrototype: true,

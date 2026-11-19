@@ -1,0 +1,367 @@
+<div class="bandeja">
+  <!-- Encabezado estándar CASILDA -->
+  <header class="bandeja__cabecera">
+    <div>
+      <h1 class="bandeja__titulo">Central de monitoreo y operaciones SPyB</h1>
+      <p class="bandeja__intro">
+        Atención telefónica (Línea 219-64-19), recepción presencial y consulta inmediata de medidas de protección preventivas.
+      </p>
+    </div>
+    <div class="bandeja__acciones">
+      <span class="boton boton--secundario">
+        <mat-icon aria-hidden="true">phone_in_talk</mat-icon>
+        Línea de emergencia 219-64-19
+      </span>
+    </div>
+  </header>
+
+  @if (demo) {
+    <p class="casilda-alerta casilda-alerta--precaucion" role="note">
+      <mat-icon aria-hidden="true">science</mat-icon>
+      <span><strong>Datos de demostración.</strong> Los servicios de Seguridad a personas y bienes están simulados.</span>
+    </p>
+  }
+
+  <mat-tab-group animationDuration="200ms" class="central-tabs" mat-stretch-tabs="false">
+    <!-- PESTAÑA 1: CONSULTA DE MEDIDAS ACTIVAS -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">security</mat-icon>
+        Consulta de medidas activas
+      </ng-template>
+
+      <div class="tab-content">
+        <mat-card class="search-card">
+          <mat-card-header>
+            <mat-card-title>Verificación de medidas de protección en tiempo real</mat-card-title>
+            <mat-card-subtitle>
+              Permite validar de forma instantánea si una persona que llama o acude cuenta con medida formal activa (RF-SPB-012).
+            </mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="search-bar">
+              <div  class="spyb-campo search-input">
+<label class="spyb-campo__etiqueta" for="spyb-docConsulta">Número de documento / cédula <button type="button" class="help-tooltip-trigger" matTooltip="Muestra si la persona tiene una medida de protección vigente." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda sobre número de documento / cédula">?</button></label>
+<mat-form-field appearance="outline">
+                <input id="spyb-docConsulta"
+                  matInput
+                  #docCtrl="ngModel"
+                  name="docConsulta"
+                  [(ngModel)]="docConsulta"
+                  required
+                  pattern="[0-9]{5,20}"
+                  maxlength="20"
+                  appSoloNumeros
+                  inputmode="numeric"
+                  autocomplete="off"
+                  (keyup.enter)="docConsultaValido && buscarMedidas()"
+                  placeholder="Ej. 1035987456"
+                  />
+                @if (docConsulta) {
+                  <button
+                    matSuffix
+                    mat-icon-button
+                    aria-label="Limpiar"
+                    (click)="docConsulta = ''; resultadoConsultaMedidas = null; haConsultado = false"
+                    >
+                    <mat-icon aria-hidden="true">close</mat-icon>
+                  </button>
+                }
+        <mat-error>{{ docCtrl.control | mensajeError:'documento' }}</mat-error>
+      </mat-form-field>
+</div>
+
+              <button
+                mat-flat-button
+                color="primary"
+                class="search-button"
+                [disabled]="!docConsultaValido || consultandoMedidas"
+                (click)="buscarMedidas()"
+                >
+                <mat-icon>search</mat-icon>
+                {{ consultandoMedidas ? 'Consultando...' : 'Consultar medidas' }}
+              </button>
+            </div>
+
+            <!-- RESULTADO DE LA CONSULTA -->
+            @if (haConsultado) {
+              <div class="resultado-seccion">
+                <!-- CASO 1: TIENE MEDIDA ACTIVA -->
+                @if (resultadoConsultaMedidas?.tieneMedidaActiva) {
+                  <div class="medida-activa-box">
+                    <div class="alerta-header">
+                      <mat-icon class="alerta-icon alerta-verde">shield</mat-icon>
+                      <div>
+                        <h3 class="alerta-titulo">LA PERSONA CUENTA CON MEDIDA DE PROTECCIÓN ACTIVA</h3>
+                        <p class="alerta-sub">
+                          Identificación: <strong>{{ resultadoConsultaMedidas?.persona?.numeroDocumento }}</strong> —
+                          Nombre: <strong>{{ resultadoConsultaMedidas?.persona?.nombreCompleto }}</strong>
+                        </p>
+                      </div>
+                    </div>
+                    <div class="medidas-lista">
+                      @for (m of resultadoConsultaMedidas?.medidas; track m) {
+                        <div class="medida-item">
+                          <div class="medida-header">
+                            <span class="caso-tag">{{ m.codigoCaso }}</span>
+                            <span class="medida-nombre">{{ m.tipoMedida }}</span>
+                            <span class="vigencia-tag">Vigente hasta: {{ m.vigenciaFin || 'Indefinida' }}</span>
+                          </div>
+                          <p class="medida-condiciones">
+                            <strong>Condiciones operativas:</strong> {{ m.condiciones }}
+                          </p>
+                          <div class="medida-actions">
+                            <button mat-flat-button color="accent" (click)="generarOrdenDesdeMedida(m)">
+                              <mat-icon>transfer_within_a_station</mat-icon>
+                              Emitir orden de acompañamiento inmediata
+                            </button>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+                <!-- CASO 2: SIN MEDIDA ACTIVA -->
+                @if (!resultadoConsultaMedidas?.tieneMedidaActiva) {
+                  <div class="sin-medida-box">
+                    <mat-icon class="alerta-icon alerta-gris">info</mat-icon>
+                    <div>
+                      <h3>Sin medida de protección vigente registrada</h3>
+                      <p>
+                        El documento <strong>{{ docConsulta }}</strong> no registra medidas cautelares ni órdenes activas en CASILDA.
+                        Si la persona manifiesta sentirse insegura, puede registrar un <em>Acompañamiento espontáneo / preventivo</em> en la siguiente pestaña.
+                      </p>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- PESTAÑA 2: REGISTRO DE RECEPCIÓN (219-64-19 / Presencial) -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">add_task</mat-icon>
+        Registrar recepción de situación
+      </ng-template>
+
+      <div class="tab-content">
+        <!-- Notificación de éxito si se acaba de registrar -->
+        @if (ultimoRegistroCreado) {
+          <div class="exito-banner">
+            <mat-icon>check_circle</mat-icon>
+            <div>
+              <strong>¡Actuación radicada con éxito!</strong> Consecutivo oficial asignado:
+              <app-spyb-consecutivo-badge [consecutivo]="ultimoRegistroCreado.consecutivo"></app-spyb-consecutivo-badge>
+              (Ingresó a la bandeja de revisión del Analista de riesgos).
+            </div>
+          </div>
+        }
+
+        <mat-card class="form-card">
+          <mat-card-header>
+            <mat-card-title>Recepción de solicitud o situación de seguridad</mat-card-title>
+            <mat-card-subtitle>
+              Registro de novedades, PQRS y alertas informadas vía telefónica o presencial (RF-SPB-010..016).
+            </mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <form [formGroup]="formRecepcion" (ngSubmit)="registrarRecepcion()">
+              <!-- SECCIÓN 1: CANAL Y TIPO DE REGISTRO -->
+              <div class="spyb-seccion-titulo">1. Datos del canal y registro</div>
+              <div class="spyb-grid">
+                <div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-canalRecepcionCodigo">Canal de recepción <span class="required-star">*</span> <button type="button" class="help-tooltip-trigger" matTooltip="Línea 219-64-19, correo, atención presencial, ronda en campo u otro canal autorizado." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda sobre canal de recepción">?</button></label>
+      <mat-form-field appearance="outline">
+        <mat-select id="spyb-canalRecepcionCodigo" formControlName="canalRecepcionCodigo" placeholder="Seleccione una opción">
+        @for (o of canales; track o.id) {
+          <mat-option [value]="o.codigo">{{ o.nombre }}</mat-option>
+        }
+      </mat-select>
+        <mat-error>{{ formRecepcion.get('canalRecepcionCodigo') | mensajeError:'seleccion' }}</mat-error>
+      </mat-form-field>
+    </div>
+
+                <div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-tipoRegistroCodigo">Tipo de registro <span class="required-star">*</span> <button type="button" class="help-tooltip-trigger" matTooltip="Novedad, alerta temprana, PQRS o informe de acompañamiento." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda sobre tipo de registro">?</button></label>
+      <mat-form-field appearance="outline">
+        <mat-select id="spyb-tipoRegistroCodigo" formControlName="tipoRegistroCodigo" placeholder="Seleccione una opción">
+        @for (o of tiposRegistro; track o.id) {
+          <mat-option [value]="o.codigo">{{ o.nombre }}</mat-option>
+        }
+      </mat-select>
+        <mat-error>{{ formRecepcion.get('tipoRegistroCodigo') | mensajeError:'seleccion' }}</mat-error>
+      </mat-form-field>
+    </div>
+
+                <div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-campusId">Sede / campus <span class="required-star">*</span> <button type="button" class="help-tooltip-trigger" matTooltip="Seleccione la sede o campus de la Universidad donde ocurrió la situación." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda sobre sede / campus">?</button></label>
+      <mat-form-field appearance="outline">
+        <mat-select id="spyb-campusId" formControlName="campusId" placeholder="Seleccione una opción">
+        @for (o of campus; track o.id) {
+          <mat-option [value]="o.id">{{ o.nombre }}</mat-option>
+        }
+      </mat-select>
+        <mat-error>{{ formRecepcion.get('campusId') | mensajeError:'seleccion' }}</mat-error>
+      </mat-form-field>
+    </div>
+
+                <div class="spyb-campo col-span-full">
+<label class="spyb-campo__etiqueta" for="spyb-lugarHechos">Lugar específico de los hechos <span class="required-star">*</span></label>
+<mat-form-field appearance="outline">
+                  <input id="spyb-lugarHechos" matInput formControlName="lugarHechos" placeholder="Ej. Bloque 22 pasillo segundo piso" maxlength="200" />
+        <mat-error>{{ formRecepcion.get('lugarHechos') | mensajeError:'texto' }}</mat-error>
+      </mat-form-field>
+</div>
+              </div>
+
+              <!-- SECCIÓN 2: PERSONA ATENDIDA / REPORTADA -->
+              <div class="spyb-seccion-titulo">2. Identificación de la persona</div>
+              <div class="spyb-grid">
+                <div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-rolPersonaCodigo">Rol de la persona <span class="required-star">*</span> <button type="button" class="help-tooltip-trigger" matTooltip="Persona afectada, persona señalada u otro interviniente o testigo." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda sobre rol de la persona">?</button></label>
+      <mat-form-field appearance="outline">
+        <mat-select id="spyb-rolPersonaCodigo" formControlName="rolPersonaCodigo" placeholder="Seleccione una opción">
+        @for (o of rolesPersona; track o.id) {
+          <mat-option [value]="o.codigo">{{ o.nombre }}</mat-option>
+        }
+      </mat-select>
+        <mat-error>{{ formRecepcion.get('rolPersonaCodigo') | mensajeError:'seleccion' }}</mat-error>
+      </mat-form-field>
+    </div>
+
+                <div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-tipoIdentificacionId">Tipo de documento <span class="required-star">*</span></label>
+      <mat-form-field appearance="outline">
+        <mat-select id="spyb-tipoIdentificacionId" formControlName="tipoIdentificacionId" placeholder="Seleccione una opción">
+        @for (o of tiposDocumento; track o.id) {
+          <mat-option [value]="o.id">{{ o.nombre }}</mat-option>
+        }
+      </mat-select>
+        <mat-error>{{ formRecepcion.get('tipoIdentificacionId') | mensajeError:'seleccion' }}</mat-error>
+      </mat-form-field>
+    </div>
+<div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-numeroDocumento">Número de documento <span class="required-star">*</span> <button type="button" class="help-tooltip-trigger" matTooltip="Solo números, sin puntos ni espacios." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda sobre número de documento">?</button></label>
+      <mat-form-field appearance="outline">
+        <input id="spyb-numeroDocumento" matInput formControlName="numeroDocumento" placeholder="Ej: 1035987456" (input)="documento.formato($event)" [attr.maxlength]="documento.maxLongitud()" inputmode="text" autocomplete="off" />
+        <mat-error>{{ formRecepcion.get('numeroDocumento') | mensajeError:'documento' }}</mat-error>
+      </mat-form-field>
+    </div>
+
+                <div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-primerNombre">Primer nombre <span class="required-star">*</span></label>
+      <mat-form-field appearance="outline">
+        <input id="spyb-primerNombre" matInput formControlName="primerNombre" placeholder="Ej: Juan" appSoloLetras autocomplete="off" maxlength="60" />
+        <mat-error>{{ formRecepcion.get('primerNombre') | mensajeError:'letras' }}</mat-error>
+      </mat-form-field>
+    </div>
+    <div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-segundoNombre">Segundo nombre</label>
+      <mat-form-field appearance="outline">
+        <input id="spyb-segundoNombre" matInput formControlName="segundoNombre" placeholder="Ej: Carlos" appSoloLetras autocomplete="off" maxlength="60" />
+        <mat-error>{{ formRecepcion.get('segundoNombre') | mensajeError:'letras' }}</mat-error>
+      </mat-form-field>
+    </div>
+    <div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-primerApellido">Primer apellido <span class="required-star">*</span></label>
+      <mat-form-field appearance="outline">
+        <input id="spyb-primerApellido" matInput formControlName="primerApellido" placeholder="Ej: Pérez" appSoloLetras autocomplete="off" maxlength="60" />
+        <mat-error>{{ formRecepcion.get('primerApellido') | mensajeError:'letras' }}</mat-error>
+      </mat-form-field>
+    </div>
+    <div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-segundoApellido">Segundo apellido</label>
+      <mat-form-field appearance="outline">
+        <input id="spyb-segundoApellido" matInput formControlName="segundoApellido" placeholder="Ej: Gómez" appSoloLetras autocomplete="off" maxlength="60" />
+        <mat-error>{{ formRecepcion.get('segundoApellido') | mensajeError:'letras' }}</mat-error>
+      </mat-form-field>
+    </div>
+
+                <div class="spyb-campo">
+<label class="spyb-campo__etiqueta" for="spyb-telefono">Teléfono de contacto</label>
+<mat-form-field appearance="outline">
+                  <input id="spyb-telefono" matInput formControlName="telefono" placeholder="Ej. 3001234567" appSoloNumeros inputmode="numeric" autocomplete="off" maxlength="12" />
+        <mat-error>{{ formRecepcion.get('telefono') | mensajeError:'telefono' }}</mat-error>
+      </mat-form-field>
+</div>
+
+                <div class="spyb-campo">
+<label class="spyb-campo__etiqueta" for="spyb-correo">Correo institucional</label>
+<mat-form-field appearance="outline">
+                  <input id="spyb-correo" matInput type="email" formControlName="correo" placeholder="ejemplo@udea.edu.co" maxlength="100" autocomplete="off" />
+        <mat-error>{{ formRecepcion.get('correo') | mensajeError:'email' }}</mat-error>
+      </mat-form-field>
+</div>
+
+                <div class="spyb-campo col-span-2">
+      <label class="spyb-campo__etiqueta" for="spyb-vinculoUdeAId">Vínculo con la universidad</label>
+      <mat-form-field appearance="outline">
+        <mat-select id="spyb-vinculoUdeAId" formControlName="vinculoUdeAId" placeholder="Seleccione una opción">
+        @for (o of vinculos; track o.id) {
+          <mat-option [value]="o.id">{{ o.nombre }}</mat-option>
+        }
+      </mat-select>
+        <mat-error>{{ formRecepcion.get('vinculoUdeAId') | mensajeError:'seleccion' }}</mat-error>
+      </mat-form-field>
+    </div>
+              </div>
+
+              <!-- SECCIÓN 3: RELATO DE LOS HECHOS -->
+              <div class="spyb-seccion-titulo">3. Descripción de los hechos</div>
+              <div  class="spyb-campo full-width">
+<label class="spyb-campo__etiqueta" for="spyb-descripcionHechos">Descripción operativa de la situación reportada <span class="required-star">*</span> <button type="button" class="help-tooltip-trigger" matTooltip="Describa hechos, no opiniones: qué pasó, quién solicitó apoyo y qué se hizo. Relato objetivo de lo ocurrido, mínimo 10 caracteres." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda sobre descripción operativa de la situación reportada">?</button></label>
+<mat-form-field appearance="outline">
+                <textarea id="spyb-descripcionHechos"
+                  matInput
+                  rows="4"
+                  formControlName="descripcionHechos"
+                  placeholder="Detalle los hechos observados o informados por el reportante..." maxlength="2000"
+                ></textarea>
+        <mat-error>{{ formRecepcion.get('descripcionHechos') | mensajeError:'texto' }}</mat-error>
+      </mat-form-field>
+</div>
+
+              <!-- SECCIÓN 4: CONSENTIMIENTO Y VOLUNTAD (RF-SPB-025..029) -->
+              <div class="spyb-seccion-titulo">4. Consentimiento y voluntad de la víctima</div>
+              <div class="consentimiento-box">
+                <div class="toggle-row">
+                  <mat-slide-toggle formControlName="lecturaConsentimiento" color="primary">
+                    Se realizó lectura y explicación del consentimiento informado para activación de Ruta Violeta
+                  </mat-slide-toggle>
+                </div>
+                <div class="toggle-row">
+                  <mat-slide-toggle formControlName="autorizaActivacionRuta" color="accent">
+                    La persona <strong>AUTORIZA</strong> la remisión o activación formal de la Ruta Violeta
+                  </mat-slide-toggle>
+                </div>
+                <p class="consentimiento-nota">
+                  * La no autorización no anula la actuación de Seguridad; quedará registrada para fines operativos e independientes (RF-SPB-028).
+                </p>
+              </div>
+
+              <div class="form-actions">
+                <button
+                  type="submit"
+                  mat-flat-button
+                  color="primary"
+                  class="submit-btn"
+                  [disabled]="formRecepcion.invalid || guardandoRegistro"
+                  >
+                  <mat-icon>save</mat-icon>
+                  {{ guardandoRegistro ? 'Radicando...' : 'Radicar actuación en seguridad' }}
+                </button>
+              </div>
+            </form>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+

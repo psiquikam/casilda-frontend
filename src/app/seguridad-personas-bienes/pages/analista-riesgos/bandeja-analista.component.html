@@ -1,0 +1,461 @@
+<div class="bandeja">
+  <!-- Encabezado estándar CASILDA -->
+  <header class="bandeja__cabecera">
+    <div>
+      <h1 class="bandeja__titulo">Seguridad a personas y bienes — bandeja de análisis</h1>
+      <p class="bandeja__intro">
+        Coordinación, clasificación, vinculación a casos CASILDA, reparto y seguimiento operativo de novedades en campus (RF-SPB-106..110).
+      </p>
+    </div>
+    <div class="bandeja__acciones">
+      <a class="boton boton--secundario" routerLink="/seguridad/indicadores">
+        <mat-icon aria-hidden="true">bar_chart</mat-icon>
+        Tablero de indicadores
+      </a>
+      <a class="boton boton--primario" routerLink="/seguridad/reportar">
+        <mat-icon aria-hidden="true">add</mat-icon>
+        Registrar novedad
+      </a>
+    </div>
+  </header>
+
+  @if (demo) {
+    <p class="casilda-alerta casilda-alerta--precaucion" role="note">
+      <mat-icon aria-hidden="true">science</mat-icon>
+      <span><strong>Datos de demostración.</strong> Los servicios de Seguridad a personas y bienes están simulados.</span>
+    </p>
+  }
+
+  <!-- GRUPO DE PESTAÑAS MULTIDIMENSIONAL -->
+  <mat-tab-group
+    animationDuration="150ms"
+    class="analista-tabs"
+    (selectedIndexChange)="alCambiarPestana($event)"
+    >
+    <!-- TAB 0: NUEVOS REPORTES -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">fiber_new</mat-icon>
+        Nuevos
+        @if (conteos().nuevos > 0) {
+          <span class="badge-count">{{ conteos().nuevos }}</span>
+        }
+      </ng-template>
+      <ng-container *ngTemplateOutlet="tablaRegistrosTemplate"></ng-container>
+    </mat-tab>
+
+    <!-- TAB 1: EN REVISIÓN / SUBSANACIÓN -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">rate_review</mat-icon>
+        En revisión
+        @if (conteos().enRevision > 0) {
+          <span class="badge-count warn">{{ conteos().enRevision }}</span>
+        }
+      </ng-template>
+      <ng-container *ngTemplateOutlet="tablaRegistrosTemplate"></ng-container>
+    </mat-tab>
+
+    <!-- TAB 2: PENDIENTE VINCULACIÓN -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">link</mat-icon>
+        Pendiente vinculación
+        @if (conteos().pendienteVinculacion > 0) {
+          <span class="badge-count purple">{{ conteos().pendienteVinculacion }}</span>
+        }
+      </ng-template>
+      <ng-container *ngTemplateOutlet="tablaRegistrosTemplate"></ng-container>
+    </mat-tab>
+
+    <!-- TAB 3: ÓRDENES DE ACOMPAÑAMIENTO -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">transfer_within_a_station</mat-icon>
+        Acompañamientos
+        @if (conteos().acompanamientos > 0) {
+          <span class="badge-count">{{ conteos().acompanamientos }}</span>
+        }
+      </ng-template>
+      <div class="tab-toolbar">
+        <h3>Órdenes de acompañamiento formales y espontáneas</h3>
+        <button mat-flat-button color="primary" (click)="abrirModalNuevaOrden()">
+          <mat-icon>add</mat-icon> Emitir nueva orden
+        </button>
+      </div>
+
+      <table mat-table [dataSource]="ordenes" class="mat-elevation-z1 spyb-table">
+        <ng-container matColumnDef="codigoOrden">
+          <th mat-header-cell *matHeaderCellDef>Código orden</th>
+          <td mat-cell *matCellDef="let o">
+            <strong>{{ o.codigoOrden }}</strong>
+            @if (o.esMedidaFormal) {
+              <span class="tag-medida">Medida EA</span>
+            }
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="prioridad">
+          <th mat-header-cell *matHeaderCellDef>Prioridad</th>
+          <td mat-cell *matCellDef="let o">
+            <span class="prioridad-chip" [class.alta]="o.prioridad === 'ALTA'">{{ o.prioridad }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="fechaHora">
+          <th mat-header-cell *matHeaderCellDef>Programada</th>
+          <td mat-cell *matCellDef="let o">{{ o.fechaProgramada }} {{ o.horaProgramada }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="itinerario">
+          <th mat-header-cell *matHeaderCellDef>Itinerario</th>
+          <td mat-cell *matCellDef="let o">{{ o.lugarOrigen }} → {{ o.lugarDestino }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="persona">
+          <th mat-header-cell *matHeaderCellDef>Persona</th>
+          <td mat-cell *matCellDef="let o">{{ o.personaAcompanada }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let o">
+            <span class="estado-orden">{{ o.estado }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let o">
+            <button
+              mat-icon-button
+              color="primary"
+              aria-label="Copiar enlace restringido para vigilante"
+              matTooltip="Copiar enlace restringido para vigilante"
+              (click)="copiarEnlaceVigilante(o)"
+              >
+              <mat-icon aria-hidden="true">qr_code</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columnasOrdenes"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnasOrdenes"></tr>
+      </table>
+    </mat-tab>
+
+    <!-- TAB 4: CÁMARAS Y EVIDENCIAS -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">videocam</mat-icon>
+        Cámaras
+        @if (conteos().camaras > 0) {
+          <span class="badge-count">{{ conteos().camaras }}</span>
+        }
+      </ng-template>
+      <div class="tab-toolbar">
+        <h3>Trazabilidad de cadena de custodia audiovisual</h3>
+        <button mat-flat-button color="primary" (click)="abrirModalSolicitudCamara()">
+          <mat-icon>add</mat-icon> Nueva solicitud de extracción
+        </button>
+      </div>
+
+      <table mat-table [dataSource]="evidencias" class="mat-elevation-z1 spyb-table">
+        <ng-container matColumnDef="codigo">
+          <th mat-header-cell *matHeaderCellDef>Solicitud</th>
+          <td mat-cell *matCellDef="let e"><strong>{{ e.codigoSolicitud }}</strong></td>
+        </ng-container>
+
+        <ng-container matColumnDef="ubicacion">
+          <th mat-header-cell *matHeaderCellDef>Cámara / ubicación</th>
+          <td mat-cell *matCellDef="let e">{{ e.ubicacionCamara }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="fechaFranja">
+          <th mat-header-cell *matHeaderCellDef>Franja horaria</th>
+          <td mat-cell *matCellDef="let e">{{ e.fechaHechos }} ({{ e.horaInicioFranja }} - {{ e.horaFinFranja }})</td>
+        </ng-container>
+
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef>Estado gestión</th>
+          <td mat-cell *matCellDef="let e">
+            <span class="chip-camara">{{ e.estadoGestionNombre || e.estadoGestion }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="referencia">
+          <th mat-header-cell *matHeaderCellDef>Referencia archivo institucional</th>
+          <td mat-cell *matCellDef="let e">
+            <code>{{ e.referenciaArchivoInstitucional || 'Pendiente extracción' }}</code>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let e">
+            <button mat-stroked-button color="primary" class="btn-sm">
+              <mat-icon>visibility</mat-icon> Detalle
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columnasEvidencias"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnasEvidencias"></tr>
+      </table>
+    </mat-tab>
+
+    <!-- TAB 5: REMISIONES -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">send</mat-icon>
+        Remisiones
+        @if (conteos().remisiones > 0) {
+          <span class="badge-count">{{ conteos().remisiones }}</span>
+        }
+      </ng-template>
+      <div class="tab-toolbar">
+        <h3>Remisiones a EA, Línea Alma, UAD y entidades externas</h3>
+      </div>
+
+      <table mat-table [dataSource]="remisiones" class="mat-elevation-z1 spyb-table">
+        <ng-container matColumnDef="consecutivo">
+          <th mat-header-cell *matHeaderCellDef>Actuación origen</th>
+          <td mat-cell *matCellDef="let r"><strong>{{ r.consecutivoSeguridad }}</strong></td>
+        </ng-container>
+
+        <ng-container matColumnDef="destino">
+          <th mat-header-cell *matHeaderCellDef>Destino</th>
+          <td mat-cell *matCellDef="let r"><span class="chip-destino">{{ r.destinoNombre || r.destino }}</span></td>
+        </ng-container>
+
+        <ng-container matColumnDef="fecha">
+          <th mat-header-cell *matHeaderCellDef>Fecha remisión</th>
+          <td mat-cell *matCellDef="let r">{{ r.fechaRemision | date:'short' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let r">{{ r.estadoRemision }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="uadConsecutivo">
+          <th mat-header-cell *matHeaderCellDef>Recibido / radicado UAD</th>
+          <td mat-cell *matCellDef="let r">
+            @if (r.consecutivorecibidouad) {
+              <span>Rec: {{ r.consecutivorecibidouad }}</span>
+            }
+            @if (r.radicadodisciplinariouad) {
+              <span class="block-span">Rad: {{ r.radicadodisciplinariouad }}</span>
+            }
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let r">
+            <button mat-stroked-button color="primary" class="btn-sm">
+              <mat-icon>edit_note</mat-icon> Actualizar estado
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columnasRemisiones"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnasRemisiones"></tr>
+      </table>
+    </mat-tab>
+
+    <!-- TAB 6: REQUERIMIENTOS UAD (CITACIÓN TESTIGOS) -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">gavel</mat-icon>
+        Requerimientos UAD
+        @if (conteos().uad > 0) {
+          <span class="badge-count">{{ conteos().uad }}</span>
+        }
+      </ng-template>
+      <div class="tab-toolbar">
+        <h3>Citaciones a personal de vigilancia como Testigos (RF-SPB-092..095)</h3>
+      </div>
+
+      <table mat-table [dataSource]="requerimientosUad" class="mat-elevation-z1 spyb-table">
+        <ng-container matColumnDef="persona">
+          <th mat-header-cell *matHeaderCellDef>Vigilante requerido</th>
+          <td mat-cell *matCellDef="let u">
+            <strong>{{ u.personaRequerida }}</strong>
+            <span class="block-span">CC: {{ u.cedulaPersonaRequerida }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="tipo">
+          <th mat-header-cell *matHeaderCellDef>Tipo requerimiento</th>
+          <td mat-cell *matCellDef="let u">{{ u.tipoRequerimientoNombre || u.tipoRequerimiento }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="audiencia">
+          <th mat-header-cell *matHeaderCellDef>Fecha audiencia</th>
+          <td mat-cell *matCellDef="let u">{{ u.fechaAudiencia | date:'medium' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="notificacion">
+          <th mat-header-cell *matHeaderCellDef>Notificación</th>
+          <td mat-cell *matCellDef="let u">
+            <span class="badge-notificado">{{ u.estadoNotificacion }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let u">
+            <button mat-stroked-button color="accent" class="btn-sm">
+              <mat-icon>mail</mat-icon> Reenviar notificación
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columnasUad"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnasUad"></tr>
+      </table>
+    </mat-tab>
+  </mat-tab-group>
+
+  <!-- TEMPLATE REUTILIZABLE PARA TABLAS DE REGISTROS -->
+  <ng-template #tablaRegistrosTemplate>
+    <div class="tabla-contenedor">
+      <table mat-table [dataSource]="registros" class="mat-elevation-z1 spyb-table">
+        <!-- Consecutivo -->
+        <ng-container matColumnDef="consecutivo">
+          <th mat-header-cell *matHeaderCellDef>Consecutivo</th>
+          <td mat-cell *matCellDef="let r">
+            <app-spyb-consecutivo-badge [consecutivo]="r.consecutivo"></app-spyb-consecutivo-badge>
+          </td>
+        </ng-container>
+
+        <!-- Tipo -->
+        <ng-container matColumnDef="tipo">
+          <th mat-header-cell *matHeaderCellDef>Tipo registro</th>
+          <td mat-cell *matCellDef="let r">{{ r.tipoRegistroNombre || r.tipoRegistro }}</td>
+        </ng-container>
+
+        <!-- Fecha -->
+        <ng-container matColumnDef="fecha">
+          <th mat-header-cell *matHeaderCellDef>Fecha reporte</th>
+          <td mat-cell *matCellDef="let r">{{ r.fechaReporte | date:'short' }}</td>
+        </ng-container>
+
+        <!-- Campus -->
+        <ng-container matColumnDef="campus">
+          <th mat-header-cell *matHeaderCellDef>Sede / lugar</th>
+          <td mat-cell *matCellDef="let r">
+            <strong>{{ r.campusNombre || 'Sede Medellín' }}</strong>
+            <span class="block-span">{{ r.lugarHechos }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Persona -->
+        <ng-container matColumnDef="persona">
+          <th mat-header-cell *matHeaderCellDef>Persona afectada</th>
+          <td mat-cell *matCellDef="let r">
+            {{ r.persona.nombreCompleto }}
+            <span class="block-span doc-span">CC: {{ r.persona.numeroDocumento }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Estado -->
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let r">
+            <app-spyb-estado-badge [estado]="r.estado"></app-spyb-estado-badge>
+          </td>
+        </ng-container>
+
+        <!-- Caso CASILDA -->
+        <ng-container matColumnDef="caso">
+          <th mat-header-cell *matHeaderCellDef>Caso CASILDA</th>
+          <td mat-cell *matCellDef="let r">
+            @if (r.codigoCaso) {
+              <span class="caso-link">{{ r.codigoCaso }}</span>
+            }
+            @if (!r.codigoCaso) {
+              <span class="sin-caso">Sin vincular</span>
+            }
+          </td>
+        </ng-container>
+
+        <!-- Acciones operativas condensadas (UX limpia y profesional) -->
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef class="th-acciones">Acciones</th>
+          <td mat-cell *matCellDef="let r">
+            <div class="action-buttons-condensed">
+              <a
+                mat-icon-button
+                color="primary"
+                aria-label="Ver ficha y auditoría"
+                matTooltip="Ver ficha y auditoría"
+                [routerLink]="['/seguridad/detalle', r.id]"
+                >
+                <mat-icon aria-hidden="true">visibility</mat-icon>
+              </a>
+
+              <button
+                mat-icon-button
+                aria-label="Más opciones de gestión"
+                matTooltip="Opciones de gestión"
+                [matMenuTriggerFor]="menuRegistro"
+                [matMenuTriggerData]="{ reg: r }"
+                >
+                <mat-icon aria-hidden="true">more_vert</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columnasRegistros"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnasRegistros"></tr>
+      </table>
+    </div>
+  </ng-template>
+
+  <!-- MENÚ DESPLEGABLE DE ACCIONES OPERATIVAS -->
+  <mat-menu #menuRegistro="matMenu">
+    <ng-template matMenuContent let-reg="reg">
+      @if (!reg.idCaso) {
+        <button mat-menu-item (click)="abrirModalVincular(reg)">
+          <mat-icon color="accent" aria-hidden="true">link</mat-icon>
+          <span>Vincular a caso CASILDA</span>
+        </button>
+      }
+
+      <button mat-menu-item (click)="abrirModalNuevaOrden(reg)">
+        <mat-icon color="primary" aria-hidden="true">transfer_within_a_station</mat-icon>
+        <span>Emitir orden de acompañamiento</span>
+      </button>
+
+      <button mat-menu-item (click)="abrirModalSolicitudCamara(reg)">
+        <mat-icon aria-hidden="true">videocam</mat-icon>
+        <span>Solicitar grabación de cámara</span>
+      </button>
+
+      <button mat-menu-item (click)="abrirModalRemision(reg)">
+        <mat-icon aria-hidden="true">send</mat-icon>
+        <span>Remitir a EA / UAD / Alma</span>
+      </button>
+
+      <mat-divider></mat-divider>
+
+      @if (reg.estado !== 'SUBSANACION_REQUERIDA') {
+        <button mat-menu-item (click)="abrirModalSubsanar(reg)">
+          <mat-icon color="warn" aria-hidden="true">assignment_late</mat-icon>
+          <span>Solicitar subsanación a vigilancia</span>
+        </button>
+      }
+
+      @if (!reg.idCaso && reg.estado !== 'ACTUACION_INDEPENDIENTE') {
+        <button mat-menu-item (click)="declararIndependiente(reg)">
+          <mat-icon aria-hidden="true">inventory_2</mat-icon>
+          <span>Cerrar como actuación independiente</span>
+        </button>
+      }
+    </ng-template>
+  </mat-menu>
+</div>
+

@@ -199,6 +199,10 @@ export const routes: Routes = [
     loadChildren: () => import('./linea-alma/psicologia/routes').then((m) => m.PSICOLOGIA_ROUTES)
   },
   {
+    path: 'seguridad',
+    loadChildren: () => import('./seguridad-personas-bienes/seguridad-personas-bienes.routes').then((m) => m.SEGURIDAD_ROUTES)
+  },
+  {
     path: 'acceso-denegado',
     title: 'Acceso denegado',
     loadComponent: () => import('./components/acceso-denegado/acceso-denegado.component').then((m) => m.AccesoDenegadoComponent)

@@ -1,0 +1,250 @@
+<div class="bandeja">
+  <header class="bandeja__cabecera">
+    <div>
+      <h1 class="bandeja__titulo">Ejecución de orden de acompañamiento</h1>
+      <p class="bandeja__intro">
+        Acceso operativo para personal de vigilancia mediante enlace seguro (RF-SPB-057..078).
+      </p>
+    </div>
+  </header>
+
+  @if (cargando) {
+    <p role="status" aria-busy="true">Cargando datos de la orden…</p>
+  }
+
+  @if (errorCarga) {
+    <div class="casilda-alerta casilda-alerta--peligro" role="alert">
+      <mat-icon aria-hidden="true">error_outline</mat-icon>
+      <div>
+        <p><strong>Orden no encontrada o enlace expirado</strong></p>
+        <p>Verifique con la central de monitoreo o solicite la regeneración del token de acompañamiento.</p>
+      </div>
+    </div>
+  }
+
+  <!-- INFORME YA COMPLETADO -->
+  @if (informeCompletado) {
+    <div class="completado-box">
+      <mat-icon class="completado-icon">verified</mat-icon>
+      <h2>¡Acompañamiento documentado exitosamente!</h2>
+      <p>
+        El informe de ejecución para la orden <strong>{{ orden?.codigoOrden }}</strong> ha quedado asociado
+        correctamente en el sistema y notificado al Analista de riesgos.
+      </p>
+      <p class="nota-seguridad">
+        Por razones de seguridad y principio de mínima información, los datos ya no son consultables desde este dispositivo.
+      </p>
+    </div>
+  }
+
+  <!-- VISTA OPERATIVA Y FORMULARIO -->
+  @if (!cargando && !errorCarga && !informeCompletado && orden) {
+    <div class="contenido-orden">
+      <!-- TARJETA CON INFORMACIÓN OPERATIVA INDISPENSABLE -->
+      <mat-card class="datos-operativos-card">
+        <mat-card-header>
+          <mat-card-title>
+            <span class="codigo-orden">{{ orden.codigoOrden }}</span>
+            <span class="prioridad-badge" [class.alta]="orden.prioridad === 'ALTA'">
+              Prioridad: {{ orden.prioridad }}
+            </span>
+          </mat-card-title>
+          <mat-card-subtitle>
+            Fecha programada: <strong>{{ orden.fechaProgramada }}</strong> — Hora: <strong>{{ orden.horaProgramada }}</strong>
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="itinerario-box">
+            <div class="punto">
+              <mat-icon color="primary">my_location</mat-icon>
+              <div>
+                <span class="label">Punto de encuentro:</span>
+                <strong>{{ orden.lugarOrigen }}</strong>
+              </div>
+            </div>
+            <mat-icon class="arrow-icon">arrow_forward</mat-icon>
+            <div class="punto">
+              <mat-icon color="warn">flag</mat-icon>
+              <div>
+                <span class="label">Destino:</span>
+                <strong>{{ orden.lugarDestino }}</strong>
+              </div>
+            </div>
+          </div>
+          <div class="persona-info">
+            <p><strong>Persona a acompañar:</strong> {{ orden.personaAcompanada }}</p>
+            @if (orden.telefonoAcompanada) {
+              <p><strong>Teléfono:</strong> {{ orden.telefonoAcompanada }}</p>
+            }
+            @if (orden.condicionesOperativas) {
+              <p class="instrucciones-alert">
+                <mat-icon>announcement</mat-icon>
+                <span><strong>Instrucciones operativas:</strong> {{ orden.condicionesOperativas }}</span>
+              </p>
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
+      <!-- FORMULARIO DE INFORME DE EJECUCIÓN -->
+      <mat-card class="informe-card">
+        <mat-card-header>
+          <mat-card-title>Diligenciamiento de informe de acompañamiento</mat-card-title>
+          <mat-card-subtitle>Al finalizar el servicio, complete los siguientes datos operativos:</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <form [formGroup]="form" (ngSubmit)="enviarInforme()">
+            <!-- IDENTIFICACIÓN DEL VIGILANTE -->
+            <div class="spyb-seccion-titulo">1. Vigilante responsable del servicio</div>
+            <div class="grid-2">
+              <div class="spyb-campo">
+<label class="spyb-campo__etiqueta" for="spyb-cedulaVigilante">Cédula del vigilante <span class="required-star">*</span></label>
+<mat-form-field appearance="outline">
+                <input id="spyb-cedulaVigilante" matInput formControlName="cedulaVigilante" placeholder="Ej. 71444333" appSoloNumeros inputmode="numeric" autocomplete="off" maxlength="10" />
+        <mat-error>{{ form.get('cedulaVigilante') | mensajeError:'cedula' }}</mat-error>
+      </mat-form-field>
+</div>
+              <div class="spyb-campo">
+  <label class="spyb-campo__etiqueta" for="spyb-vigilantePrimerNombre">Primer nombre <span class="required-star">*</span></label>
+  <mat-form-field appearance="outline">
+    <input id="spyb-vigilantePrimerNombre" matInput formControlName="vigilantePrimerNombre" placeholder="Ej: Juan" appSoloLetras autocomplete="off" maxlength="60" />
+        <mat-error>{{ form.get('vigilantePrimerNombre') | mensajeError:'letras' }}</mat-error>
+      </mat-form-field>
+</div>
+<div class="spyb-campo">
+  <label class="spyb-campo__etiqueta" for="spyb-vigilanteSegundoNombre">Segundo nombre</label>
+  <mat-form-field appearance="outline">
+    <input id="spyb-vigilanteSegundoNombre" matInput formControlName="vigilanteSegundoNombre" placeholder="Ej: Carlos" appSoloLetras autocomplete="off" maxlength="60" />
+        <mat-error>{{ form.get('vigilanteSegundoNombre') | mensajeError:'letras' }}</mat-error>
+      </mat-form-field>
+</div>
+<div class="spyb-campo">
+  <label class="spyb-campo__etiqueta" for="spyb-vigilantePrimerApellido">Primer apellido <span class="required-star">*</span></label>
+  <mat-form-field appearance="outline">
+    <input id="spyb-vigilantePrimerApellido" matInput formControlName="vigilantePrimerApellido" placeholder="Ej: Pérez" appSoloLetras autocomplete="off" maxlength="60" />
+        <mat-error>{{ form.get('vigilantePrimerApellido') | mensajeError:'letras' }}</mat-error>
+      </mat-form-field>
+</div>
+<div class="spyb-campo">
+  <label class="spyb-campo__etiqueta" for="spyb-vigilanteSegundoApellido">Segundo apellido</label>
+  <mat-form-field appearance="outline">
+    <input id="spyb-vigilanteSegundoApellido" matInput formControlName="vigilanteSegundoApellido" placeholder="Ej: Gómez" appSoloLetras autocomplete="off" maxlength="60" />
+        <mat-error>{{ form.get('vigilanteSegundoApellido') | mensajeError:'letras' }}</mat-error>
+      </mat-form-field>
+</div>
+            </div>
+            <!-- HORAS REALES DE EJECUCIÓN -->
+            <div class="spyb-seccion-titulo">2. Horarios y trayecto real</div>
+            <div class="grid-2">
+              <div class="spyb-campo">
+<label class="spyb-campo__etiqueta" for="spyb-fechaHoraInicio">Fecha y hora inicio real <span class="required-star">*</span></label>
+<mat-form-field appearance="outline">
+                <input id="spyb-fechaHoraInicio" matInput type="datetime-local" formControlName="fechaHoraInicio" [max]="ahora" />
+        <mat-error>{{ form.get('fechaHoraInicio') | mensajeError:'texto' }}</mat-error>
+      </mat-form-field>
+</div>
+              <div class="spyb-campo">
+<label class="spyb-campo__etiqueta" for="spyb-fechaHoraFin">Fecha y hora fin real <span class="required-star">*</span></label>
+<mat-form-field appearance="outline">
+                <input id="spyb-fechaHoraFin" matInput type="datetime-local" formControlName="fechaHoraFin" [max]="ahora" />
+        <mat-error>{{ form.get('fechaHoraFin') | mensajeError:'texto' }}</mat-error>
+      </mat-form-field>
+</div>
+            </div>
+            <!-- AVISTAMIENTO DEL AGRESOR (RF-SPB-072..074) -->
+            <div class="spyb-seccion-titulo">3. Seguridad y presunto agresor</div>
+            <div class="toggle-card">
+              <mat-slide-toggle formControlName="identificoAgresor" color="warn">
+                ¿Fue identificado o visualizado el presunto agresor durante el trayecto?
+              </mat-slide-toggle>
+              @if (form.get('identificoAgresor')?.value) {
+                <div class="campos-condicionales">
+                  <div  class="spyb-campo full-width">
+<label class="spyb-campo__etiqueta" for="spyb-lugarHoraAgresor">Lugar y hora de visualización</label>
+<mat-form-field appearance="outline">
+                    <input id="spyb-lugarHoraAgresor" matInput formControlName="lugarHoraAgresor" placeholder="Ej. En el cruce peatonal a las 18:15" maxlength="200" />
+        <mat-error>{{ form.get('lugarHoraAgresor') | mensajeError:'texto' }}</mat-error>
+      </mat-form-field>
+</div>
+                  <div  class="spyb-campo full-width">
+<label class="spyb-campo__etiqueta" for="spyb-descripcionAgresor">Descripción de la situación con el agresor</label>
+<mat-form-field appearance="outline">
+                    <textarea id="spyb-descripcionAgresor" matInput rows="2" formControlName="descripcionAgresor" placeholder="Describa la conducta o vestimenta observada..." maxlength="1000"></textarea>
+        <mat-error>{{ form.get('descripcionAgresor') | mensajeError:'texto' }}</mat-error>
+      </mat-form-field>
+</div>
+                </div>
+              }
+            </div>
+            <!-- INCIDENTES DE RIESGO (RF-SPB-075..077) -->
+            <div class="spyb-seccion-titulo">4. Incidentes o situaciones de riesgo</div>
+            <div class="toggle-card">
+              <mat-slide-toggle formControlName="ocurrioIncidente" color="warn">
+                ¿Ocurrió algún incidente o altercado durante el acompañamiento?
+              </mat-slide-toggle>
+              @if (form.get('ocurrioIncidente')?.value) {
+                <div class="campos-condicionales">
+                  <div  class="spyb-campo full-width">
+<label class="spyb-campo__etiqueta" for="spyb-tipoIncidente">Tipo de incidente</label>
+<mat-form-field appearance="outline">
+                    <mat-select placeholder="Seleccione una opción" id="spyb-tipoIncidente" formControlName="tipoIncidente">
+                      @for (inc of incidentesCatalogo; track inc) {
+                        <mat-option [value]="inc.codigo">
+                          {{ inc.nombre }}
+                        </mat-option>
+                      }
+                    </mat-select>
+        <mat-error>{{ form.get('tipoIncidente') | mensajeError:'seleccion' }}</mat-error>
+      </mat-form-field>
+</div>
+                  <div  class="spyb-campo full-width">
+<label class="spyb-campo__etiqueta" for="spyb-descripcionIncidente">Descripción del incidente y conducta</label>
+<mat-form-field appearance="outline">
+                    <textarea id="spyb-descripcionIncidente" matInput rows="2" formControlName="descripcionIncidente" placeholder="Indique si hubo acercamiento, intimidación o contacto..." maxlength="1000"></textarea>
+        <mat-error>{{ form.get('descripcionIncidente') | mensajeError:'texto' }}</mat-error>
+      </mat-form-field>
+</div>
+                  <div  class="spyb-campo full-width">
+<label class="spyb-campo__etiqueta" for="spyb-actuacionAdoptada">Actuación adoptada por el personal de seguridad</label>
+<mat-form-field appearance="outline">
+                    <textarea id="spyb-actuacionAdoptada" matInput rows="2" formControlName="actuacionAdoptada" placeholder="Medidas de respuesta inmediata tomadas..." maxlength="1000"></textarea>
+        <mat-error>{{ form.get('actuacionAdoptada') | mensajeError:'texto' }}</mat-error>
+      </mat-form-field>
+</div>
+                </div>
+              }
+            </div>
+            <!-- CÁMARAS Y NOVEDADES (RF-SPB-078) -->
+            <div class="spyb-seccion-titulo">5. Registro audiovisual y cierre</div>
+            <div class="toggle-card">
+              <mat-slide-toggle formControlName="camarasDisponibles" color="primary">
+                ¿Existen cámaras institucionales que potencialmente hayan registrado el trayecto o incidente?
+              </mat-slide-toggle>
+              @if (form.get('camarasDisponibles')?.value) {
+                <div class="campos-condicionales">
+                  <div  class="spyb-campo full-width">
+<label class="spyb-campo__etiqueta" for="spyb-observacionesCamaras">Observaciones de cámaras / ubicaciones</label>
+<mat-form-field appearance="outline">
+                    <input id="spyb-observacionesCamaras" matInput formControlName="observacionesCamaras" placeholder="Ej. Cámara domo 12 y cámara de acceso vehicular" maxlength="500" />
+        <mat-error>{{ form.get('observacionesCamaras') | mensajeError:'texto' }}</mat-error>
+      </mat-form-field>
+</div>
+                </div>
+              }
+            </div>
+            <mat-form-field appearance="outline" class="full-width" style="margin-top: 16px;">
+              <mat-label>Otras novedades u Observaciones generales</mat-label>
+              <textarea matInput rows="3" formControlName="novedadesAdicionales" placeholder="Cualquier información complementaria..."></textarea>
+            </mat-form-field>
+            <div class="form-actions">
+              <button mat-flat-button color="primary" class="submit-btn" [disabled]="form.invalid || guardandoInforme">
+                <mat-icon>task_alt</mat-icon>
+                {{ guardandoInforme ? 'Registrando...' : 'Finalizar y enviar informe de acompañamiento' }}
+              </button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
+</div>
+

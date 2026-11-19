@@ -35,3 +35,4 @@
 
 3. **Estrategia Frontend:**
    * Mientras backend despliega los endpoints en el ambiente QA, el frontend implementará los servicios y componentes contra un servicio mock (`src/app/features/seguridad-personas-bienes/mocks/`) asegurando independencia operativa sin bloqueos mutuos.
+

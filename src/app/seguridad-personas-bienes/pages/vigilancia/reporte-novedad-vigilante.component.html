@@ -1,0 +1,222 @@
+<div class="bandeja">
+  <header class="bandeja__cabecera">
+    <div>
+      <h1 class="bandeja__titulo">Reporte rápido de novedades en ronda</h1>
+      <p class="bandeja__intro">
+        Formulario para supervisores y personal de vigilancia en campus (RF-SPB-004..009).
+      </p>
+    </div>
+  </header>
+
+  @if (consecutivoGenerado) {
+    <div class="casilda-alerta casilda-alerta--exito" role="status">
+      <mat-icon aria-hidden="true">check_circle</mat-icon>
+      <div>
+        <p><strong>¡Reporte enviado exitosamente!</strong></p>
+        <p>
+          Su actuación ha sido registrada bajo el consecutivo oficial
+          <app-spyb-consecutivo-badge [consecutivo]="consecutivoGenerado"></app-spyb-consecutivo-badge>.
+          El analista de riesgos ha sido alertado para la revisión y trámite correspondiente.
+        </p>
+      </div>
+    </div>
+  }
+
+  <mat-card class="form-card">
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="enviarReporte()">
+        <!-- SECCIÓN A: IDENTIFICACIÓN DEL SUPERVISOR -->
+        <div class="spyb-seccion-titulo">
+          <mat-icon>badge</mat-icon>
+          1. Identificación del supervisor reportante
+        </div>
+        <div class="spyb-grid">
+          <div class="spyb-campo">
+<label class="spyb-campo__etiqueta" for="spyb-cedulaSupervisor">Número de cédula <span class="required-star">*</span> <button type="button" class="help-tooltip-trigger" matTooltip="Se exige para poder rastrear quién reportó la novedad." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda sobre número de cédula">?</button></label>
+<mat-form-field appearance="outline">
+            <input id="spyb-cedulaSupervisor" matInput formControlName="cedulaSupervisor" placeholder="Ej. 98765432" appSoloNumeros inputmode="numeric" autocomplete="off" maxlength="10" />
+        <mat-error>{{ form.get('cedulaSupervisor') | mensajeError:'cedula' }}</mat-error>
+      </mat-form-field>
+</div>
+
+          <div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-supervisorPrimerNombre">Primer nombre <span class="required-star">*</span></label>
+      <mat-form-field appearance="outline">
+        <input id="spyb-supervisorPrimerNombre" matInput formControlName="supervisorPrimerNombre" placeholder="Ej: Juan" appSoloLetras autocomplete="off" maxlength="60" />
+        <mat-error>{{ form.get('supervisorPrimerNombre') | mensajeError:'letras' }}</mat-error>
+      </mat-form-field>
+    </div>
+    <div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-supervisorSegundoNombre">Segundo nombre</label>
+      <mat-form-field appearance="outline">
+        <input id="spyb-supervisorSegundoNombre" matInput formControlName="supervisorSegundoNombre" placeholder="Ej: Carlos" appSoloLetras autocomplete="off" maxlength="60" />
+        <mat-error>{{ form.get('supervisorSegundoNombre') | mensajeError:'letras' }}</mat-error>
+      </mat-form-field>
+    </div>
+    <div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-supervisorPrimerApellido">Primer apellido <span class="required-star">*</span></label>
+      <mat-form-field appearance="outline">
+        <input id="spyb-supervisorPrimerApellido" matInput formControlName="supervisorPrimerApellido" placeholder="Ej: Pérez" appSoloLetras autocomplete="off" maxlength="60" />
+        <mat-error>{{ form.get('supervisorPrimerApellido') | mensajeError:'letras' }}</mat-error>
+      </mat-form-field>
+    </div>
+    <div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-supervisorSegundoApellido">Segundo apellido</label>
+      <mat-form-field appearance="outline">
+        <input id="spyb-supervisorSegundoApellido" matInput formControlName="supervisorSegundoApellido" placeholder="Ej: Gómez" appSoloLetras autocomplete="off" maxlength="60" />
+        <mat-error>{{ form.get('supervisorSegundoApellido') | mensajeError:'letras' }}</mat-error>
+      </mat-form-field>
+    </div>
+
+          <div class="spyb-campo">
+<label class="spyb-campo__etiqueta" for="spyb-cargoSupervisor">Cargo / turno <span class="required-star">*</span></label>
+<mat-form-field appearance="outline">
+            <input id="spyb-cargoSupervisor" matInput formControlName="cargoSupervisor" placeholder="Ej: Supervisor de turno" maxlength="80" />
+        <mat-error>{{ form.get('cargoSupervisor') | mensajeError:'texto' }}</mat-error>
+      </mat-form-field>
+</div>
+        </div>
+
+        <!-- SECCIÓN B: LUGAR Y TIPO DE NOVEDAD -->
+        <div class="spyb-seccion-titulo">
+          <mat-icon>place</mat-icon>
+          2. Ubicación y tipo de suceso
+        </div>
+        <div class="spyb-grid">
+          <div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-tipoRegistroCodigo">Tipo de registro <span class="required-star">*</span> <button type="button" class="help-tooltip-trigger" matTooltip="Novedad, alerta temprana, PQRS o informe de acompañamiento." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda sobre tipo de registro">?</button></label>
+      <mat-form-field appearance="outline">
+        <mat-select id="spyb-tipoRegistroCodigo" formControlName="tipoRegistroCodigo" placeholder="Seleccione una opción">
+        @for (o of tiposRegistro; track o.id) {
+          <mat-option [value]="o.codigo">{{ o.nombre }}</mat-option>
+        }
+      </mat-select>
+        <mat-error>{{ form.get('tipoRegistroCodigo') | mensajeError:'seleccion' }}</mat-error>
+      </mat-form-field>
+    </div>
+
+          <div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-campusId">Sede / campus <span class="required-star">*</span> <button type="button" class="help-tooltip-trigger" matTooltip="Seleccione la sede o campus de la Universidad donde ocurrió la situación." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda sobre sede / campus">?</button></label>
+      <mat-form-field appearance="outline">
+        <mat-select id="spyb-campusId" formControlName="campusId" placeholder="Seleccione una opción">
+        @for (o of campus; track o.id) {
+          <mat-option [value]="o.id">{{ o.nombre }}</mat-option>
+        }
+      </mat-select>
+        <mat-error>{{ form.get('campusId') | mensajeError:'seleccion' }}</mat-error>
+      </mat-form-field>
+    </div>
+
+          <div class="spyb-campo col-span-2">
+<label class="spyb-campo__etiqueta" for="spyb-lugarHechos">Lugar específico de los hechos <span class="required-star">*</span></label>
+<mat-form-field appearance="outline">
+            <input id="spyb-lugarHechos" matInput formControlName="lugarHechos" placeholder="Ej. Bloque 12 plazoleta sur" maxlength="200" />
+        <mat-error>{{ form.get('lugarHechos') | mensajeError:'texto' }}</mat-error>
+      </mat-form-field>
+</div>
+        </div>
+
+        <!-- SECCIÓN C: DATOS DE LA PERSONA INVOLUCRADA -->
+        <div class="spyb-seccion-titulo">
+          <mat-icon>person</mat-icon>
+          3. Datos de la persona atendida / involucrada
+        </div>
+        <div class="spyb-grid">
+          <div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-rolPersonaCodigo">Rol de la persona <span class="required-star">*</span> <button type="button" class="help-tooltip-trigger" matTooltip="Persona afectada, persona señalada u otro interviniente o testigo." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda sobre rol de la persona">?</button></label>
+      <mat-form-field appearance="outline">
+        <mat-select id="spyb-rolPersonaCodigo" formControlName="rolPersonaCodigo" placeholder="Seleccione una opción">
+        @for (o of rolesPersona; track o.id) {
+          <mat-option [value]="o.codigo">{{ o.nombre }}</mat-option>
+        }
+      </mat-select>
+        <mat-error>{{ form.get('rolPersonaCodigo') | mensajeError:'seleccion' }}</mat-error>
+      </mat-form-field>
+    </div>
+
+          <div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-tipoIdentificacionId">Tipo de documento <span class="required-star">*</span></label>
+      <mat-form-field appearance="outline">
+        <mat-select id="spyb-tipoIdentificacionId" formControlName="tipoIdentificacionId" placeholder="Seleccione una opción">
+        @for (o of tiposDocumento; track o.id) {
+          <mat-option [value]="o.id">{{ o.nombre }}</mat-option>
+        }
+      </mat-select>
+        <mat-error>{{ form.get('tipoIdentificacionId') | mensajeError:'seleccion' }}</mat-error>
+      </mat-form-field>
+    </div>
+<div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-numeroDocumento">Número de documento <span class="required-star">*</span> <button type="button" class="help-tooltip-trigger" matTooltip="Solo números, sin puntos ni espacios." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda sobre número de documento">?</button></label>
+      <mat-form-field appearance="outline">
+        <input id="spyb-numeroDocumento" matInput formControlName="numeroDocumento" placeholder="Ej: 1035987456" (input)="documento.formato($event)" [attr.maxlength]="documento.maxLongitud()" inputmode="text" autocomplete="off" />
+        <mat-error>{{ form.get('numeroDocumento') | mensajeError:'documento' }}</mat-error>
+      </mat-form-field>
+    </div>
+
+          <div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-primerNombre">Primer nombre <span class="required-star">*</span></label>
+      <mat-form-field appearance="outline">
+        <input id="spyb-primerNombre" matInput formControlName="primerNombre" placeholder="Ej: Juan" appSoloLetras autocomplete="off" maxlength="60" />
+        <mat-error>{{ form.get('primerNombre') | mensajeError:'letras' }}</mat-error>
+      </mat-form-field>
+    </div>
+    <div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-segundoNombre">Segundo nombre</label>
+      <mat-form-field appearance="outline">
+        <input id="spyb-segundoNombre" matInput formControlName="segundoNombre" placeholder="Ej: Carlos" appSoloLetras autocomplete="off" maxlength="60" />
+        <mat-error>{{ form.get('segundoNombre') | mensajeError:'letras' }}</mat-error>
+      </mat-form-field>
+    </div>
+    <div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-primerApellido">Primer apellido <span class="required-star">*</span></label>
+      <mat-form-field appearance="outline">
+        <input id="spyb-primerApellido" matInput formControlName="primerApellido" placeholder="Ej: Pérez" appSoloLetras autocomplete="off" maxlength="60" />
+        <mat-error>{{ form.get('primerApellido') | mensajeError:'letras' }}</mat-error>
+      </mat-form-field>
+    </div>
+    <div class="spyb-campo">
+      <label class="spyb-campo__etiqueta" for="spyb-segundoApellido">Segundo apellido</label>
+      <mat-form-field appearance="outline">
+        <input id="spyb-segundoApellido" matInput formControlName="segundoApellido" placeholder="Ej: Gómez" appSoloLetras autocomplete="off" maxlength="60" />
+        <mat-error>{{ form.get('segundoApellido') | mensajeError:'letras' }}</mat-error>
+      </mat-form-field>
+    </div>
+
+          <div class="spyb-campo">
+<label class="spyb-campo__etiqueta" for="spyb-telefono">Teléfono</label>
+<mat-form-field appearance="outline">
+            <input id="spyb-telefono" matInput formControlName="telefono" placeholder="Ej. 3001234567" appSoloNumeros inputmode="numeric" autocomplete="off" maxlength="12" />
+        <mat-error>{{ form.get('telefono') | mensajeError:'telefono' }}</mat-error>
+      </mat-form-field>
+</div>
+        </div>
+
+        <!-- SECCIÓN D: RELATO DE LA NOVEDAD -->
+        <div class="spyb-seccion-titulo">
+          <mat-icon>description</mat-icon>
+          4. Descripción de la novedad
+        </div>
+        <div  class="spyb-campo full-width">
+<label class="spyb-campo__etiqueta" for="spyb-descripcionHechos">Detalle de lo ocurrido durante la ronda o acompañamiento <span class="required-star">*</span> <button type="button" class="help-tooltip-trigger" matTooltip="Describa hechos, no opiniones: qué pasó, quién solicitó apoyo y qué se hizo. Relato objetivo de lo ocurrido, mínimo 10 caracteres." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda sobre detalle de lo ocurrido durante la ronda o acompañamiento">?</button></label>
+<mat-form-field appearance="outline">
+          <textarea id="spyb-descripcionHechos"
+            matInput
+            rows="5"
+            formControlName="descripcionHechos"
+            placeholder="Describa objetivamente la situación, quién solicitó apoyo y qué actuación inicial se realizó..." maxlength="2000"
+          ></textarea>
+        <mat-error>{{ form.get('descripcionHechos') | mensajeError:'texto' }}</mat-error>
+      </mat-form-field>
+</div>
+
+        <div class="form-actions">
+          <button mat-flat-button color="primary" class="submit-btn" [disabled]="form.invalid || guardando">
+            <mat-icon>send</mat-icon>
+            {{ guardando ? 'Enviando reporte...' : 'Enviar reporte a analista de riesgos' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
+

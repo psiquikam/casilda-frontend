@@ -1,0 +1,211 @@
+<div class="bandeja">
+  <div class="top-nav">
+    <a mat-button color="primary" routerLink="/seguridad/bandeja" class="back-link">
+      <mat-icon aria-hidden="true">arrow_back</mat-icon> Volver a la bandeja
+    </a>
+  </div>
+
+  <header class="bandeja__cabecera">
+    <div>
+      <h1 class="bandeja__titulo">Tablero de indicadores y trazabilidad SPyB</h1>
+      <p class="bandeja__intro">
+        Métricas diferenciadas según regla funcional institucional: <strong>Persona ≠ Caso CASILDA ≠ Actuación de seguridad</strong> (RF-SPB-141..148).
+      </p>
+    </div>
+  </header>
+
+  @if (cargando) {
+    <p role="status" aria-busy="true">Cargando métricas consolidadas…</p>
+  }
+
+  @if (!cargando && indicadores) {
+    <div class="dashboard-content">
+      <!-- FILA 1: KPIs CLAVE INSTITUCIONALES -->
+      <div class="kpi-grid">
+        <mat-card class="kpi-card">
+          <mat-card-content>
+            <div class="kpi-icon-box"><mat-icon aria-hidden="true">people</mat-icon></div>
+            <div class="kpi-val">{{ indicadores.totalPersonasAtendidas }}</div>
+            <div class="kpi-label">Personas atendidas (Cédulas únicas)</div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="kpi-card">
+          <mat-card-content>
+            <div class="kpi-icon-box"><mat-icon aria-hidden="true">folder_special</mat-icon></div>
+            <div class="kpi-val">{{ indicadores.totalCasosVinculados }}</div>
+            <div class="kpi-label">Casos CASILDA Vinculados</div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="kpi-card">
+          <mat-card-content>
+            <div class="kpi-icon-box"><mat-icon aria-hidden="true">security</mat-icon></div>
+            <div class="kpi-val">{{ indicadores.totalActuacionesSeguridad }}</div>
+            <div class="kpi-label">Total actuaciones de seguridad</div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="kpi-card">
+          <mat-card-content>
+            <div class="kpi-icon-box"><mat-icon aria-hidden="true">inventory_2</mat-icon></div>
+            <div class="kpi-val">{{ indicadores.actuacionesIndependientes }}</div>
+            <div class="kpi-label">Actuaciones independientes</div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- FILA 2: DISTRIBUCIÓN POR REGISTROS Y CANALES -->
+      <div class="charts-grid">
+        <!-- GRÁFICA 1: TIPO DE REGISTRO -->
+        <mat-card class="chart-card">
+          <mat-card-header>
+            <mat-card-title>Distribución por tipo de registro (SPB)</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="stat-list">
+              @for (item of objectEntries(indicadores.porTipoRegistro); track item[0]) {
+                <div class="stat-item">
+                  <div class="stat-info">
+                    <span class="stat-name">{{ item[0] }}</span>
+                    <span class="stat-pill">{{ item[1] }} ({{ calcularPorcentaje(item[1], indicadores.totalActuacionesSeguridad) }}%)</span>
+                  </div>
+                  <div class="bar-track">
+                    <div
+                      class="bar-progress bar-progress--primary"
+                      [style.width.%]="calcularPorcentaje(item[1], indicadores.totalActuacionesSeguridad)"
+                    ></div>
+                  </div>
+                </div>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- GRÁFICA 2: CANAL DE RECEPCIÓN -->
+        <mat-card class="chart-card">
+          <mat-card-header>
+            <mat-card-title>Canal de recepción / ingreso de novedades</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="stat-list">
+              @for (item of objectEntries(indicadores.porCanalRecepcion); track item[0]) {
+                <div class="stat-item">
+                  <div class="stat-info">
+                    <span class="stat-name">{{ item[0] }}</span>
+                    <span class="stat-pill stat-pill--secondary">{{ item[1] }} ({{ calcularPorcentaje(item[1], indicadores.totalActuacionesSeguridad) }}%)</span>
+                  </div>
+                  <div class="bar-track">
+                    <div
+                      class="bar-progress bar-progress--secondary"
+                      [style.width.%]="calcularPorcentaje(item[1], indicadores.totalActuacionesSeguridad)"
+                    ></div>
+                  </div>
+                </div>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- FILA 3: ACOMPAÑAMIENTOS Y REMISIONES -->
+      <div class="charts-grid">
+        <!-- GRÁFICA 3: ACOMPAÑAMIENTOS -->
+        <mat-card class="chart-card">
+          <mat-card-header>
+            <mat-card-title>Acompañamientos: medidas formales vs espontáneos</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <!-- Barra comparativa segmentada -->
+            <div class="segmented-bar-wrapper">
+              <div class="segmented-legend">
+                <span class="legend-item"><span class="legend-dot dot-formal"></span> Medidas EA ({{ indicadores.acompanamientosFormalesVsEspontaneos.formales }})</span>
+                <span class="legend-item"><span class="legend-dot dot-espontaneo"></span> Preventivos ({{ indicadores.acompanamientosFormalesVsEspontaneos.espontaneos }})</span>
+              </div>
+              <div class="segmented-bar">
+                <div
+                  class="segment segment-formal"
+                  [style.width.%]="calcularPorcentaje(indicadores.acompanamientosFormalesVsEspontaneos.formales, indicadores.acompanamientosFormalesVsEspontaneos.formales + indicadores.acompanamientosFormalesVsEspontaneos.espontaneos)"
+                >
+                  {{ calcularPorcentaje(indicadores.acompanamientosFormalesVsEspontaneos.formales, indicadores.acompanamientosFormalesVsEspontaneos.formales + indicadores.acompanamientosFormalesVsEspontaneos.espontaneos) }}%
+                </div>
+                <div
+                  class="segment segment-espontaneo"
+                  [style.width.%]="calcularPorcentaje(indicadores.acompanamientosFormalesVsEspontaneos.espontaneos, indicadores.acompanamientosFormalesVsEspontaneos.formales + indicadores.acompanamientosFormalesVsEspontaneos.espontaneos)"
+                >
+                  {{ calcularPorcentaje(indicadores.acompanamientosFormalesVsEspontaneos.espontaneos, indicadores.acompanamientosFormalesVsEspontaneos.formales + indicadores.acompanamientosFormalesVsEspontaneos.espontaneos) }}%
+                </div>
+              </div>
+            </div>
+
+            <mat-divider style="margin: 16px 0;"></mat-divider>
+
+            <div class="evidencias-highlight">
+              <div class="highlight-info">
+                <mat-icon aria-hidden="true">videocam</mat-icon>
+                <div>
+                  <strong>Grabaciones de cámaras CCTV Custodiadas</strong>
+                  <p class="highlight-desc">Solicitudes con preservación digital y cadena de custodia activa</p>
+                </div>
+              </div>
+              <span class="highlight-count">{{ indicadores.camarasCustodiadas }}</span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- GRÁFICA 4: REMISIONES -->
+        <mat-card class="chart-card">
+          <mat-card-header>
+            <mat-card-title>Remisiones por destino institucional</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="stat-list">
+              @for (item of objectEntries(indicadores.remisionesPorDestino); track item[0]) {
+                <div class="stat-item">
+                  <div class="stat-info">
+                    <span class="stat-name">{{ item[0] }}</span>
+                    <span class="stat-pill stat-pill--purple">{{ item[1] }} traslados</span>
+                  </div>
+                  <div class="bar-track">
+                    <div
+                      class="bar-progress bar-progress--purple"
+                      [style.width.%]="calcularPorcentaje(item[1], 15)"
+                    ></div>
+                  </div>
+                </div>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- FILA 4: INFOGRAFÍA REGLA INSTITUCIONAL -->
+      <mat-card class="chart-card reglar-card">
+        <mat-card-header>
+          <mat-card-title>Trazabilidad de la regla: Persona ≠ Caso CASILDA ≠ Actuación de seguridad</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="regla-flow">
+            <div class="regla-step">
+              <div class="step-num">{{ indicadores.totalPersonasAtendidas }}</div>
+              <div class="step-title">Personas atendidas</div>
+              <div class="step-sub">Identificadas por documento en campus o central</div>
+            </div>
+            <div class="regla-arrow">➔</div>
+            <div class="regla-step highlight-step">
+              <div class="step-num">{{ indicadores.totalCasosVinculados }}</div>
+              <div class="step-title">Casos CASILDA Vinculados</div>
+              <div class="step-sub">Con justificación técnica fundada (Ruta Violeta)</div>
+            </div>
+            <div class="regla-arrow">➔</div>
+            <div class="regla-step">
+              <div class="step-num">{{ indicadores.actuacionesIndependientes }}</div>
+              <div class="step-title">Actuaciones independientes</div>
+              <div class="step-sub">Gestionadas exclusivamente en campus sin conexidad</div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
+</div>

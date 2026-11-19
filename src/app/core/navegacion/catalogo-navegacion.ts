@@ -191,6 +191,40 @@ export const CATALOGO_MODULOS: readonly ModuloCasilda[] = [
     seccion: 'Línea Alma'
   },
 
+  // --- Seguridad a Personas y Bienes (SPyB) ---
+  {
+    id: 'spyb-bandeja',
+    nombre: 'Bandeja de seguridad',
+    icono: 'shield',
+    ruta: '/seguridad/bandeja',
+    roles: ['ADMIN', 'SPB_ANALISTA', 'SPB_COORDINACION'],
+    seccion: 'Seguridad (SPyB)'
+  },
+  {
+    id: 'spyb-central',
+    nombre: 'Central de monitoreo',
+    icono: 'sensors',
+    ruta: '/seguridad/central',
+    roles: ['ADMIN', 'COORDINADOR', 'SPB_CENTRAL', 'SPB_COORDINACION', 'SPB_ANALISTA'],
+    seccion: 'Seguridad (SPyB)'
+  },
+  {
+    id: 'spyb-reportar',
+    nombre: 'Reportar novedad SPyB',
+    icono: 'notification_important',
+    ruta: '/seguridad/reportar',
+    roles: ['ADMIN', 'SPB_VIGILANTE', 'SPB_CENTRAL', 'SPB_ANALISTA', 'SPB_COORDINACION'],
+    seccion: 'Seguridad (SPyB)'
+  },
+  {
+    id: 'spyb-indicadores',
+    nombre: 'Indicadores SPyB',
+    icono: 'query_stats',
+    ruta: '/seguridad/indicadores',
+    roles: ['ADMIN', 'SPB_ANALISTA', 'SPB_COORDINACION'],
+    seccion: 'Seguridad (SPyB)'
+  },
+
   // --- Reportes y métricas ---
   {
     id: 'indicadores',
