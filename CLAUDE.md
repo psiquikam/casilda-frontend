@@ -3,8 +3,8 @@
 > Archivo vivo. Se actualiza al cerrar cada fase de trabajo para que cualquier
 > sesión posterior (humana o asistida) retome sin repetir el análisis.
 >
-> **Última actualización:** 14 de noviembre de 2026 (módulo UAD Equipos 3 y 4, Entrega 1 contract-first con adaptador
-> mock; antes, reporte de caso v2 y Línea Alma)
+> **Última actualización:** 19 de noviembre de 2026 (módulo UAD: documentación al día con el backend y calendario en
+> los campos de fecha; antes, Entregas 1 a 3 del módulo UAD, reporte de caso v2 y Línea Alma)
 
 ---
 
@@ -34,7 +34,7 @@ Documentos de referencia, en orden de precedencia para decisiones de diseño:
 | `docs/contratos/contrato-reportar-caso.md` | Contrato con Backend para crear reportes desde `/reportar-caso` y el reporte anónimo. El §0 (2026-11-11) recoge el contrato v2 implementado (víctima, contacto, presunto agresor, evidencias multipart, maestros) y los pendientes P-REP-01…05. |
 | `docs/contratos/contrato-consultar-reporte.md` | Propuesta de `GET /reportes/{codigo}` para «Seguimiento de trámite». Hoy no existe ningún endpoint de consulta por código. |
 | `docs/contratos/linea-alma/` | Contratos para Backend de Línea Alma: APH (`README.md` con guía, plantilla y decisiones D-ALMA-01…13; atenciones/triaje/derivación; derivaciones, bandeja, contención y auditoría) y **Psicología** (`contrato-psicologia-bandeja-novedades.md`, `contrato-psicologia-casos-seguimientos-recontactos.md`, decisiones D-PSI-01…19). Plan: `docs/plan-implementacion-front-linea-alma.md`. |
-| `docs/contratos/uad/` | Módulo UAD Equipos 3 y 4: `openapi-uad.yaml` (**fuente de verdad** de los contratos, todos `PROPUESTO — NO IMPLEMENTADO`), auditoría de ambos repos, matriz requisito→contrato y `DECISIONES_PENDIENTES_UAD.md` (D-UAD-01…19). |
+| `docs/contratos/uad/` | Módulo UAD Equipos 3 y 4: `openapi-uad.yaml` (**fuente de verdad** de los contratos; cada operación lleva su `x-estado`: Entregas 1 y 2 ya implementadas en el backend), auditoría de ambos repos al 2026-11-14, matriz requisito→contrato y `DECISIONES_PENDIENTES_UAD.md` (D-UAD-01…32). |
 | `.claude/skills/contrato-backend/SKILL.md` | Skill para redactar contratos de API para Backend a partir del código del front. ⚠️ **Solo local**: misma regla `skills/` de `.gitignore` (ver pendiente 11). |
 
 ## 2. Stack y comandos
@@ -126,9 +126,10 @@ espaciados ni radios literales**: siempre `var(--token)`.
 | `UadApiPort` · `UadHttpAdapter` · `UadMockAdapter` · `provideUadApi()` | `src/app/uad/` | Puerto del módulo UAD y sus dos adaptadores; `environment.uad.adaptador` elige (`'mock'` en desarrollo, `'http'` en prod). Se provee en las rutas `/uad`, no en la raíz. |
 | `UadFacade` · `interpretarErrorUad()` | `src/app/uad/servicios/`, `infraestructura/uad-error.ts` | Lo único que inyectan las páginas UAD; errores del `ErrorResponse` real del backend traducidos a `ErrorUad`, igual en mock y HTTP. |
 | `competencia.ts` · `decision-evaluacion.ts` · `etiquetas.ts` | `src/app/uad/dominio/` | Reglas puras de reparto Equipo 3/4 y de la decisión de evaluación; **único lugar** de etiquetas de los enums UAD. |
+| `fechaContrato()` · `inicioDelDia()` | `src/app/uad/dominio/decision-evaluacion.ts` | Puente entre el calendario de Material (`Date`) y las fechas `YYYY-MM-DD` del contrato UAD, y límites `min`/`max` del calendario. |
 | `SIN_CREDENCIALES` | `src/app/services/auth.interceptor.ts` | `HttpContextToken` opt-in: la petición marcada sale sin `Authorization` y un 401 no cierra la sesión. Lo usa la queja anónima UAD; el servidor igual debe ignorar tokens en esa ruta. |
 | `UadRadicacionPort` · `provideUadRadicacion()` | `src/app/uad/` | Radicación **pública** UAD (queja anónima NDA), separada de `UadApiPort`; ruta `/uad/queja-anonima` fuera de `roleGuard`, flag `uadQuejaAnonima`. |
-| `ROLES_UAD` · `AuthService.puedeVerUad()` | `src/app/services/auth.service.ts` | Roles `UAD_COORDINACION`/`UAD_EQUIPO_3`/`UAD_EQUIPO_4` (catálogo propuesto; **aún no existen en el backend**). |
+| `ROLES_UAD` · `AuthService.puedeVerUad()` | `src/app/services/auth.service.ts` | Roles `UAD_COORDINACION`/`UAD_EQUIPO_3`/`UAD_EQUIPO_4` (catálogo propuesto). El backend los crea con `database/uad_modulo_entrega1.sql`, que no los asigna a ningún usuario. |
 | `protocolo-intentos.ts` · `seguimientos.ts` | `src/app/linea-alma/psicologia/dominio/` | Reglas puras con pruebas: protocolo de 9 intentos (RN-ALMA-03), contador de controles que no bloquea (RN-ALMA-05), fecha futura, conversión `datetime-local` ↔ ISO. |
 
 ## 5. Bitácora de avances
@@ -511,6 +512,23 @@ Contrato `openapi-uad.yaml` v0.3.0; decisiones nuevas D-UAD-26…30.
   La pregunta de vinculación de 10 opciones **no** se cambió (bloqueada por D-UAD-05).
 - **«Mis reportes»** y la respuesta a la subsanación: solo contrato en borrador, bloqueados por D-UAD-16.
 
+### 2026-11-19 — Módulo UAD: documentación al día con el backend y calendario en los campos de fecha
+Rama `feature/06/20/casilda/ajustes-modulo-uad`.
+
+- **Documentación:** `docs/contratos/uad/` decía que el backend no tenía nada UAD. Ya no es cierto: las Entregas 1 y 2 y la NDA
+  pública están en `main` del backend (PR #21 y #23). Se actualizaron README,
+  matriz, decisiones (nueva D-UAD-31 y sección «D-UAD-16 en detalle»), los `x-estado` del OpenAPI y una nota en la auditoría.
+  **El paso a HTTP queda aplazado** hasta que Backend despliegue sus cambios pendientes; los entornos no cambiaron.
+- **Campos de fecha:** los cuatro `type="date"` del módulo (filtros de la bandeja de noticias, fecha límite de la
+  subsanación y fecha de remisión en evaluación y en Gestionar caso) pasan a `matDatepicker`, que se abre al hacer clic.
+  El valor sigue viajando como `YYYY-MM-DD` (`fechaContrato()`). El módulo UAD no tiene campos de hora.
+- **Backend, Entrega 3 (rama `feature/06/20/casilda/modulo-uad-back`, sin integrar):** «Mis reportes», respuesta a la
+  subsanación solo con texto y corrección de `/solicitudes` (D-UAD-16). En el frontend solo se agregó la respuesta del
+  reportante a la tarjeta de la solicitud en la evaluación (`SolicitudInformacionVigente.respuesta`). **Falta la pantalla
+  «Mis reportes».**
+- **Sin tocar:** los campos de fecha y hora nativos de otros módulos (`modal-asignar-cita`, `modal-gestion-contacto`,
+  `modal-reprogramar-cita`, Línea Alma, Seguridad a personas y bienes).
+
 ### Pendiente
 0. **Línea Alma Psicología:** Backend debe revisar D-PSI-01…19 (entidad de la novedad antes del caso, `tomadaPorMi`,
    SLA, PDF síncrono, contención puntual); el equipo debe decidir qué roles se habilitan además de ADMIN
@@ -618,9 +636,10 @@ Contrato `openapi-uad.yaml` v0.3.0; decisiones nuevas D-UAD-26…30.
 16. **Seguimiento de trámite sin endpoint:** `/seguimiento` sigue simulando resultados y los diálogos de
     éxito prometen una consulta que no existe. Contrato propuesto en
     `docs/contratos/contrato-consultar-reporte.md`; hasta que exista, mantener el flag `publicTrackingPrototype`.
-17. **UAD:** Backend debe implementar `openapi-uad.yaml` (Entregas 1, 2 y `POST /uad/noticias-anonimas`) y crear los roles `UAD_*` (D-UAD-01, 03, 14); el
-    equipo jurídico debe validar D-UAD-02…13 y 18–30; riesgo de privacidad fuera del módulo en `/solicitudes` (D-UAD-16). Hasta entonces, solo ADMIN
-    entra a `/uad` y lo hace con datos simulados.
+17. **UAD:** el backend ya implementó las Entregas 1 y 2 y `POST /uad/noticias-anonimas`. Todo está en `main` del backend. Falta que Backend despliegue,
+    ejecute `uad_modulo_entrega1.sql` y `uad_modulo_entrega2.sql`, asigne roles `UAD_EQUIPO_3/4` a usuarios reales; **después se prueba el frontend con
+    `uad.adaptador: 'http'`** (ADMIN no ve bandejas con el servidor real, D-UAD-03). El equipo jurídico debe validar D-UAD-02…13 y 18–32. La corrección
+    de `/solicitudes` (D-UAD-16), «Mis reportes» y la respuesta a la subsanación están en la rama del backend, sin integrar; falta la pantalla «Mis reportes». Hasta la prueba con HTTP, `/uad` funciona con datos simulados.
 
 ## 6. Reglas que no se deben romper
 

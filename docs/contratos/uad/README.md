@@ -1,13 +1,19 @@
 # Módulo UAD Equipos 3 y 4: contratos y guía técnica
 
-**Estado (2026-11-15):** las Entregas 1 (bandejas NDI/NDA y evaluación) y 2 (bandeja de casos, Gestionar caso, historial, pruebas y traslado) y la queja anónima de la Entrega 3 funcionan con el adaptador mock. **El backend no tiene ninguna operación UAD**: todos los contratos están propuestos y ninguno implementado.
+**Estado (2026-11-19):**
+
+- **Frontend:** las Entregas 1 (bandejas NDI/NDA y evaluación) y 2 (bandeja de casos, Gestionar caso, historial, pruebas y traslado) y la queja anónima de la Entrega 3 funcionan con el adaptador mock.
+- **Backend:** las Entregas 1 y 2 y la radicación pública de la NDA están en `main` (PR #21 y #23). Guías: `casilda-backend/docs/UAD_BACKEND_ENTREGA1.md` y `UAD_BACKEND_ENTREGA2.md`.
+- **Paso a HTTP, aplazado:** el equipo de Backend tiene pendiente desplegar varios cambios en el servidor. Hasta que lo haga, el módulo sigue con `'mock'` en desarrollo y demo, y el adaptador HTTP queda sin probar contra el servidor real.
+- **Entrega 3 en el backend (rama `feature/06/20/casilda/modulo-uad-back`, sin integrar a `main`):** «Mis reportes» (`GET /mis-reportes`, `GET /mis-reportes/{codigo}`), respuesta a la subsanación solo con texto y corrección de la privacidad de `/solicitudes` (D-UAD-16). Guía: `casilda-backend/docs/UAD_BACKEND_ENTREGA3.md`. **No hay pantalla de «Mis reportes» todavía.**
+- **Sin implementar:** remisión a la Ruta, carga de evidencias y acceso histórico.
 
 | Documento | Para qué |
 |---|---|
 | [`openapi-uad.yaml`](openapi-uad.yaml) | **Fuente de verdad** de los contratos (OpenAPI 3.0.3). Cada operación lleva `x-estado` y `x-entrega`. |
-| [`AUDITORIA_UAD.md`](AUDITORIA_UAD.md) | Diagnóstico de los dos repositorios con evidencia, inventario de endpoints y tabla requisito → estado. |
+| [`AUDITORIA_UAD.md`](AUDITORIA_UAD.md) | Diagnóstico de los dos repositorios al 2026-11-14 (antes del backend UAD), con evidencia, inventario de endpoints y tabla requisito → estado. Lleva una nota de actualización al inicio. |
 | [`MATRIZ_CONTRATOS_UAD.md`](MATRIZ_CONTRATOS_UAD.md) | Requisito → UI → tipo/schema → endpoint → estado, y mapeo contrato → TS → puerto → adaptadores. |
-| [`DECISIONES_PENDIENTES_UAD.md`](DECISIONES_PENDIENTES_UAD.md) | D-UAD-01…30: impacto, fuente, decisión provisional y quién valida. |
+| [`DECISIONES_PENDIENTES_UAD.md`](DECISIONES_PENDIENTES_UAD.md) | D-UAD-01…32: impacto, fuente, decisión provisional y quién valida. |
 
 ## 1. Arquitectura
 
@@ -20,7 +26,7 @@ Página / componentes (src/app/uad/paginas, componentes)
 ```
 
 - `contratos/uad-api.types.ts` es el espejo del OpenAPI. Si cambia uno, cambia el otro en el mismo commit.
-- `dominio/` tiene reglas puras: competencia por equipo y validación de la decisión. Las usan la UI y el mock. **El servidor debe aplicarlas por su cuenta.**
+- `dominio/` tiene reglas puras: competencia por equipo y validación de la decisión. Las usan la UI y el mock. **El servidor las aplica por su cuenta** (`UadCompetencia`, `UadDecisionValidator`, `UadCatalogoActuaciones`); si cambia una regla, cambia en los dos lados.
 - Ambos adaptadores entregan los errores como `ErrorUad` (`infraestructura/uad-error.ts`), leído del `ErrorResponse` real del backend.
 - El puerto se provee en las rutas `/uad` (`provideUadApi()` en `routes.ts`), no en la raíz.
 
@@ -31,7 +37,7 @@ npm start          # http://localhost:4200
 ```
 
 1. Inicie sesión con un usuario **ADMIN** (QA) o, en modo demostración, con la cuenta de prueba ADMIN.
-   Hoy ningún usuario real tiene roles `UAD_*`, porque no existen en el backend.
+   Los roles `UAD_*` los crea `database/uad_modulo_entrega1.sql` en el backend, pero el script no los asigna a nadie: cada usuario real se asigna aparte en `usuariorol`.
 2. Abra el menú **UAD Equipos 3 y 4 → Noticias disciplinarias** (`/uad/noticias`).
 3. En la franja **"Datos de demostración"**:
    - Elija el **equipo simulado** (3 o 4). Así se comprueba qué ve cada equipo.
@@ -78,8 +84,15 @@ uad: { adaptador: 'http' }   // producción: {apiBaseUrl}/uad/... según openapi
 (`environment.demo.ts`, que hereda de producción y solo simula la UAD y Línea Alma) y sube una vista previa al proyecto
 `casilda-preview`. Se entra con un usuario ADMIN real de QA. `npm run build`, `deploy:vercel:preview` y `deploy:vercel` no cambian.
 
-No hay que tocar componentes. Con `'http'`, hasta que Backend implemente el contrato y registre las rutas en `endpoint` / `endpointrole`, el servidor responderá 403 o 404 y la UI mostrará sus estados de error.
-**Nunca desplegar con `'mock'`** (`environment.prod.ts` ya tiene `'http'`).
+No hay que tocar componentes. **Nunca desplegar con `'mock'`** (`environment.prod.ts` ya tiene `'http'`).
+
+Para que `'http'` responda, el servidor de ese entorno necesita:
+
+1. El WAR con el módulo UAD (Entregas 1 y 2, ya en `main` del backend) desplegado.
+2. `database/uad_modulo_entrega1.sql` y, para casos, `uad_modulo_entrega2.sql`: crean los roles y registran las rutas en `endpoint` / `endpointrole`.
+3. Un usuario con `UAD_EQUIPO_3` o `UAD_EQUIPO_4`. **ADMIN y `UAD_COORDINACION` solo alcanzan `GET /uad/contexto`, que les devuelve `capacidades: []`** (D-UAD-03): con `'http'` un ADMIN ve «Acceso restringido», no las bandejas.
+
+Si falta alguno, el servidor responde 403 o 404 y la UI muestra sus estados de error. La franja «Datos de demostración» y el equipo simulado solo existen con `'mock'`.
 
 ## 4. Generación de tipos desde OpenAPI
 
@@ -106,14 +119,31 @@ Qué cubren:
 - Páginas: bandeja y evaluación.
 - `services/auth.service.spec.ts`: roles UAD.
 
-**Prueba de integración futura (Backend):** el filtro por equipo, fase y recurso debe probarse en el servidor. Por ejemplo: Equipo 4 pide `GET /uad/noticias/{id}` de una NDI docente y debe recibir 404. Ocultar algo en el frontend no es un control de seguridad.
+**Pruebas del servidor:** el filtro por equipo, fase y recurso se prueba en el backend (`UadIntegrationTest`, que requiere Docker): por ejemplo, Equipo 4 pide `GET /uad/noticias/{id}` de una NDI docente y recibe 404. Ocultar algo en el frontend no es un control de seguridad.
 
-## 6. Plan de las siguientes entregas
+**Pendiente:** prueba de punta a punta del frontend con `'http'` contra un servidor con el módulo UAD. Las pruebas de `uad-http.adapter.spec.ts` validan el contrato escrito, no el servidor.
 
-**Entrega 2: casos. Hecha en el frontend (mock).** Para pasar a HTTP depende de que Backend implemente las operaciones `x-entrega: 2` y de D-UAD-15, 20 a 25.
+## 6. Campos de fecha
+
+Los campos de fecha del módulo usan el calendario de Material (`matDatepicker`), que se abre al hacer clic en el campo o en su ícono. Quien navega con teclado puede escribir la fecha como `dd/mm/aaaa`.
+
+| Campo | Página | Límite |
+|---|---|---|
+| Recibida desde / Recibida hasta | `bandeja-noticias` | Cada uno acota al otro. |
+| Fecha límite para responder | `evaluacion-noticia` (Solicitar información) | Desde mañana. |
+| Fecha de remisión | `evaluacion-noticia` y `gestionar-caso` | Hasta hoy. |
+
+- El calendario entrega un `Date`. `fechaContrato()` (`dominio/decision-evaluacion.ts`) lo convierte al `YYYY-MM-DD` local del contrato, sin corrimiento de zona horaria. Los límites salen de `inicioDelDia()`.
+- El formato visible (`dd/mm/aaaa`) y el idioma vienen de `CustomDateAdapter` y `MAT_DATE_LOCALE`, provistos en `app.config.ts`. Las pruebas de página usan `provideNativeDateAdapter()`.
+- El módulo UAD no tiene campos de hora. Si se agrega uno, usar `mat-timepicker` de Material con el mismo patrón.
+
+## 7. Plan de las siguientes entregas
+
+**Entregas 1 y 2: hechas en el frontend (mock) y en el backend.** Falta que Backend despliegue, ejecute los dos scripts SQL y asigne roles; después se prueba el frontend con `'http'`.
 
 **Entrega 3: transversal.**
-- **Hecho en el frontend (mock):** queja anónima NDA con envío sin credenciales y acceso desde el formulario general.
-- **Contrato en borrador, sin interfaz:** "Mis reportes" y la respuesta a la subsanación (bloqueados por D-UAD-16), y la remisión a otro actor de la Ruta (campos sin aprobar).
-- **Bloqueado por decisiones:** pregunta de vinculación de 10 opciones en el formulario general (D-UAD-05) y nacimiento de la NDI al radicar con ruta UAD (D-UAD-17).
-- **Pendiente de Backend:** cambio a HTTP real de las tres entregas.
+- **Hecho en el frontend (mock) y en el backend:** queja anónima NDA con envío sin credenciales y acceso desde el formulario general. `POST /uad/noticias-anonimas` ya existe; el flag `uadQuejaAnonima` sigue apagado en producción hasta probarlo de punta a punta.
+- **Hecho en el backend, sin interfaz:** "Mis reportes" y la respuesta a la subsanación (solo texto). La evaluación ya muestra a la UAD la respuesta del reportante. Falta la pantalla de "Mis reportes" para la persona usuaria y validar con UAD jurídica los textos de estado (D-UAD-32).
+- **Contrato en borrador, sin interfaz:** remisión a otro actor de la Ruta (campos sin aprobar).
+- **Bloqueado por decisiones:** pregunta de vinculación de 10 opciones en el formulario general (D-UAD-05). El nacimiento de la NDI al radicar (D-UAD-17) ya lo hace el backend con una regla provisional.
+- **Pendiente de Backend:** integrar y desplegar la Entrega 3, evidencias en la respuesta (D-UAD-09), acceso histórico y servicio de notificaciones.

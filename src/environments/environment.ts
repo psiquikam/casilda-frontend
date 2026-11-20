@@ -71,7 +71,8 @@ export const environment = {
   /**
    * Módulo UAD Equipos 3 y 4: adaptador del puerto `UadApiPort` (`src/app/uad/uad.providers.ts`).
    * `'mock'`: datos sintéticos en memoria, sin red. `'http'`: `{apiBaseUrl}/uad/...` según
-   * `docs/contratos/uad/openapi-uad.yaml`, **que aún no existe en el backend** (auditoría 2026-11-14).
+   * `docs/contratos/uad/openapi-uad.yaml`. El backend ya implementa las Entregas 1 y 2, pero el adaptador
+   * HTTP aún no se ha probado contra el servidor (ver `docs/contratos/uad/README.md` §3).
    * **Nunca `'mock'` en un entorno desplegado.**
    */
   uad: {
@@ -82,7 +83,7 @@ export const environment = {
     publicTrackingPrototype: true,
     reviewerDashboardPrototype: true,
     assignmentsPrototype: true,
-    /** Queja anónima ante la UAD (`/uad/queja-anonima`). El backend aún no tiene `POST /uad/noticias-anonimas`. */
+    /** Queja anónima ante la UAD (`/uad/queja-anonima`). El backend ya tiene `POST /uad/noticias-anonimas`; falta probarlo de punta a punta. */
     uadQuejaAnonima: true
   }
 };
