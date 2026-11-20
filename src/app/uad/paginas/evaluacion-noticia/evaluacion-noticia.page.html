@@ -262,6 +262,13 @@
                 <p class="sub">Enviada el {{ s.fechaSolicitud | date: 'd MMM y' }} · Fecha límite: {{ s.fechaLimite | date: 'd MMM y' }}</p>
                 @if (s.respondida) {
                   <p>El reportante respondió desde «Mis reportes». Puede continuar la evaluación.</p>
+                  @if (s.respuesta) {
+                    <h3 class="tarjeta__subtitulo">Respuesta del reportante</h3>
+                    <p class="texto-largo">{{ s.respuesta }}</p>
+                    @if (s.fechaRespuesta) {
+                      <p class="sub">Recibida el {{ s.fechaRespuesta | date: "d MMM y, h:mm a" }}</p>
+                    }
+                  }
                 } @else if (s.vencida) {
                   <div class="casilda-alerta casilda-alerta--precaucion">
                     <mat-icon aria-hidden="true">schedule</mat-icon>

@@ -152,6 +152,9 @@ export interface SolicitudInformacionVigente {
   readonly fechaLimite: string;
   readonly vencida: boolean;
   readonly respondida: boolean;
+  /** Texto con el que respondió el reportante desde «Mis reportes». Ausente o `null` mientras no responda. */
+  readonly respuesta?: string | null;
+  readonly fechaRespuesta?: string | null;
 }
 
 export interface NoticiaDetalle {
