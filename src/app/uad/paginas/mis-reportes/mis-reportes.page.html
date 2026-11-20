@@ -1,0 +1,103 @@
+<div class="reportes">
+  <h1 class="reportes__titulo">Mis reportes</h1>
+  <p class="reportes__intro">
+    Aquí aparecen los reportes que usted radicó con su sesión y que llegaron a la Unidad de Asuntos Disciplinarios (UAD). Si la UAD
+    necesita más información, se lo indicamos en el reporte.
+  </p>
+
+  @if (simulado) {
+    <p class="casilda-alerta casilda-alerta--precaucion" role="note">
+      <mat-icon aria-hidden="true">science</mat-icon>
+      <span><strong>Datos de demostración.</strong> Estos reportes son ficticios y no vienen de ningún servidor.</span>
+    </p>
+  }
+
+  @switch (vista()) {
+    @case ('cargando') {
+      <p class="sub" role="status" aria-live="polite">Cargando sus reportes…</p>
+    }
+
+    @case ('error') {
+      <section class="tarjeta estado-vista" role="alert">
+        <mat-icon aria-hidden="true">cloud_off</mat-icon>
+        <p>{{ mensajeError() }}</p>
+        <button type="button" class="boton boton--secundario" (click)="cargar()">
+          <mat-icon aria-hidden="true">refresh</mat-icon>
+          Intentar de nuevo
+        </button>
+      </section>
+    }
+
+    @case ('vacia') {
+      <section class="tarjeta estado-vista">
+        <mat-icon aria-hidden="true">inbox</mat-icon>
+        <p>Todavía no tiene reportes en la UAD.</p>
+        <p class="sub">Los reportes hechos sin iniciar sesión y las quejas anónimas no aparecen aquí, porque no quedan asociados a su cuenta.</p>
+        <a class="boton boton--primario" routerLink="/reportar-caso">
+          <mat-icon aria-hidden="true">add_circle_outline</mat-icon>
+          Reportar un caso
+        </a>
+      </section>
+    }
+
+    @case ('lista') {
+      <ul class="lista" aria-label="Mis reportes">
+        @for (r of reportes(); track r.codigo) {
+          <li class="tarjeta">
+            <h2 class="tarjeta__titulo">
+              <mat-icon aria-hidden="true">description</mat-icon>
+              <span>Reporte <span class="codigo">{{ r.codigo }}</span></span>
+            </h2>
+
+            @if (r.solicitudPendiente) {
+              <p class="casilda-alerta">
+                <mat-icon aria-hidden="true">mark_email_unread</mat-icon>
+                <span><strong>La UAD le pidió información adicional.</strong> Abra el reporte para leer la solicitud y responder.</span>
+              </p>
+            }
+
+            <dl class="datos">
+              <div>
+                <dt>Estado</dt>
+                <dd class="estado"><mat-icon aria-hidden="true">{{ r.solicitudPendiente ? 'pending_actions' : 'info' }}</mat-icon>{{ r.estado }}</dd>
+              </div>
+              <div>
+                <dt>Radicado el</dt>
+                <dd>{{ r.fechaRegistro | date: "d 'de' MMMM 'de' y" }}</dd>
+              </div>
+              @if (r.consecutivo) {
+                <div>
+                  <dt>Consecutivo en la UAD</dt>
+                  <dd class="codigo">{{ r.consecutivo }}</dd>
+                </div>
+              }
+            </dl>
+
+            <div class="acciones">
+              <a
+                class="boton"
+                [class.boton--primario]="r.solicitudPendiente"
+                [class.boton--secundario]="!r.solicitudPendiente"
+                [routerLink]="['/mis-reportes', r.codigo]"
+                [attr.aria-label]="(r.solicitudPendiente ? 'Responder la solicitud del reporte ' : 'Ver el reporte ') + r.codigo"
+              >
+                {{ r.solicitudPendiente ? 'Leer y responder' : 'Ver reporte' }}
+              </a>
+            </div>
+          </li>
+        }
+      </ul>
+
+      @if (total() > tamano) {
+        <mat-paginator
+          [length]="total()"
+          [pageIndex]="pagina()"
+          [pageSize]="tamano"
+          [hidePageSize]="true"
+          (page)="cambiarPagina($event)"
+          aria-label="Páginas de mis reportes"
+        />
+      }
+    }
+  }
+</div>

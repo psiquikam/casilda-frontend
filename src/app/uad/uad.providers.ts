@@ -1,8 +1,11 @@
 import { EnvironmentProviders, InjectionToken, Provider, makeEnvironmentProviders } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { UadApiPort } from './contratos/uad-api.port';
+import { UadMisReportesPort } from './contratos/uad-mis-reportes.port';
 import { UadRadicacionPort } from './contratos/uad-radicacion.port';
 import { UadHttpAdapter } from './infraestructura/uad-http.adapter';
+import { UadMisReportesHttpAdapter } from './infraestructura/uad-mis-reportes-http.adapter';
+import { UadMisReportesMockAdapter } from './infraestructura/mock/uad-mis-reportes-mock.adapter';
 import { UadRadicacionHttpAdapter } from './infraestructura/uad-radicacion-http.adapter';
 import { UadRadicacionMockAdapter } from './infraestructura/mock/uad-radicacion-mock.adapter';
 import { UadMockAdapter } from './infraestructura/mock/uad-mock.adapter';
@@ -40,5 +43,20 @@ export function provideUadRadicacion(adaptador: AdaptadorUad = environment.uad.a
     adaptador === 'mock'
       ? [{ provide: UadRadicacionPort, useClass: UadRadicacionMockAdapter }, { provide: UAD_RADICACION_SIMULADA, useValue: true }]
       : [{ provide: UadRadicacionPort, useClass: UadRadicacionHttpAdapter }]
+  );
+}
+
+/** `true` cuando «Mis reportes» está simulado: las páginas lo declaran («Datos de demostración»). */
+export const UAD_MIS_REPORTES_SIMULADO = new InjectionToken<boolean>('UAD_MIS_REPORTES_SIMULADO', { factory: () => false });
+
+/**
+ * Proveedores de «Mis reportes» (rol `USUARIO`). Van en la ruta `/mis-reportes`, fuera de `/uad`: quien
+ * radicó un reporte no recibe el puerto de los Equipos 3 y 4 (`UadApiPort`).
+ */
+export function provideUadMisReportes(adaptador: AdaptadorUad = environment.uad.adaptador as AdaptadorUad): EnvironmentProviders {
+  return makeEnvironmentProviders(
+    adaptador === 'mock'
+      ? [{ provide: UadMisReportesPort, useClass: UadMisReportesMockAdapter }, { provide: UAD_MIS_REPORTES_SIMULADO, useValue: true }]
+      : [{ provide: UadMisReportesPort, useClass: UadMisReportesHttpAdapter }]
   );
 }

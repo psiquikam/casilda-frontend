@@ -1,3 +1,4 @@
+import { provideNativeDateAdapter } from '@angular/material/core';
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
@@ -19,6 +20,7 @@ function montar(casoUadId: string, equipo = 'UAD_EQUIPO_3', latencia = 0): Compo
     providers: [
       provideRouter([]),
       provideNoopAnimations(),
+      provideNativeDateAdapter(),
       provideUadApi('mock'),
       { provide: UAD_MOCK_LATENCIA_MS, useValue: latencia },
       { provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap({ casoUadId }) } } },

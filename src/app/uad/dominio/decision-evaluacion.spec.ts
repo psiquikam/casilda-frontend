@@ -1,4 +1,4 @@
-import { ContextoValidacionDecision, construirDecision, validarDecision } from './decision-evaluacion';
+import { ContextoValidacionDecision, construirDecision, fechaContrato, inicioDelDia, validarDecision } from './decision-evaluacion';
 
 const CTX: ContextoValidacionDecision = {
   tipoNoticia: 'NDI',
@@ -78,5 +78,19 @@ describe('UAD · decisión de evaluación preliminar', () => {
     const cuerpo = construirDecision('INHIBITORIO', 1, { causalCodigo: 'A', justificacionInhibitorio: 'Texto', observaciones: '' });
     expect(cuerpo.observaciones).toBeNull();
     expect(validarDecision(cuerpo, CTX)).toEqual({});
+  });
+
+  it('la fecha elegida en el calendario viaja como YYYY-MM-DD local, sin corrimiento de zona horaria', () => {
+    expect(fechaContrato(new Date(2026, 10, 5))).toBe('2026-11-05');
+    expect(fechaContrato(new Date(2026, 10, 5, 23, 59))).toBe('2026-11-05');
+    expect(fechaContrato(null)).toBeNull();
+    expect(fechaContrato(new Date('no es fecha'))).toBeNull();
+  });
+
+  it('los límites del calendario son medianoche local de hoy y de mañana', () => {
+    const hoy = inicioDelDia();
+    expect([hoy.getHours(), hoy.getMinutes()]).toEqual([0, 0]);
+    expect(inicioDelDia(1).getTime()).toBeGreaterThan(hoy.getTime());
+    expect(fechaContrato(hoy)).toBe(fechaContrato(new Date()));
   });
 });

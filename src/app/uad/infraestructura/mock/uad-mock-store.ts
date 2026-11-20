@@ -176,7 +176,12 @@ export class UadSimulacionService {
     if (!n || n.estado !== 'PENDIENTE_SUBSANACION' || !n.solicitudInformacion) return false;
     n.estado = 'SUBSANACION_RECIBIDA';
     n.version += 1;
-    n.solicitudInformacion = { ...n.solicitudInformacion, respondida: true };
+    n.solicitudInformacion = {
+      ...n.solicitudInformacion,
+      respondida: true,
+      respuesta: 'Respuesta ficticia del reportante: los hechos ocurrieron el 3 de noviembre en horas de la tarde.',
+      fechaRespuesta: new Date().toISOString()
+    };
     this.store.registrarEvento(noticiaId, 'SUBSANACION_RECIBIDA', 'El reportante respondió la solicitud desde «Mis reportes» (simulado).', {
       estadoAnterior: 'PENDIENTE_SUBSANACION',
       estadoNuevo: 'SUBSANACION_RECIBIDA'

@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, DOCUMENT, OnInit, computed, inject,
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -34,6 +35,8 @@ import {
   ValoresDecision,
   construirDecision,
   fechaCalendario,
+  fechaContrato,
+  inicioDelDia,
   validarDecision
 } from '../../dominio/decision-evaluacion';
 import {
@@ -50,6 +53,8 @@ import {
   ETIQUETA_VINCULACION,
   VINCULACIONES
 } from '../../dominio/etiquetas';
+import { environment } from '../../../../environments/environment';
+import { codigoReporteMock } from '../../infraestructura/mock/uad-mis-reportes-mock.adapter';
 import { UadSimulacionService } from '../../infraestructura/mock/uad-mock-store';
 import { ErrorUad } from '../../infraestructura/uad-error';
 import { CatalogosEvaluacion, UadFacade } from '../../servicios/uad.facade';
@@ -94,6 +99,7 @@ const CAMPOS: Record<string, { id: string; etiqueta: string; control?: string }>
     LowerCasePipe,
     ReactiveFormsModule,
     RouterLink,
+    MatDatepickerModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
@@ -133,7 +139,9 @@ export class EvaluacionNoticiaPage implements OnInit, ConCambiosPendientes {
   protected readonly vinculacionElegida = signal<VinculacionInvestigado | null>(null);
 
   protected readonly hoy = fechaCalendario(new Date());
-  protected readonly manana = fechaCalendario(new Date(Date.now() + 86_400_000));
+  /** Límites de los calendarios: la remisión no puede ser futura y la subsanación vence desde mañana. */
+  protected readonly fechaMaximaRemision = inicioDelDia();
+  protected readonly fechaMinimaLimite = inicioDelDia(1);
 
   protected readonly form = this.fb.nonNullable.group({
     observaciones: [''],
@@ -142,11 +150,11 @@ export class EvaluacionNoticiaPage implements OnInit, ConCambiosPendientes {
     expedienteUad: [''],
     tipoSolicitudCodigo: [''],
     informacionRequerida: [''],
-    fechaLimite: [''],
+    fechaLimite: [null as Date | null],
     causalCodigo: [''],
     justificacionInhibitorio: [''],
     entidadDestinatariaCodigo: [''],
-    fechaRemision: [this.hoy],
+    fechaRemision: [inicioDelDia() as Date | null],
     justificacionRemision: ['']
   });
 
@@ -313,6 +321,8 @@ export class EvaluacionNoticiaPage implements OnInit, ConCambiosPendientes {
     const v = this.form.getRawValue();
     const valores: ValoresDecision = {
       ...v,
+      fechaLimite: fechaContrato(v.fechaLimite),
+      fechaRemision: fechaContrato(v.fechaRemision),
       casoIdVincular: this.casoIdVincular(),
       faseProceso: 'EVALUACION_PRELIMINAR'
     };
@@ -379,12 +389,17 @@ export class EvaluacionNoticiaPage implements OnInit, ConCambiosPendientes {
         return `La noticia pasará a «Procede trámite» y entrará a la bandeja de casos UAD${equipo ? ` de ${ETIQUETA_EQUIPO[equipo]}` : ''} en instrucción. ${caso} ${expediente} Esta decisión operativa no reemplaza el acto jurídico que inicia cada etapa.`;
       }
       case 'SOLICITAR_INFORMACION':
-        return `La solicitud llegará al reportante dentro de Casilda («Mis reportes») y la noticia quedará «Pendiente de subsanación». Si no responde antes del ${this.form.controls.fechaLimite.value}, la noticia no se cierra sola: usted decide cómo continuar.`;
+        return `La solicitud llegará al reportante dentro de Casilda («Mis reportes») y la noticia quedará «Pendiente de subsanación». Si no responde antes del ${this.fechaLimiteLegible()}, la noticia no se cierra sola: usted decide cómo continuar.`;
       case 'INHIBITORIO':
         return `Causal: ${UadFacade.nombreDe(c?.causalesInhibitorio ?? [], this.form.controls.causalCodigo.value)}. La gestión de la UAD sobre esta noticia queda como inhibitoria. El caso institucional, si existe, no se cierra. Este flujo está pendiente de validación jurídica.`;
       case 'REMISION_COMPETENCIA':
         return `Entidad: ${UadFacade.nombreDe(c?.entidadesRemision ?? [], this.form.controls.entidadDestinatariaCodigo.value)}. Casilda solo deja constancia: no envía correos ni documentos a esa entidad. La remisión oficial se hace por los canales institucionales.`;
     }
+  }
+
+  private fechaLimiteLegible(): string {
+    const fecha = this.form.controls.fechaLimite.value;
+    return fecha ? fecha.toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' }) : 'plazo indicado';
   }
 
   private mostrarErrores(errores: Record<string, string>): void {
@@ -440,6 +455,16 @@ export class EvaluacionNoticiaPage implements OnInit, ConCambiosPendientes {
     const equipo = this.facade.contexto()?.equipos[0] ?? 'EQUIPO_3';
     this.simulacion?.simularCambioConcurrente(this.noticiaId, equipo);
     this.notificacion.info('Simulado: otra persona modificó la noticia. Su próxima acción recibirá un aviso de conflicto.');
+  }
+
+  /**
+   * Solo demostración: enlace al mismo reporte visto por quien lo radicó. Con el servidor real cada persona
+   * entra a «Mis reportes» con su propia sesión; la UAD no tiene este atajo.
+   */
+  protected rutaMisReportesDemo(): string[] | null {
+    const n = this.noticia();
+    if (!this.simulacion || !environment.features.uadMisReportes || !n?.reportante || n.origen.tipo !== 'FORMULARIO_WEB_CASILDA') return null;
+    return ['/mis-reportes', codigoReporteMock(n.consecutivo)];
   }
 
   protected simularRespuesta(): void {

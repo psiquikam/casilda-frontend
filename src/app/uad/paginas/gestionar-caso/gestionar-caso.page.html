@@ -283,7 +283,17 @@
                     }
                     <mat-form-field appearance="outline" class="campo campo--corto">
                       <mat-label>Fecha de remisión</mat-label>
-                      <input matInput type="date" [max]="hoy" [ngModel]="fechaRemision()" (ngModelChange)="fechaRemision.set($event)" name="fechaRemisionCaso" />
+                      <input
+                        matInput
+                        name="fechaRemisionCaso"
+                        [matDatepicker]="selectorFechaRemision"
+                        [max]="fechaMaximaRemision"
+                        [ngModel]="fechaRemision()"
+                        (ngModelChange)="fechaRemision.set($event)"
+                        (click)="selectorFechaRemision.open()"
+                      />
+                      <mat-datepicker-toggle matIconSuffix [for]="selectorFechaRemision" aria-label="Abrir calendario: fecha de remisión" />
+                      <mat-datepicker #selectorFechaRemision />
                     </mat-form-field>
                     @if (erroresPermanente()['fechaRemision']; as m) {
                       <p class="campo-error" role="alert">{{ m }}</p>

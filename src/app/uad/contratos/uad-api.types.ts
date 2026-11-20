@@ -152,6 +152,9 @@ export interface SolicitudInformacionVigente {
   readonly fechaLimite: string;
   readonly vencida: boolean;
   readonly respondida: boolean;
+  /** Texto con el que respondió el reportante desde «Mis reportes». Ausente o `null` mientras no responda. */
+  readonly respuesta?: string | null;
+  readonly fechaRespuesta?: string | null;
 }
 
 export interface NoticiaDetalle {
@@ -407,4 +410,28 @@ export interface ErrorResponseUad {
   readonly path?: string | null;
   readonly codigo?: string | null;
   readonly validationErrors?: Readonly<Record<string, string>>;
+}
+
+// ---------------------------------------------------------------------------
+// «Mis reportes» (Entrega 3): lo que ve quien radicó. Sin datos internos de la UAD.
+// ---------------------------------------------------------------------------
+
+/** Actor de la Ruta que gestiona el reporte. El backend hoy solo entrega `UAD`. */
+export type ActorMiReporte = 'EQUIPO_ATENCION' | 'LINEA_ALMA' | 'SEGURIDAD' | 'UAD';
+
+export interface MiReporteResumen {
+  /** Código del reporte que la persona recibió al radicar (`CAS-…`). Clave de `obtenerMiReporte`. */
+  readonly codigo: string;
+  /** Consecutivo de la noticia UAD (`NDI-…`). */
+  readonly consecutivo?: string | null;
+  readonly actor: ActorMiReporte;
+  /** Estado en lenguaje para la persona usuaria: lo redacta el servidor (PROVISIONAL, D-UAD-32). */
+  readonly estado: string;
+  readonly fechaRegistro: string;
+  readonly fechaUltimaActuacion?: string | null;
+  readonly solicitudPendiente: boolean;
+}
+
+export interface MiReporteDetalle extends MiReporteResumen {
+  readonly solicitudInformacion?: SolicitudInformacionVigente | null;
 }

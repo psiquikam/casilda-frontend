@@ -1,3 +1,4 @@
+import { provideNativeDateAdapter } from '@angular/material/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
@@ -12,6 +13,7 @@ function montar(roles: string[]): ComponentFixture<BandejaNoticiasPage> {
     providers: [
       provideRouter([]),
       provideNoopAnimations(),
+      provideNativeDateAdapter(),
       provideUadApi('mock'),
       { provide: UAD_MOCK_LATENCIA_MS, useValue: 0 },
       { provide: AuthService, useValue: { currentUser: { nombre: 'Prueba' }, hasRole: (r: string) => roles.includes(r), isAdmin: () => roles.includes('ADMIN') } }

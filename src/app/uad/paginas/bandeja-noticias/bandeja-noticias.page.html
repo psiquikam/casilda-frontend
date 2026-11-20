@@ -87,11 +87,31 @@
           </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Recibida desde</mat-label>
-            <input matInput type="date" name="desde" [ngModel]="desde()" (ngModelChange)="desde.set($event)" />
+            <input
+              matInput
+              name="desde"
+              [matDatepicker]="selectorDesde"
+              [max]="hasta()"
+              [ngModel]="desde()"
+              (ngModelChange)="desde.set($event)"
+              (click)="selectorDesde.open()"
+            />
+            <mat-datepicker-toggle matIconSuffix [for]="selectorDesde" aria-label="Abrir calendario: recibida desde" />
+            <mat-datepicker #selectorDesde />
           </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Recibida hasta</mat-label>
-            <input matInput type="date" name="hasta" [ngModel]="hasta()" (ngModelChange)="hasta.set($event)" />
+            <input
+              matInput
+              name="hasta"
+              [matDatepicker]="selectorHasta"
+              [min]="desde()"
+              [ngModel]="hasta()"
+              (ngModelChange)="hasta.set($event)"
+              (click)="selectorHasta.open()"
+            />
+            <mat-datepicker-toggle matIconSuffix [for]="selectorHasta" aria-label="Abrir calendario: recibida hasta" />
+            <mat-datepicker #selectorHasta />
           </mat-form-field>
           <mat-form-field appearance="outline">
             <mat-label>Consecutivo</mat-label>

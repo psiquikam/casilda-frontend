@@ -20,6 +20,13 @@
         <span class="hnav-text">Seguimiento de trámite</span>
       </a>
 
+      @if (features.uadMisReportes) {
+        <a routerLink="/mis-reportes" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
+          <mat-icon class="hnav-icon" aria-hidden="true">fact_check</mat-icon>
+          <span class="hnav-text">Mis reportes</span>
+        </a>
+      }
+
       @if (features.complaintIntakePrototype) {
         <a routerLink="/nueva-queja" routerLinkActive="hnav-item--active" ariaCurrentWhenActive="page" class="hnav-link">
           <mat-icon class="hnav-icon" aria-hidden="true">post_add</mat-icon>
@@ -255,6 +262,13 @@
                 <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">track_changes</mat-icon>
                 <span class="hnav-mobile-item__text">Seguimiento de trámite</span>
               </a>
+              @if (features.uadMisReportes) {
+                <a routerLink="/mis-reportes" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+                  class="hnav-mobile-item" (click)="closeMobileMenu()">
+                  <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">fact_check</mat-icon>
+                  <span class="hnav-mobile-item__text">Mis reportes</span>
+                </a>
+              }
               @if (features.complaintIntakePrototype) {
                 <a routerLink="/nueva-queja" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
                   class="hnav-mobile-item" (click)="closeMobileMenu()">

@@ -2,6 +2,13 @@
 
 **Fecha:** 2026-11-14. **Alcance:** módulo UAD Equipos 3 y 4. El backend se revisó **solo en lectura**.
 
+> **Actualización del 2026-11-19.** Este documento es la foto del 2026-11-14, anterior al backend UAD, y se conserva como línea base. Desde entonces:
+>
+> - El backend implementó la Entrega 1 y la NDA pública (PR #21) y la Entrega 2 (PR #23). Las dos están en `main` del backend. Las conclusiones «No hay módulo UAD», «Roles UAD: NO ENCONTRADO», «Historial: NO ENCONTRADO» y «Todo `/uad/**`: PROPUESTO» ya no aplican.
+> - Existen las tablas `uad_*` con `@Version`, el historial `uad_evento` y los roles `UAD_*` (por SQL).
+> - **Siguen vigentes:** el riesgo de `/solicitudes` (D-UAD-16), la falta de «Mis reportes», de servicio de correo y de un ID de caso transversal (D-UAD-15).
+> - El estado al día está en [`README.md`](README.md) y [`MATRIZ_CONTRATOS_UAD.md`](MATRIZ_CONTRATOS_UAD.md).
+
 | Repositorio | Rama | HEAD | Estado al auditar |
 |---|---|---|---|
 | `casilda-frontend` | `feature/06/20/casilda/modulo-uad` | `fb1070d` | Sin cambios rastreados. Había archivos sin rastrear previos (`.vercel/`, `docs/contratos/contrato-reportar-caso-v2.md`, `perfil_contenidos.md`); no se tocaron. |

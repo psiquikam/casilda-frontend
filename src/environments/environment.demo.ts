@@ -7,9 +7,10 @@ import { environment as produccion } from './environment.prod';
  * los adaptadores de los módulos que aún no tienen backend, para poder mostrarlos con datos
  * sintéticos. Así, cualquier clave nueva de `environment.prod.ts` llega aquí sin tocar este archivo.
  *
- * - UAD Equipos 3 y 4: adaptador mock (el backend no tiene rutas `/uad`; ver
- *   `docs/contratos/uad/AUDITORIA_UAD.md`). Las pantallas muestran la franja «Datos de demostración».
+ * - UAD Equipos 3 y 4: adaptador mock (el adaptador HTTP aún no se ha probado contra el backend; ver
+ *   `docs/contratos/uad/README.md`). Las pantallas muestran la franja «Datos de demostración».
  * - Queja anónima UAD (`features.uadQuejaAnonima`): visible, con la radicación simulada.
+ * - «Mis reportes» (`features.uadMisReportes`): visible, con reportes simulados.
  * - Línea Alma (APH y Psicología): todos los grupos del servidor simulado encendidos. El interceptor
  *   solo atiende `{apiBaseUrl}/alma/...`, así que no oculta endpoints reales del backend. Se generan
  *   a partir de las claves de producción: un grupo nuevo queda simulado sin tocar este archivo.
@@ -34,6 +35,7 @@ export const environment = {
   },
   features: {
     ...produccion.features,
-    uadQuejaAnonima: true
+    uadQuejaAnonima: true,
+    uadMisReportes: true
   }
 };

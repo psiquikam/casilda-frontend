@@ -67,7 +67,8 @@ export const environment = {
   /**
    * Módulo UAD Equipos 3 y 4: adaptador del puerto `UadApiPort` (`src/app/uad/uad.providers.ts`).
    * `'mock'`: datos sintéticos en memoria, sin red. `'http'`: `{apiBaseUrl}/uad/...` según
-   * `docs/contratos/uad/openapi-uad.yaml`, **que aún no existe en el backend** (auditoría 2026-11-14).
+   * `docs/contratos/uad/openapi-uad.yaml`. El backend ya implementa las Entregas 1 y 2, pero el adaptador
+   * HTTP aún no se ha probado contra el servidor (ver `docs/contratos/uad/README.md` §3).
    * **Nunca `'mock'` en un entorno desplegado.**
    */
   uad: {
@@ -78,7 +79,9 @@ export const environment = {
     publicTrackingPrototype: false,
     reviewerDashboardPrototype: false,
     assignmentsPrototype: false,
-    /** Apagada hasta que exista `POST /uad/noticias-anonimas`: un formulario público que falla no se publica. */
-    uadQuejaAnonima: false
+    /** Apagada hasta probar `POST /uad/noticias-anonimas` de punta a punta: un formulario público que falla no se publica. */
+    uadQuejaAnonima: false,
+    /** Apagada hasta que Backend despliegue la Entrega 3 (`GET /mis-reportes`) y se pruebe de punta a punta. */
+    uadMisReportes: false
   }
 };

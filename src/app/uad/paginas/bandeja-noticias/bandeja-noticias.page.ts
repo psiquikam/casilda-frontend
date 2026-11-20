@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DOCUMENT, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -11,6 +12,7 @@ import { NotificacionService } from '../../../core/a11y/notificacion.service';
 import { EstadoNoticia, NoticiaResumen, TipoNoticia } from '../../contratos/uad-api.types';
 import { EstadoNoticiaComponent } from '../../componentes/estado-noticia/estado-noticia.component';
 import { PanelSimulacionComponent } from '../../componentes/panel-simulacion/panel-simulacion.component';
+import { fechaContrato } from '../../dominio/decision-evaluacion';
 import { ESTADOS_NOTICIA, ETIQUETA_ACTOR, ETIQUETA_EQUIPO, ETIQUETA_ESTADO_NOTICIA, ETIQUETA_ORIGEN, ETIQUETA_VINCULACION } from '../../dominio/etiquetas';
 import { ErrorUad } from '../../infraestructura/uad-error';
 import { UadFacade } from '../../servicios/uad.facade';
@@ -38,6 +40,7 @@ export interface AvisoBandeja {
     DatePipe,
     FormsModule,
     RouterLink,
+    MatDatepickerModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
@@ -59,8 +62,8 @@ export class BandejaNoticiasPage implements OnInit {
 
   protected readonly tipo = signal<TipoNoticia>('NDI');
   protected readonly estado = signal<EstadoNoticia | ''>('');
-  protected readonly desde = signal('');
-  protected readonly hasta = signal('');
+  protected readonly desde = signal<Date | null>(null);
+  protected readonly hasta = signal<Date | null>(null);
   protected readonly consecutivo = signal('');
   protected readonly pagina = signal(0);
 
@@ -129,8 +132,8 @@ export class BandejaNoticiasPage implements OnInit {
 
   protected limpiarFiltros(): void {
     this.estado.set('');
-    this.desde.set('');
-    this.hasta.set('');
+    this.desde.set(null);
+    this.hasta.set(null);
     this.consecutivo.set('');
     this.filtrar();
   }
@@ -150,8 +153,8 @@ export class BandejaNoticiasPage implements OnInit {
       .listarNoticias({
         tipo: this.tipo(),
         estado: this.estado() || null,
-        fechaRecepcionDesde: this.desde() || null,
-        fechaRecepcionHasta: this.hasta() || null,
+        fechaRecepcionDesde: fechaContrato(this.desde()),
+        fechaRecepcionHasta: fechaContrato(this.hasta()),
         consecutivo: this.consecutivo().trim() || null,
         page: this.pagina(),
         size: TAMANO_PAGINA_NOTICIAS
