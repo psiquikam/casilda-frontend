@@ -18,6 +18,9 @@
       <button type="button" class="boton boton--secundario" (click)="simularCambioConcurrente()">Simular que otra persona modifica la noticia</button>
       @if (noticia()?.estado === 'PENDIENTE_SUBSANACION') {
         <button type="button" class="boton boton--secundario" (click)="simularRespuesta()">Simular respuesta del reportante</button>
+        @if (rutaMisReportesDemo(); as ruta) {
+          <a class="boton boton--secundario" [routerLink]="ruta">Responder como reportante en «Mis reportes»</a>
+        }
       }
     }
   </app-uad-panel-simulacion>

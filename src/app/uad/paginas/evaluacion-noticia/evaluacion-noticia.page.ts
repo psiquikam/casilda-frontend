@@ -53,6 +53,8 @@ import {
   ETIQUETA_VINCULACION,
   VINCULACIONES
 } from '../../dominio/etiquetas';
+import { environment } from '../../../../environments/environment';
+import { codigoReporteMock } from '../../infraestructura/mock/uad-mis-reportes-mock.adapter';
 import { UadSimulacionService } from '../../infraestructura/mock/uad-mock-store';
 import { ErrorUad } from '../../infraestructura/uad-error';
 import { CatalogosEvaluacion, UadFacade } from '../../servicios/uad.facade';
@@ -453,6 +455,16 @@ export class EvaluacionNoticiaPage implements OnInit, ConCambiosPendientes {
     const equipo = this.facade.contexto()?.equipos[0] ?? 'EQUIPO_3';
     this.simulacion?.simularCambioConcurrente(this.noticiaId, equipo);
     this.notificacion.info('Simulado: otra persona modificó la noticia. Su próxima acción recibirá un aviso de conflicto.');
+  }
+
+  /**
+   * Solo demostración: enlace al mismo reporte visto por quien lo radicó. Con el servidor real cada persona
+   * entra a «Mis reportes» con su propia sesión; la UAD no tiene este atajo.
+   */
+  protected rutaMisReportesDemo(): string[] | null {
+    const n = this.noticia();
+    if (!this.simulacion || !environment.features.uadMisReportes || !n?.reportante || n.origen.tipo !== 'FORMULARIO_WEB_CASILDA') return null;
+    return ['/mis-reportes', codigoReporteMock(n.consecutivo)];
   }
 
   protected simularRespuesta(): void {

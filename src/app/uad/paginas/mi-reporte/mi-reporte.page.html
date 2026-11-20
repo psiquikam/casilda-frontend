@@ -1,0 +1,128 @@
+<div class="reportes">
+  <a class="volver" routerLink="/mis-reportes">
+    <mat-icon aria-hidden="true">arrow_back</mat-icon>
+    Volver a mis reportes
+  </a>
+
+  <h1 class="reportes__titulo">Reporte <span class="codigo">{{ codigo }}</span></h1>
+
+  @if (simulado) {
+    <p class="casilda-alerta casilda-alerta--precaucion" role="note">
+      <mat-icon aria-hidden="true">science</mat-icon>
+      <span><strong>Datos de demostración.</strong> Este reporte es ficticio y su respuesta no se envía a ningún servidor.</span>
+    </p>
+  }
+
+  @switch (vista()) {
+    @case ('cargando') {
+      <p class="sub" role="status" aria-live="polite">Cargando el reporte…</p>
+    }
+
+    @case ('no-encontrado') {
+      <section class="tarjeta estado-vista" role="alert">
+        <mat-icon aria-hidden="true">search_off</mat-icon>
+        <p>No encontramos este reporte entre los suyos.</p>
+        <p class="sub">Revise el código o vuelva a la lista de sus reportes.</p>
+        <a class="boton boton--primario" routerLink="/mis-reportes">Ver mis reportes</a>
+      </section>
+    }
+
+    @case ('error') {
+      <section class="tarjeta estado-vista" role="alert">
+        <mat-icon aria-hidden="true">cloud_off</mat-icon>
+        <p>{{ mensajeError() }}</p>
+        <button type="button" class="boton boton--secundario" (click)="cargar()">
+          <mat-icon aria-hidden="true">refresh</mat-icon>
+          Intentar de nuevo
+        </button>
+      </section>
+    }
+
+    @case ('detalle') {
+      @if (reporte(); as r) {
+        <section class="tarjeta" aria-labelledby="mr-estado-titulo">
+          <h2 id="mr-estado-titulo" class="tarjeta__titulo"><mat-icon aria-hidden="true">info</mat-icon> Estado del reporte</h2>
+          <dl class="datos">
+            <div>
+              <dt>Estado</dt>
+              <dd class="estado">{{ r.estado }}</dd>
+            </div>
+            <div>
+              <dt>Radicado el</dt>
+              <dd>{{ r.fechaRegistro | date: "d 'de' MMMM 'de' y" }}</dd>
+            </div>
+            @if (r.consecutivo) {
+              <div>
+                <dt>Consecutivo en la UAD</dt>
+                <dd class="codigo">{{ r.consecutivo }}</dd>
+              </div>
+            }
+          </dl>
+          <p class="sub">Lo gestiona la Unidad de Asuntos Disciplinarios (UAD). El trámite es reservado: aquí solo ve su estado general.</p>
+        </section>
+
+        @if (recienRespondida()) {
+          <section id="mr-confirmacion" class="tarjeta confirmacion" tabindex="-1" role="status">
+            <mat-icon class="confirmacion__icono" aria-hidden="true">check_circle</mat-icon>
+            <p><strong>Su respuesta fue enviada a la UAD.</strong></p>
+            <p class="sub">La UAD continuará la revisión con esta información.</p>
+          </section>
+        }
+
+        @if (solicitud(); as s) {
+          <section class="tarjeta" aria-labelledby="mr-solicitud-titulo">
+            <h2 id="mr-solicitud-titulo" class="tarjeta__titulo">
+              <mat-icon aria-hidden="true">mark_email_unread</mat-icon> Solicitud de información de la UAD
+            </h2>
+            <p class="texto-largo">{{ s.informacionRequerida }}</p>
+            <p class="sub">
+              Solicitada el {{ s.fechaSolicitud | date: "d 'de' MMMM 'de' y" }} · Fecha límite:
+              {{ s.fechaLimite | date: "d 'de' MMMM 'de' y" }}
+            </p>
+
+            @if (s.respondida) {
+              <h3 class="subtitulo">Su respuesta</h3>
+              @if (s.respuesta) {
+                <p class="texto-largo">{{ s.respuesta }}</p>
+              }
+              @if (s.fechaRespuesta) {
+                <p class="sub">Enviada el {{ s.fechaRespuesta | date: "d 'de' MMMM 'de' y, h:mm a" }}</p>
+              }
+            } @else if (puedeResponder()) {
+              @if (s.vencida) {
+                <p class="casilda-alerta casilda-alerta--precaucion">
+                  <mat-icon aria-hidden="true">schedule</mat-icon>
+                  <span>La fecha límite ya pasó, pero todavía puede responder. El reporte no se cierra por vencer el plazo.</span>
+                </p>
+              }
+
+              <form class="formulario" (submit)="enviar($event)" novalidate aria-labelledby="mr-solicitud-titulo">
+                <mat-form-field appearance="outline" class="campo">
+                  <mat-label>Su respuesta</mat-label>
+                  <textarea matInput id="mr-respuesta" [formControl]="respuesta" rows="7" autocomplete="off" [maxlength]="limite" required></textarea>
+                  <mat-hint>Escriba lo que la UAD le pide, con el detalle que considere.</mat-hint>
+                  <mat-hint align="end">{{ respuesta.value.length }} / {{ limite }}</mat-hint>
+                  <mat-error>{{ errorRespuesta() }}</mat-error>
+                </mat-form-field>
+                <p class="sub">Por ahora la respuesta solo admite texto, sin archivos adjuntos. Después de enviarla no podrá editarla.</p>
+                <div class="acciones">
+                  <button type="submit" class="boton boton--primario" [disabled]="enviando()" [attr.aria-busy]="enviando()">
+                    <mat-icon aria-hidden="true">send</mat-icon>
+                    {{ enviando() ? 'Enviando…' : 'Enviar respuesta' }}
+                  </button>
+                </div>
+              </form>
+            } @else {
+              <p class="sub">Esta solicitud ya no está pendiente de respuesta.</p>
+            }
+          </section>
+        } @else {
+          <section class="tarjeta">
+            <p>La UAD no le ha pedido información adicional sobre este reporte.</p>
+            <p class="sub">Si la necesita, verá la solicitud aquí.</p>
+          </section>
+        }
+      }
+    }
+  }
+</div>

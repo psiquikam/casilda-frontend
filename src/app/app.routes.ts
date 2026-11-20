@@ -204,6 +204,16 @@ export const routes: Routes = [
     loadChildren: () => import('./seguridad-personas-bienes/seguridad-personas-bienes.routes').then((m) => m.SEGURIDAD_ROUTES)
   },
   {
+    // «Mis reportes» de quien radicó con su sesión (rol USUARIO; ADMIN por la regla general de `roleGuard`).
+    // El dueño de cada reporte lo filtra el servidor. Detrás del flag `uadMisReportes` (apagado en producción
+    // hasta que Backend despliegue la Entrega 3). Contrato: docs/contratos/uad/openapi-uad.yaml.
+    path: 'mis-reportes',
+    canMatch: [featureCapabilityGuard],
+    canActivate: [roleGuard],
+    data: { roles: ['USUARIO'], feature: 'uadMisReportes' },
+    loadChildren: () => import('./uad/mis-reportes.routes').then((m) => m.MIS_REPORTES_ROUTES)
+  },
+  {
     // Queja anónima ante la UAD (NDA): ruta PÚBLICA, declarada antes de `uad` para no pasar por su
     // `roleGuard`. Detrás del flag `uadQuejaAnonima` (apagado en producción hasta que exista el endpoint).
     path: 'uad/queja-anonima',

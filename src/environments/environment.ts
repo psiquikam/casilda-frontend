@@ -84,6 +84,8 @@ export const environment = {
     reviewerDashboardPrototype: true,
     assignmentsPrototype: true,
     /** Queja anónima ante la UAD (`/uad/queja-anonima`). El backend ya tiene `POST /uad/noticias-anonimas`; falta probarlo de punta a punta. */
-    uadQuejaAnonima: true
+    uadQuejaAnonima: true,
+    /** «Mis reportes» (`/mis-reportes`), con datos simulados mientras `uad.adaptador` sea `'mock'`. */
+    uadMisReportes: true
   }
 };

@@ -9,13 +9,14 @@ describe('Entornos desplegables', () => {
     expect(produccion.datosDemostracion).toBeFalse();
     // Sin endpoint en el backend, un formulario público que falla no se publica.
     expect(produccion.features.uadQuejaAnonima).toBeFalse();
+    expect(produccion.features.uadMisReportes).toBeFalse();
   });
 
   it('demo hereda de producción y solo simula UAD y Línea Alma', () => {
     expect(demo.uad.adaptador).toBe('mock');
     expect(demo.apiBaseUrl).toBe(produccion.apiBaseUrl);
     expect(demo.datosDemostracion).toBeFalse();
-    expect(demo.features).toEqual({ ...produccion.features, uadQuejaAnonima: true });
+    expect(demo.features).toEqual({ ...produccion.features, uadQuejaAnonima: true, uadMisReportes: true });
   });
 
   it('demo enciende todos los grupos simulados de Línea Alma, también los que se agreguen', () => {

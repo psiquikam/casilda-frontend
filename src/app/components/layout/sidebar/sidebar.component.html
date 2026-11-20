@@ -36,6 +36,12 @@
               <mat-icon class="nav-item__icon" aria-hidden="true">track_changes</mat-icon>
               <span class="nav-item__text">Seguimiento de trámite</span>
             </a>
+            @if (features.uadMisReportes) {
+              <a routerLink="/mis-reportes" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
+                <mat-icon class="nav-item__icon" aria-hidden="true">fact_check</mat-icon>
+                <span class="nav-item__text">Mis reportes</span>
+              </a>
+            }
             @if (features.complaintIntakePrototype) {
               <a routerLink="/nueva-queja" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
                 <mat-icon class="nav-item__icon" aria-hidden="true">post_add</mat-icon>

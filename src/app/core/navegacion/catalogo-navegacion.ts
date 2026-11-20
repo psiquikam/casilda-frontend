@@ -51,6 +51,15 @@ export const CATALOGO_MODULOS: readonly ModuloCasilda[] = [
     seccion: 'Mis solicitudes'
   },
   {
+    id: 'mis-reportes',
+    nombre: 'Mis reportes',
+    icono: 'fact_check',
+    ruta: '/mis-reportes',
+    roles: ['USUARIO'],
+    feature: 'uadMisReportes',
+    seccion: 'Mis solicitudes'
+  },
+  {
     id: 'queja-uad',
     nombre: 'Queja disciplinaria (UAD)',
     icono: 'gavel',

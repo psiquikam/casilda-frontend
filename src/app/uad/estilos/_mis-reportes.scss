@@ -1,0 +1,115 @@
+// Estilos compartidos de «Mis reportes» (listado y detalle). Solo tokens: sin literales (CLAUDE.md §3).
+@mixin mis-reportes {
+  .reportes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    max-width: 760px;
+    margin: 0 auto;
+    padding: var(--space-8) var(--space-6);
+
+    @media (max-width: 600px) {
+      padding: var(--space-6) var(--space-4);
+    }
+  }
+
+  .reportes__titulo {
+    margin: 0;
+    font-size: var(--font-size-2xl);
+  }
+
+  .reportes__intro {
+    margin: 0;
+    color: var(--color-text-secondary);
+  }
+
+  .tarjeta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-surface);
+    box-shadow: var(--shadow-sm);
+
+    p {
+      margin: 0;
+    }
+  }
+
+  .tarjeta__titulo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    font-size: var(--font-size-md);
+    color: var(--color-primary);
+  }
+
+  .codigo {
+    font-family: var(--font-mono);
+    font-weight: 700;
+  }
+
+  // El estado nunca depende solo del color: lleva ícono y texto (CLAUDE.md §6.5).
+  .estado {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-weight: 600;
+
+    mat-icon {
+      width: 20px;
+      height: 20px;
+      font-size: 20px;
+      color: var(--color-primary);
+    }
+  }
+
+  .datos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--space-3);
+    margin: 0;
+
+    dt {
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
+    }
+
+    dd {
+      margin: 0;
+    }
+  }
+
+  .sub {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+  }
+
+  .texto-largo {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .acciones {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--space-2);
+  }
+
+  .estado-vista {
+    align-items: center;
+    text-align: center;
+
+    > mat-icon {
+      width: 40px;
+      height: 40px;
+      font-size: 40px;
+      color: var(--color-text-muted);
+    }
+  }
+}
