@@ -5,7 +5,8 @@
 - **Frontend:** las Entregas 1 (bandejas NDI/NDA y evaluación) y 2 (bandeja de casos, Gestionar caso, historial, pruebas y traslado) y la queja anónima de la Entrega 3 funcionan con el adaptador mock.
 - **Backend:** las Entregas 1 y 2 y la radicación pública de la NDA están en `main` (PR #21 y #23). Guías: `casilda-backend/docs/UAD_BACKEND_ENTREGA1.md` y `UAD_BACKEND_ENTREGA2.md`.
 - **Paso a HTTP, aplazado:** el equipo de Backend tiene pendiente desplegar varios cambios en el servidor. Hasta que lo haga, el módulo sigue con `'mock'` en desarrollo y demo, y el adaptador HTTP queda sin probar contra el servidor real.
-- **Entrega 3 en el backend (rama `feature/06/20/casilda/modulo-uad-back`, sin integrar a `main`):** «Mis reportes» (`GET /mis-reportes`, `GET /mis-reportes/{codigo}`), respuesta a la subsanación solo con texto y corrección de la privacidad de `/solicitudes` (D-UAD-16). Guía: `casilda-backend/docs/UAD_BACKEND_ENTREGA3.md`. **No hay pantalla de «Mis reportes» todavía.**
+- **Entrega 3 en el backend (rama `feature/06/20/casilda/modulo-uad-back`, sin integrar a `main`):** «Mis reportes» (`GET /mis-reportes`, `GET /mis-reportes/{codigo}`), respuesta a la subsanación solo con texto y corrección de la privacidad de `/solicitudes` (D-UAD-16). Guía: `casilda-backend/docs/UAD_BACKEND_ENTREGA3.md`.
+- **«Mis reportes» en el frontend (mock):** listado y detalle con respuesta a la solicitud de información, en `/mis-reportes`, detrás del flag `uadMisReportes` (apagado en producción).
 - **Sin implementar:** remisión a la Ruta, carga de evidencias y acceso histórico.
 
 | Documento | Para qué |
@@ -24,6 +25,15 @@ Página / componentes (src/app/uad/paginas, componentes)
       ├─ UadHttpAdapter (infraestructura/uad-http.adapter.ts)   {apiBaseUrl}/uad/...
       └─ UadMockAdapter (infraestructura/mock/)                 servidor simulado en memoria
 ```
+
+Fuera de las rutas `/uad` hay dos puertos más, cada uno con su adaptador HTTP y mock y su propio proveedor:
+
+| Puerto | Ruta | Quién lo usa | Proveedor |
+|---|---|---|---|
+| `UadRadicacionPort` | `/uad/queja-anonima` (pública) | Cualquier persona, sin sesión | `provideUadRadicacion()` |
+| `UadMisReportesPort` | `/mis-reportes` | Quien radicó un reporte (rol USUARIO) | `provideUadMisReportes()` |
+
+Los tres mocks comparten `UadMockStore`: la queja anónima llega a la bandeja NDA, y la solicitud de información y su respuesta viajan entre la evaluación y «Mis reportes».
 
 - `contratos/uad-api.types.ts` es el espejo del OpenAPI. Si cambia uno, cambia el otro en el mismo commit.
 - `dominio/` tiene reglas puras: competencia por equipo y validación de la decisión. Las usan la UI y el mock. **El servidor las aplica por su cuenta** (`UadCompetencia`, `UadDecisionValidator`, `UadCatalogoActuaciones`); si cambia una regla, cambia en los dos lados.
@@ -69,7 +79,11 @@ npm start          # http://localhost:4200
 | `CAS-2026-000304` | Gestión finalizada por remisión: no aparece en la bandeja activa. |
 
    Para ver el traslado completo: con Equipo 3 finalice la instrucción de `CAS-2026-000301`, que sale de su bandeja; cambie el equipo simulado a Equipo 4 y aparece en decisión.
-7. Queja anónima (`/uad/queja-anonima`, **sin iniciar sesión**). También se llega desde el formulario general, paso del presunto agresor, junto a la selección de ruta. Al enviarla aparece un consecutivo `NDA-…`; inicie sesión como ADMIN y la verá en la pestaña NDA de la bandeja. El store del mock es único en la aplicación para que esto funcione. Se reinicia al recargar.
+7. «Mis reportes» (`/mis-reportes`, rol USUARIO; un ADMIN entra por la URL). En el menú aparece en «Mis solicitudes» para el rol USUARIO.
+   - El mock trata como propias las NDI del formulario web con reportante; las NDA y `NDI-2026-000144` (remitida) no aparecen.
+   - `CAS-DEMO-000145` tiene una solicitud de información vencida: se puede responder igual.
+   - Para ver el ciclo completo: en la evaluación de una NDI use «Solicitar información adicional»; abra «Responder como reportante en "Mis reportes"» en la franja de demostración, responda y vuelva a la evaluación: la respuesta aparece en la tarjeta de la solicitud.
+8. Queja anónima (`/uad/queja-anonima`, **sin iniciar sesión**). También se llega desde el formulario general, paso del presunto agresor, junto a la selección de ruta. Al enviarla aparece un consecutivo `NDA-…`; inicie sesión como ADMIN y la verá en la pestaña NDA de la bandeja. El store del mock es único en la aplicación para que esto funcione. Se reinicia al recargar.
 
 ## 3. Alternar mock ↔ HTTP
 
@@ -116,7 +130,8 @@ Qué cubren:
 - `infraestructura/mock/uad-mock.adapter.spec.ts`: visibilidad por equipo, NDA, coordinación sin acceso, identificadores, decisiones, 409, reclasificación e historial append-only.
 - `infraestructura/uad-http.adapter.spec.ts`: rutas, verbos y traducción de errores contra el contrato.
 - `uad.providers.spec.ts`: selección de adaptador y protección de rutas.
-- Páginas: bandeja y evaluación.
+- Páginas: bandeja, evaluación, casos, queja anónima y «Mis reportes» (listado y detalle).
+- `dominio/mis-reportes.spec.ts` e `infraestructura/uad-mis-reportes.adapters.spec.ts`: reglas de la respuesta, textos para la persona usuaria, rutas HTTP y reglas del mock (dueño, 404, doble respuesta).
 - `services/auth.service.spec.ts`: roles UAD.
 
 **Pruebas del servidor:** el filtro por equipo, fase y recurso se prueba en el backend (`UadIntegrationTest`, que requiere Docker): por ejemplo, Equipo 4 pide `GET /uad/noticias/{id}` de una NDI docente y recibe 404. Ocultar algo en el frontend no es un control de seguridad.
@@ -143,7 +158,7 @@ Los campos de fecha del módulo usan el calendario de Material (`matDatepicker`)
 
 **Entrega 3: transversal.**
 - **Hecho en el frontend (mock) y en el backend:** queja anónima NDA con envío sin credenciales y acceso desde el formulario general. `POST /uad/noticias-anonimas` ya existe; el flag `uadQuejaAnonima` sigue apagado en producción hasta probarlo de punta a punta.
-- **Hecho en el backend, sin interfaz:** "Mis reportes" y la respuesta a la subsanación (solo texto). La evaluación ya muestra a la UAD la respuesta del reportante. Falta la pantalla de "Mis reportes" para la persona usuaria y validar con UAD jurídica los textos de estado (D-UAD-32).
+- **Hecho en el frontend (mock) y en el backend (rama, sin integrar):** "Mis reportes" y la respuesta a la subsanación, solo con texto. La evaluación muestra a la UAD la respuesta del reportante. Falta validar con UAD jurídica los textos de estado y de las pantallas (D-UAD-32).
 - **Contrato en borrador, sin interfaz:** remisión a otro actor de la Ruta (campos sin aprobar).
 - **Bloqueado por decisiones:** pregunta de vinculación de 10 opciones en el formulario general (D-UAD-05). El nacimiento de la NDI al radicar (D-UAD-17) ya lo hace el backend con una regla provisional.
 - **Pendiente de Backend:** integrar y desplegar la Entrega 3, evidencias en la respuesta (D-UAD-09), acceso histórico y servicio de notificaciones.

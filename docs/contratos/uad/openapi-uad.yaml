@@ -9,7 +9,7 @@ info:
     `x-entrega: 1`, `x-entrega: 2` y `radicarNoticiaAnonima`; todas están en `main`. El adaptador HTTP del
     frontend aún no se ha probado contra el servidor: se hará cuando Backend despliegue.
     `listarMisReportes`, `obtenerMiReporte` y `responderSolicitudInformacion` están
-    implementadas en la rama `feature/06/20/casilda/modulo-uad-back`, aún sin integrar a `main` y sin interfaz.
+    implementadas en la rama `feature/06/20/casilda/modulo-uad-back`, aún sin integrar a `main`; el frontend ya tiene sus pantallas con mock (`/mis-reportes`).
     Sigue propuesta: `remitirActorRuta`.
 
     Diferencias conocidas del backend con este contrato: `evidenciaId` es numérico enviado como texto
@@ -39,7 +39,7 @@ info:
 
     Entregas: las operaciones con `x-entrega: 1` (noticias y evaluación) y `x-entrega: 2` (casos) respaldan la
     interfaz ya construida con el adaptador mock. De la `x-entrega: 3`, `radicarNoticiaAnonima` ya tiene interfaz
-    con mock; «Mis reportes», la respuesta a la subsanación y la remisión a la Ruta son borradores sin interfaz.
+    con mock, igual que «Mis reportes» y la respuesta a la subsanación; la remisión a la Ruta es un borrador sin interfaz.
   contact:
     name: Frontend CASILDA
 servers:
@@ -720,7 +720,7 @@ paths:
 
         Alcance de la primera versión del backend: solo los reportes que llegaron a la UAD (`actor: UAD`).
         Orden: más recientes primero.
-      x-estado: IMPLEMENTADO EN BACKEND (rama modulo-uad-back, sin integrar) — SIN INTERFAZ — TEXTOS Y CAMPOS PENDIENTES DE VALIDACIÓN
+      x-estado: IMPLEMENTADO EN BACKEND (rama modulo-uad-back, sin integrar) — UI MOCK — TEXTOS Y CAMPOS PENDIENTES DE VALIDACIÓN
       x-entrega: 3
       x-roles: [USUARIO]
       parameters:
@@ -750,7 +750,7 @@ paths:
         `codigo` es el código del reporte (`CAS-…`) que la persona recibió al radicar. 404 si el reporte no es
         del usuario (no revela que existe). Incluye la solicitud de información más reciente de la UAD, con su
         respuesta si ya la hay, para responderla con `responderSolicitudInformacion`.
-      x-estado: IMPLEMENTADO EN BACKEND (rama modulo-uad-back, sin integrar) — SIN INTERFAZ — TEXTOS Y CAMPOS PENDIENTES DE VALIDACIÓN
+      x-estado: IMPLEMENTADO EN BACKEND (rama modulo-uad-back, sin integrar) — UI MOCK — TEXTOS Y CAMPOS PENDIENTES DE VALIDACIÓN
       x-entrega: 3
       x-roles: [USUARIO]
       parameters:
@@ -775,7 +775,7 @@ paths:
 
         409 con `codigo` `SOLICITUD_YA_RESPONDIDA` si ya se respondió, `SOLICITUD_NO_VIGENTE` si la UAD ya
         decidió sobre la noticia, o `CONFLICTO_VERSION` si la noticia cambió al mismo tiempo.
-      x-estado: IMPLEMENTADO EN BACKEND (rama modulo-uad-back, sin integrar) — SIN INTERFAZ — TEXTOS Y CAMPOS PENDIENTES DE VALIDACIÓN
+      x-estado: IMPLEMENTADO EN BACKEND (rama modulo-uad-back, sin integrar) — UI MOCK — TEXTOS Y CAMPOS PENDIENTES DE VALIDACIÓN
       x-entrega: 3
       x-roles: [USUARIO]
       parameters:

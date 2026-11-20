@@ -43,7 +43,7 @@ Las fuentes usan siglas:
 | **D-UAD-29** | **Abuso del canal público.** | Medio. | Seguridad del endpoint público | El contrato propone 429 por tasa de envíos sin guardar el origen en la noticia. No se agregó captcha: requiere un proveedor externo y su análisis de privacidad. | SEG, DEV |
 | **D-UAD-30** | **Peticiones sin credenciales.** | Bajo. | `auth.interceptor.ts` | Nuevo `SIN_CREDENCIALES` (`HttpContextToken`): la petición marcada sale sin `Authorization` y un 401 no cierra la sesión. Es opt-in; el resto de peticiones no cambia. El servidor igual debe ignorar tokens en `POST /uad/noticias-anonimas` (lo hace con `UadSinIdentidad`). | DEV, SEG |
 | **D-UAD-31** | **Aviso de revisión simultánea.** El contrato define `revisionConcurrente` (quién tiene abierta la evaluación). | Bajo. | BIT UAD-NOT-08; guía del backend E1 | El backend devuelve siempre `null`: saber quién tiene abierta una noticia exige presencia o bloqueo blando. La protección real es `version` + 409, que sí funciona. El chip «En revisión por otra persona» solo se ve con el mock. | DEV, PROD |
-| **D-UAD-32** | **Qué ve el reportante en «Mis reportes».** | Medio (reserva del trámite). | BIT UAD-NOT-02, UAD-EVA-04; ROL §3.e | El backend devuelve código del reporte, consecutivo NDI, un estado en cinco textos («Recibido», «En revisión», «Información adicional solicitada», «En trámite», «Revisión finalizada») y la solicitud de información con su respuesta. No distingue inhibitoria de remisión ni muestra historial, equipo o decisiones. Solo incluye reportes que llegaron a la UAD. Pendiente: validar textos y campos, y cómo entran los demás actores de la Ruta. | JUR, PROD |
+| **D-UAD-32** | **Qué ve el reportante en «Mis reportes».** | Medio (reserva del trámite). | BIT UAD-NOT-02, UAD-EVA-04; ROL §3.e | El backend devuelve código del reporte, consecutivo NDI, un estado en cinco textos («Recibido», «En revisión», «Información adicional solicitada», «En trámite», «Revisión finalizada») y la solicitud de información con su respuesta. No distingue inhibitoria de remisión ni muestra historial, equipo o decisiones. Solo incluye reportes que llegaron a la UAD. El frontend muestra esos datos tal cual y agrega la frase «El trámite es reservado: aquí solo ve su estado general». Pendiente: validar textos y campos, y cómo entran los demás actores de la Ruta. | JUR, PROD |
 
 ## D-UAD-16 en detalle
 
@@ -76,7 +76,7 @@ Es decir, el filtro por dueño de «Mis reportes» no depende técnicamente de `
 | Revisar e integrar a `main` la corrección de `/solicitudes`, con visto bueno de SEG y del equipo de atención | DEV backend | Un `USUARIO` solo ve lo suyo, con prueba de integración. |
 | Revisar e integrar «Mis reportes» y la respuesta a la subsanación (ya implementados en la rama) | DEV, PROD | Contrato sin la marca «pendiente de validación». |
 | Validar qué ve el reportante de su noticia UAD (D-UAD-32) | JUR, SEG | Textos y campos aprobados. |
-| Construir la pantalla «Mis reportes» en el frontend | DEV frontend | La persona responde la solicitud desde Casilda. |
+| ~~Construir la pantalla «Mis reportes» en el frontend~~ **Hecho con mock (2026-11-20)** | DEV frontend | Falta probarla con `'http'` cuando Backend despliegue, y encender el flag `uadMisReportes` en producción. |
 | Política de evidencias en la respuesta (tipos, tamaños, custodia), ligada a D-UAD-09 | JUR, SEG | Límites aprobados; mientras tanto, respuesta solo de texto. |
 | Reporte anónimo sin sesión: no tiene dueño y no entra a «Mis reportes» | PROD | Decisión documentada (misma lógica que D-UAD-26). |
 
@@ -87,5 +87,8 @@ Es decir, el filtro por dueño de «Mis reportes» no depende técnicamente de `
 - La queja anónima es una ruta pública aparte (`/uad/queja-anonima`), detrás del flag `uadQuejaAnonima`: apagada en producción hasta que exista el endpoint, encendida en desarrollo y en la demo.
 - En "Gestionar caso" la fase se muestra, pero no se elige: solo cambia con "Finalizar etapa de instrucción". El prototipo (p. 10–11) la mostraba como lista desplegable.
 - Los campos de fecha usan el calendario de Material, que se abre al hacer clic; el valor viaja como `YYYY-MM-DD` local (`fechaContrato()`).
+- «Mis reportes» es una ruta propia (`/mis-reportes`), fuera de `/uad`, detrás del flag `uadMisReportes`: apagada en producción hasta que Backend despliegue la Entrega 3.
+- En «Mis reportes» la respuesta pide confirmación antes de enviarse, porque no se puede editar después, y no ofrece campo de archivos mientras el servidor los rechace (D-UAD-09).
+- Los textos de «Mis reportes» tratan de «usted», como la queja anónima. El estado lo redacta el servidor; la pantalla no lo traduce.
 - No se guarda nada en `localStorage` ni `sessionStorage`. El mock vive en memoria y se reinicia al recargar.
 - La interfaz deshabilita y explica las acciones según `accionesDisponibles` y `motivosNoDisponible` del servidor. **No es un control de seguridad.**

@@ -70,8 +70,8 @@ Estados: `REUTILIZABLE`, `ADAPTACIÓN`, `PARCIAL`, `NO ENCONTRADO`, `NO VERIFICA
 | UAD-FOR-01 a 11 Formulario general | Formulario de reporte existente; **solo se agregó el acceso a la queja anónima** | `ReporteCasoRequest` (real) | `POST /reportes` (real) | ADAPTACIÓN, bloqueado por D-UAD-05. El backend ya crea la NDI al radicar (D-UAD-17, regla provisional) |
 | UAD-FOR-12 Acceso visible a la queja anónima | Enlace junto a la selección de ruta en `formulario-anonimo` (flag `uadQuejaAnonima`) | — | — | Hecho (UI) |
 | UAD-FOR-12, UAD-NOT-02/04, UAD-SEG-06 Queja anónima NDA | `paginas/queja-anonima` (`/uad/queja-anonima`, pública, flag `uadQuejaAnonima`) | `RadicacionNdaRequest/Response` | `POST /uad/noticias-anonimas` (`radicarNoticiaAnonima`), sin credenciales | BACKEND E1 (sin el 429 de D-UAD-29), UI mock |
-| UAD-NOT-02, UAD-EVA-04 "Mis reportes" | No existe "Mis reportes" | `MiReporteResumen`, `MiReporteDetalle` | `GET /mis-reportes`, `GET /mis-reportes/{codigo}` | BACKEND E3 (rama, sin integrar), sin UI. Solo reportes que llegaron a la UAD; textos de estado provisionales (D-UAD-32) |
-| UAD-EVA-04/05 Respuesta a la subsanación | La evaluación muestra la respuesta a la UAD; falta la pantalla del reportante | multipart `respuesta` (`evidencias` → 400) | `POST /reportes/{codigo}/solicitudes-informacion/{id}/respuesta` | BACKEND E3 (rama, sin integrar), solo texto (D-UAD-09) |
+| UAD-NOT-02, UAD-EVA-04 "Mis reportes" | `paginas/mis-reportes` (`/mis-reportes`, rol USUARIO, flag `uadMisReportes`) | `MiReporteResumen`, `MiReporteDetalle` | `GET /mis-reportes`, `GET /mis-reportes/{codigo}` | BACKEND E3 (rama, sin integrar), UI mock. Solo reportes que llegaron a la UAD; textos de estado provisionales (D-UAD-32) |
+| UAD-EVA-04/05 Respuesta a la subsanación | `paginas/mi-reporte` (`/mis-reportes/:codigo`): formulario de respuesta con confirmación. La evaluación muestra la respuesta a la UAD | multipart `respuesta` (`evidencias` → 400) | `POST /reportes/{codigo}/solicitudes-informacion/{id}/respuesta` | BACKEND E3 (rama, sin integrar), UI mock, solo texto (D-UAD-09) |
 
 ## Mapeo contrato → TypeScript → puerto → adaptadores
 
@@ -96,4 +96,7 @@ Estados: `REUTILIZABLE`, `ADAPTACIÓN`, `PARCIAL`, `NO ENCONTRADO`, `NO VERIFICA
 | `TrasladoRequest` → `ResultadoAccionCaso` | ídem | `finalizarInstruccion(id, cuerpo)` | `POST …/traslado-decision` | Cambia fase y equipo; `visibleParaUsuario: false` para el instructor. |
 | `RemisionCompetenciaCasoRequest` → `ResultadoAccionCaso` | ídem | `remitirCasoPorCompetencia(id, cuerpo)` | `POST …/remisiones-competencia` | Gestión UAD `FINALIZADA`; no envía nada. |
 | `RadicacionNdaRequest` → `RadicacionNdaResponse` | ídem | `UadRadicacionPort.radicarNoticiaAnonima(cuerpo)` | `POST /uad/noticias-anonimas` con `SIN_CREDENCIALES` | `UadMockStore.radicarNda()`: consecutivo NDA, sin reportante ni contacto; aparece en la bandeja NDA. |
+| `PaginaMiReporteResumen` | `Pagina<MiReporteResumen>` | `UadMisReportesPort.listar(page, size)` | `GET /mis-reportes` | NDI del formulario web con reportante; nunca NDA ni remitidas. |
+| `MiReporteDetalle` | `MiReporteDetalle` | `UadMisReportesPort.obtener(codigo)` | `GET /mis-reportes/{codigo}` | 404 si no es propio. |
+| multipart `respuesta` → `MiReporteDetalle` | ídem | `UadMisReportesPort.responder(codigo, solicitudId, respuesta)` | `POST /reportes/{codigo}/solicitudes-informacion/{id}/respuesta` | Mismas reglas del backend; deja la respuesta en el store que lee la evaluación. |
 | `ErrorResponse` / `ValidationErrorResponse` | `ErrorResponseUad` → `ErrorUad` | (errores de todos) | `interpretarErrorUad` | Mismo intérprete, desde `HttpErrorResponse` simulado. |

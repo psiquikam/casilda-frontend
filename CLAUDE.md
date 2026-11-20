@@ -3,8 +3,8 @@
 > Archivo vivo. Se actualiza al cerrar cada fase de trabajo para que cualquier
 > sesión posterior (humana o asistida) retome sin repetir el análisis.
 >
-> **Última actualización:** 19 de noviembre de 2026 (módulo UAD: documentación al día con el backend y calendario en
-> los campos de fecha; antes, Entregas 1 a 3 del módulo UAD, reporte de caso v2 y Línea Alma)
+> **Última actualización:** 20 de noviembre de 2026 (módulo UAD: pantalla «Mis reportes» con mock; antes, documentación
+> al día con el backend y calendario en los campos de fecha; antes, Entregas 1 a 3 del módulo UAD, reporte de caso v2 y Línea Alma)
 
 ---
 
@@ -129,6 +129,8 @@ espaciados ni radios literales**: siempre `var(--token)`.
 | `fechaContrato()` · `inicioDelDia()` | `src/app/uad/dominio/decision-evaluacion.ts` | Puente entre el calendario de Material (`Date`) y las fechas `YYYY-MM-DD` del contrato UAD, y límites `min`/`max` del calendario. |
 | `SIN_CREDENCIALES` | `src/app/services/auth.interceptor.ts` | `HttpContextToken` opt-in: la petición marcada sale sin `Authorization` y un 401 no cierra la sesión. Lo usa la queja anónima UAD; el servidor igual debe ignorar tokens en esa ruta. |
 | `UadRadicacionPort` · `provideUadRadicacion()` | `src/app/uad/` | Radicación **pública** UAD (queja anónima NDA), separada de `UadApiPort`; ruta `/uad/queja-anonima` fuera de `roleGuard`, flag `uadQuejaAnonima`. |
+| `UadMisReportesPort` · `provideUadMisReportes()` | `src/app/uad/` | «Mis reportes» de quien radicó (rol USUARIO): ruta `/mis-reportes` fuera de `/uad`, flag `uadMisReportes`. El dueño lo filtra el servidor. |
+| `mis-reportes.ts` (`mensajeParaReportante`, `validarRespuestaSolicitud`) | `src/app/uad/dominio/` | Reglas y textos para la persona usuaria; los de `uad-error.ts` hablan de «bandeja» y «equipo» y no se usan con ella. |
 | `ROLES_UAD` · `AuthService.puedeVerUad()` | `src/app/services/auth.service.ts` | Roles `UAD_COORDINACION`/`UAD_EQUIPO_3`/`UAD_EQUIPO_4` (catálogo propuesto). El backend los crea con `database/uad_modulo_entrega1.sql`, que no los asigna a ningún usuario. |
 | `protocolo-intentos.ts` · `seguimientos.ts` | `src/app/linea-alma/psicologia/dominio/` | Reglas puras con pruebas: protocolo de 9 intentos (RN-ALMA-03), contador de controles que no bloquea (RN-ALMA-05), fecha futura, conversión `datetime-local` ↔ ISO. |
 
@@ -524,10 +526,24 @@ Rama `feature/06/20/casilda/ajustes-modulo-uad`.
   El valor sigue viajando como `YYYY-MM-DD` (`fechaContrato()`). El módulo UAD no tiene campos de hora.
 - **Backend, Entrega 3 (rama `feature/06/20/casilda/modulo-uad-back`, sin integrar):** «Mis reportes», respuesta a la
   subsanación solo con texto y corrección de `/solicitudes` (D-UAD-16). En el frontend solo se agregó la respuesta del
-  reportante a la tarjeta de la solicitud en la evaluación (`SolicitudInformacionVigente.respuesta`). **Falta la pantalla
-  «Mis reportes».**
+  reportante a la tarjeta de la solicitud en la evaluación (`SolicitudInformacionVigente.respuesta`). La pantalla
+  «Mis reportes» llegó el 2026-11-20.
 - **Sin tocar:** los campos de fecha y hora nativos de otros módulos (`modal-asignar-cita`, `modal-gestion-contacto`,
   `modal-reprogramar-cita`, Línea Alma, Seguridad a personas y bienes).
+
+### 2026-11-20 — Módulo UAD: pantalla «Mis reportes» (adaptador mock)
+Rama `feature/06/20/casilda/ajustes-modulo-uad`. Contrato: operaciones `listarMisReportes`, `obtenerMiReporte` y
+`responderSolicitudInformacion` de `openapi-uad.yaml` (ya implementadas en la rama del backend, sin integrar a `main`).
+
+- **`/mis-reportes`** (rol USUARIO, flag `uadMisReportes`: apagado en producción, encendido en desarrollo y demo): tarjetas
+  con código del reporte, consecutivo NDI, estado y aviso cuando la UAD pidió información. **`/mis-reportes/:codigo`**:
+  estado, solicitud y formulario de respuesta solo con texto, con confirmación porque no se puede editar después. Se puede
+  responder aunque el plazo haya vencido (UAD-EVA-05). Un reporte ajeno o inexistente se ve igual: no encontrado.
+- **Puerto propio** `UadMisReportesPort` con adaptadores HTTP y mock. El mock comparte `UadMockStore`: lo que la UAD
+  solicita en la evaluación aparece en «Mis reportes» y la respuesta vuelve a la evaluación. La franja de demostración de
+  la evaluación enlaza al mismo reporte visto por el reportante.
+- **Menú:** «Mis reportes» en la sección del rol USUARIO de `sidebar` y `horizontal-nav`, y en `CATALOGO_MODULOS`.
+- **Textos provisionales** (D-UAD-32): pendientes de validar con UAD jurídica.
 
 ### Pendiente
 0. **Línea Alma Psicología:** Backend debe revisar D-PSI-01…19 (entidad de la novedad antes del caso, `tomadaPorMi`,
@@ -639,7 +655,7 @@ Rama `feature/06/20/casilda/ajustes-modulo-uad`.
 17. **UAD:** el backend ya implementó las Entregas 1 y 2 y `POST /uad/noticias-anonimas`. Todo está en `main` del backend. Falta que Backend despliegue,
     ejecute `uad_modulo_entrega1.sql` y `uad_modulo_entrega2.sql`, asigne roles `UAD_EQUIPO_3/4` a usuarios reales; **después se prueba el frontend con
     `uad.adaptador: 'http'`** (ADMIN no ve bandejas con el servidor real, D-UAD-03). El equipo jurídico debe validar D-UAD-02…13 y 18–32. La corrección
-    de `/solicitudes` (D-UAD-16), «Mis reportes» y la respuesta a la subsanación están en la rama del backend, sin integrar; falta la pantalla «Mis reportes». Hasta la prueba con HTTP, `/uad` funciona con datos simulados.
+    de `/solicitudes` (D-UAD-16), «Mis reportes» y la respuesta a la subsanación están en la rama del backend, sin integrar. La pantalla «Mis reportes» existe con mock; para producción falta el deploy, la prueba con HTTP y encender `uadMisReportes`. Hasta la prueba con HTTP, `/uad` funciona con datos simulados.
 
 ## 6. Reglas que no se deben romper
 
