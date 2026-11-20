@@ -200,6 +200,10 @@ export const routes: Routes = [
     loadChildren: () => import('./linea-alma/psicologia/routes').then((m) => m.PSICOLOGIA_ROUTES)
   },
   {
+    path: 'seguridad',
+    loadChildren: () => import('./seguridad-personas-bienes/seguridad-personas-bienes.routes').then((m) => m.SEGURIDAD_ROUTES)
+  },
+  {
     // Queja anónima ante la UAD (NDA): ruta PÚBLICA, declarada antes de `uad` para no pasar por su
     // `roleGuard`. Detrás del flag `uadQuejaAnonima` (apagado en producción hasta que exista el endpoint).
     path: 'uad/queja-anonima',

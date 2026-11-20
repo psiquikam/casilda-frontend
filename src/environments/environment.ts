@@ -53,6 +53,22 @@ export const environment = {
     }
   },
   /**
+   * Módulo Seguridad a Personas y Bienes (SPyB): mocks activos para desarrollo y pruebas
+   * independientes. Al desplegarse en backend, se apagan los interruptores sin tocar código.
+   */
+  seguridadPyB: {
+    mocks: {
+      catalogos: true,
+      registros: true,
+      bandejaAnalista: true,
+      medidas: true,
+      ordenes: true,
+      camaras: true,
+      remisiones: true,
+      indicadores: true
+    }
+  },
+  /**
    * Módulo UAD Equipos 3 y 4: adaptador del puerto `UadApiPort` (`src/app/uad/uad.providers.ts`).
    * `'mock'`: datos sintéticos en memoria, sin red. `'http'`: `{apiBaseUrl}/uad/...` según
    * `docs/contratos/uad/openapi-uad.yaml`, **que aún no existe en el backend** (auditoría 2026-11-14).

@@ -281,3 +281,89 @@ th.mat-mdc-header-cell,
   font-weight: 800;
 }
 
+
+/* Campos del módulo Seguridad a personas y bienes: etiqueta arriba, igual que en el resto de formularios. */
+.spyb-campo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  mat-form-field {
+    width: 100%;
+    font-size: 0.9375rem;
+
+    .mat-mdc-form-field-infix {
+      min-height: 44px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+    .mat-mdc-form-field-subscript-wrapper { min-height: 0; }
+  }
+
+  .spyb-campo__etiqueta {
+    display: block;
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 8px;
+    line-height: 1.35;
+
+    .required-star {
+      color: var(--color-danger-text, #dc2626);
+      font-weight: 700;
+      margin-left: 2px;
+    }
+
+  }
+
+  .mat-mdc-form-field-hint-wrapper,
+  .mat-mdc-form-field-error-wrapper {
+    padding: 0 2px;
+  }
+
+  mat-hint {
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary);
+  }
+}
+
+/* Títulos de sección de los formularios del módulo, con aire arriba y abajo. */
+.spyb-seccion-titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 32px 0 18px !important;
+  padding-bottom: 8px;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.spyb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px 20px;
+  margin-bottom: 8px;
+
+  .col-span-2 { grid-column: span 2; }
+  .col-span-full { grid-column: 1 / -1; }
+}
+
+/* Ícono de ayuda discreto dentro de los formularios de Seguridad a personas y bienes. */
+.spyb-campo .help-tooltip-trigger {
+  background-color: var(--color-bg-surface-alt, #f3f4f6);
+  color: var(--color-text-secondary, #4b5563);
+  border: 1px solid var(--color-border, #d1d5db);
+  font-size: 11px;
+  font-weight: 600;
+
+  &:hover,
+  &:focus-visible {
+    background-color: var(--color-bg-surface-hover, #e5e7eb);
+    color: var(--color-text-primary, #111827);
+    box-shadow: none;
+    transform: none;
+  }
+}

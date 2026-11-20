@@ -52,6 +52,18 @@ export const environment = {
       recontactos: false
     }
   },
+  seguridadPyB: {
+    mocks: {
+      catalogos: false,
+      registros: false,
+      bandejaAnalista: false,
+      medidas: false,
+      ordenes: false,
+      camaras: false,
+      remisiones: false,
+      indicadores: false
+    }
+  },
   /**
    * Módulo UAD Equipos 3 y 4: adaptador del puerto `UadApiPort` (`src/app/uad/uad.providers.ts`).
    * `'mock'`: datos sintéticos en memoria, sin red. `'http'`: `{apiBaseUrl}/uad/...` según

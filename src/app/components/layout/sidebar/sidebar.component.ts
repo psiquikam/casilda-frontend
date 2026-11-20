@@ -6,7 +6,7 @@ import { AuthService } from '../../../services/auth.service';
 import { AlmaPermisosService } from '../../../linea-alma/shared/permisos/alma-permisos.service';
 import { environment } from '../../../../environments/environment';
 
-export type MenuSectionKey = 'admin' | 'contenidos' | 'atencion' | 'alma' | 'uad' | 'reportes' | 'violeta' | 'usuario';
+export type MenuSectionKey = 'admin' | 'contenidos' | 'atencion' | 'alma' | 'seguridad' | 'uad' | 'reportes' | 'violeta' | 'usuario';
 
 @Component({
   selector: 'app-sidebar',
@@ -26,6 +26,7 @@ export class SidebarComponent implements OnInit {
     contenidos: true,
     atencion: true,
     alma: false,
+    seguridad: false,
     uad: false,
     reportes: false,
     violeta: false,
@@ -72,6 +73,8 @@ export class SidebarComponent implements OnInit {
       this.expandedSections.usuario = true;
     } else if (url.includes('/linea-alma')) {
       this.expandedSections.alma = true;
+    } else if (url.includes('/seguridad')) {
+      this.expandedSections.seguridad = true;
     } else if (url.includes('/nueva-queja')) {
       if (this.auth.isUsuario()) {
         this.expandedSections.usuario = true;

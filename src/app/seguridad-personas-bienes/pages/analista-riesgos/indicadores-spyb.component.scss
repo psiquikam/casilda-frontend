@@ -1,0 +1,319 @@
+.bandeja {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: 24px;
+}
+
+.top-nav {
+  margin-bottom: var(--space-1);
+}
+
+.bandeja__cabecera {
+  margin-bottom: var(--space-2);
+}
+
+.bandeja__titulo {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-size-2xl);
+  font-family: var(--font-serif);
+  color: var(--color-primary);
+}
+
+.bandeja__intro {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+/* KPI GRID */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.kpi-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+  background-color: var(--color-bg-surface);
+  text-align: center;
+  padding: var(--space-4);
+
+  .kpi-icon-box {
+    margin-bottom: var(--space-2);
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+      color: var(--color-primary);
+    }
+  }
+
+  .kpi-val {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    font-family: var(--font-serif);
+    line-height: 1;
+    margin-bottom: var(--space-1);
+  }
+
+  .kpi-label {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    font-weight: 600;
+  }
+}
+
+/* CHARTS GRID */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.chart-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+  background-color: var(--color-bg-surface);
+  padding: var(--space-3);
+
+  mat-card-header {
+    margin-bottom: var(--space-3);
+  }
+
+  mat-card-title {
+    font-family: var(--font-serif);
+    color: var(--color-primary);
+    font-size: var(--font-size-base);
+  }
+}
+
+/* STAT LISTS AND BARS */
+.stat-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--font-size-sm);
+}
+
+.stat-name {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.stat-pill {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  padding: 1px 8px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary-tint);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary-border);
+
+  &--secondary {
+    background-color: var(--color-secondary-tint);
+    color: var(--color-secondary);
+    border-color: rgba(14, 119, 116, 0.25);
+  }
+
+  &--purple {
+    background-color: var(--color-comp-purple-light);
+    color: var(--color-comp-purple);
+    border-color: var(--color-comp-purple-border);
+  }
+}
+
+.bar-track {
+  width: 100%;
+  height: 8px;
+  background-color: var(--color-bg-surface-alt);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.bar-progress {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.4s ease-out;
+
+  &--primary {
+    background-color: var(--color-primary);
+  }
+
+  &--secondary {
+    background-color: var(--color-secondary);
+  }
+
+  &--purple {
+    background-color: var(--color-comp-purple);
+  }
+}
+
+/* SEGMENTED BAR */
+.segmented-bar-wrapper {
+  margin: var(--space-2) 0;
+}
+
+.segmented-legend {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+
+    &.dot-formal {
+      background-color: var(--color-primary);
+    }
+    &.dot-espontaneo {
+      background-color: var(--color-secondary);
+    }
+  }
+}
+
+.segmented-bar {
+  display: flex;
+  height: 24px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  line-height: 24px;
+
+  .segment-formal {
+    background-color: var(--color-primary);
+    transition: width 0.3s ease;
+  }
+
+  .segment-espontaneo {
+    background-color: var(--color-secondary);
+    transition: width 0.3s ease;
+  }
+}
+
+/* EVIDENCIAS HIGHLIGHT */
+.evidencias-highlight {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color-bg-surface-alt);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  padding: var(--space-3) var(--space-4);
+
+  .highlight-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+
+    mat-icon {
+      font-size: 26px;
+      width: 26px;
+      height: 26px;
+      color: var(--color-primary);
+    }
+
+    strong {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-primary);
+    }
+
+    .highlight-desc {
+      margin: 1px 0 0 0;
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+    }
+  }
+
+  .highlight-count {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    font-family: var(--font-serif);
+  }
+}
+
+/* REGLA INSTITUCIONAL FLOW */
+.regla-flow {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: var(--space-4) var(--space-2);
+  background-color: var(--color-bg-surface-alt);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  margin-top: var(--space-2);
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.regla-step {
+  text-align: center;
+  padding: var(--space-2);
+  flex: 1;
+  min-width: 160px;
+
+  .step-num {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    font-family: var(--font-serif);
+    line-height: 1;
+  }
+
+  .step-title {
+    font-weight: 700;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+    margin: var(--space-1) 0;
+  }
+
+  .step-sub {
+    font-size: 11px;
+    color: var(--color-text-secondary);
+  }
+
+  &.highlight-step {
+    border-radius: var(--radius-md);
+    background-color: var(--color-primary-tint);
+    border: 1px solid var(--color-primary-border);
+  }
+}
+
+.regla-arrow {
+  font-size: 1.4rem;
+  color: var(--color-primary);
+  font-weight: 700;
+}

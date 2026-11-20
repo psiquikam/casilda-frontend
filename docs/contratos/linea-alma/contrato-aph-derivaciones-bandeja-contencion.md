@@ -37,7 +37,7 @@ remisiones recibidas, registra contenciones tras el cierre de un caso y consulta
 | D-ALMA-07 | Quién ve `GET /auditoria` | Decidir | Condición en el detalle |
 | D-ALMA-13 | `REMISION_YA_TOMADA` (APH) vs `NOVEDAD_YA_TOMADA` (Psicología) | Dos códigos, `409` | Ya traducidos ambos |
 | D-ALMA-02 | Tomar remisión → `EN_GESTION_APH` y `tomadaPor` | Adoptar | Si fuera `BORRADOR`, cambia el filtro de «mis atenciones» |
-| Nueva | **`resultado` de una ruta externa:** el front envía el **texto** (etiqueta) del catálogo `resultados-ruta-externa`, no el `codigo` (`panel-derivaciones.component.html`, `mat-option [value]="res.etiqueta"`). | Recomendado: texto libre ≤ 500 **o** cambiar a `codigo` | Con `codigo`, se cambia el `[value]` y la lectura |
+| Nueva | **`resultado` de una ruta externa:** el front envía el **`codigo`** del catálogo `resultados-ruta-externa` (`panel-derivaciones.component.html`, `mat-option [value]="res.codigo"`). *(Corregido el 10-nov-2026: una versión anterior decía que enviaba el texto.)* | Mantener `codigo` | Con texto libre, se cambia el `[value]` y la lectura |
 | Nueva | **Contención sobre caso cerrado:** el servidor valida que `numeroCaso` sea un caso cerrado de la persona de la atención | Sí | Ninguno |
 | Nueva | **Notificación de recontacto/bandeja en tiempo real (Q7):** el front no refresca la bandeja sola | Polling 30 s o SSE, decidir | Añadir `useNotificaciones` |
 
@@ -196,7 +196,7 @@ Si falla, el front **no inventa listas**: muestra error con «Intentar de nuevo�
 | `parentescos-solicitante` | paso 3 | `MADRE_PADRE`, `PAREJA`, `AMISTAD`, `COMPANERIA_ACADEMICA`, `DOCENTE`, `OTRO` |
 | `destinos-internos` | derivación interna | `SPYB`, `EA`, `DUPLA_PSICOJURIDICA`, `MASCULINIDADES`, `UAD` |
 | `rutas-externas` | ruta externa | `LINEA_123`, `CODIGO_FUCSIA`, `FISCALIA`, `COMISARIA_FAMILIA`, `POLICIA_NACIONAL`, `ICBF`, `CAIVAS` |
-| `resultados-ruta-externa` | seguimiento de ruta | `ATENDIDA`, `SIN_RESPUESTA`, `NO_ACEPTA` (ver decisión del texto vs código) |
+| `resultados-ruta-externa` | seguimiento de ruta | `ATENDIDA`, `SIN_RESPUESTA`, `NO_ACEPTA` (el front envía el `codigo`) |
 | `motivos-cierre-aph` | cierre | `NO_ACEPTA_PSICOLOGIA`, `ORIENTACION_BRINDADA`, `REMITIDA_RUTA_EXTERNA`, `SIN_RESPUESTA` |
 | `textos-consentimiento` | `ConsentimientoInformado` | un solo ítem vigente: `codigo` = versión (p. ej. `v1`), `etiqueta` = **texto oficial completo** (Q9) |
 

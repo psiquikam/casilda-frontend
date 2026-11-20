@@ -85,6 +85,10 @@ export const ROLES_CASILDA = [
   'USUARIO',
   'GESTOR_CONTENIDO',
   'TECNICO_APH',
+  'SPB_COORDINACION',
+  'SPB_ANALISTA',
+  'SPB_CENTRAL',
+  'SPB_VIGILANTE',
   'UAD_COORDINACION',
   'UAD_EQUIPO_3',
   'UAD_EQUIPO_4'
@@ -244,6 +248,42 @@ export const MOCK_USERS: Record<string, MockUserProfile> = {
     foto: null,
     descripcion: 'Ciudadano/Estudiante: reporte y consulta de solicitudes propias.',
     badgeClass: 'usuario'
+  },
+  spbAnalista: {
+    id: 9,
+    nombre: 'Yeison (Analista de Riesgos)',
+    email: 'yeison.analista@udea.edu.co',
+    password: 'Spyb123*',
+    rol: 'Analista de Riesgos',
+    roles: ['SPB_ANALISTA'],
+    authorities: ['ROLE_SPB_ANALISTA'],
+    foto: null,
+    descripcion: 'Coordinación operativa, clasificación, vinculación a casos y remisiones SPyB.',
+    badgeClass: 'coordinador'
+  },
+  spbCentral: {
+    id: 10,
+    nombre: 'Operador Central 01',
+    email: 'central.monitoreo@udea.edu.co',
+    password: 'Spyb123*',
+    rol: 'Operador/a de Central',
+    roles: ['SPB_CENTRAL'],
+    authorities: ['ROLE_SPB_CENTRAL'],
+    foto: null,
+    descripcion: 'Recepción 219-64-19, consulta de medidas activas y registro de alertas.',
+    badgeClass: 'profesional'
+  },
+  spbVigilante: {
+    id: 11,
+    nombre: 'Pedro Nel Supervisor',
+    email: 'vigilancia.supervisor@udea.edu.co',
+    password: 'Spyb123*',
+    rol: 'Personal de Vigilancia',
+    roles: ['SPB_VIGILANTE'],
+    authorities: ['ROLE_SPB_VIGILANTE'],
+    foto: null,
+    descripcion: 'Reporte ágil de novedades en campo y ejecución de órdenes de acompañamiento.',
+    badgeClass: 'usuario'
   }
 };
 
@@ -261,6 +301,11 @@ function normalizarCodigoRol(valor: string | null | undefined): CodigoRol | '' {
   if (rol === 'UAD_COORDINACION' || rol === 'UAD_EQUIPO_3' || rol === 'UAD_EQUIPO_4') return rol;
   if (/EQUIPO[\s_]*3/.test(rol)) return 'UAD_EQUIPO_3';
   if (/EQUIPO[\s_]*4/.test(rol)) return 'UAD_EQUIPO_4';
+  // SPyB (Seguridad a Personas y Bienes)
+  if (rol.includes('SPB_ANALISTA') || rol.includes('ANALISTA')) return 'SPB_ANALISTA';
+  if (rol.includes('SPB_CENTRAL') || rol.includes('CENTRAL')) return 'SPB_CENTRAL';
+  if (rol.includes('SPB_VIGILANTE') || rol.includes('VIGILANTE')) return 'SPB_VIGILANTE';
+  if (rol.includes('SPB_COORD')) return 'SPB_COORDINACION';
   // Técnico APH (primer respondiente de Línea Alma). Va antes que PROF/REVIS por si el nombre trae «técnico».
   if (rol.includes('APH')) return 'TECNICO_APH';
   if (rol.includes('COORD')) return 'COORDINADOR';
@@ -356,6 +401,26 @@ export class AuthService {
 
   isTecnicoAph(): boolean {
     return this.hasRole('TECNICO_APH');
+  }
+
+  isSpbAnalista(): boolean {
+    return this.hasRole('SPB_ANALISTA');
+  }
+
+  isSpbCentral(): boolean {
+    return this.hasRole('SPB_CENTRAL');
+  }
+
+  isSpbVigilante(): boolean {
+    return this.hasRole('SPB_VIGILANTE');
+  }
+
+  isSpbCoordinacion(): boolean {
+    return this.hasRole('SPB_COORDINACION');
+  }
+
+  isSeguridadPyB(): boolean {
+    return this.hasAnyRole(['ADMIN', 'SPB_ANALISTA', 'SPB_CENTRAL', 'SPB_VIGILANTE', 'SPB_COORDINACION']);
   }
 
   /**

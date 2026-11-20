@@ -205,6 +205,51 @@
       <hr class="nav-divider">
     }
 
+    <!-- SEGURIDAD A PERSONAS Y BIENES (SPyB) -->
+    @if (auth.isAdmin() || auth.isCoordinador() || auth.isSeguridadPyB()) {
+      <div class="nav-section">
+        <button type="button" id="toggle-seguridad" class="section-toggle" (click)="toggleSection('seguridad')"
+          [attr.aria-expanded]="isExpanded('seguridad')" aria-controls="section-seguridad">
+          <span class="section-toggle__title">
+            <mat-icon class="section-toggle__icon" aria-hidden="true">security</mat-icon>
+            <span>Seguridad (SPyB)</span>
+          </span>
+          <mat-icon class="section-toggle__chevron" [class.is-expanded]="isExpanded('seguridad')" aria-hidden="true">
+            expand_more
+          </mat-icon>
+        </button>
+        @if (isExpanded('seguridad')) {
+          <div id="section-seguridad" class="section-content" role="region" aria-labelledby="toggle-seguridad">
+            @if (auth.isAdmin() || auth.isCoordinador() || auth.isSpbAnalista() || auth.isSpbCoordinacion()) {
+              <a routerLink="/seguridad/bandeja" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
+                <mat-icon class="nav-item__icon" aria-hidden="true">admin_panel_settings</mat-icon>
+                <span class="nav-item__text">Bandeja del analista</span>
+              </a>
+            }
+            @if (auth.isAdmin() || auth.isCoordinador() || auth.isSpbCentral() || auth.isSpbAnalista() || auth.isSpbCoordinacion()) {
+              <a routerLink="/seguridad/central" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
+                <mat-icon class="nav-item__icon" aria-hidden="true">headset_mic</mat-icon>
+                <span class="nav-item__text">Central de monitoreo</span>
+              </a>
+            }
+            @if (auth.isAdmin() || auth.isSpbVigilante() || auth.isSpbCentral() || auth.isSpbAnalista() || auth.isCoordinador()) {
+              <a routerLink="/seguridad/reportar" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
+                <mat-icon class="nav-item__icon" aria-hidden="true">shield</mat-icon>
+                <span class="nav-item__text">Reporte de vigilancia</span>
+              </a>
+            }
+            @if (auth.isAdmin() || auth.isCoordinador() || auth.isSpbAnalista() || auth.isSpbCoordinacion()) {
+              <a routerLink="/seguridad/indicadores" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
+                <mat-icon class="nav-item__icon" aria-hidden="true">bar_chart</mat-icon>
+                <span class="nav-item__text">Indicadores SPyB</span>
+              </a>
+            }
+          </div>
+        }
+      </div>
+      <hr class="nav-divider">
+    }
+
     <!-- 4. UAD EQUIPO 3 Y 4 (Funcionarios) -->
     @if (!auth.isUsuario() && !auth.isGestorContenido() && !auth.isTecnicoAph()) {
       <div class="nav-section">

@@ -1,0 +1,167 @@
+@if (registro) {
+  <div class="bandeja">
+    <div class="top-nav">
+      <a mat-button routerLink="/seguridad/bandeja">
+        <mat-icon>arrow_back</mat-icon> Volver a la bandeja
+      </a>
+    </div>
+    <mat-card class="main-card">
+      <mat-card-header>
+        <div class="header-content">
+          <div>
+            <div class="badges-row">
+              <app-spyb-consecutivo-badge [consecutivo]="registro.consecutivo"></app-spyb-consecutivo-badge>
+              <app-spyb-estado-badge [estado]="registro.estado"></app-spyb-estado-badge>
+              <span class="tipo-tag">{{ registro.tipoRegistroNombre || registro.tipoRegistro }}</span>
+            </div>
+            <h1 class="titulo-detalle">Actuación de seguridad: {{ registro.consecutivo }}</h1>
+            <p class="sub-detalle">
+              Fecha de reporte: {{ registro.fechaReporte | date:'medium' }} | Canal: {{ registro.canalRecepcionNombre || registro.canalRecepcion }}
+            </p>
+          </div>
+          <div class="action-bar">
+            @if (!registro.idCaso) {
+              <button mat-flat-button color="accent" (click)="abrirModalVincular()">
+                <mat-icon>link</mat-icon> Vincular caso
+              </button>
+            }
+            <button mat-stroked-button color="warn" (click)="abrirModalSubsanar()">
+              <mat-icon>assignment_late</mat-icon> Subsanación
+            </button>
+            <button mat-flat-button color="primary" (click)="abrirModalNuevaOrden()">
+              <mat-icon>transfer_within_a_station</mat-icon> Orden acompañamiento
+            </button>
+            <button mat-stroked-button (click)="abrirModalCamara()">
+              <mat-icon>videocam</mat-icon> Cámaras
+            </button>
+            <button mat-stroked-button (click)="abrirModalRemision()">
+              <mat-icon>send</mat-icon> Remitir
+            </button>
+          </div>
+        </div>
+      </mat-card-header>
+      <mat-divider></mat-divider>
+      <mat-card-content class="card-body">
+        <!-- BLOQUE 1: CASO CASILDA -->
+        <div class="seccion-bloque caso-bloque" [class.vinculado]="registro.idCaso">
+          <h3>
+            <mat-icon>{{ registro.idCaso ? 'task_alt' : 'help_outline' }}</mat-icon>
+            Vinculación a caso CASILDA (Ruta Violeta)
+          </h3>
+          @if (registro.idCaso) {
+            <div class="info-vinculado">
+              <p><strong>Código de caso:</strong> <span class="caso-tag">{{ registro.codigoCaso }}</span></p>
+              <p><strong>Criterio de vinculación:</strong> {{ registro.criterioVinculacion }}</p>
+              <p><strong>Fecha vinculación:</strong> {{ registro.fechaVinculacion | date:'medium' }} (por: {{ registro.usuarioVinculacion }})</p>
+            </div>
+          }
+          @if (!registro.idCaso) {
+            <div class="info-no-vinculado">
+              <p>
+                Esta actuación aún no ha sido vinculada formalmente a un expediente de la Ruta Violeta.
+                Recuerde que por regla funcional, la coincidencia de cédula no genera auto-vinculación; requiere confirmación manual del analista de riesgos.
+              </p>
+            </div>
+          }
+        </div>
+        <!-- BLOQUE 2: DESCRIPCIÓN DE LOS HECHOS -->
+        <div class="seccion-bloque">
+          <h3><mat-icon>description</mat-icon> Descripción de los hechos reportados</h3>
+          <div class="hechos-box">
+            <p class="hechos-texto">{{ registro.descripcionHechos }}</p>
+            <div class="hechos-metadatos">
+              <span><strong>Sede / campus:</strong> {{ registro.campusNombre || 'Ciudad Universitaria - Medellín' }}</span>
+              <span><strong>Lugar específico:</strong> {{ registro.lugarHechos }}</span>
+              @if (registro.fechaHoraHechos) {
+                <span><strong>Fecha/Hora ocurrencia:</strong> {{ registro.fechaHoraHechos | date:'medium' }}</span>
+              }
+            </div>
+          </div>
+        </div>
+        <!-- BLOQUE 3: PERSONA Y REPORTANTE -->
+        <div class="grid-2-col">
+          <div class="seccion-bloque">
+            <h3><mat-icon>person</mat-icon> Persona atendida / involucrada</h3>
+            <table class="datos-tabla">
+              <tr>
+                <td><strong>Rol:</strong></td>
+                <td>{{ registro.rolPersona }}</td>
+              </tr>
+              <tr>
+                <td><strong>Nombre completo:</strong></td>
+                <td>{{ registro.persona.nombreCompleto }}</td>
+              </tr>
+              <tr>
+                <td><strong>Documento:</strong></td>
+                <td>{{ registro.persona.numeroDocumento }}</td>
+              </tr>
+              @if (registro.persona.telefono) {
+                <tr>
+                  <td><strong>Teléfono:</strong></td>
+                  <td>{{ registro.persona.telefono }}</td>
+                </tr>
+              }
+              @if (registro.persona.correo) {
+                <tr>
+                  <td><strong>Correo:</strong></td>
+                  <td>{{ registro.persona.correo }}</td>
+                </tr>
+              }
+              @if (registro.persona.vinculoUdeANombre) {
+                <tr>
+                  <td><strong>Vínculo udeA:</strong></td>
+                  <td>{{ registro.persona.vinculoUdeANombre }}</td>
+                </tr>
+              }
+            </table>
+          </div>
+          <div class="seccion-bloque">
+            <h3><mat-icon>badge</mat-icon> Funcionario / supervisor reportante</h3>
+            <table class="datos-tabla">
+              <tr>
+                <td><strong>Nombres:</strong></td>
+                <td>{{ registro.reportante.nombre }}</td>
+              </tr>
+              <tr>
+                <td><strong>Cédula:</strong></td>
+                <td>{{ registro.reportante.cedula }}</td>
+              </tr>
+              @if (registro.reportante.cargo) {
+                <tr>
+                  <td><strong>Cargo / turno:</strong></td>
+                  <td>{{ registro.reportante.cargo }}</td>
+                </tr>
+              }
+            </table>
+            <h4 style="margin-top: 16px;">Consentimiento para Ruta Violeta</h4>
+            <div class="consentimiento-badge-box">
+              <span class="pill" [class.si]="registro.consentimientoRutaVioleta.lecturaConsentimiento">
+                Lectura realizada: {{ registro.consentimientoRutaVioleta.lecturaConsentimiento ? 'SÍ' : 'NO' }}
+              </span>
+              <span class="pill" [class.si]="registro.consentimientoRutaVioleta.autorizaActivacionRuta">
+                Autoriza activación: {{ registro.consentimientoRutaVioleta.autorizaActivacionRuta ? 'SÍ' : 'NO' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+}
+
+@if (cargando) {
+  <div class="detalle-container">
+    <p>Cargando información de la actuación...</p>
+  </div>
+}
+
+@if (errorCarga) {
+  <div class="detalle-container">
+    <mat-card class="error-card">
+      <mat-icon color="warn">error</mat-icon>
+      <p>No se encontró la actuación de seguridad solicitada.</p>
+      <a mat-button routerLink="/seguridad/bandeja">Volver a la bandeja</a>
+    </mat-card>
+  </div>
+}
+
