@@ -388,8 +388,17 @@
                         </mat-form-field>
                         <mat-form-field appearance="outline" class="campo campo--corto">
                           <mat-label>Fecha límite para responder</mat-label>
-                          <input matInput id="uad-fecha-limite" type="date" formControlName="fechaLimite" [min]="manana" />
-                          <mat-error>{{ error('solicitudInformacion.fechaLimite') }}</mat-error>
+                          <input
+                            matInput
+                            id="uad-fecha-limite"
+                            formControlName="fechaLimite"
+                            [matDatepicker]="selectorFechaLimite"
+                            [min]="fechaMinimaLimite"
+                            (click)="selectorFechaLimite.open()"
+                          />
+                          <mat-datepicker-toggle matIconSuffix [for]="selectorFechaLimite" aria-label="Abrir calendario: fecha límite para responder" />
+                          <mat-datepicker #selectorFechaLimite />
+                          <mat-error>{{ error('solicitudInformacion.fechaLimite') ?? 'Elija en el calendario una fecha posterior a hoy.' }}</mat-error>
                         </mat-form-field>
                         <div class="casilda-alerta">
                           <mat-icon aria-hidden="true">info</mat-icon>
@@ -444,8 +453,17 @@
                         </mat-form-field>
                         <mat-form-field appearance="outline" class="campo campo--corto">
                           <mat-label>Fecha de remisión</mat-label>
-                          <input matInput id="uad-fecha-remision" type="date" formControlName="fechaRemision" [max]="hoy" />
-                          <mat-error>{{ error('remisionCompetencia.fechaRemision') }}</mat-error>
+                          <input
+                            matInput
+                            id="uad-fecha-remision"
+                            formControlName="fechaRemision"
+                            [matDatepicker]="selectorFechaRemision"
+                            [max]="fechaMaximaRemision"
+                            (click)="selectorFechaRemision.open()"
+                          />
+                          <mat-datepicker-toggle matIconSuffix [for]="selectorFechaRemision" aria-label="Abrir calendario: fecha de remisión" />
+                          <mat-datepicker #selectorFechaRemision />
+                          <mat-error>{{ error('remisionCompetencia.fechaRemision') ?? 'Elija en el calendario una fecha que no sea futura.' }}</mat-error>
                         </mat-form-field>
                         <mat-form-field appearance="outline" class="campo">
                           <mat-label>Justificación de la remisión (opcional)</mat-label>

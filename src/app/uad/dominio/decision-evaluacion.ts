@@ -224,3 +224,14 @@ export function fechaCalendario(fecha: Date): string {
   const dd = String(fecha.getDate()).padStart(2, '0');
   return `${fecha.getFullYear()}-${mm}-${dd}`;
 }
+
+/** Valor de un selector de calendario (`Date`) como fecha del contrato (`YYYY-MM-DD`); `null` si está vacío o no es válida. */
+export function fechaContrato(fecha: Date | null | undefined): string | null {
+  return fecha instanceof Date && !Number.isNaN(fecha.getTime()) ? fechaCalendario(fecha) : null;
+}
+
+/** Medianoche local de hoy más `dias`: límite `min`/`max` de un selector de calendario. */
+export function inicioDelDia(dias = 0): Date {
+  const hoy = new Date();
+  return new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + dias);
+}

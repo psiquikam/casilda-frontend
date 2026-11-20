@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, DOCUMENT, OnInit, computed, inject,
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -20,7 +21,7 @@ import {
   ResultadoAccionCaso
 } from '../../contratos/uad-api.types';
 import { PanelSimulacionComponent } from '../../componentes/panel-simulacion/panel-simulacion.component';
-import { LIMITE_EXPEDIENTE_UAD, LIMITE_TEXTO_DECISION, fechaCalendario } from '../../dominio/decision-evaluacion';
+import { LIMITE_EXPEDIENTE_UAD, LIMITE_TEXTO_DECISION, fechaCalendario, fechaContrato, inicioDelDia } from '../../dominio/decision-evaluacion';
 import { ETIQUETA_DESTINATARIO, ETIQUETA_EQUIPO, ETIQUETA_ESTADO_NOTIFICACION, ETIQUETA_EVENTO, ETIQUETA_FASE, ETIQUETA_VINCULACION } from '../../dominio/etiquetas';
 import { ErrorUad } from '../../infraestructura/uad-error';
 import { UadFacade } from '../../servicios/uad.facade';
@@ -44,7 +45,7 @@ type Permanente = 'REMISION_COMPETENCIA' | 'FINALIZAR_INSTRUCCION';
  */
 @Component({
   selector: 'app-uad-gestionar-caso-page',
-  imports: [DatePipe, FormsModule, RouterLink, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule, PanelSimulacionComponent],
+  imports: [DatePipe, FormsModule, RouterLink, MatDatepickerModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule, PanelSimulacionComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './gestionar-caso.page.html',
   styleUrl: './gestionar-caso.page.scss'
@@ -80,7 +81,9 @@ export class GestionarCasoPage implements OnInit, ConCambiosPendientes {
   // Acciones permanentes.
   protected readonly permanente = signal<Permanente | null>(null);
   protected readonly entidad = signal('');
-  protected readonly fechaRemision = signal(fechaCalendario(new Date()));
+  protected readonly fechaRemision = signal<Date | null>(inicioDelDia());
+  /** Límite del calendario: la remisión no puede ser futura. */
+  protected readonly fechaMaximaRemision = inicioDelDia();
   protected readonly justificacion = signal('');
   protected readonly confirmaTraslado = signal(false);
   protected readonly observacionesTraslado = signal('');
@@ -319,10 +322,11 @@ export class GestionarCasoPage implements OnInit, ConCambiosPendientes {
     if (!caso || this.ocupado()) return;
     const errores: Record<string, string> = {};
     if (!this.entidad()) errores['entidadDestinatariaCodigo'] = 'Seleccione la entidad destinataria.';
-    if (!this.fechaRemision()) errores['fechaRemision'] = 'Indique la fecha de remisión.';
-    else if (this.fechaRemision() > this.hoy) errores['fechaRemision'] = 'La fecha de remisión no puede ser futura.';
+    const fechaRemision = fechaContrato(this.fechaRemision());
+    if (!fechaRemision) errores['fechaRemision'] = 'Indique la fecha de remisión.';
+    else if (fechaRemision > this.hoy) errores['fechaRemision'] = 'La fecha de remisión no puede ser futura.';
     if (this.justificacion().length > LIMITE_TEXTO_DECISION) errores['justificacion'] = `Máximo ${LIMITE_TEXTO_DECISION} caracteres.`;
-    if (Object.keys(errores).length > 0) {
+    if (!fechaRemision || Object.keys(errores).length > 0) {
       this.erroresPermanente.set(errores);
       return;
     }
@@ -343,7 +347,7 @@ export class GestionarCasoPage implements OnInit, ConCambiosPendientes {
           this.facade
             .remitirCasoPorCompetencia(caso, {
               entidadDestinatariaCodigo: this.entidad(),
-              fechaRemision: this.fechaRemision(),
+              fechaRemision,
               justificacion: this.justificacion().trim() || null
             })
             .subscribe({
