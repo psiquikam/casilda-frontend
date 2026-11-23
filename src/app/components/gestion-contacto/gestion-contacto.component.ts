@@ -98,7 +98,7 @@ export class DetalleAcompanamientoComponent implements OnInit {
       hora: ['08:00', Validators.required],
       jornada: [{ value: '', disabled: true }],
       resultado: ['', Validators.required],
-      observacion: ['', [Validators.required, Validators.minLength(5)]]
+      observacion: ['', [Validators.required, Validators.pattern(/\S/)]]
     });
   }
 
@@ -129,7 +129,7 @@ export class DetalleAcompanamientoComponent implements OnInit {
       tipoDocumento: s.tipoDocumento,
       nombre: s.nombreSolicitante,
       documento: s.documentoSolicitante,
-      fecha: formatFechaCreacion(s.fechaReparto || s.fechaCreacion),
+      fecha: s.fechaReparto ? formatOnlyDate(s.fechaReparto) : 'Sin fecha de reparto',
       fechaCita: '',
       tipoAsignacion: s.tipoAsignacion || '',
       unidadAdministrativa: s.remitenteUnidadAdministrativa || s.unidadAdministrativa || '',

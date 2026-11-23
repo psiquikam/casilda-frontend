@@ -14,6 +14,13 @@ import { SolicitudService, GrupoProfesionalDto } from '../../services/solicitud.
 import { MaestroDto } from '../../services/listas.service';
 import { NotificacionService } from '../../core/a11y/notificacion.service';
 
+function fechaLocalActual(): string {
+  const fecha = new Date();
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+  const dia = String(fecha.getDate()).padStart(2, '0');
+  return `${fecha.getFullYear()}-${mes}-${dia}`;
+}
+
 @Component({
     selector: 'app-reparto-modal',
     templateUrl: './modal-reparto.component.html',
@@ -60,7 +67,7 @@ export class RepartoModalComponent implements OnInit {
   ) {
     this.repartoForm = this.fb.group({
       idTipoAsignacion: [null, Validators.required],
-      fechaReparto: [new Date().toISOString().substring(0, 10)],
+      fechaReparto: [fechaLocalActual()],
       idTipoServicio: [null, Validators.required],
       grupoProfesionalId: [{ value: null, disabled: true }, Validators.required],
       observaciones: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(500)]]
