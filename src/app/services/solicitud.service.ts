@@ -744,12 +744,15 @@ export class SolicitudService {
     return this.http.get<SolicitudAcompanamientoResponse[]>(`${this.apiUrl}/acompanamiento`, { params });
   }
 
-  listarPaginadas(page: number, size: number, idEstadoSolicitud?: number): Observable<PagedResponseDto<SolicitudAcompanamientoResponse>> {
+  listarPaginadas(page: number, size: number, idEstadoSolicitud?: number, ordenReparto = false): Observable<PagedResponseDto<SolicitudAcompanamientoResponse>> {
     let params = new HttpParams()
       .set('page', String(page))
       .set('size', String(size));
     if (idEstadoSolicitud != null) {
       params = params.set('idEstadoSolicitud', String(idEstadoSolicitud));
+    }
+    if (ordenReparto) {
+      params = params.set('ordenReparto', 'true');
     }
     return this.http.get<PagedResponseDto<SolicitudAcompanamientoResponse>>(`${this.apiUrl}/acompanamiento/paginado`, { params });
   }
