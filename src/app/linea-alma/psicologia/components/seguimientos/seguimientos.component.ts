@@ -6,10 +6,18 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectModule } from '@angular/material/select';
 import { NotificacionService } from '../../../../core/a11y/notificacion.service';
 import { ErrorAlma } from '../../../shared/http/alma-error';
 import { aplicarErroresServidor, mensajeDeError } from '../../../shared/http/errores-servidor';
-import { ETIQUETA_ESTADO_RECORDATORIO, ETIQUETA_TIPO_SEGUIMIENTO } from '../../../shared/types/alma.types';
+import { EtiquetaCampoComponent } from '../../../shared/components/etiqueta-campo/etiqueta-campo.component';
+import {
+  ETIQUETA_ESTADO_RECORDATORIO,
+  ETIQUETA_RIESGO_CLINICO,
+  ETIQUETA_TIPO_SEGUIMIENTO,
+  RIESGOS_CLINICOS,
+  RiesgoClinico
+} from '../../../shared/types/alma.types';
 import { desdeFechaLocal, fechaFuturaValidator } from '../../dominio/seguimientos';
 import { CasoAlma, CasosAlmaService } from '../../services/casos-alma.service';
 
@@ -25,7 +33,7 @@ type Continuar = '' | 'SI' | 'NO';
  */
 @Component({
   selector: 'app-seguimientos',
-  imports: [DatePipe, ReactiveFormsModule, MatFormFieldModule, MatIconModule, MatInputModule, MatRadioModule],
+  imports: [DatePipe, ReactiveFormsModule, MatFormFieldModule, MatIconModule, MatInputModule, MatRadioModule, MatSelectModule, EtiquetaCampoComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './seguimientos.component.html',
   styleUrl: './seguimientos.component.scss'
@@ -44,11 +52,14 @@ export class SeguimientosComponent {
 
   protected readonly etiquetaRecordatorio = ETIQUETA_ESTADO_RECORDATORIO;
   protected readonly etiquetaTipo = ETIQUETA_TIPO_SEGUIMIENTO;
+  protected readonly etiquetaRiesgo = ETIQUETA_RIESGO_CLINICO;
+  protected readonly riesgos = RIESGOS_CLINICOS;
   protected readonly enviando = signal(false);
   protected readonly formularioAbierto = signal(false);
 
   protected readonly form = this.fb.nonNullable.group({
     nota: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(3000)]],
+    valoracionRiesgo: ['' as RiesgoClinico | '', Validators.required],
     deseaContinuar: ['' as Continuar, Validators.required],
     proximoControl: ['', fechaFuturaValidator()]
   });
@@ -61,7 +72,7 @@ export class SeguimientosComponent {
   protected readonly ordenados = computed(() => [...this.caso().seguimientos].sort((a, b) => b.numeroSeguimiento - a.numeroSeguimiento));
 
   protected abrir(): void {
-    this.form.reset({ nota: '', deseaContinuar: '', proximoControl: '' });
+    this.form.reset({ nota: '', valoracionRiesgo: '', deseaContinuar: '', proximoControl: '' });
     this.formularioAbierto.set(true);
   }
 
@@ -69,7 +80,7 @@ export class SeguimientosComponent {
     this.formularioAbierto.set(false);
   }
 
-  protected error(control: 'nota' | 'deseaContinuar' | 'proximoControl', etiqueta: string): string | null {
+  protected error(control: 'nota' | 'valoracionRiesgo' | 'deseaContinuar' | 'proximoControl', etiqueta: string): string | null {
     const c = this.form.controls[control];
     if (c.errors?.['fechaPasada'] && (c.touched || c.dirty)) return String(c.errors['fechaPasada']);
     return mensajeDeError(c, etiqueta);
@@ -85,7 +96,7 @@ export class SeguimientosComponent {
 
     this.enviando.set(true);
     const caso = this.caso();
-    this.servicio.registrarSeguimiento(caso.numeroCaso, { version: caso.version, nota: v.nota.trim(), deseaContinuar: continua, proximoControl }).subscribe({
+    this.servicio.registrarSeguimiento(caso.numeroCaso, { version: caso.version, nota: v.nota.trim(), valoracionRiesgo: v.valoracionRiesgo as RiesgoClinico, deseaContinuar: continua, proximoControl }).subscribe({
       next: (actualizado) => {
         this.enviando.set(false);
         this.formularioAbierto.set(false);

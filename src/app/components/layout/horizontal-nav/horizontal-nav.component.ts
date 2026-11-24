@@ -53,14 +53,10 @@ export class HorizontalNavComponent {
 
   /**
    * Línea Alma se muestra si la persona puede ver al menos una de sus opciones. Mismas reglas que el
-   * menú lateral: Primer respondiente (Admin, Coordinador, Profesional) y cada opción APH o de
-   * Psicología según su permiso.
+   * menú lateral: cada opción APH o de Psicología según su permiso.
    */
   muestraLineaAlma(): boolean {
     return (
-      this.auth.isAdmin() ||
-      this.auth.isCoordinador() ||
-      this.auth.isProfesional() ||
       this.alma.tieneAlguno(['alma.aph.crear', 'alma.aph.bandeja']) ||
       this.alma.psicologiaHabilitada()
     );

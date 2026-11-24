@@ -32,7 +32,7 @@ export class DialogoService {
   /** Confirmación destructiva. Emite `true` solo si la persona confirma. */
   confirmar(data: ConfirmDialogData): Observable<boolean> {
     return this.dialog
-      .open(ConfirmDialogComponent, { data, width: '380px', maxWidth: '92vw', restoreFocus: true })
+      .open(ConfirmDialogComponent, { data, width: '480px', maxWidth: '92vw', restoreFocus: true })
       .afterClosed()
       .pipe(map((r) => r === true));
   }

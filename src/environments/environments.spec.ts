@@ -7,6 +7,8 @@ describe('Entornos desplegables', () => {
     expect(produccion.uad.adaptador).toBe('http');
     expect(Object.values(produccion.lineaAlma.mocks).some(Boolean)).toBeFalse();
     expect(produccion.datosDemostracion).toBeFalse();
+    // Lo que el backend real aún no admite no se muestra ni se envía.
+    expect(produccion.lineaAlma.extensiones).toBeFalse();
     // Sin endpoint en el backend, un formulario público que falla no se publica.
     expect(produccion.features.uadQuejaAnonima).toBeFalse();
     expect(produccion.features.uadMisReportes).toBeFalse();
@@ -22,5 +24,6 @@ describe('Entornos desplegables', () => {
   it('demo enciende todos los grupos simulados de Línea Alma, también los que se agreguen', () => {
     expect(Object.keys(demo.lineaAlma.mocks).sort()).toEqual(Object.keys(produccion.lineaAlma.mocks).sort());
     expect(Object.values(demo.lineaAlma.mocks).every(Boolean)).toBeTrue();
+    expect(demo.lineaAlma.extensiones).toBeTrue();
   });
 });

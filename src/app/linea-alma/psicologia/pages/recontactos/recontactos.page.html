@@ -34,7 +34,8 @@
     <p class="rec__vacio">No hay recontactos pendientes de decisión.</p>
   } @else {
     <div class="rec__cuerpo">
-      <nav class="rec__lista" aria-label="Recontactos pendientes">
+      <nav class="rec__lista alma-tarjeta" aria-label="Recontactos pendientes">
+        <h2 class="rec__lista-titulo">Pendientes <span class="rec__contador">{{ items().length }}</span></h2>
         <ul>
           @for (r of items(); track r.idAtencion) {
             <li>
@@ -49,9 +50,10 @@
       </nav>
 
       @if (seleccionado(); as r) {
-        <section class="rec__detalle" aria-labelledby="rec-detalle-titulo">
+        <section class="rec__detalle alma-tarjeta" aria-labelledby="rec-detalle-titulo">
           <h2 id="rec-detalle-titulo" class="rec__subtitulo">{{ r.persona.nombreCompleto }} · {{ r.persona.tipoIdentificacion }} {{ r.persona.numeroIdentificacion }}</h2>
 
+          <div class="rec__panel">
           <div class="rec__comparativa">
             <article class="rec__columna" aria-labelledby="rec-nueva">
               <h3 id="rec-nueva"><mat-icon aria-hidden="true">add_ic_call</mat-icon> Atención nueva {{ r.idAtencion }}</h3>
@@ -59,8 +61,8 @@
                 <div><dt>Registrada</dt><dd>{{ r.fechaCreacion | date: 'd MMM y, h:mm a' }}</dd></div>
                 <div><dt>Canal</dt><dd>{{ etiquetaCanal[r.canalIngreso] }}</dd></div>
                 <div><dt>Triaje de APH</dt><dd>{{ r.triaje ? etiquetaTriaje[r.triaje] : 'Omitido por peligro inminente' }}</dd></div>
-                <div><dt>Motivo de consulta</dt><dd>{{ r.motivoConsulta ?? 'Sin registrar' }}</dd></div>
-                <div><dt>Nota de APH</dt><dd>{{ r.notaAph ?? 'Sin nota' }}</dd></div>
+                <div class="rec__dato--ancho"><dt>Motivo de consulta</dt><dd>{{ r.motivoConsulta ?? 'Sin registrar' }}</dd></div>
+                <div class="rec__dato--ancho"><dt>Nota de APH</dt><dd>{{ r.notaAph ?? 'Sin nota' }}</dd></div>
               </dl>
             </article>
             <article class="rec__columna rec__columna--caso" aria-labelledby="rec-caso">
@@ -71,10 +73,11 @@
                 <div><dt>Profesional a cargo</dt><dd>{{ r.casoActivo.profesional ?? 'Sin asignar' }}</dd></div>
                 <div><dt>Controles</dt><dd>{{ controles(r.casoActivo.numeroSeguimientos) }}</dd></div>
                 <div><dt>Próximo control</dt><dd>{{ r.casoActivo.proximoControl ? (r.casoActivo.proximoControl | date: 'd MMM y, h:mm a') : 'Sin programar' }}</dd></div>
-                <div><dt>Última nota</dt><dd>{{ r.casoActivo.ultimaNota ?? 'Sin notas' }}</dd></div>
+                <div class="rec__dato--ancho"><dt>Última nota</dt><dd>{{ r.casoActivo.ultimaNota ?? 'Sin notas' }}</dd></div>
               </dl>
               <a class="boton boton--secundario" [routerLink]="['/linea-alma/psicologia/casos', r.casoActivo.numeroCaso]">Abrir el expediente</a>
             </article>
+          </div>
           </div>
 
           @if (puedeResolver()) {

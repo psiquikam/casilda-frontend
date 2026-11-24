@@ -48,12 +48,14 @@
       </div>
     </header>
 
-    <div class="nov__toma" role="group" aria-label="Toma de la novedad">
+    <div class="nov__toma alma-tarjeta" role="group" aria-label="Toma de la novedad">
       @if (n.tomadaPor; as t) {
         <p class="nov__toma-texto">
           <mat-icon aria-hidden="true">person</mat-icon>
-          Tomada por <strong>{{ n.tomadaPorMi ? 'usted' : t }}</strong>.
-          @if (!n.tomadaPorMi && n.pendiente) { Otra profesional la está gestionando; puede consultarla, no editarla. }
+          <span>
+            Tomada por <strong>{{ n.tomadaPorMi ? 'usted' : t }}</strong>.
+            @if (!n.tomadaPorMi && n.pendiente) { Otra profesional la está gestionando; puede consultarla, no editarla. }
+          </span>
         </p>
       } @else if (n.pendiente) {
         <p class="nov__toma-texto"><mat-icon aria-hidden="true">group</mat-icon> En la cola compartida, sin tomar.</p>
@@ -94,7 +96,7 @@
       </p>
     }
 
-    <section class="nov__bloque" aria-labelledby="nov-datos">
+    <section class="nov__bloque alma-tarjeta" aria-labelledby="nov-datos">
       <h2 id="nov-datos">Lo que registró APH</h2>
       <dl class="nov__datos">
         <div><dt>Canal de ingreso</dt><dd>{{ etiquetaCanal[n.canalIngreso] }}</dd></div>
@@ -121,7 +123,7 @@
         <app-primer-contacto [novedad]="n" (casoCreado)="casoCreado($event)" (conflicto)="tras409()" (cancelado)="mostrarPrimerContacto.set(false)" />
       </section>
     } @else {
-      <section class="nov__bloque" aria-labelledby="int-titulo">
+      <section class="nov__bloque alma-tarjeta" aria-labelledby="int-titulo">
         <app-intentos-contacto
           [novedad]="n"
           [soloLectura]="!puedeEditar()"
@@ -133,19 +135,25 @@
     }
 
     @if (n.cierre && !n.cerradaPorNoContacto) {
-      <section class="nov__bloque" aria-labelledby="nov-cierre">
+      <section class="nov__bloque alma-tarjeta" aria-labelledby="nov-cierre">
         <h2 id="nov-cierre">Cierre</h2>
         <p>Cerrada el {{ n.cierre.fecha | date: 'd MMM y, h:mm a' }} ({{ n.cierre.motivo }}).</p>
         @if (n.cierre.observacion) { <p>{{ n.cierre.observacion }}</p> }
       </section>
     }
 
-    <section class="nov__bloque" aria-labelledby="nov-rutas">
+    @if (extensiones) {
+      <section class="nov__bloque alma-tarjeta" aria-labelledby="datos-persona-titulo">
+        <app-datos-persona [novedad]="n" [soloLectura]="!gestionando()" (actualizada)="actualizada($event)" (conflicto)="tras409()" />
+      </section>
+    }
+
+    <section class="nov__bloque alma-tarjeta" aria-labelledby="nov-rutas">
       <h2 id="nov-rutas" class="visually-hidden">Derivaciones y rutas previas</h2>
-      <app-panel-derivaciones [contexto]="contexto()" [consentimiento]="n.consentimientoAph" [peligroInminente]="!!n.omisionTriaje" [soloLectura]="!gestionando()" />
+      <app-panel-derivaciones perfil="PSICOLOGIA" [contexto]="contexto()" [consentimiento]="n.consentimientoAph" [peligroInminente]="!!n.omisionTriaje" [soloLectura]="!gestionando()" />
     </section>
 
-    <section class="nov__bloque" aria-labelledby="audit-titulo">
+    <section class="nov__bloque alma-tarjeta" aria-labelledby="audit-titulo">
       <app-audit-trail [contexto]="contexto()" [version]="versionAuditoria()" />
     </section>
   }

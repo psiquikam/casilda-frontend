@@ -37,7 +37,7 @@ export interface RespuestaMock {
 export type ManejadorMock = (peticion: PeticionMock, store: AlmaMockStore) => RespuestaMock;
 
 export interface RutaMock {
-  readonly metodo: 'GET' | 'POST' | 'PUT' | 'PATCH';
+  readonly metodo: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   readonly patron: RegExp;
   readonly grupo: GrupoMockAlma;
   readonly manejador: ManejadorMock;

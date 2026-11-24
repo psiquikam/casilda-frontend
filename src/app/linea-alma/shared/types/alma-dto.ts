@@ -1,6 +1,7 @@
 import {
   CanalIngreso,
   EstadoAtencion,
+  LugarOcurrencia,
   MedioConsentimiento,
   OrigenRemision,
   TipoContexto,
@@ -51,18 +52,60 @@ export interface PersonaAtencionDto {
   numeroIdentificacion: string;
   nombres: string | null;
   apellidos: string | null;
+  /** El backend real usa estos cuatro en lugar de `nombres`/`apellidos` (ver `almaContratoInterceptor`). */
+  primerNombre?: string | null;
+  segundoNombre?: string | null;
+  primerApellido?: string | null;
+  segundoApellido?: string | null;
   telefonoPrincipal: string | null;
   correoPersonal: string | null;
   ciudad: string | null;
   estrato: number | null;
+  /** `YYYY-MM-DD`. Revisión de flujos 2026-11: se captura igual que en el formulario del Equipo de Atención. */
+  fechaNacimiento?: string | null;
+  /** Código del catálogo `identidades-genero`. */
+  identidadGenero?: string | null;
+  /** Código del catálogo `vinculos-udea`. */
+  vinculoUniversidad?: string | null;
 }
 
+/**
+ * Quien se comunica. En una solicitud **indirecta** (`esTercero`) es un tercero y lleva su relación
+ * con la persona; el teléfono y el correo son suyos y opcionales.
+ */
 export interface SolicitanteDto {
   esTercero: boolean;
   nombres: string | null;
   apellidos: string | null;
   telefono: string | null;
+  correo: string | null;
+  /** Código del catálogo `parentescos-solicitante`. */
   parentesco: string | null;
+  /** Texto libre cuando el parentesco es «Otro (¿Cuál?)». */
+  parentescoOtro: string | null;
+}
+
+/** Archivo adjunto a la atención (evidencias y documentos, opcional). */
+export interface EvidenciaAtencionDto {
+  idEvidencia: string;
+  nombre: string;
+  tipo: string;
+  tamanoBytes: number;
+  fechaRegistro: string;
+}
+
+/** Novedad que APH registra sobre una remisión tras comunicarse de nuevo con la persona. */
+export interface SeguimientoRemisionDto {
+  idSeguimiento: string;
+  /** Momento en que se captó la novedad (ISO-8601). */
+  fechaHora: string;
+  novedad: string;
+  autor: string;
+}
+
+export interface SeguimientoRemisionCrearDto {
+  novedad: string;
+  fechaHora: string;
 }
 
 export interface OmisionTriajeDto {
@@ -82,11 +125,25 @@ export interface DerivacionInternaDto {
   idContexto: string;
   destino: string;
   motivo: string;
-  estado: 'ENVIADA' | 'RECIBIDA' | 'RECHAZADA';
-  fechaEnvio: string;
+  /** El backend real devuelve `REGISTRADA` (pedido B-2 de la revisión backend 2026-11-20: preferiblemente `ENVIADA`). */
+  estado: 'REGISTRADA' | 'ENVIADA' | 'RECIBIDA' | 'RECHAZADA' | 'CERRADA';
+  /** Para la concurrencia optimista del cierre (propuesta: ver revisión backend 2026-11-20). */
+  version?: number;
+  /** El backend real lo devuelve en `null` (B-2); mientras tanto se usa `fechaRegistro`. */
+  fechaEnvio: string | null;
+  fechaRegistro?: string;
   peligroInminente: boolean;
   consentimiento: ConsentimientoDto | null;
   resultado: string | null;
+  /** Solo con `environment.lineaAlma.extensiones`: el backend real no lo devuelve. */
+  seguimientos?: SeguimientoRemisionDto[];
+}
+
+/** Cuerpo de `PATCH /derivaciones/internas/{id}` para cerrarla con su resultado. */
+export interface DerivacionInternaCerrarDto {
+  version: number;
+  estado: 'CERRADA';
+  resultado: string;
 }
 
 export type EstadoRutaExterna = 'ACTIVADA' | 'EN_SEGUIMIENTO' | 'CERRADA';
@@ -102,6 +159,8 @@ export interface RutaExternaDto {
   resultado: string | null;
   peligroInminente: boolean;
   consentimiento: ConsentimientoDto | null;
+  /** Solo con `environment.lineaAlma.extensiones`: el backend real no lo devuelve. */
+  seguimientos?: SeguimientoRemisionDto[];
 }
 
 /** Atención APH completa. Para el rol Psicología solo trae notas `APH` (RNF-ALMA-002). */
@@ -113,8 +172,11 @@ export interface AtencionAphDto {
   origenRemision: OrigenRemision | null;
   persona: PersonaAtencionDto;
   solicitante: SolicitanteDto | null;
+  /** Dentro o fuera de la universidad (opcional). */
+  lugarOcurrencia?: LugarOcurrencia | null;
   motivoConsulta: string | null;
   notaAph: string | null;
+  evidencias?: EvidenciaAtencionDto[];
   triaje: Triaje | null;
   omisionTriaje: OmisionTriajeDto | null;
   aceptaPsicologia: boolean | null;
@@ -139,6 +201,7 @@ export interface AtencionAphGuardarDto {
   canalIngreso?: CanalIngreso;
   persona?: Partial<PersonaAtencionDto>;
   solicitante?: SolicitanteDto | null;
+  lugarOcurrencia?: LugarOcurrencia | null;
   motivoConsulta?: string | null;
   notaAph?: string | null;
   aceptaPsicologia?: boolean | null;

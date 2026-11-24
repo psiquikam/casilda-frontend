@@ -36,6 +36,15 @@ export const environment = {
    * **Nunca `true` en un entorno desplegado.**
    */
   lineaAlma: {
+    /**
+     * Campos y servicios de la revisión de flujos de noviembre de 2026 que el backend **aún no implementa**:
+     * fecha de nacimiento, identidad de género y vínculo con la universidad de la persona, lugar de
+     * ocurrencia, evidencias, correo y «¿Cuál?» del solicitante, novedades y cierre de remisiones, y
+     * «Datos de la persona» en Psicología. Con `false` la interfaz los oculta y el interceptor
+     * `almaContratoInterceptor` los retira de lo que se envía. Detalle en
+     * `docs/contratos/linea-alma/revision-backend-vs-front-2026-11-20.md`.
+     */
+    extensiones: true,
     mocks: {
       catalogos: true,
       personas: true,

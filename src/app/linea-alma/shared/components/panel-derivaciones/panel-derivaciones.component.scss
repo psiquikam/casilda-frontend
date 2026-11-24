@@ -5,7 +5,13 @@
 }
 
 .panel__titulo {
-  margin: 0;
+  margin: 0 0 var(--space-3);
+  font-size: 1.0625rem;
+  color: var(--color-primary);
+}
+
+/* En Psicología el panel es un bloque más de la página y su título va al tamaño de los demás bloques. */
+.panel__titulo--bloque {
   font-size: var(--font-size-xl);
 }
 
@@ -28,7 +34,7 @@
 
   h4 {
     margin: 0;
-    font-size: var(--font-size-md);
+    font-size: var(--font-size-base);
   }
 }
 
@@ -96,4 +102,24 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
+}
+
+.panel__acciones--item {
+  margin-top: var(--space-2);
+}
+
+.panel__novedades {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0 0 0 var(--space-3);
+  border-left: 3px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
 }

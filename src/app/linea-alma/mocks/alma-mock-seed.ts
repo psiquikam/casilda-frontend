@@ -71,9 +71,14 @@ export function atencion(ahora: Date, p: ParametrosAtencion): AtencionAphDto {
       telefonoPrincipal: null,
       correoPersonal: null,
       ciudad: 'Medellín',
-      estrato: null
+      estrato: null,
+      fechaNacimiento: null,
+      identidadGenero: null,
+      vinculoUniversidad: null
     },
     solicitante: null,
+    lugarOcurrencia: null,
+    evidencias: [],
     motivoConsulta: p.motivo ?? 'Motivo de consulta de prueba (dato ficticio).',
     notaAph: 'Nota de valoración APH de prueba (dato ficticio).',
     triaje: p.triaje ?? null,
@@ -149,21 +154,46 @@ export const CATALOGOS_SEMILLA: Record<string, ItemCatalogo[]> = {
     ['PAS', 'Pasaporte']
   ),
   estratos: items(['1', 'Estrato 1'], ['2', 'Estrato 2'], ['3', 'Estrato 3'], ['4', 'Estrato 4'], ['5', 'Estrato 5'], ['6', 'Estrato 6']),
+  // Listado completo (Psicología). Fuente: «Revisión de Flujos Línea Alma» y formulario Violeta Te Orienta, sección 6.
   'destinos-internos': items(
-    ['SPYB', 'Seguridad a Personas y Bienes (Central de Monitoreo)'],
-    ['EA', 'Equipo de Atención'],
-    ['DUPLA_PSICOJURIDICA', 'Dupla Psicojurídica'],
-    ['MASCULINIDADES', 'Programa de Masculinidades'],
-    ['UAD', 'Unidad de Asuntos Disciplinarios']
+    ['EA', 'Equipo de atención'],
+    ['SPYB', 'Seguridad a personas y bienes'],
+    ['UAD', 'Unidad de Asuntos Disciplinarios 3-4'],
+    ['PSICOORIENTACION_GENERO', 'Psicoorientación con perspectiva de género'],
+    ['MASCULINIDADES', 'Programa de masculinidades'],
+    ['SIN_DECISION', 'No acepta / No toma ninguna decisión en esta sesión'],
+    ['NO_APLICA', 'No aplica']
   ),
   'rutas-externas': items(
-    ['LINEA_123', 'Línea 123'],
-    ['CODIGO_FUCSIA', 'Código Fucsia / Sector Salud'],
-    ['FISCALIA', 'Fiscalía General de la Nación'],
-    ['COMISARIA_FAMILIA', 'Comisarías de Familia'],
-    ['POLICIA_NACIONAL', 'Policía Nacional'],
-    ['ICBF', 'ICBF'],
-    ['CAIVAS', 'CAIVAS']
+    ['CODIGO_FUCSIA', 'Código Fucsia (ACV)'],
+    ['COMISARIA_FAMILIA', 'Comisaría de Familia – CDF'],
+    ['DEFENSORIA_PUEBLO', 'Defensoría del Pueblo'],
+    ['DUPLA_PSICOJURIDICA', 'Dupla Psico jurídica - Secretaría Mujeres Medellín'],
+    ['FISCALIA', 'Fiscalía General de la Nación – FGN'],
+    ['GERENCIA_DIVERSIDADES', 'Gerencia de Diversidades Sexuales e Identidades de Género – Medellín'],
+    ['INSPECCION_POLICIA', 'Inspección de Policía'],
+    ['LINEA_123_AGENCIA_MUJER', 'Línea 123 Agencia Mujer Medellín'],
+    ['LINEA_123_MUJER_ANTIOQUIA', 'Línea 123 Mujer Antioquia'],
+    ['LINEA_122', 'Línea 122 - Fiscalía'],
+    ['LINEA_155', 'Línea 155 - Nacional'],
+    ['MODULO_DIVERSO_123', 'Módulo Diverso Línea 123 Social'],
+    ['RUTA_SALUD', 'Ruta de salud'],
+    ['OTRA', 'Otra (¿Cuál?)'],
+    ['SIN_DECISION', 'No acepta / No toma ninguna decisión en esta sesión']
+  ),
+  // Listado acordado por APH durante la llamada.
+  'destinos-internos-aph': items(
+    ['SPYB', 'Seguridad a personas y bienes'],
+    ['MASCULINIDADES', 'Programa de masculinidades'],
+    ['BIENESTAR_FACULTAD', 'Bienestar universitario de la facultad, escuela o instituto correspondiente']
+  ),
+  'rutas-externas-aph': items(
+    ['COMISARIA_FAMILIA', 'Comisaría de Familia – CDF'],
+    ['FISCALIA', 'Fiscalía General de la Nación – FGN'],
+    ['INSPECCION_POLICIA', 'Inspección de Policía'],
+    ['PROCURADURIA', 'Procuraduría General de la Nación'],
+    ['RUTA_SALUD', 'Ruta de salud'],
+    ['OTRA', 'Otra (¿Cuál?)']
   ),
   'motivos-cierre-aph': items(
     ['NO_ACEPTA_PSICOLOGIA', 'La persona no desea atención psicológica'],
@@ -177,12 +207,53 @@ export const CATALOGOS_SEMILLA: Record<string, ItemCatalogo[]> = {
     ['NO_ACEPTA', 'La persona decidió no continuar']
   ),
   'parentescos-solicitante': items(
-    ['MADRE_PADRE', 'Madre o padre'],
-    ['PAREJA', 'Pareja'],
-    ['AMISTAD', 'Amistad'],
-    ['COMPANERIA_ACADEMICA', 'Compañía de estudio o trabajo'],
-    ['DOCENTE', 'Docente o jefatura'],
-    ['OTRO', 'Otro']
+    ['MADRE_PADRE', 'Madre / Padre'],
+    ['HIJA_HIJO', 'Hija / Hijo'],
+    ['HERMANA_HERMANO', 'Hermana / Hermano'],
+    ['OTRO_FAMILIAR', 'Otro familiar'],
+    ['PAREJA', 'Pareja o cónyuge'],
+    ['EXPAREJA', 'Expareja'],
+    ['AMISTAD', 'Amiga / Amigo'],
+    ['COMPANERIA_ESTUDIO', 'Compañera / Compañero de estudio'],
+    ['COMPANERIA_TRABAJO', 'Compañera / Compañero de trabajo'],
+    ['DOCENTE', 'Docente'],
+    ['PERSONAL_ADMINISTRATIVO', 'Personal administrativo de la Universidad'],
+    ['VECINDAD', 'Vecina / Vecino'],
+    ['CONOCIDA', 'Persona conocida (otro vínculo)'],
+    ['SIN_VINCULO', 'Sin vínculo previo'],
+    ['OTRO', 'Otro (¿Cuál?)'],
+    ['NO_INFORMA', 'No informa']
+  ),
+  // Placeholder (Q6): el catálogo oficial de identidades de género lo entrega el Equipo de Atención.
+  'identidades-genero': items(
+    ['MUJER_CIS', 'Mujer cisgénero'],
+    ['HOMBRE_CIS', 'Hombre cisgénero'],
+    ['MUJER_TRANS', 'Mujer trans'],
+    ['HOMBRE_TRANS', 'Hombre trans'],
+    ['NO_BINARIA', 'Persona no binaria'],
+    ['OTRA', 'Otra'],
+    ['NO_INFORMA', 'Prefiere no informar']
+  ),
+  // Vínculo de la persona con la UdeA (Violeta Te Orienta, sección 3).
+  'vinculos-udea': items(
+    ['CONTRATISTA_CIS', 'Contratista CIS'],
+    ['CONTRATISTA', 'Contratista'],
+    ['DOCENTE_VINCULADO', 'Docente vinculado'],
+    ['DOCENTE_OCASIONAL', 'Docente ocasional'],
+    ['DOCENTE_CATEDRA', 'Docente cátedra'],
+    ['DOCENTE_CATEDRA_50', 'Docente cátedra 50'],
+    ['EGRESADO', 'Egresado'],
+    ['EMPLEADO_ADMINISTRATIVO', 'Empleado administrativo'],
+    ['ESTUDIANTE_PREGRADO', 'Estudiante de pregrado'],
+    ['ESTUDIANTE_POSGRADO', 'Estudiante de posgrado'],
+    ['ESTUDIANTE_TECNOLOGIA', 'Estudiante de tecnología'],
+    ['EXTERNO', 'Externo'],
+    ['JUBILADO', 'Jubilado'],
+    ['PENSIONADO', 'Pensionado'],
+    ['PERSONAL_NO_DOCENTE', 'Personal no docente'],
+    ['PRESTADOR_SERVICIOS', 'Prestador de servicios'],
+    ['OTRO', 'Otro'],
+    ['SIN_VINCULO', 'No tiene vínculo con la universidad']
   ),
   'textos-consentimiento': items([
     'v0-provisional',

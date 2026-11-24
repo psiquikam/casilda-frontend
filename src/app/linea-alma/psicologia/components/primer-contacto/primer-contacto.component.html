@@ -47,7 +47,7 @@
     <!-- 2. Caracterización -->
     <mat-step label="Caracterización">
       <div class="pc__paso">
-        <p>Variables homologadas con Equipo de Atención. Complete o corrija lo que APH alcanzó a registrar.</p>
+        <p>Complete o corrija lo que APH alcanzó a registrar.</p>
         <app-caracterizacion-form [grupo]="caracterizacion" prefijoId="pc-car" />
         <div class="pc__botones">
           <button type="button" class="boton boton--secundario" (click)="irA(0)">Anterior</button>
@@ -64,7 +64,6 @@
           <span>
             Triaje registrado por APH:
             @if (novedad().triaje; as t) { <strong>{{ etiquetaTriaje[t] }}</strong> } @else { <strong>omitido por peligro inminente</strong> }.
-            Se conserva tal cual: la valoración clínica es un campo propio y no lo modifica (RN-ALMA-04).
           </span>
         </div>
         <fieldset class="pc__fieldset">
@@ -121,38 +120,64 @@
     <mat-step label="Presunto agresor">
       <div class="pc__paso" [formGroup]="agresor">
         <p class="pc__nota">Opcional. Registre solo lo que la persona quiera contar; ningún campo bloquea el guardado.</p>
-        <div class="pc__fila">
+        <div class="spyb-grid">
+          <div class="spyb-campo">
+            <app-etiqueta-campo texto="Primer nombre" para="pc-agr-primerNombre" />
+            <mat-form-field appearance="outline">
+              <input matInput appSoloLetras id="pc-agr-primerNombre" formControlName="primerNombre" maxlength="60" placeholder="Ej: Juan" autocomplete="off" />
+              @if (error('agresor', 'primerNombre', 'Primer nombre'); as e) { <mat-error>{{ e }}</mat-error> }
+            </mat-form-field>
+          </div>
+          <div class="spyb-campo">
+            <app-etiqueta-campo texto="Segundo nombre" para="pc-agr-segundoNombre" />
+            <mat-form-field appearance="outline">
+              <input matInput appSoloLetras id="pc-agr-segundoNombre" formControlName="segundoNombre" maxlength="60" placeholder="Ej: Carlos" autocomplete="off" />
+              @if (error('agresor', 'segundoNombre', 'Segundo nombre'); as e) { <mat-error>{{ e }}</mat-error> }
+            </mat-form-field>
+          </div>
+          <div class="spyb-campo">
+            <app-etiqueta-campo texto="Primer apellido" para="pc-agr-primerApellido" />
+            <mat-form-field appearance="outline">
+              <input matInput appSoloLetras id="pc-agr-primerApellido" formControlName="primerApellido" maxlength="60" placeholder="Ej: Pérez" autocomplete="off" />
+              @if (error('agresor', 'primerApellido', 'Primer apellido'); as e) { <mat-error>{{ e }}</mat-error> }
+            </mat-form-field>
+          </div>
+          <div class="spyb-campo">
+            <app-etiqueta-campo texto="Segundo apellido" para="pc-agr-segundoApellido" />
+            <mat-form-field appearance="outline">
+              <input matInput appSoloLetras id="pc-agr-segundoApellido" formControlName="segundoApellido" maxlength="60" placeholder="Ej: Gómez" autocomplete="off" />
+              @if (error('agresor', 'segundoApellido', 'Segundo apellido'); as e) { <mat-error>{{ e }}</mat-error> }
+            </mat-form-field>
+          </div>
+          <div class="spyb-campo">
+            <app-etiqueta-campo texto="Vínculo con la persona" para="pc-agr-vinculo" ayuda="Qué relación tiene el presunto agresor con la persona atendida." />
+            <mat-form-field appearance="outline">
+              <mat-select id="pc-agr-vinculo" formControlName="vinculo" placeholder="Seleccione una opción">
+                <mat-option value="">Sin dato</mat-option>
+                @for (v of vinculosCatalogo(); track v.codigo) {
+                  <mat-option [value]="v.codigo">{{ v.etiqueta }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="spyb-campo">
+            <app-etiqueta-campo texto="¿Conviven?" para="pc-agr-convivencia" ayuda="Si la persona atendida y el presunto agresor viven juntos." />
+            <mat-form-field appearance="outline">
+              <mat-select id="pc-agr-convivencia" formControlName="convivencia" placeholder="Seleccione una opción">
+                <mat-option value="">Sin dato</mat-option>
+                <mat-option value="SI">Sí</mat-option>
+                <mat-option value="NO">No</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="spyb-campo">
+          <app-etiqueta-campo texto="Observaciones" para="pc-agr-observaciones" />
           <mat-form-field appearance="outline">
-            <mat-label>Nombres</mat-label>
-            <input matInput id="pc-agr-nombres" formControlName="nombres" autocomplete="off" />
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Apellidos</mat-label>
-            <input matInput id="pc-agr-apellidos" formControlName="apellidos" autocomplete="off" />
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Vínculo con la persona</mat-label>
-            <mat-select id="pc-agr-vinculo" formControlName="vinculo">
-              <mat-option value="">Sin dato</mat-option>
-              @for (v of vinculosCatalogo(); track v.codigo) {
-                <mat-option [value]="v.codigo">{{ v.etiqueta }}</mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>¿Conviven?</mat-label>
-            <mat-select id="pc-agr-convivencia" formControlName="convivencia">
-              <mat-option value="">Sin dato</mat-option>
-              <mat-option value="SI">Sí</mat-option>
-              <mat-option value="NO">No</mat-option>
-            </mat-select>
+            <textarea matInput id="pc-agr-observaciones" formControlName="observaciones" rows="3" maxlength="1000" placeholder="Ej: Datos que la persona quiso contar sobre el presunto agresor." autocomplete="off"></textarea>
+            @if (error('agresor', 'observaciones', 'Las observaciones'); as e) { <mat-error>{{ e }}</mat-error> }
           </mat-form-field>
         </div>
-        <mat-form-field appearance="outline">
-          <mat-label>Observaciones</mat-label>
-          <textarea matInput id="pc-agr-observaciones" formControlName="observaciones" rows="3" autocomplete="off"></textarea>
-          @if (error('agresor', 'observaciones', 'Las observaciones'); as e) { <mat-error>{{ e }}</mat-error> }
-        </mat-form-field>
         <div class="pc__botones">
           <button type="button" class="boton boton--secundario" (click)="irA(3)">Anterior</button>
           <button type="button" class="boton boton--primario" (click)="irA(5)">Siguiente</button>

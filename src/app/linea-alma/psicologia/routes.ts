@@ -15,7 +15,7 @@ export const PSICOLOGIA_ROUTES: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'bandeja' },
   {
     path: 'bandeja',
-    title: 'Bandeja de Psicología — Línea Alma',
+    title: 'Pendientes atención por psicología — Línea Alma',
     canActivate: [psicologiaHabilitadaGuard, almaPermisoGuard],
     data: { permisos: ['alma.psicologia.consultar'] },
     loadComponent: () => import('./pages/bandeja-psicologia/bandeja-psicologia.page').then((m) => m.BandejaPsicologiaPage)
