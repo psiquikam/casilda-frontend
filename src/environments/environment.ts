@@ -95,6 +95,8 @@ export const environment = {
     /** Queja anónima ante la UAD (`/uad/queja-anonima`). El backend ya tiene `POST /uad/noticias-anonimas`; falta probarlo de punta a punta. */
     uadQuejaAnonima: true,
     /** «Mis reportes» (`/mis-reportes`), con datos simulados mientras `uad.adaptador` sea `'mock'`. */
-    uadMisReportes: true
+    uadMisReportes: true,
+    /** Acceso «Reportar VBG de forma anónima» de la navegación pública. Oculto por decisión del equipo; la ruta `/formulario-anonimo` sigue activa. */
+    reporteAnonimoEnNavPublica: false
   }
 };

@@ -32,7 +32,13 @@ describe('PublicHeaderComponent', () => {
     const nav: HTMLElement = fixture.nativeElement.querySelector('nav');
 
     expect(nav.getAttribute('aria-label')).toBeTruthy();
-    expect(nav.querySelectorAll('li a').length).toBe(4);
+    expect(nav.querySelectorAll('li a').length).toBe(3);
+  });
+
+  it('no debe mostrar el reporte anónimo mientras el equipo lo mantenga oculto', () => {
+    const enlaces: HTMLAnchorElement[] = Array.from(fixture.nativeElement.querySelectorAll('a'));
+
+    expect(enlaces.some((a) => a.getAttribute('href') === '/formulario-anonimo')).toBeFalse();
   });
 
   it('debe ofrecer un acceso de regreso al inicio', () => {
