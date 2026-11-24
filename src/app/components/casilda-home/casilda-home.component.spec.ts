@@ -157,6 +157,9 @@ describe('CasildaHomeComponent', () => {
       const pagina = fixture.nativeElement as HTMLElement;
       expect(pagina.textContent).not.toContain('Iniciar reporte seguro');
       expect(pagina.querySelector('.hero a[href="/formulario-anonimo"]')).toBeNull();
+      // El aviso de privacidad no promete un canal que la portada ya no ofrece.
+      expect(pagina.textContent).not.toContain('reportes de forma anónima');
+      expect(pagina.textContent).toContain('La información suministrada');
       // Sin reporte ni línea telefónica no queda un contenedor de acciones vacío.
       expect(pagina.querySelector('.hero__acciones')).toBeNull();
     });

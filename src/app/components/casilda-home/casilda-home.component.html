@@ -31,8 +31,13 @@
   <aside class="casilda-alerta home__privacidad">
     <mat-icon aria-hidden="true">lock</mat-icon>
     <p>
-      <strong>Navegación segura.</strong> Es posible realizar reportes de forma anónima y
-      la información suministrada se maneja bajo estricto secreto profesional. Para salir
+      <strong>Navegación segura.</strong>
+      @if (mostrarReporteAnonimo) {
+        Es posible realizar reportes de forma anónima y la información suministrada
+      } @else {
+        La información suministrada
+      }
+      se maneja bajo estricto secreto profesional. Para salir
       de inmediato, use el botón <strong>Salida rápida</strong> o presione <kbd>Alt</kbd> + <kbd>Q</kbd>.
     </p>
   </aside>
