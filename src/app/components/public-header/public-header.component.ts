@@ -17,5 +17,5 @@ import { environment } from '../../../environments/environment';
 })
 export class PublicHeaderComponent {
   /** «Reportar VBG de forma anónima»: oculto mientras el flag esté apagado; la ruta sigue existiendo. */
-  readonly mostrarReporteAnonimo = environment.features.reporteAnonimoEnNavPublica;
+  readonly mostrarReporteAnonimo = environment.features.reporteAnonimoPublico;
 }

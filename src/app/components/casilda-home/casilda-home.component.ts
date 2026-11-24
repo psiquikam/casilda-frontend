@@ -26,6 +26,9 @@ export class CasildaHomeComponent implements OnInit {
 
   readonly telefonoOrientacion = environment.telefonoOrientacion;
 
+  /** «Iniciar reporte seguro»: oculto mientras el flag esté apagado; la ruta sigue existiendo. */
+  readonly mostrarReporteAnonimo = environment.features.reporteAnonimoPublico;
+
   /**
    * El llamado a orientación telefónica solo se ofrece si hay un número real.
    * Un `tel:` vacío o con un número de relleno en un botón rotulado
