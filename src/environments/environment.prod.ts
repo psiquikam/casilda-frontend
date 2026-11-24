@@ -91,6 +91,8 @@ export const environment = {
     /** Apagada hasta probar `POST /uad/noticias-anonimas` de punta a punta: un formulario público que falla no se publica. */
     uadQuejaAnonima: false,
     /** Apagada hasta que Backend despliegue la Entrega 3 (`GET /mis-reportes`) y se pruebe de punta a punta. */
-    uadMisReportes: false
+    uadMisReportes: false,
+    /** Acceso «Reportar VBG de forma anónima» de la navegación pública. Oculto por decisión del equipo; la ruta `/formulario-anonimo` sigue activa. */
+    reporteAnonimoEnNavPublica: false
   }
 };
