@@ -96,7 +96,7 @@ export const environment = {
     uadQuejaAnonima: true,
     /** «Mis reportes» (`/mis-reportes`), con datos simulados mientras `uad.adaptador` sea `'mock'`. */
     uadMisReportes: true,
-    /** Acceso «Reportar VBG de forma anónima» de la navegación pública. Oculto por decisión del equipo; la ruta `/formulario-anonimo` sigue activa. */
-    reporteAnonimoEnNavPublica: false
+    /** Accesos públicos al reporte anónimo: «Reportar VBG de forma anónima» en la navegación y «Iniciar reporte seguro» en la portada. Ocultos por decisión del equipo; la ruta `/formulario-anonimo` sigue activa. */
+    reporteAnonimoPublico: false
   }
 };

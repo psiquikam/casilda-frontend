@@ -141,8 +141,29 @@ describe('CasildaHomeComponent', () => {
       expect(enlace?.getAttribute('href')).toBe('tel:6042196000');
     });
 
-    it('conserva el reporte seguro como acción disponible sin línea telefónica', async () => {
-      await crearConTelefono('');
+  });
+
+  describe('acceso al reporte anónimo', () => {
+    const flagOriginal = environment.features.reporteAnonimoPublico;
+
+    afterEach(() => {
+      environment.features.reporteAnonimoPublico = flagOriginal;
+    });
+
+    it('no ofrece «Iniciar reporte seguro» mientras el equipo lo mantenga oculto', async () => {
+      environment.features.reporteAnonimoPublico = false;
+      await crearComponente();
+
+      const pagina = fixture.nativeElement as HTMLElement;
+      expect(pagina.textContent).not.toContain('Iniciar reporte seguro');
+      expect(pagina.querySelector('.hero a[href="/formulario-anonimo"]')).toBeNull();
+      // Sin reporte ni línea telefónica no queda un contenedor de acciones vacío.
+      expect(pagina.querySelector('.hero__acciones')).toBeNull();
+    });
+
+    it('lo vuelve a ofrecer al encender el flag', async () => {
+      environment.features.reporteAnonimoPublico = true;
+      await crearComponente();
 
       expect((fixture.nativeElement as HTMLElement).textContent).toContain('Iniciar reporte seguro');
     });
