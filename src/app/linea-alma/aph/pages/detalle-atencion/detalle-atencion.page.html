@@ -53,7 +53,7 @@
       </p>
     }
 
-    <section class="detalle__bloque" aria-labelledby="det-datos">
+    <section class="detalle__bloque alma-tarjeta" aria-labelledby="det-datos">
       <h2 id="det-datos">Datos de la atención</h2>
       <dl class="detalle__datos">
         <div><dt>Canal de ingreso</dt><dd>{{ etiquetaCanal[a.canalIngreso] }}</dd></div>
@@ -71,7 +71,7 @@
       </dl>
     </section>
 
-    <section class="detalle__bloque" aria-labelledby="det-triaje">
+    <section class="detalle__bloque alma-tarjeta" aria-labelledby="det-triaje">
       <h2 id="det-triaje">Triaje</h2>
       @if (a.triaje; as t) {
         <p>Triaje <strong>{{ etiquetaTriaje[t] }}</strong>.</p>
@@ -87,13 +87,13 @@
       }
     </section>
 
-    <section class="detalle__bloque" aria-labelledby="det-notas">
+    <section class="detalle__bloque alma-tarjeta" aria-labelledby="det-notas">
       <h2 id="det-notas">Notas de APH</h2>
       <app-notas-timeline [notas]="a.notas" />
     </section>
 
     @if (casoCerrado(); as numeroCaso) {
-      <section class="detalle__bloque" aria-labelledby="det-contencion">
+      <section class="detalle__bloque alma-tarjeta" aria-labelledby="det-contencion">
         <app-contencion-post-cierre-form
           [idAtencion]="a.idAtencion"
           [numeroCaso]="numeroCaso"
@@ -103,9 +103,10 @@
       </section>
     }
 
-    <section class="detalle__bloque" aria-labelledby="det-rutas">
+    <section class="detalle__bloque alma-tarjeta" aria-labelledby="det-rutas">
       <app-panel-derivaciones
         [contexto]="contexto()"
+        perfil="APH"
         [consentimiento]="a.consentimiento"
         [peligroInminente]="!!a.omisionTriaje"
         [soloLectura]="!puedeEditar()"
@@ -114,11 +115,11 @@
     </section>
 
     @if (puedeCerrar()) {
-      <section class="detalle__bloque" aria-labelledby="det-cierre">
+      <section class="detalle__bloque alma-tarjeta" aria-labelledby="det-cierre">
         <app-cierre-atencion [atencion]="a" [bloqueo]="bloqueoCierre()" (cerrada)="tras($event)" (conflicto)="tras409()" />
       </section>
     } @else if (a.cierre; as cierre) {
-      <section class="detalle__bloque" aria-labelledby="det-cierre-info">
+      <section class="detalle__bloque alma-tarjeta" aria-labelledby="det-cierre-info">
         <h2 id="det-cierre-info">Cierre</h2>
         <p>La atención se cerró el {{ cierre.fecha | date: 'd MMM y, h:mm a' }}.</p>
         @if (cierre.observacion) { <p>{{ cierre.observacion }}</p> }
@@ -126,7 +127,7 @@
     }
 
     @if (permisos.tiene('alma.aph.consultar')) {
-      <section class="detalle__bloque" aria-labelledby="audit-titulo">
+      <section class="detalle__bloque alma-tarjeta" aria-labelledby="audit-titulo">
         <app-audit-trail [contexto]="contexto()" [version]="versionAuditoria()" />
       </section>
     }

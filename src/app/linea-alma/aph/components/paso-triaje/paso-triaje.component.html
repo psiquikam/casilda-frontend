@@ -1,5 +1,5 @@
 <section class="triaje" aria-labelledby="triaje-titulo">
-  <h3 id="triaje-titulo" class="triaje__titulo">Triaje</h3>
+  <h3 id="triaje-titulo" class="triaje__titulo" [class.visually-hidden]="!conTitulo()">Triaje</h3>
   <p class="triaje__intro">
     Seleccione el nivel que le dio la herramienta de triaje. Aquí no se calcula ni se sugiere: solo se registra.
   </p>
@@ -41,14 +41,17 @@
     <div class="casilda-alerta casilda-alerta--precaucion" role="status">
       <mat-icon aria-hidden="true">priority_high</mat-icon>
       <span>
-        El triaje quedó omitido por peligro inminente. Active ahora la ruta que corresponda. Para derivar a
+        El triaje quedó omitido por peligro inminente. Active ahora la ruta que corresponda{{ panelPeligro() ? '' : ' en el paso «Remisiones»' }}. Para derivar a
         Psicología deberá registrar el triaje después.
       </span>
     </div>
-    <app-panel-derivaciones
-      [contexto]="{ tipo: 'ATENCION_APH', id: atencion().idAtencion }"
-      [peligroInminente]="true"
-      [soloLectura]="soloLectura()"
-    />
+    @if (panelPeligro()) {
+      <app-panel-derivaciones
+        [contexto]="{ tipo: 'ATENCION_APH', id: atencion().idAtencion }"
+        [peligroInminente]="true"
+        perfil="APH"
+        [soloLectura]="soloLectura()"
+      />
+    }
   }
 </section>

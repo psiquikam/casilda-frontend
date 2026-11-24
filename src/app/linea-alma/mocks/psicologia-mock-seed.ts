@@ -104,6 +104,8 @@ function seguimientosDe(ahora: Date, p: ParametrosCaso): SeguimientoDto[] {
       tipo: 'REGULAR',
       fecha: fecha.toISOString(),
       nota: `Seguimiento ${numero}: la persona refiere avances (nota de prueba, dato ficticio).`,
+      // Riesgo descendente con los controles (dato de prueba): el último seguimiento queda en «Bajo».
+      valoracionRiesgo: numero === 1 ? 'MEDIO' : 'BAJO',
       deseaContinuar,
       proximoControl: deseaContinuar ? new Date(fecha.getTime() + 7 * DIA).toISOString() : null,
       recordatorio: deseaContinuar

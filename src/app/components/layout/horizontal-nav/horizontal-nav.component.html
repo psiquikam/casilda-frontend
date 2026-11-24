@@ -113,16 +113,10 @@
       </button>
 
       <mat-menu #almaMenu="matMenu" class="hnav-menu">
-        @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional()) {
-          <a mat-menu-item routerLink="/linea-alma/atencion-pr" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
-            <mat-icon aria-hidden="true">ring_volume</mat-icon>
-            <span>Primer respondiente</span>
-          </a>
-        }
         @if (alma.tiene('alma.aph.crear')) {
           <a mat-menu-item routerLink="/linea-alma/aph/nueva" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
             <mat-icon aria-hidden="true">add_ic_call</mat-icon>
-            <span>Nueva atención</span>
+            <span>Registrar nueva atención</span>
           </a>
         }
         @if (alma.tiene('alma.aph.bandeja')) {
@@ -135,7 +129,7 @@
         @if (alma.psicologiaHabilitada()) {
           <a mat-menu-item routerLink="/linea-alma/psicologia/bandeja" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
             <mat-icon aria-hidden="true">psychology</mat-icon>
-            <span>Bandeja de Psicología</span>
+            <span>Pendientes atención por psicología</span>
           </a>
           @if (alma.tiene('alma.notasClinicas.consultar')) {
             <a mat-menu-item routerLink="/linea-alma/psicologia/recontactos" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
@@ -390,18 +384,11 @@
 
           @if (isSectionExpanded('alma')) {
             <div class="hnav-mobile-group-content">
-              @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional()) {
-                <a routerLink="/linea-alma/atencion-pr" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
-                  class="hnav-mobile-item" (click)="closeMobileMenu()">
-                  <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">ring_volume</mat-icon>
-                  <span class="hnav-mobile-item__text">Primer respondiente</span>
-                </a>
-              }
               @if (alma.tiene('alma.aph.crear')) {
                 <a routerLink="/linea-alma/aph/nueva" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
                   class="hnav-mobile-item" (click)="closeMobileMenu()">
                   <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">add_ic_call</mat-icon>
-                  <span class="hnav-mobile-item__text">Nueva atención</span>
+                  <span class="hnav-mobile-item__text">Registrar nueva atención</span>
                 </a>
               }
               @if (alma.tiene('alma.aph.bandeja')) {
@@ -415,7 +402,7 @@
                 <a routerLink="/linea-alma/psicologia/bandeja" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
                   class="hnav-mobile-item" (click)="closeMobileMenu()">
                   <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">psychology</mat-icon>
-                  <span class="hnav-mobile-item__text">Bandeja de Psicología</span>
+                  <span class="hnav-mobile-item__text">Pendientes atención por psicología</span>
                 </a>
                 @if (alma.tiene('alma.notasClinicas.consultar')) {
                   <a routerLink="/linea-alma/psicologia/recontactos" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"

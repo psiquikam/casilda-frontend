@@ -49,6 +49,17 @@ export class AtencionesAphService {
     });
   }
 
+  /** `POST /atenciones-aph/{id}/evidencias` (multipart, parte `evidencias`). Devuelve la atención con la lista al día. */
+  adjuntarEvidencias(idAtencion: string, archivos: readonly File[]): Observable<AtencionAph> {
+    const cuerpo = new FormData();
+    archivos.forEach((archivo) => cuerpo.append('evidencias', archivo, archivo.name));
+    return this.api.post<AtencionAphDto>(`/atenciones-aph/${idAtencion}/evidencias`, cuerpo).pipe(map(aAtencion));
+  }
+
+  quitarEvidencia(idAtencion: string, idEvidencia: string): Observable<AtencionAph> {
+    return this.api.delete<AtencionAphDto>(`/atenciones-aph/${idAtencion}/evidencias/${idEvidencia}`).pipe(map(aAtencion));
+  }
+
   cerrar(idAtencion: string, cuerpo: CierreAtencionRequestDto): Observable<AtencionAph> {
     return this.api.post<AtencionAphDto>(`/atenciones-aph/${idAtencion}/cierre`, cuerpo).pipe(map(aAtencion));
   }

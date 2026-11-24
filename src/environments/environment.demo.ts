@@ -28,6 +28,8 @@ export const environment = {
   ...produccion,
   lineaAlma: {
     ...produccion.lineaAlma,
+    // Con el servidor simulado se muestran también los campos que el backend real aún no admite.
+    extensiones: true,
     mocks: todosLosGruposSimulados
   },
   uad: {

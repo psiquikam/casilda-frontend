@@ -194,6 +194,8 @@ export interface SeguimientoDto {
   tipo: TipoSeguimiento;
   fecha: string;
   nota: string;
+  /** Valoración del riesgo que hace Psicología en este seguimiento. No modifica el triaje de APH (RN-ALMA-04). */
+  valoracionRiesgo: RiesgoClinico | null;
   deseaContinuar: boolean;
   proximoControl: string | null;
   recordatorio: RecordatorioDto | null;
@@ -203,6 +205,8 @@ export interface SeguimientoDto {
 export interface SeguimientoCrearDto {
   version: number;
   nota: string;
+  /** Obligatoria: la psicóloga valora el riesgo en cada seguimiento. */
+  valoracionRiesgo: RiesgoClinico;
   deseaContinuar: boolean;
   proximoControl?: string | null;
 }

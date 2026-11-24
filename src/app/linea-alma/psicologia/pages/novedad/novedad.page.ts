@@ -15,6 +15,7 @@ import { ErrorAlma } from '../../../shared/http/alma-error';
 import { AlmaPermisosService } from '../../../shared/permisos/alma-permisos.service';
 import { PrimerContactoRespuestaDto } from '../../../shared/types/alma-psicologia-dto';
 import { ETIQUETA_CANAL_INGRESO, ETIQUETA_ESTADO_ATENCION, ETIQUETA_ORIGEN_REMISION, ETIQUETA_TRIAJE } from '../../../shared/types/alma.types';
+import { DatosPersonaComponent } from '../../components/datos-persona/datos-persona.component';
 import { IntentosContactoComponent } from '../../components/intentos-contacto/intentos-contacto.component';
 import { PrimerContactoComponent } from '../../components/primer-contacto/primer-contacto.component';
 import { NotificacionesPsicologiaService } from '../../services/notificaciones-psicologia.service';
@@ -36,6 +37,7 @@ import { NovedadPsicologia, NovedadesPsicologiaService } from '../../services/no
     MatIconModule,
     AlertaGestionSimultaneaComponent,
     AuditTrailComponent,
+    DatosPersonaComponent,
     IntentosContactoComponent,
     NotasTimelineComponent,
     PanelDerivacionesComponent,
@@ -58,6 +60,8 @@ export class NovedadPage implements OnInit, ConCambiosPendientes {
   private readonly idAtencion = this.route.snapshot.paramMap.get('idAtencion') ?? '';
 
   protected readonly demo = Object.values(environment.lineaAlma.mocks).some(Boolean);
+  /** Campos y servicios que el backend real aún no admite (ver `environment.lineaAlma.extensiones`). */
+  protected readonly extensiones = environment.lineaAlma.extensiones;
   protected readonly etiquetaEstado = ETIQUETA_ESTADO_ATENCION;
   protected readonly etiquetaCanal = ETIQUETA_CANAL_INGRESO;
   protected readonly etiquetaOrigen = ETIQUETA_ORIGEN_REMISION;

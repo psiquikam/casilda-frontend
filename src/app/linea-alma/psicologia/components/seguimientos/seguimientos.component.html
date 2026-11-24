@@ -31,12 +31,25 @@
       <form class="seg__form" [formGroup]="form" (ngSubmit)="registrar()" novalidate aria-labelledby="seg-form-titulo">
         <h3 id="seg-form-titulo" class="seg__subtitulo">Control {{ contador().realizados + 1 }}</h3>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Nota del seguimiento</mat-label>
-          <textarea matInput id="seg-nota" formControlName="nota" rows="4" autocomplete="off"></textarea>
-          <mat-hint>Cómo está la persona, qué se trabajó y qué se acordó.</mat-hint>
-          @if (error('nota', 'La nota'); as e) { <mat-error>{{ e }}</mat-error> }
-        </mat-form-field>
+        <div class="spyb-campo">
+<app-etiqueta-campo texto="Nota del seguimiento" para="seg-nota" [obligatorio]="true" ayuda="Cómo está la persona, qué se trabajó y qué se acordó. Entre 5 y 3000 caracteres." />
+          <mat-form-field appearance="outline">
+            <textarea matInput id="seg-nota" formControlName="nota" rows="4" maxlength="3000" autocomplete="off"></textarea>
+            @if (error('nota', 'La nota'); as e) { <mat-error>{{ e }}</mat-error> }
+          </mat-form-field>
+        </div>
+
+        <div class="spyb-campo">
+<app-etiqueta-campo texto="Valoración del riesgo" para="seg-valoracionRiesgo" [obligatorio]="true" ayuda="Nivel de riesgo que valora Psicología en este seguimiento. No cambia el triaje que hizo APH." />
+          <mat-form-field appearance="outline">
+            <mat-select id="seg-valoracionRiesgo" formControlName="valoracionRiesgo" placeholder="Seleccione una opción">
+              @for (nivel of riesgos; track nivel) {
+                <mat-option [value]="nivel">{{ etiquetaRiesgo[nivel] }}</mat-option>
+              }
+            </mat-select>
+            @if (error('valoracionRiesgo', 'La valoración del riesgo'); as e) { <mat-error>{{ e }}</mat-error> }
+          </mat-form-field>
+        </div>
 
         <fieldset class="seg__fieldset">
           <legend>¿La persona desea continuar con el seguimiento?</legend>
@@ -82,6 +95,7 @@
             <span>{{ etiquetaTipo[s.tipo] }}</span>
             <span>{{ s.fecha | date: 'd MMM y, h:mm a' }}</span>
             <span>{{ s.autor }}</span>
+            @if (s.valoracionRiesgo; as riesgo) { <span>Riesgo: <strong>{{ etiquetaRiesgo[riesgo] }}</strong></span> }
           </p>
           <p class="seg__item-texto">{{ s.nota }}</p>
           <p class="seg__item-pie">

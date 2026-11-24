@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { AlmaApiClient } from '../../shared/http/alma-api.client';
+import { PersonaAtencionDto } from '../../shared/types/alma-dto';
 import {
   IntentoContactoCrearDto,
   IntentoContactoDto,
@@ -55,6 +56,14 @@ export class NovedadesPsicologiaService {
   /** Registra un intento (1–9). Devuelve la novedad completa: con el 9.º el servidor la cierra por «No contacto». */
   registrarIntento(idAtencion: string, cuerpo: IntentoContactoCrearDto): Observable<NovedadPsicologia> {
     return this.api.post<NovedadPsicologiaDto>(`/psicologia/novedades/${idAtencion}/intentos`, cuerpo).pipe(map(aNovedad));
+  }
+
+  /**
+   * `PATCH /psicologia/novedades/{id}/persona`: completa o corrige los datos de la persona. El servidor
+   * ignora nombres, apellidos y documento: identifican a la persona y no se editan aquí.
+   */
+  actualizarPersona(idAtencion: string, version: number, persona: Partial<PersonaAtencionDto>): Observable<NovedadPsicologia> {
+    return this.api.patch<NovedadPsicologiaDto>(`/psicologia/novedades/${idAtencion}/persona`, { version, persona }).pipe(map(aNovedad));
   }
 
   /** Primer contacto efectivo: consolida el caso y devuelve el `CAS-…` (RF-ALMA-PSI-003). */

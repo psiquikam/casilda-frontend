@@ -96,7 +96,7 @@ import { AtencionAph, AtencionesAphService } from '../../services/atenciones-aph
   `,
   styles: `
     .der { display: flex; flex-direction: column; gap: var(--space-4); }
-    .der__titulo { margin: 0; font-size: var(--font-size-xl); }
+    .der__titulo { margin: 0; font-size: 1.0625rem; color: var(--color-primary); }
     .der__pregunta { border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-2); }
     .der__pregunta legend { font-weight: 700; margin-bottom: var(--space-2); }
     .der__pregunta mat-radio-group { display: flex; flex-direction: column; }

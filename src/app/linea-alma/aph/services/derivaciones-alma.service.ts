@@ -2,11 +2,13 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AlmaApiClient } from '../../shared/http/alma-api.client';
 import {
+  DerivacionInternaCerrarDto,
   DerivacionInternaCrearDto,
   DerivacionInternaDto,
   RutaExternaActualizarDto,
   RutaExternaCrearDto,
-  RutaExternaDto
+  RutaExternaDto,
+  SeguimientoRemisionCrearDto
 } from '../../shared/types/alma-dto';
 import { ContextoAlma } from '../../shared/types/alma.types';
 
@@ -29,6 +31,20 @@ export class DerivacionesAlmaService {
 
   listarRutasExternas(contexto: ContextoAlma): Observable<RutaExternaDto[]> {
     return this.api.get<RutaExternaDto[]>('/rutas-externas', { tipoContexto: contexto.tipo, idContexto: contexto.id });
+  }
+
+  /** Cierra una derivación interna con su resultado (cerrarla no cierra la atención). */
+  cerrarInterna(idDerivacion: string, cuerpo: DerivacionInternaCerrarDto): Observable<DerivacionInternaDto> {
+    return this.api.patch<DerivacionInternaDto>(`/derivaciones/internas/${idDerivacion}`, cuerpo);
+  }
+
+  /** Novedad con fecha y hora sobre una derivación interna: se pueden agregar tantas como haga falta. */
+  agregarSeguimientoInterna(idDerivacion: string, cuerpo: SeguimientoRemisionCrearDto): Observable<DerivacionInternaDto> {
+    return this.api.post<DerivacionInternaDto>(`/derivaciones/internas/${idDerivacion}/seguimientos`, cuerpo);
+  }
+
+  agregarSeguimientoRuta(idRuta: string, cuerpo: SeguimientoRemisionCrearDto): Observable<RutaExternaDto> {
+    return this.api.post<RutaExternaDto>(`/rutas-externas/${idRuta}/seguimientos`, cuerpo);
   }
 
   actualizarRutaExterna(idRuta: string, cuerpo: RutaExternaActualizarDto): Observable<RutaExternaDto> {

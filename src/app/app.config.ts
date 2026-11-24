@@ -8,6 +8,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './services/auth.interceptor';
 import { loadingInterceptor } from './services/loading.interceptor';
 import { almaMockInterceptor } from './linea-alma/mocks/alma-mock.interceptor';
+import { almaContratoInterceptor } from './linea-alma/shared/http/alma-contrato.interceptor';
 import { spybMockInterceptor } from './seguridad-personas-bienes/mocks/spyb-mock.interceptor';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatPaginatorIntl } from '@angular/material/paginator';
@@ -23,7 +24,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideAnimationsAsync(),
-    provideHttpClient(withInterceptors([loadingInterceptor, almaMockInterceptor, spybMockInterceptor, authInterceptor])),
+    provideHttpClient(withInterceptors([loadingInterceptor, almaMockInterceptor, spybMockInterceptor, almaContratoInterceptor, authInterceptor])),
     { provide: LOCALE_ID, useValue: 'es-CO' },
     { provide: MAT_DATE_LOCALE, useValue: 'es-CO' },
     { provide: DateAdapter, useClass: CustomDateAdapter },

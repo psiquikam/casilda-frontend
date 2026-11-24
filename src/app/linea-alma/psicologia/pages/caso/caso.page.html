@@ -68,7 +68,7 @@
       </p>
     }
 
-    <section class="caso__bloque" aria-labelledby="caso-datos">
+    <section class="caso__bloque alma-tarjeta" aria-labelledby="caso-datos">
       <h2 id="caso-datos">Datos del caso</h2>
       <dl class="caso__datos">
         <div><dt>Apertura</dt><dd>{{ c.fechaApertura | date: 'd MMM y, h:mm a' }}</dd></div>
@@ -84,7 +84,7 @@
       </dl>
     </section>
 
-    <section class="caso__bloque" aria-labelledby="caso-riesgo">
+    <section class="caso__bloque alma-tarjeta" aria-labelledby="caso-riesgo">
       <h2 id="caso-riesgo">Riesgo</h2>
       <p class="caso__nota">Se conservan las dos valoraciones: la clínica de Psicología no modifica el triaje de APH (RN-ALMA-04).</p>
       <dl class="caso__datos">
@@ -105,7 +105,7 @@
       </dl>
     </section>
 
-    <section class="caso__bloque" aria-labelledby="caso-agresor">
+    <section class="caso__bloque alma-tarjeta" aria-labelledby="caso-agresor">
       <h2 id="caso-agresor">Presunto agresor</h2>
       @if (c.presuntoAgresor; as a) {
         <dl class="caso__datos">
@@ -120,7 +120,7 @@
       }
     </section>
 
-    <section class="caso__bloque" aria-labelledby="caso-atenciones">
+    <section class="caso__bloque alma-tarjeta" aria-labelledby="caso-atenciones">
       <h2 id="caso-atenciones">Atenciones APH vinculadas</h2>
       <div class="caso__tabla-contenedor">
         <table class="caso__tabla" aria-label="Atenciones APH vinculadas al caso">
@@ -152,21 +152,21 @@
       </div>
     </section>
 
-    <section class="caso__bloque" aria-labelledby="seg-titulo">
+    <section class="caso__bloque alma-tarjeta" aria-labelledby="seg-titulo">
       <app-seguimientos [caso]="c" [soloLectura]="!puedeEditar()" (actualizado)="actualizado($event)" (conflicto)="tras409()" (solicitarCierre)="puedeCerrar() && abrirCierre()" />
     </section>
 
-    <section class="caso__bloque" aria-labelledby="caso-notas">
+    <section class="caso__bloque alma-tarjeta" aria-labelledby="caso-notas">
       <h2 id="caso-notas">Línea de tiempo</h2>
       <app-notas-timeline [notas]="c.notas" [tiposVisibles]="tiposNota" />
     </section>
 
-    <section class="caso__bloque" aria-labelledby="caso-rutas">
+    <section class="caso__bloque alma-tarjeta" aria-labelledby="caso-rutas">
       <h2 id="caso-rutas" class="visually-hidden">Derivaciones y rutas del caso</h2>
-      <app-panel-derivaciones [contexto]="contexto()" [consentimiento]="c.consentimiento" [soloLectura]="!puedeEditar()" (cambio)="versionAuditoria.set(versionAuditoria() + 1)" />
+      <app-panel-derivaciones perfil="PSICOLOGIA" [contexto]="contexto()" [consentimiento]="c.consentimiento" [soloLectura]="!puedeEditar()" (cambio)="versionAuditoria.set(versionAuditoria() + 1)" />
     </section>
 
-    <section class="caso__bloque" aria-labelledby="audit-titulo">
+    <section class="caso__bloque alma-tarjeta" aria-labelledby="audit-titulo">
       <app-audit-trail [contexto]="contexto()" [version]="versionAuditoria()" />
     </section>
   }

@@ -1,8 +1,8 @@
-<div class="confirm-container">
+<div class="confirm-container" [class.confirm-container--precaucion]="data.tono === 'precaucion'">
 
   <div class="confirm-header">
-    <div class="icon-wrapper">
-      <mat-icon aria-hidden="true">warning</mat-icon>
+    <div class="icon-wrapper" aria-hidden="true">
+      <mat-icon>{{ data.icono || 'warning' }}</mat-icon>
     </div>
     <div class="title-group">
       <!-- mat-dialog-title enlaza el título con el diálogo (aria-labelledby). -->
@@ -16,15 +16,25 @@
   </div>
 
   <div class="confirm-actions">
-    <!-- El foco inicial va a «Cancelar»: la opción segura ante una acción destructiva. -->
-    <button mat-stroked-button type="button" cdkFocusInitial (click)="cancelar()">
-      {{ data.textoCancelar || 'Cancelar' }}
-    </button>
-
-    <button mat-flat-button type="button" color="warn" (click)="confirmar()">
-      <mat-icon aria-hidden="true">{{ data.iconoConfirmar || 'delete' }}</mat-icon>
-      {{ data.textoConfirmar || 'Eliminar' }}
-    </button>
+    @if (data.accionPrincipal === 'cancelar') {
+      <!-- La opción segura es la principal y la que recibe el foco. -->
+      <button mat-button type="button" class="confirm-actions__salir" (click)="confirmar()">
+        <mat-icon aria-hidden="true">{{ data.iconoConfirmar || 'delete' }}</mat-icon>
+        {{ data.textoConfirmar || 'Eliminar' }}
+      </button>
+      <button mat-flat-button type="button" color="primary" cdkFocusInitial (click)="cancelar()">
+        {{ data.textoCancelar || 'Cancelar' }}
+      </button>
+    } @else {
+      <!-- El foco inicial va a «Cancelar»: la opción segura ante una acción destructiva. -->
+      <button mat-stroked-button type="button" cdkFocusInitial (click)="cancelar()">
+        {{ data.textoCancelar || 'Cancelar' }}
+      </button>
+      <button mat-flat-button type="button" color="warn" (click)="confirmar()">
+        <mat-icon aria-hidden="true">{{ data.iconoConfirmar || 'delete' }}</mat-icon>
+        {{ data.textoConfirmar || 'Eliminar' }}
+      </button>
+    }
   </div>
 
 </div>

@@ -3,10 +3,13 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { SpybSoloLetrasDirective } from '../../../../seguridad-personas-bienes/shared/spyb-restricciones.directive';
+import { EtiquetaCampoComponent } from '../etiqueta-campo/etiqueta-campo.component';
 import { CatalogosAlmaService } from '../../catalogos/catalogos-alma.service';
 import { mensajeDeError } from '../../http/errores-servidor';
 import { ItemCatalogo } from '../../types/alma.types';
-import { CAMPOS_CARACTERIZACION, CampoCaracterizacion } from './caracterizacion-campos';
+import { environment } from '../../../../../environments/environment';
+import { CAMPOS_CARACTERIZACION, CAMPOS_SIN_BACKEND, CampoCaracterizacion } from './caracterizacion-campos';
 
 /**
  * `CaracterizacionForm` — variables sociodemográficas homologadas con Equipo de Atención
@@ -18,43 +21,42 @@ import { CAMPOS_CARACTERIZACION, CampoCaracterizacion } from './caracterizacion-
  */
 @Component({
   selector: 'app-caracterizacion-form',
-  imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatSelectModule],
+  imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, EtiquetaCampoComponent, SpybSoloLetrasDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="car" [formGroup]="grupo()">
+    <div class="spyb-grid" [formGroup]="grupo()">
       @for (campo of campos; track campo.control) {
-        <mat-form-field appearance="outline" class="car__campo">
-          <mat-label>{{ campo.etiqueta }}</mat-label>
-          @if (campo.tipo === 'catalogo') {
-            <mat-select [formControlName]="campo.control" [id]="prefijoId() + '-' + campo.control">
-              <mat-option value="">Sin dato</mat-option>
-              @for (item of opciones()[campo.catalogo!] ?? []; track item.codigo) {
-                <mat-option [value]="item.codigo">{{ item.etiqueta }}</mat-option>
-              }
-            </mat-select>
-          } @else {
-            <input
-              matInput
-              [formControlName]="campo.control"
-              [id]="prefijoId() + '-' + campo.control"
-              [type]="campo.tipo === 'correo' ? 'email' : campo.tipo === 'telefono' ? 'tel' : 'text'"
-              [attr.inputmode]="campo.tipo === 'telefono' ? 'tel' : null"
-              autocomplete="off"
-            />
-          }
-          @if (campo.ayuda) {
-            <mat-hint>{{ campo.ayuda }}</mat-hint>
-          }
-          @if (error(campo); as mensaje) {
-            <mat-error>{{ mensaje }}</mat-error>
-          }
-        </mat-form-field>
+        <div class="spyb-campo">
+          <app-etiqueta-campo [texto]="campo.etiqueta" [para]="prefijoId() + '-' + campo.control" [obligatorio]="campo.obligatorio" [ayuda]="campo.ayuda ?? ''" />
+          <mat-form-field appearance="outline">
+            @if (campo.tipo === 'catalogo') {
+              <mat-select [formControlName]="campo.control" [id]="prefijoId() + '-' + campo.control" placeholder="Seleccione una opción">
+                <mat-option [value]="null">Sin dato</mat-option>
+                @for (item of opciones()[campo.catalogo!] ?? []; track item.codigo) {
+                  <mat-option [value]="item.codigo">{{ item.etiqueta }}</mat-option>
+                }
+              </mat-select>
+            } @else if (campo.tipo === 'nombre') {
+              <input matInput appSoloLetras [formControlName]="campo.control" [id]="prefijoId() + '-' + campo.control" [maxlength]="campo.maxLength ?? 50" [placeholder]="campo.placeholder ?? ''" autocomplete="off" />
+            } @else {
+              <input
+                matInput
+                [formControlName]="campo.control"
+                [id]="prefijoId() + '-' + campo.control"
+                [type]="campo.tipo === 'correo' ? 'email' : campo.tipo === 'telefono' ? 'tel' : campo.tipo === 'fecha' ? 'date' : 'text'"
+                [attr.inputmode]="campo.tipo === 'telefono' ? 'tel' : null"
+                [attr.max]="campo.tipo === 'fecha' ? hoy : null"
+                [placeholder]="campo.placeholder ?? ''"
+                autocomplete="off"
+              />
+            }
+            @if (error(campo); as mensaje) {
+              <mat-error>{{ mensaje }}</mat-error>
+            }
+          </mat-form-field>
+        </div>
       }
     </div>
-  `,
-  styles: `
-    .car { display: grid; gap: var(--space-2) var(--space-4); grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-    .car__campo { width: 100%; }
   `
 })
 export class CaracterizacionFormComponent implements OnInit {
@@ -64,7 +66,10 @@ export class CaracterizacionFormComponent implements OnInit {
   /** Los `id` de los controles son `${prefijoId}-${control}`, para el resumen de errores. */
   readonly prefijoId = input('caracterizacion');
 
-  protected readonly campos = CAMPOS_CARACTERIZACION;
+  protected readonly campos = environment.lineaAlma.extensiones
+    ? CAMPOS_CARACTERIZACION
+    : CAMPOS_CARACTERIZACION.filter((c) => !CAMPOS_SIN_BACKEND.includes(c.control));
+  protected readonly hoy = new Date().toISOString().slice(0, 10);
   protected readonly opciones = signal<Record<string, ItemCatalogo[] | undefined>>({});
 
   ngOnInit(): void {

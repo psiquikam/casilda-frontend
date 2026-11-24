@@ -1,39 +1,81 @@
 <section class="panel" aria-labelledby="panel-der-titulo">
-  <h3 id="panel-der-titulo" class="panel__titulo">Rutas y derivaciones</h3>
+  <h3 id="panel-der-titulo" class="panel__titulo" [class.panel__titulo--bloque]="perfil() === 'PSICOLOGIA'" [class.visually-hidden]="!conTitulo()">Remisiones y rutas acordadas</h3>
 
   @if (cargando()) {
-    <p role="status" aria-busy="true">Cargando las rutas y derivaciones…</p>
+    <p role="status" aria-busy="true">Cargando las remisiones…</p>
   } @else if (errorCarga()) {
     <div class="casilda-alerta casilda-alerta--peligro" role="alert">
       <mat-icon aria-hidden="true">error_outline</mat-icon>
       <div>
-        <p>No pudimos cargar las rutas y derivaciones. Lo que ya registró no se perdió.</p>
+        <p>No pudimos cargar las remisiones. Lo que ya registró no se perdió.</p>
         <button type="button" class="boton boton--secundario" (click)="cargar()">Intentar de nuevo</button>
       </div>
     </div>
   } @else {
-    <!-- ───────── Rutas internas ───────── -->
+    <!-- ───────── Remisiones y/o rutas internas ───────── -->
     <div class="panel__bloque">
       <div class="panel__cabecera">
-        <h4>Rutas internas de la Universidad</h4>
+        <h4>Remisiones y/o rutas internas acordadas</h4>
         @if (!soloLectura() && formularioAbierto() !== 'interna') {
           <button type="button" class="boton boton--secundario" (click)="abrir('interna')">
-            <mat-icon aria-hidden="true">add</mat-icon> Derivar a una dependencia
+            <mat-icon aria-hidden="true">add</mat-icon> Agregar remisión interna
           </button>
         }
       </div>
 
       @if (internas().length === 0) {
-        <p class="panel__vacio">Todavía no se ha derivado a ninguna dependencia.</p>
+        <p class="panel__vacio">Todavía no se ha registrado ninguna remisión interna.</p>
       } @else {
         <ul class="panel__lista">
           @for (d of internas(); track d.idDerivacion) {
             <li class="panel__item">
               <strong>{{ etiquetaDestino(d.destino) }}</strong>
-              <span class="panel__meta">{{ d.fechaEnvio | date: 'd MMM y, h:mm a' }} · {{ d.estado === 'ENVIADA' ? 'Enviada' : d.estado === 'RECIBIDA' ? 'Recibida' : 'Rechazada' }}</span>
+              <span class="panel__meta">{{ (d.fechaEnvio ?? d.fechaRegistro) | date: 'd MMM y, h:mm a' }} · {{ etiquetaEstadoInterna(d.estado) }}</span>
               <span>{{ d.motivo }}</span>
+              @if (d.resultado) { <span><em>Resultado:</em> {{ d.resultado }}</span> }
               @if (d.peligroInminente) {
                 <span class="panel__etiqueta"><mat-icon aria-hidden="true">priority_high</mat-icon> Peligro inminente: se activó sin consentimiento previo</span>
+              }
+
+              @if (d.seguimientos?.length) {
+                <ul class="panel__novedades" [attr.aria-label]="'Novedades de la remisión a ' + etiquetaDestino(d.destino)">
+                  @for (n of d.seguimientos ?? []; track n.idSeguimiento) {
+                    <li>
+                      <span class="panel__meta">{{ n.fechaHora | date: 'd MMM y, h:mm a' }} · {{ n.autor }}</span>
+                      <span>{{ n.novedad }}</span>
+                    </li>
+                  }
+                </ul>
+              }
+
+              @if (extensiones && !soloLectura() && !sinDerivacion(d.destino) && d.estado !== 'CERRADA') {
+                @if (seguimientoAbierto() === d.idDerivacion) {
+                  <ng-container *ngTemplateOutlet="formularioNovedad; context: { tipo: 'interna', id: d.idDerivacion, nombre: etiquetaDestino(d.destino) }" />
+                } @else if (cierreInternaAbierto() === d.idDerivacion) {
+                  <form class="panel__form panel__form--ruta" [formGroup]="formCierreInterna" (ngSubmit)="guardarCierreInterna(d)" novalidate [attr.aria-label]="'Cerrar la derivación a ' + etiquetaDestino(d.destino)">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Resultado de la derivación</mat-label>
+                      <textarea matInput [id]="'cierre-' + d.idDerivacion" formControlName="resultado" rows="3" maxlength="500" placeholder="Ej: La dependencia contactó a la persona y programó una cita." autocomplete="off"></textarea>
+                      <mat-hint>Qué pasó con la derivación. Al cerrarla ya no se agregan novedades.</mat-hint>
+                      @if (formCierreInterna.controls.resultado.touched && formCierreInterna.controls.resultado.invalid) { <mat-error>Registre el resultado para cerrar la derivación.</mat-error> }
+                    </mat-form-field>
+                    <div class="panel__acciones">
+                      <button type="submit" class="boton boton--primario" [disabled]="enviando()">Cerrar derivación</button>
+                      <button type="button" class="boton boton--secundario" (click)="cancelarCierreInterna()">Cancelar</button>
+                    </div>
+                  </form>
+                } @else {
+                  <div class="panel__acciones panel__acciones--item">
+                    <button type="button" class="boton boton--secundario" (click)="abrirSeguimiento(d.idDerivacion)">
+                      <mat-icon aria-hidden="true">add</mat-icon> Agregar novedad
+                      <span class="visually-hidden">a la remisión {{ etiquetaDestino(d.destino) }}</span>
+                    </button>
+                    <button type="button" class="boton boton--secundario" (click)="abrirCierreInterna(d.idDerivacion)">
+                      <mat-icon aria-hidden="true">task_alt</mat-icon> Cerrar derivación
+                      <span class="visually-hidden">a {{ etiquetaDestino(d.destino) }}</span>
+                    </button>
+                  </div>
+                }
               }
             </li>
           }
@@ -41,20 +83,23 @@
       }
 
       @if (formularioAbierto() === 'interna') {
-        <form class="panel__form" [formGroup]="formInterna" (ngSubmit)="guardarInterna()" novalidate aria-label="Nueva derivación interna">
+        <form class="panel__form" [formGroup]="formInterna" (ngSubmit)="guardarInterna()" novalidate aria-label="Nueva remisión interna">
           <mat-form-field appearance="outline">
-            <mat-label>Dependencia</mat-label>
+            <mat-label>Instancia interna</mat-label>
             <mat-select formControlName="destino" id="der-destino">
               @for (d of destinos(); track d.codigo) {
                 <mat-option [value]="d.codigo">{{ d.etiqueta }}</mat-option>
               }
             </mat-select>
-            @if (error('interna', 'destino', 'la dependencia'); as e) { <mat-error>{{ e }}</mat-error> }
+            @if (bandejaDe(formInterna.controls.destino.value); as bandeja) {
+              <mat-hint>La remisión llega a la bandeja del módulo {{ bandeja }}.</mat-hint>
+            }
+            @if (error('interna', 'destino', 'la instancia interna'); as e) { <mat-error>{{ e }}</mat-error> }
           </mat-form-field>
           <mat-form-field appearance="outline">
-            <mat-label>Motivo de la derivación</mat-label>
+            <mat-label>Motivo de la remisión{{ sinDerivacion(formInterna.controls.destino.value) ? ' (opcional)' : '' }}</mat-label>
             <textarea matInput formControlName="motivo" id="der-motivo" rows="3" autocomplete="off"></textarea>
-            <mat-hint>Escriba solo lo necesario para que la dependencia pueda actuar.</mat-hint>
+            <mat-hint>Escriba solo lo necesario para que la instancia pueda actuar.</mat-hint>
             @if (error('interna', 'motivo', 'el motivo'); as e) { <mat-error>{{ e }}</mat-error> }
           </mat-form-field>
 
@@ -63,33 +108,33 @@
               Hay peligro inminente: activar sin esperar el consentimiento.
             </mat-checkbox>
           }
-          @if (!(formInterna.controls.peligro.value && admitePeligro(formInterna.controls.destino.value)) && !consentimiento()) {
+          @if (!sinDerivacion(formInterna.controls.destino.value) && !(formInterna.controls.peligro.value && admitePeligro(formInterna.controls.destino.value)) && !consentimiento()) {
             <app-consentimiento-informado [(valor)]="consentimientoLocal" />
           }
           @if (formInterna.touched && faltaConsentimiento(formInterna.controls.peligro.value, formInterna.controls.destino.value)) {
-            <p class="panel__aviso" role="alert">Falta registrar el consentimiento de la persona para esta derivación.</p>
+            <p class="panel__aviso" role="alert">Falta registrar el consentimiento de la persona para esta remisión.</p>
           }
           <div class="panel__acciones">
-            <button type="submit" class="boton boton--primario" [disabled]="enviando()">Registrar derivación</button>
+            <button type="submit" class="boton boton--primario" [disabled]="enviando()">Registrar remisión</button>
             <button type="button" class="boton boton--secundario" (click)="cancelar()">Cancelar</button>
           </div>
         </form>
       }
     </div>
 
-    <!-- ───────── Rutas externas ───────── -->
+    <!-- ───────── Remisiones y/o rutas externas ───────── -->
     <div class="panel__bloque">
       <div class="panel__cabecera">
-        <h4>Rutas externas</h4>
+        <h4>Remisiones y/o rutas externas acordadas</h4>
         @if (!soloLectura() && formularioAbierto() !== 'externa') {
           <button type="button" class="boton boton--secundario" (click)="abrir('externa')">
-            <mat-icon aria-hidden="true">add</mat-icon> Activar una ruta externa
+            <mat-icon aria-hidden="true">add</mat-icon> Agregar remisión externa
           </button>
         }
       </div>
 
       @if (externas().length === 0) {
-        <p class="panel__vacio">Todavía no se ha activado ninguna ruta externa.</p>
+        <p class="panel__vacio">Todavía no se ha registrado ninguna remisión externa.</p>
       } @else {
         <ul class="panel__lista">
           @for (r of externas(); track r.idRuta) {
@@ -102,9 +147,22 @@
                 <span class="panel__etiqueta"><mat-icon aria-hidden="true">priority_high</mat-icon> Peligro inminente: se activó sin consentimiento previo</span>
               }
 
-              @if (!soloLectura() && r.estado !== 'CERRADA') {
-                @if (rutaEnEdicion() === r.idRuta) {
-                  <form class="panel__form panel__form--ruta" [formGroup]="formRuta" (ngSubmit)="guardarRuta(r)" novalidate [attr.aria-label]="'Actualizar la ruta ' + etiquetaEntidad(r.entidad)">
+              @if (r.seguimientos?.length) {
+                <ul class="panel__novedades" [attr.aria-label]="'Novedades de la remisión a ' + etiquetaEntidad(r.entidad)">
+                  @for (n of r.seguimientos ?? []; track n.idSeguimiento) {
+                    <li>
+                      <span class="panel__meta">{{ n.fechaHora | date: 'd MMM y, h:mm a' }} · {{ n.autor }}</span>
+                      <span>{{ n.novedad }}</span>
+                    </li>
+                  }
+                </ul>
+              }
+
+              @if (!soloLectura() && r.estado !== 'CERRADA' && !sinDerivacion(r.entidad)) {
+                @if (seguimientoAbierto() === r.idRuta) {
+                  <ng-container *ngTemplateOutlet="formularioNovedad; context: { tipo: 'externa', id: r.idRuta, nombre: etiquetaEntidad(r.entidad) }" />
+                } @else if (rutaEnEdicion() === r.idRuta) {
+                  <form class="panel__form panel__form--ruta" [formGroup]="formRuta" (ngSubmit)="guardarRuta(r)" novalidate [attr.aria-label]="'Actualizar el estado de la ruta ' + etiquetaEntidad(r.entidad)">
                     <mat-form-field appearance="outline">
                       <mat-label>Estado</mat-label>
                       <mat-select formControlName="estado">
@@ -129,10 +187,18 @@
                     </div>
                   </form>
                 } @else {
-                  <button type="button" class="boton boton--secundario panel__editar" (click)="editarRuta(r)">
-                    Registrar seguimiento
-                    <span class="visually-hidden">de la ruta {{ etiquetaEntidad(r.entidad) }}</span>
-                  </button>
+                  <div class="panel__acciones">
+                    @if (extensiones) {
+                      <button type="button" class="boton boton--secundario panel__editar" (click)="abrirSeguimiento(r.idRuta)">
+                        <mat-icon aria-hidden="true">add</mat-icon> Agregar novedad
+                        <span class="visually-hidden">a la remisión {{ etiquetaEntidad(r.entidad) }}</span>
+                      </button>
+                    }
+                    <button type="button" class="boton boton--secundario panel__editar" (click)="editarRuta(r)">
+                      Actualizar estado
+                      <span class="visually-hidden">de la ruta {{ etiquetaEntidad(r.entidad) }}</span>
+                    </button>
+                  </div>
                 }
               }
             </li>
@@ -141,7 +207,7 @@
       }
 
       @if (formularioAbierto() === 'externa') {
-        <form class="panel__form" [formGroup]="formExterna" (ngSubmit)="guardarExterna()" novalidate aria-label="Nueva ruta externa">
+        <form class="panel__form" [formGroup]="formExterna" (ngSubmit)="guardarExterna()" novalidate aria-label="Nueva remisión externa">
           <mat-form-field appearance="outline">
             <mat-label>Entidad</mat-label>
             <mat-select formControlName="entidad" id="ext-entidad">
@@ -157,8 +223,9 @@
             @if (error('externa', 'fechaActivacion', 'la fecha'); as e) { <mat-error>{{ e }}</mat-error> }
           </mat-form-field>
           <mat-form-field appearance="outline">
-            <mat-label>Motivo de la activación</mat-label>
+            <mat-label>Motivo de la remisión{{ sinDerivacion(formExterna.controls.entidad.value) ? ' (opcional)' : '' }}</mat-label>
             <textarea matInput formControlName="motivo" id="ext-motivo" rows="3" autocomplete="off"></textarea>
+            <mat-hint>Si eligió «Otra», indique cuál entidad.</mat-hint>
             @if (error('externa', 'motivo', 'el motivo'); as e) { <mat-error>{{ e }}</mat-error> }
           </mat-form-field>
 
@@ -167,14 +234,14 @@
               Hay peligro inminente: activar sin esperar el consentimiento.
             </mat-checkbox>
           }
-          @if (!(formExterna.controls.peligro.value && admitePeligro(formExterna.controls.entidad.value)) && !consentimiento()) {
+          @if (!sinDerivacion(formExterna.controls.entidad.value) && !(formExterna.controls.peligro.value && admitePeligro(formExterna.controls.entidad.value)) && !consentimiento()) {
             <app-consentimiento-informado [(valor)]="consentimientoLocal" />
           }
           @if (formExterna.touched && faltaConsentimiento(formExterna.controls.peligro.value, formExterna.controls.entidad.value)) {
-            <p class="panel__aviso" role="alert">Falta registrar el consentimiento de la persona para esta ruta.</p>
+            <p class="panel__aviso" role="alert">Falta registrar el consentimiento de la persona para esta remisión.</p>
           }
           <div class="panel__acciones">
-            <button type="submit" class="boton boton--primario" [disabled]="enviando()">Registrar ruta</button>
+            <button type="submit" class="boton boton--primario" [disabled]="enviando()">Registrar remisión</button>
             <button type="button" class="boton boton--secundario" (click)="cancelar()">Cancelar</button>
           </div>
         </form>
@@ -182,3 +249,24 @@
     </div>
   }
 </section>
+
+<!-- Novedad de una remisión: la comparten las internas y las externas. -->
+<ng-template #formularioNovedad let-tipo="tipo" let-id="id" let-nombre="nombre">
+  <form class="panel__form panel__form--ruta" [formGroup]="formSeguimiento" (ngSubmit)="guardarSeguimiento(tipo, id)" novalidate [attr.aria-label]="'Nueva novedad de la remisión a ' + nombre">
+    <mat-form-field appearance="outline">
+      <mat-label>Fecha y hora de la novedad</mat-label>
+      <input matInput type="datetime-local" formControlName="fechaHora" [max]="ahoraMaximo()" />
+      @if (errorSeguimiento('fechaHora', 'la fecha y la hora'); as e) { <mat-error>{{ e }}</mat-error> }
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Novedad o actualización</mat-label>
+      <textarea matInput formControlName="novedad" rows="3" autocomplete="off"></textarea>
+      <mat-hint>Lo que la persona informó al comunicarse con ella para conocer cómo va la remisión.</mat-hint>
+      @if (errorSeguimiento('novedad', 'la novedad'); as e) { <mat-error>{{ e }}</mat-error> }
+    </mat-form-field>
+    <div class="panel__acciones">
+      <button type="submit" class="boton boton--primario" [disabled]="enviando()">Registrar novedad</button>
+      <button type="button" class="boton boton--secundario" (click)="cancelarSeguimiento()">Cancelar</button>
+    </div>
+  </form>
+</ng-template>

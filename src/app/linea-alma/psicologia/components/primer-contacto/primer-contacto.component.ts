@@ -15,7 +15,10 @@ import { ResumenErroresComponent } from '../../../../core/a11y/resumen-errores.c
 import { BorradorLocal, crearBorrador } from '../../../shared/borrador/borrador-local';
 import { CatalogosAlmaService } from '../../../shared/catalogos/catalogos-alma.service';
 import { CaracterizacionFormComponent } from '../../../shared/components/caracterizacion-form/caracterizacion-form.component';
-import { GrupoCaracterizacion, crearGrupoCaracterizacion } from '../../../shared/components/caracterizacion-form/caracterizacion-campos';
+import { GrupoCaracterizacion, construirPersona, crearGrupoCaracterizacion, unirNombre, valoresCaracterizacion } from '../../../shared/components/caracterizacion-form/caracterizacion-campos';
+import { EtiquetaCampoComponent } from '../../../shared/components/etiqueta-campo/etiqueta-campo.component';
+import { SpybSoloLetrasDirective } from '../../../../seguridad-personas-bienes/shared/spyb-restricciones.directive';
+import { REGEX_LETRAS } from '../../../../seguridad-personas-bienes/shared/spyb-validadores';
 import { ConsentimientoInformadoComponent } from '../../../shared/components/consentimiento-informado/consentimiento-informado.component';
 import { ErrorAlma } from '../../../shared/http/alma-error';
 import { aplicarErroresServidor, mensajeDeError } from '../../../shared/http/errores-servidor';
@@ -34,7 +37,7 @@ interface BorradorPrimerContacto {
   caracterizacion: Record<string, string>;
   valoracion: { nivel: RiesgoClinico | ''; descripcion: string };
   dimensiones: string[];
-  agresor: { nombres: string; apellidos: string; vinculo: string; convivencia: Convivencia; observaciones: string };
+  agresor: { primerNombre: string; segundoNombre: string; primerApellido: string; segundoApellido: string; vinculo: string; convivencia: Convivencia; observaciones: string };
   acuerdos: { acuerdos: string; proximoControl: string };
 }
 
@@ -77,6 +80,8 @@ const CAMPOS_CARACTERIZACION: DescripcionCampos = {
     MatSelectModule,
     MatStepperModule,
     CaracterizacionFormComponent,
+    EtiquetaCampoComponent,
+    SpybSoloLetrasDirective,
     ConsentimientoInformadoComponent,
     ResumenErroresComponent
   ],
@@ -121,8 +126,10 @@ export class PrimerContactoComponent implements OnInit {
   });
   protected readonly dimensiones = new FormControl<string[]>([], { nonNullable: true });
   protected readonly agresor = this.fb.nonNullable.group({
-    nombres: ['', Validators.maxLength(100)],
-    apellidos: ['', Validators.maxLength(100)],
+    primerNombre: ['', [Validators.maxLength(60), Validators.pattern(REGEX_LETRAS)]],
+    segundoNombre: ['', [Validators.maxLength(60), Validators.pattern(REGEX_LETRAS)]],
+    primerApellido: ['', [Validators.maxLength(60), Validators.pattern(REGEX_LETRAS)]],
+    segundoApellido: ['', [Validators.maxLength(60), Validators.pattern(REGEX_LETRAS)]],
     vinculo: [''],
     convivencia: ['' as Convivencia],
     observaciones: ['', Validators.maxLength(1000)]
@@ -310,20 +317,13 @@ export class PrimerContactoComponent implements OnInit {
     return {
       version: this.novedad().version,
       consentimiento: this.consentimiento()!,
-      persona: {
-        nombres: vacioNulo(car.nombres),
-        apellidos: vacioNulo(car.apellidos),
-        telefonoPrincipal: vacioNulo(car.telefonoPrincipal),
-        correoPersonal: vacioNulo(car.correoPersonal),
-        ciudad: vacioNulo(car.ciudad),
-        estrato: car.estrato ? Number(car.estrato) : null
-      },
+      persona: construirPersona(car),
       valoracionRiesgo: { nivel: val.nivel as RiesgoClinico, descripcion: val.descripcion.trim() },
       dimensiones: this.dimensiones.value,
       presuntoAgresor: agresorRelleno
         ? {
-            nombres: vacioNulo(agr.nombres),
-            apellidos: vacioNulo(agr.apellidos),
+            nombres: unirNombre(agr.primerNombre, agr.segundoNombre),
+            apellidos: unirNombre(agr.primerApellido, agr.segundoApellido),
             vinculo: vacioNulo(agr.vinculo),
             convivencia: agr.convivencia === 'SI' ? true : agr.convivencia === 'NO' ? false : null,
             observaciones: vacioNulo(agr.observaciones)
@@ -347,15 +347,7 @@ export class PrimerContactoComponent implements OnInit {
   }
 
   private prellenarCaracterizacion(): void {
-    const p = this.novedad().persona;
-    this.caracterizacion.patchValue({
-      nombres: p.nombres ?? '',
-      apellidos: p.apellidos ?? '',
-      telefonoPrincipal: p.telefonoPrincipal ?? '',
-      correoPersonal: p.correoPersonal ?? '',
-      ciudad: p.ciudad ?? '',
-      estrato: p.estrato === null ? '' : String(p.estrato)
-    });
+    this.caracterizacion.patchValue(valoresCaracterizacion(this.novedad().persona));
   }
 
   private restaurarBorrador(): void {
