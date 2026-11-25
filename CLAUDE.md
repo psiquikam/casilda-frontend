@@ -593,6 +593,17 @@ morado `#452C7B`, blanco y negro).
   se veía en pestañas claras; el morado solo no se ve en pestañas oscuras.
 - **No se agregaron** las variantes horizontal, isotipo suelto ni negro: no tienen uso hoy.
 
+### 2026-11-24 — Home: reseña de Casilda Cundumí Dembelé, correo de contacto y nota legal
+Rama `fix/07/20/casilda/ajustes-home-quien-era-casilda`.
+
+- **Botón «¿Quién era Casilda Cundumí Dembelé?»** en el hero de la portada. Abre `QuienEraCasildaDialogComponent`
+  (`src/app/components/quien-era-casilda-dialog/`) sobre `MatDialog`, con el texto entregado por producto.
+- **`environment.correoContacto`** (`notificacasilda.dbu@udea.edu.co`) reemplaza a `proyectocasilda@udea.edu.co`, que
+  estaba quemado en el pie público y en la recuperación de contraseña del login.
+- **Nota legal de la portada:** «Los reportes se tratan con confidencialidad…» (antes «Las denuncias»).
+- **Por confirmar con producto:** la reseña nombra el sistema «Sistema de Información y Vigilancia en Salud Pública…»;
+  el encabezado y el login dicen «Sistema de vigilancia en salud pública…».
+
 ### Pendiente
 0. **Línea Alma Psicología:** Backend debe revisar D-PSI-01…19 (entidad de la novedad antes del caso, `tomadaPorMi`,
    SLA, PDF síncrono, contención puntual); el equipo debe decidir qué roles se habilitan además de ADMIN

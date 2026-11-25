@@ -11,7 +11,7 @@
     }
     <li class="public-footer__item">
       <span class="public-footer__icono" aria-hidden="true"><mat-icon aria-hidden="true">mail_outline</mat-icon></span>
-      <a href="mailto:proyectocasilda&#64;udea.edu.co">proyectocasilda&#64;udea.edu.co</a>
+      <a [href]="'mailto:' + correoContacto">{{ correoContacto }}</a>
     </li>
     <li class="public-footer__item">
       <span class="public-footer__icono" aria-hidden="true"><mat-icon aria-hidden="true">language</mat-icon></span>

@@ -15,6 +15,9 @@ export class PublicFooterComponent {
   /** Teléfono de contacto del pie, servido por entorno (nunca quemado). */
   readonly telefonoContacto = environment.telefonoContactoPublico;
 
+  /** Correo de contacto del pie, servido por entorno. */
+  readonly correoContacto = environment.correoContacto;
+
   /**
    * El pie es la primera referencia de contacto para quien aún no inició
    * sesión: si el número no es real, no se muestra (mismo criterio que

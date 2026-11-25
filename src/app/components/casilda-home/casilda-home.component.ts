@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { environment } from '../../../environments/environment';
 import { CasildaCardComponent } from '../casilda-card/casilda-card.component';
+import { QuienEraCasildaDialogComponent } from '../quien-era-casilda-dialog/quien-era-casilda-dialog.component';
 import { esTelefonoPublicable } from '../../core/security/telefono-crisis';
 import { SECCIONES_CONTENIDO } from '../../core/contenidos/catalogo-contenidos';
 import { ContenidoDestacadoDto, ContenidoHomeService } from '../../services/contenido-home.service';
@@ -23,6 +25,7 @@ import { ContenidoDestacadoDto, ContenidoHomeService } from '../../services/cont
 })
 export class CasildaHomeComponent implements OnInit {
   private readonly contenidoHome = inject(ContenidoHomeService);
+  private readonly dialog = inject(MatDialog);
 
   readonly telefonoOrientacion = environment.telefonoOrientacion;
 
@@ -57,6 +60,16 @@ export class CasildaHomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarContenido();
+  }
+
+  /** Reseña de quien da nombre al sistema. El foco vuelve al botón al cerrar. */
+  abrirQuienEraCasilda(): void {
+    this.dialog.open(QuienEraCasildaDialogComponent, {
+      width: '640px',
+      maxWidth: '92vw',
+      autoFocus: 'dialog',
+      restoreFocus: true
+    });
   }
 
   cargarContenido(): void {

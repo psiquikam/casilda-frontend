@@ -8,6 +8,12 @@
       y con orientación en cada paso.
     </p>
 
+    <button type="button" class="boton boton--secundario hero__historia" aria-haspopup="dialog"
+      (click)="abrirQuienEraCasilda()">
+      <mat-icon aria-hidden="true">auto_stories</mat-icon>
+      ¿Quién era Casilda Cundumí Dembelé?
+    </button>
+
     @if (mostrarReporteAnonimo || hayLineaOrientacion) {
       <div class="hero__acciones">
         @if (mostrarReporteAnonimo) {
@@ -69,7 +75,7 @@
   }
 
   <p class="home__legal">
-    Las denuncias se tratan con confidencialidad y en cumplimiento de la ley de protección de datos
+    Los reportes se tratan con confidencialidad y en cumplimiento de la ley de protección de datos
     personales.
   </p>
 </div>
