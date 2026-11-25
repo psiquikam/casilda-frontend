@@ -3,7 +3,7 @@ import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 
 const CASILDA_ICONS = {
-  'logo-custom': 'assets/distintivo_casilda.svg',
+  'logo-custom': 'assets/casilda-emblema-blanco.svg',
   'logo-alma': 'assets/linea_alma.svg',
   'equipo-atencion': 'assets/equipo_atencion.svg',
   'uad-equipo': 'assets/uad_equipo_3_y_4.svg',
