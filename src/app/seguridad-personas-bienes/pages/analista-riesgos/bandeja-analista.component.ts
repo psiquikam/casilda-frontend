@@ -27,7 +27,6 @@ import { ModalSolicitarSubsanacionComponent } from '../../components/modal-solic
 import { ModalNuevaOrdenComponent } from '../../components/modal-nueva-orden.component';
 import { ModalSolicitudCamaraComponent } from '../../components/modal-solicitud-camara.component';
 import { ModalRemisionSpybComponent } from '../../components/modal-remision-spyb.component';
-import { environment } from '../../../../environments/environment';
 import {
   ConteosBandejaAnalista,
   OrdenAcompanamiento,
@@ -37,10 +36,13 @@ import {
   SolicitudEvidenciaCamara
 } from '../../models/spyb.models';
 
+import { SpybAvisoDemoComponent } from '../../shared/spyb-aviso-demo.component';
+
 @Component({
   selector: 'app-bandeja-analista',
   standalone: true,
   imports: [
+    SpybAvisoDemoComponent,
     CommonModule,
     RouterModule,
     FormsModule,
@@ -72,7 +74,6 @@ export class BandejaAnalistaComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
 
-  readonly demo = environment.seguridadPyB?.mocks ?? true;
 
   // Conteos reactivos mediante Signals
   conteos = signal<ConteosBandejaAnalista>({

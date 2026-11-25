@@ -232,6 +232,12 @@
                 <span class="nav-item__text">Central de monitoreo</span>
               </a>
             }
+            @if (auth.isAdmin() || auth.isSpbAnalista() || auth.isSpbCentral() || auth.isSpbCoordinacion()) {
+              <a routerLink="/seguridad/registro-solicitud" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
+                <mat-icon class="nav-item__icon" aria-hidden="true">support_agent</mat-icon>
+                <span class="nav-item__text">Registro de solicitud</span>
+              </a>
+            }
             @if (auth.isAdmin() || auth.isSpbVigilante() || auth.isSpbCentral() || auth.isSpbAnalista() || auth.isCoordinador()) {
               <a routerLink="/seguridad/reportar" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
                 <mat-icon class="nav-item__icon" aria-hidden="true">shield</mat-icon>

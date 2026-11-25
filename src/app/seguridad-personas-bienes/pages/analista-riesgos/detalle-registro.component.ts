@@ -17,10 +17,13 @@ import { ModalSolicitudCamaraComponent } from '../../components/modal-solicitud-
 import { ModalRemisionSpybComponent } from '../../components/modal-remision-spyb.component';
 import { RegistroSeguridad } from '../../models/spyb.models';
 
+import { SpybAvisoDemoComponent } from '../../shared/spyb-aviso-demo.component';
+
 @Component({
   selector: 'app-detalle-registro',
   standalone: true,
   imports: [
+    SpybAvisoDemoComponent,
     CommonModule,
     RouterModule,
     MatCardModule,

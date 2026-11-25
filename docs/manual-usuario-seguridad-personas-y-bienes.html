@@ -188,10 +188,10 @@
   <h1>Manual de usuario — Seguridad a personas y bienes (SPyB)</h1>
 <blockquote>
 <p><strong>Para quién es:</strong> personal de vigilancia y supervisores de campus, operadores de la Central de monitoreo (línea 219-64-19), analistas de riesgos, Coordinación de Seguridad a personas y bienes y Equipo CASILDA.
-<strong>Versión:</strong> 19 de noviembre de 2026 · <strong>Alcance:</strong> módulo completo de Seguridad a personas y bienes (<code>/seguridad/*</code>). Las pantallas se explican en el mismo orden del menú lateral.</p>
+<strong>Versión:</strong> 24 de noviembre de 2026 · <strong>Alcance:</strong> módulo completo de Seguridad a personas y bienes (<code>/seguridad/*</code>). Las pantallas se explican en el mismo orden del menú lateral.</p>
 </blockquote>
 <blockquote>
-<p>⚠️ <strong>Datos de demostración.</strong> Mientras Backend no publique los servicios del módulo, funciona con un servidor simulado y verá un aviso amarillo «Datos de demostración». <strong>Nada de lo que registre llega al sistema real</strong> y las personas que aparecen son ficticias.</p>
+<p>⚠️ <strong>Datos de demostración.</strong> Mientras Backend no publique los servicios del módulo, funciona con un servidor simulado y verá un aviso amarillo «Datos de demostración». <strong>Nada de lo que registre allí llega al sistema real</strong> y las personas que aparecen son ficticias.</p>
 </blockquote>
 <blockquote>
 <p>🔎 <strong>Cómo leer las capturas.</strong> Los <strong>círculos numerados</strong> de color naranja señalan dónde actuar. Cada captura va seguida de una tabla con el mismo número que dice qué hacer en ese punto.</p>
@@ -207,6 +207,7 @@
 <li><strong>Solicitar grabaciones de cámaras</strong> y seguir su cadena de custodia, sin guardar videos en CASILDA.</li>
 <li><strong>Remitir</strong> a Equipo de atención, Línea Alma, UAD o una entidad externa.</li>
 <li><strong>Ver indicadores</strong> de oportunidad, efectividad y vinculación.</li>
+<li><strong>Registrar solicitudes de acompañamiento</strong> de la Ruta Violeta (analista, Central y Coordinación).</li>
 </ol>
 <blockquote>
 <p>🔒 <strong>Privacidad: Persona ≠ Caso CASILDA ≠ Actuación de seguridad.</strong> El personal de vigilancia y los operadores de la Central <strong>nunca ven notas clínicas, relatos sensibles ni expedientes disciplinarios</strong>; solo lo necesario para actuar. <strong>Vincular una actuación a un caso es una decisión manual del analista</strong>, con justificación obligatoria: el sistema nunca vincula solo por coincidencia de cédula.</p>
@@ -281,6 +282,14 @@
 <td align="center">✅</td>
 </tr>
 <tr>
+<td>Registrar una solicitud de acompañamiento (sección 9)</td>
+<td align="center">—</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
+</tr>
+<tr>
 <td>Ejecutar una orden (enlace seguro)</td>
 <td align="center">✅</td>
 <td align="center">—</td>
@@ -294,7 +303,7 @@
 <h2>3. Cómo entrar</h2>
 <ol>
 <li>Inicie sesión en CASILDA con su cuenta institucional.</li>
-<li>En el menú lateral busque la sección <strong>Seguridad (SPyB)</strong>. Según su rol verá, <strong>en este orden</strong>: Bandeja del analista, Central de monitoreo, Reporte de vigilancia e Indicadores SPyB.</li>
+<li>En el menú lateral busque la sección <strong>Seguridad (SPyB)</strong>. Según su rol verá, <strong>en este orden</strong>: Bandeja del analista, Central de monitoreo, Registro de solicitud, Reporte de vigilancia e Indicadores SPyB.</li>
 <li>Los vigilantes que ejecutan una orden <strong>no navegan por el menú</strong>: reciben un enlace directo <code>/seguridad/orden/:token</code>.</li>
 </ol>
 <p><img src="manual-seguridad-personas-bienes/img/01-menu-spyb.png" alt="Captura 1. Menú lateral con la sección Seguridad (SPyB)"></p>
@@ -320,10 +329,14 @@
 </tr>
 <tr>
 <td align="center"><strong>4</strong></td>
-<td><strong>Reporte de vigilancia</strong> (<code>/seguridad/reportar</code>): formulario para quien está en campo.</td>
+<td><strong>Registro de solicitud</strong> (<code>/seguridad/registro-solicitud</code>): solicitud de acompañamiento de la Ruta Violeta.</td>
 </tr>
 <tr>
 <td align="center"><strong>5</strong></td>
+<td><strong>Reporte de vigilancia</strong> (<code>/seguridad/reportar</code>): formulario para quien está en campo.</td>
+</tr>
+<tr>
+<td align="center"><strong>6</strong></td>
 <td><strong>Indicadores SPyB</strong> (<code>/seguridad/indicadores</code>): tablero de métricas.</td>
 </tr>
 </tbody></table>
@@ -964,10 +977,91 @@
 <p><img src="manual-seguridad-personas-bienes/img/06-central-exito.png" alt="Captura 16. Actuación radicada con éxito"></p>
 <p><em>Captura 16. Aviso de actuación radicada con su consecutivo.</em></p>
 <hr>
-<h2>9. Reporte de vigilancia</h2>
+<h2>9. Registro de solicitud de acompañamiento</h2>
+<p><strong>Menú → Seguridad (SPyB) → Registro de solicitud.</strong> La usan el <strong>analista de riesgos</strong>, la <strong>Central de monitoreo</strong>, la <strong>Coordinación de Seguridad</strong> y Administración para dejar registrada una <strong>solicitud de acompañamiento</strong> de la Ruta Violeta. En pantalla se titula «Solicitud de acompañamiento» y pide la misma información que «Nueva solicitud» del Equipo de atención; cambia lo que se pide cuando el medio es <strong>Virtual</strong>.</p>
+<blockquote>
+<p>⚠️ <strong>En la demostración la solicitud no se envía al sistema real.</strong> Verá el aviso «Datos de demostración», un código <code>SOL-DEMO-…</code> y, al terminar, el canal y los datos del remitente que registró. La solicitud no queda disponible para consultarla después. La búsqueda por documento solo encuentra el <code>1000000000</code>.</p>
+</blockquote>
+<blockquote>
+<p>🚧 <strong>Para usarla con datos reales</strong> falta que Backend habilite los permisos de los roles de analista, Central y Coordinación, y que guarde el canal, los datos del remitente y las evidencias.</p>
+</blockquote>
+<p><strong>¿Solicitud, recepción o novedad?</strong> La <strong>recepción en la Central</strong> (8.2) y el <strong>reporte de vigilancia</strong> (10) crean una actuación de seguridad <code>SPB-AAAA-NNNNN</code>. El <strong>registro de solicitud</strong> crea una solicitud de acompañamiento <code>SOL-…</code> que atiende el Equipo de atención en su bandeja de reparto: <strong>no aparece en la bandeja del analista</strong>.</p>
+<h3>9.1. Medio y canal por el que llegó</h3>
+<p><img src="manual-seguridad-personas-bienes/img/24-registro-canal.png" alt="Captura 17. Canal virtual y datos del remitente"></p>
+<p><em>Captura 17. Solicitud virtual recibida por WhatsApp.</em></p>
+<table>
+<thead>
+<tr>
+<th align="center">#</th>
+<th>Qué hacer</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>1</strong></td>
+<td>Elija <strong>Solicitud directa</strong> (la persona pide el acompañamiento para sí) o <strong>indirecta</strong> (alguien informa por un tercero).</td>
+</tr>
+<tr>
+<td align="center"><strong>2</strong></td>
+<td>Indique el <strong>medio</strong>: Presencial o Virtual.</td>
+</tr>
+<tr>
+<td align="center"><strong>3</strong></td>
+<td>Solo si es <strong>Virtual</strong>: elija <strong>Correo electrónico</strong> o <strong>WhatsApp</strong>. Es obligatorio.</td>
+</tr>
+<tr>
+<td align="center"><strong>4</strong></td>
+<td><strong>Datos del remitente (opcional):</strong> correo de quien envió el mensaje.</td>
+</tr>
+<tr>
+<td align="center"><strong>5</strong></td>
+<td><strong>Teléfono</strong> de quien envió el mensaje, solo números (7 a 12 dígitos). Puede llenar uno, los dos o ninguno.</td>
+</tr>
+</tbody></table>
+<p>Si cambia el medio a <strong>Presencial</strong>, el canal y los datos del remitente se borran.</p>
+<blockquote>
+<p>ℹ️ Los <strong>datos del remitente</strong> son los de quien envió el correo o el mensaje. No reemplazan los correos y teléfonos de la persona solicitante, que siguen siendo obligatorios. En una solicitud <strong>indirecta</strong> hay además la pestaña <em>Información del remitente</em>, con los datos de la persona que reporta (nombre, cargo, campus y unidad).</p>
+</blockquote>
+<h3>9.2. Resto del formulario</h3>
+<p><img src="manual-seguridad-personas-bienes/img/25-registro-formulario.png" alt="Captura 18. Formulario de solicitud completo"></p>
+<p><em>Captura 18. Formulario completo de una solicitud directa.</em></p>
+<table>
+<thead>
+<tr>
+<th align="center">#</th>
+<th>Qué hacer</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><strong>1</strong></td>
+<td>Escriba el tipo y el número de documento. La <strong>lupa</strong> trae los datos si la persona ya está registrada. Son obligatorios el documento, el primer nombre, el primer apellido y la identidad de género.</td>
+</tr>
+<tr>
+<td align="center"><strong>2</strong></td>
+<td>Agregue <strong>al menos un correo y un teléfono</strong> de la persona solicitante con el botón <strong>+</strong>.</td>
+</tr>
+<tr>
+<td align="center"><strong>3</strong></td>
+<td><strong>Descripción de los hechos</strong> (obligatoria). El lugar de ocurrencia es opcional.</td>
+</tr>
+<tr>
+<td align="center"><strong>4</strong></td>
+<td><strong>Presunta persona agresora</strong> (opcional). Si hace parte de la comunidad universitaria, se pregunta si se desea que la UAD conozca el caso.</td>
+</tr>
+<tr>
+<td align="center"><strong>5</strong></td>
+<td><strong>Evidencias</strong> (opcional). Vea el estado actual más arriba.</td>
+</tr>
+<tr>
+<td align="center"><strong>6</strong></td>
+<td>Pulse <strong>Enviar solicitud</strong>. <strong>Limpiar</strong> borra todo el formulario y pide confirmación.</td>
+</tr>
+</tbody></table>
+<p>Si falta un dato, aparece arriba un resumen de errores: pulse cada uno para ir al campo. Al terminar verá «¡Solicitud creada!»; la Central vuelve a <strong>Central de monitoreo</strong>; el analista y la Coordinación, a la <strong>bandeja del analista</strong>.</p>
+<hr>
+<h2>10. Reporte de vigilancia</h2>
 <p><strong>Menú → Seguridad (SPyB) → Reporte de vigilancia</strong> («Reporte rápido de novedades en ronda»). Es el formulario corto para quien está en campo; compárelo con la Central en la sección 4.</p>
-<p><img src="manual-seguridad-personas-bienes/img/07-reporte-vigilancia.png" alt="Captura 17. Reporte de vigilancia"></p>
-<p><em>Captura 17. Formulario de reporte de vigilancia.</em></p>
+<p><img src="manual-seguridad-personas-bienes/img/07-reporte-vigilancia.png" alt="Captura 19. Reporte de vigilancia"></p>
+<p><em>Captura 19. Formulario de reporte de vigilancia.</em></p>
 <table>
 <thead>
 <tr>
@@ -997,10 +1091,10 @@
 </tr>
 </tbody></table>
 <hr>
-<h2>10. Indicadores SPyB</h2>
+<h2>11. Indicadores SPyB</h2>
 <p><strong>Menú → Seguridad (SPyB) → Indicadores SPyB</strong>, o el botón <strong>Tablero de indicadores</strong> de la bandeja. Permite a Coordinación evaluar la oportunidad y efectividad del componente de seguridad.</p>
-<p><img src="manual-seguridad-personas-bienes/img/23-indicadores.png" alt="Captura 18. Tablero de indicadores"></p>
-<p><em>Captura 18. Tablero de indicadores y trazabilidad.</em></p>
+<p><img src="manual-seguridad-personas-bienes/img/23-indicadores.png" alt="Captura 20. Tablero de indicadores"></p>
+<p><em>Captura 20. Tablero de indicadores y trazabilidad.</em></p>
 <table>
 <thead>
 <tr>
@@ -1022,10 +1116,10 @@
 </tr>
 </tbody></table>
 <hr>
-<h2>11. Ejecutar una orden de acompañamiento (vigilante)</h2>
+<h2>12. Ejecutar una orden de acompañamiento (vigilante)</h2>
 <p>Esta pantalla <strong>no está en el menú</strong>: el vigilante abre el <strong>enlace seguro</strong> que le envió el analista (o escanea su código QR).</p>
-<p><img src="manual-seguridad-personas-bienes/img/08-ejecutar-orden.png" alt="Captura 19. Ejecución de la orden"></p>
-<p><em>Captura 19. Pantalla del vigilante para ejecutar una orden.</em></p>
+<p><img src="manual-seguridad-personas-bienes/img/08-ejecutar-orden.png" alt="Captura 21. Ejecución de la orden"></p>
+<p><em>Captura 21. Pantalla del vigilante para ejecutar una orden.</em></p>
 <table>
 <thead>
 <tr>
@@ -1052,7 +1146,7 @@
 </tbody></table>
 <p>Al terminar, el sistema confirma «Acompañamiento documentado exitosamente» y la orden pasa a <em>Finalizada</em> en la bandeja del analista.</p>
 <hr>
-<h2>12. Cómo practicar con datos de demostración</h2>
+<h2>13. Cómo practicar con datos de demostración</h2>
 <p>Con el servidor simulado activo puede usar estos datos ficticios:</p>
 <table>
 <thead>
@@ -1086,6 +1180,7 @@
 <td>Pantalla del vigilante para ejecutar una orden.</td>
 </tr>
 </tbody></table>
+<p>En <strong>Registro de solicitud</strong> (sección 9) use el documento <code>1000000000</code> para probar la búsqueda.</p>
 <p>Para ver todas las pantallas, ingrese con una cuenta con rol <strong>Administrador</strong>. Estos datos existen solo con la configuración de desarrollo y <strong>nunca</strong> se activan en un entorno desplegado. Use <strong>Salida rápida</strong> (botón rojo, <code>Alt + Q</code> o doble <code>Esc</code>) si necesita cerrar la pantalla de inmediato.</p>
 
   <div class="footer">

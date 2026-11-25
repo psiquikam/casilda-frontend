@@ -18,10 +18,13 @@ import { OrdenAcompanamiento } from '../../models/spyb.models';
 import { CATALOGO_INCIDENTES_ACOMPANAMIENTO } from '../../models/spyb-catalogos';
 import { RegistrarInformeAcompanamientoRequest } from '../../models/spyb-dtos';
 
+import { SpybAvisoDemoComponent } from '../../shared/spyb-aviso-demo.component';
+
 @Component({
   selector: 'app-ejecutar-orden-vigilante',
   standalone: true,
   imports: [
+    SpybAvisoDemoComponent,
     MensajeErrorPipe, SpybSoloNumerosDirective, SpybSoloLetrasDirective,
     ReactiveFormsModule,
     MatCardModule,
