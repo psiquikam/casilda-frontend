@@ -36,7 +36,7 @@ export class LoginComponent {
   private readonly router = inject(Router);
 
   readonly loginForm: FormGroup;
-  readonly correoSoporte = 'proyectocasilda@udea.edu.co';
+  readonly correoSoporte = environment.correoContacto;
   /** Vacía fuera del modo de demostración: el bloque de acceso rápido no se muestra. */
   readonly mockUsersList: MockUserProfile[] = environment.datosDemostracion ? Object.values(MOCK_USERS) : [];
 

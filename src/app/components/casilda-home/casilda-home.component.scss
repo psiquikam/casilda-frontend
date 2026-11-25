@@ -30,6 +30,11 @@
   line-height: var(--line-height-relaxed);
 }
 
+/* El texto del botón es largo: en pantallas angostas debe poder partirse. */
+.hero__historia {
+  max-width: 100%;
+}
+
 .hero__acciones {
   display: flex;
   flex-wrap: wrap;
@@ -108,7 +113,8 @@
     gap: var(--space-6);
   }
 
-  .hero__acciones .boton {
+  .hero__acciones .boton,
+  .hero__historia {
     width: 100%;
   }
 }

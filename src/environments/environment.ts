@@ -17,6 +17,8 @@ export const environment = {
    * TODO(negocio): reemplazar por el contacto oficial del pie público.
    */
   telefonoContactoPublico: '',
+  /** Correo de contacto de CASILDA: pie público y recuperación de contraseña del login. */
+  correoContacto: 'notificacasilda.dbu@udea.edu.co',
   /**
    * Modo de demostración, para probar la interfaz sin backend. Activo:
    * cuentas de prueba (login rápido y selector de rol del encabezado), datos

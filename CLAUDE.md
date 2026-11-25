@@ -581,6 +581,30 @@ y contraste con el backend en `revision-backend-vs-front-2026-11-20.md` (§0.4 q
   `docs/manual-linea-alma/img/`, generadas con `node tools/capturar-pantallas-alma.mjs` (servidor en `:4200` y Chrome).
 - **Pendiente:** los formularios de Psicología (intentos, seguimientos, cierre) y el panel de remisiones aún usan etiqueta flotante, no el estilo SPyB.
 
+### 2026-11-24 — Emblema de Casilda en vector (reemplaza el distintivo anterior)
+Rama `fix/casilda-distintivo-completo`. Fuente: paquete de marca del equipo de producto (emblema, horizontal e isotipo en
+morado `#452C7B`, blanco y negro).
+
+- **`assets/casilda-emblema-blanco.svg`** es el ícono `logo-custom` (encabezado y panel del login, sobre el verde UdeA) y
+  **`assets/casilda-emblema-morado.svg`** es `IMAGEN_RESPALDO` de las tarjetas del home. Son los archivos oficiales, sin
+  modificar. Reemplazan a `distintivo_casilda.svg` y `distintivo_casilda_morado.svg`, que eran un PNG incrustado en un SVG.
+- **Tamaño mínimo:** el emblema lleva el nombre en arco y por debajo de 40 px no se lee. Encabezado 40–48 px (el alto del
+  encabezado no cambia), login 72 px, tarjeta 64 px.
+- **Favicon:** isotipo blanco sobre recuadro morado, con el trazo reforzado solo ahí. El anterior era blanco sin fondo y no
+  se veía en pestañas claras; el morado solo no se ve en pestañas oscuras.
+- **No se agregaron** las variantes horizontal, isotipo suelto ni negro: no tienen uso hoy.
+
+### 2026-11-24 — Home: reseña de Casilda Cundumí Dembelé, correo de contacto y nota legal
+Rama `fix/07/20/casilda/ajustes-home-quien-era-casilda`.
+
+- **Botón «¿Quién era Casilda Cundumí Dembelé?»** en el hero de la portada. Abre `QuienEraCasildaDialogComponent`
+  (`src/app/components/quien-era-casilda-dialog/`) sobre `MatDialog`, con el texto entregado por producto.
+- **`environment.correoContacto`** (`notificacasilda.dbu@udea.edu.co`) reemplaza a `proyectocasilda@udea.edu.co`, que
+  estaba quemado en el pie público y en la recuperación de contraseña del login.
+- **Nota legal de la portada:** «Los reportes se tratan con confidencialidad…» (antes «Las denuncias»).
+- **Por confirmar con producto:** la reseña nombra el sistema «Sistema de Información y Vigilancia en Salud Pública…»;
+  el encabezado y el login dicen «Sistema de vigilancia en salud pública…».
+
 ### 2026-11-24 — Registro de solicitud en Seguridad a personas y bienes
 `/seguridad/registro-solicitud` (`RegistroSolicitudSpybComponent`) es para `SPB_ANALISTA`, `SPB_CENTRAL`,
 `SPB_COORDINACION` y ADMIN. Es una **copia deliberada** de `FormularioAcompanamientoComponent`, que no se modifica: un arreglo en

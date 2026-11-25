@@ -1,10 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconTestingModule } from '@angular/material/icon/testing';
 import { of, throwError } from 'rxjs';
 
 import { CasildaHomeComponent } from './casilda-home.component';
+import { QuienEraCasildaDialogComponent } from '../quien-era-casilda-dialog/quien-era-casilda-dialog.component';
 import { ContenidoDestacadoDto, ContenidoHomeService } from '../../services/contenido-home.service';
 import { environment } from '../../../environments/environment';
 
@@ -73,6 +75,27 @@ describe('CasildaHomeComponent', () => {
     const titulos = fixture.nativeElement.querySelectorAll('h1');
     expect(titulos.length).toBe(1);
     expect(titulos[0].textContent).toContain('espacio seguro');
+  });
+
+  it('debe abrir la reseña de Casilda Cundumí Dembelé desde la portada', async () => {
+    await crearComponente();
+    const dialog = TestBed.inject(MatDialog);
+    spyOn(dialog, 'open');
+
+    const boton = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'))
+      .find((b) => b.textContent?.includes('¿Quién era Casilda Cundumí Dembelé?'));
+    boton?.click();
+
+    expect(boton).toBeDefined();
+    expect(dialog.open).toHaveBeenCalledWith(QuienEraCasildaDialogComponent, jasmine.objectContaining({ restoreFocus: true }));
+  });
+
+  it('debe hablar de reportes, no de denuncias, en la nota legal', async () => {
+    await crearComponente();
+    const legal = (fixture.nativeElement as HTMLElement).querySelector('.home__legal')?.textContent ?? '';
+
+    expect(legal).toContain('Los reportes se tratan con confidencialidad');
+    expect(legal).not.toContain('denuncias');
   });
 
   it('no debe ofrecer acceso público a la consulta de casos', async () => {

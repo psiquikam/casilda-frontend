@@ -12,7 +12,7 @@ describe('ContenidoHomeService', () => {
 
   const contenidoBase: ContenidoDestacadoDto = {
     id: 99,
-    imagen: 'assets/distintivo_casilda_morado.svg',
+    imagen: 'assets/casilda-emblema-morado.svg',
     titulo: 'Contenido de prueba',
     contenido: 'Descripción',
     vigenciaInicio: '2026-01-01T00:00:00Z',
