@@ -8,10 +8,13 @@ import { MatDividerModule } from '@angular/material/divider';
 import { SpybAnalistaService } from '../../services/spyb-analista.service';
 import { IndicadoresSpyb } from '../../models/spyb.models';
 
+import { SpybAvisoDemoComponent } from '../../shared/spyb-aviso-demo.component';
+
 @Component({
   selector: 'app-indicadores-spyb',
   standalone: true,
   imports: [
+    SpybAvisoDemoComponent,
     RouterModule,
     MatCardModule,
     MatButtonModule,

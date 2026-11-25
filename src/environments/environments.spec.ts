@@ -3,10 +3,11 @@ import { environment as produccion } from './environment.prod';
 
 /** Barreras de los entornos desplegables: producción nunca simula; demo solo cambia lo declarado. */
 describe('Entornos desplegables', () => {
-  it('producción usa el backend real para UAD y Línea Alma y no tiene datos de demostración', () => {
+  it('producción usa el backend real para UAD, Línea Alma y Seguridad y no tiene datos de demostración', () => {
     expect(produccion.uad.adaptador).toBe('http');
     expect(Object.values(produccion.lineaAlma.mocks).some(Boolean)).toBeFalse();
     expect(produccion.datosDemostracion).toBeFalse();
+    expect(Object.values(produccion.seguridadPyB.mocks).some(Boolean)).toBeFalse();
     // Lo que el backend real aún no admite no se muestra ni se envía.
     expect(produccion.lineaAlma.extensiones).toBeFalse();
     // Sin endpoint en el backend, un formulario público que falla no se publica.
@@ -14,11 +15,16 @@ describe('Entornos desplegables', () => {
     expect(produccion.features.uadMisReportes).toBeFalse();
   });
 
-  it('demo hereda de producción y solo simula UAD y Línea Alma', () => {
+  it('demo hereda de producción y solo simula UAD, Línea Alma y Seguridad', () => {
     expect(demo.uad.adaptador).toBe('mock');
     expect(demo.apiBaseUrl).toBe(produccion.apiBaseUrl);
     expect(demo.datosDemostracion).toBeFalse();
     expect(demo.features).toEqual({ ...produccion.features, uadQuejaAnonima: true, uadMisReportes: true });
+  });
+
+  it('demo enciende todos los grupos simulados de Seguridad a personas y bienes', () => {
+    expect(Object.keys(demo.seguridadPyB.mocks).sort()).toEqual(Object.keys(produccion.seguridadPyB.mocks).sort());
+    expect(Object.values(demo.seguridadPyB.mocks).every(Boolean)).toBeTrue();
   });
 
   it('demo enciende todos los grupos simulados de Línea Alma, también los que se agreguen', () => {

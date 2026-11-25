@@ -14,6 +14,7 @@
 |---|---|
 | `README.md` (este archivo) | Introducción, guía de navegación e inventario de artefactos técnicos de SPyB. |
 | [diseno-tecnico-y-contratos-backend-spyb.md](file:///D:/Documentos/GitHub/casilda-frontend/docs/contratos/seguridad-personas-bienes/diseno-tecnico-y-contratos-backend-spyb.md) | **Especificación completa y autosuficiente:** DDL PostgreSQL, mapeo JPA, roles y permisos, contratos de endpoints REST, reglas de negocio, catálogos, notificaciones y criterios de aceptación. |
+| [contrato-registro-solicitud-canal-virtual.md](contrato-registro-solicitud-canal-virtual.md) | **Registro de solicitud desde SPyB** (`/seguridad/registro-solicitud`): permisos de los roles, canal virtual y datos del remitente, y endpoint de evidencias faltante. |
 
 ---
 

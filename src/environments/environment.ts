@@ -76,7 +76,9 @@ export const environment = {
       ordenes: true,
       camaras: true,
       remisiones: true,
-      indicadores: true
+      indicadores: true,
+      // «Registro de solicitud» (`SpybSolicitudService`): búsqueda, radicación y evidencias.
+      solicitudes: true
     }
   },
   /**

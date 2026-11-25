@@ -34,6 +34,7 @@ Documentos de referencia, en orden de precedencia para decisiones de diseño:
 | `docs/contratos/contrato-reportar-caso.md` | Contrato con Backend para crear reportes desde `/reportar-caso` y el reporte anónimo. El §0 (2026-11-11) recoge el contrato v2 implementado (víctima, contacto, presunto agresor, evidencias multipart, maestros) y los pendientes P-REP-01…05. |
 | `docs/contratos/contrato-consultar-reporte.md` | Propuesta de `GET /reportes/{codigo}` para «Seguimiento de trámite». Hoy no existe ningún endpoint de consulta por código. |
 | `docs/contratos/linea-alma/` | Contratos para Backend de Línea Alma: APH (`README.md` con guía, plantilla y decisiones D-ALMA-01…13; atenciones/triaje/derivación; derivaciones, bandeja, contención y auditoría) y **Psicología** (`contrato-psicologia-bandeja-novedades.md`, `contrato-psicologia-casos-seguimientos-recontactos.md`, decisiones D-PSI-01…19). Plan: `docs/plan-implementacion-front-linea-alma.md`. |
+| `docs/contratos/seguridad-personas-bienes/` | Diseño técnico de SPyB y `contrato-registro-solicitud-canal-virtual.md`: lo que Backend necesita para `/seguridad/registro-solicitud` (permisos, canal virtual, evidencias). |
 | `docs/contratos/uad/` | Módulo UAD Equipos 3 y 4: `openapi-uad.yaml` (**fuente de verdad** de los contratos; cada operación lleva su `x-estado`: Entregas 1 y 2 ya implementadas en el backend), auditoría de ambos repos al 2026-11-14, matriz requisito→contrato y `DECISIONES_PENDIENTES_UAD.md` (D-UAD-01…32). |
 | `.claude/skills/contrato-backend/SKILL.md` | Skill para redactar contratos de API para Backend a partir del código del front. ⚠️ **Solo local**: misma regla `skills/` de `.gitignore` (ver pendiente 11). |
 
@@ -604,7 +605,18 @@ Rama `fix/07/20/casilda/ajustes-home-quien-era-casilda`.
 - **Por confirmar con producto:** la reseña nombra el sistema «Sistema de Información y Vigilancia en Salud Pública…»;
   el encabezado y el login dicen «Sistema de vigilancia en salud pública…».
 
+### 2026-11-24 — Registro de solicitud en Seguridad a personas y bienes
+`/seguridad/registro-solicitud` (`RegistroSolicitudSpybComponent`) es para `SPB_ANALISTA`, `SPB_CENTRAL`,
+`SPB_COORDINACION` y ADMIN. Es una **copia deliberada** de `FormularioAcompanamientoComponent`, que no se modifica: un arreglo en
+uno no llega al otro. En SPyB el medio virtual pide canal (correo o WhatsApp, obligatorio) y contacto del
+remitente (correo y teléfono, opcionales), y tras enviar se vuelve a la consola del rol. La radicación está **simulada** (`SpybSolicitudService`, `seguridadPyB.mocks.solicitudes`) en desarrollo y demo, y
+`environment.demo.ts` ahora simula todo SPyB (antes no). **Backend aún no guarda esos tres campos:** ver
+`docs/contratos/seguridad-personas-bienes/contrato-registro-solicitud-canal-virtual.md`.
+
 ### Pendiente
+18. **Registro de solicitud SPyB (2026-11-24):** Backend debe dar permisos a `SPB_ANALISTA`/`SPB_CENTRAL`/`SPB_COORDINACION`, guardar canal y
+    contacto virtual, y crear `POST /solicitudes/acompanamiento/{id}/evidencias`, **que hoy tampoco existe para el Equipo de
+    Atención** (revisado en `origin/main` del backend). Al resolverlo, actualizar el aviso «Estado actual» del manual de SPyB.
 0. **Línea Alma Psicología:** Backend debe revisar D-PSI-01…19 (entidad de la novedad antes del caso, `tomadaPorMi`,
    SLA, PDF síncrono, contención puntual); el equipo debe decidir qué roles se habilitan además de ADMIN
    (`ROLES_HABILITADOS_PSICOLOGIA`) y resolver la inconsistencia COORD (matriz §11 vs J-3.2); validar textos y

@@ -15,7 +15,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { environment } from '../../../../environments/environment';
 import { SpybRegistroService } from '../../services/spyb-registro.service';
 import { SpybConsecutivoBadgeComponent } from '../../components/spyb-consecutivo-badge.component';
 import { ModalNuevaOrdenComponent } from '../../components/modal-nueva-orden.component';
@@ -31,10 +30,13 @@ import { ListasService, MaestroDto } from '../../../services/listas.service';
 import { ControlDocumento, hoyLocal, textoRequerido, validadoresCorreo, validadoresNombre, validadoresTelefono } from '../../shared/spyb-validadores';
 import { CrearRegistroSeguridadRequest } from '../../models/spyb-dtos';
 
+import { SpybAvisoDemoComponent } from '../../shared/spyb-aviso-demo.component';
+
 @Component({
   selector: 'app-central-monitoreo',
   standalone: true,
   imports: [
+    SpybAvisoDemoComponent,
     MensajeErrorPipe, SpybSoloNumerosDirective, SpybSoloLetrasDirective,
     MatTooltipModule,
     FormsModule,
@@ -55,7 +57,6 @@ import { CrearRegistroSeguridadRequest } from '../../models/spyb-dtos';
   styleUrls: ['./central-monitoreo.component.scss']
 })
 export class CentralMonitoreoComponent {
-  readonly demo = environment.seguridadPyB?.mocks ?? true;
   @ViewChild(FormGroupDirective) private formDir?: FormGroupDirective;
 
   private readonly listasService = inject(ListasService);

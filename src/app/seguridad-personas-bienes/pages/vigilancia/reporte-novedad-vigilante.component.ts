@@ -22,10 +22,13 @@ import { ListasService, MaestroDto } from '../../../services/listas.service';
 import { ControlDocumento, textoRequerido, validadoresCedula, validadoresNombre, validadoresTelefono } from '../../shared/spyb-validadores';
 import { CrearRegistroSeguridadRequest } from '../../models/spyb-dtos';
 
+import { SpybAvisoDemoComponent } from '../../shared/spyb-aviso-demo.component';
+
 @Component({
   selector: 'app-reporte-novedad-vigilante',
   standalone: true,
   imports: [
+    SpybAvisoDemoComponent,
     MensajeErrorPipe, SpybSoloNumerosDirective, SpybSoloLetrasDirective,
     MatTooltipModule,
     ReactiveFormsModule,

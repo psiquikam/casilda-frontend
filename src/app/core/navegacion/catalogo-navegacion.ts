@@ -210,6 +210,14 @@ export const CATALOGO_MODULOS: readonly ModuloCasilda[] = [
     seccion: 'Seguridad (SPyB)'
   },
   {
+    id: 'spyb-solicitud',
+    nombre: 'Registro de solicitud',
+    icono: 'support_agent',
+    ruta: '/seguridad/registro-solicitud',
+    roles: ['ADMIN', 'SPB_ANALISTA', 'SPB_CENTRAL', 'SPB_COORDINACION'],
+    seccion: 'Seguridad (SPyB)'
+  },
+  {
     id: 'spyb-reportar',
     nombre: 'Reportar novedad SPyB',
     icono: 'notification_important',

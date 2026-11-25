@@ -14,6 +14,7 @@ import { environment as produccion } from './environment.prod';
  * - Línea Alma (APH y Psicología): todos los grupos del servidor simulado encendidos. El interceptor
  *   solo atiende `{apiBaseUrl}/alma/...`, así que no oculta endpoints reales del backend. Se generan
  *   a partir de las claves de producción: un grupo nuevo queda simulado sin tocar este archivo.
+ * - Seguridad a personas y bienes: todo simulado, incluido «Registro de solicitud».
  *
  * Se compila con `ng build --configuration production,demo` (`angular.json`). **Nunca** se usa en
  * el despliegue de producción: `npm run build` y `deploy:vercel` siguen usando `environment.prod.ts`.
@@ -24,8 +25,17 @@ const todosLosGruposSimulados = Object.fromEntries(
   Object.keys(produccion.lineaAlma.mocks).map((grupo) => [grupo, true])
 ) as { [K in keyof GruposMockAlma]: boolean };
 
+type GruposMockSeguridad = typeof produccion.seguridadPyB.mocks;
+
+const seguridadSimulada = Object.fromEntries(
+  Object.keys(produccion.seguridadPyB.mocks).map((grupo) => [grupo, true])
+) as { [K in keyof GruposMockSeguridad]: boolean };
+
 export const environment = {
   ...produccion,
+  seguridadPyB: {
+    mocks: seguridadSimulada
+  },
   lineaAlma: {
     ...produccion.lineaAlma,
     // Con el servidor simulado se muestran también los campos que el backend real aún no admite.

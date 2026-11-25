@@ -8,6 +8,14 @@ export const SEGURIDAD_ROUTES: Routes = [
     pathMatch: 'full'
   },
   {
+    path: 'registro-solicitud',
+    title: 'Registro de solicitud — SPyB',
+    canActivate: [roleGuard],
+    data: { roles: ['SPB_ANALISTA', 'SPB_CENTRAL', 'SPB_COORDINACION'] },
+    loadComponent: () =>
+      import('./pages/registro-solicitud/registro-solicitud-spyb.component').then((m) => m.RegistroSolicitudSpybComponent)
+  },
+  {
     path: 'central',
     title: 'Central de monitoreo — SPyB',
     canActivate: [roleGuard],

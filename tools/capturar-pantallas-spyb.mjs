@@ -65,6 +65,13 @@ const diligenciarCentral = [
   escribir('spyb-descripcionHechos', 'La persona informa que fue seguida por un sujeto desde la biblioteca hasta el bloque 22.')
 ];
 
+const diligenciarSolicitud = [
+  `document.querySelector('#acomp-tipoReporte input[value="directa"]')?.click()`,
+  `document.querySelector('#acomp-medioSolicitud input[value="virtual"]')?.click()`,
+  `document.querySelector('#acomp-canalVirtual input[value="WHATSAPP"]')?.click()`,
+  escribir('acomp-contactoVirtualTelefono', '3001234567')
+];
+
 /* ---------- Lista de capturas ---------- */
 // marcas: { n, campo | sel | texto(+tag) }
 const capturas = [
@@ -74,8 +81,9 @@ const capturas = [
       { n: 1, sel: '#toggle-seguridad' },
       { n: 2, texto: /Bandeja del analista/, tag: 'a' },
       { n: 3, texto: /Central de monitoreo/, tag: 'a' },
-      { n: 4, texto: /Reporte de vigilancia/, tag: 'a' },
-      { n: 5, texto: /Indicadores SPyB/, tag: 'a' }
+      { n: 4, texto: /Registro de solicitud/, tag: 'a' },
+      { n: 5, texto: /Reporte de vigilancia/, tag: 'a' },
+      { n: 6, texto: /Indicadores SPyB/, tag: 'a' }
     ]
   },
   {
@@ -243,6 +251,29 @@ const capturas = [
       { n: 1, texto: /Distribución por tipo de registro/, tag: 'mat-card-title' },
       { n: 2, texto: /Canal de recepción/, tag: 'mat-card-title' },
       { n: 3, texto: /Trazabilidad de la regla/, tag: 'mat-card-title' }
+    ]
+  },
+  {
+    archivo: '24-registro-canal.png', ruta: '/seguridad/registro-solicitud', ancho: 1440, alto: 880,
+    pasos: diligenciarSolicitud,
+    marcas: [
+      { n: 1, sel: '#acomp-tipoReporte' },
+      { n: 2, sel: '#acomp-medioSolicitud' },
+      { n: 3, sel: '#acomp-canalVirtual' },
+      { n: 4, sel: 'mat-form-field:has(#acomp-contactoVirtualCorreo)' },
+      { n: 5, sel: 'mat-form-field:has(#acomp-contactoVirtualTelefono)' }
+    ]
+  },
+  {
+    archivo: '25-registro-formulario.png', ruta: '/seguridad/registro-solicitud', ancho: 1440, alto: 1950,
+    pasos: diligenciarSolicitud,
+    marcas: [
+      { n: 1, sel: 'mat-form-field:has(#acomp-numeroDocumento)' },
+      { n: 2, sel: '.contacto-dual-grid' },
+      { n: 3, sel: '.description-section' },
+      { n: 4, sel: '.victimario-card-section h3' },
+      { n: 5, sel: '.evidencias-card-section .upload-zone' },
+      { n: 6, texto: /Enviar solicitud/, tag: 'button' }
     ]
   }
 ];
