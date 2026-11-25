@@ -580,6 +580,19 @@ y contraste con el backend en `revision-backend-vs-front-2026-11-20.md` (§0.4 q
   `docs/manual-linea-alma/img/`, generadas con `node tools/capturar-pantallas-alma.mjs` (servidor en `:4200` y Chrome).
 - **Pendiente:** los formularios de Psicología (intentos, seguimientos, cierre) y el panel de remisiones aún usan etiqueta flotante, no el estilo SPyB.
 
+### 2026-11-24 — Emblema de Casilda en vector (reemplaza el distintivo anterior)
+Rama `fix/casilda-distintivo-completo`. Fuente: paquete de marca del equipo de producto (emblema, horizontal e isotipo en
+morado `#452C7B`, blanco y negro).
+
+- **`assets/casilda-emblema-blanco.svg`** es el ícono `logo-custom` (encabezado y panel del login, sobre el verde UdeA) y
+  **`assets/casilda-emblema-morado.svg`** es `IMAGEN_RESPALDO` de las tarjetas del home. Son los archivos oficiales, sin
+  modificar. Reemplazan a `distintivo_casilda.svg` y `distintivo_casilda_morado.svg`, que eran un PNG incrustado en un SVG.
+- **Tamaño mínimo:** el emblema lleva el nombre en arco y por debajo de 40 px no se lee. Encabezado 40–48 px (el alto del
+  encabezado no cambia), login 72 px, tarjeta 64 px.
+- **Favicon:** isotipo blanco sobre recuadro morado, con el trazo reforzado solo ahí. El anterior era blanco sin fondo y no
+  se veía en pestañas claras; el morado solo no se ve en pestañas oscuras.
+- **No se agregaron** las variantes horizontal, isotipo suelto ni negro: no tienen uso hoy.
+
 ### Pendiente
 0. **Línea Alma Psicología:** Backend debe revisar D-PSI-01…19 (entidad de la novedad antes del caso, `tomadaPorMi`,
    SLA, PDF síncrono, contención puntual); el equipo debe decidir qué roles se habilitan además de ADMIN

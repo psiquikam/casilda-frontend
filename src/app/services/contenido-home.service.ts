@@ -103,7 +103,7 @@ const CONTENIDO_MOCK: readonly ContenidoDestacadoDto[] = [
   },
   {
     id: 7,
-    imagen: 'assets/distintivo_casilda_morado.svg',
+    imagen: 'assets/casilda-emblema-morado.svg',
     titulo: '¿Quién es CASILDA?',
     contenido: 'Es el sistema de vigilancia en salud pública de la UdeA para el abordaje de las discriminaciones y violencias basadas en género. Centraliza la información para prevenir, atender y proteger.',
     vigenciaInicio: '2026-01-01T00:00:00Z',
