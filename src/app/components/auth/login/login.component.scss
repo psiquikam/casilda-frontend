@@ -40,10 +40,16 @@
 
 .login__distintivo {
   /* El emblema lleva el nombre en arco: necesita más tamaño que un ícono. */
-  width: 72px;
-  height: 72px;
+  width: 80px;
+  height: 80px;
   color: var(--color-text-on-primary);
   flex-shrink: 0;
+
+  ::ng-deep svg path {
+    stroke: currentColor;
+    stroke-width: 0.5px;
+    stroke-linejoin: round;
+  }
 }
 
 .login__panel-titulo {
@@ -280,6 +286,7 @@
   }
 
   .login__marca { margin-top: var(--space-4); }
+  .login__distintivo { width: 72px; height: 72px; }
 
   .login__formulario { padding: var(--space-16) var(--space-5) var(--space-12); }
 }

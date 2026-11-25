@@ -587,8 +587,9 @@ morado `#452C7B`, blanco y negro).
 - **`assets/casilda-emblema-blanco.svg`** es el ícono `logo-custom` (encabezado y panel del login, sobre el verde UdeA) y
   **`assets/casilda-emblema-morado.svg`** es `IMAGEN_RESPALDO` de las tarjetas del home. Son los archivos oficiales, sin
   modificar. Reemplazan a `distintivo_casilda.svg` y `distintivo_casilda_morado.svg`, que eran un PNG incrustado en un SVG.
-- **Tamaño mínimo:** el emblema lleva el nombre en arco y por debajo de 40 px no se lee. Encabezado 40–48 px (el alto del
-  encabezado no cambia), login 72 px, tarjeta 64 px.
+- **Tamaño mínimo:** el emblema lleva el nombre en arco y por debajo de 40 px no se lee. Encabezado 40–52 px (el alto del
+  encabezado no cambia), login 80 px en escritorio y 72 px en móvil, tarjeta 64 px. En encabezado y login el trazo se
+  refuerza ligeramente con CSS, sin modificar los archivos oficiales.
 - **Favicon:** isotipo blanco sobre recuadro morado, con el trazo reforzado solo ahí. El anterior era blanco sin fondo y no
   se veía en pestañas claras; el morado solo no se ve en pestañas oscuras.
 - **No se agregaron** las variantes horizontal, isotipo suelto ni negro: no tienen uso hoy.
