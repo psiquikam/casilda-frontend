@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { MatDialog } from '@angular/material/dialog';
-import { of } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 
 import { SeccionApreciacionesComponent } from './seccion-apreciaciones.component';
 
@@ -51,5 +51,28 @@ describe('SeccionApreciacionesComponent', () => {
     expect(component.apreciacionesPsicologicas.length).toBe(1);
     expect(component.apreciacionesPsicologicas[0].descripcion).toBe('Dos');
     expect(component.apreciacionesPsicologicasChange.emit).toHaveBeenCalled();
+  });
+
+  it('ofrece un campo amplio en ambos formularios de apreciación', async () => {
+    const dialog = TestBed.inject(MatDialog);
+    for (const abrir of [
+      () => component.abrirModalApreciacionJuridica(),
+      () => component.abrirModalApreciacionPsicologica()
+    ]) {
+      abrir();
+      fixture.detectChanges();
+      const referencia = dialog.openDialogs[dialog.openDialogs.length - 1];
+      await firstValueFrom(referencia.afterOpened());
+      const contenido = document.querySelector<HTMLElement>('.mat-mdc-dialog-content');
+      const campo = contenido?.querySelector<HTMLElement>('mat-form-field');
+      const texto = campo?.querySelector<HTMLTextAreaElement>('textarea');
+      expect(campo).toBeTruthy();
+      expect(texto).toBeTruthy();
+      expect(campo!.getBoundingClientRect().width).toBeGreaterThan(contenido!.getBoundingClientRect().width * 0.8);
+      expect(texto!.getBoundingClientRect().height).toBeGreaterThanOrEqual(160);
+      const cerrado = firstValueFrom(referencia.afterClosed());
+      referencia.close();
+      await cerrado;
+    }
   });
 });

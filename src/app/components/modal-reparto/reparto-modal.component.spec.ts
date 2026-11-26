@@ -1,16 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 
 import { RepartoModalComponent } from './modal-reparto.component';
-import { SolicitudService } from '../../services/solicitud.service';
+import { SolicitudAcompanamientoResponse, SolicitudService } from '../../services/solicitud.service';
+import { DialogoService } from '../../core/a11y/dialogo.service';
 
 describe('RepartoModalComponent', () => {
   let component: RepartoModalComponent;
   let fixture: ComponentFixture<RepartoModalComponent>;
   let solicitudService: jasmine.SpyObj<SolicitudService>;
   let dialogRef: jasmine.SpyObj<MatDialogRef<RepartoModalComponent>>;
+  let dialogo: jasmine.SpyObj<DialogoService>;
 
   beforeEach(async () => {
     solicitudService = jasmine.createSpyObj<SolicitudService>('SolicitudService', [
@@ -34,6 +36,8 @@ describe('RepartoModalComponent', () => {
     ]));
     solicitudService.asignar.and.returnValue(of({ id: 4, tipoAsignacion: 'Prioritaria' } as any));
     dialogRef = jasmine.createSpyObj<MatDialogRef<RepartoModalComponent>>('MatDialogRef', ['close']);
+    dialogo = jasmine.createSpyObj<DialogoService>('DialogoService', ['aviso']);
+    dialogo.aviso.and.returnValue(of(undefined));
 
     await TestBed.configureTestingModule({
       imports: [RepartoModalComponent],
@@ -41,6 +45,7 @@ describe('RepartoModalComponent', () => {
         provideNoopAnimations(),
         { provide: SolicitudService, useValue: solicitudService },
         { provide: MatDialogRef, useValue: dialogRef },
+        { provide: DialogoService, useValue: dialogo },
         { provide: MAT_DIALOG_DATA, useValue: { id: 'SOL-4', solicitudId: 4 } }
       ]
     })
@@ -111,5 +116,30 @@ describe('RepartoModalComponent', () => {
       observaciones: 'Reparto priorizado por el equipo.'
     }));
     expect(dialogRef.close).toHaveBeenCalledWith(jasmine.objectContaining({ id: 4 }));
+  });
+
+  it('bloquea el cierre y evita duplicados mientras espera el correo; informa si falló', () => {
+    const respuesta = new Subject<SolicitudAcompanamientoResponse>();
+    solicitudService.asignar.and.returnValue(respuesta);
+    component.repartoForm.patchValue({
+      idTipoAsignacion: 1, idTipoServicio: 1, grupoProfesionalId: 7, observaciones: 'Reparto'
+    });
+
+    component.guardar();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.reparto-progreso')?.textContent).toContain('Procesando el reparto');
+    component.cerrar();
+    component.guardar();
+    expect(dialogRef.disableClose).toBeTrue();
+    expect(dialogRef.close).not.toHaveBeenCalled();
+    expect(solicitudService.asignar).toHaveBeenCalledTimes(1);
+
+    respuesta.next({ id: 4, estadoCorreoReparto: 'ERROR' } as SolicitudAcompanamientoResponse);
+    expect(dialogRef.disableClose).toBeFalse();
+    expect(dialogRef.close).toHaveBeenCalled();
+    expect(dialogo.aviso).toHaveBeenCalledWith(jasmine.objectContaining({
+      titulo: 'Reparto guardado',
+      mensaje: jasmine.stringMatching('no se pudo enviar')
+    }));
   });
 });

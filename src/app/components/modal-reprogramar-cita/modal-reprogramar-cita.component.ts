@@ -9,14 +9,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
 import { MaestroDto } from '../../services/listas.service';
+import { RegistroVbgDatosService } from '../../services/registro-vbg-datos.service';
 
 /**
  * Validador personalizado a nivel de FormGroup que verifica que la fecha y hora sean mayor o igual a la actual
  */
-export function futureDateTime(formGroup: AbstractControl): ValidationErrors | null {
+export function futureDateTime(formGroup: AbstractControl, permitirMinutoActual = false): ValidationErrors | null {
   if (!(formGroup instanceof FormGroup)) {
     return null;
   }
@@ -28,31 +27,51 @@ export function futureDateTime(formGroup: AbstractControl): ValidationErrors | n
     return null;
   }
 
-  try {
-    // Parsear la fecha seleccionada
-    const fechaStr = fechaControl.value;
-    const horaStr = horaControl.value;
-    
-    let selectedDateTime: Date;
-    if (typeof fechaStr === 'string') {
-      // Formato: YYYY-MM-DD
-      const [year, month, day] = fechaStr.split('-').map(Number);
-      const [hours, minutes] = horaStr.split(':').map(Number);
-      selectedDateTime = new Date(year, month - 1, day, hours, minutes, 0);
+  const fechaStr = fechaControl.value;
+  const horaStr = horaControl.value;
+  const horaMatch = typeof horaStr === 'string' ? horaStr.match(/^(\d{2}):(\d{2})$/) : null;
+  if (!horaMatch) {
+    return { invalidDateTime: { value: `${fechaStr} ${horaStr}` } };
+  }
+
+  const hours = Number(horaMatch[1]);
+  const minutes = Number(horaMatch[2]);
+  if (hours > 23 || minutes > 59) {
+    return { invalidDateTime: { value: `${fechaStr} ${horaStr}` } };
+  }
+
+  let year: number;
+  let month: number;
+  let day: number;
+  if (fechaStr instanceof Date) {
+    year = fechaStr.getFullYear();
+    month = fechaStr.getMonth() + 1;
+    day = fechaStr.getDate();
+  } else if (typeof fechaStr === 'string') {
+    const isoDate = fechaStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    const localDate = fechaStr.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (isoDate) {
+      year = Number(isoDate[1]);
+      month = Number(isoDate[2]);
+      day = Number(isoDate[3]);
+    } else if (localDate) {
+      year = Number(localDate[3]);
+      month = Number(localDate[2]);
+      day = Number(localDate[1]);
     } else {
-      // Es un objeto Date
-      const [hours, minutes] = horaStr.split(':').map(Number);
-      selectedDateTime = new Date(fechaStr);
-      selectedDateTime.setHours(hours, minutes, 0, 0);
+      return { invalidDateTime: { value: `${fechaStr} ${horaStr}` } };
     }
+  } else {
+    return { invalidDateTime: { value: `${fechaStr} ${horaStr}` } };
+  }
 
-    const now = new Date();
-
-    if (selectedDateTime < now) {
-      return { 'invalidDateTime': { value: `${fechaStr} ${horaStr}` } };
-    }
-  } catch (e) {
-    return null;
+  const selectedDateTime = new Date(year, month - 1, day, hours, minutes, 0, 0);
+  const limite = permitirMinutoActual ? Math.floor(Date.now() / 60000) * 60000 : Date.now();
+  if (selectedDateTime.getFullYear() !== year
+      || selectedDateTime.getMonth() !== month - 1
+      || selectedDateTime.getDate() !== day
+      || (permitirMinutoActual ? selectedDateTime.getTime() < limite : selectedDateTime.getTime() <= limite)) {
+    return { invalidDateTime: { value: `${fechaStr} ${horaStr}` } };
   }
 
   return null;
@@ -75,7 +94,7 @@ export class ReprogramarCitaModalComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient,
+    private readonly registroVbgDatos: RegistroVbgDatosService,
     private dialogRef: MatDialogRef<ReprogramarCitaModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { caso: any, accion: 'cancelar' | 'reprogramar' }
   ) {
@@ -99,11 +118,12 @@ export class ReprogramarCitaModalComponent implements OnInit {
       this.gestionForm.updateValueAndValidity();
     }
     if (this.data.caso && this.data.caso.fecha) {
+      const fechaCita = this.parseFechaCita(this.data.caso.fecha);
       this.gestionForm.patchValue({
-        fechaCita: this.data.caso.fecha
+        fechaCita
       });
     }
-    this.http.get<MaestroDto[]>(`${environment.apiBaseUrl}/maestros/motivos-estado-cita`).subscribe({
+    this.registroVbgDatos.listarMotivosEstadoCita().subscribe({
       next: (lista) => { this.motivos = lista; },
       error: () => { this.motivos = []; }
     });
@@ -125,6 +145,30 @@ export class ReprogramarCitaModalComponent implements OnInit {
     if (!fecha) return '';
     if (typeof fecha === 'string') return fecha;
     return new Date(fecha).toISOString().substring(0, 10);
+  }
+
+  private parseFechaCita(fecha: unknown): Date | null {
+    if (fecha instanceof Date) return fecha;
+    if (typeof fecha !== 'string') return null;
+
+    const isoDate = fecha.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    const localDate = fecha.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+    const match = isoDate
+      ? [isoDate[0], isoDate[1], isoDate[2], isoDate[3]]
+      : localDate
+        ? [localDate[0], localDate[3], localDate[2], localDate[1]]
+        : null;
+    if (!match) return null;
+
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+    const parsedDate = new Date(year, month - 1, day);
+    return parsedDate.getFullYear() === year
+      && parsedDate.getMonth() === month - 1
+      && parsedDate.getDate() === day
+      ? parsedDate
+      : null;
   }
 
   guardar() {

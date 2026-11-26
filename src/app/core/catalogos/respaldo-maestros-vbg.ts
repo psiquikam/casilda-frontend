@@ -149,7 +149,9 @@ export const RESPALDO_MAESTROS_VBG: Record<string, MaestroDto[]> = {
   ],
   'lugares-entrevista': [
     { id: 1, codigo: 'OFICINA', nombre: 'Oficina de Casilda' },
-    { id: 2, codigo: 'VIRTUAL-ENTREVISTA', nombre: 'Virtual' }
+    { id: 2, codigo: 'VIRTUAL-ENTREVISTA', nombre: 'Virtual' },
+    { id: 3, codigo: 'OTRO', nombre: 'Otro' },
+    { id: 4, codigo: 'BIENESTAR', nombre: 'Oficina de Bienestar Universitario' }
   ],
   // Modalidad de contacto del seguimiento; no la gobierna la matriz (es
   // distinta de la especialidad VBG-08-01..04, ver `00-diagnostico-y-plan.md`).

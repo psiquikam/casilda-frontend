@@ -11,6 +11,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MaestroDto } from '../../services/listas.service';
 import { MaestrosVbgService } from '../../services/maestros-vbg.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-modal-remisiones',
@@ -81,13 +82,19 @@ export class ModalSeguimientosComponent implements OnInit {
     this.data.actividad = '';
     this.actividades = [];
 
-    if (id == null || !item?.codigo) {
+    if (id == null || !item) {
       return;
     }
 
-    this.maestrosVbg.obtenerCatalogo(`acciones-seguimiento/padre/${item.codigo}`).subscribe({
-      next: (data) => { this.actividades = data; },
-      error: () => { this.actividades = []; }
+    const endpoint = environment.datosDemostracion && item.codigo
+      ? `acciones-seguimiento/padre/${item.codigo}`
+      : `actividades/por-accion/${id}`;
+    this.maestrosVbg.obtenerCatalogo(endpoint).subscribe({
+      next: (data) => {
+        if (this.data.idaccion === id) {
+          this.actividades = data;
+        }
+      }
     });
   }
 
@@ -130,7 +137,8 @@ export class ModalSeguimientosComponent implements OnInit {
       }
     });
 
-    this.maestrosVbg.obtenerCatalogo('acciones-seguimiento').subscribe({
+    const endpoint = environment.datosDemostracion ? 'acciones-seguimiento' : 'acciones';
+    this.maestrosVbg.obtenerCatalogo(endpoint).subscribe({
       next: (data) => { this.acciones = data; },
       error: () => { this.acciones = []; }
     });

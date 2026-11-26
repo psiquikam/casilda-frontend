@@ -133,43 +133,42 @@ export const routes: Routes = [
     title: 'Bandeja de contacto',
     canMatch: [featureCapabilityGuard],
     canActivate: [roleGuard],
-    data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR'], feature: 'assignmentsPrototype' },
+    data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL'], feature: 'assignmentsPrototype' },
     loadComponent: () => import('./components/gestion-contacto/gestion-contacto.component').then((m) => m.DetalleAcompanamientoComponent)
   },
   {
     path: 'detalle-acompanamiento/:id',
     title: 'Gestión de contacto',
     canActivate: [roleGuard],
-    data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR'] },
+    data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL'] },
     loadComponent: () => import('./components/gestion-contacto/gestion-contacto.component').then((m) => m.DetalleAcompanamientoComponent)
   },
   {
     path: 'consulta',
     title: 'Bandeja de reparto',
     canActivate: [roleGuard],
-    data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR'] },
+    data: { roles: ['ADMIN', 'COORDINADOR'] },
     loadComponent: () => import('./components/consulta/consulta.component').then((m) => m.ConsultaComponent)
   },
   {
     path: 'registro-caso',
-    title: 'Registro de caso',
+    pathMatch: 'full',
+    title: 'Registrar primera atención',
     canActivate: [roleGuard],
     data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL'] },
     loadComponent: () => import('./components/registro-caso/registro-caso.component').then((m) => m.RegistroCasoComponent)
   },
   {
     path: 'caso',
-    title: 'Casos',
-    canActivate: [roleGuard],
-    data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL'] },
-    loadComponent: () => import('./components/caso/caso.component').then((m) => m.CasoComponent)
+    pathMatch: 'full',
+    redirectTo: 'registro-atencion'
   },
   {
     path: 'registro-atencion',
-    title: 'Registro de atención',
+    title: 'Casos',
     canActivate: [roleGuard],
-    data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL'] },
-    loadComponent: () => import('./components/registro-atencion/registro-atencion.component').then((m) => m.RegistroAtencionComponent)
+    data: { roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR'] },
+    loadComponent: () => import('./components/equipo-atencion-casos/casos-equipo.component').then((m) => m.CasosEquipoComponent)
   },
   {
     path: 'cita',

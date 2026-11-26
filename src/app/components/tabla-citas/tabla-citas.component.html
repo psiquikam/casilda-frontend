@@ -70,6 +70,13 @@
           <td mat-cell *matCellDef="let element">{{element.fecha}}</td>
         </ng-container>
 
+        <ng-container matColumnDef="estadoCita">
+          <th mat-header-cell scope="col" *matHeaderCellDef>Estado de cita</th>
+          <td mat-cell *matCellDef="let element">
+            <span class="badge-soft">{{element.estadoCita}}</span>
+          </td>
+        </ng-container>
+
         <ng-container matColumnDef="tipoAsignacion">
           <th mat-header-cell scope="col" *matHeaderCellDef>
             <div class="header-inline-container">
@@ -107,9 +114,13 @@
           </th>
           <td mat-cell *matCellDef="let element">
             <div class="action-buttons-container">
-              <button mat-icon-button [attr.aria-label]="'Iniciar la atención de la cita ' + element.id" class="action-success"
+              <button mat-stroked-button color="primary"
+                [disabled]="element.idEstadoCita !== 4 || (element.casoId !== null && element.casoId !== undefined)"
+                [matTooltip]="element.casoId !== null && element.casoId !== undefined ? 'El caso ya existe; registre el seguimiento desde Casos' : element.idEstadoCita === 4 ? 'Registrar los datos de la primera atención' : 'Disponible cuando la cita se marque como atendida'"
+                [attr.aria-label]="(element.casoId !== null && element.casoId !== undefined ? 'Caso ya registrado para la cita ' : 'Registrar caso para la cita ') + element.id"
                 (click)="iniciarAtencion(element); $event.stopPropagation()">
-                <mat-icon aria-hidden="true">play_circle_outline</mat-icon>
+                <mat-icon aria-hidden="true">post_add</mat-icon>
+                Registrar caso
               </button>
             </div>
           </td>

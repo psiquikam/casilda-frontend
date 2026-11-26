@@ -6,18 +6,9 @@
 <mat-dialog-content class="modal-content">
   <div class="form-row">
 
-    <mat-form-field appearance="outline" class="field-tipo">
-      <mat-label>Tipo</mat-label>
-      <mat-select [ngModel]="selectedTipoId" (ngModelChange)="onTipoChange($event)">
-        @for (tipo of tiposDiscapacidad; track tipo.id) {
-          <mat-option [value]="tipo.id">{{ tipo.nombre }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
     <mat-form-field appearance="outline" class="field-subtipo">
-      <mat-label>Subtipo</mat-label>
-      <mat-select [ngModel]="selectedSubTipoId" (ngModelChange)="onSubTipoChange($event)" [disabled]="!selectedTipoId">
+      <mat-label>Discapacidad</mat-label>
+      <mat-select [ngModel]="selectedSubTipoId" (ngModelChange)="onSubTipoChange($event)" [disabled]="!subTiposDiscapacidad.length">
         @for (subtipo of subTiposDiscapacidad; track subtipo.id) {
           <mat-option [value]="subtipo.id">{{ subtipo.nombre }}</mat-option>
         }
@@ -25,8 +16,8 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="field-desc">
-      <mat-label>Descripción / detalle</mat-label>
-      <input matInput [(ngModel)]="data.descripcion" placeholder="Detalle breve">
+      <mat-label>Observaciones (opcional)</mat-label>
+      <input matInput [(ngModel)]="data.descripcion" placeholder="Detalle adicional">
     </mat-form-field>
 
   </div>
@@ -36,7 +27,7 @@
   <button mat-button (click)="onNoClick()">Cancelar</button>
   <button mat-flat-button class="btn-confirm"
           [mat-dialog-close]="data"
-          [disabled]="!data.tipo || !data.descripcion">
+          [disabled]="!selectedSubTipoId">
     <mat-icon aria-hidden="true">check</mat-icon> Agregar
   </button>
 </mat-dialog-actions>

@@ -17,7 +17,7 @@
     </div>
 
     @if (porEspecialidad(esp.nombre).length === 0) {
-      <p class="seguimiento-grupo__vacio">Sin seguimientos registrados en {{ esp.nombre }}.</p>
+      <p class="seguimiento-grupo__vacio">Sin seguimientos agregados en este formulario para {{ esp.nombre }}.</p>
     } @else {
       <ul class="seguimiento-lista">
         @for (s of porEspecialidad(esp.nombre); track s) {
@@ -71,4 +71,6 @@
       </ul>
     }
   </div>
+} @empty {
+  <p>No hay especialidades de seguimiento disponibles.</p>
 }

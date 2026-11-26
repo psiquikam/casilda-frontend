@@ -64,8 +64,8 @@
       </a>
     }
 
-    <!-- 2. Equipo de Atención (Admin, Coordinador y Profesional) -->
-    @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional()) {
+    <!-- 2. Equipo de Atención (Admin, Coordinador, Profesional y Revisor) -->
+    @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional() || auth.isRevisor()) {
       <button type="button" class="hnav-dropdown-btn" [matMenuTriggerFor]="atencionMenu"
         aria-label="Abrir menú del Equipo de Atención">
         <mat-icon class="hnav-icon" aria-hidden="true">volunteer_activism</mat-icon>
@@ -78,27 +78,25 @@
           <mat-icon aria-hidden="true">add_circle_outline</mat-icon>
           <span>Nueva solicitud</span>
         </a>
-        <a mat-menu-item routerLink="/consulta" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
-          <mat-icon aria-hidden="true">move_to_inbox</mat-icon>
-          <span>Bandeja de reparto</span>
-        </a>
-        @if (features.assignmentsPrototype) {
+        @if (auth.puedeRepartirSolicitudes()) {
+          <a mat-menu-item routerLink="/consulta" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
+            <mat-icon aria-hidden="true">move_to_inbox</mat-icon>
+            <span>Bandeja de reparto</span>
+          </a>
+        }
+        @if (features.assignmentsPrototype && auth.hasAnyRole(['ADMIN', 'COORDINADOR', 'PROFESIONAL'])) {
           <a mat-menu-item routerLink="/mis-asignaciones" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
             <mat-icon aria-hidden="true">assignment_ind</mat-icon>
-          <span>Bandeja de contacto</span>
+            <span>Bandeja de contacto</span>
           </a>
         }
         <a mat-menu-item routerLink="/cita" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
           <mat-icon aria-hidden="true">calendar_month</mat-icon>
           <span>Citas y agendamiento</span>
         </a>
-        <a mat-menu-item routerLink="/registro-caso" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
-          <mat-icon aria-hidden="true">folder_shared</mat-icon>
-          <span>Registro de caso</span>
-        </a>
         <a mat-menu-item routerLink="/registro-atencion" routerLinkActive="hnav-menu-item--active" ariaCurrentWhenActive="page">
-          <mat-icon aria-hidden="true">handshake</mat-icon>
-          <span>Registro de atención</span>
+          <mat-icon aria-hidden="true">folder_open</mat-icon>
+          <span>Casos</span>
         </a>
       </mat-menu>
     }
@@ -316,7 +314,7 @@
       }
 
       <!-- 2. EQUIPO DE ATENCIÓN (Admin, Coordinador y Profesional) -->
-      @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional()) {
+      @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional() || auth.isRevisor()) {
         <div class="hnav-mobile-group">
           <button type="button" class="hnav-mobile-group-header" (click)="toggleSection('atencion')"
             [attr.aria-expanded]="isSectionExpanded('atencion')">
@@ -336,16 +334,18 @@
                 <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">add_circle_outline</mat-icon>
                 <span class="hnav-mobile-item__text">Nueva solicitud</span>
               </a>
-              <a routerLink="/consulta" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
-                class="hnav-mobile-item" (click)="closeMobileMenu()">
-                <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">move_to_inbox</mat-icon>
-                <span class="hnav-mobile-item__text">Bandeja de reparto</span>
-              </a>
-              @if (features.assignmentsPrototype) {
+              @if (auth.puedeRepartirSolicitudes()) {
+                <a routerLink="/consulta" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
+                  class="hnav-mobile-item" (click)="closeMobileMenu()">
+                  <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">move_to_inbox</mat-icon>
+                  <span class="hnav-mobile-item__text">Bandeja de reparto</span>
+                </a>
+              }
+              @if (features.assignmentsPrototype && auth.hasAnyRole(['ADMIN', 'COORDINADOR', 'PROFESIONAL'])) {
                 <a routerLink="/mis-asignaciones" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
                   class="hnav-mobile-item" (click)="closeMobileMenu()">
                   <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">assignment_ind</mat-icon>
-                <span class="hnav-mobile-item__text">Bandeja de contacto</span>
+                  <span class="hnav-mobile-item__text">Bandeja de contacto</span>
                 </a>
               }
               <a routerLink="/cita" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
@@ -353,15 +353,10 @@
                 <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">calendar_month</mat-icon>
                 <span class="hnav-mobile-item__text">Citas y agendamiento</span>
               </a>
-              <a routerLink="/registro-caso" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
-                class="hnav-mobile-item" (click)="closeMobileMenu()">
-                <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">folder_shared</mat-icon>
-                <span class="hnav-mobile-item__text">Registro de caso</span>
-              </a>
               <a routerLink="/registro-atencion" routerLinkActive="hnav-mobile-item--active" ariaCurrentWhenActive="page"
                 class="hnav-mobile-item" (click)="closeMobileMenu()">
-                <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">handshake</mat-icon>
-                <span class="hnav-mobile-item__text">Registro de atención</span>
+                <mat-icon class="hnav-mobile-item__icon" aria-hidden="true">folder_open</mat-icon>
+                <span class="hnav-mobile-item__text">Casos</span>
               </a>
             </div>
           }

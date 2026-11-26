@@ -1,23 +1,45 @@
-@if (datosDemostracion) {
-  <!-- DSH-12-08: los catálogos y los casos de este módulo son simulados
-       mientras el modo de demostración esté activo. -->
-  <p class="franja-demo" role="status">
-    <mat-icon aria-hidden="true">science</mat-icon>
-    <span>Datos de demostración. Los casos mostrados y los cambios realizados sobre ellos son simulados.</span>
-  </p>
-}
-
 @if (!modoAtencion) {
   <div class="cita-container animate-fade-in">
     <div class="section-header">
-      <h1>Consulta de casos</h1>
-      <span class="subtitle">
-        Gestión de atenciones
-      </span>
+      <h1>Casos</h1>
+      <span class="subtitle">Los casos aparecen aquí después de registrar su primera atención y asignarles un código.</span>
     </div>
+    <section class="filtros-casos" aria-label="Filtros de casos">
+      <div class="filtro-grupo" role="group" aria-label="Filtrar por etapa de atención">
+        <span class="filtro-titulo">Etapa</span>
+        <button type="button" [class.activo]="filterValues.etapa === 'todos'"
+          [attr.aria-pressed]="filterValues.etapa === 'todos'" (click)="cambiarFiltroEtapa('todos')">Todos</button>
+        <button type="button" [class.activo]="filterValues.etapa === 'seguimiento'"
+          [attr.aria-pressed]="filterValues.etapa === 'seguimiento'" (click)="cambiarFiltroEtapa('seguimiento')">
+          En seguimiento
+        </button>
+      </div>
+      <div class="filtro-grupo" role="group" aria-label="Filtrar por estado y asignación">
+        <span class="filtro-titulo">Estado</span>
+        <button type="button" [class.activo]="filterValues.estado === 'todos'"
+          [attr.aria-pressed]="filterValues.estado === 'todos'" (click)="cambiarFiltroEstado('todos')">Todos</button>
+        <button type="button" [class.activo]="filterValues.estado === 'sin-asignar'"
+          [attr.aria-pressed]="filterValues.estado === 'sin-asignar'" (click)="cambiarFiltroEstado('sin-asignar')">
+          Sin asignar
+        </button>
+        <button type="button" [class.activo]="filterValues.estado === 'activo'"
+          [attr.aria-pressed]="filterValues.estado === 'activo'" (click)="cambiarFiltroEstado('activo')">
+          Abierto activo
+        </button>
+        <button type="button" [class.activo]="filterValues.estado === 'cerrado'"
+          [attr.aria-pressed]="filterValues.estado === 'cerrado'" (click)="cambiarFiltroEstado('cerrado')">
+          Cerrado
+        </button>
+      </div>
+    </section>
     <app-tabla-casos [dataSource]="dataSource" [displayedColumns]="displayedColumnsTablaInicial"
       [serverSidePagination]="true" [totalElements]="totalElementosCasos" [pageIndex]="pageIndexCasos"
-      [pageSize]="pageSizeCasos" [expandedElement]="expandedElement" (iniciar)="iniciarAtencion($event)"
+      [pageSize]="pageSizeCasos" [expandedElement]="expandedElement"
+      [showManagementActions]="!soloLectura" [showRegisterAction]="!soloLectura"
+      (iniciar)="iniciarAtencion($event)" (visualizar)="visualizarSolicitud($event)"
+      (programarSeguimiento)="programarSeguimiento($event)"
+      (verHistorial)="verHistorialCaso($event)"
+      (editar)="editarSolicitud($event)" (eliminar)="eliminarSolicitud($event)" (repartir)="repartirCaso($event)"
       (expand)="expandedElement = expandedElement === $event ? null : $event"
       (filter)="applyFilter($event.column, $event.event)" (pageChange)="onPageChangeCasos($event)">
     </app-tabla-casos>
@@ -26,7 +48,13 @@
 
 @if (modoAtencion) {
   <div>
-    <h1 class="visually-hidden">Registro de atención</h1>
+    <header class="form-view-header">
+      <button mat-button type="button" (click)="regresar()">
+        <mat-icon aria-hidden="true">arrow_back</mat-icon>
+        Volver a casos
+      </button>
+      <h1>{{ casoSeleccionado?.tieneCodigoCaso ? 'Registro de seguimiento' : 'Registro de primera atención' }}</h1>
+    </header>
     <div class="form-container">
       <mat-card class="form-card">
         <mat-card-content>
@@ -126,7 +154,7 @@
                       </div>
                     </div>
                   </mat-tab>
-                  <mat-tab [disabled]="!casoId">
+                  <mat-tab>
                     <ng-template matTabLabel>
                       <span [class.tab-label-error]="tabErrors.has('Registro de atención')">
                         @if (tabErrors.has('Registro de atención')) { <mat-icon aria-hidden="true"
@@ -164,14 +192,14 @@
                       <input matInput formControlName="personaRegistra">
                     </mat-form-field>
                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                      <mat-label>Tipo de servicio</mat-label>
+                      <mat-label>Servicio</mat-label>
                       <mat-select formControlName="tipoServicio">
                         @for (s of tiposServicio; track s) { <mat-option [value]="s">{{s}}</mat-option>
                       }
                     </mat-select>
                   </mat-form-field>
                   <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                    <mat-label>Lugar de la entrevista</mat-label>
+                    <mat-label>Forma de la entrevista</mat-label>
                     <mat-select formControlName="lugarEntrevista">
                       @for (m of lugaresEntrevista; track m.id) {
                         <mat-option [value]="m.id">{{m.nombre}}</mat-option>
@@ -195,22 +223,12 @@
                   @if (esAmbitoOtro()) {
                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
                       <mat-label>¿Cuál? (ámbito)</mat-label>
-                      <input matInput formControlName="ambitoOcurrenciaOtro">
+                      <input matInput formControlName="ambitoOcurrenciaOtro" maxlength="255">
                     </mat-form-field>
                   }
-                  <div class="button-container">
-                    <span class="btn-label-top">
-                      Consentimiento de Atención*
-                      <button type="button" class="help-tooltip-trigger" matTooltip="Carga del archivo PDF firmado/escaneado entregado por la persona al iniciar la atención." matTooltipClass="casilda-help-tooltip" (click)="$event.stopPropagation()" aria-label="Ayuda">?</button>
-                    </span>
-                    <button mat-raised-button color="accent" type="button" class="action-btn"
-                      (click)="subirArchivo()">
-                      <mat-icon aria-hidden="true">cloud_upload</mat-icon> Consentimiento de Atención
-                    </button>
-                  </div>
                 </div>
               </mat-tab>
-              <mat-tab [disabled]="!atencionId">
+              <mat-tab>
                 <ng-template matTabLabel>
                   <span>Presunto agresor</span>
                 </ng-template>
@@ -220,7 +238,7 @@
                   [(agresoresRegistrados)]="agresoresRegistrados">
                 </app-seccion-presunto-agresor>
               </mat-tab>
-              <mat-tab [disabled]="!atencionId">
+              <mat-tab>
                 <ng-template matTabLabel>
                   <span>Apreciaciones psicojurídicas</span>
                 </ng-template>
@@ -229,7 +247,7 @@
                   [(apreciacionesPsicologicas)]="apreciacionesPsicologicas">
                 </app-seccion-apreciaciones>
               </mat-tab>
-              <mat-tab [disabled]="!atencionId">
+              <mat-tab>
                 <ng-template matTabLabel>
                   <span>Acuerdos y compromisos</span>
                 </ng-template>
@@ -253,6 +271,8 @@
                         @for (c of catalogoRutasInternas; track c.id) {
                           <mat-checkbox [checked]="rutasInternasSel.includes(c.id)"
                             (change)="onCheckboxChange($event, c.id, 'rutasInternasSel')">{{c.nombre}}</mat-checkbox>
+                        } @empty {
+                          <p>No hay rutas internas disponibles.</p>
                         }
                       </div>
                       @if (esRutaInternaOtraSeleccionada()) {
@@ -273,6 +293,8 @@
                         @for (c of catalogoRutasExternas; track c.id) {
                           <mat-checkbox [checked]="rutasExternasSel.includes(c.id)"
                             (change)="onCheckboxChange($event, c.id, 'rutasExternasSel')">{{c.nombre}}</mat-checkbox>
+                        } @empty {
+                          <p>No hay rutas externas disponibles.</p>
                         }
                       </div>
                       @if (esRutaExternaOtraSeleccionada()) {
@@ -344,7 +366,7 @@
                    No se borran `medidasRegistradas`, `abrirModalMedida`, `eliminarMedida`
                    ni el payload de guardado — solo la pestaña. -->
 
-              <mat-tab [disabled]="!atencionId">
+              <mat-tab>
                 <ng-template matTabLabel>
                   <span>Otros compromisos</span>
                 </ng-template>
@@ -443,7 +465,7 @@
                   </div>
                 </div>
               </mat-tab>
-              <mat-tab [disabled]="!atencionId">
+              <mat-tab>
                 <ng-template matTabLabel>
                   <span>Seguimientos</span>
                 </ng-template>
@@ -452,7 +474,7 @@
                     [(seguimientos)]="seguimientosRegistrados"></app-seccion-seguimientos>
                 </div>
               </mat-tab>
-              <mat-tab [disabled]="!atencionId">
+              <mat-tab>
                 <ng-template matTabLabel>
                   <span [class.tab-label-error]="tabErrors.has('Estado del Caso')">
                     @if (tabErrors.has('Estado del Caso')) { <mat-icon aria-hidden="true"
@@ -484,7 +506,9 @@
         </form>
       </mat-card-content>
       <mat-card-actions align="end">
-        <button mat-raised-button color="primary" (click)="guardarAtencion()">Guardar</button>
+        <button mat-raised-button color="primary" (click)="guardarAtencion()">
+          {{ casoSeleccionado?.tieneCodigoCaso ? 'Guardar seguimiento' : 'Guardar primera atención' }}
+        </button>
       </mat-card-actions>
     </mat-card>
   </div>

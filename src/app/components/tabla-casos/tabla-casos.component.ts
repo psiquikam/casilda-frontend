@@ -39,8 +39,16 @@ export class TablaCasosComponent implements AfterViewInit {
   @Input() totalElements = 0;
   @Input() pageIndex = 0;
   @Input() pageSize = 10;
+  @Input() showManagementActions = false;
+  @Input() showRegisterAction = true;
 
   @Output() iniciar = new EventEmitter<any>();
+  @Output() programarSeguimiento = new EventEmitter<any>();
+  @Output() verHistorial = new EventEmitter<any>();
+  @Output() visualizar = new EventEmitter<any>();
+  @Output() editar = new EventEmitter<any>();
+  @Output() eliminar = new EventEmitter<any>();
+  @Output() repartir = new EventEmitter<any>();
   @Output() reprogramar = new EventEmitter<any>();
   @Output() cancelar = new EventEmitter<any>();
   @Output() expand = new EventEmitter<any>();

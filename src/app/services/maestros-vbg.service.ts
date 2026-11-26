@@ -22,10 +22,8 @@ import { NotificacionService } from '../core/a11y/notificacion.service';
  *   (`core/catalogos/respaldo-maestros-vbg.ts`), con las etiquetas literales
  *   de la matriz donde ella gobierna el contenido.
  * - **Modo real**: se llama al backend igual que antes; si falla, cae al
- *   mismo respaldo en vez de a una lista vacía (mejora EST-02 del
- *   diagnóstico), y avisa con `NotificacionService` para que la persona que
- *   usa el formulario sepa que está viendo datos de respaldo, no los del
- *   backend.
+ *   respaldo y avisa con `NotificacionService`. Las rutas y tipos de servicio
+ *   no usan respaldo en modo real, para no enviar identificadores ficticios.
  *
  * El backend sigue siendo la fuente de los **códigos** fuera del modo de
  * demostración: aquí no se reetiquetan sus respuestas. Homologar sus
@@ -51,9 +49,18 @@ export class MaestrosVbgService {
 
     return this.http.get<MaestroDto[]>(`${this.maestrosUrl}/${endpoint}`).pipe(
       catchError((error) => {
+        if (['rutas-internas', 'rutas-externas', 'tipos-servicio', 'actividades-misionales', 'formas-ocurrencia', 'lugares-ocurrencia'].includes(endpoint)) {
+          this.notificacion.error(`No fue posible cargar «${endpoint}» desde el servidor.`, error);
+          return of([]);
+        }
         if (respaldo.length > 0) {
           this.notificacion.error(
             `No fue posible cargar «${endpoint}» desde el servidor. Se muestran datos de respaldo.`,
+            error
+          );
+        } else {
+          this.notificacion.error(
+            `No fue posible cargar «${endpoint}» desde el servidor.`,
             error
           );
         }

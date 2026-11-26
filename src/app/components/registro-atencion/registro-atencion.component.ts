@@ -23,7 +23,12 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { ActivatedRoute } from '@angular/router';
 import { forkJoin } from 'rxjs';
+import { ModalDetalleSolicitudComponent } from '../modal-detalle-solicitud/modal-detalle-solicitud.component';
+import { ModalHistorialCasoComponent } from '../modal-historial-caso/modal-historial-caso.component';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { RepartoModalComponent } from '../modal-reparto/modal-reparto.component';
 
 import { ModalDireccionComponent } from '../modal-direccion/modal-direccion.component';
 import { ModalDiscapacidadComponent } from '../modal-discapacidad/modal-discapacidad.component';
@@ -40,11 +45,13 @@ import { ModalCompromisosPersonaComponent } from '../modal-compromisos-persona/m
 import { ModalCompromisosProfesionalesComponent } from '../modal-compromisos-profesionales/modal-compromisos-profesionales.component';
 import { SeccionSeguimientosComponent, SeguimientoVbg } from '../seccion-seguimientos/seccion-seguimientos.component';
 import { DialogoExitoComponent } from '../dialog-exito/dialog-exito.component';
+import { ModalProgramarSeguimientoComponent } from '../modal-programar-seguimiento/modal-programar-seguimiento.component';
 import { AuthService } from '../../services/auth.service';
 import { AtencionRegistroRequestDto, CasoDto, CitaDto, CompromisoPersonaRequestDto, CompromisoProfesionalRequestDto, EstadoCitaEnum, HechoRequestDto, SeguimientoAtencionRequestDto, SolicitudService, VinculoUdeAEnum } from '../../services/solicitud.service';
 import { MaestroDto } from '../../services/listas.service';
 import { MaestrosVbgService } from '../../services/maestros-vbg.service';
 import { RegistroVbgDatosService } from '../../services/registro-vbg-datos.service';
+import { AMBITO_OCURRENCIA, FORMA_OCURRENCIA } from '../../core/catalogos/catalogo-vbg';
 import { environment } from '../../../environments/environment';
 import { TablaCasosComponent } from '../tabla-casos/tabla-casos.component';
 import { NotificacionService } from '../../core/a11y/notificacion.service';
@@ -94,13 +101,14 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   private readonly notificacion = inject(NotificacionService);
   private readonly dialogoServicio = inject(DialogoService);
   private readonly maestrosVbg = inject(MaestrosVbgService);
+  private readonly route = inject(ActivatedRoute);
 
-  /** DSH-12-08: franja visible mientras los datos del módulo sean simulados. */
-  datosDemostracion = environment.datosDemostracion;
   private readonly registroVbgDatos = inject(RegistroVbgDatosService);
   atencionForm!: FormGroup;
   atencionId: number | null = null;
   casoId: number | null = null;
+  citaAtencionId: number | null = null;
+  private citaSeguimientoPendiente: { citaId: number; casoId: number } | null = null;
   activeTabIndex = 0;
   private readonly maestrosUrl = `${environment.apiBaseUrl}/maestros`;
 
@@ -109,7 +117,9 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   totalElementosCasos = 0;
   pageIndexCasos = 0;
   pageSizeCasos = 10;
-  displayedColumnsTablaInicial: string[] = ['expand', 'id', 'nombre', 'documento', 'fecha', 'tipoAsignacion', 'profesional', 'acciones'];
+  displayedColumnsTablaInicial: string[] = [
+    'expand', 'id', 'etapa', 'atenciones', 'nombre', 'documento', 'fecha', 'tipoAsignacion', 'profesional', 'acciones'
+  ];
 
   @ViewChild(MatSort) sort?: MatSort;
 
@@ -146,13 +156,19 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
   expandedElement: any | null = null;
 
+  get soloLectura(): boolean {
+    return this.authService.isRevisor() && !this.authService.hasAnyRole(['ADMIN', 'COORDINADOR', 'PROFESIONAL']);
+  }
+
   filterValues: any = {
     id: '',
     nombre: '',
     documento: '',
     fecha: '',
     tipoAsignacion: '',
-    profesional: ''
+    profesional: '',
+    etapa: 'todos',
+    estado: 'todos'
   };
 
   discapacidadesRegistradas: any[] = [];
@@ -178,7 +194,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
   private readonly tabFieldMap: { tab: string; label: string; control: string; condition?: () => boolean }[] = [
     { tab: 'Registro de atención', label: 'Tipo de servicio', control: 'tipoServicio' },
-    { tab: 'Registro de atención', label: 'Lugar de la entrevista', control: 'lugarEntrevista' },
+    { tab: 'Registro de atención', label: 'Forma de la entrevista', control: 'lugarEntrevista' },
     { tab: 'Registro de atención', label: 'Forma de ocurrencia', control: 'queForma' },
     { tab: 'Registro de atención', label: 'Ámbito de ocurrencia', control: 'ambitoOcurrencia' },
     { tab: 'Datos de la persona', label: 'Tipo de documento', control: 'tipoDocumento' },
@@ -291,11 +307,34 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   ) { }
 
   ngOnInit(): void {
+    const citaId = Number(this.route.snapshot.queryParamMap.get('citaId'));
+    const casoId = Number(this.route.snapshot.queryParamMap.get('casoId'));
+    if (Number.isInteger(citaId) && citaId > 0 && Number.isInteger(casoId) && casoId > 0) {
+      this.citaSeguimientoPendiente = { citaId, casoId };
+    }
+
+    if (this.soloLectura) {
+      this.displayedColumnsTablaInicial = this.displayedColumnsTablaInicial.filter((columna) => columna !== 'acciones');
+    }
     this.initForm();
     this.configurarValidacionActividadMisional();
     this.configurarUnidadAdministrativaMunicipios();
     this.cargarListasMaestras();
     this.cargarCasos();
+    if (this.citaSeguimientoPendiente) {
+      const { citaId, casoId } = this.citaSeguimientoPendiente;
+      this.citaSeguimientoPendiente = null;
+      this.registroVbgDatos.obtenerCasoPorId(casoId).subscribe({
+        next: (caso) => this.iniciarAtencion({
+          ...this.mapearCasoATabla(caso),
+          citaAtencionId: citaId
+        }),
+        error: (error) => this.notificacion.error(
+          'No fue posible abrir el expediente de la cita de seguimiento.',
+          error
+        )
+      });
+    }
     const nombreUsuario = this.authService.currentUser?.nombre || '';
     this.atencionForm.get('personaRegistra')?.setValue(nombreUsuario);
     this.atencionForm.get('personaAtiende')?.setValue(nombreUsuario);
@@ -307,7 +346,10 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         && `${data.tipoDocumento || ''} ${data.documento || ''}`.toLowerCase().includes(searchTerms.documento)
         && (data.fecha || '').toLowerCase().includes(searchTerms.fecha)
         && (data.tipoAsignacion || '').toLowerCase().includes(searchTerms.tipoAsignacion)
-        && (data.profesional || '').toLowerCase().includes(searchTerms.profesional);
+        && (data.profesional || '').toLowerCase().includes(searchTerms.profesional)
+        && (searchTerms.etapa === 'todos'
+          || (searchTerms.etapa === 'seguimiento' && data.tieneCodigoCaso))
+        && this.coincideEstado(data, searchTerms.estado);
     };
 
 
@@ -474,7 +516,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       campus: this.obtenerMaestro('campus'),
       unidadesAcademicas: this.obtenerMaestro('unidades-academicas'),
       formasOcurrencia: this.obtenerMaestro('formas-ocurrencia'),
-      ambitoOcurrencia: this.obtenerMaestro('ambito-ocurrencia'),
       lugaresOcurrencia: this.obtenerMaestro('lugares-ocurrencia'),
       actividadesMisionales: this.obtenerMaestro('actividades-misionales'),
       estadosCaso: this.obtenerMaestro('estados-caso'),
@@ -504,8 +545,9 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         this.catalogoTiposServicio = data.tiposServicio;
         this.catalogoCampus = data.campus;
         this.catalogoUnidadesAcademicas = data.unidadesAcademicas;
-        this.catalogoFormasOcurrencia = data.formasOcurrencia;
-        this.catalogoAmbitoOcurrencia = data.ambitoOcurrencia;
+        this.catalogoFormasOcurrencia = FORMA_OCURRENCIA.flatMap(opcion =>
+          data.formasOcurrencia.filter(item => item.nombre === opcion.etiqueta)
+        );
         this.catalogoLugaresOcurrencia = data.lugaresOcurrencia;
         this.catalogoActividadesMisionales = data.actividadesMisionales;
 
@@ -528,8 +570,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         this.tiposDoc = this.mapNombres(data.tiposIdentificacion);
         this.campusM = this.mapNombres(data.campus);
         this.unidadesAcademicasM = this.mapNombres(data.unidadesAcademicas);
-        this.queForma = this.mapNombres(data.formasOcurrencia);
-        this.ambitoOcurrencia = this.mapNombres(data.ambitoOcurrencia);
+        this.queForma = this.mapNombres(this.catalogoFormasOcurrencia);
+        this.ambitoOcurrencia = AMBITO_OCURRENCIA.map(opcion => opcion.etiqueta);
         this.lugarHechos = this.mapNombres(data.lugaresOcurrencia);
         this.actividadesMisionales = this.mapNombres(data.actividadesMisionales);
         this.catalogoEstadosCaso = data.estadosCaso;
@@ -545,7 +587,9 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
         this.listaPrejuicio = data.modalidadesPrejuicio;
         this.catalogoTiemposOcurridoUnidad = data.tiemposOcurridoUnidad;
         this.listaTiemposOcurridoUnidad = this.mapNombres(data.tiemposOcurridoUnidad);
-        this.lugaresEntrevista = data.lugaresEntrevista;
+        this.lugaresEntrevista = data.lugaresEntrevista.filter(
+          lugar => !lugar.nombre.toLowerCase().includes('sede posgrados')
+        );
       },
       error: (error) => {
         this.notificacion.error('No fue posible cargar las listas del formulario. Recargue la página o intente más tarde.', error);
@@ -733,6 +777,40 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     this.dataSource.filter = JSON.stringify(this.filterValues);
   }
 
+  cambiarFiltroEtapa(etapa: 'todos' | 'seguimiento'): void {
+    this.filterValues.etapa = etapa;
+    this.aplicarFiltrosTabla();
+  }
+
+  cambiarFiltroEstado(estado: 'todos' | 'sin-asignar' | 'activo' | 'cerrado'): void {
+    this.filterValues.estado = estado;
+    this.aplicarFiltrosTabla();
+  }
+
+  esCasoConCodigo(caso: { codigo?: string | null }): boolean {
+    return Boolean(caso.codigo?.trim());
+  }
+
+  private aplicarFiltrosTabla(): void {
+    this.dataSource.filter = JSON.stringify(this.filterValues);
+  }
+
+  private coincideEstado(caso: any, estado: string): boolean {
+    const cerrado = String(caso.estadoCaso || '').trim().toLowerCase() === 'cerrado';
+    const sinAsignar = !caso.profesional || caso.profesional === 'Sin asignar';
+
+    if (estado === 'sin-asignar') {
+      return sinAsignar;
+    }
+    if (estado === 'cerrado') {
+      return cerrado;
+    }
+    if (estado === 'activo') {
+      return !sinAsignar && !cerrado;
+    }
+    return true;
+  }
+
   onPageChangeCasos(event: PageEvent): void {
     this.pageIndexCasos = event.pageIndex;
     this.pageSizeCasos = event.pageSize;
@@ -771,7 +849,6 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   private cargarCasos(page = 0, size: number = this.pageSizeCasos): void {
     this.registroVbgDatos.listarCasosPaginados(page, size).subscribe({
       next: (respuesta) => {
-        this.datosDemostracion = this.registroVbgDatos.usandoDatosDemostracion();
         const filas = respuesta.content.map((caso) => this.mapearCasoATabla(caso));
         this.casoPorAtender = filas;
         this.dataSource.data = filas;
@@ -801,7 +878,9 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     }
 
     return {
-      id: caso.codigo || String(caso.id),
+      id: caso.codigo?.trim() || '',
+      codigo: caso.codigo?.trim() || '',
+      tieneCodigoCaso: this.esCasoConCodigo(caso),
       solicitudId: caso.solicitudId,
       citaId: caso.citaId,
       casoId: caso.id,
@@ -811,6 +890,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       tipoSolicitud: caso.tipoSolicitud || '',
       fecha: fechaCasoFormateada,
       tipoAsignacion: caso.tipoAsignacion || '',
+      cantidadAtenciones: caso.cantidadAtenciones ?? 0,
+      estadoCaso: caso.estadoCaso || '',
       unidadAdministrativa: caso.unidadAdministrativa || '',
       profesional: caso.profesional || 'Sin asignar',
       unidadAcademica: caso.unidadAcademica || '',
@@ -838,6 +919,9 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       departamentoResidencia: caso.departamentoResidencia || '',
       ciudadResidencia: caso.ciudadResidencia || '',
       direccionResidencia: caso.direccionResidencia || '',
+      formaOcurrencia: caso.formaOcurrencia || '',
+      ambitoOcurrencia: caso.ambitoOcurrencia || '',
+      ambitoOcurrenciaOtro: caso.ambitoOcurrenciaOtro || '',
       // VBG-09-01, solo lectura (VBG-09-02): se conserva para mostrarlo en
       // «Estado del Caso»; no viene de ningún control del formulario.
       grupoAtencion: caso.grupoAtencion ?? null
@@ -860,13 +944,19 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   }
 
   iniciarAtencion(caso: any): void {
+    if (this.soloLectura) {
+      return;
+    }
     this.casoSeleccionado = caso;
     this.modoAtencion = true;
+    this.activeTabIndex = 0;
+    this.discapacidadesRegistradas = [];
     this.correoRegistrados = [];
     this.telefonosRegistrados = [];
     this.agresoresRegistrados = [];
     this.atencionId = null;
     this.casoId = caso.casoId || null;
+    this.citaAtencionId = caso.citaAtencionId ?? caso.citaId ?? null;
 
     let fechaNacimientoFormateada = '';
     if (caso.fechaNacimiento) {
@@ -880,6 +970,7 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
 
     this.atencionForm.patchValue({
       tipoSolicitud: caso.tipoSolicitud || 'Indirecta',
+      tipoServicio: '',
       documento: caso.documento || '',
       tipoViolencia: caso.tipoViolencia || '',
       tipoDocumento: caso.tipoDocumento || '',
@@ -904,11 +995,17 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
       campus: caso.campus || '',
       queForma: caso.queForma || caso.formaOcurrencia || '',
       ambitoOcurrencia: caso.ambitoOcurrencia || '',
+      ambitoOcurrenciaOtro: caso.ambitoOcurrenciaOtro || '',
     });
+    this.atencionForm.get('tipoServicio')?.markAsPristine();
 
     if (caso?.solicitudId) {
       this.registroVbgDatos.obtenerPorId(caso.solicitudId).subscribe({
         next: (solicitud) => {
+          if (this.casoSeleccionado !== caso || !this.modoAtencion) return;
+          if (!this.atencionForm.get('tipoServicio')?.dirty && solicitud.tipoServicio) {
+            this.atencionForm.patchValue({ tipoServicio: solicitud.tipoServicio });
+          }
           this.correoRegistrados = (solicitud.correos ?? []).map(c => ({
             tipoId: c.tipoId,
             tipo: c.tipo || '',
@@ -927,7 +1024,133 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     }
   }
 
+  visualizarSolicitud(caso: any): void {
+    this.abrirSolicitud(caso, 'visualizar');
+  }
 
+  verHistorialCaso(caso: any): void {
+    const casoId = Number(caso?.casoId);
+    if (!Number.isInteger(casoId) || casoId <= 0) {
+      this.notificacion.error('No se pudo identificar el caso para consultar su historial.');
+      return;
+    }
+
+    this.registroVbgDatos.listarHistorialAtenciones(casoId).subscribe({
+      next: (atenciones) => this.dialog.open(ModalHistorialCasoComponent, {
+        width: '700px',
+        maxHeight: '85vh',
+        data: {
+          codigo: caso.codigo,
+          nombre: caso.nombre,
+          atenciones
+        }
+      }),
+      error: (error) => this.notificacion.error('No fue posible cargar el historial de atenciones del caso.', error)
+    });
+  }
+
+  programarSeguimiento(caso: any): void {
+    const casoId = Number(caso?.casoId);
+    if (this.soloLectura || !Number.isInteger(casoId) || casoId <= 0) {
+      return;
+    }
+
+    this.dialog.open(ModalProgramarSeguimientoComponent, {
+      width: '520px',
+      data: { codigo: caso.codigo, nombre: caso.nombre }
+    }).afterClosed().subscribe((datos) => {
+      if (!datos) {
+        return;
+      }
+      this.registroVbgDatos.programarCitaSeguimiento(casoId, datos).subscribe({
+        next: () => this.dialog.open(DialogoExitoComponent, {
+          width: '400px',
+          data: {
+            titulo: '¡Cita agendada!',
+            mensaje: `La cita de seguimiento se agregó a la agenda del caso ${caso.codigo}.`
+          }
+        }),
+        error: (error) => this.notificacion.error('No fue posible agendar la cita de seguimiento.', error)
+      });
+    });
+  }
+
+  editarSolicitud(caso: any): void {
+    this.abrirSolicitud(caso, 'editar');
+  }
+
+  private abrirSolicitud(caso: any, modo: 'editar' | 'visualizar'): void {
+    const abrirDialogo = (info: any) => {
+      const dialogRef = this.dialog.open(ModalDetalleSolicitudComponent, {
+        width: '1000px',
+        maxHeight: '95vh',
+        data: { info, modo },
+        panelClass: 'custom-modal-container',
+        autoFocus: false
+      });
+
+      dialogRef.afterClosed().subscribe((resultado) => {
+        if (resultado && modo === 'editar') {
+          this.cargarCasos(this.pageIndexCasos, this.pageSizeCasos);
+        }
+      });
+    };
+
+    if (!caso.solicitudId) {
+      abrirDialogo(caso);
+      return;
+    }
+
+    this.registroVbgDatos.obtenerPorId(caso.solicitudId).subscribe({
+      next: (solicitud) => abrirDialogo(solicitud),
+      error: (error) => this.notificacion.error('No fue posible cargar el detalle de la solicitud.', error)
+    });
+  }
+
+  eliminarSolicitud(caso: any): void {
+    const solicitudId = Number(caso.solicitudId);
+    if (!Number.isInteger(solicitudId) || solicitudId <= 0) {
+      this.notificacion.error('No fue posible identificar la solicitud que se desea eliminar.');
+      return;
+    }
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '350px',
+      data: {
+        titulo: 'Eliminar caso',
+        mensaje: `¿Confirma que desea eliminar el caso ${caso.id || caso.casoId}?`
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((confirmado) => {
+      if (!confirmado) {
+        return;
+      }
+      this.solicitudService.eliminar(solicitudId).subscribe({
+        next: () => this.cargarCasos(this.pageIndexCasos, this.pageSizeCasos),
+        error: (error) => this.notificacion.error('No fue posible eliminar el caso. Intente de nuevo.', error)
+      });
+    });
+  }
+
+  repartirCaso(caso: any): void {
+    if (!caso.solicitudId) {
+      this.notificacion.error('No fue posible identificar la solicitud que se desea repartir.');
+      return;
+    }
+
+    const dialogRef = this.dialog.open(RepartoModalComponent, {
+      width: '550px',
+      data: caso,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((resultado) => {
+      if (resultado) {
+        this.cargarCasos(this.pageIndexCasos, this.pageSizeCasos);
+      }
+    });
+  }
 
   private resolverNombreMaestroPorId(id: unknown, catalogo: MaestroDto[]): string {
     const idNumerico = Number(id);
@@ -1231,6 +1454,9 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
   }
 
   guardarAtencion(tabIndex: number | null = null): void {
+    if (this.soloLectura) {
+      return;
+    }
     /**
      * Hallazgo crítico de M3: este formulario no tiene las pestañas
      * «Datos complementarios», «Documentación» ni «VBG» que sí existen en
@@ -1242,10 +1468,27 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
      * `construirRegistroAtencionRequest`, sin ninguna traducción.
      */
     const targetTabIndex = tabIndex !== null && tabIndex !== undefined ? tabIndex : this.activeTabIndex;
+    if (!this.casoId) {
+      this.notificacion.error('No se pudo identificar el caso para registrar la atención.');
+      return;
+    }
+    if (targetTabIndex === 1 && !this.resolverIdMaestro(this.atencionForm.get('tipoServicio')?.value, this.catalogoTiposServicio)) {
+      this.notificacion.error('Seleccione el servicio de la atención.');
+      return;
+    }
+    if (targetTabIndex > 1 && !this.atencionId) {
+      this.notificacion.error('Guarde primero Registro de atención para habilitar las demás pestañas.');
+      return;
+    }
     this.guardandoCompromisos = true;
     this.construirRegistroAtencionRequest(targetTabIndex)
       .then((dataFinal) => {
-        this.registroVbgDatos.registrarPestana(targetTabIndex, dataFinal, this.casoId).subscribe({
+        this.registroVbgDatos.registrarPestanaAtencion(
+          targetTabIndex,
+          dataFinal,
+          this.casoId,
+          this.citaAtencionId ?? undefined
+        ).subscribe({
           next: (atencion) => {
             this.guardandoCompromisos = false;
             this.tabErrors = new Set<string>();
@@ -1346,7 +1589,8 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
     switch (tabIndex) {
       case 0:
         const discapacidadesMapped = this.discapacidadesRegistradas.map(d => ({
-          idSubTipoDiscapacidad: Number(d.idSubTipoDiscapacidad || d.subTipoId || d.id)
+          idSubTipoDiscapacidad: Number(d.idSubTipoDiscapacidad || d.subTipoId || d.id),
+          descripcion: d.descripcion || null
         }));
         return {
           citaId,
@@ -1361,16 +1605,18 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
             correos: correos.length ? correos : undefined,
             telefonos: telefonos.length ? telefonos : undefined
           },
-          discapacidades: discapacidadesMapped
+          discapacidades: discapacidadesMapped.length ? discapacidadesMapped : undefined
         };
       case 1:
         return {
           casoId: this.casoId,
+          citaId: this.citaAtencionId ?? (citaId > 0 ? citaId : undefined),
           idAtencion: this.atencionId,
           idTipoServicio: this.resolverIdMaestro(tipoServicio, this.catalogoTiposServicio),
           idLugarEntrevista: Number(lugarEntrevista),
           idFormaOcurrencia: queForma ? this.resolverIdMaestro(queForma, this.catalogoFormasOcurrencia) : null,
-          idAmbitoOcurrencia: ambitoOcurrencia ? this.resolverIdMaestro(ambitoOcurrencia, this.catalogoAmbitoOcurrencia) : null,
+          ambitoOcurrencia: ambitoOcurrencia || '',
+          ambitoOcurrenciaOtro: formRawValue.ambitoOcurrenciaOtro || null,
           archivoConsentimientoNombre: consentimientoArchivo?.name,
           archivoConsentimientoTipo: consentimientoArchivo?.type,
           archivoConsentimientoContenido
@@ -1411,16 +1657,25 @@ export class RegistroAtencionComponent implements OnInit, AfterViewInit {
           cual: r.cual || null,
           fecha: this.formatearFechaLocalDateTime(r.fecha)
         })).filter(r => r.idTipoRemision !== undefined);
+        const rutasMapped = [
+          ...this.rutasInternasSel.map(idRutaActivacion => ({
+            idTipoRutaActivacion: 1,
+            idRutaActivacion,
+            ...(this.catalogoRutasInternas.find(r => r.id === idRutaActivacion)?.codigo === 'otras-rutas-internas'
+              ? { cual: formRawValue.rutaInternaOtraCual || null } : {})
+          })),
+          ...this.rutasExternasSel.map(idRutaActivacion => ({
+            idTipoRutaActivacion: 2,
+            idRutaActivacion,
+            ...(this.catalogoRutasExternas.find(r => r.id === idRutaActivacion)?.codigo === 'otras-rutas-externas'
+              ? { cual: formRawValue.rutaExternaOtraCual || null } : {})
+          }))
+        ];
 
         return {
           idAtencion: this.atencionId || 0,
           logroAcuerdo: logroAcuerdo === true || logroAcuerdo === 'SI',
-          // VBG-07-02/03: forma provisional (dos grupos de checkboxes, M4),
-          // pendiente de confirmación del backend — reemplaza a `rutas`.
-          rutasInternas: this.rutasInternasSel,
-          rutaInternaOtraCual: this.esRutaInternaOtraSeleccionada() ? (formRawValue.rutaInternaOtraCual || null) : null,
-          rutasExternas: this.rutasExternasSel,
-          rutaExternaOtraCual: this.esRutaExternaOtraSeleccionada() ? (formRawValue.rutaExternaOtraCual || null) : null,
+          rutas: rutasMapped,
           remisiones: remisionesMapped
         };
       // VBG-07-12: la pestaña «Medidas de protección» se retiró de la UI (ver plantilla).

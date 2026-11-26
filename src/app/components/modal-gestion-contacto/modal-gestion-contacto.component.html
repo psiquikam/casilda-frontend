@@ -56,15 +56,15 @@
                     @if (contactoForm.get('fechaCita')?.hasError('required')) {
                       <mat-error>La fecha es requerida</mat-error>
                     }
-                    @if (contactoForm.get('fechaCita')?.hasError('dateNotGreaterThanToday')) {
-                      <mat-error>La fecha debe ser posterior a hoy</mat-error>
-                    }
                   </mat-form-field>
                   <mat-form-field appearance="outline">
                     <mat-label>Hora de cita</mat-label>
                     <input matInput type="time" formControlName="horaCita">
                   </mat-form-field>
                 </div>
+                @if (contactoForm.hasError('invalidDateTime')) {
+                  <p role="alert">La fecha y hora de la cita deben ser actuales o futuras.</p>
+                }
               }
               <div class="form-actions">
                 <button mat-flat-button class="btn-save" type="submit" [disabled]="contactoForm.invalid">

@@ -85,6 +85,7 @@ export interface SolicitudAcompanamientoRequest {
 }
 
 export interface SolicitudAcompanamientoResponse {
+  estadoCorreoReparto?: 'DESACTIVADO' | 'ENVIADO' | 'ERROR';
   id: number;
   codigo: string;
   tipoSolicitud: string;
@@ -92,12 +93,14 @@ export interface SolicitudAcompanamientoResponse {
   estado: string;
   fechaCreacion: string;
   fechaReparto?: string | null;
+  fechaHoraReparto?: string | null;
   observacionesTelefono?: string | null;
   observacionesCorreo?: string | null;
   // Para la tabla
   unidadAdministrativa: string;
   profesional: string;
   tipoAsignacion: string;
+  tipoServicio?: string | null;
   // Hechos y situación
   descripcionHechos?: string | null;
   descripcion?: string | null;
@@ -134,6 +137,7 @@ export interface SolicitudAcompanamientoResponse {
   nombreSolicitante: string;
   documentoSolicitante: string;
   // Solicitante completo
+  discapacidades?: DiscapacidadSearchDto[] | null;
   tipoDocumentoId?: number | null;
   tipoDocumento: string;
   numeroDocumento: string;
@@ -198,7 +202,7 @@ export interface DiscapacidadSearchDto {
   idSubTipoDiscapacidad: number;
   subTipo?: string | null;
   tipo?: string | null;
-  descripcion: string;
+  descripcion: string | null;
 }
 
 export interface CorreoBusquedaDto {
@@ -303,6 +307,12 @@ export interface ContactoTelefonicoDto {
   horaCita?: string;
 }
 
+export interface UltimaCitaDto {
+  fechaCita: string | null;
+  estadoCita: string | null;
+  tieneCitaProgramada: boolean;
+}
+
 export interface ContactoTelefonicoRequestDto {
   fecha: string;
   resultado: string;
@@ -312,10 +322,14 @@ export interface ContactoTelefonicoRequestDto {
 }
 
 export enum EstadoCitaEnum {
-  CREADA = 1,
+  PROGRAMADA = 1,
   CANCELADA = 2,
-  REPROGRAMADA = 3
+  REPROGRAMADA = 3,
+  ATENDIDA = 4,
+  INASISTENCIA = 5
 }
+
+export type ResultadoCitaDto = 'ATENDIDA' | 'INASISTENCIA';
 
 export enum VinculoUdeAEnum {
   ESTUDIANTE_PREGRADO = 1,
@@ -338,6 +352,10 @@ export interface CitaDto {
   id: number;
   solicitudId: number;
   codigoSolicitud: string;
+  casoId?: number | null;
+  codigoCaso?: string | null;
+  solicitudTieneCaso?: boolean;
+  tipoAtencion?: 'INICIAL' | 'SEGUIMIENTO';
   nombreSolicitante: string;
   tipoDocumento?: string | null;
   documento: string;
@@ -403,6 +421,11 @@ export interface CasoDto {
    * trae el caso. En modo de demostración lo provee `CasosSimuladosService`.
    */
   grupoAtencion?: string | null;
+  cantidadAtenciones?: number;
+  formaOcurrencia?: string | null;
+  ambitoOcurrencia?: string | null;
+  ambitoOcurrenciaOtro?: string | null;
+  idActividadMisional?: number | null;
 }
 
 export interface CasoResponseDto {
@@ -604,6 +627,7 @@ export interface PestanaRegistroAtencionRequestDto {
 export interface RutaAtencionRequestDto {
   idTipoRutaActivacion: number;
   idRutaActivacion: number;
+  cual?: string | null;
 }
 
 export interface RemisionAtencionRequestDto {
@@ -744,12 +768,15 @@ export class SolicitudService {
     return this.http.get<SolicitudAcompanamientoResponse[]>(`${this.apiUrl}/acompanamiento`, { params });
   }
 
-  listarPaginadas(page: number, size: number, idEstadoSolicitud?: number): Observable<PagedResponseDto<SolicitudAcompanamientoResponse>> {
+  listarPaginadas(page: number, size: number, idEstadoSolicitud?: number, ordenReparto = false): Observable<PagedResponseDto<SolicitudAcompanamientoResponse>> {
     let params = new HttpParams()
       .set('page', String(page))
       .set('size', String(size));
     if (idEstadoSolicitud != null) {
       params = params.set('idEstadoSolicitud', String(idEstadoSolicitud));
+    }
+    if (ordenReparto) {
+      params = params.set('ordenReparto', 'true');
     }
     return this.http.get<PagedResponseDto<SolicitudAcompanamientoResponse>>(`${this.apiUrl}/acompanamiento/paginado`, { params });
   }
@@ -786,6 +813,10 @@ export class SolicitudService {
     return this.http.post<ContactoTelefonicoDto>(`${this.apiUrl}/acompanamiento/${id}/contacto`, datos);
   }
 
+  obtenerUltimaCita(id: number): Observable<UltimaCitaDto> {
+    return this.http.get<UltimaCitaDto>(`${this.apiUrl}/acompanamiento/${id}/ultima-cita`);
+  }
+
   listarCitasPaginadas(page: number, size: number, idEstadoCita?: number, excluirEstadoCitaId?: number): Observable<PagedResponseDto<CitaDto>> {
     let params = new HttpParams()
       .set('page', String(page))
@@ -801,6 +832,18 @@ export class SolicitudService {
     return this.http.get<PagedResponseDto<CitaDto>>(`${this.citasUrl}/paginado`, { params });
   }
 
+  listarCitasPendientesDeCaso(page: number, size: number): Observable<PagedResponseDto<CitaDto>> {
+    const params = new HttpParams()
+      .set('page', String(page))
+      .set('size', String(size));
+
+    return this.http.get<PagedResponseDto<CitaDto>>(`${this.citasUrl}/pendientes-caso/paginado`, { params });
+  }
+
+  listarHistorialAtenciones(casoId: number): Observable<CitaDto[]> {
+    return this.http.get<CitaDto[]>(`${this.citasUrl}/caso/${casoId}/historial`);
+  }
+
   listarCasosPaginados(page: number, size: number): Observable<PagedResponseDto<CasoDto>> {
     const params = new HttpParams()
       .set('page', String(page))
@@ -809,12 +852,30 @@ export class SolicitudService {
     return this.http.get<PagedResponseDto<CasoDto>>(`${this.casosUrl}/paginado`, { params });
   }
 
+  obtenerCasoPorId(casoId: number): Observable<CasoDto> {
+    return this.http.get<CasoDto>(`${this.casosUrl}/${casoId}`);
+  }
+
   reprogramarCita(id: number, datos: ReprogramarCitaRequestDto): Observable<CitaDto> {
     return this.http.put<CitaDto>(`${this.citasUrl}/${id}/reprogramar`, datos);
   }
 
   cancelarCita(id: number, datos: CancelarCitaRequestDto): Observable<CitaDto> {
     return this.http.put<CitaDto>(`${this.citasUrl}/${id}/cancelar`, datos);
+  }
+
+  registrarResultadoCita(
+    id: number,
+    datos: { resultado: ResultadoCitaDto; observaciones?: string }
+  ): Observable<CitaDto> {
+    return this.http.put<CitaDto>(`${this.citasUrl}/${id}/resultado`, datos);
+  }
+
+  programarCitaSeguimiento(
+    casoId: number,
+    datos: { fechaCita: string; horaCita: string }
+  ): Observable<CitaDto> {
+    return this.http.post<CitaDto>(`${this.citasUrl}/caso/${casoId}/seguimientos`, datos);
   }
 
   listarMotivosEstadoCita(): Observable<MaestroDto[]> {
@@ -849,8 +910,36 @@ export class SolicitudService {
     if (tabIndex <= 4) {
       return this.http.post<any>(`${this.casosUrl}/pestana/${tabIndex}`, datos);
     } else {
-      return this.http.post<any>(`${this.atencionesUrl}/pestana/${tabIndex}`, datos);
+      const indiceEndpoint = tabIndex >= 8 ? tabIndex + 1 : tabIndex;
+      return this.http.post<any>(`${this.atencionesUrl}/pestana/${indiceEndpoint}`, datos);
     }
+  }
+
+  registrarPestanaAtencion(
+    tabIndex: number,
+    datos: unknown
+  ): Observable<{ id?: number; codigo?: string } | null> {
+    const pestanas: Record<number, { recurso: 'casos' | 'atenciones'; indice: number }> = {
+      0: { recurso: 'casos', indice: 0 },
+      1: { recurso: 'atenciones', indice: 5 },
+      2: { recurso: 'casos', indice: 4 },
+      3: { recurso: 'atenciones', indice: 6 },
+      4: { recurso: 'atenciones', indice: 7 },
+      5: { recurso: 'atenciones', indice: 9 },
+      6: { recurso: 'atenciones', indice: 10 },
+      7: { recurso: 'atenciones', indice: 11 }
+    };
+    const pestana = pestanas[tabIndex];
+
+    if (!pestana) {
+      throw new Error(`Pestaña de Equipo de Atención no soportada: ${tabIndex}`);
+    }
+
+    const url = pestana.recurso === 'casos' ? this.casosUrl : this.atencionesUrl;
+    return this.http.post<{ id?: number; codigo?: string } | null>(
+      `${url}/pestana/${pestana.indice}`,
+      datos
+    );
   }
 
   obtenerAtencionPorCita(citaId: number): Observable<AtencionResponseDto> {

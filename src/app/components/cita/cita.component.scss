@@ -197,6 +197,12 @@ th.mat-mdc-header-cell {
     align-items: center;
     justify-content: center;
 
+    &:disabled {
+      color: var(--color-text-muted) !important;
+      background-color: transparent !important;
+      cursor: not-allowed;
+    }
+
     ::ng-deep .mat-mdc-button-touch-target {
       width: 28px !important;
       height: 28px !important;

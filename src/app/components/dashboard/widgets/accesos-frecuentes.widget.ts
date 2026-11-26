@@ -38,7 +38,7 @@ export class AccesosFrecuentesWidget {
   private readonly porRol: Record<string, readonly string[]> = {
     ADMIN: ['usuarios', 'maestros', 'contenidos-home', 'indicadores'],
     COORDINADOR: ['consulta', 'citas', 'nueva-solicitud'],
-    PROFESIONAL: ['registro-atencion', 'citas', 'mis-asignaciones'],
+    PROFESIONAL: ['registro-atencion', 'citas', 'mis-asignaciones', 'nueva-solicitud'],
     REVISOR: ['indicadores', 'consulta', 'seguimiento'],
     GESTOR_CONTENIDO: ['contenidos-home'],
     TECNICO_APH: ['alma-aph-nueva', 'alma-aph-remisiones']

@@ -14,7 +14,6 @@
         </div>
       }
 
-
       <div class="form-grid">
         <mat-form-field appearance="outline">
           <mat-label>Tipo de reparto</mat-label>
@@ -72,4 +71,13 @@
       <span>{{ guardando ? 'Guardando...' : 'Confirmar reparto' }}</span>
     </button>
   </mat-dialog-actions>
+  @if (guardando) {
+    <div class="reparto-progreso" role="status" aria-live="polite">
+      <div class="reparto-progreso__contenido">
+        <mat-spinner diameter="48"></mat-spinner>
+        <strong>Procesando el reparto</strong>
+        <span>Guardando y procesando la notificación de prueba. Esto puede tardar unos segundos.</span>
+      </div>
+    </div>
+  }
 </div>

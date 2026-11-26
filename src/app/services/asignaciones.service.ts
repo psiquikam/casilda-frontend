@@ -1,12 +1,14 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, catchError, map, of } from 'rxjs';
+import { Observable, map, of, throwError } from 'rxjs';
 
 import { CasosSimuladosService } from './casos-simulados.service';
+import { environment } from '../../environments/environment';
 import {
   ContactoTelefonicoDto,
   ContactoTelefonicoRequestDto,
   SolicitudAcompanamientoResponse,
-  SolicitudService
+  SolicitudService,
+  UltimaCitaDto
 } from './solicitud.service';
 
 const ESTADO_SOLICITUD_ASIGNADA = 2;
@@ -27,11 +29,11 @@ export interface ResultadoAsignaciones {
 /**
  * Fuente única para «Mis asignaciones» y «Gestión de contacto».
  *
- * El API publicado solo permite filtrar por estado; todavía no expone una ruta
- * «asignadas a la persona autenticada». Mientras ese contrato no exista, ambas
- * pantallas consumen exactamente el mismo listado de solicitudes asignadas.
- * Si el backend no entrega registros o falla, se usan casos ficticios y se
- * informa a la vista para que los identifique como datos de demostración.
+ * La bandeja es compartida por el equipo: ambas pantallas consultan las
+ * solicitudes asignadas sin filtrarlas por profesional.
+ * Los casos ficticios solo se usan cuando la configuración activa explícitamente
+ * el modo de demostración; en producción las respuestas vacías y los errores
+ * del API se conservan.
  */
 @Injectable({ providedIn: 'root' })
 export class AsignacionesService {
@@ -39,38 +41,35 @@ export class AsignacionesService {
   private readonly casosSimulados = inject(CasosSimuladosService);
 
   listar(page: number, size: number): Observable<ResultadoAsignaciones> {
+    if (environment.datosDemostracion) {
+      return of(this.resultadoDemostracion(page, size));
+    }
+
     return this.solicitudesApi
       .listarPaginadas(page, size, ESTADO_SOLICITUD_ASIGNADA)
       .pipe(
-        map((respuesta) => {
-          if (respuesta.content.length === 0) {
-            return this.resultadoDemostracion(page, size);
-          }
-
-          return {
-            solicitudes: respuesta.content.map((solicitud) => ({
-              ...solicitud,
-              esDemostracion: false
-            })),
-            totalElementos: respuesta.totalElements,
-            pagina: respuesta.number,
-            tamano: respuesta.size,
-            usaDemostracion: false
-          };
-        }),
-        catchError(() => of(this.resultadoDemostracion(page, size)))
+        map((respuesta) => ({
+          solicitudes: respuesta.content.map((solicitud) => ({
+            ...solicitud,
+            esDemostracion: false
+          })),
+          totalElementos: respuesta.totalElements,
+          pagina: respuesta.number,
+          tamano: respuesta.size,
+          usaDemostracion: false
+        }))
       );
   }
 
   obtener(referencia: string, size: number): Observable<ResultadoAsignaciones> {
-    if (referencia.startsWith(PREFIJO_REFERENCIA_DEMO)) {
+    if (environment.datosDemostracion && referencia.startsWith(PREFIJO_REFERENCIA_DEMO)) {
       const id = Number(referencia.slice(PREFIJO_REFERENCIA_DEMO.length));
       return of(this.resultadoDemostracion(0, size, id));
     }
 
     const id = Number(referencia);
     if (!Number.isInteger(id) || id <= 0) {
-      return of(this.resultadoDemostracion(0, size));
+      return throwError(() => new Error('La solicitud seleccionada no tiene un identificador válido.'));
     }
 
     return this.solicitudesApi.obtenerPorId(id).pipe(
@@ -80,8 +79,7 @@ export class AsignacionesService {
         pagina: 0,
         tamano: size,
         usaDemostracion: false
-      })),
-      catchError(() => of(this.resultadoDemostracion(0, size)))
+      }))
     );
   }
 
@@ -96,6 +94,18 @@ export class AsignacionesService {
       return of(this.casosSimulados.listarContactosSolicitud(solicitud.id));
     }
     return this.solicitudesApi.listarContactos(solicitud.id);
+  }
+
+  obtenerUltimaCita(solicitud: SolicitudAsignada): Observable<UltimaCitaDto> {
+    if (solicitud.esDemostracion) {
+      const cita = this.casosSimulados.obtenerUltimaCitaSolicitud(solicitud.id);
+      return of({
+        fechaCita: cita?.fechaCita ?? null,
+        estadoCita: cita?.estadoCita ?? null,
+        tieneCitaProgramada: this.casosSimulados.tieneCitaProgramada(solicitud.id)
+      });
+    }
+    return this.solicitudesApi.obtenerUltimaCita(solicitud.id);
   }
 
   registrarContacto(

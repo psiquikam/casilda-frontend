@@ -33,7 +33,7 @@ export interface OpcionCatalogoVbg {
    ========================================================================== */
 
 export const AMBITO_OCURRENCIA: readonly OpcionCatalogoVbg[] = [
-  { codigo: 'pareja-expareja', etiqueta: 'Pareja / expareja' },
+  { codigo: 'pareja-expareja', etiqueta: 'Pareja/expareja' },
   { codigo: 'laboral', etiqueta: 'Laboral' },
   { codigo: 'academico', etiqueta: 'Académico' },
   { codigo: 'sindical', etiqueta: 'Sindical' },
@@ -41,13 +41,15 @@ export const AMBITO_OCURRENCIA: readonly OpcionCatalogoVbg[] = [
   { codigo: 'publico', etiqueta: 'Público' },
   { codigo: 'privado', etiqueta: 'Privado' },
   { codigo: 'familiar', etiqueta: 'Familiar' },
-  { codigo: 'otro-ambito', etiqueta: 'Otro' }
+  { codigo: 'otro-ambito', etiqueta: 'Otro' },
+  { codigo: 'no-aplica', etiqueta: 'N/A' }
 ];
 
 export const FORMA_OCURRENCIA: readonly OpcionCatalogoVbg[] = [
   { codigo: 'presencial', etiqueta: 'Presencial' },
   { codigo: 'virtual', etiqueta: 'Virtual' },
-  { codigo: 'mixta', etiqueta: 'Mixta' }
+  { codigo: 'mixta', etiqueta: 'Mixta' },
+  { codigo: 'no-aplica', etiqueta: 'N/A' }
 ];
 
 /**
@@ -55,9 +57,10 @@ export const FORMA_OCURRENCIA: readonly OpcionCatalogoVbg[] = [
  * texto de ayuda debe dejarlo explícito.
  */
 export const LUGAR_OCURRENCIA: readonly OpcionCatalogoVbg[] = [
-  { codigo: 'dentro', etiqueta: 'Dentro' },
-  { codigo: 'fuera', etiqueta: 'Fuera' },
-  { codigo: 'mixto-lugar', etiqueta: 'Mixto' }
+  { codigo: 'dentro', etiqueta: 'Dentro de la Universidad' },
+  { codigo: 'fuera', etiqueta: 'Fuera de la Universidad' },
+  { codigo: 'mixto-lugar', etiqueta: 'Mixto' },
+  { codigo: 'no-aplica', etiqueta: 'N/A' }
 ];
 
 export const AYUDA_LUGAR_OCURRENCIA =
@@ -65,18 +68,17 @@ export const AYUDA_LUGAR_OCURRENCIA =
 
 /* ==========================================================================
    Sección 2 — Relación misional e institucional (VBG-02-01 a 02-04)
-   Estructura de dos niveles: decisión provisional del pendiente 7.
+   Opciones de la matriz para selección única.
    ========================================================================== */
 
 export const RELACION_MISIONAL: readonly OpcionCatalogoVbg[] = [
-  { codigo: 'misional', etiqueta: 'Misional' },
+  { codigo: 'misional-extension', etiqueta: 'Misionales: Extensión' },
+  { codigo: 'misional-docencia', etiqueta: 'Misionales: Docencia' },
+  { codigo: 'misional-investigacion', etiqueta: 'Misionales: Investigación' },
   { codigo: 'actividades-institucionales', etiqueta: 'Actividades institucionales' },
-  { codigo: 'representacion-u', etiqueta: 'En representación de la U' },
-  { codigo: 'bienes-inmuebles', etiqueta: 'En bienes inmuebles' },
-  // Nivel 2, obligatorio (al menos uno) solo si se marca "misional".
-  { codigo: 'misional-docencia', etiqueta: 'Docencia', padre: 'misional' },
-  { codigo: 'misional-investigacion', etiqueta: 'Investigación', padre: 'misional' },
-  { codigo: 'misional-extension', etiqueta: 'Extensión', padre: 'misional' }
+  { codigo: 'representacion-u', etiqueta: 'Actividades en representación de la Universidad' },
+  { codigo: 'bienes-inmuebles', etiqueta: 'Dentro de los bienes inmuebles de la Universidad o por fuera de estos, en razón o como consecuencia de su vínculo o del vínculo del presunto-a agresor-a con la institución educativa' },
+  { codigo: 'no-aplica', etiqueta: 'No aplica' }
 ];
 
 /**

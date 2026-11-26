@@ -55,7 +55,7 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  displayedColumns: string[] = ['expand', 'nombre', 'documento', 'fecha', 'tipoAsignacion', 'estado', 'profesional', 'acciones'];
+  displayedColumns: string[] = ['expand', 'nombre', 'documento', 'estado', 'profesional', 'tipoAsignacion', 'fecha', 'acciones'];
   expandedElement: any | null;
   expandedDetailColumns: string[] = ['expandedDetail'];
 
@@ -130,7 +130,7 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
 
   cargarDatos(page: number, size: number) {
     this.cargando = true;
-    this.solicitudService.listarPaginadas(page, size).subscribe({
+    this.solicitudService.listarPaginadas(page, size, undefined, true).subscribe({
       next: (respuesta) => {
         this.solicitudes = respuesta.content.map(r => this.mapToItem(r));
         this.totalElementos = respuesta.totalElements;
@@ -358,12 +358,9 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
     return (data: any, filter: string): boolean => {
       const searchTerms = JSON.parse(filter);
 
-      const nombreCompleto = `
-      ${data.primerNombre || ''}
-      ${data.segundoNombre || ''}
-      ${data.primerApellido || ''}
-      ${data.segundoApellido || ''}
-    `.toLowerCase();
+      const nombreCompleto = [
+        data.primerNombre, data.segundoNombre, data.primerApellido, data.segundoApellido
+      ].filter(Boolean).join(' ').toLowerCase();
 
       const documentoCompleto = `
       ${data.tipoDocumento || ''}
@@ -520,4 +517,3 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
   }
 
 }
-

@@ -1,16 +1,9 @@
 <div class="cita-container">
 
-  @if (datosDemostracion) {
-    <!-- DSH-12-08: datos simulados mientras el modo de demostración esté activo. -->
-    <p class="franja-demo" role="status">
-      <mat-icon aria-hidden="true">science</mat-icon>
-      <span>Datos de demostración. Las citas de este listado son simuladas.</span>
-    </p>
-  }
-
   <div class="section-header">
     <h2>Citas</h2>
     <span class="subtitle">Gestión de atención y seguimiento de casos con cita activa</span>
+    <p>Las acciones de atención e inasistencia se habilitan a partir de la fecha y hora de la cita.</p>
   </div>
 
   <mat-card class="pendientes-card">
@@ -72,13 +65,26 @@
         <ng-container matColumnDef="fechaCita">
           <th mat-header-cell scope="col" *matHeaderCellDef>
             <div class="header-inline-container">
-              <span class="column-title">Fecha de cita</span>
+              <span class="column-title">Fecha y hora de cita</span>
               <div class="search-box-slim"><input appFiltroColumna="fecha" (keyup)="applyFilter('fecha', $event)" placeholder="Filtrar..."></div>
             </div>
           </th>
-          <td mat-cell *matCellDef="let element">{{ formatOnlyDate(element.fechaCita) }}</td>
+          <td mat-cell *matCellDef="let element">{{ fechaHoraCita(element.fechaCita) }}</td>
         </ng-container>
 
+        <ng-container matColumnDef="tipoAtencion">
+          <th mat-header-cell scope="col" *matHeaderCellDef>Tipo</th>
+          <td mat-cell *matCellDef="let element">
+            <span class="badge-soft">
+              {{ element.tipoAtencion === 'SEGUIMIENTO' ? 'Seguimiento' : 'Primera cita' }}
+            </span>
+            @if (element.tipoAtencion !== 'SEGUIMIENTO' && element.solicitudTieneCaso && !element.casoId) {
+              <div>Anterior al caso ya creado</div>
+            } @else if (element.tipoAtencion !== 'SEGUIMIENTO' && element.casoId) {
+              <div>Caso creado: {{ element.codigoCaso }}</div>
+            }
+          </td>
+        </ng-container>
 
         <ng-container matColumnDef="profesional">
           <th mat-header-cell scope="col" *matHeaderCellDef>
@@ -94,7 +100,7 @@
         <ng-container matColumnDef="tipoSolicitud">
           <th mat-header-cell scope="col" *matHeaderCellDef>
             <div class="header-inline-container">
-              <span class="column-title">Asignado</span>
+              <span class="column-title">Tipo de solicitud</span>
               <div class="search-box-slim"><input appFiltroColumna="tipo de solicitud" (keyup)="applyFilter('tipoSolicitud', $event)" placeholder="..."></div>
             </div>
           </th>
@@ -115,7 +121,7 @@
               <div class="search-box-slim"><input appFiltroColumna="estado de la cita" (keyup)="applyFilter('estadoCita', $event)" placeholder="..."></div>
             </div>
           </th>
-          <td mat-cell *matCellDef="let element">{{element.estadoCita}}</td>
+          <td mat-cell *matCellDef="let element">{{nombreEstadoCita(element)}}</td>
         </ng-container>
 
         <ng-container matColumnDef="acciones">
@@ -124,15 +130,50 @@
           </th>
           <td mat-cell *matCellDef="let element">
             <div class="action-buttons-container">
+              @if (puedeReprogramarCita(element)) {
               <button mat-icon-button [attr.aria-label]="'Reprogramar la cita ' + element.id" class="action-warning"
-                [disabled]="estaCitaCaducada(element.fechaCita)"
-                [matTooltip]="estaCitaCaducada(element.fechaCita) ? 'La cita ha caducado y no se puede reprogramar' : 'Reprogramar'"
+                matTooltip="Reprogramar cita"
                 (click)="reprogramarCita(element); $event.stopPropagation()">
                 <mat-icon aria-hidden="true">event_repeat</mat-icon>
               </button>
               <button mat-icon-button [attr.aria-label]="'Cancelar la cita ' + element.id" class="action-danger" matTooltip="Cancelar" (click)="cancelarCita(element); $event.stopPropagation()">
                 <mat-icon aria-hidden="true">cancel</mat-icon>
               </button>
+              }
+              @if (mostrarRegistroPrimeraAtencion(element)) {
+                <span [matTooltip]="puedeAbrirRegistroPrimeraAtencion(element) ? 'Registrar primera atención y crear caso' : 'Disponible a partir de la fecha y hora de la cita'">
+                <button mat-icon-button [attr.aria-label]="'Abrir el registro de primera atención para la cita ' + element.id"
+                  class="action-success" [disabled]="!puedeAbrirRegistroPrimeraAtencion(element)"
+                  (click)="abrirRegistroPrimeraAtencion(element); $event.stopPropagation()">
+                  <mat-icon aria-hidden="true">note_add</mat-icon>
+                </button>
+                </span>
+              } @else if (esCitaPendiente(element)) {
+                <span [matTooltip]="puedeRegistrarResultado(element) ? 'Marcar cita como atendida' : 'Disponible a partir de la fecha y hora de la cita'">
+                <button mat-icon-button [attr.aria-label]="'Marcar como atendida la cita ' + element.id"
+                  class="action-success" [disabled]="!puedeRegistrarResultado(element)"
+                  (click)="registrarResultadoCita(element, 'ATENDIDA'); $event.stopPropagation()">
+                  <mat-icon aria-hidden="true">task_alt</mat-icon>
+                </button>
+                </span>
+              }
+              @if (esCitaPendiente(element)) {
+                <span [matTooltip]="puedeRegistrarResultado(element) ? 'Registrar inasistencia' : 'Disponible a partir de la fecha y hora de la cita'">
+                <button mat-icon-button [attr.aria-label]="'Registrar inasistencia de la cita ' + element.id"
+                  class="action-danger" [disabled]="!puedeRegistrarResultado(element)"
+                  (click)="registrarResultadoCita(element, 'INASISTENCIA'); $event.stopPropagation()">
+                  <mat-icon aria-hidden="true">person_off</mat-icon>
+                </button>
+                </span>
+              }
+              @if (puedeRegistrarAtencionSeguimiento(element)) {
+                <button mat-icon-button class="action-success"
+                  [attr.aria-label]="'Registrar atención de seguimiento del caso ' + element.codigoCaso"
+                  matTooltip="Agregar atención al caso existente"
+                  (click)="registrarAtencionSeguimiento(element); $event.stopPropagation()">
+                  <mat-icon aria-hidden="true">note_add</mat-icon>
+                </button>
+              }
             </div>
           </td>
         </ng-container>

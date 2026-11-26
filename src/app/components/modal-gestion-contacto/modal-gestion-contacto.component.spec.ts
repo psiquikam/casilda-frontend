@@ -43,4 +43,25 @@ describe('ModalGestionComponent', () => {
     observacion.setValue('');
     expect(observacion.invalid).toBeTrue();
   });
+
+  it('permite concertar una cita hoy desde el minuto actual, pero no antes', () => {
+    jasmine.clock().install();
+    try {
+      jasmine.clock().mockDate(new Date(2026, 10, 25, 16, 30, 45));
+      component.contactoForm.patchValue({
+        resultado: 'Contesta y se concerta cita',
+        fechaCita: new Date(2026, 10, 25),
+        horaCita: '16:29'
+      });
+      expect(component.contactoForm.hasError('invalidDateTime')).toBeTrue();
+      component.contactoForm.patchValue({ horaCita: '16:30' });
+      expect(component.contactoForm.hasError('invalidDateTime')).toBeFalse();
+      component.contactoForm.patchValue({ horaCita: '17:00' });
+      expect(component.contactoForm.hasError('invalidDateTime')).toBeFalse();
+      component.contactoForm.patchValue({ fechaCita: new Date(2026, 10, 24), horaCita: '17:00' });
+      expect(component.contactoForm.hasError('invalidDateTime')).toBeTrue();
+    } finally {
+      jasmine.clock().uninstall();
+    }
+  });
 });

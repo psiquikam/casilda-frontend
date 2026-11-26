@@ -15,7 +15,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ModalGestionComponent } from '../modal-gestion-contacto/modal-gestion-contacto.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ContactoTelefonicoDto } from '../../services/solicitud.service';
-import { formatFechaCreacion, formatOnlyDate } from '../../custom-date-adapter';
+import { formatFechaCreacion, formatFechaHoraCita, formatOnlyDate } from '../../custom-date-adapter';
 import { forkJoin, Observable } from 'rxjs';
 import { FiltroColumnaDirective } from '../../core/a11y/filtro-columna.directive';
 import { NotificacionService } from '../../core/a11y/notificacion.service';
@@ -66,10 +66,9 @@ export class DetalleAcompanamientoComponent implements OnInit {
   solicitudes: any[] = [];
   cargando = false;
   usaDemostracion = false;
-  private avisoDemostracionMostrado = false;
 
 
-  displayedColumns: string[] = ['expand', 'nombre', 'documento', 'fechaReparto', 'fechaCita', 'tipoAsignacion', 'profesional', 'acciones'];
+  displayedColumns: string[] = ['expand', 'nombre', 'documento', 'fechaCita', 'profesional', 'tipoAsignacion', 'fechaReparto', 'acciones'];
   readonly SIN_AGENDAR = 'Sin agendar';
   opcionesTipoAsignacion: string[] = [];
   opcionesProfesionales: string[] = [];
@@ -98,7 +97,7 @@ export class DetalleAcompanamientoComponent implements OnInit {
       hora: ['08:00', Validators.required],
       jornada: [{ value: '', disabled: true }],
       resultado: ['', Validators.required],
-      observacion: ['', [Validators.required, Validators.minLength(5)]]
+      observacion: ['', [Validators.required, Validators.pattern(/\S/)]]
     });
   }
 
@@ -129,8 +128,14 @@ export class DetalleAcompanamientoComponent implements OnInit {
       tipoDocumento: s.tipoDocumento,
       nombre: s.nombreSolicitante,
       documento: s.documentoSolicitante,
-      fecha: formatFechaCreacion(s.fechaReparto || s.fechaCreacion),
+      fecha: s.fechaHoraReparto
+        ? formatFechaCreacion(s.fechaHoraReparto)
+        : s.fechaReparto ? `${formatOnlyDate(s.fechaReparto)} (hora no disponible)` : 'Sin fecha de reparto',
       fechaCita: '',
+      estadoCita: '',
+      tieneCitaProgramada: false,
+      citaCargando: true,
+      citaError: false,
       tipoAsignacion: s.tipoAsignacion || '',
       unidadAdministrativa: s.remitenteUnidadAdministrativa || s.unidadAdministrativa || '',
       tipoSolicitud: s.tipoSolicitud,
@@ -149,40 +154,43 @@ export class DetalleAcompanamientoComponent implements OnInit {
     this.usaDemostracion = respuesta.usaDemostracion;
     this.cargando = false;
 
-    if (this.usaDemostracion && !this.avisoDemostracionMostrado) {
-      this.notificacion.info('Se muestran datos de demostración porque el servicio no devolvió asignaciones.');
-      this.avisoDemostracionMostrado = true;
-    }
-
     if (mapped.length === 0) return;
     const calls: Record<string, Observable<ContactoTelefonicoDto[]>> = {};
     mapped.forEach(e => {
       calls[String(e.id)] = this.asignacionesService.listarContactos(e.solicitudAsignada);
+      this.asignacionesService.obtenerUltimaCita(e.solicitudAsignada).subscribe({
+        next: (cita) => {
+          e.fechaCita = cita.fechaCita ? formatFechaHoraCita(cita.fechaCita) : '';
+          e.estadoCita = cita.estadoCita || '';
+          e.tieneCitaProgramada = cita.tieneCitaProgramada;
+          e.citaCargando = false;
+          this.actualizarCitaEnTabla(e);
+        },
+        error: (error) => {
+          e.citaCargando = false;
+          e.citaError = true;
+          this.actualizarCitaEnTabla(e);
+          this.notificacion.error('No fue posible consultar la última cita de una solicitud.', error);
+        }
+      });
     });
     forkJoin(calls).subscribe({
       next: (results) => {
         Object.keys(results).forEach(idStr => {
           this.numIntentosMap[Number(idStr)] = results[idStr].length;
-          const fila = mapped.find(e => String(e.id) === idStr);
-          if (fila) fila.fechaCita = this.ultimaCita(results[idStr]);
         });
-        // Reaplica el filtro: el estado de la cita llega después de la carga inicial.
-        this.dataSourceAsignados.filter = JSON.stringify(this.filterValues);
       },
-      error: () => { this.numIntentosMap = {}; }
+      error: (error) => {
+        this.numIntentosMap = {};
+        this.notificacion.error('No fue posible cargar el historial de contactos.', error);
+      }
     });
   }
 
-  /** Fecha y hora de la última cita concertada en los intentos de contacto, o '' si no hay. */
-  private ultimaCita(contactos: ContactoTelefonicoDto[]): string {
-    const conCita = contactos.filter(c => c.fechaCita);
-    const ultima = conCita[conCita.length - 1];
-    if (!ultima?.fechaCita) return '';
-    const hora = ultima.horaCita ?? '';
-    const sinHora = /^\d{4}-\d{2}-\d{2}$/.test(ultima.fechaCita);
-    if (sinHora && !hora) return formatOnlyDate(ultima.fechaCita);
-    const bruto = sinHora && hora ? `${ultima.fechaCita}T${hora.substring(0, 5)}:00` : ultima.fechaCita;
-    return formatFechaCreacion(bruto).replace(/:00$/, '');
+  private actualizarCitaEnTabla(fila: unknown): void {
+    if (this.dataSourceAsignados.data.includes(fila)) {
+      this.dataSourceAsignados.data = [...this.dataSourceAsignados.data];
+    }
   }
 
   applyFilter(column: string, event: Event) {
@@ -219,7 +227,7 @@ export class DetalleAcompanamientoComponent implements OnInit {
         && (!searchTerms.nombre || nombreCompleto.includes(searchTerms.nombre))
         && (!searchTerms.documento || documentoCompleto.includes(searchTerms.documento))
         && (!searchTerms.fecha || data.fecha?.toLowerCase().includes(searchTerms.fecha))
-        && (!searchTerms.estadoCita || !data.fechaCita)
+        && (!searchTerms.estadoCita || (!data.citaCargando && !data.citaError && !data.tieneCitaProgramada))
         && (!searchTerms.tipoAsignacion || data.tipoAsignacion === searchTerms.tipoAsignacion)
         && (!searchTerms.profesional || data.profesional === searchTerms.profesional);
     };
@@ -265,4 +273,3 @@ export class DetalleAcompanamientoComponent implements OnInit {
     void this.router.navigate(['/mis-asignaciones']);
   }
 }
-

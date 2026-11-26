@@ -61,11 +61,13 @@ describe('AuthService', () => {
     // 1. Admin
     service.currentUser = session(Math.floor(Date.now() / 1000) + 3600, 'Admin');
     expect(service.isAdmin()).toBeTrue();
+    expect(service.puedeRepartirSolicitudes()).toBeTrue();
     expect(service.hasAnyRole(['Usuario', 'Revisor'])).toBeTrue(); // Admin tiene acceso a todo
 
     // 2. Coordinador
     service.currentUser = session(Math.floor(Date.now() / 1000) + 3600, 'Coordinador');
     expect(service.isCoordinador()).toBeTrue();
+    expect(service.puedeRepartirSolicitudes()).toBeTrue();
     expect(service.hasRole('COORDINADOR')).toBeTrue();
     expect(service.hasRole('ROLE_COORDINADOR')).toBeTrue();
     expect(service.isAdmin()).toBeFalse();
@@ -73,6 +75,7 @@ describe('AuthService', () => {
     // 3. Profesional
     service.currentUser = session(Math.floor(Date.now() / 1000) + 3600, 'Profesional');
     expect(service.isProfesional()).toBeTrue();
+    expect(service.puedeRepartirSolicitudes()).toBeFalse();
     expect(service.hasRole('PROFESIONAL')).toBeTrue();
     expect(service.hasAnyRole(['Profesional', 'Coordinador'])).toBeTrue();
     expect(service.hasAnyRole(['Admin'])).toBeFalse();
@@ -80,6 +83,7 @@ describe('AuthService', () => {
     // 4. Revisor
     service.currentUser = session(Math.floor(Date.now() / 1000) + 3600, 'Revisor');
     expect(service.isRevisor()).toBeTrue();
+    expect(service.puedeRepartirSolicitudes()).toBeFalse();
     expect(service.hasRole('REVISOR')).toBeTrue();
 
     // 5. Usuario

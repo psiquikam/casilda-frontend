@@ -295,18 +295,13 @@
 
                               <div class="table-responsive">
                                 <table mat-table [dataSource]="discapacidadesRegistradas" class="atencion-table" aria-label="Discapacidades registradas">
-                                  <ng-container matColumnDef="tipo">
-                                    <th mat-header-cell scope="col" *matHeaderCellDef> Tipo </th>
-                                    <td mat-cell *matCellDef="let element"> {{element.tipo}} </td>
-                                  </ng-container>
-
                                   <ng-container matColumnDef="subTipo">
-                                    <th mat-header-cell scope="col" *matHeaderCellDef> Subtipo </th>
+                                    <th mat-header-cell scope="col" *matHeaderCellDef> Discapacidad </th>
                                     <td mat-cell *matCellDef="let element"> {{element.subTipo}} </td>
                                   </ng-container>
 
                                   <ng-container matColumnDef="descripcion">
-                                    <th mat-header-cell scope="col" *matHeaderCellDef> Descripción </th>
+                                    <th mat-header-cell scope="col" *matHeaderCellDef> Observaciones </th>
                                     <td mat-cell *matCellDef="let element"> {{element.descripcion}} </td>
                                   </ng-container>
 
@@ -322,9 +317,9 @@
                                   </ng-container>
 
                                   <tr mat-header-row
-                                  *matHeaderRowDef="['tipo', 'subTipo', 'descripcion', 'acciones']"></tr>
+                                  *matHeaderRowDef="['subTipo', 'descripcion', 'acciones']"></tr>
                                   <tr mat-row
-                                    *matRowDef="let row; columns: ['tipo', 'subTipo', 'descripcion', 'acciones'];">
+                                    *matRowDef="let row; columns: ['subTipo', 'descripcion', 'acciones'];">
                                   </tr>
                                 </table>
 
