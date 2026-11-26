@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom, of, throwError } from 'rxjs';
 
+import { environment } from '../../environments/environment';
 import { AsignacionesService } from './asignaciones.service';
 import { CasosSimuladosService } from './casos-simulados.service';
 import {
@@ -20,11 +21,13 @@ function solicitud(id: number, codigo: string): SolicitudAcompanamientoResponse 
 }
 
 describe('AsignacionesService', () => {
+  const modoDemostracionOriginal = environment.datosDemostracion;
   let service: AsignacionesService;
   let api: jasmine.SpyObj<SolicitudService>;
   let simulados: jasmine.SpyObj<CasosSimuladosService>;
 
   beforeEach(() => {
+    environment.datosDemostracion = false;
     api = jasmine.createSpyObj<SolicitudService>('SolicitudService', [
       'listarPaginadas',
       'obtenerPorId',
@@ -48,6 +51,10 @@ describe('AsignacionesService', () => {
     service = TestBed.inject(AsignacionesService);
   });
 
+  afterEach(() => {
+    environment.datosDemostracion = modoDemostracionOriginal;
+  });
+
   it('conserva los datos del API cuando hay asignaciones', async () => {
     const pagina: PagedResponseDto<SolicitudAcompanamientoResponse> = {
       content: [solicitud(12, 'SOL-12')],
@@ -65,28 +72,32 @@ describe('AsignacionesService', () => {
     expect(resultado.solicitudes[0].codigo).toBe('SOL-12');
   });
 
-  it('usa datos identificados como demostración cuando el API responde vacío', async () => {
+  it('conserva una respuesta vacía del API sin mostrar datos de demostración', async () => {
     api.listarPaginadas.and.returnValue(of({
       content: [], totalElements: 0, totalPages: 0, size: 10, number: 0
     }));
 
     const resultado = await firstValueFrom(service.listar(0, 10));
 
-    expect(resultado.usaDemostracion).toBeTrue();
-    expect(resultado.solicitudes[0].esDemostracion).toBeTrue();
-    expect(resultado.solicitudes[0].codigo).toBe('CAS-DEMO-0001');
+    expect(resultado.usaDemostracion).toBeFalse();
+    expect(resultado.solicitudes).toEqual([]);
+    expect(simulados.listarSolicitudesAsignadas).not.toHaveBeenCalled();
   });
 
-  it('usa datos de demostración si el endpoint falla', async () => {
+  it('propaga el error del API en vez de responder con datos de demostración', async () => {
     api.listarPaginadas.and.returnValue(throwError(() => new Error('sin servicio')));
 
-    const resultado = await firstValueFrom(service.listar(0, 10));
-
-    expect(resultado.usaDemostracion).toBeTrue();
-    expect(resultado.totalElementos).toBe(1);
+    await expectAsync(firstValueFrom(service.listar(0, 10))).toBeRejectedWithError('sin servicio');
+    expect(simulados.listarSolicitudesAsignadas).not.toHaveBeenCalled();
   });
 
-  it('resuelve una referencia demo sin consultar el API', async () => {
+  it('usa referencias demo solo cuando el modo demostración está habilitado', async () => {
+    if (!environment.datosDemostracion) {
+      await expectAsync(firstValueFrom(service.obtener('demo-9001', 10)))
+        .toBeRejectedWithError('La solicitud seleccionada no tiene un identificador válido.');
+      return;
+    }
+
     const resultado = await firstValueFrom(service.obtener('demo-9001', 10));
 
     expect(api.obtenerPorId).not.toHaveBeenCalled();

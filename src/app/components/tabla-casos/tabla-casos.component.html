@@ -11,9 +11,9 @@
         <ng-container matColumnDef="expand">
           <th mat-header-cell scope="col" *matHeaderCellDef><span class="visually-hidden">Detalle</span></th>
           <td mat-cell *matCellDef="let element">
-            <button mat-icon-button [attr.aria-label]="'Ver el detalle del caso ' + element.id"
+            <button mat-icon-button [attr.aria-label]="'Ver el detalle del caso ' + (element.id || element.casoId)"
               [attr.aria-expanded]="expandedElement === element"
-              [attr.aria-controls]="'detalle-' + element.id"
+              [attr.aria-controls]="'detalle-' + (element.casoId || element.id)"
               (click)="(expandedElement = expandedElement === element ? null : element); $event.stopPropagation()">
               <mat-icon aria-hidden="true" [ngClass]="expandedElement === element ? 'icon-remove' : 'icon-add'">
                 {{expandedElement === element ? 'remove_circle' : 'add_circle'}}
@@ -30,7 +30,38 @@
               placeholder="Filtrar"></div>
             </div>
           </th>
-          <td mat-cell *matCellDef="let element" class="id-cell">#{{element.id}}</td>
+          <td mat-cell *matCellDef="let element" class="id-cell">
+            @if (element.tieneCodigoCaso) {
+              #{{element.id}}
+            } @else {
+              <span class="id-pendiente" matTooltip="Pendiente de primera atención: aún no tiene código de caso">
+                Pendiente
+              </span>
+            }
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="etapa">
+          <th mat-header-cell scope="col" *matHeaderCellDef>
+            <div class="header-inline-container">
+              <span class="column-title">Estado de atención</span>
+            </div>
+          </th>
+          <td mat-cell *matCellDef="let element">
+            <span class="estado-etapa"
+              [class.estado-etapa--seguimiento]="element.tieneCodigoCaso"
+              [class.estado-etapa--pendiente]="!element.tieneCodigoCaso">
+              <mat-icon aria-hidden="true">
+                {{element.tieneCodigoCaso ? 'task_alt' : 'pending_actions'}}
+              </mat-icon>
+              {{element.tieneCodigoCaso ? 'En seguimiento' : 'Primera atención pendiente'}}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="atenciones">
+          <th mat-header-cell scope="col" *matHeaderCellDef>Atenciones</th>
+          <td mat-cell *matCellDef="let element">{{ element.cantidadAtenciones }}</td>
         </ng-container>
 
         <ng-container matColumnDef="nombre">
@@ -107,17 +138,53 @@
           </th>
           <td mat-cell *matCellDef="let element">
             <div class="action-buttons-container">
-              <button mat-icon-button [attr.aria-label]="'Iniciar la atención del caso ' + element.id" class="action-success"
-                (click)="iniciarAtencion(element); $event.stopPropagation()">
-                <mat-icon aria-hidden="true">play_circle_outline</mat-icon>
+              <button mat-button type="button" class="action-register"
+                matTooltip="Ver historial de atenciones del caso"
+                [attr.aria-label]="'Ver el historial de atenciones del caso ' + (element.codigo || element.casoId)"
+                (click)="verHistorial.emit(element); $event.stopPropagation()">
+                <mat-icon aria-hidden="true">history</mat-icon>
+                <span>Ver caso</span>
               </button>
+              @if (showRegisterAction) {
+                <button mat-button type="button" class="action-register"
+                  matTooltip="Agendar una cita de seguimiento para este caso"
+                  [attr.aria-label]="'Agendar seguimiento para el caso ' + (element.codigo || element.casoId)"
+                  (click)="programarSeguimiento.emit(element); $event.stopPropagation()">
+                  <mat-icon aria-hidden="true">event_available</mat-icon>
+                  <span>Agendar seguimiento</span>
+                </button>
+              }
+              @if (showManagementActions) {
+                @if (element.profesional === 'Sin asignar') {
+                  <button mat-icon-button matTooltip="Repartir el caso"
+                    [attr.aria-label]="'Repartir o asignar el caso ' + (element.id || element.casoId)"
+                    (click)="repartir.emit(element); $event.stopPropagation()">
+                    <mat-icon aria-hidden="true">assignment_ind</mat-icon>
+                  </button>
+                }
+                <button mat-icon-button matTooltip="Visualizar solicitud"
+                  [attr.aria-label]="'Visualizar el caso ' + (element.id || element.casoId)"
+                  (click)="visualizar.emit(element); $event.stopPropagation()">
+                  <mat-icon aria-hidden="true">visibility</mat-icon>
+                </button>
+                <button mat-icon-button matTooltip="Editar solicitud"
+                  [attr.aria-label]="'Editar el caso ' + (element.id || element.casoId)"
+                  (click)="editar.emit(element); $event.stopPropagation()">
+                  <mat-icon aria-hidden="true">edit</mat-icon>
+                </button>
+                <button mat-icon-button matTooltip="Eliminar solicitud"
+                  [attr.aria-label]="'Eliminar el caso ' + (element.id || element.casoId)"
+                  (click)="eliminar.emit(element); $event.stopPropagation()">
+                  <mat-icon aria-hidden="true">delete</mat-icon>
+                </button>
+              }
             </div>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="expandedDetail">
           <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
-            <div class="element-detail" [id]="'detalle-' + element.id"
+            <div class="element-detail" [id]="'detalle-' + (element.casoId || element.id)"
             [attr.inert]="element === expandedElement ? null : ''"
             [@detailExpand]="element === expandedElement ? 'expanded' : 'collapsed'">
               <div class="detail-grid">
@@ -145,10 +212,10 @@
 
   </table>
 
-  @if (dataSource.data.length === 0) {
+  @if (dataSource.filteredData.length === 0) {
     <div class="no-results-msg">
       <mat-icon aria-hidden="true">event_available</mat-icon>
-      <p>No hay citas.</p>
+      <p>No hay casos para los filtros seleccionados.</p>
     </div>
   }
 

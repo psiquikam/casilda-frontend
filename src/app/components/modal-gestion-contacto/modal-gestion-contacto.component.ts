@@ -12,13 +12,14 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { ContactoTelefonicoDto } from '../../services/solicitud.service';
 import { environment } from '../../../environments/environment';
 import { NotificacionService } from '../../core/a11y/notificacion.service';
+import { DialogoService } from '../../core/a11y/dialogo.service';
 import { AsignacionesService, SolicitudAsignada } from '../../services/asignaciones.service';
+import { futureDateTime } from '../modal-reprogramar-cita/modal-reprogramar-cita.component';
 
 /** Resultado que permite concertar cita en primera llamada */
 const RESULTADO_EXITOSO = 'Contesta y se concerta cita';
@@ -38,7 +39,6 @@ const RESULTADO_DESISTIMIENTO = 'Desistimiento';
     MatTabsModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule,
     MatDatepickerModule,
     MatNativeDateModule
 ],
@@ -47,6 +47,7 @@ const RESULTADO_DESISTIMIENTO = 'Desistimiento';
 })
 export class ModalGestionComponent implements OnInit {
   private readonly notificacion = inject(NotificacionService);
+  private readonly dialogo = inject(DialogoService);
 
   contactoForm!: FormGroup;
   guardando = false;
@@ -64,9 +65,7 @@ export class ModalGestionComponent implements OnInit {
   minCitaDate: Date = (() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow;
+    return today;
   })();
 
   private readonly maestrosUrl = `${environment.apiBaseUrl}/maestros`;
@@ -76,7 +75,6 @@ export class ModalGestionComponent implements OnInit {
     private dialogRef: MatDialogRef<ModalGestionComponent>,
     private asignacionesService: AsignacionesService,
     private http: HttpClient,
-    private snackBar: MatSnackBar,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) { }
 
@@ -141,22 +139,15 @@ export class ModalGestionComponent implements OnInit {
     });
   }
 
-  private dateGreaterThanTodayValidator(control: any) {
-    if (!control.value) return null;
-    const selectedDate = new Date(control.value);
-    selectedDate.setHours(0, 0, 0, 0);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return selectedDate > today ? null : { dateNotGreaterThanToday: true };
-  }
-
   private actualizarValidadoresCita(): void {
     if (this.mostrarCamposCita) {
-      this.contactoForm.get('fechaCita')?.setValidators([Validators.required, this.dateGreaterThanTodayValidator.bind(this)]);
+      this.contactoForm.get('fechaCita')?.setValidators([Validators.required]);
       this.contactoForm.get('horaCita')?.setValidators([Validators.required]);
+      this.contactoForm.setValidators(control => futureDateTime(control, true));
     } else {
       this.contactoForm.get('fechaCita')?.clearValidators();
       this.contactoForm.get('horaCita')?.clearValidators();
+      this.contactoForm.clearValidators();
       this.contactoForm.patchValue({ fechaCita: '', horaCita: '' });
     }
     this.contactoForm.get('fechaCita')?.updateValueAndValidity();
@@ -166,7 +157,10 @@ export class ModalGestionComponent implements OnInit {
   private formatFecha(fecha: any): string {
     if (!fecha) return '';
     if (typeof fecha === 'string') return fecha;
-    return new Date(fecha).toISOString().substring(0, 10);
+    const date = new Date(fecha);
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${date.getFullYear()}-${month}-${day}`;
   }
 
   registrarIntento(): void {
@@ -190,14 +184,14 @@ export class ModalGestionComponent implements OnInit {
     }).subscribe({
       next: (contacto) => {
         this.guardando = false;
-        if (contacto.citaCreada) {
-          this.snackBar.open(
-            `✅ Cita registrada para el ${contacto.fechaCita ?? val.fechaCita}.`,
-            'Cerrar',
-            { duration: 5000, panelClass: ['snack-success'] }
-          );
-        }
         this.dialogRef.close(true);
+        if (contacto.citaCreada) {
+          this.dialogo.aviso({
+            titulo: 'Cita agendada',
+            icono: 'check_circle',
+            mensaje: `La cita se registró para el ${contacto.fechaCita ?? this.formatFecha(val.fechaCita)}.`
+          });
+        }
       },
       error: (err) => {
         this.notificacion.error('No fue posible registrar el intento de contacto. Intente de nuevo.', err);
@@ -207,7 +201,7 @@ export class ModalGestionComponent implements OnInit {
   }
 
   private getToday(): string {
-    return new Date().toISOString().substring(0, 10);
+    return this.formatFecha(new Date());
   }
 
   private getHoraActual(): string {

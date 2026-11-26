@@ -13,6 +13,7 @@ import { MaestrosVbgService } from '../../services/maestros-vbg.service';
 import { MaestroDto } from '../../services/listas.service';
 import { ModalSeguimientosComponent } from '../modal-seguimiento/modal-seguimiento.component';
 import { esUltimaProfesionalActiva } from '../../core/vbg/ultima-profesional-activa';
+import { environment } from '../../../environments/environment';
 
 export interface SeguimientoVbg {
   especialidad: string;
@@ -63,7 +64,8 @@ export class SeccionSeguimientosComponent implements OnInit {
   motivoCierreTexto = '';
 
   ngOnInit(): void {
-    this.maestrosVbg.obtenerCatalogo('especialidades-seguimiento').subscribe({
+    const catalogo = environment.datosDemostracion ? 'especialidades-seguimiento' : 'tipos-servicio';
+    this.maestrosVbg.obtenerCatalogo(catalogo).subscribe({
       next: (data) => { this.especialidades = data; },
       error: () => { this.especialidades = []; }
     });

@@ -154,7 +154,7 @@ const INDICADORES_POR_ROL: Record<string, readonly IndicadorDto[]> = {
       definicion: 'Casos asignados a la cuenta y sin cierre formal.',
       periodo: 'A la fecha de corte',
       icono: 'folder_shared',
-      ruta: '/mis-asignaciones'
+      ruta: '/registro-atencion'
     },
     {
       id: 'citas-hoy',
@@ -172,7 +172,7 @@ const INDICADORES_POR_ROL: Record<string, readonly IndicadorDto[]> = {
       definicion: 'Compromisos con fecha de cumplimiento dentro de los próximos 7 días, de la persona y de la dupla/profesional (P-VBG-01).',
       periodo: 'Próximos 7 días',
       icono: 'task_alt',
-      ruta: '/mis-asignaciones'
+      ruta: '/registro-atencion'
     },
     {
       id: 'notas-pendientes',
@@ -202,7 +202,7 @@ const INDICADORES_POR_ROL: Record<string, readonly IndicadorDto[]> = {
       definicion: 'Expedientes bajo revisión de calidad.',
       periodo: 'A la fecha de corte',
       icono: 'fact_check',
-      ruta: '/consulta'
+      ruta: '/registro-atencion'
     },
     {
       id: 'medidas',

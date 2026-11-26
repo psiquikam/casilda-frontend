@@ -121,9 +121,9 @@ const PENDIENTES_POR_ROL: Record<string, readonly PendienteDto[]> = {
       id: 'p-pro-3',
       radicado: 'CAS-2026-203',
       iniciales: 'S. C.',
-      descripcion: 'Solicitud asignada sin primer contacto',
+      descripcion: 'Cita pendiente de primera atención',
       vence: diasDesdeHoy(3).toISOString(),
-      ruta: '/consulta'
+      ruta: '/cita'
     }
   ],
   REVISOR: [
@@ -133,7 +133,7 @@ const PENDIENTES_POR_ROL: Record<string, readonly PendienteDto[]> = {
       iniciales: 'D. O.',
       descripcion: 'Expediente con campos obligatorios vacíos',
       vence: diasDesdeHoy(1).toISOString(),
-      ruta: '/consulta'
+      ruta: '/registro-atencion'
     },
     {
       id: 'p-rev-2',

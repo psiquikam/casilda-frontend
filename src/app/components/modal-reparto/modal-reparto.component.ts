@@ -13,6 +13,7 @@ import { catchError } from 'rxjs/operators';
 import { SolicitudService, GrupoProfesionalDto } from '../../services/solicitud.service';
 import { MaestroDto } from '../../services/listas.service';
 import { NotificacionService } from '../../core/a11y/notificacion.service';
+import { DialogoService } from '../../core/a11y/dialogo.service';
 
 function fechaLocalActual(): string {
   const fecha = new Date();
@@ -20,6 +21,7 @@ function fechaLocalActual(): string {
   const dia = String(fecha.getDate()).padStart(2, '0');
   return `${fecha.getFullYear()}-${mes}-${dia}`;
 }
+
 
 @Component({
     selector: 'app-reparto-modal',
@@ -38,6 +40,7 @@ function fechaLocalActual(): string {
 })
 export class RepartoModalComponent implements OnInit {
   private readonly notificacion = inject(NotificacionService);
+  private readonly dialogo = inject(DialogoService);
   repartoForm: FormGroup;
   gruposProfesionales: GrupoProfesionalDto[] = [];
 
@@ -141,16 +144,27 @@ export class RepartoModalComponent implements OnInit {
     }
 
     this.guardando = true;
+    this.dialogRef.disableClose = true;
     const reparto = this.repartoForm.getRawValue();
     this.repartoForm.disable({ emitEvent: false });
     this.solicitudService.asignar(solicitudId, reparto).subscribe({
       next: (solicitudActualizada) => {
         this.guardando = false;
-        this.notificacion.exito('El reparto se guardó correctamente.');
+        this.dialogRef.disableClose = false;
         this.dialogRef.close(solicitudActualizada);
+        if (solicitudActualizada.estadoCorreoReparto === 'ERROR') {
+          this.dialogo.aviso({ titulo: 'Reparto guardado', icono: 'warning', mensaje: 'El reparto se guardó, pero no se pudo enviar el correo a todos los destinatarios de prueba. Revise la configuración del servidor.' });
+        } else if (solicitudActualizada.estadoCorreoReparto === 'ENVIADO') {
+          this.dialogo.aviso({ titulo: 'Reparto realizado', icono: 'check_circle', mensaje: 'El reparto se guardó y se enviaron los correos de prueba.' });
+        } else if (solicitudActualizada.estadoCorreoReparto === 'DESACTIVADO') {
+          this.dialogo.aviso({ titulo: 'Reparto realizado', icono: 'check_circle', mensaje: 'El reparto se guardó correctamente. La notificación de correo no está activada.' });
+        } else {
+          this.dialogo.aviso({ titulo: 'Reparto realizado', icono: 'check_circle', mensaje: 'El reparto se guardó correctamente. No se recibió el estado de la notificación de correo.' });
+        }
       },
       error: (error) => {
         this.guardando = false;
+        this.dialogRef.disableClose = false;
         this.repartoForm.enable({ emitEvent: false });
         this.notificacion.error('No fue posible guardar el reparto. Revise los datos e intente nuevamente.', error);
       }

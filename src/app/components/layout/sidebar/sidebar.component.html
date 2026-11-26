@@ -109,7 +109,7 @@
     }
 
     <!-- 2. EQUIPO DE ATENCIÓN (Admin, Coordinador y Profesional) -->
-    @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional()) {
+    @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional() || auth.isRevisor()) {
       <div class="nav-section">
         <button type="button" id="toggle-atencion" class="section-toggle" (click)="toggleSection('atencion')"
           [attr.aria-expanded]="isExpanded('atencion')" aria-controls="section-atencion">
@@ -127,27 +127,25 @@
               <mat-icon class="nav-item__icon" aria-hidden="true">add_circle_outline</mat-icon>
               <span class="nav-item__text">Nueva solicitud</span>
             </a>
-            <a routerLink="/consulta" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
-              <mat-icon class="nav-item__icon" aria-hidden="true">move_to_inbox</mat-icon>
-              <span class="nav-item__text">Bandeja de reparto</span>
-            </a>
-            @if (features.assignmentsPrototype) {
+            @if (auth.puedeRepartirSolicitudes()) {
+              <a routerLink="/consulta" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
+                <mat-icon class="nav-item__icon" aria-hidden="true">move_to_inbox</mat-icon>
+                <span class="nav-item__text">Bandeja de reparto</span>
+              </a>
+            }
+            @if (features.assignmentsPrototype && auth.hasAnyRole(['ADMIN', 'COORDINADOR', 'PROFESIONAL'])) {
               <a routerLink="/mis-asignaciones" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
                 <mat-icon class="nav-item__icon" aria-hidden="true">assignment_ind</mat-icon>
-              <span class="nav-item__text">Bandeja de contacto</span>
+                <span class="nav-item__text">Bandeja de contacto</span>
               </a>
             }
             <a routerLink="/cita" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
               <mat-icon class="nav-item__icon" aria-hidden="true">calendar_month</mat-icon>
               <span class="nav-item__text">Citas y agendamiento</span>
             </a>
-            <a routerLink="/registro-caso" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
-              <mat-icon class="nav-item__icon" aria-hidden="true">folder_shared</mat-icon>
-              <span class="nav-item__text">Registro de caso</span>
-            </a>
             <a routerLink="/registro-atencion" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
-              <mat-icon class="nav-item__icon" aria-hidden="true">handshake</mat-icon>
-              <span class="nav-item__text">Registro de atención</span>
+              <mat-icon class="nav-item__icon" aria-hidden="true">folder_open</mat-icon>
+              <span class="nav-item__text">Casos</span>
             </a>
           </div>
         }

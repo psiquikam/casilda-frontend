@@ -111,7 +111,7 @@ export const CATALOGO_MODULOS: readonly ModuloCasilda[] = [
     nombre: 'Bandeja de reparto',
     icono: 'move_to_inbox',
     ruta: '/consulta',
-    roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR'],
+    roles: ['ADMIN', 'COORDINADOR'],
     seccion: 'Equipo de atención'
   },
   {
@@ -119,7 +119,7 @@ export const CATALOGO_MODULOS: readonly ModuloCasilda[] = [
     nombre: 'Bandeja de contacto',
     icono: 'assignment_ind',
     ruta: '/mis-asignaciones',
-    roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR'],
+    roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL'],
     feature: 'assignmentsPrototype',
     seccion: 'Equipo de atención'
   },
@@ -132,19 +132,11 @@ export const CATALOGO_MODULOS: readonly ModuloCasilda[] = [
     seccion: 'Equipo de atención'
   },
   {
-    id: 'registro-caso',
-    nombre: 'Registro de caso',
-    icono: 'folder_shared',
-    ruta: '/registro-caso',
-    roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL'],
-    seccion: 'Equipo de atención'
-  },
-  {
     id: 'registro-atencion',
-    nombre: 'Registro de atención',
-    icono: 'handshake',
+    nombre: 'Casos',
+    icono: 'folder_open',
     ruta: '/registro-atencion',
-    roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL'],
+    roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR'],
     seccion: 'Equipo de atención'
   },
 

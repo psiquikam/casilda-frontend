@@ -1,13 +1,11 @@
 import type { CasoDto, CitaDto, PagedResponseDto, SolicitudAcompanamientoResponse } from '../../services/solicitud.service';
 
 /**
- * Modelo de un caso simulado en memoria.
+ * Modelo de una cita simulada en memoria, opcionalmente asociada a un caso.
  *
- * Es el único almacén del modo de demostración (M1 del plan de
- * estandarización VBG): lo que se registra en los formularios durante la
- * sesión se guarda aquí, y de aquí se alimentan también los widgets del
- * panel que dependen de casos concretos y `MiProcesoService` de la vista del
- * rol Usuario, para que el mismo caso se vea igual en todas las pantallas.
+ * Cada cita conserva sus propios datos de atención; las citas de seguimiento
+ * apuntan al ID de caso existente y no crean otro expediente. Es el almacén
+ * del modo de demostración para las bandejas y widgets del módulo.
  *
  * **No persiste entre sesiones** (no usa `localStorage` ni `sessionStorage`,
  * por instrucción explícita): es un `Injectable({ providedIn: 'root' })`, así
@@ -17,14 +15,18 @@ import type { CasoDto, CitaDto, PagedResponseDto, SolicitudAcompanamientoRespons
  * demostración.
  */
 export interface CasoSimuladoVbg {
-  readonly id: number;
+  readonly id: number | null;
   readonly codigo: string;
   readonly solicitudId: number;
   readonly citaId: number;
+  readonly tipoAtencion: 'INICIAL' | 'SEGUIMIENTO';
+  readonly atencionId?: number;
 
-  /** `idEstadoCita` de la matriz de `EstadoCitaEnum` (1 = Creada, no cancelada). */
+  /** `idEstadoCita` de la matriz de `EstadoCitaEnum` (1 = Programada, no cancelada). */
   readonly idEstadoCita: number;
   readonly estadoCita: string;
+  readonly motivoEstadoCita?: string;
+  readonly observaciones?: string;
   readonly estadoCaso: string;
   /** ISO 8601. */
   readonly fechaCita: string;
@@ -79,13 +81,18 @@ export function aCitaDto(caso: CasoSimuladoVbg): CitaDto {
   return {
     id: caso.citaId,
     solicitudId: caso.solicitudId,
-    codigoSolicitud: caso.codigo,
+    codigoSolicitud: String(s.id),
+    casoId: caso.id,
+    codigoCaso: caso.codigo,
+    tipoAtencion: caso.tipoAtencion,
     nombreSolicitante: s.nombreSolicitante,
     tipoDocumento: s.tipoDocumento,
     documento: s.documentoSolicitante,
     fechaCita: caso.fechaCita,
     idEstadoCita: caso.idEstadoCita,
     estadoCita: caso.estadoCita,
+    motivoEstadoCita: caso.motivoEstadoCita,
+    observaciones: caso.observaciones,
     tipoSolicitud: caso.tipoSolicitud,
     unidadAdministrativa: caso.unidadAdministrativa,
     profesional: caso.profesional,
@@ -100,13 +107,16 @@ export function aCitaDto(caso: CasoSimuladoVbg): CitaDto {
   };
 }
 
-export function aCasoDto(caso: CasoSimuladoVbg): CasoDto {
+export type CasoSimuladoConCaso = CasoSimuladoVbg & { id: number; codigo: string };
+
+export function aCasoDto(caso: CasoSimuladoConCaso): CasoDto {
   const s = caso.solicitud;
   return {
     id: caso.id,
     codigo: caso.codigo,
     solicitudId: caso.solicitudId,
     citaId: caso.citaId,
+    cantidadAtenciones: caso.atencionId == null ? 0 : 1,
     nombreSolicitante: s.nombreSolicitante,
     tipoDocumento: s.tipoDocumento,
     documento: s.documentoSolicitante,

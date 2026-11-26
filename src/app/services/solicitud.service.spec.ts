@@ -35,4 +35,41 @@ describe('SolicitudService', () => {
     normal.flush({});
   });
 
+  it('envía cada pestaña visible de atención al endpoint correspondiente', () => {
+    const rutas = [
+      '/casos/pestana/0',
+      '/atenciones/pestana/5',
+      '/casos/pestana/4',
+      '/atenciones/pestana/6',
+      '/atenciones/pestana/7',
+      '/atenciones/pestana/9',
+      '/atenciones/pestana/10',
+      '/atenciones/pestana/11'
+    ];
+
+    rutas.forEach((ruta, tabIndex) => {
+      const datos = { tabIndex };
+      service.registrarPestanaAtencion(tabIndex, datos).subscribe();
+
+      const request = http.expectOne(`${environment.apiBaseUrl}${ruta}`);
+      expect(request.request.method).toBe('POST');
+      expect(request.request.body).toEqual(datos);
+      request.flush({});
+    });
+  });
+
+  it('envía los compromisos, seguimientos y estado de primera atención a sus endpoints', () => {
+    ['/atenciones/pestana/9', '/atenciones/pestana/10', '/atenciones/pestana/11']
+      .forEach((ruta, indice) => {
+        service.registrarPestana(indice + 8, {}).subscribe();
+        const request = http.expectOne(`${environment.apiBaseUrl}${ruta}`);
+        expect(request.request.method).toBe('POST');
+        request.flush({});
+      });
+  });
+
+  it('rechaza índices de pestaña que no existen en el formulario de atención', () => {
+    expect(() => service.registrarPestanaAtencion(8, {}))
+      .toThrowError('Pestaña de Equipo de Atención no soportada: 8');
+  });
 });

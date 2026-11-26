@@ -20,13 +20,17 @@ describe('RegistroVbgDatosService', () => {
   beforeEach(() => {
     environment.datosDemostracion = false;
     api = jasmine.createSpyObj<SolicitudService>('SolicitudService', [
-      'listarCitasPaginadas', 'listarCasosPaginados', 'obtenerPorId', 'registrarPestana'
+      'listarCitasPaginadas', 'listarCasosPaginados', 'obtenerPorId', 'registrarPestana',
+      'registrarPestanaAtencion', 'listarCitasPendientesDeCaso', 'listarHistorialAtenciones', 'registrarResultadoCita'
     ]);
     simulados = jasmine.createSpyObj<CasosSimuladosService>('CasosSimuladosService', [
-      'listarCitas', 'listarCasos', 'obtenerSolicitud', 'guardarPestana', 'tieneSolicitud'
+      'listarCitas', 'listarCitasPendientesDeCaso', 'listarCasos', 'obtenerSolicitud', 'guardarPestana', 'tieneSolicitud',
+      'tieneCaso', 'tieneCita', 'registrarResultadoCita'
     ]);
     simulados.listarCitas.and.returnValue(of(paginaDemo));
     simulados.tieneSolicitud.and.returnValue(false);
+    simulados.tieneCaso.and.returnValue(false);
+    simulados.tieneCita.and.returnValue(false);
 
     TestBed.configureTestingModule({
       providers: [
@@ -42,22 +46,59 @@ describe('RegistroVbgDatosService', () => {
     environment.datosDemostracion = modoOriginal;
   });
 
-  it('usa citas simuladas cuando el backend responde sin datos', async () => {
+  it('conserva una respuesta vacía del backend sin mostrar datos simulados', async () => {
     api.listarCitasPaginadas.and.returnValue(of(paginaVacia));
 
     const resultado = await firstValueFrom(service.listarCitasPaginadas(0, 10));
 
-    expect(resultado.content[0].codigoSolicitud).toBe('CAS-DEMO-0001');
-    expect(service.usandoDatosDemostracion()).toBeTrue();
+    expect(resultado.content).toEqual([]);
+    expect(service.usandoDatosDemostracion()).toBeFalse();
   });
 
-  it('usa citas simuladas cuando el endpoint falla', async () => {
+  it('propaga el error del backend en vez de simular una respuesta exitosa', async () => {
     api.listarCitasPaginadas.and.returnValue(throwError(() => new Error('sin servicio')));
 
-    const resultado = await firstValueFrom(service.listarCitasPaginadas(0, 10));
+    await expectAsync(firstValueFrom(service.listarCitasPaginadas(0, 10)))
+      .toBeRejectedWithError('sin servicio');
+    expect(simulados.listarCitas).not.toHaveBeenCalled();
+  });
 
-    expect(resultado.content.length).toBe(1);
-    expect(service.usandoDatosDemostracion()).toBeTrue();
+  it('consulta la bandeja de citas atendidas que aún no tienen caso en el endpoint específico', async () => {
+    api.listarCitasPendientesDeCaso.and.returnValue(of(paginaDemo));
+
+    const resultado = await firstValueFrom(service.listarCitasPendientesDeCaso(0, 10));
+
+    expect(api.listarCitasPendientesDeCaso).toHaveBeenCalledWith(0, 10);
+    expect(resultado.content[0].id).toBe(9001);
+    expect(simulados.listarCitasPendientesDeCaso).not.toHaveBeenCalled();
+  });
+
+  it('consulta el historial de citas por el ID del caso', async () => {
+    api.listarHistorialAtenciones.and.returnValue(of([citaDemo]));
+
+    const resultado = await firstValueFrom(service.listarHistorialAtenciones(82));
+
+    expect(api.listarHistorialAtenciones).toHaveBeenCalledWith(82);
+    expect(resultado).toEqual([citaDemo]);
+  });
+
+  it('envía las pestañas visibles de atención al adaptador de endpoints del backend', async () => {
+    api.registrarPestanaAtencion.and.returnValue(of({ id: 33 }));
+
+    await firstValueFrom(service.registrarPestanaAtencion(1, { casoId: 7, citaId: 15 }, 7, 15));
+
+    expect(api.registrarPestanaAtencion).toHaveBeenCalledWith(1, { casoId: 7, citaId: 15 });
+    expect(simulados.guardarPestana).not.toHaveBeenCalled();
+  });
+
+  it('mantiene los índices visuales de las pestañas al guardar datos de demostración', async () => {
+    environment.datosDemostracion = true;
+    simulados.guardarPestana.and.returnValue(of({ id: 33, codigo: 'CAS-33' }));
+
+    await firstValueFrom(service.registrarPestanaAtencion(1, { casoId: 7, citaId: 15 }, 7, 15));
+
+    expect(simulados.guardarPestana).toHaveBeenCalledWith(7, 1, { casoId: 7, citaId: 15 }, 15);
+    expect(api.registrarPestanaAtencion).not.toHaveBeenCalled();
   });
 
   it('conserva la respuesta real cuando contiene citas', async () => {
@@ -68,5 +109,16 @@ describe('RegistroVbgDatosService', () => {
 
     expect(resultado.content[0].codigoSolicitud).toBe('SOL-12');
     expect(service.usandoDatosDemostracion()).toBeFalse();
+  });
+
+  it('envía el resultado de la cita al endpoint cuando trabaja con datos reales', async () => {
+    const citaAtendida = { ...citaDemo, idEstadoCita: 4, estadoCita: 'Atendida' };
+    api.registrarResultadoCita.and.returnValue(of(citaAtendida));
+    simulados.tieneCita.and.returnValue(true);
+
+    await firstValueFrom(service.registrarResultadoCita(citaDemo.id, 'ATENDIDA'));
+
+    expect(api.registrarResultadoCita).toHaveBeenCalledWith(citaDemo.id, { resultado: 'ATENDIDA' });
+    expect(simulados.registrarResultadoCita).not.toHaveBeenCalled();
   });
 });

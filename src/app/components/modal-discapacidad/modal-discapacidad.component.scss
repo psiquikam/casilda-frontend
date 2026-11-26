@@ -25,19 +25,19 @@
 
     .form-row {
       display: flex;
+      flex-wrap: wrap;
       gap: 16px;
       align-items: center;
       width: 100%;
 
-      .field-tipo,
       .field-subtipo {
-        flex: 1;
-        min-width: 180px;
+        flex: 1 1 220px;
+        min-width: 0;
       }
 
       .field-desc {
-        flex: 2;
-        min-width: 250px;
+        flex: 1 1 220px;
+        min-width: 0;
       }
     }
   }

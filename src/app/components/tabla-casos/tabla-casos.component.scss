@@ -102,6 +102,39 @@ th.mat-mdc-header-cell {
   color: var(--color-primary);
 }
 
+.id-pendiente {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.estado-etapa {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  white-space: nowrap;
+
+  mat-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+  }
+
+  &--seguimiento {
+    color: var(--color-success);
+    background: color-mix(in srgb, var(--color-success) 12%, white);
+  }
+
+  &--pendiente {
+    color: #92400e;
+    background: #fef3c7;
+  }
+}
+
 .badge-soft {
   background: var(--color-bg-subtle);
   padding: 4px 10px;
@@ -188,6 +221,20 @@ th.mat-mdc-header-cell {
 
   &:hover {
     background-color: rgba(34, 197, 94, 0.08) !important;
+  }
+}
+
+.action-register {
+  min-width: 0;
+  min-height: 36px;
+  padding: 0 8px;
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  white-space: nowrap;
+
+  mat-icon {
+    margin-right: 4px;
   }
 }
 

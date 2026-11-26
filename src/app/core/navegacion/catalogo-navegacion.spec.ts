@@ -1,4 +1,5 @@
 import { CATALOGO_MODULOS, modulosVisiblesPara, moduloPorId } from './catalogo-navegacion';
+import { routes } from '../../app.routes';
 
 /**
  * El catálogo es la única fuente de nombres de módulo (DSH-04-03). Estas
@@ -33,6 +34,17 @@ describe('catálogo de navegación', () => {
   });
 
   describe('visibilidad por rol', () => {
+    it('permite nueva solicitud a los roles del equipo sin ampliar el reparto', () => {
+      const roles = ['ADMIN', 'COORDINADOR', 'PROFESIONAL', 'REVISOR'];
+      expect(moduloPorId('nueva-solicitud')?.roles).toEqual(roles);
+      expect(routes.find(route => route.path === 'solicitud-acompanamiento')?.data?.['roles'])
+        .toEqual([...roles, 'USUARIO']);
+      expect(moduloPorId('consulta')?.roles).toEqual(['ADMIN', 'COORDINADOR']);
+      for (const rol of roles) {
+        expect(modulosVisiblesPara(rol).map(modulo => modulo.id)).toContain('nueva-solicitud');
+      }
+    });
+
     it('el rol Usuario no ve módulos del equipo de atención', () => {
       const visibles = modulosVisiblesPara('USUARIO').map((m) => m.id);
 

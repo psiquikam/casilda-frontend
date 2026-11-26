@@ -74,9 +74,23 @@ export function formatOnlyDate(dateStr: string | null | undefined): string {
   if (matchDash) {
     return `${matchDash[3]}/${matchDash[2]}/${matchDash[1]}`;
   }
+
   const matchSlash = cleanStr.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
   if (matchSlash) {
     return `${matchSlash[1]}/${matchSlash[2]}/${matchSlash[3]}`;
   }
   return dateStr;
+}
+
+export function formatFechaHoraCita(fecha: string | null | undefined): string {
+  if (!fecha) return 'Sin fecha y hora';
+  const backend = fecha.match(/^(\d{2}\/\d{2}\/\d{4})\s+(\d{2}:\d{2})/);
+  if (backend) return `${backend[1]} ${backend[2]}`;
+  const valor = new Date(fecha);
+  if (Number.isNaN(valor.getTime())) return fecha;
+  const dia = valor.getDate().toString().padStart(2, '0');
+  const mes = (valor.getMonth() + 1).toString().padStart(2, '0');
+  const hora = valor.getHours().toString().padStart(2, '0');
+  const minutos = valor.getMinutes().toString().padStart(2, '0');
+  return `${dia}/${mes}/${valor.getFullYear()} ${hora}:${minutos}`;
 }

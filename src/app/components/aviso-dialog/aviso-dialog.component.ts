@@ -23,7 +23,7 @@ export interface AvisoDialogData {
   selector: 'app-aviso-dialog',
   imports: [MatDialogModule, MatButtonModule, MatIconModule],
   template: `
-    <h2 mat-dialog-title class="aviso__titulo">
+    <h2 mat-dialog-title class="aviso__titulo" [class.aviso__titulo--exito]="data.icono === 'check_circle'">
       <mat-icon aria-hidden="true">{{ data.icono ?? 'info' }}</mat-icon>
       {{ data.titulo }}
     </h2>
@@ -39,6 +39,7 @@ export interface AvisoDialogData {
   styles: `
     .aviso__titulo { display: flex; align-items: center; gap: var(--space-2); }
     .aviso__titulo .mat-icon { color: var(--color-warning); flex-shrink: 0; }
+    .aviso__titulo--exito .mat-icon { color: var(--color-primary); }
     .aviso__mensaje { margin: 0; line-height: var(--line-height-relaxed); max-width: 42ch; }
   `
 })

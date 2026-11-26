@@ -358,12 +358,9 @@ export class ConsultaComponent implements OnInit, AfterViewInit {
     return (data: any, filter: string): boolean => {
       const searchTerms = JSON.parse(filter);
 
-      const nombreCompleto = `
-      ${data.primerNombre || ''}
-      ${data.segundoNombre || ''}
-      ${data.primerApellido || ''}
-      ${data.segundoApellido || ''}
-    `.toLowerCase();
+      const nombreCompleto = [
+        data.primerNombre, data.segundoNombre, data.primerApellido, data.segundoApellido
+      ].filter(Boolean).join(' ').toLowerCase();
 
       const documentoCompleto = `
       ${data.tipoDocumento || ''}

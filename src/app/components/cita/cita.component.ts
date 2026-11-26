@@ -13,12 +13,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { MatDialog } from '@angular/material/dialog';
 import { ReprogramarCitaModalComponent } from '../modal-reprogramar-cita/modal-reprogramar-cita.component';
-import { SolicitudService, CitaDto, EstadoCitaEnum } from '../../services/solicitud.service';
+import { CitaDto, EstadoCitaEnum } from '../../services/solicitud.service';
+import type { ResultadoCitaDto } from '../../services/solicitud.service';
 import { RegistroVbgDatosService } from '../../services/registro-vbg-datos.service';
-import { environment } from '../../../environments/environment';
-import { formatOnlyDate } from '../../custom-date-adapter';
+import { formatFechaHoraCita, formatOnlyDate } from '../../custom-date-adapter';
 import { FiltroColumnaDirective } from '../../core/a11y/filtro-columna.directive';
 import { NotificacionService } from '../../core/a11y/notificacion.service';
+import { DialogoService } from '../../core/a11y/dialogo.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-cita',
@@ -39,17 +41,16 @@ import { NotificacionService } from '../../core/a11y/notificacion.service';
 })
 export class CitaComponent implements OnInit, AfterViewInit {
   private readonly notificacion = inject(NotificacionService);
+  private readonly dialogoServicio = inject(DialogoService);
+  private readonly auth = inject(AuthService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private dialog = inject(MatDialog);
-  private solicitudService = inject(SolicitudService);
   private readonly registroVbgDatos = inject(RegistroVbgDatosService);
 
-  /** DSH-12-08: franja visible mientras los datos sean simulados. */
-  readonly datosDemostracion = environment.datosDemostracion;
   formatOnlyDate = formatOnlyDate;
 
-  displayedColumns: string[] = ['expand', 'id', 'nombre', 'documento', 'fechaCita', 'profesional', 'tipoSolicitud', 'estadoCita', 'acciones'];
+  displayedColumns: string[] = ['expand', 'id', 'nombre', 'documento', 'fechaCita', 'estadoCita', 'tipoAtencion', 'profesional', 'tipoSolicitud', 'acciones'];
   dataSource = new MatTableDataSource<CitaDto>([]);
   expandedElement: CitaDto | null = null;
   totalElementos = 0;
@@ -62,12 +63,16 @@ export class CitaComponent implements OnInit, AfterViewInit {
     id: '',
     nombre: '',
     documento: '',
+    fecha: '',
     profesional: '',
     tipoSolicitud: '',
     estadoCita: '',
   };
 
   ngOnInit() {
+    if (this.auth.isRevisor() && !this.auth.hasAnyRole(['ADMIN', 'COORDINADOR', 'PROFESIONAL'])) {
+      this.displayedColumns = this.displayedColumns.filter((columna) => columna !== 'acciones');
+    }
     this.dataSource.filterPredicate = this.createFilter();
     this.cargarCitas(0, this.pageSize);
   }
@@ -84,7 +89,10 @@ export class CitaComponent implements OnInit, AfterViewInit {
         this.pageSize = respuesta.size;
         this.cargando = false;
       },
-      error: () => { this.cargando = false; }
+      error: (error) => {
+        this.cargando = false;
+        this.notificacion.error('No fue posible cargar las citas.', error);
+      }
     });
   }
 
@@ -103,47 +111,132 @@ export class CitaComponent implements OnInit, AfterViewInit {
   createFilter(): (data: CitaDto, filter: string) => boolean {
     return (data: CitaDto, filter: string): boolean => {
       const f = JSON.parse(filter);
-      return (data.codigoSolicitud || '').toLowerCase().includes(f.id)
+      return String(data.id ?? '').toLowerCase().includes(f.id)
         && (data.nombreSolicitante || '').toLowerCase().includes(f.nombre)
-        && (data.fechaCita || '').toLowerCase().includes(f.fecha)
-        && (data.profesional || '').toLowerCase().includes(f.profesional);
+        && `${data.tipoDocumento || ''} ${data.documento || ''}`.toLowerCase().includes(f.documento)
+        && this.fechaHoraCita(data.fechaCita).toLowerCase().includes(f.fecha)
+        && (data.profesional || '').toLowerCase().includes(f.profesional)
+        && (data.tipoSolicitud || '').toLowerCase().includes(f.tipoSolicitud)
+        && (this.nombreEstadoCita(data) || '').toLowerCase().includes(f.estadoCita);
     };
   }
 
   estaCitaCaducada(fechaCitaStr: string | null | undefined): boolean {
-    if (!fechaCitaStr) return true;
-    try {
-      const parts = fechaCitaStr.split(' ');
-      const dateParts = parts[0].indexOf('/') > -1 ? parts[0].split('/') : parts[0].split('-');
-      const timeParts = parts[1].split(':');
-      let year, month, day;
-      if (parts[0].indexOf('/') > -1) {
-        day = Number(dateParts[0]);
-        month = Number(dateParts[1]) - 1;
-        year = Number(dateParts[2]);
-      } else {
-        year = Number(dateParts[0]);
-        month = Number(dateParts[1]) - 1;
-        day = Number(dateParts[2]);
-      }
-      const date = new Date(
-        year,
-        month,
-        day,
-        Number(timeParts[0]),
-        Number(timeParts[1])
-      );
-      return date.getTime() < Date.now();
-    } catch (e) {
+    if (!fechaCitaStr) return false;
+    const formatoBackend = fechaCitaStr.match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})/);
+    const fecha = formatoBackend
+      ? new Date(
+          Number(formatoBackend[3]),
+          Number(formatoBackend[2]) - 1,
+          Number(formatoBackend[1]),
+          Number(formatoBackend[4]),
+          Number(formatoBackend[5])
+        )
+      : new Date(fechaCitaStr);
+    return !Number.isNaN(fecha.getTime()) && fecha.getTime() <= Date.now();
+  }
+
+  fechaHoraCita(fecha: string | null | undefined): string {
+    return formatFechaHoraCita(fecha);
+  }
+
+  esCitaPendiente(cita: CitaDto): boolean {
+    return cita.idEstadoCita === EstadoCitaEnum.PROGRAMADA
+      || cita.idEstadoCita === EstadoCitaEnum.REPROGRAMADA;
+  }
+
+  puedeReprogramarCita(cita: CitaDto): boolean {
+    return this.esCitaPendiente(cita);
+  }
+
+  puedeRegistrarResultado(cita: CitaDto): boolean {
+    return this.esCitaPendiente(cita) && this.estaCitaCaducada(cita.fechaCita);
+  }
+
+  puedeRegistrarAtencionSeguimiento(cita: CitaDto): boolean {
+    return cita.tipoAtencion === 'SEGUIMIENTO'
+      && cita.idEstadoCita === EstadoCitaEnum.ATENDIDA
+      && cita.casoId != null;
+  }
+
+  esPrimeraCita(cita: CitaDto): boolean {
+    return cita.tipoAtencion !== 'SEGUIMIENTO' && cita.casoId == null && !cita.solicitudTieneCaso;
+  }
+
+  mostrarRegistroPrimeraAtencion(cita: CitaDto): boolean {
+    return this.esPrimeraCita(cita)
+      && (this.esCitaPendiente(cita) || cita.idEstadoCita === EstadoCitaEnum.ATENDIDA);
+  }
+
+  puedeAbrirRegistroPrimeraAtencion(cita: CitaDto): boolean {
+    if (!this.esPrimeraCita(cita)) {
       return false;
     }
+    return cita.idEstadoCita === EstadoCitaEnum.ATENDIDA
+      || this.puedeRegistrarResultado(cita);
+  }
+
+  abrirRegistroPrimeraAtencion(cita: CitaDto): void {
+    if (!this.puedeAbrirRegistroPrimeraAtencion(cita)) {
+      return;
+    }
+    this.router.navigate(['/registro-caso'], { state: { cita } });
+  }
+
+  nombreEstadoCita(cita: CitaDto): string {
+    return cita.idEstadoCita === EstadoCitaEnum.PROGRAMADA
+      || cita.estadoCita?.toLowerCase() === 'programada'
+      || cita.estadoCita?.toLowerCase() === 'creada'
+      ? 'Programada'
+      : cita.estadoCita;
+  }
+
+  registrarResultadoCita(cita: CitaDto, resultado: ResultadoCitaDto): void {
+    if (!this.puedeRegistrarResultado(cita)) {
+      return;
+    }
+
+    const atendida = resultado === 'ATENDIDA';
+    this.dialogoServicio.confirmar({
+      titulo: atendida ? '¿Confirmar cita atendida?' : '¿Registrar inasistencia?',
+      mensaje: atendida
+        ? cita.tipoAtencion === 'SEGUIMIENTO'
+          ? 'La cita quedará como atendida. Luego podrá agregar una nueva atención al caso existente.'
+          : cita.solicitudTieneCaso
+            ? 'La cita quedará como atendida. Esta solicitud ya tiene un caso y no se creará otro.'
+            : 'La cita quedará como atendida y habilitará el registro inicial del caso con su código.'
+        : 'La cita quedará como inasistencia. No se creará un caso; programe otra cita después de contactar a la persona.',
+      textoConfirmar: atendida ? 'Marcar cita atendida' : 'Registrar inasistencia',
+      iconoConfirmar: atendida ? 'check_circle' : 'event_busy',
+      textoCancelar: 'Volver'
+    }).subscribe((confirmado) => {
+      if (!confirmado) {
+        return;
+      }
+
+      this.registroVbgDatos.registrarResultadoCita(cita.id, resultado).subscribe({
+        next: () => this.cargarCitas(this.pageIndex, this.pageSize),
+        error: (error) => this.notificacion.error('No fue posible registrar el resultado de la cita.', error)
+      });
+    });
+  }
+
+  registrarAtencionSeguimiento(cita: CitaDto): void {
+    if (!this.puedeRegistrarAtencionSeguimiento(cita)) {
+      return;
+    }
+    this.router.navigate(['/registro-atencion'], {
+      queryParams: { casoId: cita.casoId, citaId: cita.id }
+    });
   }
 
   reprogramarCita(cita: CitaDto) {
+    if (!this.puedeReprogramarCita(cita)) return;
     this.abrirModalGestion(cita, 'reprogramar');
   }
 
   cancelarCita(cita: CitaDto) {
+    if (!this.esCitaPendiente(cita)) return;
     this.abrirModalGestion(cita, 'cancelar');
   }
 
@@ -161,7 +254,7 @@ export class CitaComponent implements OnInit, AfterViewInit {
       const citaId = cita.id;
       if (result.accion === 'cancelar') {
         const f = result.formulario;
-        this.solicitudService.cancelarCita(citaId, {
+        this.registroVbgDatos.cancelarCita(citaId, {
           idMotivoEstadoCita: f.idMotivoEstadoCita,
           observaciones: f.observaciones
         }).subscribe({
@@ -170,7 +263,7 @@ export class CitaComponent implements OnInit, AfterViewInit {
         });
       } else {
         const f = result.formulario;
-        this.solicitudService.reprogramarCita(citaId, {
+        this.registroVbgDatos.reprogramarCita(citaId, {
           fechaCita: f.fechaCita,
           horaCita: f.horaCita,
           idMotivoEstadoCita: f.idMotivoEstadoCita,
@@ -184,6 +277,6 @@ export class CitaComponent implements OnInit, AfterViewInit {
   }
 
   regresar() {
-    this.router.navigate(['/consulta']);
+    this.router.navigate(['/inicio']);
   }
 }

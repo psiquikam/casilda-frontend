@@ -391,6 +391,10 @@ export class AuthService {
     return this.hasRole('REVISOR');
   }
 
+  puedeRepartirSolicitudes(): boolean {
+    return this.isAdmin() || this.isCoordinador();
+  }
+
   isUsuario(): boolean {
     return this.hasRole('USUARIO');
   }
