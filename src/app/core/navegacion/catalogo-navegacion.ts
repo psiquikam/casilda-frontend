@@ -142,16 +142,8 @@ export const CATALOGO_MODULOS: readonly ModuloCasilda[] = [
 
   // --- Líneas especiales ---
   {
-    id: 'linea-alma',
-    nombre: 'Primer respondiente',
-    icono: 'ring_volume',
-    ruta: '/linea-alma/atencion-pr',
-    roles: ['ADMIN', 'COORDINADOR', 'PROFESIONAL'],
-    seccion: 'Línea Alma'
-  },
-  {
     id: 'alma-aph-nueva',
-    nombre: 'Nueva atención',
+    nombre: 'Registrar nueva atención',
     icono: 'add_ic_call',
     ruta: '/linea-alma/aph/nueva',
     roles: ['COORDINADOR', 'TECNICO_APH'],
@@ -169,7 +161,7 @@ export const CATALOGO_MODULOS: readonly ModuloCasilda[] = [
   // `ROLES_HABILITADOS_PSICOLOGIA` (`linea-alma/psicologia/psicologia-habilitacion.ts`), hoy solo ADMIN.
   {
     id: 'alma-psicologia-bandeja',
-    nombre: 'Bandeja de Psicología',
+    nombre: 'Pendientes atención por psicología',
     icono: 'psychology',
     ruta: '/linea-alma/psicologia/bandeja',
     roles: ['ADMIN'],

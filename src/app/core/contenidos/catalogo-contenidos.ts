@@ -81,4 +81,4 @@ export const IMAGEN_TAMANO_MAXIMO_BYTES = 400 * 1024;
  * permite opcional) o la suya no carga: una tarjeta con el ícono de imagen rota
  * en la portada de un servicio VBG transmite descuido.
  */
-export const IMAGEN_RESPALDO = 'assets/distintivo_casilda_morado.svg';
+export const IMAGEN_RESPALDO = 'assets/casilda-emblema-morado.svg';

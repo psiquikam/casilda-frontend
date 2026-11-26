@@ -17,6 +17,8 @@ export const environment = {
    * TODO(negocio): reemplazar por el contacto oficial del pie público.
    */
   telefonoContactoPublico: '',
+  /** Correo de contacto de CASILDA: pie público y recuperación de contraseña del login. */
+  correoContacto: 'notificacasilda.dbu@udea.edu.co',
   /**
    * Modo de demostración, para probar la interfaz sin backend. Activo:
    * cuentas de prueba (login rápido y selector de rol del encabezado), datos
@@ -36,6 +38,15 @@ export const environment = {
    * **Nunca `true` en un entorno desplegado.**
    */
   lineaAlma: {
+    /**
+     * Campos y servicios de la revisión de flujos de noviembre de 2026 que el backend **aún no implementa**:
+     * fecha de nacimiento, identidad de género y vínculo con la universidad de la persona, lugar de
+     * ocurrencia, evidencias, correo y «¿Cuál?» del solicitante, novedades y cierre de remisiones, y
+     * «Datos de la persona» en Psicología. Con `false` la interfaz los oculta y el interceptor
+     * `almaContratoInterceptor` los retira de lo que se envía. Detalle en
+     * `docs/contratos/linea-alma/revision-backend-vs-front-2026-11-20.md`.
+     */
+    extensiones: true,
     mocks: {
       catalogos: true,
       personas: true,
@@ -86,6 +97,8 @@ export const environment = {
     /** Queja anónima ante la UAD (`/uad/queja-anonima`). El backend ya tiene `POST /uad/noticias-anonimas`; falta probarlo de punta a punta. */
     uadQuejaAnonima: true,
     /** «Mis reportes» (`/mis-reportes`), con datos simulados mientras `uad.adaptador` sea `'mock'`. */
-    uadMisReportes: true
+    uadMisReportes: true,
+    /** Accesos públicos al reporte anónimo: «Reportar VBG de forma anónima» en la navegación y «Iniciar reporte seguro» en la portada. Ocultos por decisión del equipo; la ruta `/formulario-anonimo` sigue activa. */
+    reporteAnonimoPublico: false
   }
 };

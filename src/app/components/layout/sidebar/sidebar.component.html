@@ -154,7 +154,7 @@
     }
 
     <!-- 3. LÍNEA ALMA (Admin, Coordinador, Profesional, Técnico APH y Revisor; cada enlace según su permiso) -->
-    @if (alma.tieneAlguno(['alma.aph.crear', 'alma.aph.bandeja']) || alma.psicologiaHabilitada() || auth.isProfesional()) {
+    @if (alma.tieneAlguno(['alma.aph.crear', 'alma.aph.bandeja']) || alma.psicologiaHabilitada()) {
       <div class="nav-section">
         <button type="button" id="toggle-alma" class="section-toggle" (click)="toggleSection('alma')"
           [attr.aria-expanded]="isExpanded('alma')" aria-controls="section-alma">
@@ -168,16 +168,10 @@
         </button>
         @if (isExpanded('alma')) {
           <div id="section-alma" class="section-content" role="region" aria-labelledby="toggle-alma">
-            @if (auth.isAdmin() || auth.isCoordinador() || auth.isProfesional()) {
-              <a routerLink="/linea-alma/atencion-pr" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
-                <mat-icon class="nav-item__icon" aria-hidden="true">ring_volume</mat-icon>
-                <span class="nav-item__text">Primer respondiente</span>
-              </a>
-            }
             @if (alma.tiene('alma.aph.crear')) {
               <a routerLink="/linea-alma/aph/nueva" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
                 <mat-icon class="nav-item__icon" aria-hidden="true">add_ic_call</mat-icon>
-                <span class="nav-item__text">Nueva atención</span>
+                <span class="nav-item__text">Registrar nueva atención</span>
               </a>
             }
             @if (alma.tiene('alma.aph.bandeja')) {
@@ -190,7 +184,7 @@
             @if (alma.psicologiaHabilitada()) {
               <a routerLink="/linea-alma/psicologia/bandeja" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">
                 <mat-icon class="nav-item__icon" aria-hidden="true">psychology</mat-icon>
-                <span class="nav-item__text">Bandeja de Psicología</span>
+                <span class="nav-item__text">Pendientes atención por psicología</span>
               </a>
               @if (alma.tiene('alma.notasClinicas.consultar')) {
                 <a routerLink="/linea-alma/psicologia/recontactos" routerLinkActive="active-item" ariaCurrentWhenActive="page" class="nav-item">

@@ -26,7 +26,7 @@ describe('manejadores mock de Psicología', () => {
   const id = (n: number) => `ALMA-${anio}-${String(n).padStart(6, '0')}`;
   const HORA = 3_600_000;
 
-  function llamar(metodo: 'GET' | 'POST' | 'PUT' | 'PATCH', ruta: string, cuerpo?: unknown, query = '', usuario = PROFESIONAL): RespuestaMock {
+  function llamar(metodo: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE', ruta: string, cuerpo?: unknown, query = '', usuario = PROFESIONAL): RespuestaMock {
     const candidata = [...RUTAS_MOCK_PSICOLOGIA, ...RUTAS_MOCK_APH].find((r) => r.metodo === metodo && r.patron.test(ruta));
     if (!candidata) throw new Error(`Sin manejador para ${metodo} ${ruta}`);
     return candidata.manejador(
@@ -328,7 +328,7 @@ describe('manejadores mock de Psicología', () => {
 
     it('registra seguimientos más allá de los 3 reglamentarios sin bloquear, con recordatorio según haya correo', () => {
       const caso = llamar('GET', `/casos/${caso8}`).cuerpo as CasoDto;
-      const r = llamar('POST', `/casos/${caso8}/seguimientos`, { version: caso.version, nota: 'Quinto seguimiento', deseaContinuar: true, proximoControl: futuro(72) });
+      const r = llamar('POST', `/casos/${caso8}/seguimientos`, { version: caso.version, nota: 'Quinto seguimiento', valoracionRiesgo: 'BAJO', deseaContinuar: true, proximoControl: futuro(72) });
       expect(r.estado).toBe(201);
       const nuevo = r.cuerpo as CasoDto;
       expect(nuevo.numeroSeguimientos).toBe(5);
@@ -339,7 +339,7 @@ describe('manejadores mock de Psicología', () => {
 
     it('«no desea continuar» no exige próximo control y deja el caso en cierre', () => {
       const caso = llamar('GET', `/casos/${caso8}`).cuerpo as CasoDto;
-      const r = llamar('POST', `/casos/${caso8}/seguimientos`, { version: caso.version, nota: 'La persona no desea continuar', deseaContinuar: false });
+      const r = llamar('POST', `/casos/${caso8}/seguimientos`, { version: caso.version, nota: 'La persona no desea continuar', valoracionRiesgo: 'MEDIO', deseaContinuar: false });
       expect(r.estado).toBe(201);
       expect((r.cuerpo as CasoDto).estado).toBe('EN_CIERRE');
       expect((r.cuerpo as CasoDto).proximoControl).toBeNull();
@@ -349,10 +349,10 @@ describe('manejadores mock de Psicología', () => {
       const caso = llamar('GET', `/casos/${caso8}`).cuerpo as CasoDto;
       const r = llamar('POST', `/casos/${caso8}/seguimientos`, { version: caso.version, nota: '', deseaContinuar: true, proximoControl: pasado(1) });
       expect(r.estado).toBe(400);
-      expect(Object.keys(detalles(r)).sort()).toEqual(['nota', 'proximoControl']);
-      expect(codigo(llamar('POST', `/casos/${caso8}/seguimientos`, { version: 99, nota: 'Nota', deseaContinuar: false }))).toBe('CONFLICTO_VERSION');
+      expect(Object.keys(detalles(r)).sort()).toEqual(['nota', 'proximoControl', 'valoracionRiesgo']);
+      expect(codigo(llamar('POST', `/casos/${caso8}/seguimientos`, { version: 99, nota: 'Nota', valoracionRiesgo: 'BAJO', deseaContinuar: false }))).toBe('CONFLICTO_VERSION');
       const cerrado = llamar('GET', `/casos/CAS-${anio}-000003`).cuerpo as CasoDto;
-      expect(codigo(llamar('POST', `/casos/${cerrado.numeroCaso}/seguimientos`, { version: cerrado.version, nota: 'Nota', deseaContinuar: false }))).toBe('CASO_CERRADO');
+      expect(codigo(llamar('POST', `/casos/${cerrado.numeroCaso}/seguimientos`, { version: cerrado.version, nota: 'Nota', valoracionRiesgo: 'BAJO', deseaContinuar: false }))).toBe('CASO_CERRADO');
     });
 
     it('la agenda lista los controles del rango para la profesional o para todo el equipo', () => {
@@ -455,6 +455,32 @@ describe('manejadores mock de Psicología', () => {
       expect(codigo(llamar('POST', `/psicologia/recontactos/${r.idAtencion}/resolucion`, { version: 99, decision: 'CASO_NUEVO', nota: 'Nota válida' }))).toBe('CONFLICTO_VERSION');
       llamar('POST', `/psicologia/recontactos/${r.idAtencion}/resolucion`, { version: r.version, decision: 'CASO_NUEVO', nota: 'Nota válida' });
       expect(codigo(llamar('POST', `/psicologia/recontactos/${r.idAtencion}/resolucion`, { version: r.version + 1, decision: 'CASO_NUEVO', nota: 'Nota válida' }))).toBe('RECONTACTO_YA_RESUELTO');
+    });
+  });
+
+  describe('datos de la persona en la novedad', () => {
+    it('Psicología actualiza los datos de contacto, pero nunca el nombre ni el documento', () => {
+      const idAtencion = id(3);
+      const antes = tomar(idAtencion);
+      const r = llamar('PATCH', `/psicologia/novedades/${idAtencion}/persona`, {
+        version: antes.version,
+        persona: { nombres: 'Otro nombre', numeroIdentificacion: '999', telefonoPrincipal: '3001234567', identidadGenero: 'NO_BINARIA' }
+      });
+      expect(r.estado).withContext(JSON.stringify(r.cuerpo)).toBe(200);
+      const despues = r.cuerpo as NovedadPsicologiaDto;
+      expect(despues.persona.telefonoPrincipal).toBe('3001234567');
+      expect(despues.persona.identidadGenero).toBe('NO_BINARIA');
+      expect(despues.persona.nombres).toBe(antes.persona.nombres);
+      expect(despues.persona.numeroIdentificacion).toBe(antes.persona.numeroIdentificacion);
+      expect(despues.version).toBe(antes.version + 1);
+    });
+
+    it('valida el teléfono y exige tener tomada la novedad', () => {
+      const idAtencion = id(3);
+      const sinTomar = novedad(idAtencion);
+      expect(codigo(llamar('PATCH', `/psicologia/novedades/${idAtencion}/persona`, { version: sinTomar.version, persona: { ciudad: 'Bello' } }))).toBe('NOVEDAD_NO_TOMADA');
+      const tomada = tomar(idAtencion);
+      expect(llamar('PATCH', `/psicologia/novedades/${idAtencion}/persona`, { version: tomada.version, persona: { telefonoPrincipal: 'abc' } }).estado).toBe(400);
     });
   });
 });

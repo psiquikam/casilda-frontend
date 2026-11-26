@@ -5,11 +5,44 @@ import base64
 import urllib.request
 import subprocess
 import time
+import sys
 
 rootDir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-mdPath = os.path.join(rootDir, 'docs', 'manual-usuario-seguridad-personas-y-bienes.md')
-htmlPath = os.path.join(rootDir, 'docs', 'manual-usuario-seguridad-personas-y-bienes.html')
-pdfPath = os.path.join(rootDir, 'docs', 'manual-usuario-seguridad-personas-y-bienes.pdf')
+
+# Uso: python tools/compilar-manual-pdf.py [spyb|alma]   (por defecto, spyb)
+MODULOS = {
+    'spyb': {
+        'base': 'manual-usuario-seguridad-personas-y-bienes',
+        'titulo': 'Manual de Usuario — Seguridad a Personas y Bienes (SPyB)',
+        'pie': 'Universidad de Antioquia · Sistema CASILDA · Módulo Seguridad a Personas y Bienes (SPyB) · Noviembre 2026',
+        'diagramas': [
+            ('diagrama-01-recepcion.svg', 'Diagrama 1: Flujo de Recepción y Verificación de Medidas'),
+            ('diagrama-02-clasificacion.svg', 'Diagrama 2: Clasificación, Análisis y Despacho de Actuaciones'),
+            ('diagrama-03-estados.svg', 'Diagrama 3: Ciclo de Vida y Estados del Registro SPyB')
+        ]
+    },
+    'alma': {
+        'base': 'manual-usuario-linea-alma-aph',
+        'titulo': 'Manual de Usuario — Línea Alma (APH y Psicología)',
+        'pie': 'Universidad de Antioquia · Sistema CASILDA · Módulo Línea Alma (APH y Psicología) · Noviembre 2026',
+        'diagramas': [
+            ('alma-diagrama-01-registro.svg', 'Diagrama 1: De la llegada al registro'),
+            ('alma-diagrama-02-triaje-cierre.svg', 'Diagrama 2: Del triaje al cierre'),
+            ('alma-diagrama-03-psicologia.svg', 'Diagrama 3: Flujo en Psicología'),
+            ('alma-diagrama-04-estados.svg', 'Diagrama 4: Estados de una atención')
+        ]
+    }
+}
+modulo = sys.argv[1] if len(sys.argv) > 1 else 'spyb'
+if modulo not in MODULOS:
+    raise SystemExit('Módulo desconocido: use spyb o alma')
+cfg = MODULOS[modulo]
+tituloDoc = cfg['titulo']
+pieDoc = cfg['pie']
+
+mdPath = os.path.join(rootDir, 'docs', cfg['base'] + '.md')
+htmlPath = os.path.join(rootDir, 'docs', cfg['base'] + '.html')
+pdfPath = os.path.join(rootDir, 'docs', cfg['base'] + '.pdf')
 imgDir = os.path.join(rootDir, 'docs', 'img')
 
 os.makedirs(imgDir, exist_ok=True)
@@ -21,11 +54,7 @@ with open(mdPath, 'r', encoding='utf-8') as f:
 mermaidPattern = re.compile(r'```mermaid\n(.*?)\n```', re.DOTALL)
 diagrams = mermaidPattern.findall(mdContent)
 
-diagramNames = [
-    ('diagrama-01-recepcion.svg', 'Diagrama 1: Flujo de Recepción y Verificación de Medidas'),
-    ('diagrama-02-clasificacion.svg', 'Diagrama 2: Clasificación, Análisis y Despacho de Actuaciones'),
-    ('diagrama-03-estados.svg', 'Diagrama 3: Ciclo de Vida y Estados del Registro SPyB')
-]
+diagramNames = cfg['diagramas']
 
 svgs = {}
 for i, d in enumerate(diagrams):
@@ -94,7 +123,7 @@ const fullHtml = `<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Manual de Usuario — Seguridad a Personas y Bienes (SPyB)</title>
+  <title>{tituloDoc}</title>
   <style>
     @page {{
       size: letter;
@@ -279,7 +308,7 @@ const fullHtml = `<!DOCTYPE html>
 <body>
   ${{html}}
   <div class="footer">
-    Universidad de Antioquia · Sistema CASILDA · Módulo Seguridad a Personas y Bienes (SPyB) · Noviembre 2026
+    {pieDoc}
   </div>
 </body>
 </html>`;
@@ -312,5 +341,5 @@ subprocess.run(chromeArgs, check=True)
 
 if os.path.exists(pdfPath):
     sizeMb = os.path.getsize(pdfPath) / (1024 * 1024)
-    print(f'✅ PDF generado con éxito: {pdfPath} ({sizeMb:.2f} MB)')
+    print(f'PDF generado con éxito: {pdfPath} ({sizeMb:.2f} MB)')
 

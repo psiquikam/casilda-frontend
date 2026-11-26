@@ -10,7 +10,7 @@ export const APH_ROUTES: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'nueva' },
   {
     path: 'nueva',
-    title: 'Nueva atención — Línea Alma',
+    title: 'Registrar nueva atención — Línea Alma',
     canActivate: [almaPermisoGuard],
     canDeactivate: [cambiosSinGuardarGuard],
     data: { permisos: ['alma.aph.crear'] },

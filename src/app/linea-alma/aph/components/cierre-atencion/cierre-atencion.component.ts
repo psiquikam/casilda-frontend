@@ -8,6 +8,7 @@ import { filter, switchMap } from 'rxjs';
 import { DialogoService } from '../../../../core/a11y/dialogo.service';
 import { NotificacionService } from '../../../../core/a11y/notificacion.service';
 import { CatalogosAlmaService } from '../../../shared/catalogos/catalogos-alma.service';
+import { EtiquetaCampoComponent } from '../../../shared/components/etiqueta-campo/etiqueta-campo.component';
 import { ErrorAlma } from '../../../shared/http/alma-error';
 import { aplicarErroresServidor, mensajeDeError } from '../../../shared/http/errores-servidor';
 import { ItemCatalogo } from '../../../shared/types/alma.types';
@@ -19,7 +20,7 @@ import { AtencionAph, AtencionesAphService } from '../../services/atenciones-aph
  */
 @Component({
   selector: 'app-cierre-atencion',
-  imports: [ReactiveFormsModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule],
+  imports: [ReactiveFormsModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule, EtiquetaCampoComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <form class="cierre" [formGroup]="form" (ngSubmit)="cerrar()" novalidate aria-labelledby="cierre-titulo">
@@ -30,19 +31,27 @@ import { AtencionAph, AtencionesAphService } from '../../services/atenciones-aph
           <span>{{ motivo }}</span>
         </p>
       }
-      <mat-form-field appearance="outline">
-        <mat-label>Motivo de cierre</mat-label>
-        <mat-select id="cierre-motivo" formControlName="motivo">
-          @for (m of motivos(); track m.codigo) {
-            <mat-option [value]="m.codigo">{{ m.etiqueta }}</mat-option>
-          }
-        </mat-select>
-        @if (error('motivo', 'el motivo de cierre'); as e) { <mat-error>{{ e }}</mat-error> }
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Observación (opcional)</mat-label>
-        <textarea matInput id="cierre-observacion" formControlName="observacion" rows="3" autocomplete="off"></textarea>
-      </mat-form-field>
+      <p class="cierre__ayuda">
+        Si la persona no acepta la remisión a Psicología, la atención se cierra aquí. <strong>Cerrar una atención no genera un número de caso:</strong>
+        el caso solo se crea cuando Psicología atiende a la persona.
+      </p>
+      <div class="spyb-campo">
+<app-etiqueta-campo texto="Motivo de cierre" para="cierre-motivo" [obligatorio]="true" ayuda="Razón por la que se cierra la atención. Sale del catálogo oficial." />
+        <mat-form-field appearance="outline">
+          <mat-select id="cierre-motivo" formControlName="motivo" placeholder="Seleccione una opción">
+            @for (m of motivos(); track m.codigo) {
+              <mat-option [value]="m.codigo">{{ m.etiqueta }}</mat-option>
+            }
+          </mat-select>
+          @if (error('motivo', 'el motivo de cierre'); as e) { <mat-error>{{ e }}</mat-error> }
+        </mat-form-field>
+      </div>
+      <div class="spyb-campo">
+<app-etiqueta-campo texto="Observación (opcional)" para="cierre-observacion" ayuda="Cualquier dato útil para quien consulte la atención después. Máximo 1000 caracteres." />
+        <mat-form-field appearance="outline">
+          <textarea matInput id="cierre-observacion" formControlName="observacion" rows="3" maxlength="1000" autocomplete="off"></textarea>
+        </mat-form-field>
+      </div>
       <div>
         <button type="submit" class="boton boton--primario" [disabled]="enviando() || !!bloqueo()">Cerrar atención</button>
       </div>
@@ -50,6 +59,7 @@ import { AtencionAph, AtencionesAphService } from '../../services/atenciones-aph
   `,
   styles: `
     .cierre { display: flex; flex-direction: column; gap: var(--space-2); }
+    .cierre__ayuda { margin: 0; color: var(--color-text-secondary); }
     .cierre__titulo { margin: 0 0 var(--space-2); font-size: var(--font-size-xl); }
   `
 })

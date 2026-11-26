@@ -14,6 +14,15 @@ export interface ConfirmDialogData {
   textoCancelar?: string;
   /** Subtítulo bajo el título; por defecto «Esta acción no se puede deshacer». */
   subtitulo?: string;
+  /** `peligro` (rojo, por defecto) para acciones irreversibles; `precaucion` (ámbar) para avisos como salir sin guardar. */
+  tono?: 'peligro' | 'precaucion';
+  /** Ícono del encabezado; por defecto `warning`. */
+  icono?: string;
+  /**
+   * Qué botón es el principal (relleno). Por defecto `confirmar`. Con `cancelar`, la opción segura
+   * («Seguir editando») es la destacada y la acción de salir queda como botón discreto.
+   */
+  accionPrincipal?: 'confirmar' | 'cancelar';
 }
 
 @Component({

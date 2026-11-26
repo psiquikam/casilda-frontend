@@ -20,6 +20,7 @@
 | `contrato-aph-derivaciones-bandeja-contencion.md` | Derivaciones internas, rutas externas (F6), bandeja APH, tomar remisión, contención post-cierre, auditoría, catálogos. |
 | `contrato-psicologia-bandeja-novedades.md` | **Psicología (Jonathan):** bandeja con SLA, notificaciones, tomar/liberar, detalle de la novedad, intentos (1–9), primer contacto (`CAS-…`). Decisiones D-PSI-01…11. |
 | `contrato-psicologia-casos-seguimientos-recontactos.md` | **Psicología (Jonathan):** expediente, seguimientos, cierre, PDF, agenda y recontactos. Decisiones D-PSI-12…19. |
+| `contrato-revision-flujos-2026-11.md` | **Revisión de flujos (2026-11):** unificación APH + primer respondiente. Solicitud directa/indirecta, lugar de ocurrencia, evidencias, listados de remisión por perfil, novedades por remisión y datos de la persona desde Psicología. Prevalece donde difiera. |
 
 Fuentes: `docs/plan-implementacion-front-linea-alma.md` (plan, Anexo A) y
 `docs/levantamiento-requerimientos-linea-alma.md`. Skill aplicado: `.claude/skills/contrato-backend/SKILL.md`.

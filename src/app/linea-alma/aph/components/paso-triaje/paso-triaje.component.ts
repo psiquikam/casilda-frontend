@@ -42,6 +42,10 @@ export class PasoTriajeComponent {
 
   readonly atencion = input.required<AtencionAph>();
   readonly soloLectura = input(false);
+  /** Si la página ya pone el título del paso, el de este bloque queda solo para lectores de pantalla. */
+  readonly conTitulo = input(true);
+  /** Con `false` el panel de remisiones de peligro inminente no se repite aquí (lo muestra su propio paso). */
+  readonly panelPeligro = input(true);
   /** Se emite con la atención actualizada (o recargada tras un conflicto de versión). */
   readonly actualizada = output<AtencionAph>();
   readonly conflicto = output<void>();

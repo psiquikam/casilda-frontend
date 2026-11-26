@@ -193,6 +193,41 @@ function verificarGestion(s: AlmaMockStore, atencion: AtencionAphDto, usuario: s
   return null;
 }
 
+// ───────────────────────── datos de la persona (revisión de flujos, 2026-11) ─────────────────────────
+
+const PATRON_TELEFONO = /^\+?\d{7,15}$/;
+const PATRON_CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/**
+ * `PATCH /psicologia/novedades/{id}/persona`: Psicología completa o corrige los datos que ya capturó
+ * APH. **Nunca** cambia nombres, apellidos ni documento: identifican a la persona.
+ */
+const actualizarPersonaNovedad = (p: PeticionMock, s: AlmaMockStore): RespuestaMock => {
+  const atencion = buscarNovedad(s, p.parametros[0]);
+  if (esRespuesta(atencion)) return atencion;
+  const c = p.cuerpo ?? {};
+  const bloqueo = verificarGestion(s, atencion, p.usuario, c.version);
+  if (bloqueo) return bloqueo;
+
+  const datos = c.persona ?? {};
+  const faltantes: Record<string, string> = {};
+  if (datos.telefonoPrincipal && !PATRON_TELEFONO.test(datos.telefonoPrincipal)) faltantes['persona.telefonoPrincipal'] = 'Escriba solo números (de 7 a 15 dígitos).';
+  if (datos.correoPersonal && !PATRON_CORREO.test(datos.correoPersonal)) faltantes['persona.correoPersonal'] = 'Escriba un correo válido.';
+  if (datos.fechaNacimiento && (Number.isNaN(Date.parse(datos.fechaNacimiento)) || Date.parse(datos.fechaNacimiento) > s.ahora().getTime())) {
+    faltantes['persona.fechaNacimiento'] = 'La fecha de nacimiento no es válida.';
+  }
+  if (Object.keys(faltantes).length) return validacion(faltantes);
+
+  const editable = ['fechaNacimiento', 'identidadGenero', 'vinculoUniversidad', 'telefonoPrincipal', 'correoPersonal', 'ciudad', 'estrato'] as const;
+  const persona: PersonaAtencionDto = { ...atencion.persona };
+  for (const campo of editable) {
+    if (campo in datos) (persona as unknown as Record<string, unknown>)[campo] = datos[campo] ?? null;
+  }
+  const nueva = guardarAtencion(s, atencion, { persona });
+  s.registrarAuditoria('ATENCION_APH', nueva.idAtencion, p.usuario, 'ACTUALIZACION', 'Psicología actualizó los datos de la persona.');
+  return ok(aNovedadDto(s, nueva, p.usuario));
+};
+
 // ───────────────────────── bandeja y notificaciones (J-1.1) ─────────────────────────
 
 const listarBandeja = (p: PeticionMock, s: AlmaMockStore): RespuestaMock => {
@@ -480,6 +515,7 @@ const crearSeguimiento = (p: PeticionMock, s: AlmaMockStore): RespuestaMock => {
   }
   const faltantes: Record<string, string> = {};
   if (!texto(c.nota, MIN_NOTA)) faltantes['nota'] = `Escriba la nota del seguimiento (mínimo ${MIN_NOTA} caracteres).`;
+  if (!(RIESGOS_CLINICOS as readonly string[]).includes(c.valoracionRiesgo)) faltantes['valoracionRiesgo'] = 'Seleccione la valoración del riesgo.';
   if (typeof c.deseaContinuar !== 'boolean') faltantes['deseaContinuar'] = 'Indique si la persona desea continuar con el seguimiento.';
   if (c.deseaContinuar === true) {
     if (!fechaValida(c.proximoControl)) faltantes['proximoControl'] = 'Programe la fecha y hora del próximo control.';
@@ -496,6 +532,7 @@ const crearSeguimiento = (p: PeticionMock, s: AlmaMockStore): RespuestaMock => {
     tipo: 'REGULAR',
     fecha: ahora,
     nota: c.nota.trim(),
+    valoracionRiesgo: c.valoracionRiesgo,
     deseaContinuar: continua,
     proximoControl,
     // RNF-ALMA-004: el correo lo envía el servidor; aquí se simula según haya correo registrado.
@@ -666,6 +703,7 @@ export const RUTAS_MOCK_PSICOLOGIA: readonly RutaMock[] = [
   { metodo: 'POST', patron: /^\/bandeja\/psicologia\/([\w-]+)\/tomar$/, grupo: 'bandejaPsicologia', manejador: tomarNovedad },
   { metodo: 'POST', patron: /^\/bandeja\/psicologia\/([\w-]+)\/liberar$/, grupo: 'bandejaPsicologia', manejador: liberarNovedad },
   { metodo: 'GET', patron: /^\/psicologia\/novedades\/([\w-]+)$/, grupo: 'novedades', manejador: obtenerNovedad },
+  { metodo: 'PATCH', patron: /^\/psicologia\/novedades\/([\w-]+)\/persona$/, grupo: 'novedades', manejador: actualizarPersonaNovedad },
   { metodo: 'GET', patron: /^\/psicologia\/novedades\/([\w-]+)\/intentos$/, grupo: 'novedades', manejador: listarIntentos },
   { metodo: 'POST', patron: /^\/psicologia\/novedades\/([\w-]+)\/intentos$/, grupo: 'novedades', manejador: crearIntento },
   { metodo: 'POST', patron: /^\/psicologia\/novedades\/([\w-]+)\/primer-contacto$/, grupo: 'novedades', manejador: primerContacto },

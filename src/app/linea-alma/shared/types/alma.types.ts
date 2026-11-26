@@ -95,8 +95,8 @@ export const CANALES_INGRESO = ['LLAMADA', 'WHATSAPP', 'REMISION_EA', 'REMISION_
 export type CanalIngreso = (typeof CANALES_INGRESO)[number];
 
 export const ETIQUETA_CANAL_INGRESO: Record<CanalIngreso, string> = {
-  LLAMADA: 'Llamada telefónica',
-  WHATSAPP: 'WhatsApp (opción 2)',
+  LLAMADA: 'Telefónico',
+  WHATSAPP: 'WhatsApp',
   REMISION_EA: 'Remisión del Equipo de Atención',
   REMISION_SPYB: 'Remisión de Seguridad a Personas y Bienes',
   REMISION_UAD: 'Remisión de la Unidad de Asuntos Disciplinarios'
@@ -126,7 +126,37 @@ export interface ContextoAlma {
  * Códigos de catálogo hacia los que APH puede activar la ruta **sin consentimiento previo** por
  * peligro inminente (excepción de RN-ALMA-02): SPyB (interna) y Línea 123 (externa).
  */
-export const DESTINOS_PELIGRO_INMINENTE: readonly string[] = ['SPYB', 'LINEA_123'];
+export const DESTINOS_PELIGRO_INMINENTE: readonly string[] = ['SPYB', 'LINEA_123_AGENCIA_MUJER', 'LINEA_123_MUJER_ANTIOQUIA'];
+
+/**
+ * Opciones de los catálogos de remisión que **no** crean una derivación: dejan constancia de que la
+ * persona no tomó ninguna decisión o de que no aplica (Violeta Te Orienta, sección 6). No exigen
+ * consentimiento ni llegan a ninguna bandeja.
+ */
+export const DESTINOS_SIN_DERIVACION: readonly string[] = ['SIN_DECISION', 'NO_APLICA'];
+
+/** Destinos internos que son módulos de Casilda: la remisión llega a su bandeja (revisión de flujos, 2026-11). */
+export const BANDEJA_POR_DESTINO_INTERNO: Readonly<Record<string, string>> = {
+  EA: 'Equipo de Atención',
+  SPYB: 'Seguridad a Personas y Bienes',
+  UAD: 'Unidad de Asuntos Disciplinarios 3-4'
+};
+
+/** Perfil del panel de rutas: APH ofrece el listado acordado en la atención; Psicología, el completo. */
+export type PerfilPanelRutas = 'APH' | 'PSICOLOGIA';
+
+// ───────────────────────── solicitud y hechos ─────────────────────────
+
+export const LUGARES_OCURRENCIA = ['DENTRO_UDEA', 'FUERA_UDEA'] as const;
+export type LugarOcurrencia = (typeof LUGARES_OCURRENCIA)[number];
+
+export const ETIQUETA_LUGAR_OCURRENCIA: Record<LugarOcurrencia, { titulo: string; detalle: string }> = {
+  DENTRO_UDEA: { titulo: 'Dentro de la universidad', detalle: 'Campus, sedes universitarias, bloques o dependencias de la UdeA.' },
+  FUERA_UDEA: { titulo: 'Fuera de la universidad', detalle: 'Espacios externos, alrededores, plataformas virtuales, prácticas o residencia.' }
+};
+
+/** Código del parentesco «Otro (¿Cuál?)»: habilita el campo de texto libre. */
+export const PARENTESCO_OTRO = 'OTRO';
 
 // ───────────────────────── protocolo de contacto (RN-ALMA-03) ─────────────────────────
 
@@ -263,6 +293,10 @@ export type NombreCatalogo =
   | 'resultados-ruta-externa'
   | 'parentescos-solicitante'
   | 'textos-consentimiento'
+  | 'destinos-internos-aph'
+  | 'rutas-externas-aph'
+  | 'identidades-genero'
+  | 'vinculos-udea'
   // Psicología
   | 'dimensiones-salud-mental'
   | 'resultados-intento'
@@ -279,6 +313,10 @@ export const NOMBRES_CATALOGO: readonly NombreCatalogo[] = [
   'resultados-ruta-externa',
   'parentescos-solicitante',
   'textos-consentimiento',
+  'destinos-internos-aph',
+  'rutas-externas-aph',
+  'identidades-genero',
+  'vinculos-udea',
   'dimensiones-salud-mental',
   'resultados-intento',
   'motivos-cierre-psicologia',

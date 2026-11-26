@@ -545,6 +545,65 @@ Rama `feature/06/20/casilda/ajustes-modulo-uad`. Contrato: operaciones `listarMi
 - **Menú:** «Mis reportes» en la sección del rol USUARIO de `sidebar` y `horizontal-nav`, y en `CATALOGO_MODULOS`.
 - **Textos provisionales** (D-UAD-32): pendientes de validar con UAD jurídica.
 
+### 2026-11-23 — Línea Alma: revisión de flujos (unificación APH + primer respondiente)
+Rama `feature/11/021/casilda/unificar-linea-alma-primer-respondiente`, desde `origin/main`. Fuentes: «Revisión de Flujos Línea Alma y
+revisión para ajustes» y el formulario de referencia «Violeta Te Orienta». Contrato propuesto: `docs/contratos/linea-alma/contrato-revision-flujos-2026-11.md`.
+
+- **«Registrar nueva atención»** (antes «Nueva atención») en dos pasos: *Registrar atención* y *Triaje y derivación*. Solicitud directa o
+  indirecta (quien solicita con relación de 16 opciones, «¿Cuál?», teléfono y correo opcionales), canal solo WhatsApp/Telefónico, persona
+  (con fecha de nacimiento, identidad de género y vínculo con la universidad), **información de los hechos** (lugar de ocurrencia +
+  «Motivo de consulta»), **evidencias opcionales** (`EvidenciasAdjuntasComponent`, mismos límites que el reporte de caso) y APH/fecha
+  asignados por el sistema. Sin presunto agresor.
+- **Triaje y derivación:** triaje → nota de valoración APH → remisión a Psicología → panel de remisiones.
+- **`PanelDerivaciones`** recibe `perfil` (`APH` | `PSICOLOGIA`): APH ofrece 3 internas y 6 externas; Psicología, el listado completo
+  («Instancia interna» en lugar de «Dependencia»). Botón «+» por tipo, «No acepta»/«No aplica» como constancia sin consentimiento, aviso de
+  qué módulo recibe la remisión y **novedades con fecha y hora** por remisión (internas y externas).
+- **Psicología:** «Bandeja de Psicología» → «Pendientes atención por psicología»; nuevo bloque **Datos de la persona** en la novedad
+  (`DatosPersonaComponent`), editable salvo nombres y documento.
+- **Catálogos:** `DESTINOS_PELIGRO_INMINENTE` pasa de `LINEA_123` a las dos líneas 123; `ICBF`, `CAIVAS` y `POLICIA_NACIONAL` salen.
+- **Pendiente:** catálogo oficial de identidades de género (placeholder), correos/teléfonos múltiples, primer/segundo nombre por separado
+  (hay trabajo previo en la rama de SPyB que toca los mismos archivos de caracterización), «anexo de seguimiento» de Psicología y las
+  variables clínicas del formulario Violeta Te Orienta (tipología de violencias, componentes de atención, diagnóstico).
+
+### 2026-11-24 — Línea Alma: unificación APH + primer respondiente, estilo SPyB y capa de contrato real
+Rama `feature/11/021/casilda/ajustes-linea-alma`. Detalle de contrato en `docs/contratos/linea-alma/contrato-revision-flujos-2026-11.md`
+y contraste con el backend en `revision-backend-vs-front-2026-11-20.md` (§0.4 qué quedó conectado, §0.5 qué debe cambiar Backend).
+
+- **Registrar nueva atención en 4 pasos** (Solicitud, Persona y hechos, Triaje, Remisiones), cada uno bloqueado hasta completar el anterior;
+  solicitud directa/indirecta, nombres en primero y segundo, celular obligatorio (7–12 dígitos), evidencias, lugar de ocurrencia, novedades y
+  cierre de remisiones, «Datos de la persona» en Psicología. Se retiró «Primer respondiente» del menú (la ruta `atencion-pr` sigue en `app.routes.ts`).
+- **Estilo:** todo sobre tarjetas (`.alma-tarjeta`), etiquetas arriba con `EtiquetaCampoComponent` (asterisco, «?» solo en campos confusos, ejemplos y
+  «Seleccione una opción»), igual que Seguridad a personas y bienes. Modal «Salir sin guardar» rediseñado (`tono`, `icono`, `accionPrincipal`).
+- **Capa de contrato real:** `almaContratoInterceptor` (después de los mocks) convierte `nombres`/`apellidos` ↔ cuatro campos y retira lo que el backend
+  rechaza; `environment.lineaAlma.extensiones` (`true` en desarrollo/demo, `false` en producción) oculta esos campos en la interfaz.
+- **Manual y capturas:** `docs/manual-usuario-linea-alma-aph.md` reescrito con el formato del de SPyB; capturas con marcadores numerados en
+  `docs/manual-linea-alma/img/`, generadas con `node tools/capturar-pantallas-alma.mjs` (servidor en `:4200` y Chrome).
+- **Pendiente:** los formularios de Psicología (intentos, seguimientos, cierre) y el panel de remisiones aún usan etiqueta flotante, no el estilo SPyB.
+
+### 2026-11-24 — Emblema de Casilda en vector (reemplaza el distintivo anterior)
+Rama `fix/casilda-distintivo-completo`. Fuente: paquete de marca del equipo de producto (emblema, horizontal e isotipo en
+morado `#452C7B`, blanco y negro).
+
+- **`assets/casilda-emblema-blanco.svg`** es el ícono `logo-custom` (encabezado y panel del login, sobre el verde UdeA) y
+  **`assets/casilda-emblema-morado.svg`** es `IMAGEN_RESPALDO` de las tarjetas del home. Son los archivos oficiales, sin
+  modificar. Reemplazan a `distintivo_casilda.svg` y `distintivo_casilda_morado.svg`, que eran un PNG incrustado en un SVG.
+- **Tamaño mínimo:** el emblema lleva el nombre en arco y por debajo de 40 px no se lee. Encabezado 40–48 px (el alto del
+  encabezado no cambia), login 72 px, tarjeta 64 px.
+- **Favicon:** isotipo blanco sobre recuadro morado, con el trazo reforzado solo ahí. El anterior era blanco sin fondo y no
+  se veía en pestañas claras; el morado solo no se ve en pestañas oscuras.
+- **No se agregaron** las variantes horizontal, isotipo suelto ni negro: no tienen uso hoy.
+
+### 2026-11-24 — Home: reseña de Casilda Cundumí Dembelé, correo de contacto y nota legal
+Rama `fix/07/20/casilda/ajustes-home-quien-era-casilda`.
+
+- **Botón «¿Quién era Casilda Cundumí Dembelé?»** en el hero de la portada. Abre `QuienEraCasildaDialogComponent`
+  (`src/app/components/quien-era-casilda-dialog/`) sobre `MatDialog`, con el texto entregado por producto.
+- **`environment.correoContacto`** (`notificacasilda.dbu@udea.edu.co`) reemplaza a `proyectocasilda@udea.edu.co`, que
+  estaba quemado en el pie público y en la recuperación de contraseña del login.
+- **Nota legal de la portada:** «Los reportes se tratan con confidencialidad…» (antes «Las denuncias»).
+- **Por confirmar con producto:** la reseña nombra el sistema «Sistema de Información y Vigilancia en Salud Pública…»;
+  el encabezado y el login dicen «Sistema de vigilancia en salud pública…».
+
 ### Pendiente
 0. **Línea Alma Psicología:** Backend debe revisar D-PSI-01…19 (entidad de la novedad antes del caso, `tomadaPorMi`,
    SLA, PDF síncrono, contención puntual); el equipo debe decidir qué roles se habilitan además de ADMIN

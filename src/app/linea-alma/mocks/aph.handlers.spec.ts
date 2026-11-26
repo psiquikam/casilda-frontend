@@ -9,7 +9,7 @@ import { RespuestaMock } from './alma-mock-tipos';
  * desarrollo y fallaría contra el servicio real.
  */
 describe('manejadores mock de APH', () => {
-  function llamar(metodo: 'GET' | 'POST' | 'PUT' | 'PATCH', ruta: string, cuerpo?: unknown, query = ''): RespuestaMock {
+  function llamar(metodo: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE', ruta: string, cuerpo?: unknown, query = ''): RespuestaMock {
     const candidata = RUTAS_MOCK_APH.find((r) => r.metodo === metodo && r.patron.test(ruta));
     if (!candidata) throw new Error(`Sin manejador para ${metodo} ${ruta}`);
     return candidata.manejador(
@@ -237,7 +237,7 @@ describe('manejadores mock de APH', () => {
 
     it('cerrar una ruta exige resultado y luego permite cerrar la atención', () => {
       const a = enGestion();
-      const ruta = llamar('POST', '/rutas-externas', { tipoContexto: 'ATENCION_APH', idContexto: a.idAtencion, entidad: 'ICBF', motivo: 'Menor de edad', fechaActivacion: '2026-11-06', consentimiento }).cuerpo as { idRuta: string; version: number };
+      const ruta = llamar('POST', '/rutas-externas', { tipoContexto: 'ATENCION_APH', idContexto: a.idAtencion, entidad: 'COMISARIA_FAMILIA', motivo: 'Menor de edad', fechaActivacion: '2026-11-06', consentimiento }).cuerpo as { idRuta: string; version: number };
       expect(llamar('PATCH', `/rutas-externas/${ruta.idRuta}`, { version: ruta.version, estado: 'CERRADA' }).estado).toBe(400);
       expect(llamar('PATCH', `/rutas-externas/${ruta.idRuta}`, { version: ruta.version, estado: 'CERRADA', resultado: 'La entidad atendió el caso' }).estado).toBe(200);
       const actual = almaMockStore.atenciones.get(a.idAtencion)!;
@@ -341,13 +341,142 @@ describe('manejadores mock de APH', () => {
     });
   });
 
+  describe('registrar nueva atención: solicitante, hechos y evidencias', () => {
+    it('guarda quien solicita, el lugar de ocurrencia y los datos nuevos de la persona', () => {
+      const r = llamar('POST', '/atenciones-aph', {
+        canalIngreso: 'WHATSAPP',
+        persona: { tipoIdentificacion: 'CC', numeroIdentificacion: '1000000001', fechaNacimiento: '2000-05-01', identidadGenero: 'MUJER_CIS', vinculoUniversidad: 'ESTUDIANTE_PREGRADO' },
+        solicitante: { esTercero: true, nombres: 'Quien', apellidos: 'Llama', telefono: null, correo: null, parentesco: 'OTRO', parentescoOtro: 'Vecina de la residencia' },
+        lugarOcurrencia: 'DENTRO_UDEA',
+        motivoConsulta: 'Motivo de prueba'
+      });
+      const a = r.cuerpo as AtencionAphDto;
+      expect(a.persona.fechaNacimiento).toBe('2000-05-01');
+      expect(a.persona.identidadGenero).toBe('MUJER_CIS');
+      expect(a.solicitante?.parentescoOtro).toBe('Vecina de la residencia');
+      expect(a.lugarOcurrencia).toBe('DENTRO_UDEA');
+      expect(a.evidencias).toEqual([]);
+    });
+
+    it('rechaza un lugar de ocurrencia que no existe', () => {
+      const a = crearBorrador();
+      const r = llamar('PATCH', `/atenciones-aph/${a.idAtencion}`, { version: a.version, lugarOcurrencia: 'EN_LA_LUNA' });
+      expect(r.estado).toBe(400);
+    });
+
+    it('adjunta archivos, los lista y permite quitarlos; el límite es de 5', () => {
+      const a = crearBorrador();
+      const cuerpo = new FormData();
+      cuerpo.append('evidencias', new File(['uno'], 'captura.png', { type: 'image/png' }));
+      cuerpo.append('evidencias', new File(['dos'], 'denuncia.pdf', { type: 'application/pdf' }));
+      const subida = llamar('POST', `/atenciones-aph/${a.idAtencion}/evidencias`, cuerpo);
+      expect(subida.estado).toBe(201);
+      const conArchivos = subida.cuerpo as AtencionAphDto;
+      expect(conArchivos.evidencias?.map((e) => e.nombre)).toEqual(['captura.png', 'denuncia.pdf']);
+
+      const quitada = llamar('DELETE', `/atenciones-aph/${a.idAtencion}/evidencias/${conArchivos.evidencias![0].idEvidencia}`);
+      expect((quitada.cuerpo as AtencionAphDto).evidencias?.length).toBe(1);
+
+      const demasiados = new FormData();
+      for (let i = 0; i < 5; i++) demasiados.append('evidencias', new File(['x'], `a${i}.pdf`, { type: 'application/pdf' }));
+      expect(llamar('POST', `/atenciones-aph/${a.idAtencion}/evidencias`, demasiados).estado).toBe(400);
+    });
+  });
+
+  describe('remisiones: «no acepta», «no aplica» y novedades con fecha y hora', () => {
+    function enGestion(): AtencionAphDto {
+      const a = crearBorrador();
+      return llamar('PUT', `/atenciones-aph/${a.idAtencion}/triaje`, { version: 1, triaje: 'BAJO' }).cuerpo as AtencionAphDto;
+    }
+
+    it('«No acepta» y «No aplica» dejan constancia sin consentimiento ni motivo', () => {
+      const a = enGestion();
+      const base = { tipoContexto: 'ATENCION_APH', idContexto: a.idAtencion };
+      expect(llamar('POST', '/derivaciones/internas', { ...base, destino: 'NO_APLICA' }).estado).toBe(201);
+      expect(llamar('POST', '/rutas-externas', { ...base, entidad: 'SIN_DECISION', fechaActivacion: '2026-11-06' }).estado).toBe(201);
+    });
+
+    it('acepta destinos del listado de APH y del completo', () => {
+      const a = enGestion();
+      const base = { tipoContexto: 'ATENCION_APH', idContexto: a.idAtencion, motivo: 'Acompañamiento', consentimiento };
+      expect(llamar('POST', '/derivaciones/internas', { ...base, destino: 'BIENESTAR_FACULTAD' }).estado).toBe(201);
+      expect(llamar('POST', '/derivaciones/internas', { ...base, destino: 'PSICOORIENTACION_GENERO' }).estado).toBe(201);
+    });
+
+    it('cada remisión admite varias novedades con fecha y hora, en una derivación interna y en una ruta externa', () => {
+      const a = enGestion();
+      const base = { tipoContexto: 'ATENCION_APH', idContexto: a.idAtencion, motivo: 'Acompañamiento', consentimiento };
+      const der = llamar('POST', '/derivaciones/internas', { ...base, destino: 'SPYB' }).cuerpo as { idDerivacion: string };
+      const ruta = llamar('POST', '/rutas-externas', { ...base, entidad: 'FISCALIA', fechaActivacion: '2026-11-06' }).cuerpo as { idRuta: string };
+      const hace = (min: number) => new Date(Date.now() - min * 60_000).toISOString();
+
+      llamar('POST', `/derivaciones/internas/${der.idDerivacion}/seguimientos`, { novedad: 'La persona ya fue contactada', fechaHora: hace(30) });
+      const segunda = llamar('POST', `/derivaciones/internas/${der.idDerivacion}/seguimientos`, { novedad: 'Se programó una cita', fechaHora: hace(5) });
+      expect(segunda.estado).toBe(201);
+      expect((segunda.cuerpo as { seguimientos: unknown[] }).seguimientos.length).toBe(2);
+
+      const enRuta = llamar('POST', `/rutas-externas/${ruta.idRuta}/seguimientos`, { novedad: 'Radicó la denuncia', fechaHora: hace(10) });
+      expect(enRuta.estado).toBe(201);
+
+      const listaInterna = llamar('GET', '/derivaciones/internas', undefined, `tipoContexto=ATENCION_APH&idContexto=${a.idAtencion}`).cuerpo as { seguimientos: unknown[] }[];
+      expect(listaInterna[0].seguimientos.length).toBe(2);
+    });
+
+    it('una derivación interna se cierra con su resultado y la atención sigue abierta', () => {
+      const a = enGestion();
+      const der = llamar('POST', '/derivaciones/internas', { tipoContexto: 'ATENCION_APH', idContexto: a.idAtencion, destino: 'UAD', motivo: 'Remisión informativa', consentimiento }).cuerpo as { idDerivacion: string };
+      const ruta = `/derivaciones/internas/${der.idDerivacion}`;
+      expect(llamar('PATCH', ruta, { version: 1, estado: 'CERRADA' }).estado).toBe(400);
+      expect(llamar('PATCH', ruta, { version: 99, estado: 'CERRADA', resultado: 'La UAD abrió su trámite' }).estado).toBe(409);
+      const cierre = llamar('PATCH', ruta, { version: 1, estado: 'CERRADA', resultado: 'La UAD abrió su trámite' });
+      expect(cierre.estado).toBe(200);
+      expect((cierre.cuerpo as { estado: string }).estado).toBe('CERRADA');
+      expect(llamar('PATCH', ruta, { version: 2, estado: 'CERRADA', resultado: 'Otra vez' }).estado).toBe(422);
+      expect(almaMockStore.atenciones.get(a.idAtencion)!.estado).toBe('EN_GESTION_APH');
+    });
+
+    it('la novedad exige texto y una fecha y hora que no sea futura', () => {
+      const a = enGestion();
+      const der = llamar('POST', '/derivaciones/internas', { tipoContexto: 'ATENCION_APH', idContexto: a.idAtencion, destino: 'SPYB', motivo: 'Acompañamiento', consentimiento }).cuerpo as { idDerivacion: string };
+      const ruta = `/derivaciones/internas/${der.idDerivacion}/seguimientos`;
+      expect(llamar('POST', ruta, { novedad: 'ok', fechaHora: new Date().toISOString() }).estado).toBe(400);
+      expect(llamar('POST', ruta, { novedad: 'Texto suficiente', fechaHora: new Date(Date.now() + 86_400_000).toISOString() }).estado).toBe(400);
+      expect(llamar('POST', '/derivaciones/internas/DER-NO-EXISTE/seguimientos', { novedad: 'Texto suficiente', fechaHora: new Date().toISOString() }).estado).toBe(404);
+    });
+  });
+
   describe('catálogos', () => {
     it('sirve los catálogos que consume APH, solo con código y etiqueta', () => {
-      for (const nombre of ['tipos-identificacion', 'destinos-internos', 'rutas-externas', 'motivos-cierre-aph', 'textos-consentimiento']) {
+      for (const nombre of [
+        'tipos-identificacion',
+        'destinos-internos',
+        'rutas-externas',
+        'destinos-internos-aph',
+        'rutas-externas-aph',
+        'parentescos-solicitante',
+        'identidades-genero',
+        'vinculos-udea',
+        'motivos-cierre-aph',
+        'textos-consentimiento'
+      ]) {
         const items = llamar('GET', `/catalogos/${nombre}`).cuerpo as { codigo: string; etiqueta: string; activo: boolean }[];
         expect(items.length).withContext(nombre).toBeGreaterThan(0);
         expect(items.every((i) => i.codigo && i.etiqueta && i.activo === true)).withContext(nombre).toBeTrue();
       }
+    });
+
+    it('APH ofrece 3 remisiones internas y 6 externas; Psicología, el listado completo', () => {
+      const largo = (nombre: string) => (llamar('GET', `/catalogos/${nombre}`).cuerpo as unknown[]).length;
+      expect(largo('destinos-internos-aph')).toBe(3);
+      expect(largo('rutas-externas-aph')).toBe(6);
+      expect(largo('destinos-internos')).toBe(7);
+      expect(largo('rutas-externas')).toBe(15);
+    });
+
+    it('la relación con la persona tiene las 16 opciones de la revisión de flujos', () => {
+      const items = llamar('GET', '/catalogos/parentescos-solicitante').cuerpo as { codigo: string }[];
+      expect(items.length).toBe(16);
+      expect(items.some((i) => i.codigo === 'OTRO')).toBeTrue();
     });
 
     it('un catálogo inexistente responde 404', () => {

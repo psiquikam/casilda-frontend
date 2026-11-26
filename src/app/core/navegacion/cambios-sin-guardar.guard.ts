@@ -27,6 +27,9 @@ export const cambiosSinGuardarGuard: CanDeactivateFn<ConCambiosPendientes> = (co
     mensaje: '¿Desea salir? Lo que escribió todavía no se ha guardado.',
     textoConfirmar: 'Salir sin guardar',
     iconoConfirmar: 'logout',
-    textoCancelar: 'Seguir editando'
+    textoCancelar: 'Seguir editando',
+    tono: 'precaucion',
+    icono: 'edit_note',
+    accionPrincipal: 'cancelar'
   });
 };

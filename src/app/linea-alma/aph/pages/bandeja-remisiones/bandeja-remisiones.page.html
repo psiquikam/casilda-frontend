@@ -10,7 +10,7 @@
     @if (permisos.tiene('alma.aph.crear')) {
       <a class="boton boton--primario" routerLink="/linea-alma/aph/nueva">
         <mat-icon aria-hidden="true">add_ic_call</mat-icon>
-        Nueva atención
+        Registrar nueva atención
       </a>
     }
   </header>
@@ -43,9 +43,9 @@
     </button>
   </div>
 
-  <div class="bandeja__filtros">
+  <div class="bandeja__filtros alma-tarjeta">
     @if (vista() === 'remisiones') {
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Origen</mat-label>
         <mat-select [ngModel]="origen()" (ngModelChange)="origen.set($event); filtrar()">
           <mat-option value="">Todos los orígenes</mat-option>
@@ -55,7 +55,7 @@
         </mat-select>
       </mat-form-field>
     } @else {
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Estado</mat-label>
         <mat-select [ngModel]="estado()" (ngModelChange)="estado.set($event); filtrar()">
           <mat-option value="">Todos los estados</mat-option>
@@ -86,7 +86,7 @@
       @if (vista() === 'remisiones') { No hay remisiones pendientes por ahora. } @else { Todavía no hay atenciones para mostrar con estos filtros. }
     </p>
   } @else {
-    <div class="bandeja__tabla-contenedor">
+    <div class="bandeja__tabla-contenedor alma-tarjeta">
       <table class="bandeja__tabla" [attr.aria-label]="vista() === 'remisiones' ? 'Remisiones recibidas' : 'Mis atenciones'">
         <thead>
           <tr>

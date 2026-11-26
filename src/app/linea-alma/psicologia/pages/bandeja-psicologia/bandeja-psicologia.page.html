@@ -1,7 +1,7 @@
 <div class="bandeja">
   <header class="bandeja__cabecera">
     <div>
-      <h1 class="bandeja__titulo">Bandeja de Psicología — Línea Alma</h1>
+      <h1 class="bandeja__titulo">Pendientes atención por psicología — Línea Alma</h1>
       <p class="bandeja__intro">
         Novedades derivadas por APH, ordenadas por el plazo de primer contacto. La cola es compartida: tome la que va a gestionar y
         libérela si no puede continuar.
@@ -30,8 +30,8 @@
     </p>
   }
 
-  <form class="bandeja__filtros" (ngSubmit)="filtrar()" aria-label="Filtros de la bandeja">
-    <mat-form-field appearance="outline">
+  <form class="bandeja__filtros alma-tarjeta" (ngSubmit)="filtrar()" aria-label="Filtros de la bandeja">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Triaje</mat-label>
       <mat-select [ngModel]="triaje()" name="triaje" (ngModelChange)="triaje.set($event); filtrar()">
         <mat-option value="">Todos</mat-option>
@@ -40,7 +40,7 @@
         }
       </mat-select>
     </mat-form-field>
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Semáforo</mat-label>
       <mat-select [ngModel]="semaforo()" name="semaforo" (ngModelChange)="semaforo.set($event); filtrar()">
         <mat-option value="">Todos</mat-option>
@@ -49,7 +49,7 @@
         }
       </mat-select>
     </mat-form-field>
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Estado</mat-label>
       <mat-select [ngModel]="estado()" name="estado" (ngModelChange)="estado.set($event); filtrar()">
         <mat-option value="">Todos</mat-option>
@@ -58,7 +58,7 @@
         }
       </mat-select>
     </mat-form-field>
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Número de documento</mat-label>
       <input matInput type="search" name="documento" inputmode="numeric" autocomplete="off" [ngModel]="documento()" (ngModelChange)="documento.set($event)" />
       <mat-hint>Escriba el número y pulse Buscar.</mat-hint>
@@ -90,7 +90,7 @@
       {{ total() }} {{ total() === 1 ? 'novedad' : 'novedades' }} · se actualiza cada 30 segundos
       @if (ultimaActualizacion(); as u) { (última vez {{ u | date: 'h:mm:ss a' }}) }
     </p>
-    <div class="bandeja__tabla-contenedor">
+    <div class="bandeja__tabla-contenedor alma-tarjeta">
       <table class="bandeja__tabla" aria-label="Novedades pendientes de Psicología, de menor a mayor tiempo restante">
         <thead>
           <tr>

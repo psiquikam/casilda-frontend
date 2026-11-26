@@ -1,9 +1,9 @@
 <div class="pagina">
   <header class="pagina__cabecera">
     <div>
-      <h1 class="pagina__titulo">Nueva atención — Línea Alma</h1>
+      <h1 class="pagina__titulo">Registrar nueva atención — Línea Alma</h1>
       <p class="pagina__intro">
-        Registre la llamada o el mensaje de WhatsApp. Puede guardar un borrador en cualquier momento y retomarlo después.
+        Registre la solicitud que llegó por llamada telefónica o WhatsApp. Puede guardar un borrador en cualquier momento y retomarlo después.
       </p>
     </div>
     @if (idAtencion(); as id) {
@@ -39,180 +39,355 @@
   } @else {
     <app-resumen-errores [errores]="erroresResumen()" />
 
-    <form [formGroup]="form" novalidate (ngSubmit)="guardarBorrador()">
+    <form class="alma-tarjeta" [formGroup]="form" novalidate (ngSubmit)="guardarBorrador()">
       <mat-stepper
         class="pagina__stepper"
         [selectedIndex]="paso()"
         (selectionChange)="paso.set($event.selectedIndex)"
-        [linear]="false"
+        [linear]="true"
         labelPosition="bottom"
       >
-        <!-- ───────── 1. Identificación ───────── -->
-        <mat-step label="Identificación">
-          <section class="paso" formGroupName="identificacion" aria-labelledby="paso1-titulo">
-            <h2 id="paso1-titulo" class="paso__titulo">Identificación</h2>
+        <!-- ───────── 1. Registrar atención ───────── -->
+        <mat-step label="Solicitud" [completed]="solicitudCompleta()">
+          <section class="paso" aria-labelledby="paso1-titulo">
+            <h2 id="paso1-titulo" class="paso__titulo">Solicitud</h2>
 
-            <div class="paso__fila">
-              <mat-form-field appearance="outline">
-                <mat-label>Tipo de documento</mat-label>
-                <mat-select formControlName="tipoIdentificacion" id="nueva-ident-tipoIdentificacion" (selectionChange)="soloDigitos()">
-                  @for (t of tiposDocumento(); track t.codigo) {
-                    <mat-option [value]="t.codigo">{{ t.etiqueta }}</mat-option>
-                  }
-                </mat-select>
-                @if (errorCampo('identificacion', 'tipoIdentificacion', 'el tipo de documento'); as e) { <mat-error>{{ e }}</mat-error> }
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Número de documento</mat-label>
-                <input
-                  matInput
-                  id="nueva-ident-numeroIdentificacion"
-                  formControlName="numeroIdentificacion"
-                  inputmode="numeric"
-                  autocomplete="off"
-                  [maxlength]="longitudMaxima()"
-                  (input)="soloDigitos()"
-                  (keydown.enter)="$event.preventDefault(); consultar()"
-                />
-                <mat-hint>Escríbalo sin puntos ni espacios.</mat-hint>
-                @if (errorCampo('identificacion', 'numeroIdentificacion', 'el número de documento'); as e) { <mat-error>{{ e }}</mat-error> }
-              </mat-form-field>
-
-              <button
-                type="button"
-                class="boton boton--secundario paso__consultar"
-                [disabled]="consultando() || !!idAtencion()"
-                (click)="consultar()"
-              >
-                <mat-icon aria-hidden="true">person_search</mat-icon>
-                {{ consultando() ? 'Consultando…' : 'Consultar documento' }}
-              </button>
+            <!-- Tipo de solicitud y canal -->
+            <div formGroupName="solicitud">
+              <fieldset class="paso__grupo">
+                <legend>
+                  ¿Quién solicita la atención? <span class="required-star" aria-hidden="true">*</span>
+                  <button type="button" class="help-tooltip-trigger" matTooltip="Directa: la persona afectada llama o escribe. Indirecta: un tercero informa la situación de otra persona." matTooltipClass="casilda-help-tooltip" aria-label="Ayuda sobre quién solicita la atención">?</button>
+                </legend>
+                <mat-radio-group formControlName="esTercero" aria-label="Tipo de solicitud" class="paso__opciones paso__opciones--fila">
+                  <mat-radio-button [value]="false" class="paso__opcion">
+                    <span class="paso__opcion-titulo">Solicitud directa</span>
+                    <span class="paso__opcion-ayuda">La persona que requiere atención se comunica directamente con Línea Alma.</span>
+                  </mat-radio-button>
+                  <mat-radio-button [value]="true" class="paso__opcion">
+                    <span class="paso__opcion-titulo">Solicitud indirecta</span>
+                    <span class="paso__opcion-ayuda">Un tercero se comunica con Línea Alma para informar una situación que afecta a otra persona.</span>
+                  </mat-radio-button>
+                </mat-radio-group>
+              </fieldset>
             </div>
 
-            @if (consulta(); as c) {
-              @if (consultaVigente() || idAtencion()) {
-                <app-alerta-seguimiento [consulta]="c" [permitirContencion]="permisos.tiene('alma.aph.editar')" (contencion)="abrirContencion($event)" />
-              }
+            <div class="spyb-grid" formGroupName="identificacion">
+              <div class="spyb-campo">
+                <app-etiqueta-campo texto="Canal de ingreso" para="nueva-ident-canalIngreso" [obligatorio]="true" />
+                <mat-form-field appearance="outline">
+                  <mat-select formControlName="canalIngreso" id="nueva-ident-canalIngreso" placeholder="Seleccione una opción">
+                    @for (canal of canales(); track canal) {
+                      <mat-option [value]="canal">{{ etiquetaCanal(canal) }}</mat-option>
+                    }
+                  </mat-select>
+                  @if (esRemision()) { <mat-hint>La atención llegó por remisión; el canal no se cambia.</mat-hint> }
+                  @if (errorCampo('identificacion', 'canalIngreso', 'el canal'); as e) { <mat-error>{{ e }}</mat-error> }
+                </mat-form-field>
+              </div>
+            </div>
+
+            <!-- Quien realiza la solicitud (solo si es indirecta) -->
+            @if (esTercero()) {
+              <section formGroupName="solicitud" aria-labelledby="sec-solicitante">
+                <h3 id="sec-solicitante" class="spyb-seccion-titulo">Información de quien realiza la solicitud</h3>
+                <div class="spyb-grid">
+                  <div class="spyb-campo">
+                    <app-etiqueta-campo texto="Primer nombre" para="nueva-sol-solPrimerNombre" />
+                    <mat-form-field appearance="outline">
+                      <input matInput appSoloLetras maxlength="60" id="nueva-sol-solPrimerNombre" formControlName="solPrimerNombre" placeholder="Ej: Juan" autocomplete="off" />
+                    </mat-form-field>
+                  </div>
+                  <div class="spyb-campo">
+                    <app-etiqueta-campo texto="Segundo nombre" para="nueva-sol-solSegundoNombre" />
+                    <mat-form-field appearance="outline">
+                      <input matInput appSoloLetras maxlength="60" id="nueva-sol-solSegundoNombre" formControlName="solSegundoNombre" placeholder="Ej: Carlos" autocomplete="off" />
+                    </mat-form-field>
+                  </div>
+                  <div class="spyb-campo">
+                    <app-etiqueta-campo texto="Primer apellido" para="nueva-sol-solPrimerApellido" />
+                    <mat-form-field appearance="outline">
+                      <input matInput appSoloLetras maxlength="60" id="nueva-sol-solPrimerApellido" formControlName="solPrimerApellido" placeholder="Ej: Pérez" autocomplete="off" />
+                    </mat-form-field>
+                  </div>
+                  <div class="spyb-campo">
+                    <app-etiqueta-campo texto="Segundo apellido" para="nueva-sol-solSegundoApellido" />
+                    <mat-form-field appearance="outline">
+                      <input matInput appSoloLetras maxlength="60" id="nueva-sol-solSegundoApellido" formControlName="solSegundoApellido" placeholder="Ej: Gómez" autocomplete="off" />
+                    </mat-form-field>
+                  </div>
+                  <div class="spyb-campo">
+                    <app-etiqueta-campo texto="Relación con la persona" para="nueva-sol-solParentesco" [obligatorio]="true" ayuda="Qué es quien llama para la persona que requiere atención: familiar, docente, pareja, etc." />
+                    <mat-form-field appearance="outline">
+                      <mat-select id="nueva-sol-solParentesco" formControlName="solParentesco" placeholder="Seleccione una opción">
+                        @for (p of parentescos(); track p.codigo) {
+                          <mat-option [value]="p.codigo">{{ p.etiqueta }}</mat-option>
+                        }
+                      </mat-select>
+                      @if (errorCampo('solicitud', 'solParentesco', 'la relación'); as e) { <mat-error>{{ e }}</mat-error> }
+                    </mat-form-field>
+                  </div>
+                  @if (parentescoOtro() && extensiones) {
+                  <div class="spyb-campo">
+                    <app-etiqueta-campo texto="¿Cuál?" para="nueva-sol-solParentescoOtro" [obligatorio]="true" />
+                    <mat-form-field appearance="outline">
+                      <input matInput maxlength="100" id="nueva-sol-solParentescoOtro" formControlName="solParentescoOtro" placeholder="Ej: Vecina de la residencia" autocomplete="off" />
+                      @if (errorCampo('solicitud', 'solParentescoOtro', 'la relación'); as e) { <mat-error>{{ e }}</mat-error> }
+                    </mat-form-field>
+                  </div>
+                  }
+                  <div class="spyb-campo">
+                    <app-etiqueta-campo texto="Teléfono de contacto" para="nueva-sol-solTelefono" ayuda="Es el de quien solicita, no el de la persona afectada. Solo números. Es opcional." />
+                    <mat-form-field appearance="outline">
+                      <input matInput type="tel" inputmode="tel" id="nueva-sol-solTelefono" formControlName="solTelefono" placeholder="Ej: 3001234567" autocomplete="off" />
+                      @if (errorCampo('solicitud', 'solTelefono', 'el teléfono'); as e) { <mat-error>{{ e }}</mat-error> }
+                    </mat-form-field>
+                  </div>
+                  @if (extensiones) {
+                  <div class="spyb-campo">
+                    <app-etiqueta-campo texto="Correo electrónico" para="nueva-sol-solCorreo" />
+                    <mat-form-field appearance="outline">
+                      <input matInput type="email" id="nueva-sol-solCorreo" formControlName="solCorreo" placeholder="Ej: nombre@correo.com" autocomplete="off" />
+                      @if (errorCampo('solicitud', 'solCorreo', 'el correo'); as e) { <mat-error>{{ e }}</mat-error> }
+                    </mat-form-field>
+                  </div>
+                  }
+                </div>
+              </section>
             }
 
-            <mat-form-field appearance="outline" class="paso__canal">
-              <mat-label>Canal de ingreso</mat-label>
-              <mat-select formControlName="canalIngreso" id="nueva-ident-canalIngreso">
-                @for (canal of canales(); track canal) {
-                  <mat-option [value]="canal">{{ etiquetaCanal(canal) }}</mat-option>
-                }
-              </mat-select>
-              @if (esRemision()) { <mat-hint>La atención llegó por remisión; el canal no se cambia.</mat-hint> }
-              @if (errorCampo('identificacion', 'canalIngreso', 'el canal de ingreso'); as e) { <mat-error>{{ e }}</mat-error> }
-            </mat-form-field>
+            @if (!solicitudCompleta()) {
+              <p class="casilda-alerta casilda-alerta--precaucion" role="status">
+                <mat-icon aria-hidden="true">lock</mat-icon>
+                <span>Elija el canal de ingreso{{ esTercero() ? ' y la relación de quien solicita' : '' }} para continuar.</span>
+              </p>
+            }
 
             <div class="paso__acciones">
-              <button type="button" class="boton boton--primario" [disabled]="guardando()" (click)="continuar(0)">Guardar y continuar</button>
+              <button type="button" class="boton boton--primario" (click)="continuarSolicitud()">Continuar</button>
             </div>
           </section>
         </mat-step>
 
-        <!-- ───────── 2. Caracterización ───────── -->
-        <mat-step label="Caracterización">
+        <!-- ───────── 2. Persona y hechos ───────── -->
+        <mat-step label="Persona y hechos" [completed]="registroGuardado()">
           <section class="paso" aria-labelledby="paso2-titulo">
-            <h2 id="paso2-titulo" class="paso__titulo">Caracterización</h2>
-            <p class="paso__ayuda">Todos los datos son opcionales: pregunte solo lo que la persona quiera compartir.</p>
-            <app-caracterizacion-form [grupo]="form.controls.caracterizacion" prefijoId="nueva-car" />
+            <h2 id="paso2-titulo" class="paso__titulo">Persona y hechos</h2>
+
+            <!-- La persona que requiere atención -->
+            <section aria-labelledby="sec-persona">
+              <h3 id="sec-persona" class="spyb-seccion-titulo">Información de la persona que requiere atención</h3>
+
+              <div class="spyb-grid" formGroupName="identificacion">
+                <div class="spyb-campo">
+                  <app-etiqueta-campo texto="Tipo de documento" para="nueva-ident-tipoIdentificacion" [obligatorio]="true" />
+                  <mat-form-field appearance="outline">
+                    <mat-select formControlName="tipoIdentificacion" id="nueva-ident-tipoIdentificacion" placeholder="Seleccione una opción" (selectionChange)="soloDigitos()">
+                      @for (t of tiposDocumento(); track t.codigo) {
+                        <mat-option [value]="t.codigo">{{ t.etiqueta }}</mat-option>
+                      }
+                    </mat-select>
+                    @if (errorCampo('identificacion', 'tipoIdentificacion', 'el tipo de documento'); as e) { <mat-error>{{ e }}</mat-error> }
+                  </mat-form-field>
+                </div>
+
+                <div class="spyb-campo">
+                  <app-etiqueta-campo texto="Número de documento" para="nueva-ident-numeroIdentificacion" [obligatorio]="true" ayuda="Escríbalo sin puntos ni espacios. Con Enter se consulta si la persona ya tiene historial." />
+                  <mat-form-field appearance="outline">
+                    <input
+                      matInput
+                      id="nueva-ident-numeroIdentificacion"
+                      formControlName="numeroIdentificacion"
+                      placeholder="Ej: 1035987456"
+                      inputmode="numeric"
+                      autocomplete="off"
+                      [maxlength]="longitudMaxima()"
+                      (input)="soloDigitos()"
+                      (keydown.enter)="$event.preventDefault(); consultar()"
+                    />
+                    @if (errorCampo('identificacion', 'numeroIdentificacion', 'el número de documento'); as e) { <mat-error>{{ e }}</mat-error> }
+                  </mat-form-field>
+                </div>
+
+                <div class="spyb-campo paso__consultar">
+                  <span class="spyb-campo__etiqueta" aria-hidden="true">&nbsp;</span>
+                  <button
+                    type="button"
+                    class="boton boton--secundario paso__consultar-boton"
+                    [disabled]="consultando() || !!idAtencion()"
+                    aria-label="Consultar si la persona ya tiene historial por su documento"
+                    (click)="consultar()"
+                  >
+                    <mat-icon aria-hidden="true">person_search</mat-icon>
+                    {{ consultando() ? 'Consultando…' : 'Consultar' }}
+                  </button>
+                </div>
+              </div>
+
+              @if (consulta(); as c) {
+                @if (consultaVigente() || idAtencion()) {
+                  <app-alerta-seguimiento [consulta]="c" [permitirContencion]="permisos.tiene('alma.aph.editar')" (contencion)="abrirContencion($event)" />
+                }
+              }
+
+              <p class="paso__ayuda">Todos los demás datos son opcionales: pregunte solo lo que la persona quiera compartir.</p>
+              <app-caracterizacion-form [grupo]="form.controls.caracterizacion" prefijoId="nueva-car" />
+            </section>
+
+            <!-- Información de los hechos -->
+            <section formGroupName="solicitud" aria-labelledby="sec-hechos">
+              <h3 id="sec-hechos" class="spyb-seccion-titulo">Información de los hechos</h3>
+
+              @if (extensiones) {
+              <fieldset class="paso__grupo">
+                <legend>
+                  Lugar de ocurrencia
+                  <button type="button" class="help-tooltip-trigger" matTooltip="Indique si la situación ocurrió dentro de las instalaciones universitarias o en un espacio externo. Es opcional." matTooltipClass="casilda-help-tooltip" aria-label="Ayuda sobre lugar de ocurrencia">?</button>
+                </legend>
+                <mat-radio-group formControlName="lugarOcurrencia" class="paso__opciones paso__opciones--fila" aria-label="Lugar de ocurrencia">
+                  @for (lugar of lugares; track lugar) {
+                    <mat-radio-button [value]="lugar" class="paso__opcion">
+                      <span class="paso__opcion-titulo">{{ etiquetasLugar[lugar].titulo }}</span>
+                      <span class="paso__opcion-ayuda">{{ etiquetasLugar[lugar].detalle }}</span>
+                    </mat-radio-button>
+                  }
+                </mat-radio-group>
+              </fieldset>
+              }
+
+              <div class="spyb-campo">
+                <app-etiqueta-campo texto="Motivo de consulta" para="nueva-sol-motivoConsulta" [obligatorio]="true" ayuda="Describa libremente la situación, con las palabras de la persona y sin juicios." />
+                <mat-form-field appearance="outline">
+                  <textarea matInput id="nueva-sol-motivoConsulta" formControlName="motivoConsulta" placeholder="Ej: La persona cuenta que desde hace unas semanas se siente..." rows="5" maxlength="2000" autocomplete="off"></textarea>
+                  @if (errorCampo('solicitud', 'motivoConsulta', 'el motivo de consulta'); as e) { <mat-error>{{ e }}</mat-error> }
+                </mat-form-field>
+              </div>
+            </section>
+
+            <!-- Evidencias -->
+            @if (extensiones) {
+            <app-evidencias-adjuntas
+              [(archivos)]="archivosPendientes"
+              [guardadas]="atencion()?.evidencias ?? []"
+              [soloLectura]="!!atencion() && !atencion()!.editable"
+              (quitarGuardada)="quitarEvidenciaGuardada($event)"
+            />
+            }
+
+            <!-- Quién atiende y cuándo (asignados por el sistema) -->
+            <div class="spyb-grid paso__sistema">
+              <div class="spyb-campo">
+                <app-etiqueta-campo texto="APH que atiende" para="nueva-aph-atiende" ayuda="La asigna el sistema: es quien registra o toma la atención." />
+                <mat-form-field appearance="outline">
+                  <input matInput id="nueva-aph-atiende" [value]="aphQueAtiende()" readonly aria-readonly="true" />
+                </mat-form-field>
+              </div>
+              <div class="spyb-campo">
+                <app-etiqueta-campo texto="Fecha y hora de atención" para="nueva-fecha-atencion" ayuda="La asigna el sistema al abrir el registro." />
+                <mat-form-field appearance="outline">
+                  <input matInput id="nueva-fecha-atencion" [value]="fechaAtencion() | date: 'd/MM/y, h:mm a'" readonly aria-readonly="true" />
+                </mat-form-field>
+              </div>
+            </div>
+
+            @if (!registroGuardado()) {
+              <p class="casilda-alerta casilda-alerta--precaucion" role="status">
+                <mat-icon aria-hidden="true">lock</mat-icon>
+                <span>El triaje se habilita cuando complete los campos obligatorios (<span class="required-star" aria-hidden="true">*</span>) y pulse «Guardar y continuar».</span>
+              </p>
+            }
+
             <div class="paso__acciones">
               <button type="button" class="boton boton--secundario" (click)="paso.set(0)">Atrás</button>
               <button type="button" class="boton boton--secundario" [disabled]="guardando()" (click)="guardarBorrador()">Guardar borrador</button>
-              <button type="button" class="boton boton--primario" [disabled]="guardando()" (click)="continuar(1)">Guardar y continuar</button>
+              <button type="button" class="boton boton--primario" [disabled]="guardando()" (click)="continuar()">Guardar y continuar</button>
             </div>
           </section>
         </mat-step>
 
-        <!-- ───────── 3. Motivo y solicitante ───────── -->
-        <mat-step label="Motivo y solicitante">
-          <section class="paso" formGroupName="solicitud" aria-labelledby="paso3-titulo">
-            <h2 id="paso3-titulo" class="paso__titulo">Motivo y solicitante</h2>
-
-            <mat-checkbox formControlName="esTercero" id="nueva-sol-esTercero">
-              Quien se comunica es otra persona, no la persona afectada.
-            </mat-checkbox>
-
-            @if (esTercero()) {
-              <div class="paso__fila">
-                <mat-form-field appearance="outline">
-                  <mat-label>Nombres de quien llama</mat-label>
-                  <input matInput id="nueva-sol-solNombres" formControlName="solNombres" autocomplete="off" />
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Apellidos de quien llama</mat-label>
-                  <input matInput id="nueva-sol-solApellidos" formControlName="solApellidos" autocomplete="off" />
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Teléfono de quien llama</mat-label>
-                  <input matInput id="nueva-sol-solTelefono" formControlName="solTelefono" type="tel" inputmode="tel" autocomplete="off" />
-                  @if (errorCampo('solicitud', 'solTelefono', 'el teléfono'); as e) { <mat-error>{{ e }}</mat-error> }
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Relación con la persona afectada</mat-label>
-                  <mat-select id="nueva-sol-solParentesco" formControlName="solParentesco">
-                    <mat-option value="">Sin dato</mat-option>
-                    @for (p of parentescos(); track p.codigo) {
-                      <mat-option [value]="p.codigo">{{ p.etiqueta }}</mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-              </div>
-            }
-
-            <mat-form-field appearance="outline" class="paso__ancho">
-              <mat-label>Motivo de consulta</mat-label>
-              <textarea matInput id="nueva-sol-motivoConsulta" formControlName="motivoConsulta" rows="4" autocomplete="off"></textarea>
-              <mat-hint>Con las palabras de la persona, sin juicios.</mat-hint>
-              @if (errorCampo('solicitud', 'motivoConsulta', 'el motivo de consulta'); as e) { <mat-error>{{ e }}</mat-error> }
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="paso__ancho">
-              <mat-label>Nota de valoración APH (opcional)</mat-label>
-              <textarea matInput id="nueva-sol-notaAph" formControlName="notaAph" rows="4" autocomplete="off"></textarea>
-              <mat-hint>Psicología la verá como la nota de APH.</mat-hint>
-            </mat-form-field>
-
-            <div class="paso__acciones">
-              <button type="button" class="boton boton--secundario" (click)="paso.set(1)">Atrás</button>
-              <button type="button" class="boton boton--secundario" [disabled]="guardando()" (click)="guardarBorrador()">Guardar borrador</button>
-              <button type="button" class="boton boton--primario" [disabled]="guardando()" (click)="continuar(2)">Guardar y continuar</button>
-            </div>
-          </section>
-        </mat-step>
-
-        <!-- ───────── 4. Triaje y derivación ───────── -->
-        <mat-step label="Triaje y derivación">
-          <section class="paso" aria-labelledby="paso4-titulo">
-            <h2 id="paso4-titulo" class="paso__titulo">Triaje y derivación</h2>
+        <!-- ───────── 3. Triaje ───────── -->
+        <mat-step label="Triaje" [completed]="triajeRegistrado()">
+          <section class="paso" aria-labelledby="paso3-titulo">
+            <h2 id="paso3-titulo" class="paso__titulo">Triaje</h2>
 
             @if (atencion(); as a) {
               @if (mostrarContencion(); as numeroCaso) {
                 <app-contencion-post-cierre-form [idAtencion]="a.idAtencion" [numeroCaso]="numeroCaso" />
               }
 
-              <app-paso-triaje [atencion]="a" [soloLectura]="!a.editable" (actualizada)="actualizarAtencion($event)" (conflicto)="recargarTrasConflicto()" />
+              <app-paso-triaje
+                [atencion]="a"
+                [soloLectura]="!a.editable"
+                [conTitulo]="false"
+                [panelPeligro]="false"
+                (actualizada)="actualizarAtencion($event)"
+                (conflicto)="recargarTrasConflicto()"
+              />
 
-              @if (a.estado !== 'BORRADOR') {
-                <app-paso-derivacion
-                  [atencion]="a"
-                  [soloLectura]="!a.editable && a.estado !== 'PENDIENTE_PSICOLOGIA'"
-                  (actualizada)="actualizarAtencion($event)"
-                  (conflicto)="recargarTrasConflicto()"
-                />
+              <!-- Nota de valoración APH -->
+              <section class="paso__seccion" formGroupName="valoracion" aria-labelledby="sec-nota">
+                <h3 id="sec-nota" class="visually-hidden">Nota de valoración APH</h3>
+                <div class="spyb-campo">
+                  <app-etiqueta-campo texto="Nota de valoración APH" para="nueva-val-notaAph" ayuda="Es opcional. Psicología la verá como la nota de APH." />
+                  <mat-form-field appearance="outline">
+                    <textarea matInput id="nueva-val-notaAph" formControlName="notaAph" rows="4" maxlength="2000" placeholder="Ej: La persona se mostró receptiva y pidió que la llamen en la tarde." autocomplete="off"></textarea>
+                    @if (errorCampo('valoracion', 'notaAph', 'la nota'); as e) { <mat-error>{{ e }}</mat-error> }
+                  </mat-form-field>
+                </div>
+                @if (a.editable) {
+                  <div class="paso__acciones">
+                    <button type="button" class="boton boton--secundario" [disabled]="guardando() || form.controls.valoracion.pristine" (click)="guardarNota()">
+                      Guardar nota de valoración
+                    </button>
+                  </div>
+                }
+              </section>
+
+              @if (!triajeRegistrado()) {
+                <p class="casilda-alerta casilda-alerta--precaucion" role="status">
+                  <mat-icon aria-hidden="true">lock</mat-icon>
+                  <span>Las remisiones se habilitan cuando registre el triaje o la omisión por peligro inminente.</span>
+                </p>
               }
-
-              <p class="paso__ayuda">
-                Las rutas internas y externas, el cierre y el historial se gestionan desde
-                <a [routerLink]="['/linea-alma/aph/atenciones', a.idAtencion]">el detalle de la atención</a>.
-              </p>
             } @else {
               <p class="casilda-alerta casilda-alerta--precaucion" role="status">
                 <mat-icon aria-hidden="true">info</mat-icon>
-                <span>Complete y guarde los pasos anteriores para registrar el triaje.</span>
+                <span>Complete y guarde el registro de la atención para continuar con el triaje.</span>
+              </p>
+            }
+
+            <div class="paso__acciones">
+              <button type="button" class="boton boton--secundario" (click)="paso.set(1)">Atrás</button>
+              <button type="button" class="boton boton--primario" [disabled]="!triajeRegistrado()" (click)="irAlPaso(3)">Continuar a remisiones</button>
+            </div>
+          </section>
+        </mat-step>
+
+        <!-- ───────── 4. Remisiones ───────── -->
+        <mat-step label="Remisiones">
+          <section class="paso" aria-labelledby="paso4-titulo">
+            <h2 id="paso4-titulo" class="paso__titulo">Remisiones</h2>
+
+            @if (atencion(); as a) {
+              <app-paso-derivacion
+                [atencion]="a"
+                [soloLectura]="!a.editable && a.estado !== 'PENDIENTE_PSICOLOGIA'"
+                (actualizada)="actualizarAtencion($event)"
+                (conflicto)="recargarTrasConflicto()"
+              />
+
+              <app-panel-derivaciones
+                perfil="APH"
+                [conTitulo]="false"
+                [contexto]="{ tipo: 'ATENCION_APH', id: a.idAtencion }"
+                [consentimiento]="a.consentimiento"
+                [peligroInminente]="!!a.omisionTriaje"
+                [soloLectura]="!a.editable && a.estado !== 'PENDIENTE_PSICOLOGIA'"
+              />
+
+              <p class="paso__ayuda">
+                El cierre y el historial de la atención se gestionan desde
+                <a [routerLink]="['/linea-alma/aph/atenciones', a.idAtencion]">el detalle de la atención</a>.
               </p>
             }
 

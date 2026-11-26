@@ -24,13 +24,15 @@
         <span class="public-nav__label">Registrarse<span class="public-nav__label-extra"> de forma segura</span></span>
       </a>
     </li>
-    <li>
-      <a class="public-nav__item" routerLink="/formulario-anonimo" routerLinkActive="public-nav__item--activo"
-        #reporteActivo="routerLinkActive"
-        [attr.aria-current]="reporteActivo.isActive ? 'page' : null">
-        <mat-icon aria-hidden="true">shield</mat-icon>
-        <span class="public-nav__label">Reportar VBG<span class="public-nav__label-extra"> de forma anónima</span></span>
-      </a>
-    </li>
+    @if (mostrarReporteAnonimo) {
+      <li>
+        <a class="public-nav__item" routerLink="/formulario-anonimo" routerLinkActive="public-nav__item--activo"
+          #reporteActivo="routerLinkActive"
+          [attr.aria-current]="reporteActivo.isActive ? 'page' : null">
+          <mat-icon aria-hidden="true">shield</mat-icon>
+          <span class="public-nav__label">Reportar VBG<span class="public-nav__label-extra"> de forma anónima</span></span>
+        </a>
+      </li>
+    }
   </ul>
 </nav>

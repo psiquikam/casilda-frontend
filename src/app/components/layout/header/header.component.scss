@@ -69,10 +69,10 @@
   }
 
   &__distintivo {
-    width: clamp(30px, 3.4vw, 38px);
-    height: clamp(30px, 3.4vw, 38px);
+    /* El emblema lleva el nombre en arco: por debajo de 40 px deja de leerse. */
+    width: clamp(40px, 4vw, 48px);
+    height: clamp(40px, 4vw, 48px);
     color: var(--color-text-on-primary);
-    fill: currentColor;
     flex-shrink: 0;
   }
 

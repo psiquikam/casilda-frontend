@@ -1,10 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconTestingModule } from '@angular/material/icon/testing';
 import { of, throwError } from 'rxjs';
 
 import { CasildaHomeComponent } from './casilda-home.component';
+import { QuienEraCasildaDialogComponent } from '../quien-era-casilda-dialog/quien-era-casilda-dialog.component';
 import { ContenidoDestacadoDto, ContenidoHomeService } from '../../services/contenido-home.service';
 import { environment } from '../../../environments/environment';
 
@@ -75,6 +77,27 @@ describe('CasildaHomeComponent', () => {
     expect(titulos[0].textContent).toContain('espacio seguro');
   });
 
+  it('debe abrir la reseña de Casilda Cundumí Dembelé desde la portada', async () => {
+    await crearComponente();
+    const dialog = TestBed.inject(MatDialog);
+    spyOn(dialog, 'open');
+
+    const boton = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'))
+      .find((b) => b.textContent?.includes('¿Quién era Casilda Cundumí Dembelé?'));
+    boton?.click();
+
+    expect(boton).toBeDefined();
+    expect(dialog.open).toHaveBeenCalledWith(QuienEraCasildaDialogComponent, jasmine.objectContaining({ restoreFocus: true }));
+  });
+
+  it('debe hablar de reportes, no de denuncias, en la nota legal', async () => {
+    await crearComponente();
+    const legal = (fixture.nativeElement as HTMLElement).querySelector('.home__legal')?.textContent ?? '';
+
+    expect(legal).toContain('Los reportes se tratan con confidencialidad');
+    expect(legal).not.toContain('denuncias');
+  });
+
   it('no debe ofrecer acceso público a la consulta de casos', async () => {
     await crearComponente();
 
@@ -141,8 +164,32 @@ describe('CasildaHomeComponent', () => {
       expect(enlace?.getAttribute('href')).toBe('tel:6042196000');
     });
 
-    it('conserva el reporte seguro como acción disponible sin línea telefónica', async () => {
-      await crearConTelefono('');
+  });
+
+  describe('acceso al reporte anónimo', () => {
+    const flagOriginal = environment.features.reporteAnonimoPublico;
+
+    afterEach(() => {
+      environment.features.reporteAnonimoPublico = flagOriginal;
+    });
+
+    it('no ofrece «Iniciar reporte seguro» mientras el equipo lo mantenga oculto', async () => {
+      environment.features.reporteAnonimoPublico = false;
+      await crearComponente();
+
+      const pagina = fixture.nativeElement as HTMLElement;
+      expect(pagina.textContent).not.toContain('Iniciar reporte seguro');
+      expect(pagina.querySelector('.hero a[href="/formulario-anonimo"]')).toBeNull();
+      // El aviso de privacidad no promete un canal que la portada ya no ofrece.
+      expect(pagina.textContent).not.toContain('reportes de forma anónima');
+      expect(pagina.textContent).toContain('La información suministrada');
+      // Sin reporte ni línea telefónica no queda un contenedor de acciones vacío.
+      expect(pagina.querySelector('.hero__acciones')).toBeNull();
+    });
+
+    it('lo vuelve a ofrecer al encender el flag', async () => {
+      environment.features.reporteAnonimoPublico = true;
+      await crearComponente();
 
       expect((fixture.nativeElement as HTMLElement).textContent).toContain('Iniciar reporte seguro');
     });

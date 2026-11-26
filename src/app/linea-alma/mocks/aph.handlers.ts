@@ -7,9 +7,16 @@ import {
   DerivacionPsicologiaDto,
   NotaAtencionDto,
   PaginaAlma,
-  RutaExternaDto
+  RutaExternaDto,
+  SeguimientoRemisionDto
 } from '../shared/types/alma-dto';
-import { CANALES_INGRESO, ESTADOS_EDITABLES_APH, TRIAJES } from '../shared/types/alma.types';
+import {
+  CANALES_INGRESO,
+  DESTINOS_SIN_DERIVACION,
+  ESTADOS_EDITABLES_APH,
+  LUGARES_OCURRENCIA,
+  TRIAJES
+} from '../shared/types/alma.types';
 import { AlmaMockStore } from './alma-mock-store';
 import { PeticionMock, RespuestaMock, RutaMock, errorMock, ok, validacion } from './alma-mock-tipos';
 
@@ -149,9 +156,14 @@ const crearAtencion = (p: PeticionMock, s: AlmaMockStore): RespuestaMock => {
       telefonoPrincipal: persona.telefonoPrincipal ?? null,
       correoPersonal: persona.correoPersonal ?? null,
       ciudad: persona.ciudad ?? null,
-      estrato: persona.estrato ?? null
+      estrato: persona.estrato ?? null,
+      fechaNacimiento: persona.fechaNacimiento ?? null,
+      identidadGenero: persona.identidadGenero ?? null,
+      vinculoUniversidad: persona.vinculoUniversidad ?? null
     },
     solicitante: c.solicitante ?? null,
+    lugarOcurrencia: c.lugarOcurrencia ?? null,
+    evidencias: [],
     motivoConsulta: c.motivoConsulta ?? null,
     notaAph: c.notaAph ?? null,
     triaje: null,
@@ -204,6 +216,12 @@ const actualizarAtencion = (p: PeticionMock, s: AlmaMockStore): RespuestaMock =>
     };
   }
   if (c.solicitante !== undefined) cambios.solicitante = c.solicitante;
+  if (c.lugarOcurrencia !== undefined) {
+    if (c.lugarOcurrencia !== null && !LUGARES_OCURRENCIA.includes(c.lugarOcurrencia)) {
+      return validacion({ lugarOcurrencia: 'El lugar de ocurrencia no es válido.' });
+    }
+    cambios.lugarOcurrencia = c.lugarOcurrencia;
+  }
   if (c.motivoConsulta !== undefined) cambios.motivoConsulta = c.motivoConsulta;
   if (c.notaAph !== undefined) {
     cambios.notaAph = c.notaAph;
@@ -325,12 +343,12 @@ const crearDerivacionInterna = (p: PeticionMock, s: AlmaMockStore): RespuestaMoc
   const c = p.cuerpo ?? {};
   const fallo = verificarContexto(s, c.tipoContexto, c.idContexto);
   if (fallo) return fallo;
-  const destinos = s.catalogos.get('destinos-internos') ?? [];
+  const destinos = [...(s.catalogos.get('destinos-internos') ?? []), ...(s.catalogos.get('destinos-internos-aph') ?? [])];
   const faltantes: Record<string, string> = {};
   if (!destinos.some((d) => d.codigo === c.destino)) faltantes['destino'] = 'Seleccione a qué dependencia se deriva.';
-  if (!minimoNota(c.motivo, 5)) faltantes['motivo'] = 'Escriba el motivo de la derivación.';
+  if (!DESTINOS_SIN_DERIVACION.includes(c.destino) && !minimoNota(c.motivo, 5)) faltantes['motivo'] = 'Escriba el motivo de la derivación.';
   if (Object.keys(faltantes).length) return validacion(faltantes);
-  if (c.peligroInminente !== true && !consentimientoValido(c.consentimiento)) {
+  if (!DESTINOS_SIN_DERIVACION.includes(c.destino) && c.peligroInminente !== true && !consentimientoValido(c.consentimiento)) {
     return errorMock(422, 'CONSENTIMIENTO_REQUERIDO', 'No se puede derivar sin consentimiento informado.');
   }
   const derivacion: DerivacionInternaDto = {
@@ -338,12 +356,13 @@ const crearDerivacionInterna = (p: PeticionMock, s: AlmaMockStore): RespuestaMoc
     tipoContexto: c.tipoContexto,
     idContexto: c.idContexto,
     destino: c.destino,
-    motivo: c.motivo.trim(),
+    motivo: typeof c.motivo === 'string' && c.motivo.trim() ? c.motivo.trim() : 'Sin derivación',
     estado: 'ENVIADA',
     fechaEnvio: s.ahora().toISOString(),
     peligroInminente: c.peligroInminente === true,
-    consentimiento: c.peligroInminente === true ? (c.consentimiento ?? null) : c.consentimiento,
-    resultado: null
+    consentimiento: c.consentimiento ?? null,
+    resultado: null,
+    seguimientos: []
   };
   s.derivaciones.push(derivacion);
   const atencion = s.atenciones.get(c.idContexto);
@@ -364,13 +383,13 @@ const crearRutaExterna = (p: PeticionMock, s: AlmaMockStore): RespuestaMock => {
   const c = p.cuerpo ?? {};
   const fallo = verificarContexto(s, c.tipoContexto, c.idContexto);
   if (fallo) return fallo;
-  const entidades = s.catalogos.get('rutas-externas') ?? [];
+  const entidades = [...(s.catalogos.get('rutas-externas') ?? []), ...(s.catalogos.get('rutas-externas-aph') ?? [])];
   const faltantes: Record<string, string> = {};
   if (!entidades.some((e) => e.codigo === c.entidad)) faltantes['entidad'] = 'Seleccione la entidad.';
-  if (!minimoNota(c.motivo, 5)) faltantes['motivo'] = 'Escriba el motivo de la activación.';
+  if (!DESTINOS_SIN_DERIVACION.includes(c.entidad) && !minimoNota(c.motivo, 5)) faltantes['motivo'] = 'Escriba el motivo de la activación.';
   if (!c.fechaActivacion) faltantes['fechaActivacion'] = 'Indique cuándo se activó la ruta.';
   if (Object.keys(faltantes).length) return validacion(faltantes);
-  if (c.peligroInminente !== true && !consentimientoValido(c.consentimiento)) {
+  if (!DESTINOS_SIN_DERIVACION.includes(c.entidad) && c.peligroInminente !== true && !consentimientoValido(c.consentimiento)) {
     return errorMock(422, 'CONSENTIMIENTO_REQUERIDO', 'No se puede activar la ruta sin consentimiento informado.');
   }
   const ruta: RutaExternaDto = {
@@ -379,12 +398,13 @@ const crearRutaExterna = (p: PeticionMock, s: AlmaMockStore): RespuestaMock => {
     tipoContexto: c.tipoContexto,
     idContexto: c.idContexto,
     entidad: c.entidad,
-    motivo: c.motivo.trim(),
+    motivo: typeof c.motivo === 'string' && c.motivo.trim() ? c.motivo.trim() : 'Sin derivación',
     fechaActivacion: c.fechaActivacion,
     estado: 'ACTIVADA',
     resultado: null,
     peligroInminente: c.peligroInminente === true,
-    consentimiento: c.consentimiento ?? null
+    consentimiento: c.consentimiento ?? null,
+    seguimientos: []
   };
   s.rutasExternas.push(ruta);
   const atencion = s.atenciones.get(c.idContexto);
@@ -423,6 +443,130 @@ const listarRutasExternas = (p: PeticionMock, s: AlmaMockStore): RespuestaMock =
   const tipo = p.query.get('tipoContexto');
   const id = p.query.get('idContexto');
   return ok(s.rutasExternas.filter((r) => r.tipoContexto === tipo && r.idContexto === id));
+};
+
+/** Valida el cuerpo de un seguimiento de remisión: novedad con texto y fecha y hora que no sea futura. */
+function validarSeguimiento(c: any, s: AlmaMockStore): Record<string, string> {
+  const faltantes: Record<string, string> = {};
+  if (!minimoNota(c.novedad, 5)) faltantes['novedad'] = 'Describa la novedad (mínimo 5 caracteres).';
+  const momento = typeof c.fechaHora === 'string' ? Date.parse(c.fechaHora) : NaN;
+  if (Number.isNaN(momento)) faltantes['fechaHora'] = 'Indique la fecha y la hora de la novedad.';
+  else if (momento > s.ahora().getTime() + 60_000) faltantes['fechaHora'] = 'La fecha y la hora no pueden ser futuras.';
+  return faltantes;
+}
+
+function nuevoSeguimiento(c: any, s: AlmaMockStore, usuario: string): SeguimientoRemisionDto {
+  return {
+    idSeguimiento: s.siguienteId('SEG'),
+    fechaHora: new Date(c.fechaHora).toISOString(),
+    novedad: c.novedad.trim(),
+    autor: usuario
+  };
+}
+
+const crearSeguimientoDerivacion = (p: PeticionMock, s: AlmaMockStore): RespuestaMock => {
+  const derivacion = s.derivaciones.find((d) => d.idDerivacion === p.parametros[0]);
+  if (!derivacion) return errorMock(404, 'DERIVACION_NO_ENCONTRADA', 'No encontramos la derivación solicitada.');
+  const c = p.cuerpo ?? {};
+  const faltantes = validarSeguimiento(c, s);
+  if (Object.keys(faltantes).length) return validacion(faltantes);
+  const seguimiento = nuevoSeguimiento(c, s, p.usuario);
+  const actualizada: DerivacionInternaDto = { ...derivacion, seguimientos: [...(derivacion.seguimientos ?? []), seguimiento] };
+  s.derivaciones = s.derivaciones.map((d) => (d.idDerivacion === derivacion.idDerivacion ? actualizada : d));
+  const atencion = s.atenciones.get(derivacion.idContexto);
+  if (atencion) {
+    s.atenciones.set(atencion.idAtencion, {
+      ...atencion,
+      derivaciones: atencion.derivaciones.map((d) => (d.idDerivacion === derivacion.idDerivacion ? actualizada : d))
+    });
+  }
+  s.registrarAuditoria(derivacion.tipoContexto, derivacion.idContexto, p.usuario, 'ACTUALIZACION', `Novedad en la derivación a ${derivacion.destino}.`);
+  return ok(actualizada, 201);
+};
+
+const cerrarDerivacionInterna = (p: PeticionMock, s: AlmaMockStore): RespuestaMock => {
+  const derivacion = s.derivaciones.find((d) => d.idDerivacion === p.parametros[0]);
+  if (!derivacion) return errorMock(404, 'DERIVACION_NO_ENCONTRADA', 'No encontramos la derivación solicitada.');
+  const c = p.cuerpo ?? {};
+  const version = derivacion.version ?? 1;
+  if ((c.version ?? 1) !== version) {
+    return errorMock(409, 'CONFLICTO_VERSION', 'La derivación cambió desde que la abrió.', { versionActual: version });
+  }
+  if (derivacion.estado === 'CERRADA') return errorMock(422, 'RUTA_CERRADA', 'La derivación ya está cerrada.');
+  if (c.estado !== 'CERRADA') return validacion({ estado: 'Solo se puede cerrar la derivación.' });
+  if (!minimoNota(c.resultado, 3) || c.resultado.length > 500) return validacion({ resultado: 'Registre el resultado para cerrar la derivación (de 3 a 500 caracteres).' });
+  const actualizada: DerivacionInternaDto = { ...derivacion, version: version + 1, estado: 'CERRADA', resultado: c.resultado.trim() };
+  s.derivaciones = s.derivaciones.map((d) => (d.idDerivacion === derivacion.idDerivacion ? actualizada : d));
+  const atencion = s.atenciones.get(derivacion.idContexto);
+  if (atencion) {
+    s.atenciones.set(atencion.idAtencion, {
+      ...atencion,
+      derivaciones: atencion.derivaciones.map((d) => (d.idDerivacion === derivacion.idDerivacion ? actualizada : d))
+    });
+  }
+  s.registrarAuditoria(derivacion.tipoContexto, derivacion.idContexto, p.usuario, 'ACTUALIZACION', `Derivación a ${derivacion.destino} cerrada.`);
+  return ok(actualizada);
+};
+
+const crearSeguimientoRuta = (p: PeticionMock, s: AlmaMockStore): RespuestaMock => {
+  const ruta = s.rutasExternas.find((r) => r.idRuta === p.parametros[0]);
+  if (!ruta) return errorMock(404, 'RUTA_NO_ENCONTRADA', 'No encontramos la ruta solicitada.');
+  const c = p.cuerpo ?? {};
+  const faltantes = validarSeguimiento(c, s);
+  if (Object.keys(faltantes).length) return validacion(faltantes);
+  const seguimiento = nuevoSeguimiento(c, s, p.usuario);
+  const actualizada: RutaExternaDto = { ...ruta, seguimientos: [...(ruta.seguimientos ?? []), seguimiento] };
+  s.rutasExternas = s.rutasExternas.map((r) => (r.idRuta === ruta.idRuta ? actualizada : r));
+  const atencion = s.atenciones.get(ruta.idContexto);
+  if (atencion) {
+    s.atenciones.set(atencion.idAtencion, {
+      ...atencion,
+      rutasExternas: atencion.rutasExternas.map((r) => (r.idRuta === ruta.idRuta ? actualizada : r))
+    });
+  }
+  s.registrarAuditoria(ruta.tipoContexto, ruta.idContexto, p.usuario, 'ACTUALIZACION', `Novedad en la ruta ${ruta.entidad}.`);
+  return ok(actualizada, 201);
+};
+
+// ───────────────────────── evidencias ─────────────────────────
+
+const MAX_EVIDENCIAS = 5;
+
+const adjuntarEvidencias = (p: PeticionMock, s: AlmaMockStore): RespuestaMock => {
+  const atencion = buscar(s, p.parametros[0]);
+  if (esRespuesta(atencion)) return atencion;
+  if (!ESTADOS_EDITABLES_APH.includes(atencion.estado)) {
+    return errorMock(422, 'ATENCION_NO_EDITABLE', 'La atención ya no se puede modificar.', { estado: atencion.estado });
+  }
+  const archivos: File[] = p.cuerpo instanceof FormData ? (p.cuerpo.getAll('evidencias') as File[]) : [];
+  if (!archivos.length) return validacion({ evidencias: 'Seleccione al menos un archivo.' });
+  if ((atencion.evidencias ?? []).length + archivos.length > MAX_EVIDENCIAS) {
+    return validacion({ evidencias: `Una atención admite hasta ${MAX_EVIDENCIAS} archivos.` });
+  }
+  const ahora = s.ahora().toISOString();
+  const nuevas = archivos.map((a) => ({
+    idEvidencia: s.siguienteId('EVI'),
+    nombre: a.name,
+    tipo: a.type,
+    tamanoBytes: a.size,
+    fechaRegistro: ahora
+  }));
+  const nueva = guardarVersion(s, atencion, { evidencias: [...(atencion.evidencias ?? []), ...nuevas] });
+  s.registrarAuditoria('ATENCION_APH', nueva.idAtencion, p.usuario, 'ACTUALIZACION', `Se adjuntaron ${nuevas.length} archivo(s).`);
+  return ok(aVista(nueva), 201);
+};
+
+const quitarEvidencia = (p: PeticionMock, s: AlmaMockStore): RespuestaMock => {
+  const atencion = buscar(s, p.parametros[0]);
+  if (esRespuesta(atencion)) return atencion;
+  if (!ESTADOS_EDITABLES_APH.includes(atencion.estado)) {
+    return errorMock(422, 'ATENCION_NO_EDITABLE', 'La atención ya no se puede modificar.', { estado: atencion.estado });
+  }
+  if (!(atencion.evidencias ?? []).some((e) => e.idEvidencia === p.parametros[1])) {
+    return errorMock(404, 'EVIDENCIA_NO_ENCONTRADA', 'No encontramos ese archivo.');
+  }
+  const nueva = guardarVersion(s, atencion, { evidencias: (atencion.evidencias ?? []).filter((e) => e.idEvidencia !== p.parametros[1]) });
+  return ok(aVista(nueva));
 };
 
 // ───────────────────────── bandeja ─────────────────────────
@@ -548,6 +692,11 @@ export const RUTAS_MOCK_APH: readonly RutaMock[] = [
   { metodo: 'POST', patron: /^\/rutas-externas$/, grupo: 'derivaciones', manejador: crearRutaExterna },
   { metodo: 'GET', patron: /^\/rutas-externas$/, grupo: 'derivaciones', manejador: listarRutasExternas },
   { metodo: 'PATCH', patron: /^\/rutas-externas\/([\w-]+)$/, grupo: 'derivaciones', manejador: actualizarRutaExterna },
+  { metodo: 'POST', patron: /^\/derivaciones\/internas\/([\w-]+)\/seguimientos$/, grupo: 'derivaciones', manejador: crearSeguimientoDerivacion },
+  { metodo: 'PATCH', patron: /^\/derivaciones\/internas\/([\w-]+)$/, grupo: 'derivaciones', manejador: cerrarDerivacionInterna },
+  { metodo: 'POST', patron: /^\/rutas-externas\/([\w-]+)\/seguimientos$/, grupo: 'derivaciones', manejador: crearSeguimientoRuta },
+  { metodo: 'POST', patron: /^\/atenciones-aph\/([\w-]+)\/evidencias$/, grupo: 'atencionesAph', manejador: adjuntarEvidencias },
+  { metodo: 'DELETE', patron: /^\/atenciones-aph\/([\w-]+)\/evidencias\/([\w-]+)$/, grupo: 'atencionesAph', manejador: quitarEvidencia },
   { metodo: 'GET', patron: /^\/bandeja\/aph$/, grupo: 'bandejaAph', manejador: listarBandejaAph },
   { metodo: 'POST', patron: /^\/bandeja\/aph\/([\w-]+)\/tomar$/, grupo: 'bandejaAph', manejador: tomarRemision },
   { metodo: 'POST', patron: /^\/contenciones-post-cierre$/, grupo: 'contenciones', manejador: crearContencion },
